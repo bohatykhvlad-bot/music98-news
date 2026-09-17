@@ -65,10 +65,28 @@ main{position:relative;z-index:1}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .tab-head{margin-bottom:22px;--head:clamp(26px,4vw,38px)}
-.tab-head h1{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-size:var(--head);line-height:1;letter-spacing:-.03em}
-.tab-head .tab-title{line-height:1;display:block}
-.tab-head .tab-bar{width:4px;height:1.22em;border-radius:2px;background:var(--accent);flex:none}
-.tab-head .sub{margin:0;color:var(--muted);font-size:15px;font-weight:400;letter-spacing:0;line-height:1;display:block}
+.tab-head h1{
+  margin:0;
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:center;
+  gap:12px;
+  height:1.22em;
+  font-size:var(--head);
+  line-height:1;
+  letter-spacing:-.03em;
+}
+.tab-head .tab-title,
+.tab-head .sub,
+.tab-head .tab-bar{
+  display:flex;
+  align-items:center;
+  height:100%;
+  margin:0;
+}
+.tab-head .tab-title{font-size:var(--head);line-height:1;flex:none}
+.tab-head .tab-bar{width:4px;height:100%;border-radius:2px;background:var(--accent);flex:none;align-self:center}
+.tab-head .sub{color:var(--muted);font-size:15px;font-weight:400;letter-spacing:0;line-height:1;flex:none}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative}
@@ -320,7 +338,8 @@ textarea{resize:vertical;min-height:64px}
   .tab{padding-top:14px}
   .tab.rise{animation:none}
   .tab-head{margin-bottom:14px;--head:26px}
-  .tab-head h1{font-size:26px;gap:10px;flex-wrap:wrap;align-items:center}
+  .tab-head h1{font-size:26px;height:1.22em;gap:10px;flex-wrap:nowrap;align-items:center}
+  .tab-head .tab-title,.tab-head .sub,.tab-head .tab-bar{height:100%;align-items:center}
   .tab-head .sub{font-size:14px}
   body{padding-top:calc(var(--header-h, 148px) + 8px)}
   .hero .body{padding:16px}
