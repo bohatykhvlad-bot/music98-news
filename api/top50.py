@@ -24,13 +24,14 @@ from pathlib import Path
 
 SIZE = 50
 LAUNCH = date(2026, 9, 17)
-TENURE_PATH = Path(__file__).resolve().parents[1] / "data" / "chart-tenure.json"
+ROOT = Path(__file__).resolve().parents[1]
+PUBLIC = ROOT / "public"
+TENURE_PATH = PUBLIC / "data" / "chart-tenure.json"
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 )
 CTX = ssl.create_default_context()
-ROOT = Path(__file__).resolve().parents[1]
 
 TITLE_ALIASES = {
     "iknewitiknewyoufromtoystory5": "iknewitiknewyou",
@@ -504,12 +505,12 @@ def js_obj(track: dict, weeks: int, delta: str) -> str:
 
 
 def write_static(payload: dict) -> None:
-    out_dir = ROOT / "data"
+    out_dir = PUBLIC / "data"
     out_dir.mkdir(exist_ok=True)
     (out_dir / "top50.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    index = ROOT / "index.html"
+    index = PUBLIC / "index.html"
     html = index.read_text(encoding="utf-8")
     items = []
     for i, track in enumerate(payload["tracks"], 1):

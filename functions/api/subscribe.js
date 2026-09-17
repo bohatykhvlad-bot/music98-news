@@ -15,7 +15,7 @@ export async function onRequestPost({ request, env }) {
     if (String(e.message) === "kv_missing") {
       return json({
         error: "kv_missing",
-        hint: "Create a KV namespace, then bind it to this Pages project as DESK.",
+          hint: "Create a KV namespace, then bind it to this Worker as DESK.",
       }, 503);
     }
     throw e;

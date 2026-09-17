@@ -12,8 +12,9 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+PUBLIC = ROOT / "public"
 API = runpy.run_path(str(ROOT / "api" / "top50.py"))
-DESK = ROOT / "data" / "desk.json"
+DESK = PUBLIC / "data" / "desk.json"
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
@@ -60,7 +61,7 @@ def json_bytes(obj, status=200):
 
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=str(ROOT), **kwargs)
+        super().__init__(*args, directory=str(PUBLIC), **kwargs)
 
     def _send(self, status, body, content_type="application/json; charset=utf-8"):
         self.send_response(status)

@@ -15,21 +15,21 @@ Password is `ADMIN_PASSWORD` in `.env` (default `music98`). Change it before you
 
 ## Netlify
 
-The public site is static HTML. On Netlify, keep **Build command empty** and **Publish directory** `.`. Do not set Functions directory to `functions/` — that folder is Cloudflare Pages. Use `netlify/functions` (empty). The homepage still loads `data/top50.json` if `/api/top50` is missing.
+The public site is static HTML. On Netlify, keep **Build command empty** and **Publish directory** `public`. Do not set Functions directory to `functions/` — that folder is Cloudflare Workers. Use `netlify/functions` (empty). The homepage still loads `data/top50.json` if `/api/top50` is missing.
 
 ## Cloudflare
 
-Do not upload a zip. Use **Cloudflare Pages connected to GitHub** so the `functions/` API (chart, desk, subscribe) actually runs.
+Do not upload a zip. Connect **Workers & Pages** to GitHub and deploy with `npx wrangler deploy` (this repo already has `worker.js` + `wrangler.toml`).
 
 Russian click-by-click: see **КАК-ЗАЛИТЬ.md**.
 
 Short version:
 
-1. [Sign up](https://dash.cloudflare.com/sign-up) → [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → **Create** → **Pages** → **Connect to Git**.
-2. Framework preset **None**, empty build command, output `/`.
+1. [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → open **music98-news**.
+2. If a build is red: **Retry build**. After it turns green, open the `*.workers.dev` link.
 3. Create a [KV namespace](https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces), then in the project: **Settings → Bindings → Add → KV namespace**. Variable name must be `DESK`.
 4. **Settings → Variables and Secrets**: `ADMIN_PASSWORD` (encrypt). Retry the deployment.
-5. Desk URL: `https://YOUR-PROJECT.pages.dev/m98desk.html` (not linked on the public site).
+5. Desk URL: `https://YOUR-PROJECT.workers.dev/m98desk.html` (not linked on the public site).
 
 `/api/top50` rebuilds on the first visit of the day and stores the result in KV. If that times out, the baked `data/top50.json` is served.
 

@@ -1,6 +1,6 @@
 # Static site. Cloudflare's /functions folder is NOT Netlify Functions.
 [build]
-  publish = "."
+  publish = "public"
   command = "true"
 
 [functions]
