@@ -13,6 +13,13 @@ export default {
     if (path === "/api/subscribe" && request.method === "POST") return subscribe(c);
     if (path === "/api/subscribers" && request.method === "GET") return subscribers(c);
     if (path === "/api/broadcast" && request.method === "POST") return broadcast(c);
-    return env.ASSETS.fetch(request);
+    const res = await env.ASSETS.fetch(request);
+    const type = (res.headers.get("content-type") || "").toLowerCase();
+    if (type.includes("text/html")) {
+      const headers = new Headers(res.headers);
+      headers.set("Cache-Control", "no-store, max-age=0");
+      return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+    }
+    return res;
   },
 };

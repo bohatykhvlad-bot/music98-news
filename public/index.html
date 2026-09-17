@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
+<meta name="m98-build" content="head-cross-2">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -71,22 +72,41 @@ main{position:relative;z-index:1}
   flex-wrap:nowrap;
   align-items:center;
   gap:12px;
-  height:1.22em;
   font-size:var(--head);
   line-height:1;
   letter-spacing:-.03em;
 }
-.tab-head .tab-title,
-.tab-head .sub,
-.tab-head .tab-bar{
+.tab-head .tab-title{
+  flex:none;
+  font-size:var(--head);
+  line-height:.73em;
+  height:.73em;
   display:flex;
   align-items:center;
-  height:100%;
-  margin:0;
 }
-.tab-head .tab-title{font-size:var(--head);line-height:1;flex:none}
-.tab-head .tab-bar{width:4px;height:100%;border-radius:2px;background:var(--accent);flex:none;align-self:center}
-.tab-head .sub{color:var(--muted);font-size:15px;font-weight:400;letter-spacing:0;line-height:1;flex:none}
+.tab-head .tab-bar{
+  flex:none;
+  width:4px;
+  height:1.22em;
+  border-radius:2px;
+  background:var(--accent);
+}
+.tab-head .sub{
+  flex:none;
+  margin:0;
+  color:var(--muted);
+  font-size:15px;
+  font-weight:400;
+  letter-spacing:0;
+  line-height:.73em;
+  height:.73em;
+  display:flex;
+  align-items:center;
+}
+@supports (height:1cap){
+  .tab-head .tab-title,
+  .tab-head .sub{line-height:1cap;height:1cap}
+}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative}
@@ -187,8 +207,8 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .flink{display:block;color:var(--muted);text-decoration:none;font-size:14px;padding:5px 0;transition:.15s}
 .flink:hover{color:var(--acc2)}
 .social .icons{display:flex;gap:10px;flex-wrap:wrap}
-.social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--muted);text-decoration:none}
-.social a:active{color:var(--acc2);border-color:var(--accent)}
+.social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--acc2);text-decoration:none}
+.social a:active{border-color:var(--accent)}
 .social svg{width:18px;height:18px}
 .foot-col .copy{margin:16px 0 0;color:var(--muted2);font-size:12.5px}
 
@@ -338,8 +358,7 @@ textarea{resize:vertical;min-height:64px}
   .tab{padding-top:14px}
   .tab.rise{animation:none}
   .tab-head{margin-bottom:14px;--head:26px}
-  .tab-head h1{font-size:26px;height:1.22em;gap:10px;flex-wrap:nowrap;align-items:center}
-  .tab-head .tab-title,.tab-head .sub,.tab-head .tab-bar{height:100%;align-items:center}
+  .tab-head h1{font-size:26px;gap:10px;flex-wrap:nowrap;align-items:center;height:auto}
   .tab-head .sub{font-size:14px}
   body{padding-top:calc(var(--header-h, 148px) + 8px)}
   .hero .body{padding:16px}
