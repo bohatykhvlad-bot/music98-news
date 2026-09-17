@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="card-press-1">
+<meta name="m98-build" content="search-cyan-2">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -49,7 +49,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .top-actions{display:flex;align-items:center;gap:10px;justify-self:end}
 .search{position:relative;width:230px;height:40px}
 .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted2);pointer-events:none}
-.search input{height:40px;padding-left:33px;border-radius:999px;background:rgba(255,255,255,.7);border-color:var(--line);color:var(--text)}
+.search input{height:40px;padding-left:33px;border-radius:999px;background:rgba(255,255,255,.7);border:1px solid var(--line);color:var(--text);outline:none;-webkit-appearance:none;appearance:none;box-shadow:none}
+.search input::-webkit-search-decoration,
+.search input::-webkit-search-cancel-button,
+.search input::-webkit-search-results-button,
+.search input::-webkit-search-results-decoration{-webkit-appearance:none;appearance:none;display:none}
+.search input:focus,
+.search input:focus-visible,
+.search.on input{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent)}
 .topbar ::placeholder{color:var(--muted2);opacity:1}
 .search-hints{max-width:1180px;margin:0 auto;padding:0 20px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--text)}
 .hint-chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:999px;padding:5px 11px;cursor:pointer;color:var(--text);font-size:12.5px;line-height:1}
@@ -347,11 +354,14 @@ textarea{resize:vertical;min-height:64px}
   .brand{height:36px}
   .brand-logo{width:32px;height:32px}
   .brand-name{font-size:17px}
-  .top-actions{flex:1;min-width:0}
+  .top-actions{flex:1;min-width:0;overflow:visible}
   .nav{order:3;width:100%;height:40px;gap:4px;padding:4px;justify-content:stretch;background:rgba(255,255,255,.5);border:1px solid rgba(15,60,64,.14);backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%)}
   .nav-btn{flex:1;height:32px;padding:0 8px;font-size:13px;justify-content:center}
-  .search{width:auto;flex:1;height:36px}
-  .search input{height:36px;background:rgba(255,255,255,.7)}
+  .search{width:auto;flex:1;height:36px;overflow:visible}
+  .search input{height:36px;background:rgba(255,255,255,.7);-webkit-appearance:none;appearance:none}
+  .search input:focus,
+  .search input:focus-visible,
+  .search.on input{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent)}
   .foot-in{grid-template-columns:1fr}
   .tab{padding-top:14px}
   .tab.rise{animation:none}
@@ -412,7 +422,7 @@ textarea{resize:vertical;min-height:64px}
     <div class="top-actions">
       <div class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="search" type="search" placeholder="Search" autocomplete="off">
+        <input id="search" type="search" placeholder="Search" autocomplete="off" enterkeyhint="search" spellcheck="false">
       </div>
     </div>
   </div>
@@ -1267,6 +1277,14 @@ $("#search").addEventListener("input", e=>{
   query = e.target.value.trim().toLowerCase();
   renderNews(); renderReleases(); renderCharts(); renderHints();
 });
+(function(){
+  const inp = $("#search");
+  const wrap = inp && inp.closest(".search");
+  if(!inp || !wrap) return;
+  const sync = ()=> wrap.classList.toggle("on", document.activeElement === inp);
+  inp.addEventListener("focus", sync);
+  inp.addEventListener("blur", sync);
+})();
 document.addEventListener("keydown", e=>{
   if(e.key==="/" && document.activeElement.tagName!=="INPUT" && document.activeElement.tagName!=="TEXTAREA"){ e.preventDefault(); $("#search").focus(); }
   if(e.key==="Escape"){ closePrivacy(); }
