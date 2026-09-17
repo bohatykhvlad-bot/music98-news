@@ -372,7 +372,7 @@ textarea{resize:vertical;min-height:64px}
     <div class="top-actions">
       <div class="search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input id="search" type="search" placeholder="Search: artist, album, track…" autocomplete="off">
+        <input id="search" type="search" placeholder="Search" autocomplete="off">
       </div>
     </div>
   </div>
@@ -1350,6 +1350,8 @@ function onScroll(){
 function syncHeaderPad(){
   if(!topbar) return;
   document.documentElement.style.setProperty("--header-h", Math.ceil(topbar.getBoundingClientRect().height)+"px");
+  const q = $("#search");
+  if(q) q.placeholder = window.matchMedia("(max-width: 640px)").matches ? "Search" : "Search: artist, album, track…";
 }
 window.addEventListener("scroll", onScroll, {passive:true});
 window.addEventListener("resize", syncHeaderPad);
