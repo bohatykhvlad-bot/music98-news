@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="chart-pos-1">
+<meta name="m98-build" content="head-cross-2">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -72,41 +72,47 @@ main{position:relative;z-index:1}
 .tab.active{display:block}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
-.tab-head{margin-bottom:22px;--head:clamp(26px,4vw,38px)}
-.tab-head h1{
-  margin:0;
+.tab-head{
+  --head:clamp(26px,4vw,38px);
+  --sub:15px;
   display:flex;
+  flex-direction:row;
   flex-wrap:nowrap;
   align-items:center;
   gap:12px;
-  font-size:var(--head);
-  line-height:1;
-  letter-spacing:-.03em;
+  margin:0 0 22px;
+  min-height:var(--head);
 }
 .tab-head .tab-title{
+  margin:0;
   flex:none;
   font-size:var(--head);
-  line-height:1;
+  font-weight:800;
+  letter-spacing:-.03em;
+  line-height:var(--head);
+  height:var(--head);
+  display:flex;
+  align-items:center;
 }
 .tab-head .tab-bar{
   flex:none;
   width:4px;
-  height:1.22em;
+  height:calc(var(--head) * 1.22);
   border-radius:2px;
   background:var(--accent);
+  align-self:center;
 }
 .tab-head .sub{
-  flex:none;
   margin:0;
+  flex:none;
   color:var(--muted);
-  font-size:15px;
+  font-size:var(--sub);
   font-weight:400;
   letter-spacing:0;
-  line-height:1;
-}
-@supports (text-box-trim:both){
-  .tab-head .tab-title,
-  .tab-head .sub{text-box-trim:both;text-box-edge:cap alphabetic}
+  line-height:var(--head);
+  height:var(--head);
+  display:flex;
+  align-items:center;
 }
 
 /* hero */
@@ -116,13 +122,13 @@ main{position:relative;z-index:1}
 .hero .body{padding:28px 30px;display:flex;flex-direction:column;gap:12px}
 .hero h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.22;letter-spacing:-.02em}
 .hero p{margin:0;color:var(--muted);font-size:15px}
-.hero:active{border-color:var(--accent)}
+.hero:active,.hero:focus,.hero:focus-visible{border-color:var(--line);outline:none;box-shadow:none}
 
 /* cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px}
 a.card,a.hero{color:inherit;text-decoration:none}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:border-color .15s ease,box-shadow .2s ease,transform .2s ease;display:flex;flex-direction:column;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
-.card:active{border-color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;display:flex;flex-direction:column;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
+.card:active,.card:focus,.card:focus-visible{border-color:var(--line);outline:none;box-shadow:none;transform:none}
 .card .cover{position:relative;aspect-ratio:1/1;overflow:hidden;background:var(--card2)}
 .card .cover img{width:100%;height:100%;object-fit:cover;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
 .card.square .cover{aspect-ratio:1/1}
@@ -291,8 +297,8 @@ textarea{resize:vertical;min-height:64px}
 .related h2{margin:0 0 4px;font-size:22px;letter-spacing:-.02em}
 .related .rel-sub{margin:0 0 16px;color:var(--muted);font-size:13.5px}
 .rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
-.rcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .15s ease;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
-.rcard:active{border-color:var(--accent)}
+.rcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
+.rcard:active,.rcard:focus,.rcard:focus-visible{border-color:var(--line);outline:none;box-shadow:none}
 .rcard .rcover{aspect-ratio:16/9;overflow:hidden;background:var(--card2)}
 .rcard .rcover img{width:100%;height:100%;object-fit:cover;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
 .rcard .rbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
@@ -345,7 +351,7 @@ textarea{resize:vertical;min-height:64px}
   .chart-row.playing .rplay:hover,.chart-row.playing .rplay:active{background:var(--accent);color:#03282b;border-color:transparent}
   .card:hover,.hero:hover,.rcard:hover{transform:none;border-color:var(--line);box-shadow:none}
   .card:hover .cover img{transform:none}
-  .card:active,.hero:active,.rcard:active{border-color:var(--accent)}
+  .card:active,.hero:active,.rcard:active{border-color:var(--line);transform:none;box-shadow:none}
 }
 @media (max-width:640px){
   .wrap{padding:0 16px}
@@ -365,9 +371,7 @@ textarea{resize:vertical;min-height:64px}
   .foot-in{grid-template-columns:1fr}
   .tab{padding-top:14px}
   .tab.rise{animation:none}
-  .tab-head{margin-bottom:14px;--head:26px}
-  .tab-head h1{font-size:26px;gap:10px;flex-wrap:nowrap;align-items:center}
-  .tab-head .sub{font-size:14px}
+  .tab-head{margin-bottom:14px;--head:26px;--sub:14px;gap:10px}
   body{padding-top:calc(var(--header-h, 148px) + 8px)}
   .hero .body{padding:16px}
   .sub-in{padding:32px 16px}
@@ -435,20 +439,20 @@ textarea{resize:vertical;min-height:64px}
 
 <main class="wrap">
   <section class="tab active" id="tab-news">
-    <div class="tab-head"><h1><span class="tab-title">News</span><span class="tab-bar" aria-hidden="true"></span><span class="sub">Latest stories</span></h1></div>
+    <div class="tab-head"><h1 class="tab-title">News</h1><span class="tab-bar" aria-hidden="true"></span><p class="sub">Latest stories</p></div>
     <div id="heroSlot"></div>
     <div class="grid" id="newsGrid"></div>
     <div class="empty" id="newsEmpty" hidden>Nothing found for your query. Try another search.</div>
   </section>
 
   <section class="tab" id="tab-releases">
-    <div class="tab-head"><h1><span class="tab-title">Releases</span><span class="tab-bar" aria-hidden="true"></span><span class="sub">Albums, EPs and singles</span></h1></div>
+    <div class="tab-head"><h1 class="tab-title">Releases</h1><span class="tab-bar" aria-hidden="true"></span><p class="sub">Albums, EPs and singles</p></div>
     <div class="grid" id="relGrid"></div>
     <div class="empty" id="relEmpty" hidden>Nothing found for your query.</div>
   </section>
 
   <section class="tab" id="tab-charts">
-    <div class="tab-head"><h1><span class="tab-title">Charts</span><span class="tab-bar" aria-hidden="true"></span><span class="sub">Daily Top 50</span></h1></div>
+    <div class="tab-head"><h1 class="tab-title">Charts</h1><span class="tab-bar" aria-hidden="true"></span><p class="sub">Daily Top 50</p></div>
     <div class="chart-switch" id="chartSwitch" hidden></div>
     <div class="chart" id="chartList" role="list"></div>
     <p class="chart-note" id="chartStatus" hidden></p>
@@ -1217,38 +1221,6 @@ function renderHints(){
 function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHints(); updateStorageInfo(); }
 
 /* ============ tabs & search events ============ */
-function glyphMid(el){
-  if(!el) return 0;
-  if(!el.textContent || !String(el.textContent).trim()){
-    const b = el.getBoundingClientRect();
-    return b.top + b.height/2;
-  }
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  const rects = [...range.getClientRects()].filter(r => r.width > 0 && r.height > 0);
-  try{ range.detach(); }catch(e){}
-  if(!rects.length){
-    const b = el.getBoundingClientRect();
-    return b.top + b.height/2;
-  }
-  const top = Math.min(...rects.map(r => r.top));
-  const bottom = Math.max(...rects.map(r => r.bottom));
-  return (top + bottom) / 2;
-}
-function alignTabHeads(){
-  $$(".tab-head h1").forEach(h=>{
-    if(!h.getClientRects().length) return;
-    const title = h.querySelector(".tab-title");
-    const sub = h.querySelector(".sub");
-    const bar = h.querySelector(".tab-bar");
-    if(!title || !sub || !bar) return;
-    sub.style.transform = "none";
-    bar.style.transform = "none";
-    const target = glyphMid(title);
-    sub.style.transform = "translateY(" + (target - glyphMid(sub)).toFixed(2) + "px)";
-    bar.style.transform = "translateY(" + (target - glyphMid(bar)).toFixed(2) + "px)";
-  });
-}
 function setTab(t){
   if(!$("#articlePage").hidden){           /* leave the article page first, then switch */
     hideArticle();
@@ -1262,7 +1234,6 @@ function setTab(t){
     s.classList.toggle("rise", on);
   });
   window.scrollTo(0, 0);
-  requestAnimationFrame(alignTabHeads);
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
@@ -1664,9 +1635,6 @@ $("#es_reset").addEventListener("click", ()=>{
 
 /* ---- init ---- */
 S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); loadPublishedDesk(); route();
-requestAnimationFrame(alignTabHeads);
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>requestAnimationFrame(alignTabHeads));
-window.addEventListener("resize", ()=>{ requestAnimationFrame(alignTabHeads); }, {passive:true});
 </script>
 </body>
 </html>
