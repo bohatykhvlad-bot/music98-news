@@ -27,9 +27,9 @@ Short version:
 
 1. [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → open **music98-news**.
 2. If a build is red: **Retry build**. After it turns green, open the `*.workers.dev` link.
-3. Create a [KV namespace](https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces), then in the project: **Settings → Bindings → Add → KV namespace**. Variable name must be `DESK`.
-4. **Settings → Variables and Secrets**: `ADMIN_PASSWORD` (encrypt). Retry the deployment.
-5. Desk URL: `https://YOUR-PROJECT.workers.dev/m98desk.html` (not linked on the public site).
+3. Live site: `https://music98-news.bohatykhvlad.workers.dev`
+4. Desk URL: `https://music98-news.bohatykhvlad.workers.dev/m98desk.html` (not linked on the public site). Password defaults to `music98` until you set `ADMIN_PASSWORD`.
+5. KV namespace `DESK` is provisioned from `wrangler.toml` on deploy.
 
 `/api/top50` rebuilds on the first visit of the day and stores the result in KV. If that times out, the baked `data/top50.json` is served.
 

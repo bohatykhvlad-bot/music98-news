@@ -1,12 +1,14 @@
 name = "music98-news"
 main = "worker.js"
 compatibility_date = "2026-09-17"
-
-# Bind KV in the Cloudflare dashboard after the first successful deploy:
-# Settings → Bindings → Add → KV namespace → Variable name DESK
+keep_vars = true
 
 [assets]
 directory = "./public"
 binding = "ASSETS"
 run_worker_first = ["/api/*"]
 html_handling = "auto-trailing-slash"
+
+# Created automatically on Cloudflare Git deploy (no id needed).
+[[kv_namespaces]]
+binding = "DESK"
