@@ -1352,7 +1352,7 @@ function showArticle(p){
   listY = window.scrollY || document.documentElement.scrollTop || 0;
   const paras = (p.body||p.excerpt||"").split(/\n{2,}/).filter(Boolean);
   $("#articlePage").innerHTML = `
-    <a class="aback" href="#" id="aback">← Back to music98.news</a>
+    <a class="aback" href="#" id="aback">← Back</a>
     <div class="acover"><img src="${coverOf(p,false)}" alt=""></div>
     <span class="tag${p.type==="release"?" pink":""}" style="position:static;margin-top:14px">${esc(p.tag || (p.type==="release" ? (p.rtype||"Release") : "News"))}</span>
     <h1>${esc(p.artist && p.type==="release" ? p.artist+" — "+p.title : p.title)}</h1>
