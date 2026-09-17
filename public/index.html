@@ -329,26 +329,27 @@ textarea{resize:vertical;min-height:64px}
     --pw:auto;
     display:grid;
     grid-template-columns:28px 48px minmax(0,1fr);
-    grid-template-areas:"pos art names" "pos art play" ". . week";
+    grid-template-areas:"pos art names" "pos play extra" ". week week";
     gap:8px 10px;
     padding:14px 12px;
     align-items:center;
     transition:background .15s ease;
   }
   .chart-row .delta{display:none}
-  .pos{grid-area:pos;font-size:18px;padding-top:0;align-self:center}
-  .artwrap{grid-area:art;width:48px;height:48px;border-radius:10px;align-self:center}
-  .ctext{grid-area:names;align-self:center}
-  .cmid{grid-area:play;justify-self:start;align-self:center;width:auto;max-width:100%;border:1px solid transparent;background:none;padding:0;border-radius:999px;gap:6px;overflow:hidden}
-  .chart-row.playing .cmid{background:rgba(255,255,255,.85);border-color:rgba(15,60,64,.10);backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);padding:3px 6px 3px 3px}
-  .rplay{width:36px;height:36px}
+  .pos{grid-area:pos;font-size:18px;padding-top:0;align-self:start}
+  .artwrap{grid-area:art;width:48px;height:48px;border-radius:10px;align-self:start}
+  .ctext{grid-area:names;align-self:center;min-width:0}
+  .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
+  .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .rplay{grid-area:play;justify-self:center;align-self:center;width:36px;height:36px}
   .rplay svg{width:16px;height:16px}
-  .pextra{display:flex;align-items:center;gap:6px;width:0;max-width:0;opacity:0;overflow:hidden;transform:translateY(-10px);pointer-events:none;transition:max-width .35s cubic-bezier(.3,.65,.25,1),opacity .25s ease,transform .35s cubic-bezier(.3,.65,.25,1)}
-  .chart-row.playing .pextra{width:auto;max-width:240px;opacity:1;transform:none;pointer-events:auto}
-  .ptime{display:flex;padding:4px 8px;gap:6px}
-  .pbar{width:72px;height:6px}
-  .pdur{font-size:11px}
-  .abadge img{height:24px}
+  .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:0;opacity:0;overflow:hidden;transform:translateY(-12px);pointer-events:none;transition:height .32s ease,opacity .28s ease,transform .32s ease}
+  .chart-row.playing .pextra{height:36px;opacity:1;overflow:visible;transform:none;pointer-events:auto}
+  .ptime{display:flex;align-items:center;flex:1;min-width:0;padding:0;gap:8px;background:none;border:0;border-radius:0}
+  .pbar{flex:1;min-width:40px;width:auto;max-width:none;height:6px}
+  .pdur{font-size:11px;flex:none}
+  .pextra .abadge{flex:none;min-width:0}
+  .abadge img{height:22px;width:auto;max-width:92px;display:block}
   .weeks{grid-area:week;text-align:left;justify-self:start;align-self:center;font-size:12px;white-space:nowrap;height:auto;display:block;padding-top:0}
   .cartist{white-space:normal;font-size:14px;line-height:1.25;word-break:normal;overflow-wrap:break-word}
   .ctext .ctrack{font-size:12.5px}
