@@ -13,6 +13,10 @@ Open http://127.0.0.1:43123
 Private desk (not linked on the public site): http://127.0.0.1:43123/m98desk.html  
 Password is `ADMIN_PASSWORD` in `.env` (default `music98`). Change it before you go live.
 
+## Netlify
+
+The public site is static HTML. On Netlify, keep **Build command empty** and **Publish directory** `.`. Do not set Functions directory to `functions/` — that folder is Cloudflare Pages. Use `netlify/functions` (empty). The homepage still loads `data/top50.json` if `/api/top50` is missing.
+
 ## Cloudflare
 
 Do not upload a zip. Use **Cloudflare Pages connected to GitHub** so the `functions/` API (chart, desk, subscribe) actually runs.

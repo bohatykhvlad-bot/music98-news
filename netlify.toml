@@ -1,0 +1,10 @@
+# Static site. Cloudflare's /functions folder is NOT Netlify Functions.
+[build]
+  publish = "."
+  command = "true"
+
+[functions]
+  directory = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
