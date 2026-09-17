@@ -1,10 +1,28 @@
 {
   "cleanUrls": true,
+  "crons": [
+    {
+      "path": "/api/top50",
+      "schedule": "0 7 * * *"
+    }
+  ],
   "headers": [
+    {
+      "source": "/api/top50",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=86400, stale-while-revalidate=3600"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
       ]
     }
   ]
