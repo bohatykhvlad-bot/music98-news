@@ -1,0 +1,11 @@
+{
+  "name": "music98-news",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.134.0"
+  }
+}
