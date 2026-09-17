@@ -318,6 +318,7 @@ textarea{resize:vertical;min-height:64px}
   .search input{height:36px;background:rgba(255,255,255,.7)}
   .foot-in{grid-template-columns:1fr}
   .tab{padding-top:14px}
+  .tab.rise{animation:none}
   .tab-head{margin-bottom:14px;--head:26px}
   .tab-head h1{font-size:26px;gap:10px;flex-wrap:wrap;align-items:center}
   .tab-head .sub{font-size:14px}
@@ -1322,14 +1323,27 @@ function showArticle(p){
     ${relatedHTML(p)}`;
   $("#articlePage").hidden = false;
   document.body.classList.add("articlepage");
-  window.scrollTo(0, 0);
+  jumpY(0);
   $("#aback").addEventListener("click", e=>{ e.preventDefault(); closeArticle(); });
 }
-function hideArticle(){ $("#articlePage").hidden = true; document.body.classList.remove("articlepage"); }
+function jumpY(y){
+  y = Math.max(0, y || 0);
+  const root = document.documentElement;
+  const prev = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  try{ window.scrollTo({ top:y, left:0, behavior:"instant" }); }
+  catch(e){ window.scrollTo(0, y); }
+  root.style.scrollBehavior = prev;
+}
+function hideArticle(){
+  $$(".tab").forEach(s => s.classList.remove("rise"));
+  $("#articlePage").hidden = true;
+  document.body.classList.remove("articlepage");
+}
 function closeArticle(){
   hideArticle();
   try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
-  window.scrollTo(0, listY);
+  jumpY(listY);
 }
 function route(){
   const m = location.hash.match(/^#post\/(.+)$/);
@@ -1338,7 +1352,7 @@ function route(){
     if(p){ showArticle(p); return; }
   }
   hideArticle();
-  window.scrollTo(0, listY);
+  jumpY(listY);
 }
 window.addEventListener("hashchange", route);
 
