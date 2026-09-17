@@ -26,7 +26,7 @@
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{scroll-behavior:smooth;scrollbar-gutter:stable;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:auto;scrollbar-gutter:stable;-webkit-tap-highlight-color:transparent}
 body{margin:0;padding-top:var(--header-h,70px);background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 img{display:block;max-width:100%}
 button{font-family:inherit;color:inherit}
@@ -61,7 +61,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 /* ---------- tabs / layout ---------- */
 main{position:relative;z-index:1}
 .tab{display:none;padding:20px 0 8px}
-.tab.active{display:block;animation:rise .28s ease both}
+.tab.active{display:block}
+.tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .tab-head{margin-bottom:22px}
 .tab-head h1{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-size:clamp(26px,4vw,38px);line-height:1;letter-spacing:-.03em}
@@ -1156,8 +1157,12 @@ function setTab(t){
   }
   activeTab = t;
   $$("#nav .nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===t));
-  $$(".tab").forEach(s=>s.classList.toggle("active", s.id==="tab-"+t));
-  window.scrollTo({top:0, behavior:"instant"});
+  $$(".tab").forEach(s=>{
+    const on = s.id==="tab-"+t;
+    s.classList.toggle("active", on);
+    s.classList.toggle("rise", on);
+  });
+  window.scrollTo(0, 0);
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
@@ -1284,7 +1289,9 @@ function relatedHTML(p){
 }
 
 /* ============ article modal ============ */
+let listY = 0;
 function showArticle(p){
+  listY = window.scrollY || document.documentElement.scrollTop || 0;
   const paras = (p.body||p.excerpt||"").split(/\n{2,}/).filter(Boolean);
   $("#articlePage").innerHTML = `
     <a class="aback" href="#" id="aback">← Back to music98.news</a>
@@ -1296,10 +1303,15 @@ function showArticle(p){
     ${relatedHTML(p)}`;
   $("#articlePage").hidden = false;
   document.body.classList.add("articlepage");
-  window.scrollTo({top:0, behavior:"instant"});
-  $("#aback").addEventListener("click", e=>{ e.preventDefault(); location.hash = ""; });
+  window.scrollTo(0, 0);
+  $("#aback").addEventListener("click", e=>{ e.preventDefault(); closeArticle(); });
 }
 function hideArticle(){ $("#articlePage").hidden = true; document.body.classList.remove("articlepage"); }
+function closeArticle(){
+  hideArticle();
+  try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
+  window.scrollTo(0, listY);
+}
 function route(){
   const m = location.hash.match(/^#post\/(.+)$/);
   if(m){
@@ -1307,6 +1319,7 @@ function route(){
     if(p){ showArticle(p); return; }
   }
   hideArticle();
+  window.scrollTo(0, listY);
 }
 window.addEventListener("hashchange", route);
 
