@@ -13,18 +13,21 @@ Open http://127.0.0.1:43123
 Private desk (not linked on the public site): http://127.0.0.1:43123/m98desk.html  
 Password is `ADMIN_PASSWORD` in `.env` (default `music98`). Change it before you go live.
 
-## Cloudflare, in plain language
+## Cloudflare
 
-Uploading the zip as **static files only** (R2, “Assets”, a plain CDN) is like putting a printed newspaper on a shelf: the site opens, but nothing can save a new post, a new email, or rebuild the chart by itself.
+Do not upload a zip. Use **Cloudflare Pages connected to GitHub** so the `functions/` API (chart, desk, subscribe) actually runs.
 
-To have the chart and the desk work on Cloudflare you want **Cloudflare Pages** (not just a dump of files):
+Russian click-by-click: see **КАК-ЗАЛИТЬ.md**.
 
-1. Create a Pages project and connect this folder (or GitHub).
-2. Add environment variables: `ADMIN_PASSWORD`, later `RESEND_API_KEY` and `FROM_EMAIL`.
-3. Create a **KV** namespace, bind it as `DESK`. That is the notebook where posts and subscriber emails are stored.
-4. After that, `/api/top50` rebuilds the chart on the first visit of the day (cached 24 hours). The GitHub Action in `.github/workflows/daily-top50.yml` is a second, optional timer if you connect GitHub.
+Short version:
 
-If Pages Functions time out on the chart rebuild, the baked `data/top50.json` still shows, and the GitHub Action can refresh that file daily.
+1. [Sign up](https://dash.cloudflare.com/sign-up) → [Workers & Pages](https://dash.cloudflare.com/?to=/:account/workers-and-pages) → **Create** → **Pages** → **Connect to Git**.
+2. Framework preset **None**, empty build command, output `/`.
+3. Create a [KV namespace](https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces), then in the project: **Settings → Bindings → Add → KV namespace**. Variable name must be `DESK`.
+4. **Settings → Variables and Secrets**: `ADMIN_PASSWORD` (encrypt). Retry the deployment.
+5. Desk URL: `https://YOUR-PROJECT.pages.dev/m98desk.html` (not linked on the public site).
+
+`/api/top50` rebuilds on the first visit of the day and stores the result in KV. If that times out, the baked `data/top50.json` is served.
 
 ## Editorial desk
 

@@ -71,7 +71,10 @@ function points(pos) {
 }
 
 async function getText(url) {
-  const r = await fetch(url, { headers: { "User-Agent": UA } });
+  const r = await fetch(url, {
+    headers: { "User-Agent": UA },
+    signal: AbortSignal.timeout(8000),
+  });
   if (!r.ok) throw new Error(String(r.status));
   return r.text();
 }
@@ -223,20 +226,59 @@ export async function buildTop50() {
   };
 }
 
-export async function onRequestGet({ env }) {
+function top50Response(payload) {
+  return new Response(JSON.stringify(payload), {
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+    },
+  });
+}
+
+async function bakedTop50(request) {
   try {
-    const payload = await buildTop50();
+    const r = await fetch(new URL("/data/top50.json", request.url));
+    if (r.ok) return await r.json();
+  } catch {}
+  return null;
+}
+
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
+  ]);
+}
+
+export async function onRequestGet({ env, request }) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (env && env.DESK) {
+    try {
+      const cached = await env.DESK.get("top50", { type: "json" });
+      if (cached && cached.updated === today && Array.isArray(cached.tracks) && cached.tracks.length) {
+        return top50Response(cached);
+      }
+    } catch {}
+  }
+  try {
+    const payload = await withTimeout(buildTop50(), 12000);
     payload.tracks = await applyTenure(env, payload.tracks);
-    return new Response(JSON.stringify(payload), {
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
-      },
-    });
+    if (env && env.DESK && payload.tracks && payload.tracks.length) {
+      try { await env.DESK.put("top50", JSON.stringify(payload)); } catch {}
+    }
+    if (payload.tracks && payload.tracks.length) return top50Response(payload);
   } catch (err) {
+    const baked = await bakedTop50(request);
+    if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
     return new Response(JSON.stringify({ error: "rebuild_failed", detail: String(err) }), {
       status: 502,
       headers: { "Content-Type": "application/json" },
     });
   }
+  const baked = await bakedTop50(request);
+  if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
+  return new Response(JSON.stringify({ error: "rebuild_failed" }), {
+    status: 502,
+    headers: { "Content-Type": "application/json" },
+  });
 }

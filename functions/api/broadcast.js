@@ -7,7 +7,7 @@ export async function onRequestPost({ request, env }) {
   const subject = String(payload.subject || "").trim();
   const text = String(payload.text || "").trim();
   if (!subject || !text) return json({ error: "subject_and_text_required" }, 400);
-  const desk = await readDesk(env);
+  const desk = await readDesk(env, request);
   const emails = desk.subscribers || [];
   if (!emails.length) return json({ error: "no_subscribers" }, 400);
   const key = (env.RESEND_API_KEY || "").trim();

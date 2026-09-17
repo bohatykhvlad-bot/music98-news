@@ -1,0 +1,15 @@
+.git
+.gitignore
+.env
+.env.*
+scripts
+api
+functions
+node_modules
+wrangler.toml
+vercel.json
+.github
+*.py
+tmp-scaffold
+КАК-ЗАЛИТЬ.md
+.cursor
