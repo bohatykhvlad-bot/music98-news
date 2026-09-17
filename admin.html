@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editorial desk — music98.news</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23000'/%3E%3Cpath d='M18 46c8-4 10-16 12-24 2 8 0 18 6 18 5 0 8-6 8-12' fill='none' stroke='%2325e8f5' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#ffffff; --bg2:#f4f6f7; --card:#fff; --line:#e2e8ea;
+  --text:#15181a; --muted:#5c6a70; --accent:#00fdfb; --acc2:#00767a;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5}
+.wrap{max-width:920px;margin:0 auto;padding:28px 20px 80px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;font-weight:800}
+.brand img{width:36px;height:36px;border-radius:50%}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
+h1{display:flex;align-items:center;gap:14px;margin:0 0 8px;font-size:32px;line-height:1;letter-spacing:-.03em}
+h1::after{content:"";width:4px;height:.72em;border-radius:2px;background:var(--accent)}
+.sub{margin:0;color:var(--muted);font-size:15px;line-height:1}
+.head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
+input,textarea,select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2)}
+textarea{min-height:140px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{border:0;border-radius:999px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
+.btn.primary{background:var(--accent);color:#03282b}
+.btn.ghost{background:var(--bg2);border:1px solid var(--line)}
+.btn.danger{background:#fff0f0;color:#b42318}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 16px}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{display:grid;grid-template-columns:52px 1fr auto auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px}
+.item img{width:52px;height:52px;object-fit:cover;border-radius:8px}
+.muted{color:var(--muted);font-size:13px}
+.toast{position:fixed;right:16px;bottom:16px;background:#fff;border:1px solid var(--accent);border-radius:12px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.cover{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:8px;background:var(--bg2)}
+.login{max-width:380px;margin:12vh auto;padding:24px}
+.hide{display:none}
+a{color:var(--acc2)}
+@media (max-width:700px){ .row,.item{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="index.html">music98.news</a>
+    <a href="index.html">← Public site</a>
+  </div>
+
+  <section id="gate" class="card login">
+    <div class="head"><h1>Desk</h1><p class="sub">Private editor</p></div>
+    <p class="muted">This page changes the public News and Releases. Default local password is <code>music98</code> — change it in <code>.env</code> before you go live.</p>
+    <label for="key">Password</label>
+    <input id="key" type="password" autocomplete="current-password">
+    <div class="actions"><button class="btn primary" id="login" type="button">Open desk</button></div>
+  </section>
+
+  <section id="desk" class="hide">
+    <div class="head"><h1>Write</h1><p class="sub">Posts, photos, newsletter</p></div>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <label for="type">Type</label>
+          <select id="type"><option value="news">News</option><option value="release">Release</option></select>
+        </div>
+        <div>
+          <label for="date">Date</label>
+          <input id="date" type="date">
+        </div>
+      </div>
+      <div class="row">
+        <div><label for="tag">Tag</label><input id="tag" placeholder="Interview"></div>
+        <div><label for="rtype">Release type</label><input id="rtype" placeholder="Single / EP / Album"></div>
+      </div>
+      <label for="artist">Artist (optional)</label>
+      <input id="artist">
+      <label for="title">Title</label>
+      <input id="title">
+      <label for="excerpt">Short teaser</label>
+      <textarea id="excerpt" style="min-height:70px"></textarea>
+      <label for="body">Body (blank line = new paragraph)</label>
+      <textarea id="body"></textarea>
+      <label for="photo">Cover photo</label>
+      <input id="photo" type="file" accept="image/*">
+      <img id="preview" class="cover hide" alt="">
+      <label><input id="pinned" type="checkbox" style="width:auto"> Pin to the top of News</label>
+      <div class="actions">
+        <button class="btn primary" id="save" type="button">Publish to the site</button>
+        <button class="btn ghost" id="reset" type="button">Clear form</button>
+      </div>
+      <p class="muted" id="saveNote">Publish writes to the server. Visitors see it on the homepage after a refresh.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 10px">On the site</h2>
+      <div class="list" id="list"></div>
+    </div>
+
+    <div class="card">
+      <div class="head"><h1 style="font-size:24px">Mail</h1><p class="sub">Subscribers</p></div>
+      <p class="muted" id="subCount">No addresses yet.</p>
+      <label for="msubject">Subject</label>
+      <input id="msubject" placeholder="This week on music98.news">
+      <label for="mtext">Letter</label>
+      <textarea id="mtext" placeholder="We’ll write this later. It goes to everyone on the list."></textarea>
+      <div class="actions">
+        <button class="btn primary" id="send" type="button">Send to the list</button>
+      </div>
+      <p class="muted">Sending needs a Resend API key in <code>.env</code> (or Cloudflare / Vercel environment variables). Addresses are saved even before that key exists.</p>
+    </div>
+  </section>
+</div>
+<div class="toast hide" id="toast"></div>
+<script>
+const $ = s => document.querySelector(s);
+const KEY = "music98_admin_key";
+let posts = [];
+let cover = "";
+let editing = null;
+
+function toast(m){
+  const t = $("#toast"); t.textContent = m; t.classList.remove("hide");
+  clearTimeout(toast._t); toast._t = setTimeout(()=> t.classList.add("hide"), 2800);
+}
+function auth(){ return sessionStorage.getItem(KEY) || ""; }
+function headers(json=true){
+  const h = {"X-Admin-Key": auth()};
+  if(json) h["Content-Type"] = "application/json";
+  return h;
+}
+function today(){ return new Date().toISOString().slice(0,10); }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function esc(s){ return String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+
+function readPhoto(file, cb){
+  if(!file || file.type.indexOf("image/")!==0) return;
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = ()=>{
+    const max = 1400;
+    let w = img.width, h = img.height;
+    if(Math.max(w,h)>max){ const s = max/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
+    const c = document.createElement("canvas"); c.width=w; c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);
+    cb(c.toDataURL("image/jpeg", 0.84));
+  };
+  img.src = url;
+}
+
+async function api(path, opt={}){
+  const r = await fetch(path, opt);
+  const j = await r.json().catch(()=>({}));
+  if(!r.ok) throw j;
+  return j;
+}
+
+function renderList(){
+  $("#list").innerHTML = posts.length ? posts.map(p=>`
+    <div class="item">
+      <img src="${esc(p.cover && p.cover.src || "")}" alt="">
+      <div><b>${esc(p.title)}</b><div class="muted">${esc(p.type)} · ${esc(p.date||"")}</div></div>
+      <button class="btn ghost" data-edit="${esc(p.id)}" type="button">Edit</button>
+      <button class="btn danger" data-del="${esc(p.id)}" type="button">Delete</button>
+    </div>`).join("") : '<p class="muted">Nothing published yet. The public site still shows the demo stories until you publish here.</p>';
+}
+
+function fillForm(p){
+  editing = p ? p.id : null;
+  $("#type").value = p?.type || "news";
+  $("#date").value = p?.date || today();
+  $("#tag").value = p?.tag || "";
+  $("#rtype").value = p?.rtype || "";
+  $("#artist").value = p?.artist || "";
+  $("#title").value = p?.title || "";
+  $("#excerpt").value = p?.excerpt || "";
+  $("#body").value = p?.body || "";
+  $("#pinned").checked = !!p?.pinned;
+  cover = (p?.cover && p.cover.src) || "";
+  const prev = $("#preview");
+  if(cover){ prev.src = cover; prev.classList.remove("hide"); } else { prev.classList.add("hide"); }
+}
+
+async function reload(){
+  const d = await api("/api/desk", {headers: headers(false)});
+  posts = d.posts || [];
+  renderList();
+  try{
+    const s = await api("/api/subscribers", {headers: headers(false)});
+    const n = (s.subscribers||[]).length;
+    $("#subCount").textContent = n ? n + " subscriber" + (n===1?"":"s") + " on the list." : "No addresses yet.";
+  }catch(e){
+    $("#subCount").textContent = "Could not load the list.";
+  }
+}
+
+$("#login").onclick = async ()=>{
+  sessionStorage.setItem(KEY, $("#key").value.trim());
+  try{
+    await reload();
+    $("#gate").classList.add("hide");
+    $("#desk").classList.remove("hide");
+  }catch(e){
+    sessionStorage.removeItem(KEY);
+    toast("Wrong password, or the desk API is not running.");
+  }
+};
+
+$("#photo").onchange = e=>{
+  readPhoto(e.target.files[0], src=>{
+    cover = src;
+    $("#preview").src = src;
+    $("#preview").classList.remove("hide");
+  });
+};
+
+$("#reset").onclick = ()=> fillForm(null);
+
+$("#save").onclick = async ()=>{
+  const title = $("#title").value.trim();
+  if(!title){ toast("Add a title"); return; }
+  const rec = {
+    id: editing || uid(),
+    type: $("#type").value,
+    tag: $("#tag").value.trim() || ($("#type").value==="release" ? "Release" : "News"),
+    rtype: $("#rtype").value.trim(),
+    artist: $("#artist").value.trim(),
+    title,
+    excerpt: $("#excerpt").value.trim(),
+    body: $("#body").value.trim(),
+    date: $("#date").value || today(),
+    pinned: $("#pinned").checked,
+    cover: cover ? {kind:"img", src:cover} : {kind:"preset", i:0}
+  };
+  const ix = posts.findIndex(p=>p.id===rec.id);
+  if(ix>=0) posts[ix] = rec; else posts.unshift(rec);
+  try{
+    await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts})});
+    toast("Published on the public site");
+    fillForm(null);
+    renderList();
+  }catch(e){
+    toast(e.error === "unauthorized" ? "Password rejected" : "Could not publish");
+  }
+};
+
+$("#list").onclick = async e=>{
+  const del = e.target.closest("[data-del]");
+  const ed = e.target.closest("[data-edit]");
+  if(ed){
+    fillForm(posts.find(p=>p.id===ed.dataset.edit));
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+  if(del){
+    posts = posts.filter(p=>p.id!==del.dataset.del);
+    try{
+      await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts})});
+      renderList();
+      toast("Removed from the site");
+    }catch(err){ toast("Could not delete"); }
+  }
+};
+
+$("#send").onclick = async ()=>{
+  try{
+    const j = await api("/api/broadcast", {
+      method:"POST", headers: headers(),
+      body: JSON.stringify({subject: $("#msubject").value.trim(), text: $("#mtext").value.trim()})
+    });
+    toast("Sent to " + (j.sent||0) + " addresses");
+  }catch(e){
+    if(e.error==="missing_resend_key") toast("Addresses are saved. Add a Resend key to actually send.");
+    else if(e.error==="no_subscribers") toast("Nobody has subscribed yet");
+    else toast("Could not send");
+  }
+};
+
+$("#date").value = today();
+if(auth()){
+  reload().then(()=>{ $("#gate").classList.add("hide"); $("#desk").classList.remove("hide"); }).catch(()=>{});
+}
+</script>
+</body>
+</html>

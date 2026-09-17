@@ -72,10 +72,10 @@ main{position:relative;z-index:1}
 .tab.active .grid>:nth-child(6){animation-delay:.09s}
 .tab.active .grid>:nth-child(7){animation-delay:.105s}
 .tab.active .grid>:nth-child(n+8){animation-delay:.12s}
-.tab-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
-.tab-head h1{margin:0;position:relative;font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.03em}
-.tab-head h1::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:4px;border-radius:2px;background:var(--accent)}
-.tab-head .sub{margin:.42em 0 0;color:var(--muted);font-size:14.5px;line-height:1.15}
+.tab-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.tab-head h1{margin:0;display:flex;align-items:center;gap:14px;font-size:clamp(26px,4vw,38px);line-height:1;letter-spacing:-.03em}
+.tab-head h1::after{content:"";width:4px;height:.72em;border-radius:2px;background:var(--accent);flex:none}
+.tab-head .sub{margin:0;color:var(--muted);font-size:15px;line-height:1;align-self:center}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative}
@@ -391,7 +391,7 @@ textarea{resize:vertical;min-height:64px}
   </div>
   <div class="foot-bottom"><div class="foot-bottom-in">
     <span>© 2026 · all content is demo material</span>
-    <button id="openEditor" title="Ctrl+Shift+E">✎ Editor</button>
+    <a class="flink" href="admin.html" title="Editorial desk">Editorial desk</a>
     <span>Apple Music badges are affiliate links (Apple Performance Partners) · made with love for music ♪</span>
   </div></div>
 </footer>
@@ -405,7 +405,7 @@ textarea{resize:vertical;min-height:64px}
       <span class="rel-kicker">Legal · last updated 17 September 2026</span>
       <h1>Privacy &amp; disclosure</h1>
       <div class="ptext">
-        <p><b>In short.</b> music98.news is an independent demo music-media project; data controller: the music98.news editorial team, privacy@music98.news. Everything you create or set — editor posts, preferences, chart history, cached preview metadata — is stored only in your browser (local storage). No accounts, no cookies, no analytics or advertising trackers, no profiling, no data selling.</p>
+        <p><b>In short.</b> music98.news is an independent music-media project; data controller: the music98.news editorial team, privacy@music98.news. If you subscribe, we store only your email to send the newsletter. Editor drafts and chart playback cache can also live in your browser. No advertising trackers, no profiling, no data selling.</p>
         <p><b>Apple Music.</b> 30-second previews, artwork and “Listen on Apple Music” links are provided by Apple. When you play a preview or follow a badge, your browser contacts Apple’s servers directly and Apple processes technical data (including your IP) under the <a href="https://www.apple.com/legal/privacy/">Apple Privacy Policy</a>; previews are streamed, never re-hosted. Apple Music badges are affiliate links (Apple Performance Partners): we may earn a commission at no extra cost to you, and this never influences editorial coverage or charts (FTC 16 CFR Part 255).</p>
         <p><b>Your rights.</b> Under GDPR/UK GDPR/CCPA you may access, rectify, erase, restrict, port or object to processing of your data. As all personal data lives only on your device, clearing the site data in your browser settings (Site settings → Clear storage) erases it instantly; for anything else email us — we reply within 30 days. The service is not directed to children under 13. Material policy changes are announced on the front page; the date above is always current.</p>
       </div>
@@ -434,7 +434,8 @@ textarea{resize:vertical;min-height:64px}
     <div class="field"><label for="ef_title">Title</label><input id="ef_title" placeholder="Story headline"></div>
     <div class="field"><label for="ef_excerpt">Excerpt</label><textarea id="ef_excerpt" rows="2"></textarea></div>
     <div class="field"><label for="ef_body">Body (blank line = new paragraph)</label><textarea id="ef_body" rows="5"></textarea></div>
-    <div class="field"><label>Cover</label><div class="cover-picks" id="ef_covers"></div></div>
+    <div class="field"><label>Cover</label><div class="cover-picks" id="ef_covers"></div>
+      <input id="ef_photo" type="file" accept="image/*" style="margin-top:8px"></div>
     <label class="dnote"><input type="checkbox" id="ef_pinned" style="width:auto;margin-right:6px">Pin to top of the feed</label>
     <div class="form-actions"><button class="btn primary" id="ef_save" type="button">Save post</button><button class="btn" id="ef_cancel" type="button">Cancel</button></div>
     <div class="post-list" id="ef_list"></div>
@@ -764,7 +765,37 @@ const FEEDS = [
   {id:"jp-songs",  label:"Japan · Songs",      kind:"store", sf:"jp", type:"topsongs", note:"Japan top songs — weekly feed"}
 ];
 function feedById(id){ return FEEDS.find(f=>f.id===id) || FEEDS[0]; }
-if(!FEEDS.some(f=>f.id === S.feed)){ S.feed = "us-songs"; saveS(); }   /* legacy ids (global/pop/us...) fall back to USA Songs */
+if(!FEEDS.some(f=>f.id === S.feed)){ 
+function loadPublishedDesk(){
+  const grab = u => fetch(u).then(r=>{ if(!r.ok) throw 0; return r.json(); });
+  grab("/api/desk").catch(()=> grab("data/desk.json")).then(j=>{
+    if(!j || !Array.isArray(j.posts) || !j.posts.length) return;
+    data.posts = j.posts;
+    renderNews(); renderReleases(); renderHints();
+    if($("#ef_list")) renderPostList();
+  }).catch(()=>{});
+}
+function readPhoto(file, cb){
+  if(!file || !file.type || file.type.indexOf("image/") !== 0) return;
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = ()=>{
+    const max = 1400;
+    let w = img.width, h = img.height;
+    if(Math.max(w,h) > max){ const s = max/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
+    const c = document.createElement("canvas"); c.width=w; c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);
+    cb(c.toDataURL("image/jpeg", 0.84));
+  };
+  img.src = url;
+}
+if($("#ef_photo")) $("#ef_photo").addEventListener("change", e=>{
+  const f = e.target.files && e.target.files[0];
+  readPhoto(f, src=>{ formCover = {kind:"img", src}; renderCoverPicks(); toast("Photo attached"); });
+});
+
+S.feed = "us-songs"; saveS(); }   /* legacy ids (global/pop/us...) fall back to USA Songs */
 function feedUrl(sf, type){ return "https://itunes.apple.com/"+sf+"/rss/"+(type||"topsongs")+"/limit=50/json"; }
 function parseFeed(j){
   const entries = (j && j.feed && j.feed.entry) || [];
@@ -1082,7 +1113,7 @@ $("#search").addEventListener("input", e=>{
 });
 document.addEventListener("keydown", e=>{
   if(e.key==="/" && document.activeElement.tagName!=="INPUT" && document.activeElement.tagName!=="TEXTAREA"){ e.preventDefault(); $("#search").focus(); }
-  if((e.ctrlKey||e.metaKey) && e.shiftKey && e.key.toLowerCase()==="e"){ e.preventDefault(); if(typeof requestEditor==="function") requestEditor(); }
+  if((e.ctrlKey||e.metaKey) && e.shiftKey && e.key.toLowerCase()==="e"){ e.preventDefault(); location.href = "admin.html"; }
   if(e.key==="Escape"){ closePrivacy(); }
 });
 
@@ -1170,19 +1201,15 @@ function updateStorageInfo(){
 /* ---- subscribe ---- */
 /* Newsletter: paste your ESP endpoint (Buttondown / Mailchimp / Brevo / Formspree / own backend)
    to make the form live; empty string = demo mode, e-mails never leave the browser. */
-const SUBSCRIBE_API = "";
 $("#subForm").addEventListener("submit", e=>{
   e.preventDefault();
-  const email = (e.target.querySelector('input[type="email"]')||{}).value || "";
-  if(SUBSCRIBE_API){
-    fetch(SUBSCRIBE_API, {method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({email: email.trim(), source:"music98.news", ts:new Date().toISOString()})})
-      .then(r=>{ if(!r.ok) throw 0; toast("Subscribed! Confirm the e-mail we just sent 💌"); })
-      .catch(()=> toast("Mail service is unreachable — try again later"));
-  } else {
-    toast("Demo mode: the address stays in your browser. Add SUBSCRIBE_API in the code to go live 💌");
-  }
-  e.target.reset();
+  const email = ((e.target.querySelector('input[type="email"]')||{}).value || "").trim();
+  if(!email){ toast("Enter an email address"); return; }
+  fetch("/api/subscribe", {method:"POST", headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({email})})
+    .then(r=>{ if(!r.ok) throw 0; return r.json().catch(()=>({})); })
+    .then(()=>{ toast("You’re on the list. We’ll write when the next edition goes out."); e.target.reset(); })
+    .catch(()=> toast("Could not save that address — try again in a moment"));
 });
 
 /* ============ glass header: rides with the scroll ============ */
@@ -1241,7 +1268,7 @@ function setLogos(){
 }
 
 /* ---- editor drawer (posts / manual chart / settings) ---- */
-function requestEditor(){ openEditor(); }
+function requestEditor(){ location.href = "admin.html"; }
 function openEditor(){
   $("#edDrawer").classList.add("open");
   $("#edScrim").hidden = false;
@@ -1251,7 +1278,7 @@ function closeEditor(){
   $("#edDrawer").classList.remove("open");
   $("#edScrim").hidden = true;
 }
-$("#openEditor").addEventListener("click", openEditor);
+if($("#openEditor")) $("#openEditor").addEventListener("click", ()=>{ location.href = "admin.html"; });
 $("#edClose").addEventListener("click", closeEditor);
 $("#edScrim").addEventListener("click", closeEditor);
 $$(".drawer-tabs .dtab").forEach(b=>b.addEventListener("click", ()=>{
@@ -1369,7 +1396,7 @@ $("#es_reset").addEventListener("click", ()=>{
 });
 
 /* ---- init ---- */
-S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); route();
+S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); loadPublishedDesk(); route();
 </script>
 </body>
 </html>
