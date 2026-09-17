@@ -73,9 +73,10 @@ main{position:relative;z-index:1}
 .tab.active .grid>:nth-child(7){animation-delay:.105s}
 .tab.active .grid>:nth-child(n+8){animation-delay:.12s}
 .tab-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
-.tab-head h1{margin:0;display:flex;align-items:center;gap:14px;font-size:clamp(26px,4vw,38px);line-height:1;letter-spacing:-.03em}
-.tab-head h1::after{content:"";width:4px;height:.72em;border-radius:2px;background:var(--accent);flex:none}
-.tab-head .sub{margin:0;color:var(--muted);font-size:15px;line-height:1;align-self:center}
+.tab-head h1{margin:0;display:flex;align-items:center;gap:14px;font-size:clamp(26px,4vw,38px);line-height:1;letter-spacing:-.03em;flex-wrap:wrap}
+.tab-head .tab-bar{width:4px;height:.72em;border-radius:2px;background:var(--accent);flex:none;align-self:center}
+.tab-head .sub{margin:0;color:var(--muted);font-size:15px;font-weight:400;letter-spacing:0;line-height:1;display:flex;align-items:center;align-self:stretch;text-box-trim:trim-both;text-box-edge:cap alphabetic}
+.tab-head .tab-title{display:flex;align-items:center;line-height:1;text-box-trim:trim-both;text-box-edge:cap alphabetic}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative}
@@ -336,20 +337,20 @@ textarea{resize:vertical;min-height:64px}
 
 <main class="wrap">
   <section class="tab active" id="tab-news">
-    <div class="tab-head"><h1>News</h1><p class="sub">The heartbeat of the music industry — updated daily</p></div>
+    <div class="tab-head"><h1><span class="tab-title">News</span><span class="tab-bar" aria-hidden="true"></span><span class="sub">The heartbeat of the music industry — updated daily</span></h1></div>
     <div id="heroSlot"></div>
     <div class="grid" id="newsGrid"></div>
     <div class="empty" id="newsEmpty" hidden>Nothing found for your query. Try another search — or write the story yourself in the editor.</div>
   </section>
 
   <section class="tab" id="tab-releases">
-    <div class="tab-head"><h1>Releases</h1><p class="sub">Fresh albums, EPs and singles worth your ears</p></div>
+    <div class="tab-head"><h1><span class="tab-title">Releases</span><span class="tab-bar" aria-hidden="true"></span><span class="sub">Fresh albums, EPs and singles worth your ears</span></h1></div>
     <div class="grid" id="relGrid"></div>
     <div class="empty" id="relEmpty" hidden>Nothing found for your query.</div>
   </section>
 
   <section class="tab" id="tab-charts">
-    <div class="tab-head"><h1>Charts</h1><p class="sub">Top 50 tracks of the week</p></div>
+    <div class="tab-head"><h1><span class="tab-title">Charts</span><span class="tab-bar" aria-hidden="true"></span><span class="sub">Top 50 tracks of the week</span></h1></div>
     <div class="chart-switch" id="chartSwitch" hidden></div>
     <div class="chart" id="chartList" role="list"></div>
     <p class="chart-note" id="chartStatus" hidden></p>
