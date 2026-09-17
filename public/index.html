@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="head-cross-2">
+<meta name="m98-build" content="back-only-1">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -484,8 +484,8 @@ textarea{resize:vertical;min-height:64px}
 
 <div class="overlay" id="privacyOverlay" hidden>
   <div class="article">
-    <button class="aclose" id="privacyClose" aria-label="Close">✕</button>
     <div class="abody">
+      <a class="aback" href="#" id="privacyBack">Back</a>
       <span class="legal-kicker">Last updated 17 September 2026</span>
       <h1>Privacy &amp; disclosure</h1>
       <div class="ptext">
@@ -1352,7 +1352,7 @@ function showArticle(p){
   listY = window.scrollY || document.documentElement.scrollTop || 0;
   const paras = (p.body||p.excerpt||"").split(/\n{2,}/).filter(Boolean);
   $("#articlePage").innerHTML = `
-    <a class="aback" href="#" id="aback">← Back</a>
+    <a class="aback" href="#" id="aback">Back</a>
     <div class="acover"><img src="${coverOf(p,false)}" alt=""></div>
     <span class="tag${p.type==="release"?" pink":""}" style="position:static;margin-top:14px">${esc(p.tag || (p.type==="release" ? (p.rtype||"Release") : "News"))}</span>
     <h1>${esc(p.artist && p.type==="release" ? p.artist+" — "+p.title : p.title)}</h1>
@@ -1473,7 +1473,7 @@ function closePrivacy(){
   setTimeout(()=>{ po.hidden = true; }, 240);
 }
 $("#footPrivacy").addEventListener("click", e=>{ e.preventDefault(); openPrivacy(); });
-$("#privacyClose").addEventListener("click", closePrivacy);
+$("#privacyBack").addEventListener("click", e=>{ e.preventDefault(); closePrivacy(); });
 $("#privacyOverlay").addEventListener("click", e=>{ if(e.target.id === "privacyOverlay") closePrivacy(); });
 
 /* ============ logo ============ */
