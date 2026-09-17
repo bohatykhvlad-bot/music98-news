@@ -16,7 +16,7 @@
 <style>
 :root{
   --bg:#ffffff; --bg2:#f4f6f7; --card:#ffffff; --card2:#edf1f2; --line:#e2e8ea;
-  --text:#15181a; --muted:#5c6a70; --accent:#00fdfb; --accent-dim:#00c2cc; --acc2:#00767a;
+  --text:#15181a; --muted:#5c6a70; --accent:#00fdfb; --accent-dim:#00c2cc; --acc2:#15181a;
   --pink:#ff3d81; --green:#18b26b; --red:#e5484d; --amber:#ffb03a;
   --muted2:#8a969b; --faint:#c3ccd0; --body-text:#2b3438;
   --glass:rgba(255,255,255,.6); --glass-line:rgba(255,255,255,.55);
@@ -53,7 +53,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .search-hints{max-width:1180px;margin:0 auto;padding:0 20px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--text)}
 .hint-chip{border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:999px;padding:4px 11px;cursor:pointer;color:var(--text);font-size:12.5px}
 .hint-chip:hover{color:var(--text);border-color:var(--accent-dim)}
-.hint-chip b{color:#00767a}
+.hint-chip b{color:var(--text)}
 
 /* ---------- marquee plate ---------- */
 
@@ -261,8 +261,7 @@ textarea{resize:vertical;min-height:64px}
 
 /* ---------- related stories ("you might also like") ---------- */
 .related{margin-top:36px;border-top:1px solid var(--line);padding-top:22px}
-.rel-kicker{font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--acc2)}
-.related h2{margin:6px 0 4px;font-size:22px;letter-spacing:-.02em}
+.related h2{margin:0 0 4px;font-size:22px;letter-spacing:-.02em}
 .related .rel-sub{margin:0 0 16px;color:var(--muted);font-size:13.5px}
 .rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
 .rcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:.2s}
@@ -1134,41 +1133,109 @@ document.addEventListener("keydown", e=>{
 });
 
 /* ============ related stories ("you might also like") ============ */
-const STOPW = new Set(("the a an and or to of in on for with his her its their is are was were be been at by from as into about after before this that he she they it we you not no out up down over under again more most some such only own same so than too very can will just don should now new what when who how why all any both each few off once here there").split(" "));
+const STOPW = new Set(("the a an and or to of in on for with his her its their is are was were be been at by from as into about after before this that he she they it we you not no out up down over under again more most some such only own same so than too very can will just don should now new what when who how why all any both each few off once here there album single ep news release review interview").split(" "));
 function relTokens(s){
   return (s||"").toLowerCase().replace(/[^a-z0-9\s]/g," ").split(/\s+/).filter(w=>w.length>2 && !STOPW.has(w));
 }
+function splitNames(s){
+  return String(s||"").split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)
+    .map(x=>x.trim().toLowerCase()).filter(x=>x.length>1);
+}
+const ARTIST_LANE = {
+  drake:"hip-hop","kendrick lamar":"hip-hop","lil baby":"hip-hop","mac miller":"hip-hop",
+  "jhené aiko":"hip-hop","jhene aiko":"hip-hop","nicki minaj":"hip-hop","ty dolla $ign":"hip-hop",
+  "ty dolla sign":"hip-hop","future":"hip-hop","travis scott":"hip-hop","kanye west":"hip-hop",
+  "21 savage":"hip-hop","sza":"hip-hop","the weeknd":"r&b",
+  "ella langley":"country","morgan wallen":"country","luke combs":"country","shaboozey":"country",
+  "olivia rodrigo":"pop","ariana grande":"pop","taylor swift":"pop","olivia dean":"pop",
+  "zara larsson":"pop","katy perry":"pop","bruno mars":"pop","justin bieber":"pop",
+  "adela":"pop","adéla":"pop","karol g":"latin","shakira":"latin","burna boy":"afrobeats",
+  "tame impala":"indie","jennie":"k-pop","lisa":"k-pop"
+};
+const LANE_WORDS = {
+  "hip-hop":["hiphop","hip-hop","rap","rapper","trap","drill","grime"],
+  "r&b":["rnb","r&b","soul"],
+  country:["country","nashville","honky"],
+  pop:["pop","synthpop"],
+  latin:["latin","reggaeton","urbano"],
+  afrobeats:["afrobeats","afrobeat","amapiano"],
+  indie:["indie","alternative","psych"],
+  "k-pop":["kpop","k-pop"],
+  rock:["rock","guitar"],
+  electronic:["electronic","dance","house","techno"]
+};
+function postBlob(p){
+  return [p.title, p.excerpt, p.body, p.artist, p.tag, p.rtype].filter(Boolean).join(" ");
+}
+function nameCatalog(){
+  const set = new Set(Object.keys(ARTIST_LANE));
+  data.posts.forEach(p=> splitNames(p.artist).forEach(n=> set.add(n)));
+  return [...set].filter(Boolean).sort((a,b)=> b.length-a.length);
+}
+function namesIn(p, catalog){
+  const out = new Set(splitNames(p.artist));
+  const text = postBlob(p).toLowerCase();
+  catalog.forEach(n=>{ if(n.length>2 && text.includes(n)) out.add(n); });
+  return out;
+}
+function lanesOf(p, names){
+  const lanes = new Set();
+  const text = postBlob(p).toLowerCase();
+  const tag = (p.tag||"").toLowerCase();
+  Object.entries(LANE_WORDS).forEach(([lane, words])=>{
+    if(words.some(w=> tag===w || tag.includes(w) || text.includes(w))) lanes.add(lane);
+  });
+  names.forEach(n=>{ if(ARTIST_LANE[n]) lanes.add(ARTIST_LANE[n]); });
+  return lanes;
+}
 function relatedPosts(p){
-  const mine = new Set(relTokens(p.title+" "+(p.excerpt||"")+" "+(p.artist||"")));
-  const scored = data.posts.map(q=>{
-    if(q.id === p.id) return null;
+  const catalog = nameCatalog();
+  const myNames = namesIn(p, catalog);
+  const myLanes = lanesOf(p, myNames);
+  const myTags = new Set([p.tag, p.rtype].map(t=>String(t||"").toLowerCase()).filter(t=>t && !STOPW.has(t)));
+  const myTokens = new Set(relTokens(postBlob(p)));
+  const scored = data.posts.filter(q=>q.id!==p.id).map(q=>{
+    const names = namesIn(q, catalog);
+    const lanes = lanesOf(q, names);
     let s = 0;
-    if(q.tag && q.tag === p.tag) s += 3;
-    if(q.type === p.type) s += 1;
-    if(q.artist && p.artist && q.artist.toLowerCase() === p.artist.toLowerCase()) s += 4;
-    let ov = 0;
-    relTokens(q.title+" "+(q.excerpt||"")+" "+(q.artist||"")).forEach(w=>{ if(mine.has(w)) ov++; });
-    s += Math.min(4, ov);
-    return s > 0 ? {q:q, s:s} : null;
-  }).filter(Boolean);
-  scored.sort((a,b)=> b.s - a.s || (b.q.date||"").localeCompare(a.q.date||""));
-  const out = scored.slice(0,3).map(x=>x.q);
-  if(out.length < 3){
-    data.posts.forEach(q=>{
-      if(out.length < 3 && q.id !== p.id && out.indexOf(q) < 0) out.push(q);
+    names.forEach(n=>{ if(myNames.has(n)) s += 24; });
+    lanes.forEach(l=>{ if(myLanes.has(l)) s += 10; });
+    [q.tag, q.rtype].forEach(t=>{
+      t = String(t||"").toLowerCase();
+      if(t && myTags.has(t)) s += 6;
     });
+    let hit = 0;
+    relTokens(postBlob(q)).forEach(w=>{ if(myTokens.has(w)) hit++; });
+    s += Math.min(8, hit*2);
+    return {q, s};
+  }).filter(x=>x.s>0);
+  scored.sort((a,b)=> b.s-a.s || (b.q.date||"").localeCompare(a.q.date||""));
+  const out = scored.slice(0,3).map(x=>x.q);
+  if(out.length<3){
+    data.posts.filter(q=>q.id!==p.id && !out.includes(q))
+      .sort((a,b)=>(b.date||"").localeCompare(a.date||""))
+      .forEach(q=>{ if(out.length<3) out.push(q); });
   }
   return out;
+}
+function relatedLine(p){
+  const names = [...namesIn(p, nameCatalog())];
+  if(names.length){
+    const raw = p.artist && splitNames(p.artist)[0] ? p.artist.split(/\s*(?:,|&|feat\.?|ft\.?|with|w\/)\s*/i)[0].trim() : names[0];
+    return "More on " + raw;
+  }
+  const lanes = [...lanesOf(p, new Set(names))];
+  if(lanes.length) return "More " + lanes[0];
+  if(p.tag && !STOPW.has(p.tag.toLowerCase())) return "More on " + p.tag;
+  return "Related stories and releases";
 }
 function relatedHTML(p){
   const rel = relatedPosts(p);
   if(!rel.length) return "";
-  const topic = p.tag || (p.type === "release" ? (p.rtype||"releases") : "this story");
   return `
     <section class="related">
-      <span class="rel-kicker">More like this</span>
       <h2>You might also like</h2>
-      <p class="rel-sub">More on ${esc(topic)} and related artists — hand-picked by the music98.news editors</p>
+      <p class="rel-sub">${esc(relatedLine(p))}</p>
       <div class="rel-grid">${rel.map(q=>`
         <a class="rcard" href="#post/${q.id}">
           <div class="rcover"><img src="${coverOf(q,true)}" alt="" loading="lazy"></div>
