@@ -8,3 +8,4 @@ __pycache__/
 tmp-scaffold/
 *.zip
 download.html
+.agents/
