@@ -64,12 +64,11 @@ main{position:relative;z-index:1}
 .tab.active{display:block}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
-.tab-head{margin-bottom:22px}
-.tab-head h1{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-size:clamp(26px,4vw,38px);line-height:1;letter-spacing:-.03em}
-.tab-lead{display:inline-flex;align-items:center;gap:12px}
-.tab-head .tab-title{line-height:1;display:block}
-.tab-head .tab-bar{width:4px;height:1.22em;border-radius:2px;background:var(--accent);flex:none;align-self:center}
-.tab-head .sub{margin:0;color:var(--muted);font-size:15px;font-weight:400;letter-spacing:0;line-height:1;align-self:center}
+.tab-head{margin-bottom:22px;--head:clamp(26px,4vw,38px)}
+.tab-head h1{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:12px;font-size:var(--head);line-height:1;letter-spacing:-.03em}
+.tab-head .tab-title{line-height:1;display:flex;align-items:center;height:var(--head)}
+.tab-head .tab-bar{width:4px;height:0.72em;border-radius:2px;background:var(--accent);flex:none;display:block}
+.tab-head .sub{margin:0;color:var(--muted);font-size:15px;font-weight:400;letter-spacing:0;line-height:1;display:flex;align-items:center;height:var(--head)}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative}
@@ -319,9 +318,9 @@ textarea{resize:vertical;min-height:64px}
   .search input{height:36px;background:rgba(255,255,255,.7)}
   .foot-in{grid-template-columns:1fr}
   .tab{padding-top:14px}
-  .tab-head{margin-bottom:14px}
+  .tab-head{margin-bottom:14px;--head:26px}
   .tab-head h1{font-size:26px;gap:10px;flex-wrap:wrap;align-items:center}
-  .tab-head .sub{font-size:14px;align-self:center}
+  .tab-head .sub{font-size:14px}
   body{padding-top:calc(var(--header-h, 148px) + 8px)}
   .hero .body{padding:16px}
   .sub-in{padding:32px 16px}
@@ -387,20 +386,20 @@ textarea{resize:vertical;min-height:64px}
 
 <main class="wrap">
   <section class="tab active" id="tab-news">
-    <div class="tab-head"><h1><span class="tab-lead"><span class="tab-title">News</span><span class="tab-bar" aria-hidden="true"></span></span><span class="sub">Latest stories</span></h1></div>
+    <div class="tab-head"><h1><span class="tab-title">News</span><span class="tab-bar" aria-hidden="true"></span><span class="sub">Latest stories</span></h1></div>
     <div id="heroSlot"></div>
     <div class="grid" id="newsGrid"></div>
     <div class="empty" id="newsEmpty" hidden>Nothing found for your query. Try another search.</div>
   </section>
 
   <section class="tab" id="tab-releases">
-    <div class="tab-head"><h1><span class="tab-lead"><span class="tab-title">Releases</span><span class="tab-bar" aria-hidden="true"></span></span><span class="sub">Albums, EPs and singles</span></h1></div>
+    <div class="tab-head"><h1><span class="tab-title">Releases</span><span class="tab-bar" aria-hidden="true"></span><span class="sub">Albums, EPs and singles</span></h1></div>
     <div class="grid" id="relGrid"></div>
     <div class="empty" id="relEmpty" hidden>Nothing found for your query.</div>
   </section>
 
   <section class="tab" id="tab-charts">
-    <div class="tab-head"><h1><span class="tab-lead"><span class="tab-title">Charts</span><span class="tab-bar" aria-hidden="true"></span></span><span class="sub">Daily Top 50</span></h1></div>
+    <div class="tab-head"><h1><span class="tab-title">Charts</span><span class="tab-bar" aria-hidden="true"></span><span class="sub">Daily Top 50</span></h1></div>
     <div class="chart-switch" id="chartSwitch" hidden></div>
     <div class="chart" id="chartList" role="list"></div>
     <p class="chart-note" id="chartStatus" hidden></p>
