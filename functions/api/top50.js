@@ -1,5 +1,27 @@
 const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
+const APPLE_AT = "1001l3aZW";
+const APPLE_CT = "music98";
+const TOP50_KV = "top50v2";
+
+function isApplePreview(url) {
+  const u = String(url || "").toLowerCase();
+  return u.includes("apple.com") || u.includes("mzstatic.com");
+}
+function appleAff(url) {
+  if (!url) return "";
+  try {
+    const u = new URL(url);
+    const host = u.hostname.toLowerCase();
+    if (host !== "apple.com" && !host.endsWith(".apple.com")) return url;
+    u.searchParams.set("app", "music");
+    u.searchParams.set("at", APPLE_AT);
+    u.searchParams.set("ct", APPLE_CT);
+    return u.href;
+  } catch {
+    return url;
+  }
+}
 
 function chartWeek() {
   return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000 / 7));
@@ -102,7 +124,7 @@ function parseDeezer(data) {
     url: "",
     art: (item.album && (item.album.cover_xl || item.album.cover_medium)) || "",
     year: "",
-    prev: item.preview || "",
+    prev: "",
   })).filter((r) => r.title && r.artist);
 }
 
@@ -168,7 +190,7 @@ function ingest(bucket, src, rows) {
     }
     if (row.url && !rec.url) rec.url = row.url;
     if (row.art && !rec.art) rec.art = row.art;
-    if (row.prev && !rec.prev) rec.prev = row.prev;
+    if (isApplePreview(row.prev) && !isApplePreview(rec.prev)) rec.prev = row.prev;
     if (row.year && !rec.year) rec.year = row.year;
     bucket.set(key, rec);
   }
@@ -215,15 +237,56 @@ export async function buildTop50() {
     artist: rec.artist,
     url: rec.url || "",
     art: rec.art || "",
-    prev: rec.prev || "",
+    prev: isApplePreview(rec.prev) ? rec.prev : "",
     year: rec.year || "",
   }));
+  await enrichApple(tracks);
+  tracks.forEach((t) => {
+    t.url = appleAff(t.url);
+    if (!isApplePreview(t.prev)) t.prev = "";
+  });
   return {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
     tracks,
   };
+}
+
+async function itunesLookup(title, artist) {
+  const term = encodeURIComponent(`${artist} ${stripParen(title)}`.trim());
+  const data = await getJson(`https://itunes.apple.com/search?term=${term}&entity=song&limit=5&country=US`);
+  const wantT = normTitle(title);
+  const wantA = primaryArtist(artist);
+  let hit = (data.results || []).find((item) => normTitle(item.trackName) === wantT && primaryArtist(item.artistName) === wantA)
+    || (data.results || []).find((item) => normTitle(item.trackName) === wantT)
+    || (data.results || [])[0];
+  if (!hit) return {};
+  const album = String(hit.collectionId || "");
+  const track = String(hit.trackId || "");
+  const url = album && track ? `https://music.apple.com/us/album/${album}?i=${track}` : (hit.trackViewUrl || "");
+  return {
+    url,
+    art: String(hit.artworkUrl100 || "").replace("100x100bb", "600x600bb"),
+    prev: hit.previewUrl || "",
+    year: String(hit.releaseDate || "").slice(0, 4),
+  };
+}
+
+async function enrichApple(tracks) {
+  await Promise.all(tracks.map(async (t) => {
+    if (t.url && isApplePreview(t.prev) && t.art) return;
+    try {
+      const extra = await Promise.race([
+        itunesLookup(t.title, t.artist),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("itunes-timeout")), 2500)),
+      ]);
+      if (extra.prev && isApplePreview(extra.prev)) t.prev = extra.prev;
+      if (extra.url && !t.url) t.url = extra.url;
+      if (extra.art && !t.art) t.art = extra.art;
+      if (extra.year && !t.year) t.year = extra.year;
+    } catch {}
+  }));
 }
 
 function top50Response(payload) {
@@ -254,7 +317,7 @@ export async function onRequestGet({ env, request }) {
   const today = new Date().toISOString().slice(0, 10);
   if (env && env.DESK) {
     try {
-      const cached = await env.DESK.get("top50", { type: "json" });
+      const cached = await env.DESK.get(TOP50_KV, { type: "json" });
       if (cached && cached.updated === today && Array.isArray(cached.tracks) && cached.tracks.length) {
         return top50Response(cached);
       }
@@ -264,7 +327,7 @@ export async function onRequestGet({ env, request }) {
     const payload = await withTimeout(buildTop50(), 12000);
     payload.tracks = await applyTenure(env, payload.tracks);
     if (env && env.DESK && payload.tracks && payload.tracks.length) {
-      try { await env.DESK.put("top50", JSON.stringify(payload)); } catch {}
+      try { await env.DESK.put(TOP50_KV, JSON.stringify(payload)); } catch {}
     }
     if (payload.tracks && payload.tracks.length) return top50Response(payload);
   } catch (err) {

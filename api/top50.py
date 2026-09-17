@@ -32,6 +32,8 @@ UA = (
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
 )
 CTX = ssl.create_default_context()
+APPLE_AT = "1001l3aZW"
+APPLE_CT = "music98"
 
 TITLE_ALIASES = {
     "iknewitiknewyoufromtoystory5": "iknewitiknewyou",
@@ -244,6 +246,21 @@ def load_source(name: str, fn):
         return []
 
 
+def is_apple_preview(url: str) -> bool:
+    u = (url or "").lower()
+    return "apple.com" in u or "mzstatic.com" in u
+
+
+def apple_aff(url: str) -> str:
+    if not url or "apple.com" not in url.lower():
+        return url or ""
+    parsed = urllib.parse.urlparse(url)
+    q = urllib.parse.parse_qsl(parsed.query, keep_blank_values=True)
+    q = [(k, v) for k, v in q if k not in ("at", "ct", "app")]
+    q.extend([("app", "music"), ("at", APPLE_AT), ("ct", APPLE_CT)])
+    return urllib.parse.urlunparse(parsed._replace(query=urllib.parse.urlencode(q)))
+
+
 def itunes_lookup(title: str, artist: str) -> dict:
     term = urllib.parse.quote(f"{artist} {strip_paren(title)}".strip())
     url = f"https://itunes.apple.com/search?term={term}&entity=song&limit=5&country=US"
@@ -279,12 +296,29 @@ def itunes_lookup(title: str, artist: str) -> dict:
 
 def enrich_tracks(tracks: list[dict]) -> None:
     def one(t):
-        if t.get("url") and t.get("prev") and t.get("art"):
+        if t.get("url"):
+            t["url"] = apple_aff(t["url"])
+        if (
+            t.get("url")
+            and is_apple_preview(t.get("prev") or "")
+            and t.get("art")
+        ):
             return t
         extra = itunes_lookup(t["title"], t["artist"])
-        for k, v in extra.items():
-            if v and not t.get(k):
-                t[k] = v
+        if extra.get("prev") and (
+            is_apple_preview(extra["prev"]) or not is_apple_preview(t.get("prev") or "")
+        ):
+            t["prev"] = extra["prev"]
+        if extra.get("url") and not t.get("url"):
+            t["url"] = extra["url"]
+        if extra.get("art") and not t.get("art"):
+            t["art"] = extra["art"]
+        if extra.get("year") and not t.get("year"):
+            t["year"] = extra["year"]
+        if t.get("url"):
+            t["url"] = apple_aff(t["url"])
+        if t.get("prev") and not is_apple_preview(t["prev"]):
+            t["prev"] = ""
         return t
 
     with ThreadPoolExecutor(max_workers=8) as pool:
@@ -311,8 +345,9 @@ def ingest(bucket: dict, src: str, rows: list[dict]) -> None:
             rec["url"] = row["url"]
         if row.get("art") and not rec["art"]:
             rec["art"] = row["art"]
-        if row.get("prev") and not rec["prev"]:
-            rec["prev"] = row["prev"]
+        prev = row.get("prev") or ""
+        if is_apple_preview(prev) and not is_apple_preview(rec.get("prev") or ""):
+            rec["prev"] = prev
         if row.get("year") and not rec["year"]:
             rec["year"] = row["year"]
         bucket[key] = rec
@@ -426,14 +461,17 @@ def build_payload(enrich: bool = False) -> dict:
 
     tracks = []
     for i, rec in enumerate(ranked, 1):
+        prev = rec.get("prev") or ""
+        if not is_apple_preview(prev):
+            prev = ""
         tracks.append(
             {
                 "rank": i,
                 "title": rec["title"],
                 "artist": rec["artist"],
-                "url": rec.get("url") or "",
+                "url": apple_aff(rec.get("url") or ""),
                 "art": rec.get("art") or "",
-                "prev": rec.get("prev") or "",
+                "prev": prev,
                 "year": rec.get("year") or "",
             }
         )
@@ -490,7 +528,7 @@ def js_obj(track: dict, weeks: int, delta: str) -> str:
         "artist": track["artist"],
         "weeks": weeks,
         "delta": delta,
-        "url": track.get("url") or "",
+        "url": apple_aff(track.get("url") or ""),
         "art": track.get("art") or "",
         "prev": track.get("prev") or "",
         "year": track.get("year") or "",
