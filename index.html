@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>music98.news — consensus Top 50</title>
+  <meta name="description" content="Independent music desk. A weekly Top 50 built from Apple Music, Spotify, Deezer and Billboard, with official Listen on Apple Music links." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235eead4'/%3E%3Ctext x='16' y='21' text-anchor='middle' font-size='12' font-family='system-ui' font-weight='800' fill='%2306201c'%3E98%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/site.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="#news" data-tab="news">
+        <span class="logo">98</span>
+        <span>
+          <b>music98.news</b>
+          <small>consensus chart</small>
+        </span>
+      </a>
+      <nav class="tabs" aria-label="Sections">
+        <button type="button" data-tab="news" class="active">News</button>
+        <button type="button" data-tab="releases">Releases</button>
+        <button type="button" data-tab="charts">Charts</button>
+      </nav>
+      <div class="top-actions">
+        <button type="button" class="ghost" id="btn-subscribe">Subscribe</button>
+        <button type="button" class="ghost" id="btn-editor">Desk</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="view-news" class="view active">
+      <div class="hero">
+        <div class="kicker">Week of Sep 14–20, 2026</div>
+        <h1>Four charts, one Top 50.</h1>
+        <p class="lede">music98 averages Apple Music, Spotify, Deezer and Billboard into a single ranking. Amazon Music has no public web chart, so it stays out of the math. Every row opens a 30-second preview and the official Listen on Apple Music badge.</p>
+      </div>
+      <div class="grid-news">
+        <article class="card">
+          <img class="cover" src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/91/4d/e2914d0a-7f1d-f04c-fbf4-c50b38548838/196873638690.jpg/1200x600bb.jpg" alt="Ella Langley — Choosin' Texas" />
+          <div class="pad">
+            <div class="meta">Lead · Sep 17, 2026</div>
+            <h2>Choosin’ Texas still owns the consensus.</h2>
+            <p>Ella Langley sits at No. 1 on the music98 Top 50 this week: Billboard Hot 100 No. 1, Apple Music No. 2, Deezer No. 2, Spotify No. 26. Inverse-rank scoring across those four lists gives it 173 points — the only title this week that scores on every source.</p>
+          </div>
+        </article>
+        <div class="stack" id="news-side">
+          <article class="card pad mini">
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2b/66/b2/2b66b26c-ab23-faa1-c4ee-06fa2cce8f76/26UM1IM00558.rgb.jpg/200x200bb.jpg" alt="KAROL G — BbY WOW" />
+            <div>
+              <div class="meta">Streaming · Sep 17</div>
+              <h3>KAROL G holds Apple and Spotify at No. 1</h3>
+              <p>BbY WOW with Judeline and rusowsky is the rare double-top. It still misses Deezer, so the consensus parks it at No. 2.</p>
+            </div>
+          </article>
+          <article class="card pad mini">
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7c/de/5e/7cde5e7a-612d-9714-d34c-1eb234c85ebb/810129961546.jpg/200x200bb.jpg" alt="STELLA LEFTY — Boston" />
+            <div>
+              <div class="meta">Country · Sep 16</div>
+              <h3>Boston keeps STELLA LEFTY in the high teens</h3>
+              <p>Hot 100 No. 2 and Deezer No. 3, but a 28 on Apple Music. The spread is the whole point of averaging the lists.</p>
+            </div>
+          </article>
+          <article class="card pad mini">
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/200x200bb.jpg" alt="Olivia Dean — Man I Need" />
+            <div>
+              <div class="meta">Crossover · Sep 15</div>
+              <h3>Olivia Dean is the most even four-source record</h3>
+              <p>Man I Need is the only other title besides Choosin’ Texas that lands on Apple, Spotify, Deezer and Billboard at once.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div id="desk-news" class="stack" style="margin-top:16px"></div>
+    </section>
+
+    <section id="view-releases" class="view">
+      <div class="hero">
+        <div class="kicker">New &amp; current</div>
+        <h1>Releases moving the chart.</h1>
+        <p class="lede">Singles and album cuts that actually appear in this week’s consensus. Artwork and links come from Apple Music via the iTunes Search API.</p>
+      </div>
+      <div class="releases" id="release-grid"></div>
+    </section>
+
+    <section id="view-charts" class="view">
+      <div class="chart-head">
+        <div class="hero" style="margin:0">
+          <div class="kicker">music98 Top 50</div>
+          <h1>This week’s consensus.</h1>
+        </div>
+        <div class="status" id="chart-status">Loading snapshot…</div>
+      </div>
+      <div class="formula">
+        Each source is a 50-deep list. A title at position <code>p</code> scores <code>max(0, 51 − p)</code>.
+        Missing a chart scores <code>0</code>. music98 score = <code>A + S + D + B</code>.
+        Ties break on number of sources, then best rank.
+        Amazon Music is excluded: there is no public web chart to read.
+        <div class="legend">
+          <span class="chip A on">A Apple Music</span>
+          <span class="chip S on">S Spotify</span>
+          <span class="chip D on">D Deezer</span>
+          <span class="chip B on">B Billboard</span>
+        </div>
+      </div>
+      <div class="chart-list" id="chart-list">
+        <div class="loading">Assembling the Top 50…</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>
+        <strong style="color:#f5f7fa">music98.news</strong>
+        <div>Independent ranking. Previews are Apple’s 30-second clips. Full tracks open on Apple Music.</div>
+      </div>
+      <div>
+        <button type="button" class="ghost" id="btn-privacy">Privacy</button>
+        <button type="button" class="ghost" id="btn-method">Method</button>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal" id="modal-sub" role="dialog" aria-labelledby="sub-title">
+    <div class="sheet">
+      <h2 id="sub-title">Get the weekly Top 50</h2>
+      <p style="color:var(--muted);margin:0 0 8px">One mail when the consensus updates. Stored only in this browser until you plug in a real list.</p>
+      <label for="sub-email">Email</label>
+      <input id="sub-email" type="email" placeholder="you@label.com" />
+      <div class="row-btns">
+        <button type="button" class="ghost" data-close>Cancel</button>
+        <button type="button" class="primary" id="sub-save">Subscribe</button>
+      </div>
+      <p id="sub-msg" class="meta" style="margin-top:10px"></p>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-privacy" role="dialog" aria-labelledby="priv-title">
+    <div class="sheet">
+      <h2 id="priv-title">Privacy</h2>
+      <p style="color:var(--muted)">No accounts, no server-side store. Subscribe and desk drafts live in localStorage on this device. Chart audio is streamed from Apple (iTunes preview) or Deezer. Outbound Listen on Apple Music links use Apple’s affiliate parameters so a token can be added later without changing the layout.</p>
+      <div class="row-btns"><button type="button" class="primary" data-close>Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-method" role="dialog" aria-labelledby="meth-title">
+    <div class="sheet">
+      <h2 id="meth-title">How the Top 50 is built</h2>
+      <p style="color:var(--muted)">On load we show a baked snapshot, then refresh Apple Music (US most played, 50) and Deezer (worldwide tracks, 50). Spotify Global and Billboard Hot 100 are compiled into the snapshot — they have no public CORS feed. Each position scores 51 minus rank. The page then re-sorts. Every row’s badge is the official Listen on Apple Music artwork from Apple’s Marketing Tools API, wrapped around an Apple Music song URL.</p>
+      <div class="row-btns"><button type="button" class="primary" data-close>Close</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-editor" role="dialog" aria-labelledby="ed-title">
+    <div class="sheet">
+      <h2 id="ed-title">Desk draft</h2>
+      <p style="color:var(--muted);margin:0">Local notes for this browser. Not published anywhere.</p>
+      <label for="ed-title-in">Headline</label>
+      <input id="ed-title-in" maxlength="120" placeholder="Headline" />
+      <label for="ed-body">Body</label>
+      <textarea id="ed-body" placeholder="What happened this week…"></textarea>
+      <div class="row-btns">
+        <button type="button" class="ghost" id="ed-clear">Clear</button>
+        <button type="button" class="ghost" data-close>Close</button>
+        <button type="button" class="primary" id="ed-save">Save draft</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/app.js" defer></script>
+</body>
+</html>
