@@ -51,7 +51,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .search input{height:40px;padding-left:33px;border-radius:999px;background:rgba(255,255,255,.7);border-color:var(--line);color:var(--text)}
 .topbar ::placeholder{color:var(--muted2);opacity:1}
 .search-hints{max-width:1180px;margin:0 auto;padding:0 20px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--text)}
-.hint-chip{border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:999px;padding:4px 11px;cursor:pointer;color:var(--text);font-size:12.5px}
+.hint-chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:999px;padding:5px 11px;cursor:pointer;color:var(--text);font-size:12.5px;line-height:1}
 .hint-chip:hover{color:var(--text);border-color:var(--accent-dim)}
 .hint-chip b{color:var(--text)}
 
@@ -64,11 +64,11 @@ main{position:relative;z-index:1}
 .tab.active{display:block;animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .tab-head{margin-bottom:22px}
-.tab-head h1{margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;font-size:clamp(26px,4vw,38px);line-height:1;letter-spacing:-.03em}
-.tab-lead{display:inline-flex;align-items:center;gap:14px}
-.tab-head .tab-title{line-height:1}
-.tab-head .tab-bar{width:4px;height:.72em;border-radius:2px;background:var(--accent);flex:none}
-.tab-head .sub{margin:0;color:var(--muted);font-size:15px;font-weight:400;letter-spacing:0;line-height:1}
+.tab-head h1{margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:14px;font-size:clamp(26px,4vw,38px);line-height:1;letter-spacing:-.03em}
+.tab-lead{display:inline-flex;align-items:center;gap:12px}
+.tab-head .tab-title{line-height:1;display:block}
+.tab-head .tab-bar{width:4px;height:1.22em;border-radius:2px;background:var(--accent);flex:none;align-self:center}
+.tab-head .sub{margin:0;color:var(--muted);font-size:15px;font-weight:400;letter-spacing:0;line-height:1;align-self:center}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative}
@@ -88,7 +88,7 @@ a.card,a.hero{color:inherit;text-decoration:none}
 .card .cover img{width:100%;height:100%;object-fit:cover;transition:.35s}
 .card:hover .cover img{transform:scale(1.05)}
 .card.square .cover{aspect-ratio:1/1}
-.tag{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.86);backdrop-filter:blur(6px);color:var(--acc2);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid rgba(0,0,0,.18)}
+.tag{position:absolute;left:10px;top:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.86);backdrop-filter:blur(6px);color:var(--acc2);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1;padding:6px 11px;border-radius:999px;border:1px solid rgba(0,0,0,.18)}
 .tag.pink{color:var(--pink);border-color:rgba(255,61,129,.4)}
 .card .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
 .card h3{margin:0;font-size:16px;line-height:1.32;letter-spacing:-.01em}
@@ -107,7 +107,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- charts ---------- */
 .chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
-.chart-row{--pw:64px;display:grid;grid-template-columns:40px 44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
+.chart-row{--pw:52px;display:grid;grid-template-columns:40px 44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .pos{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--text);text-align:center}
@@ -117,18 +117,18 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .artwrap{position:relative;width:56px;height:56px;border-radius:12px;overflow:hidden;background:var(--card2);flex:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block}
 .chart-row.playing .artwrap{box-shadow:0 0 0 2px var(--accent)}
-.cmid{--pexp:0px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:14px;z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
-.chart-row.playing .cmid{background:rgba(255,255,255,.85);border-color:rgba(15,60,64,.10);backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);padding:10px}
-.rplay{width:64px;height:64px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transition:background .16s ease,color .16s ease,transform .16s ease}
-.rplay svg{width:26px;height:26px}
+.cmid{--pexp:0px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:10px;z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
+.chart-row.playing .cmid{background:rgba(255,255,255,.85);border-color:rgba(15,60,64,.10);backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);padding:4px}
+.rplay{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transition:background .16s ease,color .16s ease,transform .16s ease}
+.rplay svg{width:20px;height:20px}
 .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.06)}
 .chart-row.playing .rplay{background:var(--accent);border-color:transparent;color:#03282b}
-.pextra{display:flex;align-items:center;gap:14px;width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
+.pextra{display:flex;align-items:center;gap:10px;width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
 .chart-row.playing .pextra{opacity:1}
-.ptime{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:12px 18px;flex:none;height:56px}
-.pbar{width:200px;height:10px;border-radius:999px;background:var(--line);overflow:hidden;display:block}
+.ptime{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:8px 12px;flex:none}
+.pbar{width:140px;height:7px;border-radius:999px;background:var(--line);overflow:hidden;display:block}
 .pbar i{display:block;height:100%;width:0;background:var(--accent)}
-.pdur{font-size:16px;color:var(--muted2);font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+.pdur{font-size:13px;color:var(--muted2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .pextra .abadge{flex:none}
 .tinfo b{display:block;font-size:15.5px;letter-spacing:-.01em}
 .tinfo span{color:var(--muted);font-size:13px}
@@ -183,7 +183,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .article .acover{aspect-ratio:21/9;overflow:hidden;position:relative}
 .article .acover img{width:100%;height:100%;object-fit:cover}
-.article .abody{padding:26px 32px 34px}
+.article .abody{padding:24px 28px 22px}
 .article h1{margin:10px 0 6px;font-size:clamp(22px,3.4vw,32px);line-height:1.2;letter-spacing:-.02em}
 .article .ameta{color:var(--muted2);font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .article .atext{margin-top:16px;font-size:15.5px;color:var(--body-text)}
@@ -243,7 +243,7 @@ textarea{resize:vertical;min-height:64px}
 /* ---------- apple integrations ---------- */
 .cbtns{display:flex;gap:8px;align-items:center}
 .abadge{display:inline-flex;align-items:center;padding:0;background:transparent;border:0;border-radius:0;text-decoration:none;white-space:nowrap;transition:.15s}
-.abadge img{height:56px;width:auto;display:block}
+.abadge img{height:44px;width:auto;display:block}
 .abadge svg{display:none}
 .abadge:hover{opacity:.85}
 
@@ -263,9 +263,11 @@ textarea{resize:vertical;min-height:64px}
 .rcard .rdate{color:var(--muted2);font-size:11.5px}
 
 /* ---------- privacy overlay ---------- */
-.overlay .article{position:relative}
+.overlay .article{position:relative;max-width:720px}
+#privacyOverlay .abody{padding:22px 28px 16px}
 .ptext h2{font-size:16.5px;margin:22px 0 6px;letter-spacing:-.01em}
-.ptext p,.ptext li{font-size:14px;color:var(--body-text);margin:0 0 10px;line-height:1.65}
+.ptext p,.ptext li{font-size:14px;color:var(--body-text);margin:0 0 12px;line-height:1.6}
+.ptext p:last-child{margin-bottom:0}
 .ptext ul{padding-left:18px;margin:0 0 12px}
 .ptext a{color:var(--text);text-decoration:underline;text-underline-offset:2px}
 .legal-kicker{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#15181a;margin:0 0 8px}
@@ -275,16 +277,10 @@ textarea{resize:vertical;min-height:64px}
 .toast{background:var(--card);border:1px solid var(--accent-dim);border-left:3px solid var(--accent);border-radius:12px;padding:11px 16px;font-size:13.5px;box-shadow:var(--shadow);animation:pop .25s ease;max-width:320px}
 
 @media (max-width:1100px){
-  .pbar{width:160px}
+  .pbar{width:120px}
 }
 @media (max-width:900px){
   .chart-row{grid-template-columns:36px 40px 52px minmax(90px,1fr) var(--pw) auto}
-  .rplay{width:56px;height:56px}
-  .rplay svg{width:22px;height:22px}
-  .abadge img{height:48px}
-  .ptime{height:48px;padding:10px 14px}
-  .pbar{width:140px;height:8px}
-  .pdur{font-size:14px}
   .pextra .abadge{display:inline-flex}
   .foot-in{grid-template-columns:1fr 1fr}
   .hero{grid-template-columns:1fr}
@@ -298,10 +294,7 @@ textarea{resize:vertical;min-height:64px}
   .search{width:auto;flex:1}
   .foot-in{grid-template-columns:1fr}
   .chart-row{grid-template-columns:28px 34px 48px minmax(70px,1fr) var(--pw);gap:10px;padding:14px}
-  .rplay{width:52px;height:52px}
-  .ptime{height:44px;padding:8px 12px;gap:10px}
-  .pbar{width:96px;height:8px}
-  .abadge img{height:44px}
+  .pbar{width:96px}
   .weeks{grid-column:1/-1;text-align:left;justify-self:start}
   body{padding-top:118px}
   .cartist{white-space:normal;font-size:22px}
@@ -352,11 +345,11 @@ textarea{resize:vertical;min-height:64px}
   </section>
 
   <section class="tab" id="tab-charts">
-    <div class="tab-head"><h1><span class="tab-lead"><span class="tab-title">Charts</span><span class="tab-bar" aria-hidden="true"></span></span><span class="sub">Top 50 tracks of the week</span></h1></div>
+    <div class="tab-head"><h1><span class="tab-lead"><span class="tab-title">Charts</span><span class="tab-bar" aria-hidden="true"></span></span><span class="sub">Daily Top 50</span></h1></div>
     <div class="chart-switch" id="chartSwitch" hidden></div>
     <div class="chart" id="chartList" role="list"></div>
     <p class="chart-note" id="chartStatus" hidden></p>
-    <p class="chart-note">Click a row to play a 30-second preview. The year sits next to the title. Arrows show how a track moved this week.</p>
+    <p class="chart-note">The daily Top 50 is rebuilt every day.</p>
     <div class="empty" id="chartEmpty" hidden>Nothing found for your query.</div>
   </section>
 </main>
@@ -373,8 +366,7 @@ textarea{resize:vertical;min-height:64px}
   <div class="foot-in">
     <div class="foot-col">
       <h3>About us</h3>
-      <p>News, releases and a weekly Top 50.</p>
-      <p class="copy">© 2026 music98.news</p>
+      <p>Independent music media: industry news, release reviews and up-to-date charts. Short, sharp and to the point.</p>
     </div>
     <div class="foot-col">
       <h3>Sections</h3>
@@ -398,15 +390,15 @@ textarea{resize:vertical;min-height:64px}
 
 
 <div class="overlay" id="privacyOverlay" hidden>
-  <div class="article" style="max-width:860px">
+  <div class="article">
     <button class="aclose" id="privacyClose" aria-label="Close">✕</button>
     <div class="abody">
       <span class="legal-kicker">Last updated 17 September 2026</span>
       <h1>Privacy &amp; disclosure</h1>
       <div class="ptext">
-        <p><b>What we keep.</b> music98.news is an independent music site. If you subscribe, we store only that email so we can send the newsletter. A little playback state can also sit in your browser so the chart player remembers the last clip. We do not run ad trackers, we do not profile you, and we do not sell data.</p>
+        <p>If you subscribe, we store only that email for the newsletter. The chart player may keep a little playback state in your browser. No ad trackers, no profiling, no selling data.</p>
         <p><b>Apple Music.</b> The 30-second clips, artwork and Listen on Apple Music buttons come from Apple. Play a preview or tap a badge and your browser talks to Apple directly. Apple then handles technical data (including your IP address) under the <a href="https://www.apple.com/legal/privacy/">Apple Privacy Policy</a>. We stream the clip; we never re-host the audio. Those badges are affiliate links (Apple Performance Partners): if you start a subscription we may earn a commission, at no extra cost to you. That never changes what we cover or how the Top 50 is ranked.</p>
-        <p><b>Your choices.</b> You can ask us to see, correct or delete a newsletter address we hold. Anything stored only in your browser disappears when you clear this site’s data in the browser settings. The site is not aimed at children under 13. If this page changes in a way that matters, we update the date above.</p>
+        <p>You can ask us to see, correct or delete a newsletter address. Data stored only in your browser clears when you clear this site’s data. Not aimed at children under 13.</p>
       </div>
     </div>
   </div>
@@ -707,7 +699,7 @@ function markRows(){
           const w = pe ? pe.scrollWidth : 0;
           if(w > 0 && row.classList.contains("playing")){
             cm.style.setProperty("--pexp", w+"px");
-            row.style.setProperty("--pw", (w + 104)+"px");
+            row.style.setProperty("--pw", (w + 72)+"px");
           }
         });
       } else { cm.style.removeProperty("--pexp"); row.style.removeProperty("--pw"); }
@@ -1071,7 +1063,7 @@ function renderCharts(){
     const key = (r.title||"")+"|"+(r.artist||"");
     const art = r.art ? esc(r.art) : presetCover(i, r.title || r.artist, true);
     const searchUrl = aff("https://music.apple.com/us/search?term=" + encodeURIComponent((r.title||"") + " " + (r.artist||"")));
-    const badgeImg = '<img src="badges/listen-on-apple-music.svg" alt="Listen on Apple Music" height="56">';
+    const badgeImg = '<img src="badges/listen-on-apple-music.svg" alt="Listen on Apple Music" height="44">';
     const badge = r.url
       ? `<a class="abadge" rel="nofollow sponsored" href="${esc(aff(r.url))}" title="Listen on Apple Music" aria-label="Listen on Apple Music">${badgeImg}</a>`
       : `<a class="abadge" data-lk="${esc(key)}" rel="nofollow sponsored" href="${searchUrl}" title="Listen on Apple Music" aria-label="Listen on Apple Music">${badgeImg}</a>`;
