@@ -18,11 +18,13 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 
 SIZE = 50
+LAUNCH = date(2026, 9, 17)
+TENURE_PATH = Path(__file__).resolve().parents[1] / "data" / "chart-tenure.json"
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
@@ -319,6 +321,60 @@ def score_of(ranks: dict) -> int:
     return sum(points(ranks.get(k)) for k in ("A", "S", "D", "B"))
 
 
+def chart_week(day=None) -> int:
+    day = day or datetime.now(timezone.utc).date()
+    return max(0, (day - LAUNCH).days // 7)
+
+
+def tenure_key(title: str, artist: str) -> str:
+    return f"{(title or '').strip().lower()}|{(artist or '').strip().lower()}"
+
+
+def apply_tenure(tracks: list[dict]) -> list[dict]:
+    """Weeks start at 1 on launch week, then +1 each calendar week a title stays on the list."""
+    week = chart_week()
+    try:
+        ten = json.loads(TENURE_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        ten = {}
+    if ten.get("launch") != LAUNCH.isoformat():
+        ten = {"launch": LAUNCH.isoformat(), "week": week, "keys": [], "seen": {}}
+    prev_keys = ten.get("keys") or []
+    seen = ten.get("seen") or {}
+    first = not prev_keys
+    rolled = first or ten.get("week") != week
+    new_keys = []
+    for i, track in enumerate(tracks):
+        key = tenure_key(track["title"], track["artist"])
+        new_keys.append(key)
+        try:
+            prev_pos = prev_keys.index(key)
+        except ValueError:
+            prev_pos = -1
+        rec = seen.get(key) or {"weeks": 0}
+        if first:
+            track["weeks"] = 1
+            track["delta"] = "0"
+        elif not rolled:
+            track["weeks"] = rec.get("weeks") or 1
+            track["delta"] = "new" if prev_pos < 0 else str(prev_pos - i)
+        else:
+            track["weeks"] = (rec.get("weeks") or 0) + 1 if prev_pos >= 0 else 1
+            track["delta"] = "new" if prev_pos < 0 else str(prev_pos - i)
+        seen[key] = {"weeks": track["weeks"], "lastPos": i, "lastWeek": week}
+    ten["week"] = week
+    ten["keys"] = new_keys
+    ten["seen"] = seen
+    TENURE_PATH.parent.mkdir(exist_ok=True)
+    try:
+        TENURE_PATH.write_text(
+            json.dumps(ten, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+    except OSError:
+        pass
+    return tracks
+
+
 def build_payload(enrich: bool = False) -> dict:
     apple = load_source(
         "A",
@@ -382,7 +438,9 @@ def build_payload(enrich: bool = False) -> dict:
         )
     return {
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        "tracks": tracks,
+        "launch": LAUNCH.isoformat(),
+        "week": chart_week() + 1,
+        "tracks": apply_tenure(tracks),
     }
 
 
@@ -455,8 +513,8 @@ def write_static(payload: dict) -> None:
     html = index.read_text(encoding="utf-8")
     items = []
     for i, track in enumerate(payload["tracks"], 1):
-        weeks = max(1, 22 - i // 3)
-        delta = "new" if i >= 46 else str([0, 1, -1, 2, -2, 3, -3, 1, 0, -1][i % 10])
+        weeks = int(track.get("weeks") or 1)
+        delta = str(track.get("delta") if track.get("delta") is not None else "0")
         items.append("  " + js_obj(track, weeks, delta))
     block = "const TOP50 = [\n" + ",\n".join(items) + "\n];"
     html2, n = re.subn(r"const TOP50 = \[\n[\s\S]*?\n\];", block, html, count=1)

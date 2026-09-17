@@ -184,5 +184,5 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", "43123"))
     httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     print(f"music98.news → http://127.0.0.1:{port}")
-    print("Desk → http://127.0.0.1:%s/admin.html" % port)
+    print("Desk → http://127.0.0.1:%s/m98desk.html" % port)
     httpd.serve_forever()

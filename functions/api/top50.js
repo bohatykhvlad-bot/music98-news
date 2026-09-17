@@ -1,4 +1,47 @@
 const SIZE = 50;
+const LAUNCH = Date.UTC(2026, 8, 17);
+
+function chartWeek() {
+  return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000 / 7));
+}
+function tenureKey(title, artist) {
+  return `${String(title || "").trim().toLowerCase()}|${String(artist || "").trim().toLowerCase()}`;
+}
+async function applyTenure(env, tracks) {
+  const week = chartWeek();
+  let ten = { launch: "2026-09-17", week, keys: [], seen: {} };
+  if (env && env.DESK) {
+    const v = await env.DESK.get("tenure", { type: "json" });
+    if (v && v.seen) ten = v;
+  }
+  const prevKeys = ten.keys || [];
+  const seen = ten.seen || {};
+  const first = !prevKeys.length;
+  const rolled = first || ten.week !== week;
+  const newKeys = [];
+  tracks.forEach((track, i) => {
+    const key = tenureKey(track.title, track.artist);
+    newKeys.push(key);
+    const prevPos = prevKeys.indexOf(key);
+    const rec = seen[key] || { weeks: 0 };
+    if (first) {
+      track.weeks = 1;
+      track.delta = "0";
+    } else if (!rolled) {
+      track.weeks = rec.weeks || 1;
+      track.delta = prevPos < 0 ? "new" : String(prevPos - i);
+    } else {
+      track.weeks = prevPos >= 0 ? (rec.weeks || 0) + 1 : 1;
+      track.delta = prevPos < 0 ? "new" : String(prevPos - i);
+    }
+    seen[key] = { weeks: track.weeks, lastPos: i, lastWeek: week };
+  });
+  ten.week = week;
+  ten.keys = newKeys;
+  ten.seen = seen;
+  if (env && env.DESK) await env.DESK.put("tenure", JSON.stringify(ten));
+  return tracks;
+}
 const UA = "Mozilla/5.0 (compatible; music98/1.0)";
 
 function stripParen(s) {
@@ -163,23 +206,27 @@ export async function buildTop50() {
       return a.title.localeCompare(b.title);
     })
     .slice(0, SIZE);
+  const tracks = ranked.map((rec, i) => ({
+    rank: i + 1,
+    title: rec.title,
+    artist: rec.artist,
+    url: rec.url || "",
+    art: rec.art || "",
+    prev: rec.prev || "",
+    year: rec.year || "",
+  }));
   return {
     updated: new Date().toISOString().slice(0, 10),
-    tracks: ranked.map((rec, i) => ({
-      rank: i + 1,
-      title: rec.title,
-      artist: rec.artist,
-      url: rec.url || "",
-      art: rec.art || "",
-      prev: rec.prev || "",
-      year: rec.year || "",
-    })),
+    launch: "2026-09-17",
+    week: chartWeek() + 1,
+    tracks,
   };
 }
 
-export async function onRequestGet() {
+export async function onRequestGet({ env }) {
   try {
     const payload = await buildTop50();
+    payload.tracks = await applyTenure(env, payload.tracks);
     return new Response(JSON.stringify(payload), {
       headers: {
         "Content-Type": "application/json; charset=utf-8",

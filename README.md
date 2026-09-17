@@ -10,7 +10,8 @@ python3 scripts/serve.py
 ```
 
 Open http://127.0.0.1:43123  
-Editorial desk: http://127.0.0.1:43123/admin.html (password from `.env`, default `music98`)
+Private desk (not linked on the public site): http://127.0.0.1:43123/m98desk.html  
+Password is `ADMIN_PASSWORD` in `.env` (default `music98`). Change it before you go live.
 
 ## Cloudflare, in plain language
 
@@ -27,7 +28,7 @@ If Pages Functions time out on the chart rebuild, the baked `data/top50.json` st
 
 ## Editorial desk
 
-`/admin.html` is a separate page. You log in, write a story, attach a photo, press **Publish to the site**. Visitors see it on News / Releases. This is not the old browser-only drawer: it writes to the server (`data/desk.json` locally, KV on Cloudflare).
+`/m98desk.html` is a private page. It is not linked in the footer. Bookmark it. You log in, write a story, attach a photo, press **Publish to the site**. Visitors see it on News / Releases. This writes to the server (`data/desk.json` locally, KV on Cloudflare).
 
 Until you publish at least one post, the homepage keeps the demo stories.
 
