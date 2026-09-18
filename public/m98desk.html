@@ -38,8 +38,7 @@ input,textarea,select{width:100%;font:inherit;font-size:14px;padding:8px 10px;bo
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 12px}
 .list{display:flex;flex-direction:column;gap:6px}
 .item{display:grid;grid-template-columns:40px 1fr auto auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px}
-.item img{width:40px;height:40px;object-fit:cover;border-radius:6px;background:var(--bg2)}
-.item .ph{width:40px;height:40px;border-radius:6px;background:var(--bg2)}
+.item img,.item canvas{width:40px;height:40px;object-fit:cover;border-radius:6px;background:var(--bg2);display:block}
 .st{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:2px 7px;margin-left:6px;vertical-align:middle}
 .st.live{background:#e8fff6;color:#0d6b45}
 .st.draft{background:#f4f6f7;color:#5c6a70}
@@ -337,6 +336,25 @@ function esc(s){ return String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&
 function rich(s){ return esc(s).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>"); }
 function originalCover(src){
   return String(src||"").replace(/-banner(\.[a-z0-9]+)(?:\?.*)?$/i, "$1");
+}
+const PAL = [
+  ["#083b40","#04161a","#00fdfb"], ["#40102a","#160410","#ff3d81"],
+  ["#402a08","#170d02","#ffb03a"], ["#241a4d","#0b0620","#8f7bff"],
+  ["#0c3a26","#03150d","#3ddc84"], ["#3a0f0f","#150404","#ff5c5c"],
+  ["#123a4d","#04141c","#4dd2ff"], ["#3d3a10","#141203","#e8e04d"]
+];
+function presetThumb(p){
+  const i = Number(p && p.cover && p.cover.i) || 0;
+  const [c1,c2,ac] = PAL[((i%PAL.length)+PAL.length)%PAL.length];
+  const letter = esc((p.artist || p.title || "♪").trim().charAt(0).toUpperCase() || "♪");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="80" height="80" fill="url(#g)"/><circle cx="66" cy="16" r="34" fill="${ac}" opacity="0.16"/><text x="40" y="54" font-family="Arial,Helvetica,sans-serif" font-size="34" font-weight="800" fill="#fff" fill-opacity="0.9" text-anchor="middle">${letter}</text></svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+function listThumbSrc(p){
+  const src = (p.cover && p.cover.src) || "";
+  if(src && src.indexOf("data:image/")!==0 && src.indexOf("blob:")!==0) return src;
+  if(src) return "";
+  return presetThumb(p);
 }
 
 function readPhoto(file, cb, max=1800){
@@ -862,12 +880,14 @@ function setCover(src, pos, zoom){
 function renderList(){
   $("#list").innerHTML = posts.length ? posts.map(p=>{
     const src = (p.cover && p.cover.src) || "";
-    const tiny = src.indexOf("data:image/")===0 ? "" : src;
+    const tiny = listThumbSrc(p);
     const st = p.status || "live";
     const badge = st==="draft" ? "draft" : st==="scheduled" ? "sched" : "live";
     const badgeLabel = st==="draft" ? "Draft" : st==="scheduled" ? "Scheduled" : "Live";
     const when = st==="scheduled" && p.publishAt ? " · "+fmtWhen(p.publishAt) : (p.date ? " · "+esc(p.date) : "");
-    const thumb = tiny ? `<img src="${esc(tiny)}" alt="">` : `<div class="ph"></div>`;
+    const thumb = tiny
+      ? `<img src="${esc(tiny)}" alt="">`
+      : (src ? `<img data-thumb="${esc(p.id)}" alt="">` : `<div class="ph"></div>`);
     return `
     <div class="item">
       ${thumb}
@@ -876,6 +896,11 @@ function renderList(){
       <button class="btn danger" data-del="${esc(p.id)}" type="button">Delete</button>
     </div>`;
   }).join("") : '<p class="muted">Nothing saved yet.</p>';
+  $("#list").querySelectorAll("img[data-thumb]").forEach(img=>{
+    const p = posts.find(x => x.id === img.getAttribute("data-thumb"));
+    const src = p && p.cover && p.cover.src;
+    if(src) img.src = src;
+  });
 }
 
 function fillForm(p){
