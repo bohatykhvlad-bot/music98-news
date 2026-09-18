@@ -136,7 +136,7 @@ a{color:var(--text)}
 <body>
 <div class="wrap">
   <div class="top">
-    <a class="brand" href="index.html" title="music98.news — home">
+    <a class="brand" href="#desk" id="brandHome" title="music98.news — desk">
       <img class="brand-logo" src="logo.png" alt="music98.news" width="40" height="40">
       <span class="brand-name">music98.news</span>
     </a>
@@ -1263,6 +1263,15 @@ document.addEventListener("keydown", e=>{
 });
 
 $("#reset").onclick = ()=> fillForm(null);
+$("#brandHome").onclick = e=>{
+  e.preventDefault();
+  const apple = $("#appleModal");
+  const yt = $("#ytModal");
+  if(apple) apple.classList.add("hide");
+  if(yt) yt.classList.add("hide");
+  if($("#desk") && !$("#desk").classList.contains("hide")) fillForm(null);
+  window.scrollTo(0, 0);
+};
 
 function collectPost(status){
   const title = $("#title").value.trim();
