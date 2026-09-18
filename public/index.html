@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="chart-pad-eq-1">
+<meta name="m98-build" content="hd-albums-1">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -73,7 +73,7 @@ main{position:relative;z-index:1}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .hd{margin:0 0 22px}
-.hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text)}
+.hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
@@ -413,7 +413,7 @@ textarea{resize:vertical;min-height:64px}
   </section>
 
   <section class="tab" id="tab-releases">
-    <div class="hd"><h1 class="hd-t">New albums, EPs and singles</h1></div>
+    <div class="hd"><h1 class="hd-t">Albums, EPs & singles</h1></div>
     <div class="grid" id="relGrid"></div>
     <div class="empty" id="relEmpty" hidden>Nothing found for your query.</div>
   </section>
