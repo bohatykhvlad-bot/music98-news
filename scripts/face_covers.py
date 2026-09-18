@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Cut 16:9 cover stills on the detected face.
 
-Keep the whole head. On a close-up, hang the hair from the top of the
-frame so there is no empty strip of sky above it.
+Keep the whole head. On a close-up, find the real hairline (not a
+guessed pad above the face box) and hang it from the top of the frame
+so there is no empty strip of sky.
 """
 from __future__ import annotations
 
@@ -10,6 +11,7 @@ import urllib.request
 from pathlib import Path
 
 import cv2
+import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 PHOTOS = ROOT / "public" / "photos"
@@ -43,6 +45,25 @@ def detect_face(im):
     return x, y, fw, fh
 
 
+def hair_top(im, face):
+    """First strong silhouette above the face — the crown of the hair."""
+    x, y, fw, fh = face
+    H, W = im.shape[:2]
+    hx0 = max(0, int(x + 0.18 * fw))
+    hx1 = min(W, int(x + 0.82 * fw))
+    y1 = max(2, int(y))
+    gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+    roi = gray[0:y1, hx0:hx1].astype(np.float32)
+    if roi.size == 0:
+        return max(0.0, y - 0.06 * fh)
+    gy = cv2.Sobel(roi, cv2.CV_32F, 0, 1, ksize=5)
+    energy = np.abs(gy).mean(axis=1)
+    peak = float(energy.max()) if len(energy) else 0.0
+    if peak < 40:
+        return max(0.0, y - 0.06 * fh)
+    return float(int(np.argmax(energy)))
+
+
 def crop_to_face(im, face):
     H, W = im.shape[:2]
     x, y, fw, fh = face
@@ -52,18 +73,16 @@ def crop_to_face(im, face):
     if need_h > H:
         need_h = float(H)
         need_w = need_h * ASPECT
-    closeup = fh > 0.32 * need_h
-    hair_pad = (0.10 if closeup else 0.45) * fh
-    chin_pad = 0.18 * fh
-    hair = y - hair_pad
-    chin = y + fh + chin_pad
+    closeup = fh > 0.28 * need_h
+    chin = y + fh + 0.18 * fh
+    crown = hair_top(im, face)
     if closeup:
-        top = hair
+        top = crown
     else:
         cy = y + fh * 0.42
         top = cy - need_h / 2
-        if top > hair:
-            top = hair
+        if top > crown:
+            top = crown
     if top + need_h < chin:
         top = chin - need_h
     left = cx - need_w / 2
@@ -73,7 +92,7 @@ def crop_to_face(im, face):
     x1, y1 = int(round(left + need_w)), int(round(top + need_h))
     crop = im[y0:y1, x0:x1]
     out_h = int(round(OUT_W / ASPECT))
-    return cv2.resize(crop, (OUT_W, out_h), interpolation=cv2.INTER_AREA)
+    return cv2.resize(crop, (OUT_W, out_h), interpolation=cv2.INTER_AREA), y0, crown, closeup
 
 
 def main() -> None:
@@ -83,10 +102,23 @@ def main() -> None:
         if im is None:
             raise SystemExit(f"missing {src}")
         face = detect_face(im)
-        out = crop_to_face(im, face)
+        out, y0, crown, closeup = crop_to_face(im, face)
         dest = PHOTOS / (src.stem + "-banner.jpg")
         cv2.imwrite(str(dest), out, [int(cv2.IMWRITE_JPEG_QUALITY), 90])
-        print("wrote", dest.name, out.shape[1], out.shape[0], "face", tuple(round(v) for v in face))
+        print(
+            "wrote",
+            dest.name,
+            out.shape[1],
+            out.shape[0],
+            "face",
+            tuple(round(v) for v in face),
+            "crown",
+            round(crown),
+            "crop_y",
+            y0,
+            "closeup",
+            closeup,
+        )
 
 
 if __name__ == "__main__":
