@@ -2,6 +2,11 @@ import { adminOk, json, readDesk, writeDesk } from "../lib/store.js";
 
 export async function onRequest({ request, env }) {
   if (request.method === "GET") {
+    const url = new URL(request.url);
+    if (url.searchParams.get("auth") === "1") {
+      if (!adminOk(request, env)) return json({ error: "unauthorized" }, 401);
+      return json({ ok: true });
+    }
     const desk = await readDesk(env, request);
     return json({ posts: desk.posts });
   }

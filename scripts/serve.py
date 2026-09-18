@@ -264,6 +264,11 @@ class Handler(SimpleHTTPRequestHandler):
                 status, body = json_bytes({"error": "rebuild_failed", "detail": str(exc)}, 502)
             return self._send(status, body)
         if path == "/api/desk":
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            if (qs.get("auth") or [""])[0] == "1":
+                if not self._authed():
+                    return self._send(*json_bytes({"error": "unauthorized"}, 401))
+                return self._send(*json_bytes({"ok": True}))
             d = desk_read()
             return self._send(*json_bytes({"posts": d["posts"]}))
         if path == "/api/subscribers":

@@ -478,19 +478,23 @@ async function reload(){
   }
 }
 
-$("#login").onclick = async ()=>{
-  sessionStorage.setItem(KEY, $("#key").value.trim());
+async function unlockDesk(){
+  const key = $("#key").value.trim();
+  if(!key){ toast("Enter the password"); return; }
+  sessionStorage.setItem(KEY, key);
   try{
+    await api("/api/desk?auth=1", {headers: headers(false)});
     await reload();
     $("#gate").classList.add("hide");
     $("#desk").classList.remove("hide");
     setAspect("16/9");
   }catch(e){
     sessionStorage.removeItem(KEY);
-    toast(e && e.error === "unauthorized" ? "Wrong password" : "Desk did not open. Open /m98desk on the site, then try music98.");
+    toast("Wrong password");
   }
-};
-$("#key").addEventListener("keydown", e=>{ if(e.key === "Enter") $("#login").click(); });
+}
+$("#login").onclick = unlockDesk;
+$("#key").addEventListener("keydown", e=>{ if(e.key === "Enter") unlockDesk(); });
 
 const stage = $("#stage");
 stage.addEventListener("click", e=>{
@@ -732,11 +736,11 @@ $("#send").onclick = async ()=>{
 
 $("#date").value = today();
 if(auth()){
-  reload().then(()=>{
+  api("/api/desk?auth=1", {headers: headers(false)}).then(()=> reload()).then(()=>{
     $("#gate").classList.add("hide");
     $("#desk").classList.remove("hide");
     setAspect("16/9");
-  }).catch(()=>{});
+  }).catch(()=> sessionStorage.removeItem(KEY));
 }
 
 function pauseDeskMedia(){
