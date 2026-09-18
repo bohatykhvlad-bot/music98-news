@@ -1289,7 +1289,6 @@ function loadPublishedDesk(){
     data.posts = posts;
     renderNews(); renderReleases(); renderHints();
     if($("#ef_list")) renderPostList();
-    bootAppleFromPosts(posts);
     route();
   };
   grab("/api/desk").catch(()=> grab("data/desk.json")).then(j=>{
@@ -1947,9 +1946,23 @@ function closeArticle(){
   try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
   jumpY(listY);
 }
+function intentBootPost(id){
+  try{ id = decodeURIComponent(id||""); }catch(e){}
+  const p = data.posts.find(x=>x.id===id);
+  if(p && !p.__m98boot){ p.__m98boot = 1; bootAppleFromPosts([p]); }
+}
+function intentBootEvent(e){
+  const a = e.target && e.target.closest ? e.target.closest("a.hero, a.card") : null;
+  if(!a) return;
+  const m = (a.getAttribute("href")||"").match(/^#post\/(.+)$/);
+  if(m) intentBootPost(m[1]);
+}
+document.addEventListener("mouseover", intentBootEvent, {passive:true});
+document.addEventListener("focusin", intentBootEvent);
 function route(){
   const m = location.hash.match(/^#post\/(.+)$/);
   if(m){
+    intentBootPost(m[1]);       /* preload exactly this page's players */
     const p = data.posts.find(x=>x.id===decodeURIComponent(m[1]));
     if(p){ showArticle(p); return; }
   }
