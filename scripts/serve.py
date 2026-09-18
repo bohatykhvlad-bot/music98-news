@@ -271,6 +271,8 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._send(*json_bytes({"error": "unauthorized"}, 401))
             d = desk_read()
             return self._send(*json_bytes({"subscribers": d["subscribers"]}))
+        if path == "/m98desk":
+            self.path = "/m98desk.html"
         return super().do_GET()
 
     def do_POST(self):
@@ -356,5 +358,5 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", "43123"))
     httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     print(f"music98.news → http://127.0.0.1:{port}")
-    print("Desk → http://127.0.0.1:%s/m98desk.html" % port)
+    print("Desk → http://127.0.0.1:%s/m98desk" % port)
     httpd.serve_forever()

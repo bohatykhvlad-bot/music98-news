@@ -16,15 +16,15 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5}
-.wrap{max-width:920px;margin:0 auto;padding:28px 20px 80px}
+.wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;font-weight:800}
-.brand img{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
+.brand img{width:40px;height:40px;border-radius:50%;object-fit:cover}
 .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
-h1{margin:0 0 8px;font-size:32px;line-height:1;letter-spacing:-.03em}
+h1{margin:0 0 8px;font-size:32px;line-height:1;letter-spacing:-.03em;color:var(--text)}
+h2{margin:0 0 10px;font-size:20px;color:var(--text)}
 .head{margin-bottom:22px}
-label{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
-input,textarea,select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2)}
-textarea{min-height:140px;resize:vertical}
+label{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text);margin:12px 0 6px}
+input,textarea,select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--text)}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .btn{border:0;border-radius:999px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
 .btn.primary{background:var(--accent);color:#03282b}
@@ -36,12 +36,34 @@ textarea{min-height:140px;resize:vertical}
 .item{display:grid;grid-template-columns:52px 1fr auto auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px}
 .item img{width:52px;height:52px;object-fit:cover;border-radius:8px}
 .muted{color:var(--muted);font-size:13px}
-.toast{position:fixed;right:16px;bottom:16px;background:#fff;border:1px solid var(--accent);border-radius:12px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
-.cover{width:100%;max-height:220px;object-fit:cover;border-radius:12px;margin-top:8px;background:var(--bg2)}
+.toast{position:fixed;right:16px;bottom:16px;background:#fff;border:1px solid var(--accent);border-radius:12px;padding:10px 14px;box-shadow:0 8px 24px rgba(0,0,0,.08);z-index:40}
 .login{max-width:380px;margin:12vh auto;padding:24px}
 .hide{display:none}
 a{color:var(--text)}
-@media (max-width:700px){ .row,.item{grid-template-columns:1fr} }
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.toolbar .btn{padding:12px 16px;font-size:15px}
+.stage-wrap{border:1px dashed var(--line);border-radius:14px;background:var(--bg2);overflow:hidden}
+.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;cursor:grab;background:#e8ecee;touch-action:none}
+.stage.hot{outline:2px solid var(--acc2);outline-offset:-2px}
+.stage:active{cursor:grabbing}
+.stage img{position:absolute;left:0;top:0;max-width:none;user-select:none;pointer-events:none;will-change:transform}
+.stage .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;pointer-events:none}
+.cropbar{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid var(--line)}
+.cropbar input[type=range]{flex:1}
+.composer{min-height:520px;padding:18px 18px 40px;border:1px solid var(--line);border-radius:14px;background:#fff;font-size:17px;line-height:1.65;outline:none}
+.composer:empty:before{content:attr(data-placeholder);color:var(--muted)}
+.composer p{margin:0 0 14px}
+.composer em,.composer i{font-style:italic}
+.composer .blk{position:relative;margin:14px auto 22px;border-radius:14px}
+.composer .blk .kill{position:absolute;right:8px;top:8px;z-index:2;width:28px;height:28px;border:0;border-radius:50%;background:#fff;color:#15181a;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.composer .aembed{max-width:600px;margin:14px auto 22px}
+.composer .aembed.album{max-width:100%}
+.composer iframe{width:100%;border:0;border-radius:12px;display:block;background:transparent}
+.composer .abody-pic img{width:100%;border-radius:14px;display:block}
+.modal{position:fixed;inset:0;background:rgba(10,16,18,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:30}
+.modal .card{max-width:640px;width:100%;margin:0}
+.modal iframe{width:100%;border:0;border-radius:12px;display:block;margin-top:12px}
+@media (max-width:900px){ .row,.item{grid-template-columns:1fr} .composer{min-height:380px} }
 </style>
 </head>
 <body>
@@ -56,7 +78,6 @@ a{color:var(--text)}
 
   <section id="gate" class="card login">
     <div class="head"><h1>Desk</h1></div>
-    <p class="muted">This page changes the public News and Releases. Default local password is <code>music98</code> — change it in <code>.env</code> before you go live.</p>
     <label for="key">Password</label>
     <input id="key" type="password" autocomplete="current-password">
     <div class="actions"><button class="btn primary" id="login" type="button">Open desk</button></div>
@@ -77,59 +98,97 @@ a{color:var(--text)}
         </div>
       </div>
       <div class="row">
-        <div><label for="tag">Tag</label><input id="tag" placeholder="Interview"></div>
-        <div><label for="rtype">Release type</label><input id="rtype" placeholder="Single / EP / Album"></div>
+        <div><label for="tag">Tag</label><input id="tag" placeholder="News"></div>
+        <div><label for="rtype">Release type</label><input id="rtype" placeholder="Album / Single / EP"></div>
       </div>
-      <label for="artist">Artist (optional)</label>
+      <label for="artist">Artist</label>
       <input id="artist">
       <label for="title">Title</label>
       <input id="title">
       <label for="excerpt">Short teaser</label>
       <textarea id="excerpt" style="min-height:70px"></textarea>
-      <label for="body">Body (blank line = new paragraph; album titles in *asterisks* for italics; songs in "quotes"; Apple Music: [apple:album:ID] or [apple:song:ALBUM:TRACK])</label>
-      <textarea id="body"></textarea>
-      <label for="photo">Cover photo</label>
-      <input id="photo" type="file" accept="image/*">
-      <img id="preview" class="cover hide" alt="">
-      <label for="credit">Photo credit (under the picture)</label>
+
+      <label>Cover — drop a photo, then drag like Instagram. Prefer 2026, then 2025.</label>
+      <div class="stage-wrap">
+        <div class="stage" id="stage">
+          <img id="stageImg" class="hide" alt="">
+          <p class="muted hint" id="coverHint">Click or drop a photo. Drag to frame the face. Keep the whole head.</p>
+        </div>
+        <div class="cropbar">
+          <span class="muted">Zoom</span>
+          <input id="zoom" type="range" min="1" max="2.6" step="0.01" value="1">
+          <button class="btn ghost" type="button" id="replaceCover">Replace</button>
+        </div>
+      </div>
+      <input id="photo" class="hide" type="file" accept="image/*">
+      <label for="credit">Photo credit</label>
       <input id="credit" placeholder="Photographer / Wikimedia Commons (CC BY 4.0)">
       <label for="creditUrl">Credit link</label>
       <input id="creditUrl" placeholder="https://commons.wikimedia.org/wiki/File:...">
+
+      <label>Story</label>
+      <div class="toolbar">
+        <button class="btn ghost" type="button" data-wrap="italic">Italic album</button>
+        <button class="btn ghost" type="button" data-wrap="song">“Song title”</button>
+        <button class="btn ghost" type="button" id="btnPhoto">Photo in story</button>
+        <button class="btn ghost" type="button" id="btnSong">Apple song</button>
+        <button class="btn ghost" type="button" id="btnAlbum">Apple album</button>
+      </div>
+      <input id="bodyPhoto" class="hide" type="file" accept="image/*">
+      <div class="composer" id="composer" contenteditable="true" data-placeholder="Type here. Select a name and click Italic album. Click Apple song and paste a music.apple.com link — the token is added for you."></div>
+
       <label><input id="pinned" type="checkbox" style="width:auto"> Pin to the top of News</label>
       <div class="actions">
         <button class="btn primary" id="save" type="button">Publish to the site</button>
         <button class="btn ghost" id="reset" type="button">Clear form</button>
       </div>
-      <p class="muted" id="saveNote">Publish writes to the server. Visitors see it on the homepage after a refresh.</p>
+      <p class="muted">Publish writes to the live site. Open a story from the list to edit it.</p>
     </div>
 
     <div class="card">
-      <h2 style="margin:0 0 10px">On the site</h2>
+      <h2>On the site</h2>
       <div class="list" id="list"></div>
     </div>
 
     <div class="card">
-      <div class="head"><h1 style="font-size:24px">Mail</h1></div>
+      <h2>Mail</h2>
       <p class="muted" id="subCount">No addresses yet.</p>
       <label for="msubject">Subject</label>
       <input id="msubject" placeholder="This week on music98.news">
       <label for="mtext">Letter</label>
-      <textarea id="mtext" placeholder="We’ll write this later. It goes to everyone on the list."></textarea>
+      <textarea id="mtext" style="min-height:100px"></textarea>
       <div class="actions">
         <button class="btn primary" id="send" type="button">Send to the list</button>
       </div>
-      <p class="muted">Sending needs a Resend API key in <code>.env</code> (or Cloudflare / Vercel environment variables). Addresses are saved even before that key exists.</p>
     </div>
   </section>
+</div>
+
+<div class="modal hide" id="appleModal">
+  <div class="card">
+    <h2 id="appleTitle">Apple Music</h2>
+    <p class="muted">Paste a music.apple.com link. The affiliate token is attached automatically.</p>
+    <label for="appleUrl">Link</label>
+    <input id="appleUrl" placeholder="https://music.apple.com/us/song/…">
+    <div id="applePrev"></div>
+    <div class="actions">
+      <button class="btn primary" type="button" id="appleGo">Insert</button>
+      <button class="btn ghost" type="button" id="appleCancel">Cancel</button>
+    </div>
+  </div>
 </div>
 <div class="toast hide" id="toast"></div>
 <script>
 const $ = s => document.querySelector(s);
 const KEY = "music98_admin_key";
+const APPLE_AT = "1001l3aZW";
 let posts = [];
-let cover = "";
-let coverMeta = {pos:"center top"};
+let coverSrc = "";
+let crop = {x:0.5, y:0.5, zoom:1, dirty:false};
 let editing = null;
+let appleKind = "song";
+let pendingApple = null;
+let drag = null;
 
 function toast(m){
   const t = $("#toast"); t.textContent = m; t.classList.remove("hide");
@@ -144,19 +203,19 @@ function headers(json=true){
 function today(){ return new Date().toISOString().slice(0,10); }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function esc(s){ return String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+function rich(s){ return esc(s).replace(/\*([^*]+)\*/g, "<em>$1</em>"); }
 
-function readPhoto(file, cb){
+function readPhoto(file, cb, max=1800){
   if(!file || file.type.indexOf("image/")!==0) return;
   const img = new Image();
   const url = URL.createObjectURL(file);
   img.onload = ()=>{
-    const max = 1400;
     let w = img.width, h = img.height;
     if(Math.max(w,h)>max){ const s = max/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
     const c = document.createElement("canvas"); c.width=w; c.height=h;
     c.getContext("2d").drawImage(img,0,0,w,h);
     URL.revokeObjectURL(url);
-    cb(c.toDataURL("image/jpeg", 0.84));
+    cb(c.toDataURL("image/jpeg", 0.86));
   };
   img.src = url;
 }
@@ -168,6 +227,154 @@ async function api(path, opt={}){
   return j;
 }
 
+function parseApple(raw){
+  try{
+    const u = new URL(raw.trim());
+    const host = (u.hostname||"").toLowerCase();
+    if(host!=="music.apple.com" && host!=="itunes.apple.com") return null;
+    const album = u.pathname.match(/\/album\/(?:[^/]+\/)?(\d+)/);
+    const song = u.pathname.match(/\/song\/(?:[^/]+\/)?(\d+)/);
+    const track = u.searchParams.get("i");
+    if(album && /^\d+$/.test(track||"")) return {kind:"song", album:album[1], track};
+    if(album) return {kind:"album", album:album[1]};
+    if(song) return {kind:"song-only", track:song[1]};
+  }catch(e){}
+  return null;
+}
+
+async function resolveApple(p){
+  if(!p) return null;
+  if(p.kind !== "song-only") return p;
+  const r = await fetch("https://itunes.apple.com/lookup?id="+encodeURIComponent(p.track)+"&entity=song");
+  const j = await r.json();
+  const item = (j.results||[]).find(x=>x.wrapperType==="track") || (j.results||[])[0];
+  if(!item || !item.collectionId) return null;
+  return {kind:"song", album:String(item.collectionId), track:p.track};
+}
+
+function appleSrc(albumId, songId){
+  const id = String(albumId||"").replace(/\D/g,"");
+  const track = String(songId||"").replace(/\D/g,"");
+  if(!id) return "";
+  let src = "https://embed.music.apple.com/us/album/"+id+"?";
+  if(track) src += "i="+track+"&";
+  src += "at="+APPLE_AT+"&ct=music98";
+  return src;
+}
+
+function appleBlock(kind, album, track){
+  const src = appleSrc(album, track);
+  const song = kind==="song" || track;
+  const h = song ? 166 : 450;
+  const token = song ? ("song:"+album+":"+track) : ("album:"+album);
+  return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}"><button class="kill" type="button" aria-label="Remove">×</button><iframe height="${h}" src="${esc(src)}" title="Apple Music" loading="eager"></iframe></figure>`;
+}
+function photoBlock(src){
+  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}"><button class="kill" type="button" aria-label="Remove">×</button><img src="${esc(src)}" alt=""></figure>`;
+}
+
+function insertHTML(html){
+  const el = $("#composer");
+  el.focus();
+  const sel = window.getSelection();
+  if(sel && sel.rangeCount && el.contains(sel.anchorNode)){
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const wrap = document.createElement("div");
+    wrap.innerHTML = html + "<p><br></p>";
+    const frag = document.createDocumentFragment();
+    while(wrap.firstChild) frag.appendChild(wrap.firstChild);
+    range.insertNode(frag);
+  }else{
+    el.insertAdjacentHTML("beforeend", html + "<p><br></p>");
+  }
+}
+
+function inlineText(node){
+  let s = "";
+  node.childNodes.forEach(n=>{
+    if(n.nodeType===3) s += n.textContent;
+    else if(n.nodeName==="BR") s += "\n";
+    else if(n.nodeName==="EM" || n.nodeName==="I") s += "*"+n.textContent+"*";
+    else if(n.nodeName==="FIGURE") return;
+    else s += inlineText(n);
+  });
+  return s;
+}
+function serialize(){
+  const parts = [];
+  const root = $("#composer");
+  const dump = (node)=>{
+    if(node.nodeType===3){
+      const t = node.textContent.trim();
+      if(t) parts.push(t);
+      return;
+    }
+    if(node.nodeName==="FIGURE"){
+      if(node.dataset.apple) parts.push("[apple:"+node.dataset.apple+"]");
+      if(node.dataset.photo) parts.push("[photo:"+node.dataset.photo+"]");
+      return;
+    }
+    if(node.querySelector && node.querySelector("figure")){
+      node.childNodes.forEach(dump);
+      return;
+    }
+    const t = inlineText(node).trim();
+    if(t) parts.push(t);
+  };
+  root.childNodes.forEach(dump);
+  return parts.join("\n\n");
+}
+function bodyToComposer(text){
+  const html = String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
+    const t = raw.trim();
+    const pic = t.match(/^\[photo:(.+?)\]$/i);
+    if(pic) return photoBlock(pic[1]);
+    const album = t.match(/^\[apple:album:(\d+)\]$/i);
+    if(album) return appleBlock("album", album[1]);
+    const song = t.match(/^\[apple:song:(\d+):(\d+)\]$/i);
+    if(song) return appleBlock("song", song[1], song[2]);
+    return "<p>"+rich(raw)+"</p>";
+  }).join("");
+  $("#composer").innerHTML = html || "<p><br></p>";
+}
+
+function parsePos(p){
+  const m = String(p||"").match(/([\d.]+)%\s+([\d.]+)%/);
+  if(m) return {x: Math.min(1, Math.max(0, +m[1]/100)), y: Math.min(1, Math.max(0, +m[2]/100))};
+  return {x:0.5, y:0.5};
+}
+function layoutCrop(){
+  const stage = $("#stage");
+  const img = $("#stageImg");
+  if(!coverSrc || !img.naturalWidth) return;
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const z = crop.zoom || 1;
+  const base = Math.max(sw/iw, sh/ih) * z;
+  const dw = iw * base, dh = ih * base;
+  let left = sw/2 - crop.x * dw;
+  let top = sh/2 - crop.y * dh;
+  left = Math.min(0, Math.max(sw - dw, left));
+  top = Math.min(0, Math.max(sh - dh, top));
+  crop.x = dw ? (sw/2 - left) / dw : 0.5;
+  crop.y = dh ? (sh/2 - top) / dh : 0.5;
+  img.style.width = dw+"px";
+  img.style.height = dh+"px";
+  img.style.transform = "translate("+left+"px,"+top+"px)";
+}
+function setCover(src, pos, zoom){
+  coverSrc = src;
+  const parsed = parsePos(pos);
+  crop.x = parsed.x; crop.y = parsed.y; crop.zoom = Number(zoom)||1;
+  $("#zoom").value = crop.zoom;
+  const img = $("#stageImg");
+  img.onload = ()=> layoutCrop();
+  img.src = src;
+  img.classList.remove("hide");
+  $("#coverHint").classList.add("hide");
+}
+
 function renderList(){
   $("#list").innerHTML = posts.length ? posts.map(p=>`
     <div class="item">
@@ -175,11 +382,12 @@ function renderList(){
       <div><b>${esc(p.title)}</b><div class="muted">${esc(p.type)} · ${esc(p.date||"")}</div></div>
       <button class="btn ghost" data-edit="${esc(p.id)}" type="button">Edit</button>
       <button class="btn danger" data-del="${esc(p.id)}" type="button">Delete</button>
-    </div>`).join("") : '<p class="muted">Nothing published yet. The public site still shows the demo stories until you publish here.</p>';
+    </div>`).join("") : '<p class="muted">Nothing published yet.</p>';
 }
 
 function fillForm(p){
   editing = p ? p.id : null;
+  crop.dirty = false;
   $("#type").value = p?.type || "news";
   $("#date").value = p?.date || today();
   $("#tag").value = p?.tag || "";
@@ -187,14 +395,20 @@ function fillForm(p){
   $("#artist").value = p?.artist || "";
   $("#title").value = p?.title || "";
   $("#excerpt").value = p?.excerpt || "";
-  $("#body").value = p?.body || "";
+  bodyToComposer(p?.body || "");
   $("#pinned").checked = !!p?.pinned;
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
-  cover = (p?.cover && p.cover.src) || "";
-  coverMeta = p?.cover && p.cover.kind === "img" ? {pos: p.cover.pos || "center top"} : {pos:"center top"};
-  const prev = $("#preview");
-  if(cover){ prev.src = cover; prev.classList.remove("hide"); } else { prev.classList.add("hide"); }
+  const src = (p?.cover && p.cover.src) || "";
+  if(src) setCover(src, p.cover.pos, p.cover.zoom);
+  else {
+    coverSrc = "";
+    $("#stageImg").classList.add("hide");
+    $("#stageImg").removeAttribute("src");
+    $("#coverHint").classList.remove("hide");
+    crop = {x:0.5, y:0.5, zoom:1, dirty:false};
+    $("#zoom").value = 1;
+  }
 }
 
 async function reload(){
@@ -218,16 +432,133 @@ $("#login").onclick = async ()=>{
     $("#desk").classList.remove("hide");
   }catch(e){
     sessionStorage.removeItem(KEY);
-    toast("Wrong password, or the desk API is not running.");
+    toast("Wrong password");
   }
 };
 
-$("#photo").onchange = e=>{
+const stage = $("#stage");
+stage.addEventListener("click", e=>{
+  if(!coverSrc) $("#photo").click();
+});
+$("#replaceCover").onclick = ()=> $("#photo").click();
+stage.addEventListener("dragover", e=>{ e.preventDefault(); stage.classList.add("hot"); });
+stage.addEventListener("dragleave", ()=> stage.classList.remove("hot"));
+stage.addEventListener("drop", e=>{
+  e.preventDefault(); stage.classList.remove("hot");
+  const f = e.dataTransfer.files[0];
+  if(f) readPhoto(f, src=>{ crop.dirty = true; setCover(src); });
+});
+$("#photo").onchange = e=> readPhoto(e.target.files[0], src=>{ crop.dirty = true; setCover(src); e.target.value=""; });
+$("#zoom").oninput = ()=>{ crop.zoom = Number($("#zoom").value)||1; crop.dirty = true; layoutCrop(); };
+window.addEventListener("resize", layoutCrop);
+
+stage.addEventListener("pointerdown", e=>{
+  if(!coverSrc) return;
+  e.preventDefault();
+  stage.setPointerCapture(e.pointerId);
+  drag = {x:e.clientX, y:e.clientY, cx:crop.x, cy:crop.y};
+});
+stage.addEventListener("pointermove", e=>{
+  if(!drag) return;
+  const img = $("#stageImg");
+  const dw = parseFloat(img.style.width)||1;
+  const dh = parseFloat(img.style.height)||1;
+  crop.x = drag.cx - (e.clientX - drag.x) / dw;
+  crop.y = drag.cy - (e.clientY - drag.y) / dh;
+  crop.dirty = true;
+  layoutCrop();
+});
+stage.addEventListener("pointerup", ()=> drag=null);
+stage.addEventListener("pointercancel", ()=> drag=null);
+
+document.querySelector(".toolbar").addEventListener("click", e=>{
+  const wrap = e.target.closest("[data-wrap]");
+  if(!wrap) return;
+  $("#composer").focus();
+  if(wrap.dataset.wrap==="italic") document.execCommand("italic");
+  if(wrap.dataset.wrap==="song"){
+    const sel = window.getSelection();
+    const t = sel && String(sel) ? String(sel) : "Song";
+    document.execCommand("insertText", false, "\""+t+"\"");
+  }
+});
+
+$("#btnPhoto").onclick = ()=> $("#bodyPhoto").click();
+$("#bodyPhoto").onchange = e=>{
   readPhoto(e.target.files[0], src=>{
-    cover = src;
-    $("#preview").src = src;
-    $("#preview").classList.remove("hide");
-  });
+    insertHTML(photoBlock(src));
+    e.target.value = "";
+  }, 1400);
+};
+
+$("#composer").addEventListener("click", e=>{
+  const k = e.target.closest(".kill");
+  if(k){ e.preventDefault(); k.closest("figure")?.remove(); }
+});
+$("#composer").addEventListener("dragover", e=>{
+  if(e.dataTransfer && [...e.dataTransfer.types].includes("Files")) e.preventDefault();
+});
+$("#composer").addEventListener("drop", e=>{
+  const f = e.dataTransfer && e.dataTransfer.files[0];
+  if(f && f.type.indexOf("image/")===0){
+    e.preventDefault();
+    readPhoto(f, src=> insertHTML(photoBlock(src)), 1400);
+  }
+});
+$("#composer").addEventListener("paste", e=>{
+  const item = [...(e.clipboardData && e.clipboardData.items || [])].find(i=>i.type.indexOf("image/")===0);
+  if(item){
+    e.preventDefault();
+    readPhoto(item.getAsFile(), src=> insertHTML(photoBlock(src)), 1400);
+    return;
+  }
+  const text = (e.clipboardData && e.clipboardData.getData("text") || "").trim();
+  const parsed = parseApple(text);
+  if(parsed){
+    e.preventDefault();
+    resolveApple(parsed).then(got=>{
+      if(!got){ toast("Could not read that Apple link"); return; }
+      if(got.kind==="album") insertHTML(appleBlock("album", got.album));
+      else insertHTML(appleBlock("song", got.album, got.track));
+    }).catch(()=> toast("Could not read that Apple link"));
+  }
+});
+
+function openApple(kind){
+  appleKind = kind;
+  pendingApple = null;
+  $("#appleTitle").textContent = kind==="album" ? "Apple album" : "Apple song";
+  $("#appleUrl").value = "";
+  $("#applePrev").innerHTML = "";
+  $("#appleModal").classList.remove("hide");
+  $("#appleUrl").focus();
+}
+async function previewApple(){
+  const parsed = parseApple($("#appleUrl").value);
+  $("#applePrev").innerHTML = "";
+  pendingApple = null;
+  if(!parsed) return;
+  try{
+    const got = await resolveApple(parsed);
+    if(!got) return;
+    pendingApple = got;
+    const src = appleSrc(got.album, got.track);
+    const h = (appleKind==="album" || got.kind==="album") && !got.track ? 450 : 166;
+    $("#applePrev").innerHTML = `<iframe height="${h}" src="${esc(src)}" title="Apple Music"></iframe>`;
+  }catch(e){}
+}
+$("#btnSong").onclick = ()=> openApple("song");
+$("#btnAlbum").onclick = ()=> openApple("album");
+$("#appleCancel").onclick = ()=> $("#appleModal").classList.add("hide");
+$("#appleUrl").addEventListener("change", previewApple);
+$("#appleUrl").addEventListener("paste", ()=> setTimeout(previewApple, 50));
+$("#appleGo").onclick = async ()=>{
+  if(!pendingApple) await previewApple();
+  const got = pendingApple;
+  if(!got){ toast("Paste a music.apple.com link"); return; }
+  if(appleKind==="album" || got.kind==="album") insertHTML(appleBlock("album", got.album));
+  else insertHTML(appleBlock("song", got.album, got.track));
+  $("#appleModal").classList.add("hide");
 };
 
 $("#reset").onclick = ()=> fillForm(null);
@@ -243,15 +574,16 @@ $("#save").onclick = async ()=>{
     artist: $("#artist").value.trim(),
     title,
     excerpt: $("#excerpt").value.trim(),
-    body: $("#body").value.trim(),
+    body: serialize(),
     date: $("#date").value || today(),
     pinned: $("#pinned").checked,
-    cover: cover ? {
+    cover: coverSrc ? {
       kind:"img",
-      src:cover,
+      src: coverSrc,
       credit: $("#credit").value.trim(),
       creditUrl: $("#creditUrl").value.trim(),
-      pos: coverMeta.pos || "center top"
+      pos: Math.round(crop.x*100)+"% "+Math.round(crop.y*100)+"%",
+      zoom: Math.round((crop.zoom||1)*100)/100
     } : {kind:"preset", i:0}
   };
   const ix = posts.findIndex(p=>p.id===rec.id);
