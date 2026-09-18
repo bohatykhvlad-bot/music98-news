@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="chart-pos-gap-3">
+<meta name="m98-build" content="chart-art-lock-1">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -729,10 +729,25 @@ function applePreview(url){
   }catch(e){ return ""; }
 }
 /* ---- iTunes Search API via JSONP (30s previews, artwork, track urls) ---- */
-const PREVCACHE = "music98news_prevcache";
+const PREVCACHE = "music98news_prevcache_v2";
 function prevCache(){ try{ const r = lsGetRaw(PREVCACHE); return r ? JSON.parse(r) : {}; }catch(e){ return {}; } }
 let jsonpN = 0;
-function itunesLookup(term, cb){
+function itunesNorm(s){
+  return String(s||"").toLowerCase().replace(/[’‘]/g,"'").replace(/\([^)]*\)|\[[^\]]*\]/g," ").replace(/[^a-z0-9]+/g,"");
+}
+function itunesPick(results, title, artist){
+  const list = results || [];
+  if(!list.length) return null;
+  const wantT = itunesNorm(title);
+  const wantA = itunesNorm(String(artist||"").split(/\s*(?:,|&|\/|\+| x | feat\.? | ft\.? | featuring | with )\s*/i)[0]);
+  const hit = list.find(item => itunesNorm(item.trackName) === wantT && itunesNorm(item.artistName) === wantA)
+    || list.find(item => itunesNorm(item.trackName) === wantT)
+    || list.find(item => wantT && itunesNorm(item.trackName).indexOf(wantT) === 0)
+    || null;
+  return hit;
+}
+function itunesLookup(title, artist, cb){
+  const term = (title+" "+artist).trim();
   const key = term.toLowerCase();
   const cache = prevCache();
   if(cache[key]) return cb(cache[key]);
@@ -742,7 +757,7 @@ function itunesLookup(term, cb){
   function cleanup(){ clearTimeout(to); delete window[cbn]; if(s.parentNode) s.parentNode.removeChild(s); }
   window[cbn] = d=>{
     cleanup();
-    const r = d && d.results && d.results[0];
+    const r = itunesPick(d && d.results, title, artist);
     const out = r ? {preview:r.previewUrl||"", track:r.trackViewUrl||"", art:(r.artworkUrl100||"").replace("100x100","200x200")} : null;
     if(out && out.preview){
       cache[key]=out;
@@ -753,7 +768,7 @@ function itunesLookup(term, cb){
     cb(out);
   };
   s.onerror = ()=>{ cleanup(); cb(null); };
-  s.src = "https://itunes.apple.com/search?media=music&entity=song&limit=1&callback="+cbn+"&term="+encodeURIComponent(term);
+  s.src = "https://itunes.apple.com/search?media=music&entity=song&limit=5&country=US&callback="+cbn+"&term="+encodeURIComponent(term);
   document.head.appendChild(s);
 }
 /* ---- one shared <audio>; the whole player UI lives inside each chart row ---- */
@@ -805,17 +820,23 @@ function setBadge(key, track){
   $$(".abadge[data-lk]").forEach(a=>{ if(a.dataset.lk === key){ a.href = aff(track); a.hidden = false; } });
 }
 function setRowArt(key, src){
-  $$("#chartList .artwrap img[data-lk]").forEach(im=>{ if(im.dataset.lk === key){ im.src = src; im.removeAttribute("data-need"); } });
+  if(!src) return;
+  $$("#chartList .artwrap img[data-lk]").forEach(im=>{
+    if(im.dataset.lk !== key) return;
+    if(!im.hasAttribute("data-need")) return;
+    im.src = src;
+    im.removeAttribute("data-need");
+  });
 }
 function playItunes(key, title, artist, url){
-  itunesLookup(title+" "+artist, r=>{
+  itunesLookup(title, artist, r=>{
     if(curKey !== key) return;
     if(!r || !applePreview(r.preview)){ toast("No 30-second preview found for this track"); stopPreview(); return; }
     previewTriedItunes = true;
     try{ audio.src = r.preview; tryPlay(); }catch(e){}
     if(r.track) setBadge(key, r.track);
     else if(url) setBadge(key, url);
-    if(r.art) setRowArt(key, r.art);
+    setRowArt(key, r.art);
     markRows();
   });
 }
@@ -1138,7 +1159,7 @@ function hydrateArts(){
     if(!row) return;
     setTimeout(()=>{
       if(!im.isConnected) return;
-      itunesLookup(row.dataset.title+" "+row.dataset.artist, r=>{
+      itunesLookup(row.dataset.title, row.dataset.artist, r=>{
         if(!r) return;
         if(r.art && im.isConnected) setRowArt(row.dataset.key, r.art);
         if(r.track) setBadge(row.dataset.key, r.track);
