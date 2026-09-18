@@ -1407,7 +1407,7 @@ function collectPost(status){
     date: $("#date").value || today(),
     pinned: $("#pinned").checked,
     status,
-    publishAt: publishAt || "",
+    publishAt: publishAt || (editing ? ((data.posts.find(x=>x.id===editing)||{}).publishAt || "") : "") || (status==="live" ? new Date().toISOString() : ""),
     cover: coverSrc ? {
       kind:"img",
       src: originalCover(coverSrc),

@@ -1,4 +1,4 @@
-import { adminOk, json, promoteScheduled, publicPosts, readDesk, writeDesk } from "../lib/store.js";
+import { adminOk, json, migratePublishAt, promoteScheduled, publicPosts, readDesk, writeDesk } from "../lib/store.js";
 
 export async function onRequest({ request, env }) {
   if (request.method === "GET") {
@@ -8,7 +8,9 @@ export async function onRequest({ request, env }) {
       return json({ ok: true });
     }
     const desk = await readDesk(env, request);
-    if (promoteScheduled(desk) && env && env.DESK) {
+    let dirty = promoteScheduled(desk);
+    if (migratePublishAt(desk)) dirty = true;
+    if (dirty && env && env.DESK) {
       try { await writeDesk(env, desk); } catch {}
     }
     if (adminOk(request, env)) return json({ posts: desk.posts });

@@ -19,6 +19,21 @@ export function newsletterRecipients(desk) {
   return out;
 }
 
+export function migratePublishAt(desk) {
+  const posts = (desk && desk.posts) || [];
+  const n = posts.length;
+  let changed = false;
+  posts.forEach((p, i) => {
+    if (p && !p.publishAt) {
+      const d = Date.parse(p.date || "") || Date.now();
+      const seed = /^[a-z]{1,2}\d+$/.test(String(p.id || ""));
+      p.publishAt = new Date(seed ? d - 86400000 + i * 60000 : d + (n - i) * 60000).toISOString();
+      changed = true;
+    }
+  });
+  return changed;
+}
+
 function empty() {
   return { posts: [], subscribers: [], mail: {} };
 }

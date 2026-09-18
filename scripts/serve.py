@@ -61,6 +61,22 @@ def admin_password() -> str:
     return os.environ.get("ADMIN_PASSWORD", "music98")
 
 
+def migrate_publish_at(d):
+    posts = d.get("posts") or []
+    n = len(posts)
+    changed = False
+    for i, p in enumerate(posts):
+        if not isinstance(p, dict) or p.get("publishAt"):
+            continue
+        import datetime
+        day = datetime.datetime.fromisoformat(p.get("date") or "2026-01-01")
+        seed = bool(re.fullmatch(r"[a-z]{1,2}\d+", str(p.get("id") or "")))
+        delta = datetime.timedelta(days=-1, seconds=i * 60) if seed else datetime.timedelta(seconds=(n - i) * 60)
+        p["publishAt"] = (day + delta).isoformat()
+        changed = True
+    return changed
+
+
 def desk_read() -> dict:
     try:
         data = json.loads(DESK.read_text(encoding="utf-8"))
@@ -500,7 +516,10 @@ class Handler(SimpleHTTPRequestHandler):
                     return self._send(*json_bytes({"error": "unauthorized"}, 401))
                 return self._send(*json_bytes({"ok": True}))
             d = desk_read()
-            if promote_scheduled(d):
+            dirty = promote_scheduled(d)
+            if migrate_publish_at(d):
+                dirty = True
+            if dirty:
                 desk_write(d)
             posts = d["posts"] if self._authed() else public_posts(d)
             return self._send(*json_bytes({"posts": posts}))
