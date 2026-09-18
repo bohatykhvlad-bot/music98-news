@@ -22,6 +22,7 @@ OUT_W = 1600
 JOBS = [
     "olivia-rodrigo-glastonbury-2025.jpg",
     "carly-rae-jepsen-troubadour-2025-smile.jpg",
+    "carly-rae-jepsen-day-and-night-2026-pressebild.jpg",
 ]
 
 
