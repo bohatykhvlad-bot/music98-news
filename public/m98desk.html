@@ -633,6 +633,34 @@ $("#date").value = today();
 if(auth()){
   reload().then(()=>{ $("#gate").classList.add("hide"); $("#desk").classList.remove("hide"); }).catch(()=>{});
 }
+
+function pauseDeskMedia(){
+  document.querySelectorAll("audio, video").forEach(el=>{ try{ el.pause(); }catch(e){} });
+  document.querySelectorAll("iframe").forEach(f=>{
+    const src = f.dataset.keepSrc || f.getAttribute("src") || "";
+    if(!/embed\.music\.apple\.com|youtube\.com|youtube-nocookie\.com|open\.spotify\.com/i.test(src)) return;
+    if(src !== "about:blank") f.dataset.keepSrc = src;
+    const keep = f.dataset.keepSrc;
+    const n = document.createElement("iframe");
+    for(const a of f.attributes){
+      if(a.name === "src") continue;
+      n.setAttribute(a.name, a.value);
+    }
+    n.dataset.keepSrc = keep;
+    n.src = "about:blank";
+    f.replaceWith(n);
+  });
+}
+function restoreDeskMedia(){
+  document.querySelectorAll("iframe").forEach(f=>{
+    if(f.dataset.keepSrc) f.src = f.dataset.keepSrc;
+  });
+}
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden) pauseDeskMedia();
+  else restoreDeskMedia();
+});
+window.addEventListener("pagehide", pauseDeskMedia);
 </script>
 </body>
 </html>

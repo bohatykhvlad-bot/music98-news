@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-29">
+<meta name="m98-build" content="editorial-30">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -830,6 +830,7 @@ function attachOut(){
 }
 function tryPlay(){
   deviceVol();
+  try{ if(actx && actx.state === "suspended") actx.resume(); }catch(e){}
   try{ const p = audio.play(); if(p && p.catch) p.catch(()=>{}); }catch(e){}
 }
 function applySrc(src){
@@ -933,27 +934,51 @@ function stopPreview(){
   progTo(0,0,90);
   markRows();
 }
+const EMBED_SRC = /embed\.music\.apple\.com|music\.apple\.com|youtube\.com|youtube-nocookie\.com|youtu\.be|open\.spotify\.com|soundcloud\.com|player\.vimeo\.com/i;
+function embedKeep(f){
+  const src = f.dataset.keepSrc || f.getAttribute("src") || "";
+  if(src && src !== "about:blank" && EMBED_SRC.test(src)) return src;
+  return f.dataset.keepSrc || "";
+}
 function pauseAllMedia(){
   try{ audio.pause(); }catch(e){}
+  try{ if(actx && actx.state === "running") actx.suspend(); }catch(e){}
+  $$("audio, video").forEach(el=>{ try{ el.pause(); }catch(e){} });
+  try{ if(navigator.mediaSession) navigator.mediaSession.playbackState = "paused"; }catch(e){}
   markRows();
   $$("iframe").forEach(f=>{
-    const src = f.getAttribute("src") || "";
-    if(/embed\.music\.apple\.com|youtube\.com|youtube-nocookie\.com|open\.spotify\.com/i.test(src)){
-      if(!f.dataset.keepSrc) f.dataset.keepSrc = src;
-      try{ f.src = "about:blank"; }catch(e){}
+    const keep = embedKeep(f);
+    if(!keep) return;
+    f.dataset.keepSrc = keep;
+    try{ f.contentWindow && f.contentWindow.postMessage("pause", "*"); }catch(e){}
+    const n = document.createElement("iframe");
+    for(const a of f.attributes){
+      if(a.name === "src") continue;
+      n.setAttribute(a.name, a.value);
     }
+    n.dataset.keepSrc = keep;
+    n.src = "about:blank";
+    n.setAttribute("aria-hidden", "true");
+    f.replaceWith(n);
   });
+  dropAppleBoots();
 }
 function restoreAppleFrames(){
   $$("iframe").forEach(f=>{
-    if(f.dataset.keepSrc) f.src = f.dataset.keepSrc;
+    if(!f.dataset.keepSrc) return;
+    f.src = f.dataset.keepSrc;
+    f.removeAttribute("aria-hidden");
   });
 }
+function pageIsAway(){
+  return document.hidden || document.visibilityState === "hidden";
+}
 document.addEventListener("visibilitychange", ()=>{
-  if(document.hidden) pauseAllMedia();
-  else if($("#articlePage") && !$("#articlePage").hidden) restoreAppleFrames();
+  if(pageIsAway()) pauseAllMedia();
+  else restoreAppleFrames();
 });
 window.addEventListener("pagehide", pauseAllMedia);
+document.addEventListener("freeze", pauseAllMedia);
 function setBadge(key, track){
   $$(".abadge[data-lk]").forEach(a=>{ if(a.dataset.lk === key){ a.href = aff(track); a.hidden = false; } });
 }
@@ -1424,8 +1449,10 @@ function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHint
 
 /* ============ tabs & search events ============ */
 function setTab(t){
-  pauseAllMedia();
-  stopPreview();
+  if(t !== activeTab || ($("#articlePage") && !$("#articlePage").hidden)){
+    pauseAllMedia();
+    stopPreview();
+  }
   if(!$("#articlePage").hidden){           /* leave the article page first, then switch */
     hideArticle();
     try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
