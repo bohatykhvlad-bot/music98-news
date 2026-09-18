@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-63">
+<meta name="m98-build" content="editorial-64">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -252,8 +252,9 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 #articlePage .atext p{margin:0 0 16px}
 .aembed{margin:6px auto 22px;max-width:660px;background:transparent;border-radius:12px;overflow:visible}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
-.aembed.album{height:450px;overflow:hidden;contain:strict}
-.aembed.album iframe{width:660px;max-width:100%;height:450px;border-radius:0}
+.aembed.album{width:100%;max-width:660px;height:450px;overflow:hidden;border-radius:12px}
+.aembed-lock{width:660px;height:450px;transform-origin:top left}
+.aembed.album iframe{width:660px!important;max-width:none!important;height:450px!important;border-radius:0;overflow:hidden}
 .aembed.song{max-width:600px;width:100%;margin:6px auto 22px}
 .aembed.song iframe{height:166px;max-width:100%}
 .yembed{margin:6px auto 22px;max-width:660px;width:100%}
@@ -1810,6 +1811,18 @@ function dropAppleBoots(){
     if(f.parentElement !== host) host.appendChild(f);
   });
 }
+function fitAppleAlbum(slot){
+  if(!slot || !slot.classList.contains("album")) return;
+  const lock = slot.querySelector(".aembed-lock");
+  if(!lock) return;
+  const w = slot.clientWidth || 660;
+  const s = Math.min(1, w / 660);
+  lock.style.transform = s < 0.999 ? "scale("+s+")" : "";
+  slot.style.height = Math.round(450 * s) + "px";
+}
+function fitAppleAlbums(root){
+  (root || document).querySelectorAll(".aembed.album").forEach(fitAppleAlbum);
+}
 function placeAppleFrame(slot){
   if(!slot) return;
   const src = slot.dataset.appleSrc || "";
@@ -1818,9 +1831,26 @@ function placeAppleFrame(slot){
   let f = appleBoots[src];
   if(!f || !f.isConnected) f = ensureAppleBoot(src, h);
   if(!f) return;
-  if(f.parentElement !== slot) slot.appendChild(f);
+  const album = slot.classList.contains("album") || h >= 400;
+  let lock = slot.querySelector(".aembed-lock");
+  if(album && !lock){
+    lock = document.createElement("div");
+    lock.className = "aembed-lock";
+    slot.appendChild(lock);
+  }
+  const home = album && lock ? lock : slot;
+  if(f.parentElement !== home) home.appendChild(f);
   f.classList.remove("apple-park");
   f.removeAttribute("aria-hidden");
+  if(album){
+    f.setAttribute("scrolling", "no");
+    f.setAttribute("width", "660");
+    f.setAttribute("height", "450");
+    f.style.width = "660px";
+    f.style.height = "450px";
+    f.style.maxWidth = "none";
+    fitAppleAlbum(slot);
+  }
 }
 function parkAppleEmbeds(root){
   appleWatchers.splice(0).forEach(w=>{ try{ w.disconnect(); }catch(e){} });
@@ -1869,7 +1899,8 @@ function appleEmbed(albumId, songId){
   const src = appleEmbedUrl(id, track);
   const kind = track ? " song" : " album";
   ensureAppleBoot(src, h);
-  return `<div class="aembed${kind}" data-apple-src="${esc(src)}" data-apple-h="${h}" style="min-height:${h}px"></div>`;
+  const lock = track ? "" : `<div class="aembed-lock"></div>`;
+  return `<div class="aembed${kind}" data-apple-src="${esc(src)}" data-apple-h="${h}" style="min-height:${h}px">${lock}</div>`;
 }
 function youtubeEmbed(id, start){
   if(!/^[A-Za-z0-9_-]{11}$/.test(id||"")) return "";
@@ -2026,8 +2057,8 @@ function syncHeaderPad(){
   if(q) q.placeholder = window.matchMedia("(max-width: 640px)").matches ? "Search" : "Search: artist, album, track…";
 }
 window.addEventListener("scroll", onScroll, {passive:true});
-window.addEventListener("resize", ()=>{ onScroll(); syncHeaderPad(); });
-window.addEventListener("orientationchange", ()=>{ onScroll(); syncHeaderPad(); });
+window.addEventListener("resize", ()=>{ onScroll(); syncHeaderPad(); fitAppleAlbums(); });
+window.addEventListener("orientationchange", ()=>{ onScroll(); syncHeaderPad(); fitAppleAlbums(); });
 onScroll();
 syncHeaderPad();
 setTimeout(syncHeaderPad, 50);
