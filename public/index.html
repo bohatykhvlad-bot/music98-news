@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-47">
+<meta name="m98-build" content="editorial-48">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -96,6 +96,7 @@ main{position:relative;z-index:1}
 /* hero — left cell matches the text column; photo fills and crops to the face */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .hero .cover{position:relative;min-height:300px;height:100%;overflow:hidden;background:var(--card2)}
+#heroSlot:empty{min-height:300px}
 .hero .cover img,.card .cover img,.article .acover img,#articlePage .acover img,.rcard .rcover img{
   position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;border:0;display:block;
   -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none
@@ -679,7 +680,12 @@ function presetCover(i, label, square){
   return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
 }
 function coverOf(p, square){
-  if (p.cover && p.cover.kind === "img" && p.cover.src) return p.cover.src;
+  if (p.cover && p.cover.kind === "img" && p.cover.src){
+    const src = p.cover.src;
+    if(/^data:|^blob:/i.test(src)) return src;
+    const sig = [p.id||"", p.cover.pos||"", p.cover.zoom||"", (src.length+"")].join(".");
+    return src + (src.indexOf("?")>=0 ? "&" : "?") + "m98="+encodeURIComponent(sig);
+  }
   return presetCover(p.cover ? p.cover.i : 0, p.artist || p.title, square);
 }
 function fmtDate(iso){
@@ -1201,16 +1207,20 @@ function isLivePost(p){
   return s === "live";
 }
 function loadPublishedDesk(){
-  const grab = u => fetch(u).then(r=>{ if(!r.ok) throw 0; return r.json(); });
-  grab("/api/desk").catch(()=> grab("data/desk.json")).then(j=>{
-    if(!j || !Array.isArray(j.posts) || !j.posts.length) return;
-    const live = j.posts.filter(isLivePost);
-    if(!live.length) return;
-    data.posts = live;
+  const grab = u => fetch(u, {cache:"no-store"}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
+  const paint = posts => {
+    data.posts = posts;
     renderNews(); renderReleases(); renderHints();
     if($("#ef_list")) renderPostList();
-    bootAppleFromPosts(live);
-  }).catch(()=>{});
+    bootAppleFromPosts(posts);
+    route();
+  };
+  grab("/api/desk").catch(()=> grab("data/desk.json")).then(j=>{
+    const live = (j && Array.isArray(j.posts)) ? j.posts.filter(isLivePost) : [];
+    paint(live.length ? live : JSON.parse(JSON.stringify(SEED.posts)));
+  }).catch(()=>{
+    paint(JSON.parse(JSON.stringify(SEED.posts)));
+  });
 }
 function readPhoto(file, cb){
   if(!file || !file.type || file.type.indexOf("image/") !== 0) return;
@@ -1400,12 +1410,18 @@ let formCover = {kind:"preset", i:0};
 function load(){
   try{
     const raw = lsGet();
-    if(raw){ const d = JSON.parse(raw); if(d && Array.isArray(d.posts) && Array.isArray(d.chart)) return d; }
+    if(raw){
+      const d = JSON.parse(raw);
+      if(d && Array.isArray(d.chart)){
+        if(d.posts) lsSet(JSON.stringify({ chart: d.chart }));
+        return { posts: [], chart: d.chart };
+      }
+    }
   }catch(e){}
-  return JSON.parse(JSON.stringify(SEED));
+  return { posts: [], chart: JSON.parse(JSON.stringify(SEED.chart)) };
 }
 function save(){
-  lsSet(JSON.stringify(data));
+  lsSet(JSON.stringify({ chart: data.chart }));
   updateStorageInfo();
 }
 function toast(msg){
@@ -2085,7 +2101,10 @@ $("#es_reset").addEventListener("click", ()=>{
 
 /* ---- init ---- */
 window.addEventListener("resize", ()=> document.querySelectorAll("img.js-cover").forEach(fitCover));
-S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); loadPublishedDesk(); bootAppleFromPosts(data.posts); route();
+window.addEventListener("pageshow", e=>{ if(e.persisted) loadPublishedDesk(); });
+S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refreshDailyTop50();
+if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
+loadPublishedDesk();
 </script>
 </body>
 </html>

@@ -21,3 +21,6 @@
 
 /data/desk.json
   Cache-Control: no-store
+
+/photos/*
+  Cache-Control: no-store

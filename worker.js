@@ -17,8 +17,8 @@ export default {
     if (path === "/api/broadcast" && request.method === "POST") return broadcast(c);
     const res = await env.ASSETS.fetch(request);
     const type = (res.headers.get("content-type") || "").toLowerCase();
-    if (type.includes("text/html")) {
-      const headers = new Headers(res.headers);
+    const headers = new Headers(res.headers);
+    if (type.includes("text/html") || path.startsWith("/photos/") || path === "/data/desk.json") {
       headers.set("Cache-Control", "no-store, max-age=0");
       return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
     }
