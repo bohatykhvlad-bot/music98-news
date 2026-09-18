@@ -15,7 +15,7 @@ Open http://127.0.0.1:43123
 Private desk (not linked on the public site): http://127.0.0.1:43123/m98desk  
 Password is `ADMIN_PASSWORD` in `.env` (default `music98`). Change it before you go live.
 
-In the desk: drop a cover and drag/zoom it like Instagram, type the story, click **Italic album** / **“Song title”** / **Photo in story** / **Apple song** / **Apple album**. Paste a `music.apple.com` link — the affiliate token is attached for you. Publish writes to the live site.
+In the desk: drop a cover and drag/zoom it like Instagram, type the story, click **Italic album** / **“Song title”** / **Photo in story** / **Apple song** / **Apple album**. Paste a `music.apple.com` link — the affiliate token is attached for you. **Publish to the site** goes live now. **Save draft** stays private. Set **Go live at** and press **Schedule** to wait until that time.
 
 ## Netlify
 
@@ -39,7 +39,7 @@ Short version:
 
 ## Editorial desk
 
-`/m98desk` is a private page. It is not linked in the footer. Bookmark it. You log in, write a story, frame the cover, click to insert photos and Apple players, press **Publish to the site**. Visitors see it on News / Releases. This writes to the server (`data/desk.json` locally, KV on Cloudflare).
+`/m98desk` is a private page. It is not linked in the footer. Bookmark it. You log in, write a story, frame the cover, click to insert photos and Apple players, then **Publish to the site**, **Save draft**, or **Schedule**. Visitors only see live stories. This writes to the server (`data/desk.json` locally, KV on Cloudflare).
 
 Until you publish at least one post, the homepage keeps the demo stories.
 

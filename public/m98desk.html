@@ -38,7 +38,12 @@ input,textarea,select{width:100%;font:inherit;font-size:14px;padding:8px 10px;bo
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 12px}
 .list{display:flex;flex-direction:column;gap:6px}
 .item{display:grid;grid-template-columns:40px 1fr auto auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px}
-.item img{width:40px;height:40px;object-fit:cover;border-radius:6px}
+.item img{width:40px;height:40px;object-fit:cover;border-radius:6px;background:var(--bg2)}
+.item .ph{width:40px;height:40px;border-radius:6px;background:var(--bg2)}
+.st{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:2px 7px;margin-left:6px;vertical-align:middle}
+.st.live{background:#e8fff6;color:#0d6b45}
+.st.draft{background:#f4f6f7;color:#5c6a70}
+.st.sched{background:#fff6e0;color:#8a5a00}
 .muted{color:var(--muted);font-size:12px}
 .toast{position:fixed;right:16px;bottom:16px;background:#fff;border:1px solid var(--accent);border-radius:10px;padding:8px 12px;box-shadow:0 8px 24px rgba(0,0,0,.08);z-index:40;font-size:13px}
 .login{max-width:340px;margin:12vh auto;padding:18px}
@@ -211,14 +216,19 @@ a{color:var(--text)}
       <div class="composer" id="composer" contenteditable="true" data-placeholder="Write here"></div>
 
       <label><input id="pinned" type="checkbox" style="width:auto"> Pin to the top of News</label>
+      <label for="goLive">Go live at</label>
+      <input id="goLive" type="datetime-local" step="60">
+      <p class="muted">Leave empty and press Publish to the site. To wait, set a time and press Schedule.</p>
       <div class="actions">
         <button class="btn primary" id="save" type="button">Publish to the site</button>
+        <button class="btn ghost" id="schedule" type="button">Schedule</button>
+        <button class="btn ghost" id="draft" type="button">Save draft</button>
         <button class="btn ghost" id="reset" type="button">Clear</button>
       </div>
     </div>
 
     <div class="card">
-      <h2>On the site</h2>
+      <h2>Stories</h2>
       <div class="list" id="list"></div>
     </div>
 
@@ -289,6 +299,24 @@ function headers(json=true){
 }
 function today(){ return new Date().toISOString().slice(0,10); }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function toLocalInput(iso){
+  if(!iso) return "";
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return "";
+  const pad = n => String(n).padStart(2,"0");
+  return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes());
+}
+function fromLocalInput(v){
+  if(!v) return "";
+  const raw = /T\d{2}:\d{2}$/.test(v) ? v+":00" : v;
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? "" : d.toISOString();
+}
+function fmtWhen(iso){
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return "";
+  return d.toLocaleString("en-GB", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"});
+}
 function esc(s){ return String(s??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
 function rich(s){ return esc(s).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>"); }
 function originalCover(src){
@@ -603,14 +631,19 @@ function renderList(){
   $("#list").innerHTML = posts.length ? posts.map(p=>{
     const src = (p.cover && p.cover.src) || "";
     const tiny = src.indexOf("data:image/")===0 ? "" : src;
+    const st = p.status || "live";
+    const badge = st==="draft" ? "draft" : st==="scheduled" ? "sched" : "live";
+    const badgeLabel = st==="draft" ? "Draft" : st==="scheduled" ? "Scheduled" : "Live";
+    const when = st==="scheduled" && p.publishAt ? " · "+fmtWhen(p.publishAt) : (p.date ? " · "+esc(p.date) : "");
+    const thumb = tiny ? `<img src="${esc(tiny)}" alt="">` : `<div class="ph"></div>`;
     return `
     <div class="item">
-      <img src="${esc(tiny)}" alt="" data-full="${tiny ? "" : "1"}">
-      <div><b>${esc(p.title)}</b><div class="muted">${esc(p.type)} · ${esc(p.date||"")}</div></div>
+      ${thumb}
+      <div><b>${esc(p.title)}</b> <span class="st ${badge}">${badgeLabel}</span><div class="muted">${esc(p.type)}${when}</div></div>
       <button class="btn ghost" data-edit="${esc(p.id)}" type="button">Edit</button>
       <button class="btn danger" data-del="${esc(p.id)}" type="button">Delete</button>
     </div>`;
-  }).join("") : '<p class="muted">Nothing published yet.</p>';
+  }).join("") : '<p class="muted">Nothing saved yet.</p>';
 }
 
 function fillForm(p){
@@ -625,6 +658,7 @@ function fillForm(p){
   $("#excerpt").value = p?.excerpt || "";
   bodyToComposer(p?.body || "");
   $("#pinned").checked = !!p?.pinned;
+  $("#goLive").value = toLocalInput(p?.publishAt);
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
   const src = (p?.cover && p.cover.src) || "";
@@ -898,10 +932,16 @@ document.addEventListener("keydown", e=>{ if(e.key === "Escape"){ closeApple(); 
 
 $("#reset").onclick = ()=> fillForm(null);
 
-$("#save").onclick = async ()=>{
+function collectPost(status){
   const title = $("#title").value.trim();
-  if(!title){ toast("Add a title"); return; }
-  const rec = {
+  if(!title){ toast("Add a title"); return null; }
+  let publishAt = fromLocalInput($("#goLive").value.trim());
+  if(status === "scheduled" && !publishAt){
+    toast("Set a time under Go live at");
+    return null;
+  }
+  if(status !== "scheduled") publishAt = publishAt || undefined;
+  return {
     id: editing || uid(),
     type: $("#type").value,
     tag: $("#tag").value.trim() || ($("#type").value==="release" ? "Release" : "News"),
@@ -912,6 +952,8 @@ $("#save").onclick = async ()=>{
     body: serialize(),
     date: $("#date").value || today(),
     pinned: $("#pinned").checked,
+    status,
+    publishAt: publishAt || "",
     cover: coverSrc ? {
       kind:"img",
       src: originalCover(coverSrc),
@@ -921,17 +963,28 @@ $("#save").onclick = async ()=>{
       zoom: Math.round((crop.zoom||1)*100)/100
     } : {kind:"preset", i:0}
   };
+}
+async function writePost(status){
+  const rec = collectPost(status);
+  if(!rec) return;
+  if(!rec.publishAt) delete rec.publishAt;
   const ix = posts.findIndex(p=>p.id===rec.id);
   if(ix>=0) posts[ix] = rec; else posts.unshift(rec);
   try{
     await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts})});
-    toast("Published on the public site");
-    fillForm(null);
+    if(status==="live") toast("Published on the public site");
+    else if(status==="scheduled") toast("Scheduled — it goes live at that time");
+    else toast("Saved as draft — not on the public site");
+    fillForm(rec);
+    editing = rec.id;
     renderList();
   }catch(e){
-    toast(e.error === "unauthorized" ? "Password rejected" : "Could not publish");
+    toast(e.error === "unauthorized" ? "Password rejected" : "Could not save");
   }
-};
+}
+$("#save").onclick = ()=> writePost("live");
+$("#schedule").onclick = ()=> writePost("scheduled");
+$("#draft").onclick = ()=> writePost("draft");
 
 $("#list").onclick = async e=>{
   const del = e.target.closest("[data-del]");

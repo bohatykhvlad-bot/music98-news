@@ -1,4 +1,4 @@
-import { adminOk, json, readDesk, writeDesk } from "../lib/store.js";
+import { adminOk, json, promoteScheduled, publicPosts, readDesk, writeDesk } from "../lib/store.js";
 
 export async function onRequest({ request, env }) {
   if (request.method === "GET") {
@@ -8,7 +8,11 @@ export async function onRequest({ request, env }) {
       return json({ ok: true });
     }
     const desk = await readDesk(env, request);
-    return json({ posts: desk.posts });
+    if (promoteScheduled(desk) && env && env.DESK) {
+      try { await writeDesk(env, desk); } catch {}
+    }
+    if (adminOk(request, env)) return json({ posts: desk.posts });
+    return json({ posts: publicPosts(desk) });
   }
   if (request.method === "POST") {
     if (!adminOk(request, env)) return json({ error: "unauthorized" }, 401);

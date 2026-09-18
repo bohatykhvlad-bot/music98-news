@@ -37,6 +37,37 @@ export function adminOk(request, env) {
   return Boolean(got) && got === want;
 }
 
+export function postStatus(p) {
+  return (p && p.status) || "live";
+}
+
+export function postIsPublic(p, now = Date.now()) {
+  const s = postStatus(p);
+  if (s === "draft") return false;
+  if (s === "scheduled") {
+    const at = Date.parse(p && p.publishAt);
+    return Number.isFinite(at) && at <= now;
+  }
+  return s === "live";
+}
+
+export function promoteScheduled(desk, now = Date.now()) {
+  let changed = false;
+  for (const p of desk.posts || []) {
+    if (postStatus(p) !== "scheduled") continue;
+    const at = Date.parse(p.publishAt);
+    if (Number.isFinite(at) && at <= now) {
+      p.status = "live";
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+export function publicPosts(desk, now = Date.now()) {
+  return (desk.posts || []).filter((p) => postIsPublic(p, now));
+}
+
 export function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,

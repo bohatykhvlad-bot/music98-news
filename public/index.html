@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-46">
+<meta name="m98-build" content="editorial-47">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -1191,14 +1191,25 @@ const FEEDS = [
 ];
 function feedById(id){ return FEEDS.find(f=>f.id===id) || FEEDS[0]; }
 if(!FEEDS.some(f=>f.id === S.feed)) S.feed = "us-songs";
+function isLivePost(p){
+  const s = (p && p.status) || "live";
+  if(s === "draft") return false;
+  if(s === "scheduled"){
+    const at = Date.parse(p.publishAt || "");
+    return Number.isFinite(at) && at <= Date.now();
+  }
+  return s === "live";
+}
 function loadPublishedDesk(){
   const grab = u => fetch(u).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   grab("/api/desk").catch(()=> grab("data/desk.json")).then(j=>{
     if(!j || !Array.isArray(j.posts) || !j.posts.length) return;
-    data.posts = j.posts;
+    const live = j.posts.filter(isLivePost);
+    if(!live.length) return;
+    data.posts = live;
     renderNews(); renderReleases(); renderHints();
     if($("#ef_list")) renderPostList();
-    bootAppleFromPosts(j.posts);
+    bootAppleFromPosts(live);
   }).catch(()=>{});
 }
 function readPhoto(file, cb){

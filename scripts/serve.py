@@ -9,6 +9,7 @@ import runpy
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -71,6 +72,53 @@ def desk_read() -> dict:
 def desk_write(data: dict) -> None:
     DESK.parent.mkdir(exist_ok=True)
     DESK.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def post_status(p: dict) -> str:
+    return str((p or {}).get("status") or "live")
+
+
+def parse_when(value):
+    if not value:
+        return None
+    raw = str(value).strip().replace("Z", "+00:00")
+    try:
+        dt = datetime.fromisoformat(raw)
+    except Exception:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+def promote_scheduled(data: dict) -> bool:
+    now = datetime.now(timezone.utc)
+    changed = False
+    for p in data.get("posts") or []:
+        if post_status(p) != "scheduled":
+            continue
+        at = parse_when(p.get("publishAt"))
+        if at is None:
+            continue
+        if at <= now:
+            p["status"] = "live"
+            changed = True
+    return changed
+
+
+def public_posts(data: dict) -> list:
+    now = datetime.now(timezone.utc)
+    out = []
+    for p in data.get("posts") or []:
+        s = post_status(p)
+        if s == "draft":
+            continue
+        if s == "scheduled":
+            at = parse_when(p.get("publishAt"))
+            if at is None or at > now:
+                continue
+        out.append(p)
+    return out
 
 
 def json_bytes(obj, status=200):
@@ -270,7 +318,10 @@ class Handler(SimpleHTTPRequestHandler):
                     return self._send(*json_bytes({"error": "unauthorized"}, 401))
                 return self._send(*json_bytes({"ok": True}))
             d = desk_read()
-            return self._send(*json_bytes({"posts": d["posts"]}))
+            if promote_scheduled(d):
+                desk_write(d)
+            posts = d["posts"] if self._authed() else public_posts(d)
+            return self._send(*json_bytes({"posts": posts}))
         if path == "/api/subscribers":
             if not self._authed():
                 return self._send(*json_bytes({"error": "unauthorized"}, 401))
