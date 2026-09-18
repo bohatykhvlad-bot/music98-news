@@ -47,7 +47,7 @@ Until you publish at least one post, the homepage keeps the demo stories.
 
 The Subscribe box saves the address to the same notebook (`/api/subscribe`).
 
-Letters go out through [Resend](https://resend.com). The live site stores the send key on the private desk (not in the public repo). Until `music98.news` is verified in Resend, the sender is their test address `beth.t@example.com`, which only delivers to the inbox used to sign up there.
+Letters go out through [Resend](https://resend.com). The live site stores the send key on the private desk (not in the public repo). Until `music98.news` is verified in Resend, the sender is `onboarding@resend.dev`, which only delivers to the inbox used to sign up there.
 
 Open the desk → Mail → write subject and text → **Send to the list**.
 

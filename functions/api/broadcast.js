@@ -1,7 +1,10 @@
-import { adminOk, json, mailConfig, readDesk } from "../lib/store.js";
+import { adminOk, json, mailConfig, newsletterRecipients, readDesk } from "../lib/store.js";
 
 function clipErr(raw) {
-  return String(raw || "").replace(/re_[A-Za-z0-9_]+/g, "[key]").slice(0, 280);
+  return String(raw || "")
+    .replace(/re_[A-Za-z0-9_]+/g, "[key]")
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[email]")
+    .slice(0, 280);
 }
 
 export async function onRequestPost({ request, env }) {
@@ -12,7 +15,7 @@ export async function onRequestPost({ request, env }) {
   const text = String(payload.text || "").trim();
   if (!subject || !text) return json({ error: "subject_and_text_required" }, 400);
   const desk = await readDesk(env, request);
-  const emails = desk.subscribers || [];
+  const emails = newsletterRecipients(desk);
   if (!emails.length) return json({ error: "no_subscribers" }, 400);
   const mail = mailConfig(desk, env);
   if (!mail.key) {

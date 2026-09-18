@@ -691,7 +691,7 @@ async function reload(){
   try{
     const m = await api("/api/mail", {headers: headers(false)});
     $("#mailStatus").textContent = m.configured
-      ? "Mail is connected. Letters send through Resend."
+      ? "Mail is connected. Until the site domain is verified, letters only reach the inbox you used at Resend."
       : "Mail is not connected yet.";
   }catch(e){
     $("#mailStatus").textContent = "Could not check mail.";
@@ -1019,7 +1019,7 @@ $("#send").onclick = async ()=>{
       body: JSON.stringify({subject: $("#msubject").value.trim(), text: $("#mtext").value.trim()})
     });
     if((j.sent||0) > 0) toast("Sent to " + j.sent + " addresses");
-    else if((j.failed||0) > 0) toast("Resend did not send. Until the domain is verified, it only delivers to the inbox you used to sign up.");
+    else if((j.failed||0) > 0) toast("Resend did not send. Use the same inbox you used to sign up at Resend, then try again.");
     else toast("Nothing sent");
   }catch(e){
     if(e.error==="missing_resend_key") toast("Mail is not connected yet");

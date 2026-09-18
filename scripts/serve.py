@@ -36,8 +36,10 @@ PUBLIC = ROOT / "public"
 API = runpy.run_path(str(ROOT / "api" / "top50.py"))
 DESK = PUBLIC / "data" / "desk.json"
 MAIL_FILE = ROOT / ".mail.json"
-TEST_FROM = "music98.news <beth.t@example.com>"
+TEST_FROM = "music98.news <onboarding@resend.dev>"
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+FAKE_HOST = re.compile(r"\.(invalid|test|localhost)$", re.I)
+FAKE_EXACT = re.compile(r"^(example\.(com|net|org|invalid)|localhost)$", re.I)
 
 
 def load_env():
@@ -95,6 +97,24 @@ def mail_config() -> tuple[str, str]:
     key = str(os.environ.get("RESEND_API_KEY") or stored.get("resendKey") or "").strip()
     sender = str(stored.get("fromEmail") or os.environ.get("FROM_EMAIL") or TEST_FROM).strip()
     return key, sender
+
+
+def newsletter_recipients(desk: dict) -> list[str]:
+    seen = set()
+    out = []
+    for raw in desk.get("subscribers") or []:
+        email = str(raw or "").strip().lower()
+        at = email.rfind("@")
+        if at < 1:
+            continue
+        host = email[at + 1 :]
+        if not host or FAKE_EXACT.match(host) or FAKE_HOST.search(host):
+            continue
+        if email in seen:
+            continue
+        seen.add(email)
+        out.append(email)
+    return out
 
 
 def post_status(p: dict) -> str:
@@ -392,7 +412,7 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._send(*json_bytes({"error": "subject_and_text_required"}, 400))
             key, sender = mail_config()
             d = desk_read()
-            emails = d["subscribers"]
+            emails = newsletter_recipients(d)
             if not emails:
                 return self._send(*json_bytes({"error": "no_subscribers"}, 400))
             if not key:

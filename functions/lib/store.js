@@ -1,4 +1,23 @@
-export const TEST_FROM = "music98.news <beth.t@example.com>";
+export const TEST_FROM = "music98.news <onboarding@resend.dev>";
+
+const FAKE_HOST = /\.(invalid|test|localhost)$/i;
+const FAKE_EXACT = /^(example\.(com|net|org|invalid)|localhost)$/i;
+
+export function newsletterRecipients(desk) {
+  const seen = new Set();
+  const out = [];
+  for (const raw of desk.subscribers || []) {
+    const email = String(raw || "").trim().toLowerCase();
+    const at = email.lastIndexOf("@");
+    if (at < 1) continue;
+    const host = email.slice(at + 1);
+    if (!host || FAKE_EXACT.test(host) || FAKE_HOST.test(host)) continue;
+    if (seen.has(email)) continue;
+    seen.add(email);
+    out.push(email);
+  }
+  return out;
+}
 
 function empty() {
   return { posts: [], subscribers: [], mail: {} };
