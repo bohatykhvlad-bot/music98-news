@@ -142,6 +142,17 @@
        controls into a loading variant for a couple of frames (progress bar
        collapses, transport row shifts), so it stays a fallback. Setting
        queue.position alone moves the marker without starting the track. */
+    /* Direct jump: the skip loop walks the equalizer bars and the explicit
+       badge through every intermediate row, which reads as flipping through
+       the album. The brief loading variant this call triggers is neutralised
+       by the pinned grid below. */
+    if (typeof mk.changeToMediaAtIndex === "function") {
+      settleWindow(300);
+      await mk.changeToMediaAtIndex(target);
+      settleWindow(300);
+      if (!mk.isPlaying && mk.play) await mk.play();
+      if ((mk.queue.position || 0) === target) return true;
+    }
     if (typeof mk.skipToNextItem === "function" && typeof mk.skipToPreviousItem === "function") {
       var steps = target - pos;
       if (steps > 0) {
@@ -150,11 +161,6 @@
         for (var j = 0; j < -steps; j++) await mk.skipToPreviousItem();
       }
       if ((mk.queue.position || 0) === target) return true;
-    }
-    if (typeof mk.changeToMediaAtIndex === "function") {
-      await mk.changeToMediaAtIndex(target);
-      if (!mk.isPlaying && mk.play) await mk.play();
-      return true;
     }
     if (mk.queue) {
       mk.queue.position = target;
@@ -206,6 +212,48 @@
     });
   }
 
+  /* After a direct jump Apple swaps the left chrome into a loading variant
+     for ~30ms: the progress bar hops to another row and a metadata lockup
+     pops in. Cancel both visually for a short settle window. */
+  var settleRaf = 0;
+  function settleWindow(ms) {
+    if (settleRaf) cancelAnimationFrame(settleRaf);
+    var prog = deepQuery("embed-audio-progress");
+    var lockup = deepQuery("embed-metadata-lockup");
+    var until = Date.now() + (ms || 250);
+    var fixed = false, hidLock = false;
+    var b = prog ? prog.getBoundingClientRect() : null;
+    var base = b ? { x: b.x, y: b.y, w: b.width, h: b.height } : null;
+    function frame() {
+      if (Date.now() > until) {
+        if (prog && fixed) {
+          ["position", "left", "top", "width", "height", "margin", "zIndex", "transform"].forEach(function (k) {
+            prog.style.removeProperty(k);
+          });
+        }
+        if (lockup && hidLock) lockup.style.removeProperty("display");
+        settleRaf = 0;
+        return;
+      }
+      if (prog && base && !fixed) {
+        prog.style.setProperty("position", "fixed", "important");
+        prog.style.setProperty("left", base.x + "px", "important");
+        prog.style.setProperty("top", base.y + "px", "important");
+        prog.style.setProperty("width", base.w + "px", "important");
+        prog.style.setProperty("height", base.h + "px", "important");
+        prog.style.setProperty("margin", "0", "important");
+        prog.style.setProperty("z-index", "3", "important");
+        fixed = true;
+      }
+      if (lockup && lockup.getBoundingClientRect().height > 0) {
+        lockup.style.setProperty("display", "none", "important");
+        hidLock = true;
+      }
+      settleRaf = requestAnimationFrame(frame);
+    }
+    settleRaf = requestAnimationFrame(frame);
+  }
+
   /* The embed recomputes its two-column grid for a frame or two while a
      track row is pressed, which reads as a sideways jump. Pin the columns
      to whatever the large layout computed, and re-pin on real resizes. */
@@ -234,30 +282,70 @@
     try { old = root.getElementById ? root.getElementById("m98-grid-lock") : null; } catch (err) {}
     if (!large) {
       if (old && old.parentNode) old.parentNode.removeChild(old);
-      if (el.__m98Lock) { el.style.removeProperty("grid-template-columns"); el.__m98Lock = ""; }
+      if (el.__m98Lock) {
+        el.style.removeProperty("grid-template-columns");
+        el.style.removeProperty("grid-template-rows");
+        el.__m98Lock = "";
+      }
       return;
     }
     var val = cs.gridTemplateColumns;
+    var rows = cs.gridTemplateRows;
+    var prog = deepQuery("embed-audio-progress");
+    var pcs = prog ? window.getComputedStyle(prog) : null;
+    var progNow = pcs ? pcs.height : "";
+    /* Only trust a full-size reading: sampling during the loading stub
+       would pin the collapsed geometry forever. */
+    if (parseFloat(progNow) >= 20 && parseFloat(pcs.width) >= 100) {
+      el.__m98ProgBox = {
+        h: progNow,
+        w: pcs.width,
+        gc: pcs.gridColumnStart,
+        gr: pcs.gridRowStart
+      };
+    }
+    var box = el.__m98ProgBox || null;
+    var progH = box ? box.h : "";
+    var rule = val + " | " + rows + " | " + (box ? box.h + box.w + box.gc + box.gr : "");
     /* A stylesheet rule survives the embed remounting its own nodes, an
-       inline style does not - prev-at-track-1 rebuilds the container. */
-    if (!old || (old.textContent || "").indexOf(val) < 0) {
+       inline style does not - prev-at-track-1 rebuilds the container.
+       Rows are pinned too: the loading variant of the controls reshapes
+       them, which is what made the progress bar and transport row hop. */
+    if (!old || (old.getAttribute("data-m98") || "") !== rule) {
       if (old && old.parentNode) old.parentNode.removeChild(old);
       var st = document.createElement("style");
       st.id = "m98-grid-lock";
+      st.setAttribute("data-m98", rule);
       st.textContent = "@media (min-width: 560px) { .container-player { grid-template-columns: " +
-        val + " !important; } }";
+        val + " !important; grid-template-rows: " + rows + " !important; }" +
+        (box ? " .container-player embed-audio-progress { height: " + box.h + " !important;" +
+          " width: " + box.w + " !important;" +
+          (box.gc && box.gc !== "auto" ? " grid-column: " + box.gc + " !important;" : "") +
+          (box.gr && box.gr !== "auto" ? " grid-row: " + box.gr + " !important;" : "") +
+          " }" : "") + " }";
       try { root.appendChild(st); } catch (err) {}
     }
-    if (el.__m98Lock !== val) {
+    if (el.__m98Lock !== rule) {
       el.style.setProperty("grid-template-columns", val, "important");
-      el.__m98Lock = val;
+      el.style.setProperty("grid-template-rows", rows, "important");
+      if (prog && box) {
+        prog.style.setProperty("height", box.h, "important");
+        prog.style.setProperty("width", box.w, "important");
+        if (box.gc && box.gc !== "auto") prog.style.setProperty("grid-column", box.gc, "important");
+        if (box.gr && box.gr !== "auto") prog.style.setProperty("grid-row", box.gr, "important");
+      }
+      el.__m98Lock = rule;
     }
   }
 
   var rsT = null;
   window.addEventListener("resize", function () {
     var el = deepQuery(".container-player");
-    if (el && el.__m98Lock) { el.style.removeProperty("grid-template-columns"); el.__m98Lock = ""; }
+    if (el && el.__m98Lock) {
+      el.style.removeProperty("grid-template-columns");
+      el.style.removeProperty("grid-template-rows");
+      el.__m98Lock = "";
+    }
     clearTimeout(rsT);
     rsT = setTimeout(lockAlbumGrid, 180);
   });
