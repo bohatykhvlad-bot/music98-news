@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-54">
+<meta name="m98-build" content="editorial-55">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -40,24 +40,38 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 
 /* ---------- header ---------- */
-.topbar{--hp:0;position:fixed;top:0;left:0;right:0;z-index:60;background:transparent;border:0;box-shadow:none;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none;transition:--hp .4s cubic-bezier(.22,.7,.24,1)}
-@media (prefers-reduced-motion: reduce){
-  .topbar{transition:none}
-}
-/* One frost recipe. --hp only moves the rectangle; it must not tint the blur. */
+.topbar{--hp:0;position:fixed;top:0;left:0;right:0;z-index:60;background:transparent;border:0;box-shadow:none;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
+/* Same frost on both layers. Size never morphs — the island is already compact, the full bar only fades. */
 .topbar-glass{
   position:absolute;
-  top:calc(var(--hp)*10px);
-  height:calc(68px - var(--hp)*20px);
-  left:max(calc(var(--hp)*14px), calc(50% - 590px));
-  right:max(calc(var(--hp)*14px + var(--sbw,0px)), calc(50% - 590px));
   background:rgba(255,255,255,.72);
   border:1px solid rgba(255,255,255,.8);
-  border-radius:calc(var(--hp)*18px);
   backdrop-filter:blur(12px) saturate(180%);
   -webkit-backdrop-filter:blur(12px) saturate(180%);
   pointer-events:none;
   z-index:0;
+  transition:opacity .42s ease;
+}
+.topbar-glass-full{
+  top:0;
+  height:68px;
+  left:max(0px, calc(50% - 590px));
+  right:max(var(--sbw,0px), calc(50% - 590px));
+  border-radius:0;
+  opacity:1;
+}
+.topbar-glass-isle{
+  top:10px;
+  height:48px;
+  left:max(14px, calc(50% - 590px));
+  right:max(calc(14px + var(--sbw,0px)), calc(50% - 590px));
+  border-radius:18px;
+  opacity:0;
+}
+.topbar.is-away .topbar-glass-full{opacity:0}
+.topbar.is-away .topbar-glass-isle{opacity:1}
+@media (prefers-reduced-motion: reduce){
+  .topbar-glass{transition:none}
 }
 .topbar-in{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 22px;height:68px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;background:transparent;border:0;overflow:visible}
 .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none;justify-self:start}
@@ -443,7 +457,8 @@ textarea{resize:vertical;min-height:64px}
 
 
 <header class="topbar">
-  <div class="topbar-glass" aria-hidden="true"></div>
+  <div class="topbar-glass topbar-glass-full" aria-hidden="true"></div>
+  <div class="topbar-glass topbar-glass-isle" aria-hidden="true"></div>
   <div class="topbar-in">
     <a class="brand" href="#" id="brandHome" title="music98.news — home">
       <img class="brand-logo" id="brandLogo" src="logo.png" alt="music98.news" width="44" height="44">
@@ -1933,38 +1948,43 @@ $("#subForm").addEventListener("submit", e=>{
     .catch(()=> toast("Could not save that address — try again in a moment"));
 });
 
-/* ============ glass header: compact while scrolling, expands only at the top ============ */
+/* ============ glass header: compact island always; dissolves at the top ============ */
 const topbar = document.querySelector(".topbar");
 const mqPhone = window.matchMedia("(max-width: 640px)");
 let hpRaf = 0;
 let hpAway = false;
-let hpVal = null;
 let hpReady = false;
-function setHeaderHp(compact){
-  const s = mqPhone.matches ? "0" : (compact ? "1" : "0");
-  if(s === hpVal) return;
-  hpVal = s;
+function setHeaderAway(away){
+  if(mqPhone.matches){
+    topbar.classList.remove("is-away");
+    return;
+  }
+  if(hpReady && away === hpAway && topbar.classList.contains("is-away") === away) return;
+  hpAway = away;
   if(!hpReady){
-    topbar.style.transition = "none";
-    topbar.style.setProperty("--hp", s);
+    topbar.style.setProperty("transition", "none");
+    topbar.querySelectorAll(".topbar-glass").forEach(el=>{ el.style.transition = "none"; });
+    topbar.classList.toggle("is-away", away);
     void topbar.offsetHeight;
-    topbar.style.transition = "";
+    topbar.style.removeProperty("transition");
+    topbar.querySelectorAll(".topbar-glass").forEach(el=>{ el.style.transition = ""; });
     hpReady = true;
     return;
   }
-  topbar.style.setProperty("--hp", s);
+  topbar.classList.toggle("is-away", away);
 }
 function onScroll(){
   if(hpRaf) return;
   hpRaf = requestAnimationFrame(()=>{
     hpRaf = 0;
     const y = window.scrollY || document.documentElement.scrollTop || 0;
-    if(hpAway){
-      if(y <= 1) hpAway = false;
+    let away = hpAway;
+    if(away){
+      if(y <= 1) away = false;
     }else if(y > 12){
-      hpAway = true;
+      away = true;
     }
-    setHeaderHp(hpAway);
+    setHeaderAway(away);
   });
 }
 function syncHeaderPad(){
