@@ -252,7 +252,27 @@ async function safe(label, fn) {
   }
 }
 
-export async function buildTop50() {
+async function seedBaked(origin, tracks) {
+  /* The baked chart carries verified Apple urls and 30s previews; reuse them
+     so a slow or rate-limited iTunes lookup cannot leave rows silent. */
+  try {
+    const baked = await getJson(origin + "/data/top50.json");
+    const map = new Map();
+    (baked.tracks || []).forEach((t) => {
+      map.set(normTitle(t.title) + "|" + primaryArtist(t.artist), t);
+    });
+    tracks.forEach((t) => {
+      const b = map.get(normTitle(t.title) + "|" + primaryArtist(t.artist));
+      if (!b) return;
+      if (!isApplePreview(t.prev) && isApplePreview(b.prev)) t.prev = b.prev;
+      if (!t.url && b.url) t.url = b.url;
+      if (!t.art && b.art) t.art = b.art;
+      if (!t.year && b.year) t.year = b.year;
+    });
+  } catch {}
+}
+
+export async function buildTop50(origin) {
   const [apple, spotify, deezer, billboard, youtube] = await Promise.all([
     safe("A", async () => parseApple(await getJson("https://rss.applemarketingtools.com/api/v2/us/music/most-played/50/songs.json"))),
     safe("S", async () => parseSpotify(await getText("https://kworb.net/spotify/country/global_daily.html"))),
@@ -301,6 +321,7 @@ export async function buildTop50() {
     prev: isApplePreview(rec.prev) ? rec.prev : "",
     year: rec.year || "",
   }));
+  await seedBaked(origin || "", tracks);
   await enrichApple(tracks);
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
@@ -391,7 +412,7 @@ export async function onRequestGet({ env, request }) {
     } catch {}
   }
   try {
-    const payload = await withTimeout(buildTop50(), 12000);
+    const payload = await withTimeout(buildTop50(new URL(request.url).origin), 14000);
     payload.tracks = await applyTenure(env, payload.tracks);
     if (env && env.DESK && payload.tracks && payload.tracks.length) {
       try { await env.DESK.put(TOP50_KV, JSON.stringify(payload)); } catch {}
