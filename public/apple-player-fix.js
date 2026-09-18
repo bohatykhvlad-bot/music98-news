@@ -1,9 +1,45 @@
 /* Track-name clicks call MusicKit.changeToMediaItem and remount the
    left chrome. Skip arrows call skipToNextItem / skipToPreviousItem and
-   stay put. Route name clicks through the skip path. */
+   stay put. Route name clicks through the skip path.
+   Apple's catalog API only accepts embed.music.apple.com, so fetch is
+   rewritten through /apple-gw on this origin. */
 (function () {
   if (window.__m98AppleFix) return;
   window.__m98AppleFix = true;
+
+  var API_HOSTS = {
+    "amp-api.music.apple.com": 1,
+    "amp-api-edge.music.apple.com": 1,
+    "api.music.apple.com": 1,
+    "play.itunes.apple.com": 1,
+    "sf-api-token-service.itunes.apple.com": 1
+  };
+
+  function gateUrl(raw) {
+    try {
+      var u = new URL(raw, location.href);
+      if (!API_HOSTS[u.hostname]) return raw;
+      return "/apple-gw/" + u.hostname + u.pathname + u.search;
+    } catch (err) {
+      return raw;
+    }
+  }
+
+  var origFetch = window.fetch;
+  window.fetch = function (input, init) {
+    try {
+      if (typeof input === "string") input = gateUrl(input);
+      else if (input && typeof input.url === "string") input = new Request(gateUrl(input.url), input);
+    } catch (err) {}
+    return origFetch.call(this, input, init);
+  };
+
+  var origOpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function (method, url) {
+    var args = arguments;
+    if (typeof url === "string") args[1] = gateUrl(url);
+    return origOpen.apply(this, args);
+  };
 
   var busy = false;
 

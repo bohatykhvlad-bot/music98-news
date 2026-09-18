@@ -8,6 +8,7 @@ import { onRequest as mail } from "./functions/api/mail.js";
 
 const APPLE_ALBUM = /^\/apple-embed\/([a-z]{2})\/album\/(\d+)$/;
 const APPLE_STATIC = /^\/apple-static\/(build|assets)\/([A-Za-z0-9._/-]+)$/;
+const APPLE_GW = /^\/apple-gw\/(amp-api\.music\.apple\.com|amp-api-edge\.music\.apple\.com|api\.music\.apple\.com|play\.itunes\.apple\.com|sf-api-token-service\.itunes\.apple\.com)(\/.*)?$/;
 const APPLE_EMBED_CSP = [
   "default-src 'self' https://*.apple.com musics: itmss://*.apple.com",
   "img-src 'self' https://*.apple.com https://*.mzstatic.com artwork: data:",
@@ -22,8 +23,8 @@ function rewriteAppleEmbed(html) {
   let out = String(html || "");
   out = out.replace(/(["'])\/build\//g, "$1/apple-static/build/");
   out = out.replace(/(["'])\/assets\//g, "$1/apple-static/assets/");
-  const tag = '<script src="/apple-player-fix.js?v=editorial-70"></script>';
-  if (/<\/head>/i.test(out)) out = out.replace(/<\/head>/i, tag + "</head>");
+  const tag = '<script src="/apple-player-fix.js?v=editorial-71"></script>';
+  if (/<head([^>]*)>/i.test(out)) out = out.replace(/<head([^>]*)>/i, "<head$1>" + tag);
   else out = tag + out;
   return out;
 }
@@ -69,15 +70,54 @@ async function proxyAppleStatic(path) {
   return new Response(upstream.body, { status: 200, headers });
 }
 
+const GW_FORWARD = {
+  authorization: 1,
+  accept: 1,
+  "accept-language": 1,
+  "content-type": 1,
+  range: 1,
+  "music-user-token": 1,
+};
+
+async function proxyAppleGw(request, rawPath) {
+  const m = rawPath.match(APPLE_GW);
+  if (!m || rawPath.includes("..")) return new Response("not found", { status: 404 });
+  const dest = new URL("https://" + m[1] + (m[2] || "/"));
+  dest.search = new URL(request.url).search;
+  const headers = new Headers();
+  for (const [k, v] of request.headers) {
+    const key = k.toLowerCase();
+    if (GW_FORWARD[key] || key.startsWith("x-apple-")) headers.set(k, v);
+  }
+  headers.set("Origin", "https://embed.music.apple.com");
+  headers.set("Referer", "https://embed.music.apple.com/");
+  const init = { method: request.method, headers };
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    init.body = request.body;
+    init.duplex = "half";
+  }
+  const upstream = await fetch(dest.toString(), init);
+  const out = new Headers();
+  const type = upstream.headers.get("content-type");
+  if (type) out.set("Content-Type", type);
+  out.set("Cache-Control", "no-store");
+  return new Response(upstream.body, { status: upstream.status, headers: out });
+}
+
 export default {
   async fetch(request, env, ctx) {
-    const path = new URL(request.url).pathname.replace(/\/+$/, "") || "/";
+    const url = new URL(request.url);
+    const rawPath = url.pathname;
+    const path = rawPath.replace(/\/+$/, "") || "/";
     const c = { request, env, waitUntil: (p) => ctx.waitUntil(p) };
     if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/apple-embed/")) {
       return proxyAppleAlbum(request, path);
     }
     if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/apple-static/")) {
       return proxyAppleStatic(path);
+    }
+    if (rawPath.startsWith("/apple-gw/")) {
+      return proxyAppleGw(request, rawPath);
     }
     if (path === "/api/top50" && request.method === "GET") return top50(c);
     if (path === "/api/preview" && (request.method === "GET" || request.method === "HEAD")) return preview(c);

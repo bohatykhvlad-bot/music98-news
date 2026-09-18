@@ -250,6 +250,10 @@ def resolve_clip(clip: str, song: str) -> str:
 
 APPLE_ALBUM_RE = re.compile(r"^/apple-embed/([a-z]{2})/album/(\d+)$")
 APPLE_STATIC_RE = re.compile(r"^/apple-static/(build|assets)/([A-Za-z0-9._/-]+)$")
+APPLE_GW_RE = re.compile(
+    r"^/apple-gw/(amp-api\.music\.apple\.com|amp-api-edge\.music\.apple\.com|"
+    r"api\.music\.apple\.com|play\.itunes\.apple\.com|sf-api-token-service\.itunes\.apple\.com)(/.*)?$"
+)
 APPLE_EMBED_CSP = (
     "default-src 'self' https://*.apple.com musics: itmss://*.apple.com; "
     "img-src 'self' https://*.apple.com https://*.mzstatic.com artwork: data:; "
@@ -268,9 +272,9 @@ def rewrite_apple_embed(html: str) -> str:
     out = out.replace('"/assets/', '"/apple-static/assets/').replace(
         "'/assets/", "'/apple-static/assets/"
     )
-    tag = '<script src="/apple-player-fix.js?v=editorial-70"></script>'
-    if re.search(r"</head>", out, re.I):
-        out = re.sub(r"</head>", tag + "</head>", out, count=1, flags=re.I)
+    tag = '<script src="/apple-player-fix.js?v=editorial-71"></script>'
+    if re.search(r"<head([^>]*)>", out, re.I):
+        out = re.sub(r"<head([^>]*)>", r"<head\1>" + tag, out, count=1, flags=re.I)
     else:
         out = tag + out
     return out
@@ -417,6 +421,46 @@ class Handler(SimpleHTTPRequestHandler):
         if self.command != "HEAD":
             self.wfile.write(body)
 
+    def _apple_gw(self, path: str):
+        m = APPLE_GW_RE.match(path)
+        if not m or ".." in path:
+            return self._send(404, b"not found", "text/plain; charset=utf-8")
+        dest = f"https://{m.group(1)}{m.group(2) or '/'}"
+        query = urllib.parse.urlparse(self.path).query
+        if query:
+            dest += "?" + query
+        headers = {
+            "User-Agent": PAGE_UA,
+            "Origin": "https://embed.music.apple.com",
+            "Referer": "https://embed.music.apple.com/",
+        }
+        for name in ("Authorization", "Accept", "Accept-Language", "Content-Type", "Range", "Music-User-Token"):
+            val = self.headers.get(name)
+            if val:
+                headers[name] = val
+        for k, v in self.headers.items():
+            if k.lower().startswith("x-apple-"):
+                headers[k] = v
+        req = urllib.request.Request(dest, headers=headers, method=self.command)
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                body = resp.read()
+                ctype = resp.headers.get("Content-Type") or "application/octet-stream"
+                status = resp.status
+        except urllib.error.HTTPError as exc:
+            body = exc.read() if exc.fp else b""
+            ctype = exc.headers.get("Content-Type") if exc.headers else "text/plain"
+            status = exc.code
+        except Exception:
+            return self._send(502, b"upstream", "text/plain; charset=utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
     def do_HEAD(self):
         path = self.path.split("?", 1)[0].rstrip("/") or "/"
         if path == "/api/preview":
@@ -425,6 +469,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self._apple_embed(path)
         if APPLE_STATIC_RE.match(path):
             return self._apple_static(path)
+        if APPLE_GW_RE.match(path):
+            return self._apple_gw(path)
         return super().do_HEAD()
 
     def do_GET(self):
@@ -433,6 +479,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self._apple_embed(path)
         if APPLE_STATIC_RE.match(path):
             return self._apple_static(path)
+        if APPLE_GW_RE.match(path):
+            return self._apple_gw(path)
         if path == "/api/preview":
             return self._preview()
         if path == "/api/top50":
