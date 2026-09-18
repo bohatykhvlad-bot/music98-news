@@ -903,6 +903,7 @@ audio.volume = 1;         /* always 100% of the device volume; never fade, mute,
 let curKey = null;
 let playGen = 0;
 let previewTriedItunes = false;
+let userPaused = false;   /* icon follows intent, not the async play() handshake */
 let actx = null;
 let blobUrl = "";
 let seekBar = null;
@@ -1016,7 +1017,7 @@ function markRows(){
     const on = row.dataset.key === curKey;
     row.classList.toggle("playing", on);
     const ic = row.querySelector(".rplay");
-    if(ic) ic.innerHTML = (on && !audio.paused) ? ICON_PAUSE : ICON_PLAY;
+    if(ic) ic.innerHTML = (on && !userPaused) ? ICON_PAUSE : ICON_PLAY;
     const cm = row.querySelector(".cmid");
     if(cm){
       const narrow = window.matchMedia("(max-width: 640px)").matches;
@@ -1040,6 +1041,7 @@ function markRows(){
 function stopPreview(){
   playGen++;
   curKey = null;
+  userPaused = false;
   previewTriedItunes = false;
   pendingSeek = null;
   lastSeekT = null;
@@ -1118,24 +1120,35 @@ function setRowArt(key, src){
 function playItunes(key, title, artist, url, gen){
   itunesLookup(title, artist, r=>{
     if(gen !== playGen || curKey !== key) return;
-    if(!r || !applePreview(r.preview)){ toast("No preview found for this track"); stopPreview(); return; }
+    if(r && applePreview(r.preview)) return useItunes(key, r, url, gen);
+    /* second chance: title only, featured artists often break the match */
+    itunesLookup(title, "", r2=>{
+      if(gen !== playGen || curKey !== key) return;
+      if(!r2 || !applePreview(r2.preview)){ toast("No preview found for this track"); stopPreview(); return; }
+      useItunes(key, r2, url, gen);
+    });
+  });
+}
+function useItunes(key, r, url, gen){
     previewTriedItunes = true;
     armSrc(previewPlayUrl(r.preview, r.track || url));
     if(r.track) setBadge(key, r.track);
     else if(url) setBadge(key, url);
     setRowArt(key, r.art);
     markRows();
-  });
 }
 function selectTrack(key, title, artist, url, prev){
   attachOut();
   if(curKey === key){           /* same row: play/pause toggle */
-    if(audio.paused){ tryPlay(); } else { audio.pause(); }
+    if(audio.paused){ userPaused = false; tryPlay(); }
+    else { userPaused = true; audio.pause(); }
+    markRows();
     return;
   }
   playGen++;
   const gen = playGen;
   curKey = key;
+  userPaused = false;
   previewTriedItunes = false;
   pendingSeek = null;
   lastSeekT = null;
@@ -1190,7 +1203,7 @@ audio.addEventListener("error", ()=>{
   if(code === 1) return;        /* aborted because we changed src */
   const row = $$("#chartList .chart-row").find(r => r.dataset.key === curKey);
   if(!row){ stopPreview(); return; }
-  if(previewTriedItunes) return;
+  if(previewTriedItunes){ toast("No preview found for this track"); stopPreview(); return; }
   playItunes(curKey, row.dataset.title || "", row.dataset.artist || "", row.dataset.url || "", gen);
 });
 
