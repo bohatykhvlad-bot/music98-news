@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-58">
+<meta name="m98-build" content="editorial-59">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -1508,7 +1508,6 @@ function renderNews(){
     <a class="hero" href="#post/${hero.id}">
       <div class="cover">${coverImg(hero,false)}</div>
       <div class="body">
-        <span class="tag" style="position:static;align-self:flex-start">${esc(hero.tag||"News")}</span>
         <h2>${titleHTML(hero)}</h2>
         <p>${rich(hero.excerpt||"")}</p>
         <div class="meta"><span>${fmtDate(hero.date)}</span></div>
@@ -1516,8 +1515,7 @@ function renderNews(){
     </a>` : "";
   $("#newsGrid").innerHTML = rest.map(p=>`
     <a class="card" href="#post/${p.id}">
-      <div class="cover">${coverImg(p,false,true)}
-        <span class="tag">${esc(p.tag||"News")}</span></div>
+      <div class="cover">${coverImg(p,false,true)}</div>
       <div class="body"><h3>${titleHTML(p)}</h3><p>${rich(p.excerpt||"")}</p>
         <div class="meta"><span>${fmtDate(p.date)}</span></div></div>
     </a>`).join("");
@@ -1755,7 +1753,7 @@ function relatedHTML(p){
         <a class="rcard" href="#post/${q.id}">
           <div class="rcover">${coverImg(q,true,true)}</div>
           <div class="rbody">
-            <span class="rtag">${esc(q.tag || (q.type==="release" ? (q.rtype||"Release") : "News"))}</span>
+            ${q.type==="release" ? `<span class="rtag">${esc(q.rtype||"Release")}</span>` : ""}
             <h3>${titleHTML(q)}</h3>
             <span class="rdate">${fmtDate(q.date)}</span>
           </div>
@@ -1894,7 +1892,7 @@ function showArticle(p){
     <a class="aback" href="#" id="aback">Back</a>
     <div class="acover">${coverImg(p,false)}</div>
     ${creditHTML(p)}
-    <span class="tag" style="position:static;margin-top:14px">${esc(p.tag || (p.type==="release" ? (p.rtype||"Release") : "News"))}</span>
+    ${p.type==="release" ? `<span class="tag" style="position:static;margin-top:14px">${esc(p.rtype||p.tag||"Release")}</span>` : ""}
     <h1>${titleHTML(p)}</h1>
     <div class="ameta"><span>${fmtDate(p.date)}</span></div>
     <div class="atext">${renderBody(p.body||p.excerpt||"")}</div>
