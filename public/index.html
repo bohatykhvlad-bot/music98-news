@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="hd-v6">
+<meta name="m98-build" content="hd-solo-7">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -72,11 +72,8 @@ main{position:relative;z-index:1}
 .tab.active{display:block}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
-.hd{display:flex;align-items:center;gap:10px;margin:0 0 22px}
-.hd-t,.hd-s{margin:0;padding:0;line-height:1;white-space:nowrap}
-.hd-t{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em}
-.hd-b{width:4px;height:clamp(26px,4vw,38px);border-radius:2px;background:var(--accent);flex:none}
-.hd-s{font-size:15px;font-weight:400;color:var(--muted)}
+.hd{margin:0 0 22px}
+.hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text)}
 
 /* hero */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
@@ -339,10 +336,8 @@ textarea{resize:vertical;min-height:64px}
   .foot-in{grid-template-columns:1fr}
   .tab{padding-top:14px}
   .tab.rise{animation:none}
-  .hd{margin-bottom:14px;gap:10px}
+  .hd{margin-bottom:14px}
   .hd-t{font-size:26px}
-  .hd-b{height:26px}
-  .hd-s{font-size:14px}
   body{padding-top:calc(var(--header-h, 148px) + 8px)}
   .hero .body{padding:16px}
   .sub-in{padding:32px 16px}
@@ -411,20 +406,20 @@ textarea{resize:vertical;min-height:64px}
 
 <main class="wrap">
   <section class="tab active" id="tab-news">
-    <div class="hd"><span class="hd-t" role="heading" aria-level="1">News</span><span class="hd-b" aria-hidden="true"></span><span class="hd-s">Latest stories</span></div>
+    <div class="hd"><h1 class="hd-t">Latest stories</h1></div>
     <div id="heroSlot"></div>
     <div class="grid" id="newsGrid"></div>
     <div class="empty" id="newsEmpty" hidden>Nothing found for your query. Try another search.</div>
   </section>
 
   <section class="tab" id="tab-releases">
-    <div class="hd"><span class="hd-t" role="heading" aria-level="1">Releases</span><span class="hd-b" aria-hidden="true"></span><span class="hd-s">Albums, EPs and singles</span></div>
+    <div class="hd"><h1 class="hd-t">New albums, EPs and singles</h1></div>
     <div class="grid" id="relGrid"></div>
     <div class="empty" id="relEmpty" hidden>Nothing found for your query.</div>
   </section>
 
   <section class="tab" id="tab-charts">
-    <div class="hd"><span class="hd-t" role="heading" aria-level="1">Charts</span><span class="hd-b" aria-hidden="true"></span><span class="hd-s">Daily Top 50</span></div>
+    <div class="hd"><h1 class="hd-t">Daily Top 50</h1></div>
     <div class="chart-switch" id="chartSwitch" hidden></div>
     <div class="chart" id="chartList" role="list"></div>
     <p class="chart-note" id="chartStatus" hidden></p>
