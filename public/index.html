@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="play-col-6">
+<meta name="m98-build" content="play-gap-7">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -125,13 +125,13 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
-.cmid{--pexp:0px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:8px;z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
-.chart-row.playing .cmid{background:rgba(255,255,255,.85);border-color:rgba(15,60,64,.10);backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);padding:3px}
+.cmid{--pexp:0px;--pin:8px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:var(--pin);z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
+.chart-row.playing .cmid{background:rgba(255,255,255,.85);border-color:rgba(15,60,64,.10);backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);padding:4px var(--pin)}
 .rplay{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transition:background .16s ease,color .16s ease,transform .16s ease}
 .rplay svg{width:15px;height:15px}
 .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.04)}
 .chart-row.playing .rplay{background:var(--accent);border-color:transparent;color:#03282b}
-.pextra{display:flex;align-items:center;gap:8px;width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
+.pextra{display:flex;align-items:center;gap:var(--pin, 8px);width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
 .chart-row.playing .pextra{opacity:1}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
 .pbar{width:108px;height:5px;border-radius:999px;background:var(--line);overflow:hidden;display:block}
@@ -858,7 +858,7 @@ function markRows(){
           pe.style.width = prevW;
           if(w > 0 && row.classList.contains("playing")){
             cm.style.setProperty("--pexp", w+"px");
-            row.style.setProperty("--pw", (w + 56)+"px");
+            row.style.setProperty("--pw", (w + 66)+"px");
           }
         });
       } else { cm.style.removeProperty("--pexp"); row.style.removeProperty("--pw"); }
