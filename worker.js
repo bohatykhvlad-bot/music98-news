@@ -17,6 +17,10 @@ export default {
     if (path === "/api/subscribers" && request.method === "GET") return subscribers(c);
     if (path === "/api/broadcast" && request.method === "POST") return broadcast(c);
     if (path === "/api/mail") return mail(c);
+    if (path === "/m98desk" || path === "/m98desk.html") {
+      const u = new URL("/admin-desk", request.url);
+      return Response.redirect(u, 301);
+    }
     const res = await env.ASSETS.fetch(request);
     const type = (res.headers.get("content-type") || "").toLowerCase();
     const headers = new Headers(res.headers);

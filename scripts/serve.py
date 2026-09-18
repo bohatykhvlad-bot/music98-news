@@ -375,8 +375,13 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._send(*json_bytes({"error": "unauthorized"}, 401))
             key, sender = mail_config()
             return self._send(*json_bytes({"ok": True, "configured": bool(key), "from": sender}))
-        if path == "/m98desk":
-            self.path = "/m98desk.html"
+        if path in ("/m98desk", "/m98desk.html"):
+            self.send_response(301)
+            self.send_header("Location", "/admin-desk")
+            self.end_headers()
+            return
+        if path == "/admin-desk":
+            self.path = "/admin-desk.html"
         return super().do_GET()
 
     def do_POST(self):
@@ -461,6 +466,7 @@ class Handler(SimpleHTTPRequestHandler):
                         last_err = (body or str(exc))[:280]
                         if key:
                             last_err = last_err.replace(key, "[key]")
+                        last_err = re.sub(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", "[email]", last_err, flags=re.I)
             return self._send(*json_bytes({"ok": True, "sent": sent, "failed": failed, "from": sender, "detail": last_err or None}))
         if path == "/api/mail":
             if not self._authed():
@@ -486,5 +492,5 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", "43123"))
     httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
     print(f"music98.news → http://127.0.0.1:{port}")
-    print("Desk → http://127.0.0.1:%s/m98desk" % port)
+    print("Desk → http://127.0.0.1:%s/admin-desk" % port)
     httpd.serve_forever()
