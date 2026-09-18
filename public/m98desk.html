@@ -101,7 +101,17 @@ a{color:var(--text)}
 .composer em,.composer i{font-style:italic}
 .composer b,.composer strong{font-weight:700}
 .composer .blk{position:relative;margin:12px auto 16px;border-radius:10px}
-.composer .blk .kill{position:absolute;right:6px;top:6px;z-index:2;width:24px;height:24px;border:0;border-radius:50%;background:#fff;color:#15181a;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.composer .blk .kill,.composer .blk .grip{
+  position:absolute;top:6px;z-index:2;width:24px;height:24px;border:0;border-radius:6px;
+  background:#fff;color:#15181a;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)
+}
+.composer .blk .kill{right:6px;border-radius:50%}
+.composer .blk .grip{left:6px;cursor:grab;letter-spacing:-2px;line-height:1;font-size:16px;padding:0}
+.composer .blk .grip:active{cursor:grabbing}
+.composer .blk.sel{outline:2px solid var(--accent);outline-offset:2px}
+.composer .blk.dragging{opacity:.4}
+.composer.moving iframe{pointer-events:none}
+.composer .drop-line{height:3px;background:var(--accent);border-radius:99px;margin:8px 12px;padding:0;border:0}
 .composer .aembed{max-width:520px;width:100%;margin:12px auto 16px}
 .composer .aembed.song{max-width:420px}
 .composer .aembed.song iframe{height:166px}
@@ -214,6 +224,7 @@ a{color:var(--text)}
       </div>
       <input id="bodyPhoto" class="hide" type="file" accept="image/*">
       <div class="composer" id="composer" contenteditable="true" data-placeholder="Write here"></div>
+      <p class="muted">Click in the story, then insert. Drag the dots on a player or photo to move it.</p>
 
       <label><input id="pinned" type="checkbox" style="width:auto"> Pin to the top of News</label>
       <label for="goLive">Go live at</label>
@@ -276,6 +287,7 @@ a{color:var(--text)}
 <div class="toast hide" id="toast"></div>
 <script>
 const $ = s => document.querySelector(s);
+const $$ = (s, root=document) => [...root.querySelectorAll(s)];
 const KEY = "music98_admin_key";
 const APPLE_AT = "1001l3aZW";
 let posts = [];
@@ -430,10 +442,10 @@ function appleBlock(kind, album, track){
   const song = kind==="song" || track;
   const h = song ? 166 : 320;
   const token = song ? ("song:"+album+":"+track) : ("album:"+album);
-  return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}"><button class="kill" type="button" aria-label="Remove">×</button><iframe height="${h}" src="${esc(src)}" title="Apple Music" loading="eager"></iframe></figure>`;
+  return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}"><span class="grip" draggable="true" aria-label="Move">⋮⋮</span><button class="kill" type="button" aria-label="Remove">×</button><iframe height="${h}" src="${esc(src)}" title="Apple Music" loading="eager"></iframe></figure>`;
 }
 function photoBlock(src){
-  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}"><button class="kill" type="button" aria-label="Remove">×</button><img src="${esc(src)}" alt=""></figure>`;
+  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}"><span class="grip" draggable="true" aria-label="Move">⋮⋮</span><button class="kill" type="button" aria-label="Remove">×</button><img src="${esc(src)}" alt=""></figure>`;
 }
 function parseYouTube(raw){
   const s = String(raw||"").trim();
@@ -467,24 +479,149 @@ function youtubeSrc(id, start){
 }
 function youtubeBlock(id, start){
   const token = start ? (id+":"+start) : id;
-  return `<figure class="blk yembed" contenteditable="false" data-youtube="${esc(token)}"><button class="kill" type="button" aria-label="Remove">×</button><div class="ytbox"><iframe src="${esc(youtubeSrc(id, start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="eager"></iframe></div></figure>`;
+  return `<figure class="blk yembed" contenteditable="false" data-youtube="${esc(token)}"><span class="grip" draggable="true" aria-label="Move">⋮⋮</span><button class="kill" type="button" aria-label="Remove">×</button><div class="ytbox"><iframe src="${esc(youtubeSrc(id, start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="eager"></iframe></div></figure>`;
 }
 
-function insertHTML(html){
+let savedRange = null;
+let dragBlk = null;
+
+function htmlNode(html){
+  const wrap = document.createElement("div");
+  wrap.innerHTML = html;
+  return wrap.firstElementChild;
+}
+function saveCaret(){
   const el = $("#composer");
-  el.focus();
+  const sel = window.getSelection();
+  if(!sel || !sel.rangeCount) return;
+  const node = sel.anchorNode;
+  if(!node || !el.contains(node)) return;
+  if(node.nodeType===1 && node.closest && node.closest(".blk")) return;
+  savedRange = sel.getRangeAt(0).cloneRange();
+}
+function composerRange(){
+  const el = $("#composer");
   const sel = window.getSelection();
   if(sel && sel.rangeCount && el.contains(sel.anchorNode)){
-    const range = sel.getRangeAt(0);
-    range.deleteContents();
-    const wrap = document.createElement("div");
-    wrap.innerHTML = html + "<p><br></p>";
-    const frag = document.createDocumentFragment();
-    while(wrap.firstChild) frag.appendChild(wrap.firstChild);
-    range.insertNode(frag);
-  }else{
-    el.insertAdjacentHTML("beforeend", html + "<p><br></p>");
+    const n = sel.anchorNode;
+    const insideBlk = n.nodeType===1 ? n.closest(".blk") : n.parentElement && n.parentElement.closest(".blk");
+    if(!insideBlk) return sel.getRangeAt(0).cloneRange();
   }
+  if(savedRange && el.contains(savedRange.startContainer)) return savedRange.cloneRange();
+  return null;
+}
+function caretFromPoint(x, y){
+  const el = $("#composer");
+  let r = null;
+  if(document.caretRangeFromPoint) r = document.caretRangeFromPoint(x, y);
+  else if(document.caretPositionFromPoint){
+    const p = document.caretPositionFromPoint(x, y);
+    if(p && p.offsetNode){
+      r = document.createRange();
+      r.setStart(p.offsetNode, p.offset);
+      r.collapse(true);
+    }
+  }
+  if(r && el.contains(r.startContainer)) savedRange = r;
+}
+function placeCaretIn(node){
+  if(!node) return;
+  const sel = window.getSelection();
+  const r = document.createRange();
+  r.selectNodeContents(node);
+  r.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(r);
+  savedRange = r.cloneRange();
+}
+function childOfComposer(node, el){
+  let n = node;
+  if(n && n.nodeType===3) n = n.parentElement;
+  while(n && n.parentElement && n.parentElement !== el) n = n.parentElement;
+  return (n && n.parentElement === el) ? n : null;
+}
+function atStartOf(range, block){
+  const probe = document.createRange();
+  probe.selectNodeContents(block);
+  probe.collapse(true);
+  return range.startContainer===probe.startContainer && range.startOffset===probe.startOffset;
+}
+function atEndOf(range, block){
+  const probe = document.createRange();
+  probe.selectNodeContents(block);
+  probe.collapse(false);
+  return range.startContainer===probe.startContainer && range.startOffset===probe.startOffset;
+}
+function ensureParaAfter(node){
+  let next = node.nextElementSibling;
+  if(!next || next.nodeName!=="P"){
+    next = document.createElement("p");
+    next.innerHTML = "<br>";
+    node.after(next);
+  }
+  return next;
+}
+function insertHTML(html){
+  const el = $("#composer");
+  const node = htmlNode(html);
+  if(!node) return;
+  el.focus();
+  const range = composerRange();
+  if(!range){
+    el.appendChild(node);
+    placeCaretIn(ensureParaAfter(node));
+    return;
+  }
+  if(!range.collapsed) range.deleteContents();
+  const inBlk = range.startContainer.nodeType===1
+    ? range.startContainer.closest(".blk")
+    : range.startContainer.parentElement && range.startContainer.parentElement.closest(".blk");
+  if(inBlk && el.contains(inBlk)){
+    inBlk.after(node);
+    placeCaretIn(ensureParaAfter(node));
+    return;
+  }
+  const block = childOfComposer(range.startContainer, el);
+  if(!block || block === el){
+    range.insertNode(node);
+    placeCaretIn(ensureParaAfter(node));
+    return;
+  }
+  if(block.classList && block.classList.contains("blk")){
+    block.after(node);
+    placeCaretIn(ensureParaAfter(node));
+    return;
+  }
+  if(atStartOf(range, block)){
+    block.before(node);
+  }else if(atEndOf(range, block)){
+    block.after(node);
+  }else{
+    const tail = document.createRange();
+    tail.setStart(range.startContainer, range.startOffset);
+    tail.setEndAfter(block.lastChild || block);
+    const after = document.createElement(block.nodeName || "P");
+    after.appendChild(tail.extractContents());
+    if(!String(after.textContent||"").trim() && !after.querySelector("img,iframe,figure")) after.innerHTML = "<br>";
+    if(!String(block.textContent||"").trim() && !block.querySelector("img,iframe,figure")) block.innerHTML = "<br>";
+    block.after(node);
+    node.after(after);
+  }
+  placeCaretIn(ensureParaAfter(node));
+}
+function clearDropLine(){
+  $$("#composer .drop-line").forEach(n=>n.remove());
+}
+function dropAnchor(e){
+  const el = $("#composer");
+  const kids = [...el.children].filter(n=> !n.classList.contains("drop-line") && n !== dragBlk);
+  const y = e.clientY;
+  for(const kid of kids){
+    const r = kid.getBoundingClientRect();
+    const mid = r.top + r.height/2;
+    if(y < mid) return kid;
+  }
+  return null;
 }
 
 function inlineText(node){
@@ -807,8 +944,20 @@ stage.addEventListener("dblclick", e=>{
 });
 
 document.querySelector(".toolbar").addEventListener("mousedown", e=>{
-  if(e.target.closest("button")) e.preventDefault();
+  if(e.target.closest("button")){
+    saveCaret();
+    e.preventDefault();
+  }
 });
+document.addEventListener("selectionchange", ()=>{
+  const el = $("#composer");
+  if(!el) return;
+  const sel = window.getSelection();
+  if(sel && sel.rangeCount && el.contains(sel.anchorNode)) saveCaret();
+});
+$("#composer").addEventListener("keyup", saveCaret);
+$("#composer").addEventListener("mouseup", saveCaret);
+
 document.querySelector(".toolbar").addEventListener("click", e=>{
   const wrap = e.target.closest("[data-wrap]");
   if(!wrap) return;
@@ -822,7 +971,7 @@ document.querySelector(".toolbar").addEventListener("click", e=>{
   }
 });
 
-$("#btnPhoto").onclick = ()=> $("#bodyPhoto").click();
+$("#btnPhoto").onclick = ()=>{ saveCaret(); $("#bodyPhoto").click(); };
 $("#bodyPhoto").onchange = e=>{
   readPhoto(e.target.files[0], src=>{
     insertHTML(photoBlock(src));
@@ -832,12 +981,64 @@ $("#bodyPhoto").onchange = e=>{
 
 $("#composer").addEventListener("click", e=>{
   const k = e.target.closest(".kill");
-  if(k){ e.preventDefault(); k.closest("figure")?.remove(); }
+  if(k){
+    e.preventDefault();
+    k.closest("figure")?.remove();
+    return;
+  }
+  $$("#composer .blk.sel").forEach(n=>n.classList.remove("sel"));
+  const blk = e.target.closest(".blk");
+  if(blk && $("#composer").contains(blk)) blk.classList.add("sel");
+});
+$("#composer").addEventListener("dragstart", e=>{
+  const grip = e.target.closest(".grip");
+  const blk = grip && grip.closest(".blk");
+  if(!blk) return;
+  dragBlk = blk;
+  blk.classList.add("dragging","sel");
+  $("#composer").classList.add("moving");
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", "move");
+});
+$("#composer").addEventListener("dragend", ()=>{
+  if(dragBlk) dragBlk.classList.remove("dragging");
+  dragBlk = null;
+  $("#composer").classList.remove("moving");
+  clearDropLine();
 });
 $("#composer").addEventListener("dragover", e=>{
+  if(dragBlk){
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    clearDropLine();
+    const line = document.createElement("div");
+    line.className = "drop-line";
+    line.contentEditable = "false";
+    const before = dropAnchor(e);
+    if(before && before !== dragBlk) before.before(line);
+    else $("#composer").appendChild(line);
+    return;
+  }
   if(dropHasImage(e.dataTransfer)) e.preventDefault();
 });
 $("#composer").addEventListener("drop", e=>{
+  if(dragBlk){
+    e.preventDefault();
+    const line = $("#composer .drop-line");
+    if(line){
+      line.replaceWith(dragBlk);
+    }else{
+      const before = dropAnchor(e);
+      if(before && before !== dragBlk) before.before(dragBlk);
+      else $("#composer").appendChild(dragBlk);
+    }
+    dragBlk.classList.remove("dragging");
+    dragBlk = null;
+    $("#composer").classList.remove("moving");
+    clearDropLine();
+    return;
+  }
+  caretFromPoint(e.clientX, e.clientY);
   takeDroppedImage(e, src=> insertHTML(photoBlock(src)), 1400);
 });
 $("#composer").addEventListener("paste", e=>{
@@ -871,6 +1072,7 @@ function closeApple(){
   pendingApple = null;
 }
 function openApple(kind){
+  saveCaret();
   closeYoutube();
   appleKind = kind;
   pendingApple = null;
@@ -914,6 +1116,7 @@ function closeYoutube(){
   $("#ytPrev").innerHTML = "";
 }
 function openYoutube(){
+  saveCaret();
   closeApple();
   $("#ytUrl").value = "";
   $("#ytPrev").innerHTML = "";
