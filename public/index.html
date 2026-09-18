@@ -200,7 +200,17 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .cs-btn.active{background:#15181a;border-color:#15181a;color:#fff}
 
 /* ---------- subscribe ---------- */
-.subscribe{margin:46px 0 0;border-top:1px solid var(--line);background:linear-gradient(180deg,rgba(0,253,251,.08),transparent 70%)}
+.subscribe{
+  margin:46px 0 0;
+  border-top:1px solid rgba(255,255,255,.8);
+  background-color:rgba(255,255,255,.72);
+  background-image:
+    radial-gradient(620px 240px at 16% 18%, rgba(0,253,251,.10), transparent 70%),
+    radial-gradient(540px 220px at 84% 32%, rgba(0,253,251,.07), transparent 70%),
+    linear-gradient(180deg, rgba(0,253,251,.06), transparent 70%);
+  backdrop-filter:blur(12px) saturate(180%);
+  -webkit-backdrop-filter:blur(12px) saturate(180%);
+}
 .sub-in{max-width:660px;margin:0 auto;padding:46px 20px;text-align:center}
 .sub-in h2{margin:0 0 8px;font-size:26px;letter-spacing:-.02em}
 .sub-in p{margin:0 0 20px;color:var(--muted);font-size:14.5px}
