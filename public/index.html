@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="chart-pos-text-2">
+<meta name="m98-build" content="chart-pos-gap-3">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -117,6 +117,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
 .cname{min-width:0;font-size:clamp(14px,1.4vw,18px);line-height:1.2;font-weight:800;letter-spacing:-.01em;text-transform:uppercase;overflow-wrap:break-word}
 .chart-row .pos,.cartist{font:inherit;letter-spacing:inherit;line-height:inherit;font-weight:inherit;text-transform:inherit;color:inherit;display:inline;width:auto;height:auto;margin:0;padding:0;border:0;text-align:start}
+.chart-row .pos{margin-inline-end:10px}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta.up{color:var(--green)} .delta.down{color:var(--red)} .delta.same{color:var(--muted2)}
 .delta.new{color:#03282b;background:var(--amber);border-radius:6px;padding:2px 0;font-size:10.5px;letter-spacing:.08em}
@@ -356,6 +357,7 @@ textarea{resize:vertical;min-height:64px}
   .artwrap{grid-area:art;width:48px;height:48px;border-radius:10px;align-self:start}
   .ctext{grid-area:names;align-self:start;min-width:0}
   .cname{font-size:14px;line-height:1.2}
+  .chart-row .pos{margin-inline-end:8px}
   .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .rplay{grid-area:play;justify-self:center;align-self:center;width:36px;height:36px}
@@ -1165,7 +1167,7 @@ function renderCharts(){
     return `<div class="chart-row${i<3?" top":""}" data-key="${esc(key)}" data-title="${esc(r.title)}" data-artist="${esc(r.artist)}" data-url="${esc(appleUrl==="#" ? "" : appleUrl)}" data-prev="${esc(applePreview(r.prev||""))}" tabindex="0" role="listitem" aria-label="Position ${i+1}: ${esc(r.title)} by ${esc(r.artist)} — press Enter to play the 30-second preview">
       <div class="delta ${dcls}">${dtxt}</div>
       <div class="artwrap"><img data-lk="${esc(key)}"${r.art ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} — ${esc(r.artist)}" loading="lazy"></div>
-      <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span> <span class="cartist">${esc(r.artist)}</span></div><div class="ctrack">${esc(r.title)}${r.year ? ' <span class="cyear">· '+esc(r.year)+'</span>' : ""}</div></div></div>
+      <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span><span class="cartist">${esc(r.artist)}</span></div><div class="ctrack">${esc(r.title)}${r.year ? ' <span class="cyear">· '+esc(r.year)+'</span>' : ""}</div></div></div>
       <div class="cmid">
         <button class="rplay" title="Play 30-second preview" aria-label="Play 30-second preview of ${esc(r.title)}">${ICON_PLAY}</button>
         <div class="pextra"><span class="ptime"><span class="pbar"><i></i></span><span class="pdur">0:00 / 0:30</span></span>${badge}</div>
