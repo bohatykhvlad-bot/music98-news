@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-18">
+<meta name="m98-build" content="editorial-19">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -82,7 +82,7 @@ main{position:relative;z-index:1}
 /* hero — left cell matches the text column; photo fills and crops to the face */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .hero .cover{position:relative;min-height:300px;height:100%;overflow:hidden;background:var(--card2)}
-.hero .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
+.hero .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--pos, center top);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
 .hero .body{padding:28px;display:flex;flex-direction:column;gap:12px}
 .hero h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.22;letter-spacing:-.02em}
 .hero p{margin:0;color:var(--muted);font-size:15px}
@@ -94,7 +94,7 @@ a.card,a.hero{color:inherit;text-decoration:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;display:flex;flex-direction:column;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .card:active,.card:focus,.card:focus-visible{border-color:var(--line);outline:none;box-shadow:none;transform:none}
 .card .cover{position:relative;aspect-ratio:1/1;overflow:hidden;background:var(--card2)}
-.card .cover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
+.card .cover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center top);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
 .card.square .cover{aspect-ratio:1/1}
 .tag{position:absolute;left:10px;top:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.92);color:var(--acc2);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1;padding:6px 11px;border-radius:999px;border:1px solid rgba(0,0,0,.18)}
 .card .body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
@@ -142,7 +142,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .pextra{display:flex;align-items:center;gap:var(--pin, 8px);width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
 .chart-row.playing .pextra{opacity:1}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
-.pbar{width:108px;height:5px;border-radius:999px;background:var(--line);overflow:hidden;display:block}
+.pbar{width:108px;height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:block;cursor:pointer;touch-action:none}
 .pbar i{display:block;height:100%;width:0;background:var(--accent)}
 .pdur{font-size:12px;color:var(--muted2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .pextra .abadge{flex:none}
@@ -196,7 +196,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .overlay.open .article{transform:none}
 @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .article .acover{aspect-ratio:21/9;overflow:hidden;position:relative;background:var(--card2)}
-.article .acover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%)}
+.article .acover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center top)}
 .article .abody{padding:24px 28px 22px}
 .article h1{margin:10px 0 6px;font-size:clamp(22px,3.4vw,32px);line-height:1.2;letter-spacing:-.02em}
 .article .ameta{color:var(--muted2);font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -208,13 +208,15 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 /* ---------- full article page ---------- */
 #articlePage{max-width:780px;margin:26px auto 40px;padding:0 20px;position:relative;z-index:1}
 #articlePage .acover{aspect-ratio:21/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--card2)}
-#articlePage .acover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%)}
+#articlePage .acover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center top)}
 #articlePage h1{font-size:clamp(26px,4vw,40px);letter-spacing:-.02em;line-height:1.15;margin:18px 0 8px}
 #articlePage .ameta{color:var(--muted2);font-size:13.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #articlePage .atext{margin-top:18px;font-size:16.5px;line-height:1.7;color:var(--body-text)}
 #articlePage .atext p{margin:0 0 16px}
-.aembed{margin:6px 0 22px;max-width:660px;background:var(--bg2);border-radius:12px;overflow:hidden}
+.aembed{margin:6px 0 22px;max-width:660px;background:transparent;border-radius:12px;overflow:hidden}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
+.aembed.song{max-width:520px}
+.aembed.song iframe{height:150px}
 .aback{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin-bottom:16px}
 .aback::before{content:"";width:7px;height:7px;flex:none;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-1px}
 .aback:hover{text-decoration:underline}
@@ -273,7 +275,7 @@ textarea{resize:vertical;min-height:64px}
 .rcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .rcard:active,.rcard:focus,.rcard:focus-visible{border-color:var(--line);outline:none;box-shadow:none}
 .rcard .rcover{aspect-ratio:16/9;overflow:hidden;background:var(--card2)}
-.rcard .rcover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
+.rcard .rcover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center top);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
 .rcard .rbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
 .rcard .rtag{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
 .rcard h3{margin:0;font-size:14px;line-height:1.35}
@@ -556,7 +558,7 @@ function titleHTML(p){
 }
 function coverPos(p){
   const v = p && p.cover && p.cover.pos;
-  return v || "center 14%";
+  return v || "center top";
 }
 function coverImg(p, square, lazy){
   const extra = lazy ? ' loading="lazy"' : '';
@@ -668,7 +670,7 @@ const TOP50 = [
 ];
 
 const SEED = {
-  posts:     [{"id": "n1", "type": "news", "pinned": true, "tag": "News", "title": "Olivia Rodrigo's Unraveled Tour Starts Next Week With a Record That Won't Sit Down", "excerpt": "Hartford is seven days away. *you seem pretty sad for a girl so in love* is still rewriting her own chart records, and the rooms keep getting bigger.", "body": "Hartford is seven days away, and the rooms are already too small. Olivia Rodrigo opens the Unraveled Tour on September 25 at PeoplesBank Arena, the first night of a run that began as four Brooklyn dates and then kept multiplying until it looked less like a tour routing and more like a residency map: ten nights at Los Angeles' Intuit Dome, ten at Barclays Center, eleven at London's O2. Live Nation has the routing. The audience has the receipts. More than a million tickets are already gone.\n\nThis is the third album cycle, and it does not behave like a victory lap. *you seem pretty sad for a girl so in love* arrived June 12 on Geffen with a first-week haul of 485,000 equivalent units in the United States, the biggest solo week of 2026, then spent a second week on top of the Billboard 200. In early September it walked back to No. 1 on Top Alternative Albums and Top Rock & Alternative Albums. On the latter list it is now her longest-running leader, past *Guts*. The record is three months old and still arguing with the chart.\n\n[apple:song:6779097512:6779097526]\n\n\"drop dead\" was the door. It is the song that made the tour announcement sound like a dare instead of a press release: a guitar figure that refuses to sit politely, a vocal that treats heartbreak as a contact sport. The rest of the album is not a sequel to *Sour*'s diary or *Guts*' sneer so much as a third temperature. Rodrigo still writes like someone who cannot leave a feeling half-named. The difference is scale. The feelings got bigger rooms.\n\nSupport on select dates comes from Wolf Alice, The Last Dinner Party, Devon Again, Die Spitz, and Grace Ives. That bill is not filler. It is a statement about where she wants the nights to live: guitar music that can scrape a ceiling, pop that can take a punch, rooms that do not flatten the band into a click track. The outing was drawn for 65 shows. Demand added twenty-five more, including extra London, Amsterdam, Barcelona, and Paris, plus an October 18 date at Boston's TD Garden. The last listed night is May 10, 2027, back at the O2.\n\n[apple:song:6779097512:6779097756]\n\n\"the cure\" sits further into the album, and it is the one that explains the title. The writing is still sharp enough to bruise, but the arrangement leaves air around the bruise. You can hear why rock radio and the alternative albums chart have not let go. This is not a pop star borrowing a guitar for a costume change. It is a pop star who built the third record so the guitar would have somewhere to live.\n\nUniversal Music Canada's June note on the album also listed the hardware around it: limited vinyl, merch drops, collectibles timed to release week. That is the ordinary machinery of a modern campaign. What is less ordinary is the way the live hold keeps tightening after the first-week spike. Most arena tours cool once the album is no longer new. Unraveled is doing the opposite. The album returned to a summit in September. The tour still had not started.\n\nThere is a useful comparison inside her own catalog. *Sour* made her a phenomenon. *Guts* made the phenomenon louder and meaner. *you seem pretty sad for a girl so in love* is the first time the phenomenon has to carry a long itinerary and a long chart life at once. A ten-night Intuit Dome stand is a venue record. A double-digit O2 residency puts her in a short list that already includes Prince, the Spice Girls, One Direction, Ariana Grande, Elton John, and Rihanna. Those names are not press-kit garnish. They are a measurement of how many nights a city will buy from one artist before it is full.\n\nThe week ahead is logistics: rehearsals, load-in, the first two Hartford dates on September 25 and 26. After that the map runs through the fall and into a winter of doubled cities, then Europe in the spring. If the album keeps behaving the way it has since June, the set list will not have to chase a fading single. It can play a record that is still moving units while the trucks are on the highway.\n\nThat is the story, a week out. The tour is not a victory lap. It is a second argument, made in rooms that keep getting added because the first argument did not finish.", "date": "2026-09-18", "artist": "Olivia Rodrigo", "cover": {"kind": "img", "src": "photos/olivia-rodrigo-glastonbury-2025.jpg", "pos": "center 18%", "credit": "Raph_PH / Wikimedia Commons (CC BY 4.0)", "creditUrl": "https://commons.wikimedia.org/wiki/File:Olivia_Rodrigo_2.jpeg"}}, {"id": "r1", "type": "release", "tag": "Album", "rtype": "Album", "artist": "Carly Rae Jepsen", "title": "Day and Night", "excerpt": "A 24-song double album, split between live-band daylight pop and after-hours synths, is out today on Schoolboy and Interscope.", "body": "Carly Rae Jepsen has a habit of treating time like a writing partner. *Dedicated* had a Side B. *Emotion* had one too. *The Loneliest Time* found a companion in *The Loveliest Time*. *Day and Night*, out today on Schoolboy and Interscope, is the habit made architectural: twenty-four songs, two discs, one clock. *Day* is twelve tracks of live-band grain and 1970s psychedelic pop. *Night* is twelve more, pulled into synths and the kind of dance music that does not ask permission to stay out. The runtime is just under eighty-five minutes. It does not hurry.\n\nThe record was announced on June 22. The first taste was \"On Wires,\" June 26, a daylight song about the impatient early minutes of wanting someone, written with Kyle Shearer and Nate Cyphert. \"After All\" followed on July 16. \"Don't Leave Me on the Dance Floor\" arrived August 7. \"Motivation\" closed the singles run on August 21. Four trailers is a lot for an artist whose cult already knows how to wait. Jepsen used them as weather reports: two for the sun, two for the club.\n\n[apple:album:6781767022]\n\nThe official framing is a twenty-four-hour blur. Nights stretch into mornings. Days dissolve into nights. You are supposed to feel suspended inside a single long hour. That is marketing language, and it happens to describe the sequencing. \"After All\" opens *Day* like a window being lifted. \"Habits of Creatures\" and \"Versailles\" keep the light in the room. \"On Wires,\" track four, is the impatient heart of the disc: Shearer's production, a vocal that leans forward as if the chorus might leave without her. By \"Just a Little Walk on the Moon,\" the daylight side has walked itself out to the edge of evening.\n\n*Night* starts with \"Never Let a Good Thing Die,\" the longest cut on the album, and then the temperature changes. \"Amalfi Coast,\" \"Patience Power Passion,\" \"Don't Leave Me on the Dance Floor,\" \"Motivation.\" The second disc is not a remix of the first. It is the same writer staying up. Collaborators include Tavish Crowe, Shearer, Cyphert, and Cole M.G.N., Jepsen's husband, alongside Noonie Bao, Patrik Berger, Markus Krunegard, and Pontus Winnberg. The credits read like a map of the last decade of smart pop: Stockholm, Los Angeles, the *Emotion* brain trust, the people who know how to make a chorus feel expensive without making it cheap.\n\nCritics got the album a few days early, and the early scores have been generally favorable: Metacritic sitting near 80. *The Line of Best Fit* called it her most far-reaching work. *Rolling Stone* heard a dissertation on love, which is a grand way of saying Jepsen is still writing about the same subject she has always written about, only with more rooms in the house. *Paste* liked the textures. *Slant Magazine*, less convinced, found it sonically adventurous and a little unwieldy, which is a fair warning about a double album. *NME* said it grows. *The Times* wondered if the length was a mistake. None of that is a consensus. It is a split that a twenty-four-track pop record should expect.\n\nWhat is not in dispute is the shape. Jepsen has spent a decade proving that pop can be meticulous without being cold. *Emotion*'s tenth anniversary show at the Troubadour last August was a reminder of that contract: play the album in order, take the choruses seriously, do not wink so hard the songs collapse. *Day and Night* is the first new full-length since that night, and it sounds like someone who heard the crowd sing the old precision and decided the new precision could be longer.\n\nShe launches the album onstage September 27, headlining New York's All Things Go Festival, her first billed performance of 2026, on a bill that also includes Zara Larsson, Lola Young, Brandi Carlile, and MUNA. A festival slot is a strange place to debut a double album. It is also the right kind of strange. You cannot play twenty-four songs. You can play the argument: a *Day* song, a *Night* song, proof that the two halves talk to each other.\n\nPhysical editions and the digital album went out this morning. The Japanese CD adds \"Reaching for a Star\" and \"Yes.\" Everyone else gets the twenty-four. If you only have time for a first pass, start at \"After All,\" stay through \"On Wires,\" then skip to \"Don't Leave Me on the Dance Floor\" and let *Night* finish the hour. If you have the whole evening, play it in order. That is what the title is for.\n\nJepsen has never been in a hurry to be the loudest person in the room. *Day and Night* does not change that. It just gives the room two lighting states and asks you to stay until both of them have had their say.", "date": "2026-09-18", "cover": {"kind": "img", "src": "photos/carly-rae-jepsen-primavera-2019.jpg", "pos": "center 12%", "credit": "Raph_PH / Wikimedia Commons (CC BY 2.0)", "creditUrl": "https://commons.wikimedia.org/wiki/File:Carly_Rae_Jepsen_Primavera19_-146_(48986111926)_(cropped).jpg"}}],
+  posts:     [{"id": "n1", "type": "news", "pinned": true, "tag": "News", "title": "Olivia Rodrigo's Unraveled Tour Starts Next Week With a Record That Won't Sit Down", "excerpt": "Hartford is seven days away. *you seem pretty sad for a girl so in love* is still rewriting her own chart records, and the rooms keep getting bigger.", "body": "Hartford is seven days away, and the rooms are already too small. Olivia Rodrigo opens the Unraveled Tour on September 25 at PeoplesBank Arena, the first night of a run that began as four Brooklyn dates and then kept multiplying until it looked less like a tour routing and more like a residency map: ten nights at Los Angeles' Intuit Dome, ten at Barclays Center, eleven at London's O2. Live Nation has the routing. The audience has the receipts. More than a million tickets are already gone.\n\nThis is the third album cycle, and it does not behave like a victory lap. *you seem pretty sad for a girl so in love* arrived June 12 on Geffen with a first-week haul of 485,000 equivalent units in the United States, the biggest solo week of 2026, then spent a second week on top of the Billboard 200. In early September it walked back to No. 1 on Top Alternative Albums and Top Rock & Alternative Albums. On the latter list it is now her longest-running leader, past *Guts*. The record is three months old and still arguing with the chart.\n\n[apple:song:6779097512:6779097526]\n\n\"drop dead\" was the door. It is the song that made the tour announcement sound like a dare instead of a press release: a guitar figure that refuses to sit politely, a vocal that treats heartbreak as a contact sport. The rest of the album is not a sequel to *Sour*'s diary or *Guts*' sneer so much as a third temperature. Rodrigo still writes like someone who cannot leave a feeling half-named. The difference is scale. The feelings got bigger rooms.\n\nSupport on select dates comes from Wolf Alice, The Last Dinner Party, Devon Again, Die Spitz, and Grace Ives. That bill is not filler. It is a statement about where she wants the nights to live: guitar music that can scrape a ceiling, pop that can take a punch, rooms that do not flatten the band into a click track. The outing was drawn for 65 shows. Demand added twenty-five more, including extra London, Amsterdam, Barcelona, and Paris, plus an October 18 date at Boston's TD Garden. The last listed night is May 10, 2027, back at the O2.\n\n[apple:song:6779097512:6779097756]\n\n\"the cure\" sits further into the album, and it is the one that explains the title. The writing is still sharp enough to bruise, but the arrangement leaves air around the bruise. You can hear why rock radio and the alternative albums chart have not let go. This is not a pop star borrowing a guitar for a costume change. It is a pop star who built the third record so the guitar would have somewhere to live.\n\nUniversal Music Canada's June note on the album also listed the hardware around it: limited vinyl, merch drops, collectibles timed to release week. That is the ordinary machinery of a modern campaign. What is less ordinary is the way the live hold keeps tightening after the first-week spike. Most arena tours cool once the album is no longer new. Unraveled is doing the opposite. The album returned to a summit in September. The tour still had not started.\n\nThere is a useful comparison inside her own catalog. *Sour* made her a phenomenon. *Guts* made the phenomenon louder and meaner. *you seem pretty sad for a girl so in love* is the first time the phenomenon has to carry a long itinerary and a long chart life at once. A ten-night Intuit Dome stand is a venue record. A double-digit O2 residency puts her in a short list that already includes Prince, the Spice Girls, One Direction, Ariana Grande, Elton John, and Rihanna. Those names are not press-kit garnish. They are a measurement of how many nights a city will buy from one artist before it is full.\n\nThe week ahead is logistics: rehearsals, load-in, the first two Hartford dates on September 25 and 26. After that the map runs through the fall and into a winter of doubled cities, then Europe in the spring. If the album keeps behaving the way it has since June, the set list will not have to chase a fading single. It can play a record that is still moving units while the trucks are on the highway.\n\nThat is the story, a week out. The tour is not a victory lap. It is a second argument, made in rooms that keep getting added because the first argument did not finish.", "date": "2026-09-18", "artist": "Olivia Rodrigo", "cover": {"kind": "img", "src": "photos/olivia-rodrigo-glastonbury-2025.jpg", "pos": "center top", "credit": "Raph_PH / Wikimedia Commons (CC BY 4.0)", "creditUrl": "https://commons.wikimedia.org/wiki/File:Olivia_Rodrigo_2.jpeg"}}, {"id": "r1", "type": "release", "tag": "Album", "rtype": "Album", "artist": "Carly Rae Jepsen", "title": "Day and Night", "excerpt": "A 24-song double album, split between live-band daylight pop and after-hours synths, is out today on Schoolboy and Interscope.", "body": "Carly Rae Jepsen has a habit of treating time like a writing partner. *Dedicated* had a Side B. *Emotion* had one too. *The Loneliest Time* found a companion in *The Loveliest Time*. *Day and Night*, out today on Schoolboy and Interscope, is the habit made architectural: twenty-four songs, two discs, one clock. *Day* is twelve tracks of live-band grain and 1970s psychedelic pop. *Night* is twelve more, pulled into synths and the kind of dance music that does not ask permission to stay out. The runtime is just under eighty-five minutes. It does not hurry.\n\nThe record was announced on June 22. The first taste was \"On Wires,\" June 26, a daylight song about the impatient early minutes of wanting someone, written with Kyle Shearer and Nate Cyphert. \"After All\" followed on July 16. \"Don't Leave Me on the Dance Floor\" arrived August 7. \"Motivation\" closed the singles run on August 21. Four trailers is a lot for an artist whose cult already knows how to wait. Jepsen used them as weather reports: two for the sun, two for the club.\n\n[apple:album:6781767022]\n\nThe official framing is a twenty-four-hour blur. Nights stretch into mornings. Days dissolve into nights. You are supposed to feel suspended inside a single long hour. That is marketing language, and it happens to describe the sequencing. \"After All\" opens *Day* like a window being lifted. \"Habits of Creatures\" and \"Versailles\" keep the light in the room. \"On Wires,\" track four, is the impatient heart of the disc: Shearer's production, a vocal that leans forward as if the chorus might leave without her. By \"Just a Little Walk on the Moon,\" the daylight side has walked itself out to the edge of evening.\n\n*Night* starts with \"Never Let a Good Thing Die,\" the longest cut on the album, and then the temperature changes. \"Amalfi Coast,\" \"Patience Power Passion,\" \"Don't Leave Me on the Dance Floor,\" \"Motivation.\" The second disc is not a remix of the first. It is the same writer staying up. Collaborators include Tavish Crowe, Shearer, Cyphert, and Cole M.G.N., Jepsen's husband, alongside Noonie Bao, Patrik Berger, Markus Krunegard, and Pontus Winnberg. The credits read like a map of the last decade of smart pop: Stockholm, Los Angeles, the *Emotion* brain trust, the people who know how to make a chorus feel expensive without making it cheap.\n\nCritics got the album a few days early, and the early scores have been generally favorable: Metacritic sitting near 80. *The Line of Best Fit* called it her most far-reaching work. *Rolling Stone* heard a dissertation on love, which is a grand way of saying Jepsen is still writing about the same subject she has always written about, only with more rooms in the house. *Paste* liked the textures. *Slant Magazine*, less convinced, found it sonically adventurous and a little unwieldy, which is a fair warning about a double album. *NME* said it grows. *The Times* wondered if the length was a mistake. None of that is a consensus. It is a split that a twenty-four-track pop record should expect.\n\nWhat is not in dispute is the shape. Jepsen has spent a decade proving that pop can be meticulous without being cold. *Emotion*'s tenth anniversary show at the Troubadour last August was a reminder of that contract: play the album in order, take the choruses seriously, do not wink so hard the songs collapse. *Day and Night* is the first new full-length since that night, and it sounds like someone who heard the crowd sing the old precision and decided the new precision could be longer.\n\nShe launches the album onstage September 27, headlining New York's All Things Go Festival, her first billed performance of 2026, on a bill that also includes Zara Larsson, Lola Young, Brandi Carlile, and MUNA. A festival slot is a strange place to debut a double album. It is also the right kind of strange. You cannot play twenty-four songs. You can play the argument: a *Day* song, a *Night* song, proof that the two halves talk to each other.\n\nPhysical editions and the digital album went out this morning. The Japanese CD adds \"Reaching for a Star\" and \"Yes.\" Everyone else gets the twenty-four. If you only have time for a first pass, start at \"After All,\" stay through \"On Wires,\" then skip to \"Don't Leave Me on the Dance Floor\" and let *Night* finish the hour. If you have the whole evening, play it in order. That is what the title is for.\n\nJepsen has never been in a hurry to be the loudest person in the room. *Day and Night* does not change that. It just gives the room two lighting states and asks you to stay until both of them have had their say.", "date": "2026-09-18", "cover": {"kind": "img", "src": "photos/carly-rae-jepsen-primavera-2019.jpg", "pos": "center top", "credit": "Raph_PH / Wikimedia Commons (CC BY 2.0)", "creditUrl": "https://commons.wikimedia.org/wiki/File:Carly_Rae_Jepsen_Primavera19_-146_(48986111926)_(cropped).jpg"}}],
   chart: TOP50.map(r=>({...r}))
 };
 
@@ -928,6 +930,34 @@ audio.addEventListener("error", ()=>{
   if(previewTriedItunes) return;
   playItunes(curKey, row.dataset.title || "", row.dataset.artist || "", row.dataset.url || "", gen);
 });
+
+let seekBar = null;
+function seekFromEvent(e, bar){
+  const row = bar && bar.closest(".chart-row");
+  if(!row || row.dataset.key !== curKey) return;
+  const d = audio.duration;
+  if(!d || !isFinite(d)) return;
+  const r = bar.getBoundingClientRect();
+  const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+  audio.currentTime = x * d;
+  progTo(x * 100, audio.currentTime, d);
+}
+document.addEventListener("pointerdown", e=>{
+  const bar = e.target.closest(".pbar");
+  if(!bar) return;
+  const row = bar.closest(".chart-row");
+  if(!row || row.dataset.key !== curKey) return;
+  e.preventDefault();
+  e.stopPropagation();
+  seekBar = bar;
+  seekFromEvent(e, bar);
+});
+window.addEventListener("pointermove", e=>{
+  if(!seekBar) return;
+  seekFromEvent(e, seekBar);
+});
+window.addEventListener("pointerup", ()=>{ seekBar = null; });
+window.addEventListener("pointercancel", ()=>{ seekBar = null; });
 
 /* ---- weekly snapshot ---- */
 const SNAP = {"us-songs":[["Choosin' Texas","Ella Langley"],["Sweet Forever","Mondo Cozmo"],["Resting In His Arms","Silas Kirk"],["BAD TIMES","Imael Angel"],["Boston","STELLA LEFTY"],["Been By Now","Morgan Wallen"],["Can't Hold Us (feat. Ray Dalton)","Macklemore & Ryan Lewis"],["9 to 5","Dolly Parton"],["Babydoll","Jamie Miller"],["Uninvited (Live at Newport Folk)","Brandi Carlile"],["God Didn’t Let Me Break","Still Heals"],["when I see You","Josiah Queen"],["Never Forget","Chad Prather & Real America's Music"],["Bad Times (Extended Version)","Imael Angel"],["BbY WOW","KAROL G, Judeline & rusowsky"],["Be Her","Ella Langley"],["Dancing On My Own","Robyn"],["I Can't Love You Anymore","Ella Langley & Morgan Wallen"],["I Knew It, I Knew You (From \"Toy Story 5\")","Taylor Swift"],["Black Velvet","Alannah Myles"],["Bass Persuades","Miley Cyrus"],["Islands In the Stream","Dolly Parton & Kenny Rogers"],["Be By You","Luke Combs"],["God I'm Just Grateful","Elevation Worship & Chandler Moore"],["Jolene","Dolly Parton"]],"us-albums":[["Morgan Freeman's Symphonic Blues Experience","Morgan Freeman, Ground Zero Blues Club Band, Chineke! Orchestra & Martin Gellner"],["Dandelion","Ella Langley"],["Good Grief","Sara Bareilles"],["Ultimate Dolly Parton","Dolly Parton"],["Their Greatest Hits 1971-1975","Eagles"],["Chronicle: The 20 Greatest Hits","Creedence Clearwater Revival"],["Greatest Hits (2024 Remaster)","Journey"],["TRAIL TO THE HEAVENS: FINAL FANTASY XIV Original Soundtrack (78 Track Version)","Masayoshi Soken"],["Vol.II","Angine de Poitrine"],["Boston","Boston"],["Phases","Beoga"],["The Essential Michael Jackson","Michael Jackson"],["Vol.1","Angine de Poitrine"],["The Art of Loving","Olivia Dean"],["So Much For Goodbyes","Billy Strings"],["Genshin Impact - Where Mercy Endures (Original Game Soundtrack)","HOYO-MiX"],["Long Way Home","STELLA LEFTY"],["Kiss All The Time. Disco, Occasionally.","Harry Styles"],["hungover","Ella Langley"],["Practical Magic (Music from the Motion Picture)","Alan Silvestri"],["Lost and Seeking","Noah Graves"],["Practical Magic 2 (Original Motion Picture Soundtrack)","Rupert Gregson-Williams"],["Distance in Static","Bonobo"],["Greatest Hits","Fleetwood Mac"],["Grateful","The Red Clay Strays"]],"us-videos":[["MILEY","Miley Cyrus"],["Angel","Lizzy McAlpine"],["PRESS PLAY","LISA"],["Day and Night","Carly Rae Jepsen"],["Above the Noise","The Jetsetters"],["Choosin' Texas","Ella Langley"],["Bass Persuades","Miley Cyrus"],["We Miss You Charlie (feat. BENJY GAITHER)","Natasha Owens"],["Hurt","Johnny Cash"],["Life Goes On","BTS"],["Sam Smith: Music Room","Sam Smith"],["The Star Spangled Banner (Live)","Chris Stapleton & NFL"],["More Than Words","EXTREME"],["ESTRUS","Tove Lo"],["The Fate of Ophelia","Taylor Swift"],["Good Old Days (feat. Kesha)","Macklemore"],["Still","KAROL G & Bruno Mars"],["Comfortably Numb Re-Imagined","Roger Waters & Mona Miari"],["Butter","BTS"],["Pop Muzik","M"],["Just the Way You Are","Bruno Mars"],["Ms. Jackson","Outkast"],["Turnin Me On (feat. Lil Wayne)","Keri Hilson & Lil Wayne"],["More Than A Woman","Aaliyah"],["Happily Ever After","Case"]],"gb-songs":[["Movin' To The Sun","HUGEL, Imael Angel & Ultra Naté"],["Boston","STELLA LEFTY"],["Choosin' Texas","Ella Langley"],["Dai Dai","Shakira & Burna Boy"],["BAD TIMES","Imael Angel"],["Can't Hold Us (feat. Ray Dalton)","Macklemore & Ryan Lewis"],["Rise Slow","Kimo Sounds"],["Ordinary","Alex Warren"],["Babydoll","Jamie Miller"],["Training Season","Dua Lipa"],["Great Expectation","SIENNA SPIRO"],["Sweet Forever","Mondo Cozmo"],["Inside My Soul","SK.music"],["Bass Persuades","Miley Cyrus"],["Jamaican (Bam Bam)","HUGEL & SOLTO (FR)"],["My Body Isn't Ready","sombr"],["Machine","Architects"],["WHERE IS MY HUSBAND!","RAYE"],["Tastes Like Summer","James Blunt"],["Man I Need","Olivia Dean"],["Resting In His Arms","Silas Kirk"],["Zombie (2025 Remastered)","The Cranberries"],["Stop The Wedding!","Ashe"],["A Thousand Miles","Vanessa Carlton"],["Homewrecker","sombr"]],"jp-songs":[["Emotion","Aぇ! group"],["時空超えてユニバース","M!LK"],["見知らぬ糸","スピッツ"],["うさぎラップ (ソロver.)","うさぎ(CV.小澤亜李), 人魚(CV.大木咲絵子) & 人魚(CV.七瀬彩夏)"],["Brand New","Mrs. GREEN APPLE"],["Don't let me down!","M!LK"],["僕のすべては君のもの","M!LK"],["愛MUST BE","櫻坂46"],["音銀河","玉置浩二 & ASKA"],["好きすぎて滅!","M!LK"],["BLACK OUT MISSION","なにわ男子"],["うさぎラップ (リズム感のある者たちver.)","うさぎ(CV.小澤亜李), モモンガ(CV.井口裕香), 人魚(CV.大木咲絵子) & 人魚(CV.七瀬彩夏)"],["Yes! 東京 (feat. SUPER★DRAGON, Sakurashimeji, ONE N' ONLY, BUDDiiS, ICEx & Lienel)","EBiDAN (恵比寿学園男子部), 超特急, M!LK & 原因は自分にある。"],["マイオンリー","SixTONES"],["マスク・ド・カメロ","ポルノグラフィティ"],["ありふれた世界の果てに (feat. Awich, CHICO CARLITO, ONE OK ROCK & Paledusk)","YAO"],["パジャマパーティーズのうた","パジャマパーティーズ みどり(CV. 諸星すみれ)、ぴんく(CV. 長縄まりあ)、しろ(CV. 篠原侑)、むらさき(CV. 内山茉莉)"],["i know you","IDOLiSH7"],["ファンファーレ","玉置浩二"],["Made My Night","LE SSERAFIM"],["晴々","緑黄色社会"],["Five","嵐"],["The Arcadion ～至天の座アルカディア:ヘビー級～","祖堅正慶"],["Thursday","HENDERY"],["風と町","Mrs. GREEN APPLE"]]};
@@ -1207,7 +1237,7 @@ function renderReleases(){
 }
 $("#chartList").addEventListener("pointerdown", attachOut);
 $("#chartList").addEventListener("click", e=>{
-  if(e.target.closest("a")) return;
+  if(e.target.closest("a, .pbar, .ptime")) return;
   const row = e.target.closest(".chart-row");
   if(row) selectTrack(row.dataset.key, row.dataset.title, row.dataset.artist, row.dataset.url || "", row.dataset.prev || "");
 });
@@ -1454,10 +1484,10 @@ function appleEmbed(albumId, songId){
   const id = String(albumId||"").replace(/\D/g,"");
   const track = String(songId||"").replace(/\D/g,"");
   if(!id) return "";
-  const h = track ? 175 : 450;
+  const h = track ? 150 : 450;
   const src = appleEmbedUrl(id, track);
-  const load = track ? "lazy" : "eager";
-  return `<div class="aembed" style="min-height:${h}px"><iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${h}" loading="${load}" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${esc(src)}" title="Listen on Apple Music"></iframe></div>`;
+  const kind = track ? " song" : " album";
+  return `<div class="aembed${kind}" style="min-height:${h}px"><iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${h}" loading="${track ? "lazy" : "eager"}" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${esc(src)}" title="Listen on Apple Music"></iframe></div>`;
 }
 function renderBody(text){
   return String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
@@ -1538,22 +1568,6 @@ $("#subForm").addEventListener("submit", e=>{
 const topbar = document.querySelector(".topbar");
 const mqPhone = window.matchMedia("(max-width: 640px)");
 let hpRaf = 0;
-function fadeUnderHeader(){
-  const els = $$(".tab.active .hd-t, #articlePage h1");
-  if(mqPhone.matches){
-    els.forEach(el => { el.style.opacity = ""; });
-    return;
-  }
-  const cut = topbar.getBoundingClientRect().bottom;
-  els.forEach(el => {
-    const r = el.getBoundingClientRect();
-    if(!r.height){ el.style.opacity = ""; return; }
-    const overlap = cut - r.top;
-    if(overlap <= 0){ el.style.opacity = ""; return; }
-    const t = Math.min(1, Math.max(0, overlap / (r.height * 0.8)));
-    el.style.opacity = (1 - t).toFixed(3);
-  });
-}
 function onScroll(){
   if(hpRaf) return;
   hpRaf = requestAnimationFrame(()=>{
@@ -1566,7 +1580,6 @@ function onScroll(){
     if(mqPhone.matches){ t = 0; g = 0; }
     topbar.style.setProperty("--hp", t.toFixed(3));
     topbar.style.setProperty("--hg", g.toFixed(3));
-    fadeUnderHeader();
   });
 }
 function syncHeaderPad(){
@@ -1672,7 +1685,7 @@ $("#ef_save").addEventListener("click", ()=>{
     date: $("#ef_date").value || todayLocal(),
     pinned: $("#ef_pinned").checked,
     cover: (formCover.kind === "img")
-      ? {kind:"img", src:formCover.src, credit:formCover.credit||"", creditUrl:formCover.creditUrl||"", pos:formCover.pos||"center 14%"}
+      ? {kind:"img", src:formCover.src, credit:formCover.credit||"", creditUrl:formCover.creditUrl||"", pos:formCover.pos||"center top"}
       : {kind:"preset", i:formCover.i||0}
   };
   const ix = data.posts.findIndex(p=>p.id===rec.id);

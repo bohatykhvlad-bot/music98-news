@@ -128,7 +128,7 @@ const $ = s => document.querySelector(s);
 const KEY = "music98_admin_key";
 let posts = [];
 let cover = "";
-let coverMeta = {pos:"center 20%"};
+let coverMeta = {pos:"center top"};
 let editing = null;
 
 function toast(m){
@@ -192,7 +192,7 @@ function fillForm(p){
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
   cover = (p?.cover && p.cover.src) || "";
-  coverMeta = p?.cover && p.cover.kind === "img" ? {pos: p.cover.pos || "center 20%"} : {pos:"center 20%"};
+  coverMeta = p?.cover && p.cover.kind === "img" ? {pos: p.cover.pos || "center top"} : {pos:"center top"};
   const prev = $("#preview");
   if(cover){ prev.src = cover; prev.classList.remove("hide"); } else { prev.classList.add("hide"); }
 }
@@ -251,7 +251,7 @@ $("#save").onclick = async ()=>{
       src:cover,
       credit: $("#credit").value.trim(),
       creditUrl: $("#creditUrl").value.trim(),
-      pos: coverMeta.pos || "center 20%"
+      pos: coverMeta.pos || "center top"
     } : {kind:"preset", i:0}
   };
   const ix = posts.findIndex(p=>p.id===rec.id);
