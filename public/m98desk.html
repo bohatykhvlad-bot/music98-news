@@ -22,8 +22,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);lin
 .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
 h1{display:flex;align-items:center;gap:14px;margin:0 0 8px;font-size:32px;line-height:1;letter-spacing:-.03em}
 h1::after{content:"";width:4px;height:.72em;border-radius:2px;background:var(--accent)}
-.sub{margin:0;color:var(--muted);font-size:15px;line-height:1}
-.head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.head{margin-bottom:22px}
 label{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
 input,textarea,select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2)}
 textarea{min-height:140px;resize:vertical}
@@ -54,7 +53,7 @@ a{color:var(--text)}
   </div>
 
   <section id="gate" class="card login">
-    <div class="head"><h1>Desk</h1><p class="sub">Private editor</p></div>
+    <div class="head"><h1>Desk</h1></div>
     <p class="muted">This page changes the public News and Releases. Default local password is <code>music98</code> — change it in <code>.env</code> before you go live.</p>
     <label for="key">Password</label>
     <input id="key" type="password" autocomplete="current-password">
@@ -62,7 +61,7 @@ a{color:var(--text)}
   </section>
 
   <section id="desk" class="hide">
-    <div class="head"><h1>Write</h1><p class="sub">Posts, photos, newsletter</p></div>
+    <div class="head"><h1>Write</h1></div>
 
     <div class="card">
       <div class="row">
@@ -104,7 +103,7 @@ a{color:var(--text)}
     </div>
 
     <div class="card">
-      <div class="head"><h1 style="font-size:24px">Mail</h1><p class="sub">Subscribers</p></div>
+      <div class="head"><h1 style="font-size:24px">Mail</h1></div>
       <p class="muted" id="subCount">No addresses yet.</p>
       <label for="msubject">Subject</label>
       <input id="msubject" placeholder="This week on music98.news">
