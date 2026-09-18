@@ -4,10 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-17">
+<meta name="m98-build" content="editorial-18">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
+<link rel="preconnect" href="https://embed.music.apple.com">
+<link rel="preconnect" href="https://js-cdn.music.apple.com" crossorigin>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <meta property="og:title" content="music98.news — Music News, Releases & Charts">
@@ -77,10 +79,10 @@ main{position:relative;z-index:1}
 .hd{margin:0 0 22px}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
 
-/* hero */
-.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
-.hero .cover{height:100%;min-height:300px;overflow:hidden;background:var(--card2)}
-.hero .cover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 20%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
+/* hero — left cell matches the text column; photo fills and crops to the face */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
+.hero .cover{position:relative;min-height:300px;height:100%;overflow:hidden;background:var(--card2)}
+.hero .cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
 .hero .body{padding:28px;display:flex;flex-direction:column;gap:12px}
 .hero h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.22;letter-spacing:-.02em}
 .hero p{margin:0;color:var(--muted);font-size:15px}
@@ -92,7 +94,7 @@ a.card,a.hero{color:inherit;text-decoration:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;display:flex;flex-direction:column;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .card:active,.card:focus,.card:focus-visible{border-color:var(--line);outline:none;box-shadow:none;transform:none}
 .card .cover{position:relative;aspect-ratio:1/1;overflow:hidden;background:var(--card2)}
-.card .cover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 20%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
+.card .cover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
 .card.square .cover{aspect-ratio:1/1}
 .tag{position:absolute;left:10px;top:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.92);color:var(--acc2);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1;padding:6px 11px;border-radius:999px;border:1px solid rgba(0,0,0,.18)}
 .card .body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
@@ -193,8 +195,8 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .article{background:var(--card);border:1px solid var(--line);border-radius:20px;max-width:780px;width:100%;overflow:hidden;box-shadow:var(--shadow);transform:translateY(12px);transition:transform .28s cubic-bezier(.2,.8,.3,1)}
 .overlay.open .article{transform:none}
 @keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-.article .acover{overflow:hidden;position:relative;background:var(--card2)}
-.article .acover img{width:100%;height:auto;display:block;object-fit:contain;object-position:var(--pos, center 20%)}
+.article .acover{aspect-ratio:21/9;overflow:hidden;position:relative;background:var(--card2)}
+.article .acover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%)}
 .article .abody{padding:24px 28px 22px}
 .article h1{margin:10px 0 6px;font-size:clamp(22px,3.4vw,32px);line-height:1.2;letter-spacing:-.02em}
 .article .ameta{color:var(--muted2);font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -205,13 +207,13 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 
 /* ---------- full article page ---------- */
 #articlePage{max-width:780px;margin:26px auto 40px;padding:0 20px;position:relative;z-index:1}
-#articlePage .acover{border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--card2)}
-#articlePage .acover img{width:100%;height:auto;display:block;object-fit:contain;object-position:var(--pos, center 20%)}
+#articlePage .acover{aspect-ratio:21/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--card2)}
+#articlePage .acover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%)}
 #articlePage h1{font-size:clamp(26px,4vw,40px);letter-spacing:-.02em;line-height:1.15;margin:18px 0 8px}
 #articlePage .ameta{color:var(--muted2);font-size:13.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #articlePage .atext{margin-top:18px;font-size:16.5px;line-height:1.7;color:var(--body-text)}
 #articlePage .atext p{margin:0 0 16px}
-.aembed{margin:6px 0 22px}
+.aembed{margin:6px 0 22px;max-width:660px;background:var(--bg2);border-radius:12px;overflow:hidden}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
 .aback{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin-bottom:16px}
 .aback::before{content:"";width:7px;height:7px;flex:none;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-1px}
@@ -271,7 +273,7 @@ textarea{resize:vertical;min-height:64px}
 .rcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .rcard:active,.rcard:focus,.rcard:focus-visible{border-color:var(--line);outline:none;box-shadow:none}
 .rcard .rcover{aspect-ratio:16/9;overflow:hidden;background:var(--card2)}
-.rcard .rcover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 20%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
+.rcard .rcover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 14%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
 .rcard .rbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
 .rcard .rtag{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
 .rcard h3{margin:0;font-size:14px;line-height:1.35}
@@ -554,7 +556,7 @@ function titleHTML(p){
 }
 function coverPos(p){
   const v = p && p.cover && p.cover.pos;
-  return v || "center 20%";
+  return v || "center 14%";
 }
 function coverImg(p, square, lazy){
   const extra = lazy ? ' loading="lazy"' : '';
@@ -949,6 +951,7 @@ function loadPublishedDesk(){
     data.posts = j.posts;
     renderNews(); renderReleases(); renderHints();
     if($("#ef_list")) renderPostList();
+    prefetchAppleFromPosts(j.posts);
   }).catch(()=>{});
 }
 function readPhoto(file, cb){
@@ -1422,15 +1425,39 @@ function relatedHTML(p){
 
 /* ============ article modal ============ */
 let listY = 0;
+function appleEmbedUrl(albumId, songId){
+  const id = String(albumId||"").replace(/\D/g,"");
+  const track = String(songId||"").replace(/\D/g,"");
+  if(!id) return "";
+  let src = "https://embed.music.apple.com/us/album/"+id;
+  src += track ? ("?i="+track+"&") : "?";
+  src += "at="+APPLE_AT+"&ct="+encodeURIComponent(APPLE_CT||"music98");
+  return src;
+}
+const applePrefetched = {};
+function prefetchApple(url){
+  if(!url || applePrefetched[url]) return;
+  applePrefetched[url] = 1;
+  const l = document.createElement("link");
+  l.rel = "prefetch";
+  l.href = url;
+  document.head.appendChild(l);
+}
+function prefetchAppleFromPosts(posts){
+  (posts||[]).forEach(p=>{
+    String(p.body||"").replace(/\[apple:(album|song):(\d+)(?::(\d+))?\]/gi, (_, kind, a, s)=>{
+      prefetchApple(appleEmbedUrl(a, s));
+    });
+  });
+}
 function appleEmbed(albumId, songId){
   const id = String(albumId||"").replace(/\D/g,"");
   const track = String(songId||"").replace(/\D/g,"");
   if(!id) return "";
   const h = track ? 175 : 450;
-  let src = "https://embed.music.apple.com/us/album/"+id;
-  src += track ? ("?i="+track+"&") : "?";
-  src += "at="+APPLE_AT+"&ct="+encodeURIComponent(APPLE_CT||"music98");
-  return `<div class="aembed"><iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${h}" loading="lazy" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${esc(src)}" title="Listen on Apple Music"></iframe></div>`;
+  const src = appleEmbedUrl(id, track);
+  const load = track ? "lazy" : "eager";
+  return `<div class="aembed" style="min-height:${h}px"><iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${h}" loading="${load}" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${esc(src)}" title="Listen on Apple Music"></iframe></div>`;
 }
 function renderBody(text){
   return String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
@@ -1511,6 +1538,22 @@ $("#subForm").addEventListener("submit", e=>{
 const topbar = document.querySelector(".topbar");
 const mqPhone = window.matchMedia("(max-width: 640px)");
 let hpRaf = 0;
+function fadeUnderHeader(){
+  const els = $$(".tab.active .hd-t, #articlePage h1");
+  if(mqPhone.matches){
+    els.forEach(el => { el.style.opacity = ""; });
+    return;
+  }
+  const cut = topbar.getBoundingClientRect().bottom;
+  els.forEach(el => {
+    const r = el.getBoundingClientRect();
+    if(!r.height){ el.style.opacity = ""; return; }
+    const overlap = cut - r.top;
+    if(overlap <= 0){ el.style.opacity = ""; return; }
+    const t = Math.min(1, Math.max(0, overlap / (r.height * 0.8)));
+    el.style.opacity = (1 - t).toFixed(3);
+  });
+}
 function onScroll(){
   if(hpRaf) return;
   hpRaf = requestAnimationFrame(()=>{
@@ -1523,6 +1566,7 @@ function onScroll(){
     if(mqPhone.matches){ t = 0; g = 0; }
     topbar.style.setProperty("--hp", t.toFixed(3));
     topbar.style.setProperty("--hg", g.toFixed(3));
+    fadeUnderHeader();
   });
 }
 function syncHeaderPad(){
@@ -1628,7 +1672,7 @@ $("#ef_save").addEventListener("click", ()=>{
     date: $("#ef_date").value || todayLocal(),
     pinned: $("#ef_pinned").checked,
     cover: (formCover.kind === "img")
-      ? {kind:"img", src:formCover.src, credit:formCover.credit||"", creditUrl:formCover.creditUrl||"", pos:formCover.pos||"center 20%"}
+      ? {kind:"img", src:formCover.src, credit:formCover.credit||"", creditUrl:formCover.creditUrl||"", pos:formCover.pos||"center 14%"}
       : {kind:"preset", i:formCover.i||0}
   };
   const ix = data.posts.findIndex(p=>p.id===rec.id);
@@ -1709,7 +1753,7 @@ $("#es_reset").addEventListener("click", ()=>{
 });
 
 /* ---- init ---- */
-S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); loadPublishedDesk(); route();
+S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); loadPublishedDesk(); prefetchAppleFromPosts(data.posts); route();
 </script>
 </body>
 </html>
