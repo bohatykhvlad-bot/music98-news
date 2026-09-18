@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-59">
+<meta name="m98-build" content="editorial-60">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -30,7 +30,7 @@
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{scroll-behavior:auto;scrollbar-gutter:stable;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:auto;scrollbar-gutter:stable;-webkit-tap-highlight-color:transparent;overflow-x:clip}
 body{margin:0;padding-top:var(--header-h,70px);background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
 img{display:block;max-width:100%}
 button{font-family:inherit;color:inherit}
@@ -122,9 +122,10 @@ main{position:relative;z-index:1}
 #articlePage .acover img,#articlePage .abody-pic img{
   pointer-events:auto;-webkit-user-select:auto;user-select:auto;-webkit-touch-callout:default;cursor:default
 }
-.hero .body{padding:28px;display:flex;flex-direction:column;gap:12px}
-.hero h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.22;letter-spacing:-.02em}
+.hero .body{padding:24px 28px;display:flex;flex-direction:column;gap:12px}
+.hero h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.18;letter-spacing:-.02em}
 .hero p{margin:0;color:var(--muted);font-size:15px}
+.hero .meta{margin-top:auto;padding-top:0;line-height:1}
 .hero:active,.hero:focus,.hero:focus-visible{border-color:var(--line);outline:none;box-shadow:none}
 
 /* cards */
@@ -259,8 +260,8 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 #appleBoot{position:fixed;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:0}
 iframe.apple-park{
   position:fixed!important;
-  left:0!important;
-  top:72px!important;
+  left:-120vw!important;
+  top:0!important;
   width:660px!important;
   max-width:660px!important;
   opacity:.001!important;
@@ -363,7 +364,7 @@ textarea{resize:vertical;min-height:64px}
   .pextra .abadge{display:inline-flex}
   .foot-in{grid-template-columns:1fr 1fr}
   .hero{grid-template-columns:1fr}
-  .hero .cover{min-height:210px}
+  .hero .cover{min-height:0;aspect-ratio:16/9;height:auto}
   .search{width:170px}
 }
 @media (hover:hover) and (pointer:fine){
@@ -413,6 +414,11 @@ textarea{resize:vertical;min-height:64px}
   #articlePage{margin:18px auto 32px;padding:0 16px}
   #articlePage h1{font-size:clamp(22px,7vw,32px)}
   .hero .body{padding:16px}
+  .hero .meta{line-height:1;padding-top:0}
+  .aembed,.aembed iframe,.yembed{max-width:100%}
+  .rel-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .toasts{left:12px;right:12px;bottom:12px}
+  .toast{max-width:none}
   .sub-in{padding:32px 16px}
   .sub-in form{flex-direction:column;max-width:none}
   .chart-row{
