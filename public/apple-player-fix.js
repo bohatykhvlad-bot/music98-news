@@ -367,10 +367,14 @@
     ev.preventDefault();
     ev.stopPropagation();
     if (typeof ev.stopImmediatePropagation === "function") ev.stopImmediatePropagation();
+    /* Match the pristine embed: prev on track 1 restarts it from zero and
+       plays, without Apple's re-queue remount. */
     Promise.resolve()
       .then(function () {
-        if (typeof mk.skipToBeginning === "function") return mk.skipToBeginning();
-        mk.queue.position = 0;
+        try {
+          if (typeof mk.seekToTime === "function") mk.seekToTime(0);
+          else mk.currentPlaybackTime = 0;
+        } catch (err) {}
         if (!mk.isPlaying && mk.play) return mk.play();
       })
       .catch(function () {});
