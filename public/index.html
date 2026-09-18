@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="hd-solo-8">
+<meta name="m98-build" content="chart-pos-name-1">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -111,11 +111,12 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- charts ---------- */
 .chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
-.chart-row{--pw:52px;display:grid;grid-template-columns:40px 44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
+.chart-row{--pw:52px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
-.pos{font-size:26px;font-weight:800;letter-spacing:-.03em;color:var(--text);text-align:center;line-height:1;display:flex;align-items:center;justify-content:center}
+.cname{display:flex;align-items:baseline;gap:var(--posgap);min-width:0;font-size:clamp(14px,1.4vw,18px);line-height:1.2;font-weight:800}
+.chart-row .pos{flex:none;width:var(--posw);margin:0;padding:0;border:0;height:auto;font:inherit;font-variant-numeric:tabular-nums;letter-spacing:-.03em;color:var(--text);text-align:right;line-height:inherit;display:block}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta.up{color:var(--green)} .delta.down{color:var(--red)} .delta.same{color:var(--muted2)}
 .delta.new{color:#03282b;background:var(--amber);border-radius:6px;padding:2px 0;font-size:10.5px;letter-spacing:.08em}
@@ -138,10 +139,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .tinfo b{display:block;font-size:15.5px;letter-spacing:-.01em}
 .tinfo span{color:var(--muted);font-size:13px}
 
-.tnames{min-width:0}
+.tnames{--posw:2ch;--posgap:10px;min-width:0}
 .ctext{min-width:0}
-.cartist{font-weight:800;text-transform:uppercase;letter-spacing:-.01em;line-height:1.2;font-size:clamp(14px,1.4vw,18px);white-space:normal;overflow-wrap:break-word}
-.ctext .ctrack{color:var(--muted);font-size:13px;margin-top:2px;white-space:normal;overflow-wrap:break-word}
+.cartist{flex:1;min-width:0;font:inherit;font-weight:800;text-transform:uppercase;letter-spacing:-.01em;line-height:inherit;white-space:normal;overflow-wrap:break-word}
+.ctext .ctrack{color:var(--muted);font-size:13px;margin-top:2px;padding-left:calc(var(--posw,2ch) + var(--posgap,10px));white-space:normal;overflow-wrap:break-word}
 .cyear{color:var(--muted2);font-size:11.5px}
 .chart-row.playing{background:var(--bg2)}
 .chart-note{margin:14px 2px 0;color:var(--muted2);font-size:12.5px}
@@ -289,7 +290,7 @@ textarea{resize:vertical;min-height:64px}
   .pbar{width:120px}
 }
 @media (max-width:900px){
-  .chart-row{grid-template-columns:36px 40px 52px minmax(90px,1fr) var(--pw) auto}
+  .chart-row{grid-template-columns:40px 52px minmax(90px,1fr) var(--pw) auto}
   .pextra .abadge{display:inline-flex}
   .foot-in{grid-template-columns:1fr 1fr}
   .hero{grid-template-columns:1fr}
@@ -344,20 +345,19 @@ textarea{resize:vertical;min-height:64px}
   .sub-in form{flex-direction:column;max-width:none}
   .chart-row{
     --pw:auto;
-    --name-line:18px;
     display:grid;
-    grid-template-columns:28px 48px minmax(0,1fr);
-    grid-template-areas:"pos art names" ". play extra" ". week week";
+    grid-template-columns:48px minmax(0,1fr);
+    grid-template-areas:"art names" "play extra" "week week";
     gap:8px 10px;
     padding:14px 12px;
-    align-items:center;
+    align-items:start;
     transition:background .15s ease;
   }
   .chart-row .delta{display:none}
-  .pos{grid-area:pos;font-size:18px;line-height:1;height:var(--name-line);padding:0;align-self:start}
   .artwrap{grid-area:art;width:48px;height:48px;border-radius:10px;align-self:start}
   .ctext{grid-area:names;align-self:start;min-width:0}
-  .cartist{white-space:normal;font-size:14px;line-height:var(--name-line);word-break:normal;overflow-wrap:break-word}
+  .tnames{--posgap:8px}
+  .cname{font-size:14px;line-height:1.2}
   .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .rplay{grid-area:play;justify-self:center;align-self:center;width:36px;height:36px}
@@ -1165,10 +1165,9 @@ function renderCharts(){
     const appleUrl = r.url ? aff(r.url) : searchUrl;
     const badge = `<a class="abadge"${r.url ? "" : ' data-lk="'+esc(key)+'"'} rel="nofollow sponsored" href="${esc(appleUrl)}" title="Listen on Apple Music" aria-label="Listen on Apple Music">${badgeImg}</a>`;
     return `<div class="chart-row${i<3?" top":""}" data-key="${esc(key)}" data-title="${esc(r.title)}" data-artist="${esc(r.artist)}" data-url="${esc(appleUrl==="#" ? "" : appleUrl)}" data-prev="${esc(applePreview(r.prev||""))}" tabindex="0" role="listitem" aria-label="Position ${i+1}: ${esc(r.title)} by ${esc(r.artist)} — press Enter to play the 30-second preview">
-      <div class="pos">${i+1}</div>
       <div class="delta ${dcls}">${dtxt}</div>
       <div class="artwrap"><img data-lk="${esc(key)}"${r.art ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} — ${esc(r.artist)}" loading="lazy"></div>
-      <div class="ctext"><div class="tnames"><div class="cartist">${esc(r.artist)}</div><div class="ctrack">${esc(r.title)}${r.year ? ' <span class="cyear">· '+esc(r.year)+'</span>' : ""}</div></div></div>
+      <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span><div class="cartist">${esc(r.artist)}</div></div><div class="ctrack">${esc(r.title)}${r.year ? ' <span class="cyear">· '+esc(r.year)+'</span>' : ""}</div></div></div>
       <div class="cmid">
         <button class="rplay" title="Play 30-second preview" aria-label="Play 30-second preview of ${esc(r.title)}">${ICON_PLAY}</button>
         <div class="pextra"><span class="ptime"><span class="pbar"><i></i></span><span class="pdur">0:00 / 0:30</span></span>${badge}</div>
