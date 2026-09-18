@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-43">
+<meta name="m98-build" content="editorial-44">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -99,6 +99,9 @@ main{position:relative;z-index:1}
 .hero .cover img,.card .cover img,.article .acover img,#articlePage .acover img,.rcard .rcover img{
   position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;border:0;display:block;
   -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none
+}
+#articlePage .acover img,#articlePage .abody-pic img{
+  pointer-events:auto;-webkit-user-select:auto;user-select:auto;-webkit-touch-callout:default;cursor:grab
 }
 .hero .body{padding:28px;display:flex;flex-direction:column;gap:12px}
 .hero h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.22;letter-spacing:-.02em}
@@ -637,7 +640,7 @@ function coverImg(p, square, lazy){
   const extra = lazy ? ' loading="lazy"' : '';
   const f = coverFocus(p);
   const z = coverZoom(p);
-  return `<img class="js-cover" src="${esc(coverOf(p, square))}" alt=""${extra} data-fx="${f.x}" data-fy="${f.y}" data-zoom="${z}">`;
+  return `<img class="js-cover" src="${esc(coverOf(p, square))}" alt="" draggable="true"${extra} data-fx="${f.x}" data-fy="${f.y}" data-zoom="${z}">`;
 }
 function creditHTML(p){
   const c = p && p.cover;

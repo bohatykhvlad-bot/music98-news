@@ -15,14 +15,6 @@ export default {
     if (path === "/api/subscribe" && request.method === "POST") return subscribe(c);
     if (path === "/api/subscribers" && request.method === "GET") return subscribers(c);
     if (path === "/api/broadcast" && request.method === "POST") return broadcast(c);
-    if (path === "/m98desk") {
-      const u = new URL(request.url);
-      u.pathname = "/m98desk.html";
-      const desk = await env.ASSETS.fetch(new Request(u.toString(), request));
-      const headers = new Headers(desk.headers);
-      headers.set("Cache-Control", "no-store, max-age=0");
-      return new Response(desk.body, { status: desk.status, statusText: desk.statusText, headers });
-    }
     const res = await env.ASSETS.fetch(request);
     const type = (res.headers.get("content-type") || "").toLowerCase();
     if (type.includes("text/html")) {

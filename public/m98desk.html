@@ -307,7 +307,42 @@ function readPhoto(file, cb, max=1800){
     URL.revokeObjectURL(url);
     cb(c.toDataURL("image/jpeg", 0.86));
   };
+  img.onerror = ()=> URL.revokeObjectURL(url);
   img.src = url;
+}
+function dropHasImage(dt){
+  if(!dt) return false;
+  const types = [...(dt.types||[])];
+  if(types.includes("Files") || types.includes("text/uri-list") || types.includes("text/html")) return true;
+  return [...(dt.items||[])].some(i => (i.type||"").indexOf("image/")===0);
+}
+function takeDroppedImage(e, cb, max=1800){
+  const dt = e.dataTransfer;
+  if(!dt) return false;
+  const file = [...(dt.files||[])].find(f => (f.type||"").indexOf("image/")===0)
+    || [...(dt.items||[])].map(i => i.kind==="file" ? i.getAsFile() : null).find(f => f && (f.type||"").indexOf("image/")===0);
+  if(file){ e.preventDefault(); readPhoto(file, cb, max); return true; }
+  const uri = (dt.getData("text/uri-list") || dt.getData("text/plain") || "").split("\n").map(s=>s.trim()).find(s=>s && !s.startsWith("#"));
+  if(uri && /^https?:\/\//i.test(uri) && /\.(jpe?g|png|webp|gif|avif)(\?|$)/i.test(uri.split("?")[0])){
+    e.preventDefault();
+    fetch(uri, {mode:"cors"}).then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(blob=>{
+      const type = blob.type || "image/jpeg";
+      if(type.indexOf("image/")!==0 && type !== "application/octet-stream") throw 0;
+      readPhoto(new File([blob], "photo.jpg", {type: type.indexOf("image/")===0 ? type : "image/jpeg"}), cb, max);
+    }).catch(()=> toast("Save the photo first, then drop the file here."));
+    return true;
+  }
+  const html = dt.getData("text/html") || "";
+  const m = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if(m && /^https?:\/\//i.test(m[1])){
+    e.preventDefault();
+    fetch(m[1], {mode:"cors"}).then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(blob=>{
+      const type = blob.type || "image/jpeg";
+      readPhoto(new File([blob], "photo.jpg", {type: type.indexOf("image/")===0 ? type : "image/jpeg"}), cb, max);
+    }).catch(()=> toast("Save the photo first, then drop the file here."));
+    return true;
+  }
+  return false;
 }
 
 async function api(path, opt={}){
@@ -658,12 +693,14 @@ stage.addEventListener("click", e=>{
   if(!coverSrc) $("#photo").click();
 });
 $("#replaceCover").onclick = ()=> $("#photo").click();
-stage.addEventListener("dragover", e=>{ e.preventDefault(); stage.classList.add("hot"); });
+stage.addEventListener("dragover", e=>{
+  if(dropHasImage(e.dataTransfer) || (e.dataTransfer && e.dataTransfer.types && e.dataTransfer.types.length)) e.preventDefault();
+  stage.classList.add("hot");
+});
 stage.addEventListener("dragleave", ()=> stage.classList.remove("hot"));
 stage.addEventListener("drop", e=>{
-  e.preventDefault(); stage.classList.remove("hot");
-  const f = e.dataTransfer.files[0];
-  if(f) readPhoto(f, src=>{ crop.dirty = true; setCover(src); });
+  stage.classList.remove("hot");
+  if(!takeDroppedImage(e, src=>{ crop.dirty = true; setCover(src); })) e.preventDefault();
 });
 $("#photo").onchange = e=> readPhoto(e.target.files[0], src=>{ crop.dirty = true; setCover(src); e.target.value=""; });
 $("#zoom").oninput = ()=> setZoom($("#zoom").value);
@@ -755,14 +792,10 @@ $("#composer").addEventListener("click", e=>{
   if(k){ e.preventDefault(); k.closest("figure")?.remove(); }
 });
 $("#composer").addEventListener("dragover", e=>{
-  if(e.dataTransfer && [...e.dataTransfer.types].includes("Files")) e.preventDefault();
+  if(dropHasImage(e.dataTransfer)) e.preventDefault();
 });
 $("#composer").addEventListener("drop", e=>{
-  const f = e.dataTransfer && e.dataTransfer.files[0];
-  if(f && f.type.indexOf("image/")===0){
-    e.preventDefault();
-    readPhoto(f, src=> insertHTML(photoBlock(src)), 1400);
-  }
+  takeDroppedImage(e, src=> insertHTML(photoBlock(src)), 1400);
 });
 $("#composer").addEventListener("paste", e=>{
   const item = [...(e.clipboardData && e.clipboardData.items || [])].find(i=>i.type.indexOf("image/")===0);

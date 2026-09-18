@@ -3,9 +3,18 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: SAMEORIGIN
 
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+
+/m98desk
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store, max-age=0
+
 /m98desk.html
   X-Robots-Tag: noindex, nofollow
-  Cache-Control: no-store
+  Cache-Control: no-store, max-age=0
 
 /data/top50.json
   Cache-Control: public, max-age=300
