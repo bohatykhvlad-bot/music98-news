@@ -1379,13 +1379,13 @@ function computeMoves(feedId, rows){
   }
 }
 function setChartStatus(f, tag){
-  const st = $("#chartStatus"); if(!st) return; st.hidden = false;
-  const t = new Date().toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
-  if(tag === "live")          st.textContent = "Updated today · " + t;
-  else if(tag === "live-mem") st.textContent = "Updated today";
-  else if(tag === "cache")    st.textContent = "Updated today";
-  else if(tag === "snap")     st.textContent = "This week’s Top 50";
-  else                        st.textContent = "Showing the latest copy stored in this browser.";
+  const st = $("#chartStatus"); if(!st) return;
+  let txt = "";
+  if(tag === "live" || tag === "live-mem" || tag === "cache") txt = "";
+  else if(tag === "snap") txt = "This week’s Top 50";
+  else txt = "Showing the latest copy stored in this browser.";
+  st.textContent = txt;
+  st.hidden = !txt;
 }
 function todayUTC(){ return new Date().toISOString().slice(0,10); }
 function rowsFromTracks(tracks){
