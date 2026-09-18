@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-50">
+<meta name="m98-build" content="editorial-51">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -88,7 +88,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 main{position:relative;z-index:1}
 .tab{display:none;padding:20px 0 8px}
 .tab.active{display:block}
-.tab.rise,#articlePage.rise{animation:rise .28s ease both}
+.tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .hd{margin:0 0 22px}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
@@ -386,7 +386,7 @@ textarea{resize:vertical;min-height:64px}
   .search.on input{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent)}
   .foot-in{grid-template-columns:1fr;padding:32px 16px 36px}
   .tab{padding-top:14px}
-  .tab.rise,#articlePage.rise{animation:none}
+  .tab.rise{animation:none}
   .hd{margin-bottom:14px}
   .hd-t{font-size:26px;white-space:nowrap}
   body{padding-top:calc(var(--header-h, 148px) + 8px)}
@@ -1829,7 +1829,6 @@ function showArticle(p){
   listY = window.scrollY || document.documentElement.scrollTop || 0;
   const page = $("#articlePage");
   document.body.classList.add("articlepage");
-  page.classList.remove("rise");
   page.hidden = false;
   page.innerHTML = `
     <a class="aback" href="#" id="aback">Back</a>
@@ -1840,8 +1839,6 @@ function showArticle(p){
     <div class="ameta"><span>${fmtDate(p.date)}</span></div>
     <div class="atext">${renderBody(p.body||p.excerpt||"")}</div>
     ${relatedHTML(p)}`;
-  void page.offsetWidth;
-  page.classList.add("rise");
   jumpY(0);
   bindCovers(page);
   parkAppleEmbeds(page);
@@ -1861,7 +1858,6 @@ function hideArticle(){
   dropAppleBoots();
   $$(".tab").forEach(s => s.classList.remove("rise"));
   const page = $("#articlePage");
-  page.classList.remove("rise");
   page.innerHTML = "";
   page.hidden = true;
   document.body.classList.remove("articlepage");
