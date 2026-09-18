@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-16">
+<meta name="m98-build" content="editorial-17">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -27,7 +27,6 @@
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
 @property --hg{syntax:"<number>";inherits:true;initial-value:0}
-@property --hb{syntax:"<number>";inherits:true;initial-value:0}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-behavior:auto;scrollbar-gutter:stable;-webkit-tap-highlight-color:transparent}
@@ -40,8 +39,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 
 /* ---------- header ---------- */
-.topbar{--hp:0;--hg:0;--hb:0;position:fixed;top:0;left:0;right:0;z-index:60;background:transparent;border:0;box-shadow:none;padding:calc(var(--hp)*10px) calc(var(--hp)*14px + var(--sbw,0px)) calc(var(--hp)*10px) calc(var(--hp)*14px);backdrop-filter:none;-webkit-backdrop-filter:none}
-.topbar-in{max-width:1180px;margin:0 auto;padding:0 22px;height:calc(68px - var(--hp)*8px);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;background:rgba(255,255,255,calc(var(--hg)*.92));border:1px solid rgba(255,255,255,calc(var(--hg)*.8));box-shadow:none;border-radius:calc(var(--hp)*18px);overflow:hidden;clip-path:inset(0 round calc(var(--hp)*18px));backdrop-filter:blur(calc(var(--hb)*12px)) saturate(calc(100% + var(--hg)*80%));-webkit-backdrop-filter:blur(calc(var(--hb)*12px)) saturate(calc(100% + var(--hg)*80%))}
+.topbar{--hp:0;--hg:0;position:fixed;top:0;left:0;right:0;z-index:60;background:transparent;border:0;box-shadow:none;padding:calc(var(--hp)*10px) calc(var(--hp)*14px + var(--sbw,0px)) calc(var(--hp)*10px) calc(var(--hp)*14px);backdrop-filter:none;-webkit-backdrop-filter:none}
+.topbar-in{max-width:1180px;margin:0 auto;padding:0 22px;height:calc(68px - var(--hp)*8px);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;background:rgba(255,255,255,calc(var(--hg)*.72));border:1px solid rgba(255,255,255,calc(var(--hg)*.8));box-shadow:none;border-radius:calc(var(--hp)*18px);overflow:visible;clip-path:inset(0 round calc(var(--hp)*18px));backdrop-filter:blur(calc(var(--hg)*12px)) saturate(calc(100% + var(--hg)*80%));-webkit-backdrop-filter:blur(calc(var(--hg)*12px)) saturate(calc(100% + var(--hg)*80%))}
 .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none;justify-self:start}
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text)}
@@ -76,11 +75,11 @@ main{position:relative;z-index:1}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .hd{margin:0 0 22px}
-.hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap;-webkit-font-smoothing:antialiased}
+.hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
 
-/* hero — original two-column: photo fills the left cell, text sets the height */
-.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
-.hero .cover{height:100%;min-height:300px;position:relative;overflow:hidden;background:var(--card2)}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
+.hero .cover{height:100%;min-height:300px;overflow:hidden;background:var(--card2)}
 .hero .cover img{width:100%;height:100%;object-fit:cover;object-position:var(--pos, center 20%);-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
 .hero .body{padding:28px;display:flex;flex-direction:column;gap:12px}
 .hero h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.22;letter-spacing:-.02em}
@@ -100,7 +99,6 @@ a.card,a.hero{color:inherit;text-decoration:none}
 .pcred{margin:8px 0 0;font-size:12px;line-height:1.45;color:var(--muted2)}
 .pcred a{color:var(--muted2);text-decoration:underline;text-underline-offset:2px}
 .pcred a:hover{color:var(--text)}
-.hero .cover .pcred,.card .cover .pcred{position:absolute;left:0;right:0;bottom:0;margin:0;padding:8px 12px 10px;background:linear-gradient(180deg,transparent,rgba(255,255,255,.94));border:0;z-index:1}
 #articlePage .pcred{margin:8px 2px 14px}
 em{font-style:italic;font-weight:inherit}
 .card h3{margin:0;font-size:16px;line-height:1.32;letter-spacing:-.01em}
@@ -331,7 +329,7 @@ textarea{resize:vertical;min-height:64px}
 }
 @media (max-width:640px){
   .wrap{padding:0 16px}
-  .topbar{--hp:0;--hg:0;--hb:0;background:rgba(255,255,255,.82);padding:0;box-shadow:0 1px 0 var(--line);backdrop-filter:none;-webkit-backdrop-filter:none}
+  .topbar{--hp:0;--hg:0;background:rgba(255,255,255,.82);padding:0;box-shadow:0 1px 0 var(--line);backdrop-filter:none;-webkit-backdrop-filter:none}
   .topbar-in{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:8px 16px 10px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;clip-path:none;backdrop-filter:none;-webkit-backdrop-filter:none}
   .brand{height:36px}
   .brand-logo{width:32px;height:32px}
@@ -1174,7 +1172,7 @@ function renderNews(){
   const hero = posts[0], rest = posts.slice(1);
   $("#heroSlot").innerHTML = hero ? `
     <a class="hero" href="#post/${hero.id}">
-      <div class="cover">${coverImg(hero,false)}${creditHTML(hero)}</div>
+      <div class="cover">${coverImg(hero,false)}</div>
       <div class="body">
         <span class="tag" style="position:static;align-self:flex-start">${esc(hero.tag||"News")}</span>
         <h2>${titleHTML(hero)}</h2>
@@ -1185,7 +1183,7 @@ function renderNews(){
   $("#newsGrid").innerHTML = rest.map(p=>`
     <a class="card" href="#post/${p.id}">
       <div class="cover">${coverImg(p,false,true)}
-        <span class="tag">${esc(p.tag||"News")}</span>${creditHTML(p)}</div>
+        <span class="tag">${esc(p.tag||"News")}</span></div>
       <div class="body"><h3>${titleHTML(p)}</h3><p>${rich(p.excerpt||"")}</p>
         <div class="meta"><span>${fmtDate(p.date)}</span></div></div>
     </a>`).join("");
@@ -1197,7 +1195,7 @@ function renderReleases(){
   $("#relGrid").innerHTML = posts.map(p=>`
     <a class="card square" href="#post/${p.id}">
       <div class="cover">${coverImg(p,true,true)}
-        <span class="tag">${esc(p.rtype||"Release")}</span>${creditHTML(p)}</div>
+        <span class="tag">${esc(p.rtype||"Release")}</span></div>
       <div class="body"><h3>${titleHTML(p)}</h3>
         <p>${rich(p.excerpt||"")}</p>
         <div class="meta"><span>${fmtDate(p.date)}</span></div></div>
@@ -1519,14 +1517,12 @@ function onScroll(){
     hpRaf = 0;
     const y = window.scrollY || document.documentElement.scrollTop || 0;
     let u = Math.min(1, Math.max(0, y / 260));
-    /* Shape eases in. Milk covers large headings before blur, so "Latest stories" does not smear. */
+    /* Shape eases in; milk/blur lag so the white slab does not flash over type. */
     let t = u*u*u*(u*(u*6 - 15) + 10);
-    let g = Math.min(1, u * 1.7);
-    let b = u*u*u;
-    if(mqPhone.matches){ t = 0; g = 0; b = 0; }
+    let g = u*u;
+    if(mqPhone.matches){ t = 0; g = 0; }
     topbar.style.setProperty("--hp", t.toFixed(3));
     topbar.style.setProperty("--hg", g.toFixed(3));
-    topbar.style.setProperty("--hb", b.toFixed(3));
   });
 }
 function syncHeaderPad(){
