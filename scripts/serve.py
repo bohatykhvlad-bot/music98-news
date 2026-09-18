@@ -248,6 +248,58 @@ def resolve_clip(clip: str, song: str) -> str:
     return clip
 
 
+APPLE_ALBUM_RE = re.compile(r"^/apple-embed/([a-z]{2})/album/(\d+)$")
+APPLE_EMBED_CSP = (
+    "default-src 'self' https://*.apple.com musics: itmss://*.apple.com; "
+    "img-src 'self' https://*.apple.com https://*.mzstatic.com artwork: data:; "
+    "style-src 'self' https://*.apple.com 'unsafe-inline'; "
+    "script-src 'self' https://*.apple.com blob: 'unsafe-eval'; "
+    "connect-src 'self' https://*.apple.com https://*.mzstatic.com; "
+    "media-src 'self' https://*.apple.com https://*.mzstatic.com blob:; "
+    "block-all-mixed-content"
+)
+
+
+def rewrite_apple_embed(html: str, script_url: str) -> str:
+    out = html.replace('"/build/', '"https://embed.music.apple.com/build/').replace(
+        "'/build/", "'https://embed.music.apple.com/build/"
+    )
+    out = out.replace('"/assets/', '"https://embed.music.apple.com/assets/').replace(
+        "'/assets/", "'https://embed.music.apple.com/assets/"
+    )
+    if not re.search(r"<base\s", out, re.I):
+        out = re.sub(
+            r"<head([^>]*)>",
+            r'<head\1><base href="https://embed.music.apple.com/">',
+            out,
+            count=1,
+            flags=re.I,
+        )
+    tag = f'<script src="{script_url}"></script>'
+    if re.search(r"</head>", out, re.I):
+        out = re.sub(r"</head>", tag + "</head>", out, count=1, flags=re.I)
+    else:
+        out = tag + out
+    return out
+
+
+def fetch_apple_album_html(cc: str, album_id: str, query: str, script_url: str) -> tuple[int, bytes]:
+    apple = f"https://embed.music.apple.com/{cc}/album/{album_id}"
+    if query:
+        apple += "?" + query
+    req = urllib.request.Request(
+        apple,
+        headers={"User-Agent": PAGE_UA, "Accept": "text/html"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            raw = resp.read().decode("utf-8", "replace")
+    except Exception:
+        return 502, b"apple embed unavailable"
+    html = rewrite_apple_embed(raw, script_url)
+    return 200, html.encode("utf-8")
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(PUBLIC), **kwargs)
@@ -337,14 +389,36 @@ class Handler(SimpleHTTPRequestHandler):
         got = (self.headers.get("X-Admin-Key") or "").strip()
         return bool(got) and got == admin_password()
 
+    def _apple_embed(self, path: str):
+        m = APPLE_ALBUM_RE.match(path)
+        if not m:
+            return self._send(404, b"not found", "text/plain; charset=utf-8")
+        query = urllib.parse.urlparse(self.path).query
+        host = self.headers.get("Host") or "127.0.0.1:43123"
+        scheme = "https" if self.headers.get("X-Forwarded-Proto") == "https" else "http"
+        script = f"{scheme}://{host}/apple-player-fix.js?v=editorial-69"
+        status, body = fetch_apple_album_html(m.group(1), m.group(2), query, script)
+        self.send_response(status)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Cache-Control", "public, max-age=60")
+        self.send_header("Content-Security-Policy", APPLE_EMBED_CSP)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
     def do_HEAD(self):
         path = self.path.split("?", 1)[0].rstrip("/") or "/"
         if path == "/api/preview":
             return self._preview()
+        if APPLE_ALBUM_RE.match(path):
+            return self._apple_embed(path)
         return super().do_HEAD()
 
     def do_GET(self):
         path = self.path.split("?", 1)[0].rstrip("/") or "/"
+        if APPLE_ALBUM_RE.match(path):
+            return self._apple_embed(path)
         if path == "/api/preview":
             return self._preview()
         if path == "/api/top50":

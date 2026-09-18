@@ -32,3 +32,6 @@
 
 /photos/*
   Cache-Control: no-store
+
+/apple-player-fix.js
+  Cache-Control: public, max-age=120

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-68">
+<meta name="m98-build" content="editorial-69">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -1050,7 +1050,7 @@ function stopPreview(){
   progTo(0,0,90);
   markRows();
 }
-const EMBED_SRC = /embed\.music\.apple\.com|music\.apple\.com|youtube\.com|youtube-nocookie\.com|youtu\.be|open\.spotify\.com|soundcloud\.com|player\.vimeo\.com/i;
+const EMBED_SRC = /embed\.music\.apple\.com|music\.apple\.com|\/apple-embed\/|youtube\.com|youtube-nocookie\.com|youtu\.be|open\.spotify\.com|soundcloud\.com|player\.vimeo\.com/i;
 function embedKeep(f){
   const src = f.dataset.keepSrc || f.getAttribute("src") || "";
   if(src && src !== "about:blank" && EMBED_SRC.test(src)) return src;
@@ -1774,10 +1774,9 @@ function appleEmbedUrl(albumId, songId){
   const id = String(albumId||"").replace(/\D/g,"");
   const track = String(songId||"").replace(/\D/g,"");
   if(!id) return "";
-  let src = "https://embed.music.apple.com/us/album/"+id;
-  src += track ? ("?i="+track+"&") : "?";
-  src += "at="+APPLE_AT+"&ct="+encodeURIComponent(APPLE_CT||"music98");
-  return src;
+  const qs = "at="+APPLE_AT+"&ct="+encodeURIComponent(APPLE_CT||"music98");
+  if(track) return "https://embed.music.apple.com/us/album/"+id+"?i="+track+"&"+qs;
+  return "/apple-embed/us/album/"+id+"?"+qs;
 }
 const appleBoots = {};
 let appleWatchers = [];
