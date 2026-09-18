@@ -249,6 +249,7 @@ def resolve_clip(clip: str, song: str) -> str:
 
 
 APPLE_ALBUM_RE = re.compile(r"^/apple-embed/([a-z]{2})/album/(\d+)$")
+APPLE_STATIC_RE = re.compile(r"^/apple-static/(build|assets)/([A-Za-z0-9._/-]+)$")
 APPLE_EMBED_CSP = (
     "default-src 'self' https://*.apple.com musics: itmss://*.apple.com; "
     "img-src 'self' https://*.apple.com https://*.mzstatic.com artwork: data:; "
@@ -260,22 +261,14 @@ APPLE_EMBED_CSP = (
 )
 
 
-def rewrite_apple_embed(html: str, script_url: str) -> str:
-    out = html.replace('"/build/', '"https://embed.music.apple.com/build/').replace(
-        "'/build/", "'https://embed.music.apple.com/build/"
+def rewrite_apple_embed(html: str) -> str:
+    out = html.replace('"/build/', '"/apple-static/build/').replace(
+        "'/build/", "'/apple-static/build/"
     )
-    out = out.replace('"/assets/', '"https://embed.music.apple.com/assets/').replace(
-        "'/assets/", "'https://embed.music.apple.com/assets/"
+    out = out.replace('"/assets/', '"/apple-static/assets/').replace(
+        "'/assets/", "'/apple-static/assets/"
     )
-    if not re.search(r"<base\s", out, re.I):
-        out = re.sub(
-            r"<head([^>]*)>",
-            r'<head\1><base href="https://embed.music.apple.com/">',
-            out,
-            count=1,
-            flags=re.I,
-        )
-    tag = f'<script src="{script_url}"></script>'
+    tag = '<script src="/apple-player-fix.js?v=editorial-70"></script>'
     if re.search(r"</head>", out, re.I):
         out = re.sub(r"</head>", tag + "</head>", out, count=1, flags=re.I)
     else:
@@ -283,7 +276,7 @@ def rewrite_apple_embed(html: str, script_url: str) -> str:
     return out
 
 
-def fetch_apple_album_html(cc: str, album_id: str, query: str, script_url: str) -> tuple[int, bytes]:
+def fetch_apple_album_html(cc: str, album_id: str, query: str) -> tuple[int, bytes]:
     apple = f"https://embed.music.apple.com/{cc}/album/{album_id}"
     if query:
         apple += "?" + query
@@ -296,7 +289,7 @@ def fetch_apple_album_html(cc: str, album_id: str, query: str, script_url: str) 
             raw = resp.read().decode("utf-8", "replace")
     except Exception:
         return 502, b"apple embed unavailable"
-    html = rewrite_apple_embed(raw, script_url)
+    html = rewrite_apple_embed(raw)
     return 200, html.encode("utf-8")
 
 
@@ -394,14 +387,31 @@ class Handler(SimpleHTTPRequestHandler):
         if not m:
             return self._send(404, b"not found", "text/plain; charset=utf-8")
         query = urllib.parse.urlparse(self.path).query
-        host = self.headers.get("Host") or "127.0.0.1:43123"
-        scheme = "https" if self.headers.get("X-Forwarded-Proto") == "https" else "http"
-        script = f"{scheme}://{host}/apple-player-fix.js?v=editorial-69"
-        status, body = fetch_apple_album_html(m.group(1), m.group(2), query, script)
+        status, body = fetch_apple_album_html(m.group(1), m.group(2), query)
         self.send_response(status)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Cache-Control", "public, max-age=60")
         self.send_header("Content-Security-Policy", APPLE_EMBED_CSP)
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
+    def _apple_static(self, path: str):
+        m = APPLE_STATIC_RE.match(path)
+        if not m or ".." in path:
+            return self._send(404, b"not found", "text/plain; charset=utf-8")
+        apple = f"https://embed.music.apple.com/{m.group(1)}/{m.group(2)}"
+        req = urllib.request.Request(apple, headers={"User-Agent": PAGE_UA})
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                body = resp.read()
+                ctype = resp.headers.get("Content-Type") or "application/octet-stream"
+        except Exception:
+            return self._send(404, b"not found", "text/plain; charset=utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", ctype)
+        self.send_header("Cache-Control", "public, max-age=3600")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         if self.command != "HEAD":
@@ -413,12 +423,16 @@ class Handler(SimpleHTTPRequestHandler):
             return self._preview()
         if APPLE_ALBUM_RE.match(path):
             return self._apple_embed(path)
+        if APPLE_STATIC_RE.match(path):
+            return self._apple_static(path)
         return super().do_HEAD()
 
     def do_GET(self):
         path = self.path.split("?", 1)[0].rstrip("/") or "/"
         if APPLE_ALBUM_RE.match(path):
             return self._apple_embed(path)
+        if APPLE_STATIC_RE.match(path):
+            return self._apple_static(path)
         if path == "/api/preview":
             return self._preview()
         if path == "/api/top50":
