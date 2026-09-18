@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-61">
+<meta name="m98-build" content="editorial-62">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -252,6 +252,8 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 #articlePage .atext p{margin:0 0 16px}
 .aembed{margin:6px auto 22px;max-width:660px;background:transparent;border-radius:12px;overflow:visible}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
+.aembed.album{height:450px;overflow:hidden;contain:strict}
+.aembed.album iframe{width:660px;max-width:100%;height:450px;border-radius:0}
 .aembed.song{max-width:600px;width:100%;margin:6px auto 22px}
 .aembed.song iframe{height:166px;max-width:100%}
 .yembed{margin:6px auto 22px;max-width:660px;width:100%}
@@ -1855,7 +1857,8 @@ function bootAppleFromPosts(posts){
   });
 }
 function appleIframeHTML(src, h){
-  return `<iframe class="apple-park" allow="${APPLE_IFRAME_ALLOW}" frameborder="0" height="${h}" loading="eager" fetchpriority="high" sandbox="${APPLE_IFRAME_SANDBOX}" src="${esc(src)}" title="Listen on Apple Music"></iframe>`;
+  const w = h >= 400 ? ' width="660"' : "";
+  return `<iframe class="apple-park" allow="${APPLE_IFRAME_ALLOW}" frameborder="0"${w} height="${h}" loading="eager" fetchpriority="high" sandbox="${APPLE_IFRAME_SANDBOX}" src="${esc(src)}" title="Listen on Apple Music"></iframe>`;
 }
 function appleEmbed(albumId, songId){
   const id = String(albumId||"").replace(/\D/g,"");
