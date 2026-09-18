@@ -72,7 +72,9 @@ a{color:var(--text)}
 .composer .aembed.album iframe{height:450px}
 .composer iframe{width:100%;border:0;border-radius:14px;display:block;background:transparent}
 .composer .abody-pic img{width:100%;border-radius:16px;display:block}
-.modal{position:fixed;inset:0;background:rgba(10,16,18,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:30}
+.modal{position:fixed;inset:0;background:rgba(10,16,18,.45);align-items:center;justify-content:center;padding:20px;z-index:30}
+.modal:not(.hide){display:flex}
+.modal.hide{display:none}
 .modal .card{max-width:720px;width:100%;margin:0}
 .modal iframe{width:100%;border:0;border-radius:14px;display:block;margin-top:12px}
 @media (max-width:900px){ .row,.item{grid-template-columns:1fr} .composer{min-height:560px;padding:18px 16px 40px;font-size:17px} }
@@ -616,6 +618,11 @@ $("#composer").addEventListener("paste", e=>{
   }
 });
 
+function closeApple(){
+  $("#appleModal").classList.add("hide");
+  $("#applePrev").innerHTML = "";
+  pendingApple = null;
+}
 function openApple(kind){
   appleKind = kind;
   pendingApple = null;
@@ -641,7 +648,9 @@ async function previewApple(){
 }
 $("#btnSong").onclick = ()=> openApple("song");
 $("#btnAlbum").onclick = ()=> openApple("album");
-$("#appleCancel").onclick = ()=> $("#appleModal").classList.add("hide");
+$("#appleCancel").onclick = closeApple;
+$("#appleModal").addEventListener("click", e=>{ if(e.target === $("#appleModal")) closeApple(); });
+document.addEventListener("keydown", e=>{ if(e.key === "Escape") closeApple(); });
 $("#appleUrl").addEventListener("change", previewApple);
 $("#appleUrl").addEventListener("paste", ()=> setTimeout(previewApple, 50));
 $("#appleGo").onclick = async ()=>{
@@ -650,7 +659,7 @@ $("#appleGo").onclick = async ()=>{
   if(!got){ toast("Paste a music.apple.com link"); return; }
   if(appleKind==="album" || got.kind==="album") insertHTML(appleBlock("album", got.album));
   else insertHTML(appleBlock("song", got.album, got.track));
-  $("#appleModal").classList.add("hide");
+  closeApple();
 };
 
 $("#reset").onclick = ()=> fillForm(null);
