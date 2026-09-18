@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="delta-zero-1">
+<meta name="m98-build" content="play-ring-1">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -111,19 +111,19 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- charts ---------- */
 .chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
-.chart-row{--pw:40px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
+.chart-row{--pw:40px;display:grid;grid-template-columns:44px 56px minmax(0,1fr) var(--pw) auto;gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
-.cname{min-width:0;font-size:clamp(14px,1.4vw,18px);line-height:1.2;font-weight:800;letter-spacing:-.01em;text-transform:uppercase;overflow-wrap:break-word}
+.cname{min-width:0;font-size:clamp(14px,1.4vw,18px);line-height:1.2;font-weight:800;letter-spacing:-.01em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chart-row .pos,.cartist{font:inherit;letter-spacing:inherit;line-height:inherit;font-weight:inherit;text-transform:inherit;color:inherit;display:inline;width:auto;height:auto;margin:0;padding:0;border:0;text-align:start}
 .chart-row .pos{margin-inline-end:10px}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta.up{color:var(--green)} .delta.down{color:var(--red)} .delta.same{color:var(--muted2)}
 .delta.new{color:#03282b;background:var(--amber);border-radius:6px;padding:2px 0;font-size:10.5px;letter-spacing:.08em}
-.artwrap{position:relative;width:56px;height:56px;border-radius:12px;overflow:hidden;background:var(--card2);flex:none}
+.artwrap{position:relative;width:56px;height:56px;border-radius:12px;overflow:hidden;background:var(--card2);flex:none;border:2px solid transparent}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block}
-.chart-row.playing .artwrap{box-shadow:none;outline:2px solid var(--accent);outline-offset:-2px}
+.chart-row.playing .artwrap{border-color:var(--accent);outline:0;box-shadow:none}
 .cmid{--pexp:0px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:8px;z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
 .chart-row.playing .cmid{background:rgba(255,255,255,.85);border-color:rgba(15,60,64,.10);backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);padding:3px}
 .rplay{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transition:background .16s ease,color .16s ease,transform .16s ease}
@@ -140,9 +140,9 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .tinfo b{display:block;font-size:15.5px;letter-spacing:-.01em}
 .tinfo span{color:var(--muted);font-size:13px}
 
-.tnames{min-width:0}
-.ctext{min-width:0}
-.ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:normal;overflow-wrap:break-word}
+.tnames{min-width:0;overflow:hidden}
+.ctext{min-width:0;overflow:hidden}
+.ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cyear{color:var(--muted2);font-size:11.5px}
 .chart-row.playing{background:var(--bg2)}
 .chart-note{margin:14px 2px 0;color:var(--muted2);font-size:12.5px}
