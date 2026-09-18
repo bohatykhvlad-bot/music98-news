@@ -3,10 +3,15 @@
  * Safari/iOS applies iTunNORM (Sound Check) after playback starts, so the
  * clip blasts then ducks. Rename the atom (same length) so Sound Check
  * never sees it. Also serve audio/mp4 instead of Apple's audio/x-m4p.
+ *
+ * iTunes Search still returns the 30s .p.m4a clip. The Apple Music song
+ * page JSON-LD contentUrl is the 90s .ep.m4a when the track is long enough.
  */
-const MAX_BYTES = 3 * 1024 * 1024;
+const MAX_BYTES = 5 * 1024 * 1024;
 const NEEDLE = new TextEncoder().encode("iTunNORM");
 const REPL = new TextEncoder().encode("iTunSKIP");
+const PAGE_UA =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15";
 
 function allowedHost(host) {
   const h = String(host || "").toLowerCase();
@@ -16,6 +21,11 @@ function allowedHost(host) {
     h === "mzstatic.com" ||
     h.endsWith(".mzstatic.com")
   );
+}
+
+function allowedSongHost(host) {
+  const h = String(host || "").toLowerCase();
+  return h === "music.apple.com" || h === "itunes.apple.com";
 }
 
 function allowedPreview(url) {
@@ -42,13 +52,59 @@ function stripSoundCheck(buf) {
   return u8;
 }
 
+function songPageUrl(song) {
+  const s = String(song || "").trim();
+  if (/^\d+$/.test(s)) return "https://music.apple.com/us/song/" + s;
+  let u;
+  try {
+    u = new URL(s);
+  } catch {
+    return "";
+  }
+  if (u.protocol !== "https:" || !allowedSongHost(u.hostname)) return "";
+  const id = u.searchParams.get("i") || "";
+  if (/^\d+$/.test(id)) return "https://music.apple.com/us/song/" + id;
+  const m = u.pathname.match(/\/song\/(?:[^/]+\/)?(\d+)/);
+  if (m) return "https://music.apple.com/us/song/" + m[1];
+  if (u.hostname.toLowerCase() === "music.apple.com") return u.origin + u.pathname;
+  return "";
+}
+
+function extractExtended(html) {
+  const text = String(html || "");
+  const m =
+    text.match(/"contentUrl"\s*:\s*"(https:\\\/\\\/audio(?:-ssl)?\.itunes\.apple\.com[^"]+\.m4a)"/i) ||
+    text.match(/"contentUrl"\s*:\s*"(https:\/\/audio(?:-ssl)?\.itunes\.apple\.com[^"]+\.m4a)"/i);
+  if (!m) return "";
+  return m[1].replace(/\\u002F/gi, "/").replace(/\\\//g, "/");
+}
+
+async function resolveClip(clip, song) {
+  const page = songPageUrl(song);
+  if (!page) return clip;
+  try {
+    const res = await fetch(page, {
+      headers: { "User-Agent": PAGE_UA, Accept: "text/html,application/xhtml+xml" },
+      cf: { cacheEverything: true, cacheTtl: 86400 },
+      signal: AbortSignal.timeout(7000),
+    });
+    if (!res.ok) return clip;
+    const ext = extractExtended(await res.text());
+    if (!ext) return clip;
+    const u = new URL(ext);
+    if (u.protocol === "https:" && allowedHost(u.hostname) && allowedPreview(u)) return u.href;
+  } catch {}
+  return clip;
+}
+
 export async function onRequestGet({ request }) {
   if (request.method !== "GET" && request.method !== "HEAD") {
     return new Response("method", { status: 405 });
   }
+  const params = new URL(request.url).searchParams;
   let target;
   try {
-    target = new URL(new URL(request.url).searchParams.get("u") || "");
+    target = new URL(params.get("u") || "");
   } catch {
     return new Response("bad url", { status: 400 });
   }
@@ -56,9 +112,14 @@ export async function onRequestGet({ request }) {
     return new Response("bad url", { status: 400 });
   }
 
+  let href = target.href;
+  try {
+    href = await resolveClip(href, params.get("song") || "");
+  } catch {}
+
   let upstream;
   try {
-    upstream = await fetch(target.href, {
+    upstream = await fetch(href, {
       headers: { Accept: "audio/*,*/*;q=0.8" },
       cf: { cacheEverything: true, cacheTtl: 86400 },
     });

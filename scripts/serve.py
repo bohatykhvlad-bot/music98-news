@@ -12,10 +12,23 @@ import urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-PREVIEW_MAX = 3 * 1024 * 1024
+PREVIEW_MAX = 5 * 1024 * 1024
 PREVIEW_CACHE = {}
+RESOLVE_CACHE = {}
 ITUNNORM = b"iTunNORM"
 ITUNSKIP = b"iTunSKIP"
+PAGE_UA = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
+)
+CONTENT_RE = re.compile(
+    r'"contentUrl"\s*:\s*"(https://audio(?:-ssl)?\.itunes\.apple\.com[^"]+\.m4a)"',
+    re.I,
+)
+CONTENT_ESC_RE = re.compile(
+    r'"contentUrl"\s*:\s*"(https:\\/\\/audio(?:-ssl)?\.itunes\.apple\.com[^"]+\.m4a)"',
+    re.I,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
@@ -82,10 +95,66 @@ def fetch_preview(url: str):
     if len(data) > PREVIEW_MAX:
         return 413, b""
     data = data.replace(ITUNNORM, ITUNSKIP)
-    if len(PREVIEW_CACHE) > 80:
+    if len(PREVIEW_CACHE) > 12:
         PREVIEW_CACHE.clear()
     PREVIEW_CACHE[url] = data
     return 200, data
+
+
+def song_page_url(song: str) -> str:
+    s = (song or "").strip()
+    if re.fullmatch(r"\d+", s):
+        return f"https://music.apple.com/us/song/{s}"
+    try:
+        u = urllib.parse.urlparse(s)
+    except Exception:
+        return ""
+    host = (u.hostname or "").lower()
+    if host not in {"music.apple.com", "itunes.apple.com"}:
+        return ""
+    qs = urllib.parse.parse_qs(u.query)
+    iid = (qs.get("i") or [""])[0]
+    if iid.isdigit():
+        return f"https://music.apple.com/us/song/{iid}"
+    m = re.search(r"/song/(?:[^/]+/)?(\d+)", u.path or "")
+    if m:
+        return f"https://music.apple.com/us/song/{m.group(1)}"
+    if host == "music.apple.com":
+        return urllib.parse.urlunparse((u.scheme, u.netloc, u.path, "", "", ""))
+    return ""
+
+
+def extract_extended(html: str) -> str:
+    m = CONTENT_RE.search(html or "") or CONTENT_ESC_RE.search(html or "")
+    if not m:
+        return ""
+    return m.group(1).replace("\\u002F", "/").replace("\\/", "/")
+
+
+def resolve_clip(clip: str, song: str) -> str:
+    page = song_page_url(song)
+    if not page:
+        return clip
+    if page in RESOLVE_CACHE:
+        return RESOLVE_CACHE[page]
+    try:
+        req = urllib.request.Request(page, headers={"User-Agent": PAGE_UA, "Accept": "text/html"})
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            html = resp.read().decode("utf-8", "replace")
+        ext = extract_extended(html)
+        if ext:
+            u = urllib.parse.urlparse(ext)
+            host = (u.hostname or "").lower()
+            if u.scheme == "https" and allowed_preview_host(host) and (
+                (u.path or "").lower().endswith(".m4a") or "audiopreview" in ext.lower()
+            ):
+                if len(RESOLVE_CACHE) > 200:
+                    RESOLVE_CACHE.clear()
+                RESOLVE_CACHE[page] = ext
+                return ext
+    except Exception:
+        pass
+    return clip
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -129,8 +198,9 @@ class Handler(SimpleHTTPRequestHandler):
                 or not (target.path.lower().endswith(".m4a") or "audiopreview" in href)
             ):
                 return self._send(400, b"bad url", "text/plain; charset=utf-8")
+            clip = resolve_clip(raw, (qs.get("song") or [""])[0])
             try:
-                status, body = fetch_preview(raw)
+                status, body = fetch_preview(clip)
             except Exception:
                 return self._send(502, b"upstream", "text/plain; charset=utf-8")
             if status != 200:
