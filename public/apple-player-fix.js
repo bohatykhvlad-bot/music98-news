@@ -215,18 +215,33 @@
   function lockAlbumGrid() {
     var el = deepQuery(".container-player");
     if (!el) return;
+    var root = el.getRootNode ? el.getRootNode() : document;
     var cs = window.getComputedStyle(el);
     if (cs.display.indexOf("grid") < 0) return;
     var parts = cs.gridTemplateColumns.trim().split(/\s+/);
     var mid = Math.round(parseFloat(parts[1] || "0"));
-    if (parts.length === 3 && mid >= 200 && mid <= 260) {
-      if (el.__m98Lock !== cs.gridTemplateColumns) {
-        el.style.setProperty("grid-template-columns", cs.gridTemplateColumns, "important");
-        el.__m98Lock = cs.gridTemplateColumns;
-      }
-    } else if (el.__m98Lock) {
-      el.style.removeProperty("grid-template-columns");
-      el.__m98Lock = "";
+    var large = parts.length === 3 && mid >= 200 && mid <= 260;
+    var old = null;
+    try { old = root.getElementById ? root.getElementById("m98-grid-lock") : null; } catch (err) {}
+    if (!large) {
+      if (old && old.parentNode) old.parentNode.removeChild(old);
+      if (el.__m98Lock) { el.style.removeProperty("grid-template-columns"); el.__m98Lock = ""; }
+      return;
+    }
+    var val = cs.gridTemplateColumns;
+    /* A stylesheet rule survives the embed remounting its own nodes, an
+       inline style does not - prev-at-track-1 rebuilds the container. */
+    if (!old || (old.textContent || "").indexOf(val) < 0) {
+      if (old && old.parentNode) old.parentNode.removeChild(old);
+      var st = document.createElement("style");
+      st.id = "m98-grid-lock";
+      st.textContent = "@media (min-width: 560px) { .container-player { grid-template-columns: " +
+        val + " !important; } }";
+      try { root.appendChild(st); } catch (err) {}
+    }
+    if (el.__m98Lock !== val) {
+      el.style.setProperty("grid-template-columns", val, "important");
+      el.__m98Lock = val;
     }
   }
 
