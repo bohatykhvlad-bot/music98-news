@@ -2,7 +2,7 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-const TOP50_KV = "top50v3";
+const TOP50_KV = "top50v4";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -42,7 +42,7 @@ async function applyTenure(env, tracks) {
   const prevKeys = ten.keys || [];
   const seen = ten.seen || {};
   const first = !prevKeys.length;
-  const rolled = first || ten.week !== week;
+  const rolled = !first && ten.week !== week;
   const newKeys = [];
   tracks.forEach((track, i) => {
     const key = tenureKey(track.title, track.artist);
@@ -54,15 +54,15 @@ async function applyTenure(env, tracks) {
       track.delta = "0";
     } else if (!rolled) {
       track.weeks = rec.weeks || 1;
-      track.delta = prevPos < 0 ? "new" : String(prevPos - i);
+      track.delta = rec.delta != null && rec.delta !== "" ? String(rec.delta) : "0";
     } else {
       track.weeks = prevPos >= 0 ? (rec.weeks || 0) + 1 : 1;
       track.delta = prevPos < 0 ? "new" : String(prevPos - i);
     }
-    seen[key] = { weeks: track.weeks, lastPos: i, lastWeek: week };
+    seen[key] = { weeks: track.weeks, lastPos: i, lastWeek: week, delta: track.delta };
   });
+  if (first || rolled) ten.keys = newKeys;
   ten.week = week;
-  ten.keys = newKeys;
   ten.seen = seen;
   if (env && env.DESK) await env.DESK.put("tenure", JSON.stringify(ten));
   return tracks;

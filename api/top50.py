@@ -456,7 +456,7 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
     prev_keys = ten.get("keys") or []
     seen = ten.get("seen") or {}
     first = not prev_keys
-    rolled = first or ten.get("week") != week
+    rolled = (not first) and ten.get("week") != week
     new_keys = []
     for i, track in enumerate(tracks):
         key = tenure_key(track["title"], track["artist"])
@@ -471,13 +471,19 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
             track["delta"] = "0"
         elif not rolled:
             track["weeks"] = rec.get("weeks") or 1
-            track["delta"] = "new" if prev_pos < 0 else str(prev_pos - i)
+            track["delta"] = str(rec["delta"]) if rec.get("delta") not in (None, "") else "0"
         else:
             track["weeks"] = (rec.get("weeks") or 0) + 1 if prev_pos >= 0 else 1
             track["delta"] = "new" if prev_pos < 0 else str(prev_pos - i)
-        seen[key] = {"weeks": track["weeks"], "lastPos": i, "lastWeek": week}
+        seen[key] = {
+            "weeks": track["weeks"],
+            "lastPos": i,
+            "lastWeek": week,
+            "delta": track["delta"],
+        }
+    if first or rolled:
+        ten["keys"] = new_keys
     ten["week"] = week
-    ten["keys"] = new_keys
     ten["seen"] = seen
     TENURE_PATH.parent.mkdir(exist_ok=True)
     try:

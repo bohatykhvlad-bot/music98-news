@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="player-sm-1">
+<meta name="m98-build" content="delta-zero-1">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -346,14 +346,15 @@ textarea{resize:vertical;min-height:64px}
   .chart-row{
     --pw:auto;
     display:grid;
-    grid-template-columns:48px minmax(0,1fr);
-    grid-template-areas:"art names" "play extra" "week week";
+    grid-template-columns:36px 48px minmax(0,1fr);
+    grid-template-areas:"delta art names" ". play extra" ". week week";
     gap:8px 10px;
     padding:14px;
     align-items:start;
     transition:background .15s ease;
   }
-  .chart-row .delta{display:none}
+  .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:48px}
+  .delta.new{padding:2px 3px;font-size:9px;letter-spacing:.04em}
   .artwrap{grid-area:art;width:48px;height:48px;border-radius:10px;align-self:start}
   .ctext{grid-area:names;align-self:start;min-width:0}
   .cname{font-size:14px;line-height:1.2}
@@ -691,7 +692,7 @@ const lsSet = v => lsSetRaw(KEY, v);
 
 /* ============ settings & Apple integrations ============ */
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v2";
+const DAILYKEY = "music98news_daily_v3";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -939,7 +940,7 @@ const SNAP = {"us-songs":[["Choosin' Texas","Ella Langley"],["Sweet Forever","Mo
 let autoRows = null;
 let feedLive = {};
 let lastChartCount = 0;
-const HISTKEY = "music98news_charthist_v2", PREVKEY = "music98news_chartprev_v2";
+const HISTKEY = "music98news_charthist_v3", PREVKEY = "music98news_chartprev_v3";
 const FEEDS = [
   {id:"us-songs",  label:"USA · Songs",        kind:"store", sf:"us", type:"topsongs",       note:"USA top songs — weekly feed"},
   {id:"us-albums", label:"USA · Albums",       kind:"store", sf:"us", type:"topalbums",      note:"USA top albums — weekly feed"},
@@ -1027,25 +1028,25 @@ function computeMoves(feedId, rows){
   const sameWeek = !firstEver && Number(pk.week) === week;
   rows.forEach((r,i)=>{
     const key = keys[i];
-    const p = (!firstEver && pk.keys) ? pk.keys.indexOf(key) : -1;
     const baked = parseInt(r.weeks,10);
-    if(sameWeek){
-      r.delta = (r.delta!=null && r.delta!=="") ? String(r.delta) : (p<0 ? "new" : String(p-i));
-      r.weeks = hk[key] ? hk[key].weeks : (baked || 1);
-      return;
-    }
-    if(firstEver){
-      r.delta = (r.delta!=null && r.delta!=="") ? String(r.delta) : "0";
+    if(week === 0 || firstEver){
+      r.delta = "0";
       r.weeks = baked || 1;
-      hk[key] = {weeks: r.weeks};
+      hk[key] = {weeks: r.weeks, delta: "0"};
       return;
     }
+    if(sameWeek){
+      r.delta = (r.delta!=null && r.delta!=="") ? String(r.delta) : "0";
+      r.weeks = baked || (hk[key] && hk[key].weeks) || 1;
+      return;
+    }
+    const p = pk.keys.indexOf(key);
     r.delta = p<0 ? "new" : String(p-i);
     const prevW = hk[key] ? hk[key].weeks : (baked || 0);
     r.weeks = p>=0 ? prevW+1 : 1;
-    hk[key] = {weeks: r.weeks};
+    hk[key] = {weeks: r.weeks, delta: r.delta};
   });
-  if(!sameWeek){
+  if(firstEver || !sameWeek){
     hist[feedId] = hk; lsSetRaw(HISTKEY, JSON.stringify(hist));
     prev[feedId] = {week, keys}; lsSetRaw(PREVKEY, JSON.stringify(prev));
   }
