@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-33">
+<meta name="m98-build" content="editorial-34">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -231,7 +231,18 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
 .aembed.song{max-width:600px;width:100%;margin:6px auto 22px}
 .aembed.song iframe{height:166px;max-width:100%}
-.aembed iframe.apple-park{position:fixed!important;left:8px;opacity:.05;pointer-events:none;z-index:2;max-width:360px}
+/* Boot the real iframe in the viewport, but paint nothing — never overlay the header. */
+.aembed iframe.apple-park{
+  position:fixed!important;
+  left:0!important;
+  top:0!important;
+  opacity:0!important;
+  pointer-events:none!important;
+  z-index:-1!important;
+  clip:rect(0,0,0,0)!important;
+  clip-path:inset(100%)!important;
+  -webkit-clip-path:inset(100%)!important;
+}
 .abody-pic{margin:8px 0 22px}
 .abody-pic img{width:100%;border-radius:14px;display:block}
 .aback{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin-bottom:16px}
@@ -1635,6 +1646,7 @@ function dropAppleBoots(){
     f.classList.remove("apple-park");
     f.style.top = "";
     f.style.height = "";
+    f.removeAttribute("aria-hidden");
   });
 }
 function appleIframeHTML(src, h){
@@ -1658,20 +1670,19 @@ function prefetchAppleFromPosts(posts){
 function parkAppleEmbeds(root){
   dropAppleBoots();
   const frames = [...(root||document).querySelectorAll(".aembed iframe")];
-  frames.forEach((f, i)=>{
-    const h = parseInt(f.getAttribute("height"), 10) || 166;
+  frames.forEach(f=>{
     const src = f.getAttribute("src");
     if(!src) return;
     f.loading = "eager";
     f.setAttribute("fetchpriority", "high");
+    f.setAttribute("aria-hidden", "true");
     f.classList.add("apple-park");
-    f.style.top = (8 + i * 14) + "px";
-    f.style.height = Math.min(h, 220) + "px";
     f.src = src;
     const place = ()=>{
       f.classList.remove("apple-park");
       f.style.top = "";
       f.style.height = "";
+      f.removeAttribute("aria-hidden");
     };
     const slot = f.closest(".aembed") || f;
     if(!("IntersectionObserver" in window)){ place(); return; }
