@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-51">
+<meta name="m98-build" content="editorial-52">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -380,49 +380,56 @@ textarea{resize:vertical;min-height:64px}
   .nav{order:3;width:100%;height:40px;gap:4px;padding:4px;justify-content:stretch;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14)}
   .nav-btn{flex:1;height:32px;padding:0 8px;font-size:13px;justify-content:center}
   .search{width:auto;flex:1;height:36px;overflow:visible}
-  .search input{height:36px;background:rgba(255,255,255,.7);-webkit-appearance:none;appearance:none}
+  .search input{height:36px;font-size:16px;background:rgba(255,255,255,.7);-webkit-appearance:none;appearance:none}
   .search input:focus,
   .search input:focus-visible,
   .search.on input{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent)}
+  input,textarea,select{font-size:16px}
+  .search-hints{padding:0 16px 10px;row-gap:6px}
   .foot-in{grid-template-columns:1fr;padding:32px 16px 36px}
   .tab{padding-top:14px}
   .tab.rise{animation:none}
   .hd{margin-bottom:14px}
-  .hd-t{font-size:26px;white-space:nowrap}
+  .hd-t{font-size:clamp(22px,7vw,26px);white-space:normal}
   body{padding-top:calc(var(--header-h, 148px) + 8px)}
+  #articlePage{margin:18px auto 32px;padding:0 16px}
+  #articlePage h1{font-size:clamp(22px,7vw,32px)}
   .hero .body{padding:16px}
   .sub-in{padding:32px 16px}
   .sub-in form{flex-direction:column;max-width:none}
   .chart-row{
     --pw:auto;
     display:grid;
-    grid-template-columns:36px 48px minmax(0,1fr);
-    grid-template-areas:"delta art names" ". play extra" ". week week";
-    gap:8px 10px;
-    padding:14px;
-    align-items:start;
+    grid-template-columns:28px 44px minmax(0,1fr) 36px;
+    grid-template-areas:
+      "delta art names play"
+      ". week week week"
+      ". extra extra extra";
+    gap:6px 10px;
+    padding:12px 14px;
+    align-items:center;
     transition:background .15s ease;
   }
-  .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:48px}
+  .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0}
   .delta.new{padding:2px 3px;font-size:9px;letter-spacing:.04em}
-  .artwrap{grid-area:art;width:48px;height:48px;padding:2px;border-radius:10px;align-self:start}
+  .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
   .artwrap img{border-radius:8px}
-  .ctext{grid-area:names;align-self:start;min-width:0}
-  .cname{font-size:14px;line-height:1.2}
+  .ctext{grid-area:names;align-self:center;min-width:0}
+  .cname{font-size:13.5px;line-height:1.2}
   .chart-row .pos{margin-inline-end:8px}
   .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
-  .rplay{grid-area:play;justify-self:start;align-self:center;width:36px;height:36px}
+  .rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}
   .rplay svg{width:16px;height:16px}
-  .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:0;opacity:0;overflow:hidden;transform:translateY(-12px);pointer-events:none;transition:height .32s ease,opacity .28s ease,transform .32s ease}
-  .chart-row.playing .pextra{height:36px;opacity:1;overflow:visible;transform:none;pointer-events:auto}
+  .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:auto;min-height:0;opacity:0;overflow:hidden;transform:none;pointer-events:none;max-height:0;margin:0;transition:opacity .28s ease,max-height .32s ease}
+  .chart-row.playing .pextra{opacity:1;overflow:hidden;pointer-events:auto;max-height:36px}
   .ptime{display:flex;align-items:center;flex:1;min-width:0;padding:0;gap:8px;background:none;border:0;border-radius:0}
   .pbar{flex:1;min-width:40px;width:auto;max-width:none;height:6px}
   .pdur{font-size:11px;flex:none}
   .pextra .abadge{flex:none;min-width:0}
   .abadge img{height:22px;width:auto;max-width:92px;display:block}
-  .weeks{grid-area:week;text-align:left;justify-self:start;align-self:center;font-size:12px;white-space:nowrap;height:auto;display:block;padding-top:0}
-  .ctext .ctrack{font-size:13.5px}
+  .weeks{grid-area:week;text-align:left;justify-self:start;align-self:center;font-size:11px;white-space:nowrap;height:auto;display:block;padding-top:0;margin:0;line-height:1.2}
+  .ctext .ctrack{font-size:13px}
   .crow{grid-template-columns:24px 1fr 1fr 70px;grid-auto-rows:auto}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
   #privacyOverlay .abody{padding:24px 20px}
@@ -1541,7 +1548,7 @@ function renderCharts(){
 }
 function renderHints(){
   const box = $("#searchHints");
-  if(!query){ box.hidden = true; box.innerHTML=""; return; }
+  if(!query){ box.hidden = true; box.innerHTML=""; requestAnimationFrame(syncHeaderPad); return; }
   const nN = data.posts.filter(p=>p.type==="news"&&matches(p)).length;
   const nR = data.posts.filter(p=>p.type==="release"&&matches(p)).length;
   const nC = lastChartCount;
@@ -1550,6 +1557,7 @@ function renderHints(){
     <button class="hint-chip" data-goto="news">News: <b>${nN}</b></button>
     <button class="hint-chip" data-goto="releases">Releases: <b>${nR}</b></button>
     <button class="hint-chip" data-goto="charts">Chart: <b>${nC}</b></button>`;
+  requestAnimationFrame(syncHeaderPad);
 }
 function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHints(); updateStorageInfo(); }
 
