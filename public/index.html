@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="privacy-3">
+<meta name="m98-build" content="head-textbox-5">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -81,16 +81,17 @@ main{position:relative;z-index:1}
   align-items:center;
   gap:12px;
   margin:0 0 22px;
-  line-height:0;
 }
 .tab-head .tab-title,
 .tab-head .sub{
-  all:unset;
-  display:block;
-  flex:none;
+  margin:0;
+  padding:0;
   min-height:0;
   line-height:1;
   font-family:inherit;
+  text-box:trim-both cap alphabetic;
+  text-box-trim:trim-both;
+  text-box-edge:cap alphabetic;
 }
 .tab-head .tab-title{
   font-size:var(--head);
@@ -102,7 +103,8 @@ main{position:relative;z-index:1}
 .tab-head .tab-bar{
   flex:none;
   width:4px;
-  height:calc(var(--head) * 1.22);
+  height:1em;
+  font-size:var(--head);
   border-radius:2px;
   background:var(--accent);
   align-self:center;
@@ -445,20 +447,20 @@ textarea{resize:vertical;min-height:64px}
 
 <main class="wrap">
   <section class="tab active" id="tab-news">
-    <div class="tab-head"><h1 class="tab-title">News</h1><span class="tab-bar" aria-hidden="true"></span><p class="sub">Latest stories</p></div>
+    <div class="tab-head"><h1 class="tab-title">News</h1><span class="tab-bar" aria-hidden="true"></span><span class="sub">Latest stories</span></div>
     <div id="heroSlot"></div>
     <div class="grid" id="newsGrid"></div>
     <div class="empty" id="newsEmpty" hidden>Nothing found for your query. Try another search.</div>
   </section>
 
   <section class="tab" id="tab-releases">
-    <div class="tab-head"><h1 class="tab-title">Releases</h1><span class="tab-bar" aria-hidden="true"></span><p class="sub">Albums, EPs and singles</p></div>
+    <div class="tab-head"><h1 class="tab-title">Releases</h1><span class="tab-bar" aria-hidden="true"></span><span class="sub">Albums, EPs and singles</span></div>
     <div class="grid" id="relGrid"></div>
     <div class="empty" id="relEmpty" hidden>Nothing found for your query.</div>
   </section>
 
   <section class="tab" id="tab-charts">
-    <div class="tab-head"><h1 class="tab-title">Charts</h1><span class="tab-bar" aria-hidden="true"></span><p class="sub">Daily Top 50</p></div>
+    <div class="tab-head"><h1 class="tab-title">Charts</h1><span class="tab-bar" aria-hidden="true"></span><span class="sub">Daily Top 50</span></div>
     <div class="chart-switch" id="chartSwitch" hidden></div>
     <div class="chart" id="chartList" role="list"></div>
     <p class="chart-note" id="chartStatus" hidden></p>
@@ -1233,42 +1235,6 @@ function renderHints(){
 function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHints(); updateStorageInfo(); }
 
 /* ============ tabs & search events ============ */
-const _inkCtx = document.createElement("canvas").getContext("2d");
-function xHeightMid(el){
-  if(!el) return 0;
-  const box = el.getBoundingClientRect();
-  const cs = getComputedStyle(el);
-  _inkCtx.font = cs.font;
-  let xh = 0;
-  try { xh = _inkCtx.measureText("x").actualBoundingBoxAscent || 0; } catch(e){ xh = 0; }
-  const probe = document.createElement("span");
-  probe.setAttribute("aria-hidden", "true");
-  probe.style.cssText = "display:inline-block;width:0;height:0;overflow:hidden;padding:0;margin:0;border:0;vertical-align:baseline";
-  el.appendChild(probe);
-  const baseline = probe.getBoundingClientRect().top;
-  el.removeChild(probe);
-  if(xh > 0) return baseline - xh / 2;
-  return box.top + box.height / 2;
-}
-function boxMid(el){
-  const b = el.getBoundingClientRect();
-  return b.top + b.height / 2;
-}
-function alignTabHeads(){
-  $$(".tab.active .tab-head").forEach(head=>{
-    if(!head.getClientRects().length) return;
-    const title = head.querySelector(".tab-title");
-    const sub = head.querySelector(".sub");
-    const bar = head.querySelector(".tab-bar");
-    if(!title || !sub || !bar) return;
-    title.style.transform = "none";
-    sub.style.transform = "none";
-    bar.style.transform = "none";
-    const target = xHeightMid(title);
-    sub.style.transform = "translateY(" + (target - xHeightMid(sub)).toFixed(2) + "px)";
-    bar.style.transform = "translateY(" + (target - boxMid(bar)).toFixed(2) + "px)";
-  });
-}
 function setTab(t){
   if(!$("#articlePage").hidden){           /* leave the article page first, then switch */
     hideArticle();
@@ -1282,7 +1248,6 @@ function setTab(t){
     s.classList.toggle("rise", on);
   });
   window.scrollTo(0, 0);
-  requestAnimationFrame(alignTabHeads);
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
@@ -1684,9 +1649,6 @@ $("#es_reset").addEventListener("click", ()=>{
 
 /* ---- init ---- */
 S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); loadPublishedDesk(); route();
-requestAnimationFrame(alignTabHeads);
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>requestAnimationFrame(alignTabHeads));
-window.addEventListener("resize", ()=>{ requestAnimationFrame(alignTabHeads); }, {passive:true});
 </script>
 </body>
 </html>
