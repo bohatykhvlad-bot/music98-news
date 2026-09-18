@@ -102,6 +102,9 @@ a{color:var(--text)}
 .composer .aembed.song{max-width:420px}
 .composer .aembed.song iframe{height:166px}
 .composer .aembed.album iframe{height:320px}
+.composer .yembed{max-width:520px;width:100%}
+.composer .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
+.composer .yembed iframe{position:absolute;inset:0;width:100%;height:100%;border-radius:0}
 .composer iframe{width:100%;border:0;border-radius:10px;display:block;background:transparent}
 .composer .abody-pic{max-width:320px;margin:12px auto}
 .composer .abody-pic img{width:100%;max-height:220px;object-fit:contain;border-radius:10px;display:block;background:var(--bg2)}
@@ -203,6 +206,7 @@ a{color:var(--text)}
         </button>
         <button class="ico wide" type="button" id="btnSong" title="Apple song">♪ Song</button>
         <button class="ico wide" type="button" id="btnAlbum" title="Apple album">Album</button>
+        <button class="ico wide" type="button" id="btnYoutube" title="YouTube">YouTube</button>
       </div>
       <input id="bodyPhoto" class="hide" type="file" accept="image/*">
       <div class="composer" id="composer" contenteditable="true" data-placeholder="Write here"></div>
@@ -243,6 +247,19 @@ a{color:var(--text)}
     <div class="actions">
       <button class="btn primary" type="button" id="appleGo">Insert</button>
       <button class="btn ghost" type="button" id="appleCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+<div class="modal hide" id="ytModal">
+  <div class="card">
+    <h2>YouTube</h2>
+    <p class="muted">Paste a youtube.com or youtu.be link.</p>
+    <label for="ytUrl">Link</label>
+    <input id="ytUrl" placeholder="https://www.youtube.com/watch?v=…">
+    <div id="ytPrev"></div>
+    <div class="actions">
+      <button class="btn primary" type="button" id="ytGo">Insert</button>
+      <button class="btn ghost" type="button" id="ytCancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -346,6 +363,40 @@ function appleBlock(kind, album, track){
 function photoBlock(src){
   return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}"><button class="kill" type="button" aria-label="Remove">×</button><img src="${esc(src)}" alt=""></figure>`;
 }
+function parseYouTube(raw){
+  const s = String(raw||"").trim();
+  if(/^[A-Za-z0-9_-]{11}$/.test(s)) return {id:s, start:0};
+  let u;
+  try{ u = new URL(s); }catch(e){ return null; }
+  const host = (u.hostname||"").replace(/^www\./,"").toLowerCase();
+  if(!["youtube.com","m.youtube.com","music.youtube.com","youtu.be","youtube-nocookie.com"].includes(host)) return null;
+  let id = "";
+  if(host==="youtu.be") id = (u.pathname.split("/").filter(Boolean)[0]||"");
+  else{
+    id = u.searchParams.get("v") || "";
+    const m = u.pathname.match(/\/(?:embed|shorts|live|v)\/([A-Za-z0-9_-]{11})/);
+    if(m) id = m[1];
+  }
+  id = String(id).slice(0,11);
+  if(!/^[A-Za-z0-9_-]{11}$/.test(id)) return null;
+  let start = 0;
+  const t = u.searchParams.get("t") || u.searchParams.get("start") || "";
+  if(/^\d+$/.test(t)) start = +t;
+  else{
+    const mm = String(t).match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i);
+    if(mm && t) start = (+mm[1]||0)*3600 + (+mm[2]||0)*60 + (+mm[3]||0);
+  }
+  return {id, start: start||0};
+}
+function youtubeSrc(id, start){
+  let src = "https://www.youtube-nocookie.com/embed/"+id+"?rel=0&modestbranding=1&enablejsapi=1";
+  if(start) src += "&start="+start;
+  return src;
+}
+function youtubeBlock(id, start){
+  const token = start ? (id+":"+start) : id;
+  return `<figure class="blk yembed" contenteditable="false" data-youtube="${esc(token)}"><button class="kill" type="button" aria-label="Remove">×</button><div class="ytbox"><iframe src="${esc(youtubeSrc(id, start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="eager"></iframe></div></figure>`;
+}
 
 function insertHTML(html){
   const el = $("#composer");
@@ -388,6 +439,7 @@ function serialize(){
     if(node.nodeName==="FIGURE"){
       if(node.dataset.apple) parts.push("[apple:"+node.dataset.apple+"]");
       if(node.dataset.photo) parts.push("[photo:"+node.dataset.photo+"]");
+      if(node.dataset.youtube) parts.push("[youtube:"+node.dataset.youtube+"]");
       return;
     }
     if(node.querySelector && node.querySelector("figure")){
@@ -409,6 +461,8 @@ function bodyToComposer(text){
     if(album) return appleBlock("album", album[1]);
     const song = t.match(/^\[apple:song:(\d+):(\d+)\]$/i);
     if(song) return appleBlock("song", song[1], song[2]);
+    const yt = t.match(/^\[youtube:([A-Za-z0-9_-]{11})(?::(\d+))?\]$/i);
+    if(yt) return youtubeBlock(yt[1], yt[2] ? +yt[2] : 0);
     return "<p>"+rich(raw)+"</p>";
   }).join("");
   $("#composer").innerHTML = html || "<p><br></p>";
@@ -686,6 +740,12 @@ $("#composer").addEventListener("paste", e=>{
       if(got.kind==="album") insertHTML(appleBlock("album", got.album));
       else insertHTML(appleBlock("song", got.album, got.track));
     }).catch(()=> toast("Could not read that Apple link"));
+    return;
+  }
+  const yt = parseYouTube(text);
+  if(yt){
+    e.preventDefault();
+    insertHTML(youtubeBlock(yt.id, yt.start));
   }
 });
 
@@ -695,6 +755,7 @@ function closeApple(){
   pendingApple = null;
 }
 function openApple(kind){
+  closeYoutube();
   appleKind = kind;
   pendingApple = null;
   $("#appleTitle").textContent = kind==="album" ? "Apple album" : "Apple song";
@@ -721,7 +782,6 @@ $("#btnSong").onclick = ()=> openApple("song");
 $("#btnAlbum").onclick = ()=> openApple("album");
 $("#appleCancel").onclick = closeApple;
 $("#appleModal").addEventListener("click", e=>{ if(e.target === $("#appleModal")) closeApple(); });
-document.addEventListener("keydown", e=>{ if(e.key === "Escape") closeApple(); });
 $("#appleUrl").addEventListener("change", previewApple);
 $("#appleUrl").addEventListener("paste", ()=> setTimeout(previewApple, 50));
 $("#appleGo").onclick = async ()=>{
@@ -732,6 +792,36 @@ $("#appleGo").onclick = async ()=>{
   else insertHTML(appleBlock("song", got.album, got.track));
   closeApple();
 };
+
+function closeYoutube(){
+  $("#ytModal").classList.add("hide");
+  $("#ytPrev").innerHTML = "";
+}
+function openYoutube(){
+  closeApple();
+  $("#ytUrl").value = "";
+  $("#ytPrev").innerHTML = "";
+  $("#ytModal").classList.remove("hide");
+  $("#ytUrl").focus();
+}
+function previewYoutube(){
+  const got = parseYouTube($("#ytUrl").value);
+  $("#ytPrev").innerHTML = "";
+  if(!got) return;
+  $("#ytPrev").innerHTML = `<div class="ytbox" style="position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000;margin-top:10px"><iframe src="${esc(youtubeSrc(got.id, got.start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+}
+$("#btnYoutube").onclick = openYoutube;
+$("#ytCancel").onclick = closeYoutube;
+$("#ytModal").addEventListener("click", e=>{ if(e.target === $("#ytModal")) closeYoutube(); });
+$("#ytUrl").addEventListener("change", previewYoutube);
+$("#ytUrl").addEventListener("paste", ()=> setTimeout(previewYoutube, 50));
+$("#ytGo").onclick = ()=>{
+  const got = parseYouTube($("#ytUrl").value);
+  if(!got){ toast("Paste a YouTube link"); return; }
+  insertHTML(youtubeBlock(got.id, got.start));
+  closeYoutube();
+};
+document.addEventListener("keydown", e=>{ if(e.key === "Escape"){ closeApple(); closeYoutube(); } });
 
 $("#reset").onclick = ()=> fillForm(null);
 

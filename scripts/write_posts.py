@@ -80,10 +80,10 @@ POSTS = [
         "date": "2026-09-18",
         "cover": {
             "kind": "img",
-            "src": "photos/carly-rae-jepsen-day-and-night-2026-pressebild.jpg",
-            "pos": "50% 0%",
-            "credit": "Vince Aung / Universal Music",
-            "creditUrl": "https://www.universal-music.de/carly-rae-jepsen/fotos",
+            "src": "photos/carly-rae-jepsen-troubadour-2025-smile.jpg",
+            "pos": "50% 38%",
+            "credit": "Justin Higuchi / Wikimedia Commons (CC BY 4.0)",
+            "creditUrl": "https://commons.wikimedia.org/wiki/File:Carly_Rae_Jepsen_@_Troubadour_08_19_2025_(54849754281).jpg",
         },
     },
 ]
