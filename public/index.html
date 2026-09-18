@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="hd-albums-1">
+<meta name="m98-build" content="preview-vol-1">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -728,6 +728,11 @@ function applePreview(url){
     return (h === "apple.com" || h.endsWith(".apple.com") || h.endsWith(".mzstatic.com")) ? url : "";
   }catch(e){ return ""; }
 }
+function previewPlayUrl(url){
+  const clip = applePreview(url);
+  if(!clip) return "";
+  return "/api/preview?u="+encodeURIComponent(clip);
+}
 /* ---- iTunes Search API via JSONP (30s previews, artwork, track urls) ---- */
 const PREVCACHE = "music98news_prevcache_v2";
 function prevCache(){ try{ const r = lsGetRaw(PREVCACHE); return r ? JSON.parse(r) : {}; }catch(e){ return {}; } }
@@ -777,9 +782,25 @@ const ICON_PLAY = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="tru
 const ICON_PAUSE = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></svg>';
 const audio = new Audio();
 audio.preload = "none";   /* streaming only: previews are never pre-fetched or stored */
+audio.playsInline = true;
+audio.setAttribute("playsinline", "");
+audio.volume = 1;
 let curKey = null;
+let playGen = 0;
 let previewTriedItunes = false;
-function tryPlay(){ try{ const p = audio.play(); if(p && p.catch) p.catch(()=>{}); }catch(e){} }
+let previewUsedRaw = false;
+function pinVol(){ if(audio.volume !== 1) audio.volume = 1; }
+function tryPlay(){
+  pinVol();
+  try{ const p = audio.play(); if(p && p.catch) p.catch(()=>{}); }catch(e){}
+}
+function armSrc(url){
+  try{ audio.pause(); }catch(e){}
+  pinVol();
+  audio.src = url;
+  try{ audio.load(); }catch(e){}
+  tryPlay();
+}
 function fmtTime(s){ s = Math.max(0, Math.round(s||0)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
 function progTo(p, cur, dur){
   $$("#chartList .chart-row.playing").forEach(row=>{
@@ -810,9 +831,11 @@ function markRows(){
   });
 }
 function stopPreview(){
-  try{ audio.pause(); audio.removeAttribute("src"); }catch(e){}
+  playGen++;
   curKey = null;
   previewTriedItunes = false;
+  previewUsedRaw = false;
+  try{ audio.pause(); audio.removeAttribute("src"); }catch(e){}
   progTo(0,0,30);
   markRows();
 }
@@ -828,12 +851,13 @@ function setRowArt(key, src){
     im.removeAttribute("data-need");
   });
 }
-function playItunes(key, title, artist, url){
+function playItunes(key, title, artist, url, gen){
   itunesLookup(title, artist, r=>{
-    if(curKey !== key) return;
+    if(gen !== playGen || curKey !== key) return;
     if(!r || !applePreview(r.preview)){ toast("No 30-second preview found for this track"); stopPreview(); return; }
     previewTriedItunes = true;
-    try{ audio.src = r.preview; tryPlay(); }catch(e){}
+    previewUsedRaw = false;
+    armSrc(previewPlayUrl(r.preview));
     if(r.track) setBadge(key, r.track);
     else if(url) setBadge(key, url);
     setRowArt(key, r.art);
@@ -845,27 +869,45 @@ function selectTrack(key, title, artist, url, prev){
     if(audio.paused){ tryPlay(); } else { audio.pause(); }
     return;
   }
+  playGen++;
+  const gen = playGen;
   curKey = key;
   previewTriedItunes = false;
+  previewUsedRaw = false;
   progTo(0,0,30);
   markRows();
-  const clip = applePreview(prev);
-  if(clip){
-    try{ audio.src = clip; tryPlay(); }catch(e){ playItunes(key, title, artist, url); }
+  const src = previewPlayUrl(prev);
+  if(src){
+    armSrc(src);
     markRows();
     return;
   }
-  playItunes(key, title, artist, url);
+  playItunes(key, title, artist, url, gen);
 }
-audio.addEventListener("play", ()=>{ markRows(); });
+audio.addEventListener("play", ()=>{ pinVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
-audio.addEventListener("timeupdate", ()=>{ const d = audio.duration || 30; progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d); });
+audio.addEventListener("volumechange", pinVol);
+audio.addEventListener("timeupdate", ()=>{
+  pinVol();
+  const d = audio.duration || 30;
+  progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d);
+});
 audio.addEventListener("ended", ()=>{ stopPreview(); });
 audio.addEventListener("error", ()=>{
-  if(!curKey || previewTriedItunes) return;
+  if(!curKey) return;
+  const gen = playGen;
+  const code = audio.error && audio.error.code;
+  if(code === 1) return;        /* aborted because we changed src */
   const row = $$("#chartList .chart-row").find(r => r.dataset.key === curKey);
   if(!row){ stopPreview(); return; }
-  playItunes(curKey, row.dataset.title || "", row.dataset.artist || "", row.dataset.url || "");
+  const raw = applePreview(row.dataset.prev || "");
+  if(!previewUsedRaw && raw && (audio.currentSrc || audio.src || "").indexOf("/api/preview") >= 0){
+    previewUsedRaw = true;
+    armSrc(raw);
+    return;
+  }
+  if(previewTriedItunes) return;
+  playItunes(curKey, row.dataset.title || "", row.dataset.artist || "", row.dataset.url || "", gen);
 });
 
 /* ---- weekly snapshot ---- */

@@ -7,9 +7,15 @@ import os
 import re
 import runpy
 import urllib.error
+import urllib.parse
 import urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+PREVIEW_MAX = 3 * 1024 * 1024
+PREVIEW_CACHE = {}
+ITUNNORM = b"iTunNORM"
+ITUNSKIP = b"iTunSKIP"
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
@@ -59,6 +65,29 @@ def json_bytes(obj, status=200):
     return status, body
 
 
+def allowed_preview_host(host: str) -> bool:
+    h = (host or "").lower()
+    return h in {"audio-ssl.itunes.apple.com", "audio.itunes.apple.com", "mzstatic.com"} or h.endswith(
+        ".mzstatic.com"
+    )
+
+
+def fetch_preview(url: str):
+    cached = PREVIEW_CACHE.get(url)
+    if cached:
+        return 200, cached
+    req = urllib.request.Request(url, headers={"Accept": "audio/*,*/*;q=0.8"})
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        data = resp.read(PREVIEW_MAX + 1)
+    if len(data) > PREVIEW_MAX:
+        return 413, b""
+    data = data.replace(ITUNNORM, ITUNSKIP)
+    if len(PREVIEW_CACHE) > 80:
+        PREVIEW_CACHE.clear()
+    PREVIEW_CACHE[url] = data
+    return 200, data
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(PUBLIC), **kwargs)
@@ -85,6 +114,28 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = self.path.split("?", 1)[0].rstrip("/") or "/"
+        if path == "/api/preview":
+            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+            raw = (qs.get("u") or [""])[0]
+            try:
+                target = urllib.parse.urlparse(raw)
+            except Exception:
+                return self._send(400, b"bad url", "text/plain; charset=utf-8")
+            host = (target.hostname or "").lower()
+            href = raw.lower()
+            if (
+                target.scheme != "https"
+                or not allowed_preview_host(host)
+                or not (target.path.lower().endswith(".m4a") or "audiopreview" in href)
+            ):
+                return self._send(400, b"bad url", "text/plain; charset=utf-8")
+            try:
+                status, body = fetch_preview(raw)
+            except Exception:
+                return self._send(502, b"upstream", "text/plain; charset=utf-8")
+            if status != 200:
+                return self._send(status, b"too large" if status == 413 else b"upstream", "text/plain; charset=utf-8")
+            return self._send(200, body, "audio/mp4")
         if path == "/api/top50":
             try:
                 payload = API["build_payload"](enrich=False)
