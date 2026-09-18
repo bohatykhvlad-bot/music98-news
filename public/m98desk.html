@@ -17,10 +17,11 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.45}
 .wrap{max-width:920px;margin:0 auto;padding:16px 16px 56px}
-.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:inherit;font-weight:700;font-size:15px}
-.brand img{width:28px;height:28px;border-radius:50%;object-fit:cover}
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-.top a{font-size:13px}
+.brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:inherit;user-select:none}
+.brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
+.brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;min-height:40px}
+.top > a:last-child{font-size:13px}
 h1{margin:0 0 4px;font-size:22px;line-height:1.1;letter-spacing:-.03em;color:var(--text)}
 h2{margin:0 0 8px;font-size:15px;color:var(--text)}
 .head{margin-bottom:12px}
@@ -53,6 +54,18 @@ a{color:var(--text)}
 .toolbar .ico b{font-family:Georgia,"Times New Roman",serif;font-size:14px}
 .toolbar .ico i{font-family:Georgia,"Times New Roman",serif;font-size:14px;font-weight:700}
 .toolbar .ico.wide{width:auto;padding:0 9px;gap:5px;font-size:12px;font-weight:650}
+.toolbar .ico.quote{width:38px;gap:0}
+.toolbar .ico.quote .qmark{
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:22px;
+  font-weight:700;
+  font-style:normal;
+  line-height:1;
+  display:block;
+  width:11px;
+  text-align:center;
+  transform:translateY(-1px);
+}
 .toolbar .tsep{width:1px;height:18px;background:var(--line);margin:0 4px}
 .stage-wrap{border:1px dashed var(--line);border-radius:12px;background:#111;overflow:hidden}
 .crop-row{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:start}
@@ -97,8 +110,8 @@ a{color:var(--text)}
 <div class="wrap">
   <div class="top">
     <a class="brand" href="index.html" title="music98.news — home">
-      <img src="logo.png" alt="music98.news" width="40" height="40">
-      <span>music98.news</span>
+      <img class="brand-logo" src="logo.png" alt="music98.news" width="40" height="40">
+      <span class="brand-name">music98.news</span>
     </a>
     <a href="index.html">← Public site</a>
   </div>
@@ -168,7 +181,7 @@ a{color:var(--text)}
       <div class="toolbar" role="toolbar" aria-label="Format">
         <button class="ico" type="button" data-wrap="bold" title="Bold"><b>B</b></button>
         <button class="ico" type="button" data-wrap="italic" title="Italic"><i>I</i></button>
-        <button class="ico" type="button" data-wrap="song" title="Song title">“”</button>
+        <button class="ico quote" type="button" data-wrap="song" title="Song title" aria-label="Song title"><span class="qmark">“</span><span class="qmark">”</span></button>
         <span class="tsep"></span>
         <button class="ico" type="button" id="btnPhoto" title="Photo">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10.5" r="1.6"/><path d="M21 16l-5.2-5.2L8 19"/></svg>
