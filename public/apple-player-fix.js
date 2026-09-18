@@ -134,6 +134,12 @@
     if (!mk || target < 0) return false;
     var pos = mk.queue && typeof mk.queue.position === "number" ? mk.queue.position : 0;
     if (target === pos) {
+      /* The pristine embed restarts the track when its own row is clicked
+         while playing; do the same instead of swallowing the gesture. */
+      try {
+        if (typeof mk.seekToTime === "function") mk.seekToTime(0);
+        else mk.currentPlaybackTime = 0;
+      } catch (err) {}
       if (!mk.isPlaying && mk.play) await mk.play();
       return true;
     }

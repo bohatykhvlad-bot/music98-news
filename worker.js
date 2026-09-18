@@ -23,7 +23,7 @@ function rewriteAppleEmbed(html) {
   let out = String(html || "");
   out = out.replace(/(["'])\/build\//g, "$1/apple-static/build/");
   out = out.replace(/(["'])\/assets\//g, "$1/apple-static/assets/");
-  const tag = '<script src="/apple-player-fix.js?v=editorial-78"></script>';
+  const tag = '<script src="/apple-player-fix.js?v=editorial-79"></script>';
   if (/<head([^>]*)>/i.test(out)) out = out.replace(/<head([^>]*)>/i, "<head$1>" + tag);
   else out = tag + out;
   return out;
