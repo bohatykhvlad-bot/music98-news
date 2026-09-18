@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-30">
+<meta name="m98-build" content="editorial-31">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -227,7 +227,7 @@ body.articlepage .subscribe{display:none}
 
 /* ---------- drawer (editor) ---------- */
 .scrim{position:fixed;inset:0;z-index:80;background:rgba(18,28,32,.35)}
-.drawer{visibility:hidden;position:fixed;top:0;right:0;bottom:0;z-index:85;width:min(480px,100%);background:var(--bg2);border-left:1px solid var(--line);display:flex;flex-direction:column;transform:translateX(102%);transition:transform .28s ease,visibility .28s ease;box-shadow:-20px 0 50px rgba(0,0,0,.4)}
+.drawer{visibility:hidden;position:fixed;top:0;right:0;bottom:0;z-index:85;width:min(720px,100%);background:var(--bg2);border-left:1px solid var(--line);display:flex;flex-direction:column;transform:translateX(102%);transition:transform .28s ease,visibility .28s ease;box-shadow:-20px 0 50px rgba(0,0,0,.4)}
 .drawer.open{transform:none;visibility:visible}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line)}
 .drawer-head h2{margin:0;font-size:18px;letter-spacing:-.01em}
@@ -241,6 +241,9 @@ body.articlepage .subscribe{display:none}
 .field label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
 .fieldrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 textarea{resize:vertical;min-height:64px}
+#ef_excerpt{min-height:140px;font-size:16px}
+#ef_body{min-height:420px;font-size:16px;line-height:1.55}
+#ef_title{min-height:52px;font-size:18px;font-weight:700}
 .cover-picks{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .cpick{width:44px;height:32px;border-radius:8px;border:2px solid transparent;cursor:pointer;padding:0}
 .cpick.sel{border-color:var(--accent)}
@@ -520,8 +523,8 @@ textarea{resize:vertical;min-height:64px}
     </div>
     <div class="field"><label for="ef_artist">Artist (optional)</label><input id="ef_artist" placeholder="JENNIE"></div>
     <div class="field"><label for="ef_title">Title</label><input id="ef_title" placeholder="Story headline"></div>
-    <div class="field"><label for="ef_excerpt">Excerpt</label><textarea id="ef_excerpt" rows="2"></textarea></div>
-    <div class="field"><label for="ef_body">Body (blank line = new paragraph)</label><textarea id="ef_body" rows="5"></textarea></div>
+    <div class="field"><label for="ef_excerpt">Excerpt</label><textarea id="ef_excerpt" rows="5"></textarea></div>
+    <div class="field"><label for="ef_body">Body (blank line = new paragraph)</label><textarea id="ef_body" rows="18"></textarea></div>
     <div class="field"><label>Cover</label><div class="cover-picks" id="ef_covers"></div>
       <input id="ef_photo" type="file" accept="image/*" style="margin-top:8px"></div>
     <label class="dnote"><input type="checkbox" id="ef_pinned" style="width:auto;margin-right:6px">Pin to top of the feed</label>

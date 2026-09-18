@@ -16,7 +16,7 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5}
-.wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 80px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;font-weight:800}
 .brand img{width:40px;height:40px;border-radius:50%;object-fit:cover}
 .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}
@@ -24,14 +24,16 @@ h1{margin:0 0 8px;font-size:32px;line-height:1;letter-spacing:-.03em;color:var(-
 h2{margin:0 0 10px;font-size:20px;color:var(--text)}
 .head{margin-bottom:22px}
 label{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text);margin:12px 0 6px}
-input,textarea,select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--text)}
+input,textarea,select{width:100%;font:inherit;font-size:17px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);color:var(--text);min-height:52px}
+#title{min-height:64px;font-size:22px;font-weight:700;letter-spacing:-.02em}
+#excerpt{min-height:160px;font-size:17px;line-height:1.55}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .btn{border:0;border-radius:999px;padding:10px 16px;font:inherit;font-weight:700;cursor:pointer}
 .btn.primary{background:var(--accent);color:#03282b}
 .btn.ghost{background:var(--bg2);border:1px solid var(--line)}
 .btn.danger{background:#fff0f0;color:#b42318}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin:0 0 16px}
 .list{display:flex;flex-direction:column;gap:8px}
 .item{display:grid;grid-template-columns:52px 1fr auto auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px}
 .item img{width:52px;height:52px;object-fit:cover;border-radius:8px}
@@ -40,8 +42,8 @@ input,textarea,select{width:100%;font:inherit;padding:10px 12px;border:1px solid
 .login{max-width:380px;margin:12vh auto;padding:24px}
 .hide{display:none}
 a{color:var(--text)}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
-.toolbar .btn{padding:12px 16px;font-size:15px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 12px}
+.toolbar .btn{padding:14px 20px;font-size:16px}
 .stage-wrap{border:1px dashed var(--line);border-radius:14px;background:var(--bg2);overflow:hidden}
 .stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;cursor:grab;background:#e8ecee;touch-action:none}
 .stage.hot{outline:2px solid var(--acc2);outline-offset:-2px}
@@ -50,20 +52,21 @@ a{color:var(--text)}
 .stage .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;pointer-events:none}
 .cropbar{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid var(--line)}
 .cropbar input[type=range]{flex:1}
-.composer{min-height:520px;padding:18px 18px 40px;border:1px solid var(--line);border-radius:14px;background:#fff;font-size:17px;line-height:1.65;outline:none}
+.composer{min-height:780px;padding:28px 32px 64px;border:1px solid var(--line);border-radius:16px;background:#fff;font-size:19px;line-height:1.7;outline:none}
 .composer:empty:before{content:attr(data-placeholder);color:var(--muted)}
-.composer p{margin:0 0 14px}
+.composer p{margin:0 0 18px}
 .composer em,.composer i{font-style:italic}
-.composer .blk{position:relative;margin:14px auto 22px;border-radius:14px}
-.composer .blk .kill{position:absolute;right:8px;top:8px;z-index:2;width:28px;height:28px;border:0;border-radius:50%;background:#fff;color:#15181a;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
-.composer .aembed{max-width:600px;margin:14px auto 22px}
-.composer .aembed.album{max-width:100%}
-.composer iframe{width:100%;border:0;border-radius:12px;display:block;background:transparent}
-.composer .abody-pic img{width:100%;border-radius:14px;display:block}
+.composer .blk{position:relative;margin:18px auto 28px;border-radius:16px}
+.composer .blk .kill{position:absolute;right:10px;top:10px;z-index:2;width:36px;height:36px;border:0;border-radius:50%;background:#fff;color:#15181a;font-weight:800;font-size:18px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.composer .aembed{max-width:none;width:100%;margin:18px auto 28px}
+.composer .aembed.song iframe{height:175px}
+.composer .aembed.album iframe{height:450px}
+.composer iframe{width:100%;border:0;border-radius:14px;display:block;background:transparent}
+.composer .abody-pic img{width:100%;border-radius:16px;display:block}
 .modal{position:fixed;inset:0;background:rgba(10,16,18,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:30}
-.modal .card{max-width:640px;width:100%;margin:0}
-.modal iframe{width:100%;border:0;border-radius:12px;display:block;margin-top:12px}
-@media (max-width:900px){ .row,.item{grid-template-columns:1fr} .composer{min-height:380px} }
+.modal .card{max-width:720px;width:100%;margin:0}
+.modal iframe{width:100%;border:0;border-radius:14px;display:block;margin-top:12px}
+@media (max-width:900px){ .row,.item{grid-template-columns:1fr} .composer{min-height:560px;padding:18px 16px 40px;font-size:17px} }
 </style>
 </head>
 <body>
@@ -106,7 +109,7 @@ a{color:var(--text)}
       <label for="title">Title</label>
       <input id="title">
       <label for="excerpt">Short teaser</label>
-      <textarea id="excerpt" style="min-height:70px"></textarea>
+      <textarea id="excerpt"></textarea>
 
       <label>Cover — drop a photo, then drag like Instagram. Prefer 2026, then 2025.</label>
       <div class="stage-wrap">
@@ -265,7 +268,7 @@ function appleSrc(albumId, songId){
 function appleBlock(kind, album, track){
   const src = appleSrc(album, track);
   const song = kind==="song" || track;
-  const h = song ? 166 : 450;
+  const h = song ? 175 : 450;
   const token = song ? ("song:"+album+":"+track) : ("album:"+album);
   return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}"><button class="kill" type="button" aria-label="Remove">×</button><iframe height="${h}" src="${esc(src)}" title="Apple Music" loading="eager"></iframe></figure>`;
 }
