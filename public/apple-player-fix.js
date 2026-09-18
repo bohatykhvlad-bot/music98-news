@@ -137,22 +137,30 @@
       if (!mk.isPlaying && mk.play) await mk.play();
       return true;
     }
+    /* Jumping straight to the queue position keeps the left chrome and the
+       progress bar in place. changeToMediaAtIndex swaps the controls into a
+       loading variant for a couple of frames, which reads as a jump, so it
+       stays a last resort. */
+    if (mk.queue) {
+      mk.queue.position = target;
+      if (!mk.isPlaying && mk.play) await mk.play();
+      if ((mk.queue.position || 0) === target) return true;
+    }
+    if (typeof mk.skipToNextItem === "function" && typeof mk.skipToPreviousItem === "function") {
+      var steps = target - pos;
+      if (steps > 0) {
+        for (var i = 0; i < steps; i++) await mk.skipToNextItem();
+      } else {
+        for (var j = 0; j < -steps; j++) await mk.skipToPreviousItem();
+      }
+      if ((mk.queue.position || 0) === target) return true;
+    }
     if (typeof mk.changeToMediaAtIndex === "function") {
       await mk.changeToMediaAtIndex(target);
       if (!mk.isPlaying && mk.play) await mk.play();
       return true;
     }
-    if (typeof mk.skipToNextItem !== "function" || typeof mk.skipToPreviousItem !== "function") {
-      if (mk.queue) mk.queue.position = target;
-      if (!mk.isPlaying && mk.play) await mk.play();
-      return true;
-    }
-    var steps = target - pos;
-    if (steps > 0) {
-      for (var i = 0; i < steps; i++) await mk.skipToNextItem();
-    } else {
-      for (var j = 0; j < -steps; j++) await mk.skipToPreviousItem();
-    }
+    return false;
     return true;
   }
 
