@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-28">
+<meta name="m98-build" content="editorial-29">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -1583,6 +1583,13 @@ function appleEmbedUrl(albumId, songId){
   return src;
 }
 const applePrefetched = {};
+let appleBoots = [];
+function dropAppleBoots(){
+  appleBoots.splice(0).forEach(n=>{ try{ n.remove(); }catch(e){} });
+}
+function appleIframeHTML(src, h){
+  return `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${h}" loading="eager" fetchpriority="high" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${esc(src)}" title="Listen on Apple Music"></iframe>`;
+}
 function prefetchApple(url){
   if(!url || applePrefetched[url]) return;
   applePrefetched[url] = 1;
@@ -1598,6 +1605,35 @@ function prefetchAppleFromPosts(posts){
     });
   });
 }
+function bootAppleEmbeds(root){
+  dropAppleBoots();
+  const frames = [...(root||document).querySelectorAll(".aembed iframe")];
+  frames.forEach(f=>{
+    const src = f.getAttribute("src");
+    if(!src) return;
+    f.loading = "eager";
+    f.setAttribute("fetchpriority", "high");
+    const boot = document.createElement("iframe");
+    boot.src = src;
+    boot.loading = "eager";
+    boot.setAttribute("fetchpriority", "high");
+    boot.setAttribute("aria-hidden", "true");
+    boot.tabIndex = -1;
+    boot.title = "";
+    boot.style.cssText = "position:fixed;top:0;left:0;width:360px;height:175px;opacity:0;pointer-events:none;border:0;z-index:-1";
+    document.body.appendChild(boot);
+    appleBoots.push(boot);
+    const drop = ()=>{
+      const i = appleBoots.indexOf(boot);
+      if(i>=0) appleBoots.splice(i,1);
+      try{ boot.remove(); }catch(e){}
+    };
+    boot.addEventListener("load", drop, {once:true});
+    f.addEventListener("load", drop, {once:true});
+    setTimeout(drop, 15000);
+    f.src = src;
+  });
+}
 function appleEmbed(albumId, songId){
   const id = String(albumId||"").replace(/\D/g,"");
   const track = String(songId||"").replace(/\D/g,"");
@@ -1605,7 +1641,7 @@ function appleEmbed(albumId, songId){
   const h = track ? 166 : 450;
   const src = appleEmbedUrl(id, track);
   const kind = track ? " song" : " album";
-  return `<div class="aembed${kind}" style="min-height:${h}px"><iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${h}" loading="eager" fetchpriority="high" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${esc(src)}" title="Listen on Apple Music"></iframe></div>`;
+  return `<div class="aembed${kind}" style="min-height:${h}px">${appleIframeHTML(src, h)}</div>`;
 }
 function renderBody(text){
   return String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
@@ -1621,7 +1657,10 @@ function renderBody(text){
 }
 function showArticle(p){
   listY = window.scrollY || document.documentElement.scrollTop || 0;
-  $("#articlePage").innerHTML = `
+  const page = $("#articlePage");
+  document.body.classList.add("articlepage");
+  page.hidden = false;
+  page.innerHTML = `
     <a class="aback" href="#" id="aback">Back</a>
     <div class="acover">${coverImg(p,false)}</div>
     ${creditHTML(p)}
@@ -1630,9 +1669,8 @@ function showArticle(p){
     <div class="ameta"><span>${fmtDate(p.date)}</span><span class="dot" style="width:3px;height:3px;border-radius:50%;background:var(--faint)"></span><span>music98.news</span></div>
     <div class="atext">${renderBody(p.body||p.excerpt||"")}</div>
     ${relatedHTML(p)}`;
-  $("#articlePage").hidden = false;
-  document.body.classList.add("articlepage");
   jumpY(0);
+  bootAppleEmbeds(page);
   $("#aback").addEventListener("click", e=>{ e.preventDefault(); closeArticle(); });
 }
 function jumpY(y){
@@ -1646,6 +1684,7 @@ function jumpY(y){
 }
 function hideArticle(){
   pauseAllMedia();
+  dropAppleBoots();
   $$(".tab").forEach(s => s.classList.remove("rise"));
   $("#articlePage").innerHTML = "";
   $("#articlePage").hidden = true;
