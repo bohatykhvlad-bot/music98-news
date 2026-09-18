@@ -135,13 +135,47 @@ export async function onRequestGet({ request }) {
   const raw = await upstream.arrayBuffer();
   if (raw.byteLength > MAX_BYTES) return new Response("too large", { status: 413 });
   const body = stripSoundCheck(raw);
+  return audioRangeResponse(request, body);
+}
 
+function parseByteRange(header, total) {
+  if (!header || total <= 0) return null;
+  const m = /^bytes=(\d*)-(\d*)$/i.exec(String(header).split(",")[0].trim());
+  if (!m) return null;
+  let start;
+  let end;
+  if (m[1] === "" && m[2] === "") return null;
+  if (m[1] === "") {
+    const suffix = Number(m[2]);
+    if (!Number.isFinite(suffix) || suffix <= 0) return null;
+    start = Math.max(0, total - suffix);
+    end = total - 1;
+  } else {
+    start = Number(m[1]);
+    end = m[2] === "" ? total - 1 : Number(m[2]);
+    if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+  }
+  if (start < 0 || start >= total || end < start) return null;
+  return { start, end: Math.min(end, total - 1) };
+}
+
+function audioRangeResponse(request, body) {
+  const total = body.byteLength;
+  const range = parseByteRange(request.headers.get("Range"), total);
   const headers = {
     "Content-Type": "audio/mp4",
-    "Content-Length": String(body.byteLength),
+    "Accept-Ranges": "bytes",
     "Cache-Control": "public, max-age=86400",
-    "Accept-Ranges": "none",
+    "Access-Control-Allow-Origin": "*",
   };
-  if (request.method === "HEAD") return new Response(null, { status: 200, headers });
-  return new Response(body, { status: 200, headers });
+  if (!range) {
+    headers["Content-Length"] = String(total);
+    if (request.method === "HEAD") return new Response(null, { status: 200, headers });
+    return new Response(body, { status: 200, headers });
+  }
+  const slice = body.subarray(range.start, range.end + 1);
+  headers["Content-Length"] = String(slice.byteLength);
+  headers["Content-Range"] = `bytes ${range.start}-${range.end}/${total}`;
+  if (request.method === "HEAD") return new Response(null, { status: 206, headers });
+  return new Response(slice, { status: 206, headers });
 }

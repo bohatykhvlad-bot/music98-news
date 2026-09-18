@@ -167,7 +167,72 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(body)
+        if self.command != "HEAD":
+            self.wfile.write(body)
+
+    def _send_audio(self, body: bytes):
+        total = len(body)
+        start, end, status = 0, total - 1 if total else 0, 200
+        rng = (self.headers.get("Range") or "").strip()
+        if rng.lower().startswith("bytes=") and total:
+            spec = rng.split("=", 1)[1].split(",", 1)[0].strip()
+            left, _, right = spec.partition("-")
+            try:
+                if left == "" and right:
+                    n = int(right)
+                    start = max(0, total - n)
+                    end = total - 1
+                    status = 206
+                elif left != "":
+                    start = int(left)
+                    end = int(right) if right else total - 1
+                    end = min(max(end, start), total - 1)
+                    if 0 <= start < total:
+                        status = 206
+                    else:
+                        start, end, status = 0, total - 1, 200
+            except ValueError:
+                start, end, status = 0, total - 1, 200
+        if total == 0:
+            start, end, status = 0, 0, 200
+            chunk = b""
+        else:
+            chunk = body[start : end + 1]
+        self.send_response(status)
+        self.send_header("Content-Type", "audio/mp4")
+        self.send_header("Accept-Ranges", "bytes")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Content-Length", str(len(chunk)))
+        if status == 206:
+            self.send_header("Content-Range", f"bytes {start}-{end}/{total}")
+        self.end_headers()
+        if self.command != "HEAD":
+            self.wfile.write(chunk)
+
+    def _preview(self):
+        qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        raw = (qs.get("u") or [""])[0]
+        try:
+            target = urllib.parse.urlparse(raw)
+        except Exception:
+            return self._send(400, b"bad url", "text/plain; charset=utf-8")
+        host = (target.hostname or "").lower()
+        href = raw.lower()
+        if (
+            target.scheme != "https"
+            or not allowed_preview_host(host)
+            or not (target.path.lower().endswith(".m4a") or "audiopreview" in href)
+        ):
+            return self._send(400, b"bad url", "text/plain; charset=utf-8")
+        clip = resolve_clip(raw, (qs.get("song") or [""])[0])
+        try:
+            status, body = fetch_preview(clip)
+        except Exception:
+            return self._send(502, b"upstream", "text/plain; charset=utf-8")
+        if status != 200:
+            return self._send(status, b"too large" if status == 413 else b"upstream", "text/plain; charset=utf-8")
+        return self._send_audio(body)
 
     def _read_json(self):
         n = int(self.headers.get("Content-Length") or 0)
@@ -181,31 +246,16 @@ class Handler(SimpleHTTPRequestHandler):
         got = (self.headers.get("X-Admin-Key") or "").strip()
         return bool(got) and got == admin_password()
 
+    def do_HEAD(self):
+        path = self.path.split("?", 1)[0].rstrip("/") or "/"
+        if path == "/api/preview":
+            return self._preview()
+        return super().do_HEAD()
+
     def do_GET(self):
         path = self.path.split("?", 1)[0].rstrip("/") or "/"
         if path == "/api/preview":
-            qs = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
-            raw = (qs.get("u") or [""])[0]
-            try:
-                target = urllib.parse.urlparse(raw)
-            except Exception:
-                return self._send(400, b"bad url", "text/plain; charset=utf-8")
-            host = (target.hostname or "").lower()
-            href = raw.lower()
-            if (
-                target.scheme != "https"
-                or not allowed_preview_host(host)
-                or not (target.path.lower().endswith(".m4a") or "audiopreview" in href)
-            ):
-                return self._send(400, b"bad url", "text/plain; charset=utf-8")
-            clip = resolve_clip(raw, (qs.get("song") or [""])[0])
-            try:
-                status, body = fetch_preview(clip)
-            except Exception:
-                return self._send(502, b"upstream", "text/plain; charset=utf-8")
-            if status != 200:
-                return self._send(status, b"too large" if status == 413 else b"upstream", "text/plain; charset=utf-8")
-            return self._send(200, body, "audio/mp4")
+            return self._preview()
         if path == "/api/top50":
             try:
                 payload = API["build_payload"](enrich=False)

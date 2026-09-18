@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-20">
+<meta name="m98-build" content="editorial-21">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -142,8 +142,8 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .pextra{display:flex;align-items:center;gap:var(--pin, 8px);width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
 .chart-row.playing .pextra{opacity:1}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
-.pbar{width:108px;height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:block;cursor:pointer;touch-action:none}
-.pbar i{display:block;height:100%;width:0;background:var(--accent)}
+.pbar{width:108px;height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:block;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none}
+.pbar i{display:block;height:100%;width:0;background:var(--accent);pointer-events:none}
 .pdur{font-size:12px;color:var(--muted2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .pextra .abadge{flex:none}
 .tinfo b{display:block;font-size:15.5px;letter-spacing:-.01em}
@@ -776,7 +776,7 @@ const APPLE_GLYPH = '<svg viewBox="0 0 384 512" fill="currentColor" aria-hidden=
 const ICON_PLAY = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4.5 2.2v11.6L14 8z"/></svg>';
 const ICON_PAUSE = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></svg>';
 const audio = new Audio();
-audio.preload = "none";   /* streaming only: previews are never pre-fetched or stored */
+audio.preload = "auto";
 audio.playsInline = true;
 audio.setAttribute("playsinline", "");
 audio.setAttribute("webkit-playsinline", "");
@@ -788,6 +788,14 @@ let curKey = null;
 let playGen = 0;
 let previewTriedItunes = false;
 let actx = null;
+let blobUrl = "";
+let seekBar = null;
+let seekLock = 0;
+function dropBlob(){
+  if(!blobUrl) return;
+  try{ URL.revokeObjectURL(blobUrl); }catch(e){}
+  blobUrl = "";
+}
 function deviceVol(){
   audio.muted = false;
   audio.defaultMuted = false;
@@ -813,16 +821,48 @@ function tryPlay(){
   deviceVol();
   try{ const p = audio.play(); if(p && p.catch) p.catch(()=>{}); }catch(e){}
 }
+function applySrc(src){
+  deviceVol();
+  try{ audio.pause(); }catch(e){}
+  audio.src = src;
+  tryPlay();
+}
 function armSrc(url){
+  const gen = playGen;
   const ready = attachOut();
   deviceVol();
   try{ audio.pause(); }catch(e){}
-  audio.src = url;
-  const go = ()=>{ deviceVol(); tryPlay(); };
+  const go = ()=>{
+    if(gen !== playGen) return;
+    fetch(url, { cache: "no-store" }).then(r=>{
+      if(gen !== playGen) return null;
+      if(!r.ok) throw 0;
+      return r.blob();
+    }).then(b=>{
+      if(gen !== playGen || !b) return;
+      dropBlob();
+      blobUrl = URL.createObjectURL(b);
+      applySrc(blobUrl);
+    }).catch(()=>{
+      if(gen !== playGen) return;
+      applySrc(url);
+    });
+  };
   if(ready && typeof ready.then === "function") ready.then(go, go);
   else go();
 }
 function fmtTime(s){ s = Math.max(0, Math.round(s||0)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+function previewDur(){
+  const d = audio.duration;
+  if(d && isFinite(d) && d > 0) return d;
+  try{
+    if(audio.seekable && audio.seekable.length){
+      const end = audio.seekable.end(audio.seekable.length - 1);
+      if(end && isFinite(end) && end > 0) return end;
+    }
+  }catch(e){}
+  return 90;
+}
 function progTo(p, cur, dur){
   $$("#chartList .chart-row.playing").forEach(row=>{
     const f = row.querySelector(".pbar i"); if(f) f.style.width = p+"%";
@@ -859,7 +899,8 @@ function stopPreview(){
   playGen++;
   curKey = null;
   previewTriedItunes = false;
-  try{ audio.pause(); audio.removeAttribute("src"); }catch(e){}
+  try{ audio.pause(); audio.removeAttribute("src"); audio.load(); }catch(e){}
+  dropBlob();
   progTo(0,0,90);
   markRows();
 }
@@ -909,14 +950,19 @@ function selectTrack(key, title, artist, url, prev){
 }
 audio.addEventListener("loadedmetadata", ()=>{
   deviceVol();
-  const d = audio.duration || 90;
+  const d = previewDur();
+  progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
+});
+audio.addEventListener("durationchange", ()=>{
+  const d = previewDur();
   progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
 });
 audio.addEventListener("playing", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("play", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
 audio.addEventListener("timeupdate", ()=>{
-  const d = audio.duration || 90;
+  if(seekBar) return;
+  const d = previewDur();
   progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d);
 });
 audio.addEventListener("ended", ()=>{ stopPreview(); });
@@ -931,33 +977,52 @@ audio.addEventListener("error", ()=>{
   playItunes(curKey, row.dataset.title || "", row.dataset.artist || "", row.dataset.url || "", gen);
 });
 
-let seekBar = null;
+function pointerX(e){
+  if(e.touches && e.touches[0]) return e.touches[0].clientX;
+  if(e.changedTouches && e.changedTouches[0]) return e.changedTouches[0].clientX;
+  return e.clientX;
+}
 function seekFromEvent(e, bar){
   const row = bar && bar.closest(".chart-row");
   if(!row || row.dataset.key !== curKey) return;
-  const d = audio.duration;
-  if(!d || !isFinite(d)) return;
+  const d = previewDur();
   const r = bar.getBoundingClientRect();
-  const x = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-  audio.currentTime = x * d;
-  progTo(x * 100, audio.currentTime, d);
+  if(!r.width) return;
+  const x = Math.max(0, Math.min(1, (pointerX(e) - r.left) / r.width));
+  const t = x * d;
+  try{
+    if(typeof audio.fastSeek === "function") audio.fastSeek(t);
+    else audio.currentTime = t;
+  }catch(err){
+    try{ audio.currentTime = t; }catch(err2){}
+  }
+  progTo(x * 100, t, d);
+}
+function endSeek(e){
+  if(!seekBar) return;
+  if(e) seekFromEvent(e, seekBar);
+  seekBar = null;
+  seekLock = Date.now();
 }
 document.addEventListener("pointerdown", e=>{
-  const bar = e.target.closest(".pbar");
+  const bar = e.target.closest && e.target.closest(".pbar");
   if(!bar) return;
   const row = bar.closest(".chart-row");
   if(!row || row.dataset.key !== curKey) return;
   e.preventDefault();
   e.stopPropagation();
+  attachOut();
   seekBar = bar;
+  try{ bar.setPointerCapture(e.pointerId); }catch(err){}
   seekFromEvent(e, bar);
-});
-window.addEventListener("pointermove", e=>{
+}, true);
+document.addEventListener("pointermove", e=>{
   if(!seekBar) return;
+  e.preventDefault();
   seekFromEvent(e, seekBar);
-});
-window.addEventListener("pointerup", ()=>{ seekBar = null; });
-window.addEventListener("pointercancel", ()=>{ seekBar = null; });
+}, true);
+document.addEventListener("pointerup", endSeek, true);
+document.addEventListener("pointercancel", endSeek, true);
 
 /* ---- weekly snapshot ---- */
 const SNAP = {"us-songs":[["Choosin' Texas","Ella Langley"],["Sweet Forever","Mondo Cozmo"],["Resting In His Arms","Silas Kirk"],["BAD TIMES","Imael Angel"],["Boston","STELLA LEFTY"],["Been By Now","Morgan Wallen"],["Can't Hold Us (feat. Ray Dalton)","Macklemore & Ryan Lewis"],["9 to 5","Dolly Parton"],["Babydoll","Jamie Miller"],["Uninvited (Live at Newport Folk)","Brandi Carlile"],["God Didn’t Let Me Break","Still Heals"],["when I see You","Josiah Queen"],["Never Forget","Chad Prather & Real America's Music"],["Bad Times (Extended Version)","Imael Angel"],["BbY WOW","KAROL G, Judeline & rusowsky"],["Be Her","Ella Langley"],["Dancing On My Own","Robyn"],["I Can't Love You Anymore","Ella Langley & Morgan Wallen"],["I Knew It, I Knew You (From \"Toy Story 5\")","Taylor Swift"],["Black Velvet","Alannah Myles"],["Bass Persuades","Miley Cyrus"],["Islands In the Stream","Dolly Parton & Kenny Rogers"],["Be By You","Luke Combs"],["God I'm Just Grateful","Elevation Worship & Chandler Moore"],["Jolene","Dolly Parton"]],"us-albums":[["Morgan Freeman's Symphonic Blues Experience","Morgan Freeman, Ground Zero Blues Club Band, Chineke! Orchestra & Martin Gellner"],["Dandelion","Ella Langley"],["Good Grief","Sara Bareilles"],["Ultimate Dolly Parton","Dolly Parton"],["Their Greatest Hits 1971-1975","Eagles"],["Chronicle: The 20 Greatest Hits","Creedence Clearwater Revival"],["Greatest Hits (2024 Remaster)","Journey"],["TRAIL TO THE HEAVENS: FINAL FANTASY XIV Original Soundtrack (78 Track Version)","Masayoshi Soken"],["Vol.II","Angine de Poitrine"],["Boston","Boston"],["Phases","Beoga"],["The Essential Michael Jackson","Michael Jackson"],["Vol.1","Angine de Poitrine"],["The Art of Loving","Olivia Dean"],["So Much For Goodbyes","Billy Strings"],["Genshin Impact - Where Mercy Endures (Original Game Soundtrack)","HOYO-MiX"],["Long Way Home","STELLA LEFTY"],["Kiss All The Time. Disco, Occasionally.","Harry Styles"],["hungover","Ella Langley"],["Practical Magic (Music from the Motion Picture)","Alan Silvestri"],["Lost and Seeking","Noah Graves"],["Practical Magic 2 (Original Motion Picture Soundtrack)","Rupert Gregson-Williams"],["Distance in Static","Bonobo"],["Greatest Hits","Fleetwood Mac"],["Grateful","The Red Clay Strays"]],"us-videos":[["MILEY","Miley Cyrus"],["Angel","Lizzy McAlpine"],["PRESS PLAY","LISA"],["Day and Night","Carly Rae Jepsen"],["Above the Noise","The Jetsetters"],["Choosin' Texas","Ella Langley"],["Bass Persuades","Miley Cyrus"],["We Miss You Charlie (feat. BENJY GAITHER)","Natasha Owens"],["Hurt","Johnny Cash"],["Life Goes On","BTS"],["Sam Smith: Music Room","Sam Smith"],["The Star Spangled Banner (Live)","Chris Stapleton & NFL"],["More Than Words","EXTREME"],["ESTRUS","Tove Lo"],["The Fate of Ophelia","Taylor Swift"],["Good Old Days (feat. Kesha)","Macklemore"],["Still","KAROL G & Bruno Mars"],["Comfortably Numb Re-Imagined","Roger Waters & Mona Miari"],["Butter","BTS"],["Pop Muzik","M"],["Just the Way You Are","Bruno Mars"],["Ms. Jackson","Outkast"],["Turnin Me On (feat. Lil Wayne)","Keri Hilson & Lil Wayne"],["More Than A Woman","Aaliyah"],["Happily Ever After","Case"]],"gb-songs":[["Movin' To The Sun","HUGEL, Imael Angel & Ultra Naté"],["Boston","STELLA LEFTY"],["Choosin' Texas","Ella Langley"],["Dai Dai","Shakira & Burna Boy"],["BAD TIMES","Imael Angel"],["Can't Hold Us (feat. Ray Dalton)","Macklemore & Ryan Lewis"],["Rise Slow","Kimo Sounds"],["Ordinary","Alex Warren"],["Babydoll","Jamie Miller"],["Training Season","Dua Lipa"],["Great Expectation","SIENNA SPIRO"],["Sweet Forever","Mondo Cozmo"],["Inside My Soul","SK.music"],["Bass Persuades","Miley Cyrus"],["Jamaican (Bam Bam)","HUGEL & SOLTO (FR)"],["My Body Isn't Ready","sombr"],["Machine","Architects"],["WHERE IS MY HUSBAND!","RAYE"],["Tastes Like Summer","James Blunt"],["Man I Need","Olivia Dean"],["Resting In His Arms","Silas Kirk"],["Zombie (2025 Remastered)","The Cranberries"],["Stop The Wedding!","Ashe"],["A Thousand Miles","Vanessa Carlton"],["Homewrecker","sombr"]],"jp-songs":[["Emotion","Aぇ! group"],["時空超えてユニバース","M!LK"],["見知らぬ糸","スピッツ"],["うさぎラップ (ソロver.)","うさぎ(CV.小澤亜李), 人魚(CV.大木咲絵子) & 人魚(CV.七瀬彩夏)"],["Brand New","Mrs. GREEN APPLE"],["Don't let me down!","M!LK"],["僕のすべては君のもの","M!LK"],["愛MUST BE","櫻坂46"],["音銀河","玉置浩二 & ASKA"],["好きすぎて滅!","M!LK"],["BLACK OUT MISSION","なにわ男子"],["うさぎラップ (リズム感のある者たちver.)","うさぎ(CV.小澤亜李), モモンガ(CV.井口裕香), 人魚(CV.大木咲絵子) & 人魚(CV.七瀬彩夏)"],["Yes! 東京 (feat. SUPER★DRAGON, Sakurashimeji, ONE N' ONLY, BUDDiiS, ICEx & Lienel)","EBiDAN (恵比寿学園男子部), 超特急, M!LK & 原因は自分にある。"],["マイオンリー","SixTONES"],["マスク・ド・カメロ","ポルノグラフィティ"],["ありふれた世界の果てに (feat. Awich, CHICO CARLITO, ONE OK ROCK & Paledusk)","YAO"],["パジャマパーティーズのうた","パジャマパーティーズ みどり(CV. 諸星すみれ)、ぴんく(CV. 長縄まりあ)、しろ(CV. 篠原侑)、むらさき(CV. 内山茉莉)"],["i know you","IDOLiSH7"],["ファンファーレ","玉置浩二"],["Made My Night","LE SSERAFIM"],["晴々","緑黄色社会"],["Five","嵐"],["The Arcadion ～至天の座アルカディア:ヘビー級～","祖堅正慶"],["Thursday","HENDERY"],["風と町","Mrs. GREEN APPLE"]]};
@@ -1237,6 +1302,7 @@ function renderReleases(){
 }
 $("#chartList").addEventListener("pointerdown", attachOut);
 $("#chartList").addEventListener("click", e=>{
+  if(Date.now() - seekLock < 500) return;
   if(e.target.closest("a, .pbar, .ptime")) return;
   const row = e.target.closest(".chart-row");
   if(row) selectTrack(row.dataset.key, row.dataset.title, row.dataset.artist, row.dataset.url || "", row.dataset.prev || "");
