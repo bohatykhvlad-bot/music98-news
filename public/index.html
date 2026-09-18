@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-66">
+<meta name="m98-build" content="editorial-68">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -252,16 +252,6 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 #articlePage .atext p{margin:0 0 16px}
 .aembed{margin:6px auto 22px;max-width:660px;background:transparent;border-radius:12px;overflow:visible}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
-.aembed.album{width:100%;max-width:660px;height:450px;overflow:hidden;border-radius:12px;position:relative}
-.aembed.album iframe{
-  width:660px!important;
-  max-width:none!important;
-  min-width:660px;
-  height:450px!important;
-  border-radius:0;
-  display:block;
-  overflow:hidden;
-}
 .aembed.song{max-width:600px;width:100%;margin:6px auto 22px}
 .aembed.song iframe{height:166px;max-width:100%}
 .yembed{margin:6px auto 22px;max-width:660px;width:100%}
@@ -425,8 +415,7 @@ textarea{resize:vertical;min-height:64px}
   #articlePage h1{font-size:clamp(22px,7vw,32px)}
   .hero .body{padding:16px}
   .hero .meta{line-height:1;padding-top:0}
-  .aembed:not(.album),.aembed:not(.album) iframe,.yembed{max-width:100%}
-  .aembed.album iframe{max-width:none!important}
+  .aembed,.aembed iframe,.yembed{max-width:100%}
   .rel-grid{grid-template-columns:1fr 1fr;gap:10px}
   .toasts{left:12px;right:12px;bottom:12px}
   .toast{max-width:none}
@@ -1851,10 +1840,6 @@ function ensureAppleBoot(src, h){
   f.setAttribute("sandbox", APPLE_IFRAME_SANDBOX);
   f.setAttribute("title", "Listen on Apple Music");
   f.setAttribute("height", String(h||166));
-  if((h||166) >= 400){
-    f.setAttribute("width", "660");
-    f.setAttribute("scrolling", "no");
-  }
   f.setAttribute("loading", "eager");
   f.setAttribute("fetchpriority", "high");
   f.dataset.appleBoot = "1";
@@ -1873,8 +1858,7 @@ function bootAppleFromPosts(posts){
   });
 }
 function appleIframeHTML(src, h){
-  const w = h >= 400 ? ' width="660" scrolling="no"' : "";
-  return `<iframe class="apple-park" allow="${APPLE_IFRAME_ALLOW}" frameborder="0"${w} height="${h}" loading="eager" fetchpriority="high" sandbox="${APPLE_IFRAME_SANDBOX}" src="${esc(src)}" title="Listen on Apple Music"></iframe>`;
+  return `<iframe class="apple-park" allow="${APPLE_IFRAME_ALLOW}" frameborder="0" height="${h}" loading="eager" fetchpriority="high" sandbox="${APPLE_IFRAME_SANDBOX}" src="${esc(src)}" title="Listen on Apple Music"></iframe>`;
 }
 function appleEmbed(albumId, songId){
   const id = String(albumId||"").replace(/\D/g,"");
