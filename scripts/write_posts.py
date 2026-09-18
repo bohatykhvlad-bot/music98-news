@@ -45,9 +45,7 @@ What is not in dispute is the shape. Jepsen has spent a decade proving that pop 
 
 She launches the album onstage September 27, headlining New York's All Things Go Festival, her first billed performance of 2026, on a bill that also includes Zara Larsson, Lola Young, Brandi Carlile, and MUNA. A festival slot is a strange place to debut a double album. It is also the right kind of strange. You cannot play twenty-four songs. You can play the argument. A song from the *Day* disc, a song from *Night*, proof that the two halves talk to each other.
 
-Physical editions and the digital album went out this morning. The Japanese CD adds "Reaching for a Star" and "Yes." Everyone else gets the twenty-four. If you only have time for a first pass, start at "After All," stay through "On Wires," then skip to "Don't Leave Me on the Dance Floor" and let *Night* finish the hour. If you have the whole evening, play it in order. That is what the title is for.
-
-Jepsen has never been in a hurry to be the loudest person in the room. *Day and Night* does not change that. It just gives the room two lighting states and asks you to stay until both of them have had their say."""
+The Japanese CD tacks on "Reaching for a Star" and "Yes." That is a regional extra, not a third disc. The album as written is twenty-four songs and two clocks. *Day and Night* is for people who will sit with both hours, not for the loudest person in the room."""
 
 POSTS = [
     {

@@ -2,6 +2,8 @@ name = "music98-news"
 main = "worker.js"
 compatibility_date = "2026-09-17"
 keep_vars = true
+workers_dev = true
+compatibility_flags = ["global_fetch_strictly_public"]
 
 [vars]
 FROM_EMAIL = "music98.news <onboarding@resend.dev>"
