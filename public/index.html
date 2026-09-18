@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="hd-solo-7">
+<meta name="m98-build" content="hd-solo-8">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -389,7 +389,7 @@ textarea{resize:vertical;min-height:64px}
     <nav class="nav" id="nav">
       <button class="nav-btn active" data-tab="news">News</button>
       <button class="nav-btn" data-tab="releases">Releases</button>
-      <button class="nav-btn" data-tab="charts">Charts</button>
+      <button class="nav-btn" data-tab="charts">Chart</button>
     </nav>
     <div class="top-actions">
       <div class="search">
@@ -445,7 +445,7 @@ textarea{resize:vertical;min-height:64px}
       <h3>Sections</h3>
       <a class="flink" href="#" data-goto="news">News</a>
       <a class="flink" href="#" data-goto="releases">Releases</a>
-      <a class="flink" href="#" data-goto="charts">Charts</a>
+      <a class="flink" href="#" data-goto="charts">Chart</a>
       <a class="flink" href="#" id="footPrivacy">Privacy</a>
     </div>
     <div class="foot-col social">
@@ -1189,7 +1189,7 @@ function renderHints(){
   box.innerHTML = `<span>Results for “${esc(query)}”:</span>
     <button class="hint-chip" data-goto="news">News: <b>${nN}</b></button>
     <button class="hint-chip" data-goto="releases">Releases: <b>${nR}</b></button>
-    <button class="hint-chip" data-goto="charts">Charts: <b>${nC}</b></button>`;
+    <button class="hint-chip" data-goto="charts">Chart: <b>${nC}</b></button>`;
 }
 function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHints(); updateStorageInfo(); }
 
