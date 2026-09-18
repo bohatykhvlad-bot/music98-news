@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Cut 16:9 cover stills centred on the detected face, keeping the whole head."""
+"""Cut 16:9 cover stills on the detected face.
+
+Keep the whole head. On a close-up, hang the hair from the top of the
+frame so there is no empty strip of sky above it.
+"""
 from __future__ import annotations
 
 import urllib.request
@@ -43,20 +47,26 @@ def crop_to_face(im, face):
     H, W = im.shape[:2]
     x, y, fw, fh = face
     cx = x + fw / 2
-    cy = y + fh * 0.42
-    hair = y - 0.55 * fh
-    chin = y + fh + 0.22 * fh
-    need_h = max(chin - hair, W / ASPECT)
-    need_w = need_h * ASPECT
-    if need_w > W:
-        need_w = float(W)
-        need_h = need_w / ASPECT
-    left = cx - need_w / 2
-    top = cy - need_h / 2
-    if top > hair:
+    need_w = float(W)
+    need_h = need_w / ASPECT
+    if need_h > H:
+        need_h = float(H)
+        need_w = need_h * ASPECT
+    closeup = fh > 0.32 * need_h
+    hair_pad = (0.10 if closeup else 0.45) * fh
+    chin_pad = 0.18 * fh
+    hair = y - hair_pad
+    chin = y + fh + chin_pad
+    if closeup:
         top = hair
+    else:
+        cy = y + fh * 0.42
+        top = cy - need_h / 2
+        if top > hair:
+            top = hair
     if top + need_h < chin:
         top = chin - need_h
+    left = cx - need_w / 2
     left = max(0.0, min(left, W - need_w))
     top = max(0.0, min(top, H - need_h))
     x0, y0 = int(round(left)), int(round(top))
