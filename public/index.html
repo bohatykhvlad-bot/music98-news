@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="preview-vol-3">
+<meta name="m98-build" content="preview-vol-4">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -786,49 +786,48 @@ const audio = new Audio();
 audio.preload = "none";   /* streaming only: previews are never pre-fetched or stored */
 audio.playsInline = true;
 audio.setAttribute("playsinline", "");
+audio.setAttribute("webkit-playsinline", "");
 audio.crossOrigin = "anonymous";
-audio.volume = 0;         /* Chrome/Android first buffers play at max until media volume attaches */
+audio.muted = false;
+audio.defaultMuted = false;
+audio.volume = 1;         /* always 100% of the device volume; never fade, mute, or duck */
 let curKey = null;
 let playGen = 0;
 let previewTriedItunes = false;
-let fadeArmed = false, fadeTimer = 0, fadeRaf = 0;
-function cutOut(){
-  fadeArmed = false;
-  if(fadeTimer){ clearTimeout(fadeTimer); fadeTimer = 0; }
-  if(fadeRaf){ cancelAnimationFrame(fadeRaf); fadeRaf = 0; }
-  audio.muted = true;
-  audio.volume = 0;
-}
-function fadeIn(){
-  if(fadeRaf){ cancelAnimationFrame(fadeRaf); fadeRaf = 0; }
+let actx = null;
+function deviceVol(){
   audio.muted = false;
-  const start = performance.now(), ms = 180;
-  audio.volume = 0;
-  (function step(now){
-    if(audio.paused){ audio.volume = 0; return; }
-    const k = Math.min(1, (now - start) / ms);
-    audio.volume = k;
-    if(k < 1) fadeRaf = requestAnimationFrame(step);
-  })(start);
+  audio.defaultMuted = false;
+  audio.volume = 1;
 }
-function maybeFade(){
-  if(!fadeArmed || audio.paused) return;
-  fadeArmed = false;
-  if(fadeTimer) clearTimeout(fadeTimer);
-  /* wait until Android has switched to the media volume stream */
-  fadeTimer = setTimeout(fadeIn, 90);
+function attachOut(){
+  deviceVol();
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if(!AC || actx === false) return Promise.resolve();
+  try{
+    if(!actx){
+      actx = new AC();
+      actx.createMediaElementSource(audio).connect(actx.destination);
+    }
+  }catch(e){
+    actx = false;
+    return Promise.resolve();
+  }
+  if(actx.state === "running") return Promise.resolve();
+  try{ return actx.resume(); }catch(e){ return Promise.resolve(); }
 }
 function tryPlay(){
+  deviceVol();
   try{ const p = audio.play(); if(p && p.catch) p.catch(()=>{}); }catch(e){}
 }
 function armSrc(url){
-  cutOut();
+  const ready = attachOut();
+  deviceVol();
   try{ audio.pause(); }catch(e){}
-  audio.muted = true;
-  audio.volume = 0;
   audio.src = url;
-  fadeArmed = true;
-  tryPlay();
+  const go = ()=>{ deviceVol(); tryPlay(); };
+  if(ready && typeof ready.then === "function") ready.then(go, go);
+  else go();
 }
 function fmtTime(s){ s = Math.max(0, Math.round(s||0)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
 function progTo(p, cur, dur){
@@ -863,7 +862,6 @@ function stopPreview(){
   playGen++;
   curKey = null;
   previewTriedItunes = false;
-  cutOut();
   try{ audio.pause(); audio.removeAttribute("src"); }catch(e){}
   progTo(0,0,90);
   markRows();
@@ -893,11 +891,9 @@ function playItunes(key, title, artist, url, gen){
   });
 }
 function selectTrack(key, title, artist, url, prev){
+  attachOut();
   if(curKey === key){           /* same row: play/pause toggle */
-    if(audio.paused){
-      if(audio.volume < 0.9){ fadeArmed = true; maybeFade(); }
-      tryPlay();
-    } else { audio.pause(); }
+    if(audio.paused){ tryPlay(); } else { audio.pause(); }
     return;
   }
   playGen++;
@@ -915,14 +911,14 @@ function selectTrack(key, title, artist, url, prev){
   playItunes(key, title, artist, url, gen);
 }
 audio.addEventListener("loadedmetadata", ()=>{
+  deviceVol();
   const d = audio.duration || 90;
   progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
 });
-audio.addEventListener("playing", ()=>{ markRows(); maybeFade(); });
-audio.addEventListener("play", ()=>{ markRows(); maybeFade(); });
+audio.addEventListener("playing", ()=>{ deviceVol(); markRows(); });
+audio.addEventListener("play", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
 audio.addEventListener("timeupdate", ()=>{
-  maybeFade();
   const d = audio.duration || 90;
   progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d);
 });
@@ -1213,6 +1209,7 @@ function renderReleases(){
     </a>`).join("");
   $("#relEmpty").hidden = posts.length > 0;
 }
+$("#chartList").addEventListener("pointerdown", attachOut);
 $("#chartList").addEventListener("click", e=>{
   if(e.target.closest("a")) return;
   const row = e.target.closest(".chart-row");
