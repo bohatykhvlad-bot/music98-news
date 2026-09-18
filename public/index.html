@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="head-cross-2">
+<meta name="m98-build" content="head-ink-3">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -81,18 +81,25 @@ main{position:relative;z-index:1}
   align-items:center;
   gap:12px;
   margin:0 0 22px;
-  min-height:var(--head);
+  line-height:0;
+}
+.tab-head .tab-title,
+.tab-head .sub{
+  all:unset;
+  display:block;
+  flex:none;
+  min-height:0;
+  line-height:1;
+  font-family:inherit;
+  text-box-trim:trim-both;
+  text-box-edge:cap alphabetic;
 }
 .tab-head .tab-title{
-  margin:0;
-  flex:none;
   font-size:var(--head);
   font-weight:800;
   letter-spacing:-.03em;
-  line-height:var(--head);
-  height:var(--head);
-  display:flex;
-  align-items:center;
+  color:inherit;
+  white-space:nowrap;
 }
 .tab-head .tab-bar{
   flex:none;
@@ -103,16 +110,11 @@ main{position:relative;z-index:1}
   align-self:center;
 }
 .tab-head .sub{
-  margin:0;
-  flex:none;
-  color:var(--muted);
   font-size:var(--sub);
   font-weight:400;
   letter-spacing:0;
-  line-height:var(--head);
-  height:var(--head);
-  display:flex;
-  align-items:center;
+  color:var(--muted);
+  white-space:nowrap;
 }
 
 /* hero */
@@ -308,13 +310,18 @@ textarea{resize:vertical;min-height:64px}
 
 /* ---------- privacy overlay ---------- */
 .overlay .article{position:relative;max-width:720px}
-#privacyOverlay .abody{padding:22px 28px 16px}
-.ptext h2{font-size:16.5px;margin:22px 0 6px;letter-spacing:-.01em}
-.ptext p,.ptext li{font-size:14px;color:var(--body-text);margin:0 0 12px;line-height:1.6}
+#privacyOverlay .article{max-width:640px}
+#privacyOverlay .abody{padding:28px}
+#privacyOverlay .aback{margin:0 0 20px}
+#privacyOverlay .article h1{margin:0 0 16px;font-size:clamp(26px,6vw,32px)}
+#privacyOverlay .ptext{margin:0}
+#privacyOverlay .ptext h2{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin:22px 0 8px}
+#privacyOverlay .ptext h2:first-child{margin-top:0}
+.ptext p,.ptext li{font-size:15px;color:var(--body-text);margin:0 0 12px;line-height:1.65}
 .ptext p:last-child{margin-bottom:0}
 .ptext ul{padding-left:18px;margin:0 0 12px}
 .ptext a{color:var(--text);text-decoration:underline;text-underline-offset:2px}
-.legal-kicker{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#15181a;margin:0 0 8px}
+.legal-kicker{display:block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#15181a;margin:0 0 10px}
 
 /* toasts */
 .toasts{position:fixed;right:18px;bottom:18px;z-index:120;display:flex;flex-direction:column;gap:8px}
@@ -1221,6 +1228,49 @@ function renderHints(){
 function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHints(); updateStorageInfo(); }
 
 /* ============ tabs & search events ============ */
+const _inkCtx = document.createElement("canvas").getContext("2d");
+function inkMid(el){
+  if(!el) return 0;
+  const text = (el.textContent || "").replace(/\s+/g, " ").trim();
+  const box = el.getBoundingClientRect();
+  if(!text) return box.top + box.height / 2;
+  const cs = getComputedStyle(el);
+  _inkCtx.font = cs.font;
+  let m;
+  try { m = _inkCtx.measureText(text); } catch(e){ m = null; }
+  const probe = document.createElement("span");
+  probe.setAttribute("aria-hidden", "true");
+  probe.style.cssText = "display:inline-block;width:0;height:0;overflow:hidden;padding:0;margin:0;border:0;vertical-align:baseline";
+  el.appendChild(probe);
+  const baseline = probe.getBoundingClientRect().top;
+  el.removeChild(probe);
+  if(m && typeof m.actualBoundingBoxAscent === "number"){
+    const top = baseline - m.actualBoundingBoxAscent;
+    const bottom = baseline + (m.actualBoundingBoxDescent || 0);
+    return (top + bottom) / 2;
+  }
+  return box.top + box.height / 2;
+}
+function boxMid(el){
+  const b = el.getBoundingClientRect();
+  return b.top + b.height / 2;
+}
+function alignTabHeads(){
+  $$(".tab.active .tab-head").forEach(head=>{
+    if(!head.offsetParent && getComputedStyle(head).display === "none") return;
+    if(!head.getClientRects().length) return;
+    const title = head.querySelector(".tab-title");
+    const sub = head.querySelector(".sub");
+    const bar = head.querySelector(".tab-bar");
+    if(!title || !sub || !bar) return;
+    title.style.transform = "none";
+    sub.style.transform = "none";
+    bar.style.transform = "none";
+    const target = inkMid(title);
+    sub.style.transform = "translateY(" + (target - inkMid(sub)).toFixed(2) + "px)";
+    bar.style.transform = "translateY(" + (target - boxMid(bar)).toFixed(2) + "px)";
+  });
+}
 function setTab(t){
   if(!$("#articlePage").hidden){           /* leave the article page first, then switch */
     hideArticle();
@@ -1234,6 +1284,7 @@ function setTab(t){
     s.classList.toggle("rise", on);
   });
   window.scrollTo(0, 0);
+  requestAnimationFrame(alignTabHeads);
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
@@ -1635,6 +1686,9 @@ $("#es_reset").addEventListener("click", ()=>{
 
 /* ---- init ---- */
 S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); loadPublishedDesk(); route();
+requestAnimationFrame(alignTabHeads);
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>requestAnimationFrame(alignTabHeads));
+window.addEventListener("resize", ()=>{ requestAnimationFrame(alignTabHeads); }, {passive:true});
 </script>
 </body>
 </html>
