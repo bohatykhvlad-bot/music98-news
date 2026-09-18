@@ -137,15 +137,11 @@
       if (!mk.isPlaying && mk.play) await mk.play();
       return true;
     }
-    /* Jumping straight to the queue position keeps the left chrome and the
-       progress bar in place. changeToMediaAtIndex swaps the controls into a
-       loading variant for a couple of frames, which reads as a jump, so it
-       stays a last resort. */
-    if (mk.queue) {
-      mk.queue.position = target;
-      if (!mk.isPlaying && mk.play) await mk.play();
-      if ((mk.queue.position || 0) === target) return true;
-    }
+    /* Skipping step by step is what the transport arrows do, and it swaps the
+       track without touching the chrome layout. changeToMediaAtIndex puts the
+       controls into a loading variant for a couple of frames (progress bar
+       collapses, transport row shifts), so it stays a fallback. Setting
+       queue.position alone moves the marker without starting the track. */
     if (typeof mk.skipToNextItem === "function" && typeof mk.skipToPreviousItem === "function") {
       var steps = target - pos;
       if (steps > 0) {
@@ -157,6 +153,11 @@
     }
     if (typeof mk.changeToMediaAtIndex === "function") {
       await mk.changeToMediaAtIndex(target);
+      if (!mk.isPlaying && mk.play) await mk.play();
+      return true;
+    }
+    if (mk.queue) {
+      mk.queue.position = target;
       if (!mk.isPlaying && mk.play) await mk.play();
       return true;
     }

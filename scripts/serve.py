@@ -272,7 +272,7 @@ def rewrite_apple_embed(html: str) -> str:
     out = out.replace('"/assets/', '"/apple-static/assets/').replace(
         "'/assets/", "'/apple-static/assets/"
     )
-    tag = '<script src="/apple-player-fix.js?v=editorial-75"></script>'
+    tag = '<script src="/apple-player-fix.js?v=editorial-76"></script>'
     if re.search(r"<head([^>]*)>", out, re.I):
         out = re.sub(r"<head([^>]*)>", r"<head\1>" + tag, out, count=1, flags=re.I)
     else:
