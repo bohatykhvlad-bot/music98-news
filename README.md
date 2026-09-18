@@ -2,6 +2,8 @@
 
 Independent music desk: news, releases, and a Top 50 that can rebuild itself once a day.
 
+The chart scores a title across five public lists: Apple Music most-played (US), Spotify global daily, Deezer global, Billboard Hot 100, and YouTube Weekly Top Songs. A miss on a list is zero points. Trending videos are not used.
+
 ## Run locally
 
 ```bash

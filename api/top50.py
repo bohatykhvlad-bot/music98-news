@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Rebuild the music98.news Top 50.
 
-Score = sum of max(0, 51 - position) across four public lists.
+Score = sum of max(0, 51 - position) across five public lists
+(Apple, Spotify, Deezer, Billboard, YouTube Weekly Top Songs).
 A list a title is missing from contributes 0. Ties: more lists, then
 best rank, then title. Amazon Music is not included (no public chart).
+YouTube Trending is not used: it mixes non-music videos.
 
 This module is both the Vercel serverless handler and the local CLI.
 """
@@ -23,7 +25,12 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 SIZE = 50
+SOURCES = ("A", "S", "D", "B", "Y")
 LAUNCH = date(2026, 9, 17)
+YT_CHARTS = (
+    "https://charts.youtube.com/youtubei/v1/browse?alt=json"
+    "&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM"
+)
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
 TENURE_PATH = PUBLIC / "data" / "chart-tenure.json"
@@ -69,6 +76,24 @@ def fetch(url: str, timeout: int = 22) -> str:
 
 def fetch_json(url: str, timeout: int = 22):
     return json.loads(fetch(url, timeout=timeout))
+
+
+def fetch_post_json(url: str, body: dict, timeout: int = 22):
+    data = json.dumps(body).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers={
+            "User-Agent": UA,
+            "Accept": "*/*",
+            "Content-Type": "application/json",
+            "Origin": "https://charts.youtube.com",
+            "Referer": "https://charts.youtube.com/charts/TopSongs/global/weekly",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=timeout, context=CTX) as resp:
+        return json.loads(resp.read().decode("utf-8", "replace"))
 
 
 def strip_paren(s: str) -> str:
@@ -196,6 +221,59 @@ def parse_spotify_kworb(page: str) -> list[dict]:
                 "prev": "",
             }
         )
+    rows.sort(key=lambda r: r["pos"])
+    return rows[:SIZE]
+
+
+def parse_youtube(data: dict) -> list[dict]:
+    try:
+        content = (
+            data["contents"]["sectionListRenderer"]["contents"][0][
+                "musicAnalyticsSectionRenderer"
+            ]["content"]
+        )
+    except (KeyError, IndexError, TypeError):
+        return []
+    groups = content.get("trackTypes") or []
+    weekly = next(
+        (g for g in groups if g.get("chartPeriodType") == "CHART_PERIOD_TYPE_WEEKLY"),
+        groups[0] if groups else {},
+    )
+    seen = set()
+    rows = []
+    for item in weekly.get("trackViews") or []:
+        title = item.get("name") or ""
+        artist = ", ".join(
+            a.get("name") or "" for a in (item.get("artists") or []) if a.get("name")
+        )
+        if not title or not artist:
+            continue
+        key = merge_key(title, artist)
+        if key in seen:
+            continue
+        seen.add(key)
+        meta = item.get("chartEntryMetadata") or {}
+        try:
+            pos = int(meta.get("currentPosition") or 0)
+        except (TypeError, ValueError):
+            pos = 0
+        if pos < 1:
+            pos = len(rows) + 1
+        if pos > SIZE:
+            continue
+        rows.append(
+            {
+                "pos": pos,
+                "title": title,
+                "artist": artist,
+                "url": "",
+                "art": "",
+                "year": "",
+                "prev": "",
+            }
+        )
+        if len(rows) >= SIZE:
+            break
     rows.sort(key=lambda r: r["pos"])
     return rows[:SIZE]
 
@@ -354,7 +432,7 @@ def ingest(bucket: dict, src: str, rows: list[dict]) -> None:
 
 
 def score_of(ranks: dict) -> int:
-    return sum(points(ranks.get(k)) for k in ("A", "S", "D", "B"))
+    return sum(points(ranks.get(k)) for k in SOURCES)
 
 
 def chart_week(day=None) -> int:
@@ -439,12 +517,34 @@ def build_payload(enrich: bool = False) -> dict:
     billboard = load_source(
         "B", lambda: parse_billboard(fetch("https://www.billboard.com/charts/hot-100/"))
     )
+    youtube = load_source(
+        "Y",
+        lambda: parse_youtube(
+            fetch_post_json(
+                YT_CHARTS,
+                {
+                    "context": {
+                        "client": {
+                            "clientName": "WEB_MUSIC_ANALYTICS",
+                            "clientVersion": "2.0",
+                            "hl": "en",
+                            "gl": "US",
+                            "theme": "MUSIC",
+                        }
+                    },
+                    "browseId": "FEmusic_analytics_charts_home",
+                    "query": json.dumps({"region": "global"}),
+                },
+            )
+        ),
+    )
 
     bucket: dict[str, dict] = {}
     ingest(bucket, "A", apple)
     ingest(bucket, "S", spotify)
     ingest(bucket, "D", deezer)
     ingest(bucket, "B", billboard)
+    ingest(bucket, "Y", youtube)
 
     ranked = sorted(
         bucket.values(),

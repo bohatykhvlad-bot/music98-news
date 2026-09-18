@@ -2,7 +2,10 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-const TOP50_KV = "top50v2";
+const TOP50_KV = "top50v3";
+const SOURCES = ["A", "S", "D", "B", "Y"];
+const YT_CHARTS =
+  "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
 
 function isApplePreview(url) {
   const u = String(url || "").toLowerCase();
@@ -103,6 +106,21 @@ async function getText(url) {
 async function getJson(url) {
   return JSON.parse(await getText(url));
 }
+async function postJson(url, body) {
+  const r = await fetch(url, {
+    method: "POST",
+    headers: {
+      "User-Agent": UA,
+      "Content-Type": "application/json",
+      Origin: "https://charts.youtube.com",
+      Referer: "https://charts.youtube.com/charts/TopSongs/global/weekly",
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!r.ok) throw new Error(String(r.status));
+  return r.json();
+}
 
 function parseApple(data) {
   return ((data.feed && data.feed.results) || []).slice(0, SIZE).map((item, i) => ({
@@ -147,6 +165,35 @@ function parseSpotify(html) {
       year: "",
       prev: "",
     });
+  }
+  return rows.sort((a, b) => a.pos - b.pos).slice(0, SIZE);
+}
+
+function parseYouTube(data) {
+  const content =
+    data &&
+    data.contents &&
+    data.contents.sectionListRenderer &&
+    data.contents.sectionListRenderer.contents &&
+    data.contents.sectionListRenderer.contents[0] &&
+    data.contents.sectionListRenderer.contents[0].musicAnalyticsSectionRenderer &&
+    data.contents.sectionListRenderer.contents[0].musicAnalyticsSectionRenderer.content;
+  const groups = (content && content.trackTypes) || [];
+  const weekly = groups.find((g) => g.chartPeriodType === "CHART_PERIOD_TYPE_WEEKLY") || groups[0] || {};
+  const views = weekly.trackViews || [];
+  const seen = new Set();
+  const rows = [];
+  for (const item of views) {
+    const title = item.name || "";
+    const artist = ((item.artists || []).map((a) => a && a.name).filter(Boolean)).join(", ");
+    if (!title || !artist) continue;
+    const key = mergeKey(title, artist);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const pos = Number(item.chartEntryMetadata && item.chartEntryMetadata.currentPosition) || rows.length + 1;
+    if (pos < 1 || pos > SIZE) continue;
+    rows.push({ pos, title, artist, url: "", art: "", year: "", prev: "" });
+    if (rows.length >= SIZE) break;
   }
   return rows.sort((a, b) => a.pos - b.pos).slice(0, SIZE);
 }
@@ -206,27 +253,41 @@ async function safe(label, fn) {
 }
 
 export async function buildTop50() {
-  const [apple, spotify, deezer, billboard] = await Promise.all([
+  const [apple, spotify, deezer, billboard, youtube] = await Promise.all([
     safe("A", async () => parseApple(await getJson("https://rss.applemarketingtools.com/api/v2/us/music/most-played/50/songs.json"))),
     safe("S", async () => parseSpotify(await getText("https://kworb.net/spotify/country/global_daily.html"))),
     safe("D", async () => parseDeezer(await getJson("https://api.deezer.com/chart/0/tracks?limit=50"))),
     safe("B", async () => parseBillboard(await getText("https://www.billboard.com/charts/hot-100/"))),
+    safe("Y", async () => parseYouTube(await postJson(YT_CHARTS, {
+      context: {
+        client: {
+          clientName: "WEB_MUSIC_ANALYTICS",
+          clientVersion: "2.0",
+          hl: "en",
+          gl: "US",
+          theme: "MUSIC",
+        },
+      },
+      browseId: "FEmusic_analytics_charts_home",
+      query: JSON.stringify({ region: "global" }),
+    }))),
   ]);
   const bucket = new Map();
   ingest(bucket, "A", apple);
   ingest(bucket, "S", spotify);
   ingest(bucket, "D", deezer);
   ingest(bucket, "B", billboard);
+  ingest(bucket, "Y", youtube);
   const ranked = [...bucket.values()]
     .sort((a, b) => {
-      const sa = ["A", "S", "D", "B"].reduce((n, k) => n + points(a.ranks[k]), 0);
-      const sb = ["A", "S", "D", "B"].reduce((n, k) => n + points(b.ranks[k]), 0);
+      const sa = SOURCES.reduce((n, k) => n + points(a.ranks[k]), 0);
+      const sb = SOURCES.reduce((n, k) => n + points(b.ranks[k]), 0);
       if (sb !== sa) return sb - sa;
-      const ca = ["A", "S", "D", "B"].filter((k) => a.ranks[k]).length;
-      const cb = ["A", "S", "D", "B"].filter((k) => b.ranks[k]).length;
+      const ca = SOURCES.filter((k) => a.ranks[k]).length;
+      const cb = SOURCES.filter((k) => b.ranks[k]).length;
       if (cb !== ca) return cb - ca;
-      const ba = Math.min(...["A", "S", "D", "B"].map((k) => a.ranks[k]).filter(Boolean), 99);
-      const bb = Math.min(...["A", "S", "D", "B"].map((k) => b.ranks[k]).filter(Boolean), 99);
+      const ba = Math.min(...SOURCES.map((k) => a.ranks[k]).filter(Boolean), 99);
+      const bb = Math.min(...SOURCES.map((k) => b.ranks[k]).filter(Boolean), 99);
       if (ba !== bb) return ba - bb;
       return a.title.localeCompare(b.title);
     })
