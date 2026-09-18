@@ -100,18 +100,21 @@ a{color:var(--text)}
 .composer p{margin:0 0 12px}
 .composer em,.composer i{font-style:italic}
 .composer b,.composer strong{font-weight:700}
-.composer .blk{position:relative;margin:12px auto 16px;border-radius:10px}
-.composer .blk .kill,.composer .blk .grip{
-  position:absolute;top:6px;z-index:2;width:24px;height:24px;border:0;border-radius:6px;
-  background:#fff;color:#15181a;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)
+.composer .blk{position:relative;margin:16px auto;padding-top:40px;border-radius:10px;-webkit-user-drag:none}
+.composer .blk img{-webkit-user-drag:none;user-select:none;pointer-events:none}
+.composer .blk-tools{
+  position:absolute;left:0;top:0;z-index:6;display:flex;flex-direction:row;gap:4px
 }
-.composer .blk .kill{right:6px;border-radius:50%}
-.composer .blk .grip{left:6px;cursor:grab;letter-spacing:-2px;line-height:1;font-size:16px;padding:0}
-.composer .blk .grip:active{cursor:grabbing}
+.composer .blk-tools button{
+  width:32px;height:32px;border:1px solid var(--line);border-radius:8px;background:#fff;
+  color:#15181a;font-size:16px;line-height:1;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.08)
+}
+.composer .blk-tools button:hover{background:#f4f6f7}
+.composer .blk .kill{
+  position:absolute;right:0;top:0;z-index:6;width:32px;height:32px;border:1px solid var(--line);border-radius:8px;
+  background:#fff;color:#15181a;font-weight:700;font-size:18px;line-height:1;cursor:pointer
+}
 .composer .blk.sel{outline:2px solid var(--accent);outline-offset:2px}
-.composer .blk.dragging{opacity:.4}
-.composer.moving iframe{pointer-events:none}
-.composer .drop-line{height:3px;background:var(--accent);border-radius:99px;margin:8px 12px;padding:0;border:0}
 .composer .aembed{max-width:520px;width:100%;margin:12px auto 16px}
 .composer .aembed.song{max-width:420px}
 .composer .aembed.song iframe{height:166px}
@@ -224,7 +227,7 @@ a{color:var(--text)}
       </div>
       <input id="bodyPhoto" class="hide" type="file" accept="image/*">
       <div class="composer" id="composer" contenteditable="true" data-placeholder="Write here"></div>
-      <p class="muted">Click in the story, then insert. Drag the dots on a player or photo to move it.</p>
+      <p class="muted">Click where the player should sit, then insert. Move it with the ↑ ↓ buttons on the block — no dragging.</p>
 
       <label><input id="pinned" type="checkbox" style="width:auto"> Pin to the top of News</label>
       <label for="goLive">Go live at</label>
@@ -437,15 +440,18 @@ function appleSrc(albumId, songId){
   return src;
 }
 
+function blkChrome(){
+  return `<span class="blk-tools" contenteditable="false"><button class="mv" data-dir="-1" type="button" aria-label="Move up">↑</button><button class="mv" data-dir="1" type="button" aria-label="Move down">↓</button></span><button class="kill" type="button" aria-label="Remove">×</button>`;
+}
 function appleBlock(kind, album, track){
   const src = appleSrc(album, track);
   const song = kind==="song" || track;
   const h = song ? 166 : 320;
   const token = song ? ("song:"+album+":"+track) : ("album:"+album);
-  return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}"><span class="grip" draggable="true" aria-label="Move">⋮⋮</span><button class="kill" type="button" aria-label="Remove">×</button><iframe height="${h}" src="${esc(src)}" title="Apple Music" loading="eager"></iframe></figure>`;
+  return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}">${blkChrome()}<iframe height="${h}" src="${esc(src)}" title="Apple Music" loading="eager"></iframe></figure>`;
 }
 function photoBlock(src){
-  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}"><span class="grip" draggable="true" aria-label="Move">⋮⋮</span><button class="kill" type="button" aria-label="Remove">×</button><img src="${esc(src)}" alt=""></figure>`;
+  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}">${blkChrome()}<img src="${esc(src)}" alt="" draggable="false"></figure>`;
 }
 function parseYouTube(raw){
   const s = String(raw||"").trim();
@@ -479,50 +485,124 @@ function youtubeSrc(id, start){
 }
 function youtubeBlock(id, start){
   const token = start ? (id+":"+start) : id;
-  return `<figure class="blk yembed" contenteditable="false" data-youtube="${esc(token)}"><span class="grip" draggable="true" aria-label="Move">⋮⋮</span><button class="kill" type="button" aria-label="Remove">×</button><div class="ytbox"><iframe src="${esc(youtubeSrc(id, start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="eager"></iframe></div></figure>`;
+  return `<figure class="blk yembed" contenteditable="false" data-youtube="${esc(token)}">${blkChrome()}<div class="ytbox"><iframe src="${esc(youtubeSrc(id, start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="eager"></iframe></div></figure>`;
 }
 
 let savedRange = null;
-let dragBlk = null;
+let caretFrozen = false;
+let caretMark = null;
 
 function htmlNode(html){
   const wrap = document.createElement("div");
   wrap.innerHTML = html;
   return wrap.firstElementChild;
 }
-function saveCaret(){
+function nodePath(node, root){
+  const path = [];
+  let n = node;
+  while(n && n !== root){
+    const parent = n.parentNode;
+    if(!parent) return null;
+    path.unshift(Array.prototype.indexOf.call(parent.childNodes, n));
+    n = parent;
+  }
+  return n === root ? path : null;
+}
+function markFromRange(range){
+  const el = $("#composer");
+  if(!range || !el.contains(range.startContainer)) return null;
+  const path = nodePath(range.startContainer, el);
+  if(!path) return null;
+  return {path, offset: range.startOffset};
+}
+function rangeFromMark(mark){
+  const el = $("#composer");
+  if(!mark) return null;
+  let n = el;
+  for(const i of mark.path){
+    if(!n.childNodes || i < 0 || i >= n.childNodes.length) return null;
+    n = n.childNodes[i];
+  }
+  try{
+    const r = document.createRange();
+    const max = n.nodeType===3 ? n.length : n.childNodes.length;
+    r.setStart(n, Math.min(mark.offset, max));
+    r.collapse(true);
+    return r;
+  }catch(e){ return null; }
+}
+function rememberRange(range){
+  if(!range) return;
+  savedRange = range.cloneRange();
+  caretMark = markFromRange(savedRange);
+}
+function freezeCaret(){
+  saveCaret(true);
+  caretFrozen = true;
+}
+function thawCaret(){
+  caretFrozen = false;
+}
+function saveCaret(force){
+  if(caretFrozen && !force) return;
   const el = $("#composer");
   const sel = window.getSelection();
   if(!sel || !sel.rangeCount) return;
   const node = sel.anchorNode;
   if(!node || !el.contains(node)) return;
   if(node.nodeType===1 && node.closest && node.closest(".blk")) return;
-  savedRange = sel.getRangeAt(0).cloneRange();
+  const parent = node.nodeType===1 ? node : node.parentElement;
+  if(parent && parent.closest && parent.closest(".blk")) return;
+  try{ rememberRange(sel.getRangeAt(0)); }catch(e){}
 }
-function composerRange(){
+function liveRange(){
   const el = $("#composer");
+  if(caretFrozen && caretMark){
+    const fromMark = rangeFromMark(caretMark);
+    if(fromMark) return fromMark;
+  }
   const sel = window.getSelection();
-  if(sel && sel.rangeCount && el.contains(sel.anchorNode)){
+  if(!caretFrozen && sel && sel.rangeCount && el.contains(sel.anchorNode)){
     const n = sel.anchorNode;
     const insideBlk = n.nodeType===1 ? n.closest(".blk") : n.parentElement && n.parentElement.closest(".blk");
     if(!insideBlk) return sel.getRangeAt(0).cloneRange();
   }
-  if(savedRange && el.contains(savedRange.startContainer)) return savedRange.cloneRange();
+  if(caretMark){
+    const fromMark = rangeFromMark(caretMark);
+    if(fromMark) return fromMark;
+  }
+  if(savedRange){
+    try{ if(el.contains(savedRange.startContainer)) return savedRange.cloneRange(); }catch(e){}
+  }
   return null;
 }
 function caretFromPoint(x, y){
   const el = $("#composer");
-  let r = null;
-  if(document.caretRangeFromPoint) r = document.caretRangeFromPoint(x, y);
+  let range = null;
+  if(document.caretRangeFromPoint) range = document.caretRangeFromPoint(x, y);
   else if(document.caretPositionFromPoint){
-    const p = document.caretPositionFromPoint(x, y);
-    if(p && p.offsetNode){
-      r = document.createRange();
-      r.setStart(p.offsetNode, p.offset);
-      r.collapse(true);
+    const pos = document.caretPositionFromPoint(x, y);
+    if(pos){
+      range = document.createRange();
+      range.setStart(pos.offsetNode, pos.offset);
+      range.collapse(true);
     }
   }
-  if(r && el.contains(r.startContainer)) savedRange = r;
+  if(range && el.contains(range.startContainer)){
+    const n = range.startContainer;
+    const insideBlk = n.nodeType===1 ? n.closest(".blk") : n.parentElement && n.parentElement.closest(".blk");
+    if(insideBlk){
+      rememberRange((()=>{ const r = document.createRange(); r.setStartBefore(insideBlk); r.collapse(true); return r; })());
+    }else{
+      rememberRange(range);
+    }
+    caretFrozen = true;
+    return true;
+  }
+  return false;
+}
+function rangeEmpty(range){
+  return !String(range.toString()||"").replace(/\u00a0/g,"").trim();
 }
 function placeCaretIn(node){
   if(!node) return;
@@ -532,25 +612,13 @@ function placeCaretIn(node){
   r.collapse(true);
   sel.removeAllRanges();
   sel.addRange(r);
-  savedRange = r.cloneRange();
+  rememberRange(r);
 }
 function childOfComposer(node, el){
   let n = node;
   if(n && n.nodeType===3) n = n.parentElement;
   while(n && n.parentElement && n.parentElement !== el) n = n.parentElement;
   return (n && n.parentElement === el) ? n : null;
-}
-function atStartOf(range, block){
-  const probe = document.createRange();
-  probe.selectNodeContents(block);
-  probe.collapse(true);
-  return range.startContainer===probe.startContainer && range.startOffset===probe.startOffset;
-}
-function atEndOf(range, block){
-  const probe = document.createRange();
-  probe.selectNodeContents(block);
-  probe.collapse(false);
-  return range.startContainer===probe.startContainer && range.startOffset===probe.startOffset;
 }
 function ensureParaAfter(node){
   let next = node.nextElementSibling;
@@ -561,67 +629,93 @@ function ensureParaAfter(node){
   }
   return next;
 }
+function liftFigures(root){
+  [...root.querySelectorAll("figure.blk")].forEach(fig=>{
+    if(fig.parentElement && fig.parentElement !== root){
+      const parent = fig.parentElement;
+      parent.after(fig);
+      if(parent !== root && !String(parent.textContent||"").trim() && !parent.querySelector("img,iframe,figure")) parent.remove();
+    }
+  });
+}
+function afterInsert(node){
+  liftFigures($("#composer"));
+  $$("#composer .blk.sel").forEach(n=>n.classList.remove("sel"));
+  node.classList.add("sel");
+  const p = ensureParaAfter(node);
+  placeCaretIn(p);
+  try{ node.scrollIntoView({block:"nearest"}); }catch(e){}
+}
 function insertHTML(html){
   const el = $("#composer");
+  if(!el.firstChild) el.innerHTML = "<p><br></p>";
   const node = htmlNode(html);
   if(!node) return;
-  el.focus();
-  const range = composerRange();
+  const range = liveRange();
+  thawCaret();
+  caretMark = null;
+  savedRange = null;
   if(!range){
     el.appendChild(node);
-    placeCaretIn(ensureParaAfter(node));
+    afterInsert(node);
     return;
   }
-  if(!range.collapsed) range.deleteContents();
-  const inBlk = range.startContainer.nodeType===1
-    ? range.startContainer.closest(".blk")
-    : range.startContainer.parentElement && range.startContainer.parentElement.closest(".blk");
-  if(inBlk && el.contains(inBlk)){
-    inBlk.after(node);
-    placeCaretIn(ensureParaAfter(node));
-    return;
+  if(!range.collapsed){
+    try{ range.deleteContents(); }catch(e){}
   }
   const block = childOfComposer(range.startContainer, el);
   if(!block || block === el){
-    range.insertNode(node);
-    placeCaretIn(ensureParaAfter(node));
+    const kids = [...el.childNodes];
+    const ref = kids[range.startOffset] || null;
+    if(ref) el.insertBefore(node, ref);
+    else el.appendChild(node);
+    afterInsert(node);
     return;
   }
   if(block.classList && block.classList.contains("blk")){
     block.after(node);
-    placeCaretIn(ensureParaAfter(node));
+    afterInsert(node);
     return;
   }
-  if(atStartOf(range, block)){
+  const before = document.createRange();
+  before.selectNodeContents(block);
+  try{ before.setEnd(range.startContainer, range.startOffset); }catch(e){ before.setEnd(block, 0); }
+  const after = document.createRange();
+  try{
+    after.setStart(range.startContainer, range.startOffset);
+    after.setEnd(block, block.childNodes.length);
+  }catch(e){
+    after.selectNodeContents(block);
+    after.collapse(false);
+  }
+  if(rangeEmpty(before)){
     block.before(node);
-  }else if(atEndOf(range, block)){
+  }else if(rangeEmpty(after)){
     block.after(node);
   }else{
-    const tail = document.createRange();
-    tail.setStart(range.startContainer, range.startOffset);
-    tail.setEndAfter(block.lastChild || block);
-    const after = document.createElement(block.nodeName || "P");
-    after.appendChild(tail.extractContents());
-    if(!String(after.textContent||"").trim() && !after.querySelector("img,iframe,figure")) after.innerHTML = "<br>";
-    if(!String(block.textContent||"").trim() && !block.querySelector("img,iframe,figure")) block.innerHTML = "<br>";
+    let tail;
+    try{ tail = after.extractContents(); }catch(e){ tail = null; }
+    const next = document.createElement(block.nodeName || "P");
+    if(tail) next.appendChild(tail);
+    if(!String(next.textContent||"").trim() && !next.querySelector("img,iframe,figure")) next.innerHTML = "<br>";
     block.after(node);
-    node.after(after);
+    node.after(next);
   }
-  placeCaretIn(ensureParaAfter(node));
+  afterInsert(node);
 }
-function clearDropLine(){
-  $$("#composer .drop-line").forEach(n=>n.remove());
-}
-function dropAnchor(e){
-  const el = $("#composer");
-  const kids = [...el.children].filter(n=> !n.classList.contains("drop-line") && n !== dragBlk);
-  const y = e.clientY;
-  for(const kid of kids){
-    const r = kid.getBoundingClientRect();
-    const mid = r.top + r.height/2;
-    if(y < mid) return kid;
+function moveBlk(blk, dir){
+  if(dir < 0){
+    const prev = blk.previousElementSibling;
+    if(prev) prev.before(blk);
+  }else{
+    const next = blk.nextElementSibling;
+    if(next) next.after(blk);
   }
-  return null;
+  $$("#composer .blk.sel").forEach(n=>n.classList.remove("sel"));
+  blk.classList.add("sel");
+  const p = ensureParaAfter(blk);
+  rememberRange((()=>{ const r = document.createRange(); r.selectNodeContents(p); r.collapse(true); return r; })());
+  try{ blk.scrollIntoView({block:"nearest", behavior:"smooth"}); }catch(e){}
 }
 
 function inlineText(node){
@@ -944,19 +1038,24 @@ stage.addEventListener("dblclick", e=>{
 });
 
 document.querySelector(".toolbar").addEventListener("mousedown", e=>{
-  if(e.target.closest("button")){
-    saveCaret();
-    e.preventDefault();
-  }
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  saveCaret(true);
+  e.preventDefault();
+  if(btn.id==="btnPhoto" || btn.id==="btnSong" || btn.id==="btnAlbum" || btn.id==="btnYoutube") freezeCaret();
 });
 document.addEventListener("selectionchange", ()=>{
   const el = $("#composer");
-  if(!el) return;
+  if(!el || caretFrozen) return;
   const sel = window.getSelection();
   if(sel && sel.rangeCount && el.contains(sel.anchorNode)) saveCaret();
 });
-$("#composer").addEventListener("keyup", saveCaret);
-$("#composer").addEventListener("mouseup", saveCaret);
+$("#composer").addEventListener("keyup", ()=> saveCaret());
+$("#composer").addEventListener("mouseup", ()=> saveCaret());
+$("#composer").addEventListener("focus", ()=>{
+  const el = $("#composer");
+  if(!el.firstChild) el.innerHTML = "<p><br></p>";
+});
 
 document.querySelector(".toolbar").addEventListener("click", e=>{
   const wrap = e.target.closest("[data-wrap]");
@@ -971,15 +1070,32 @@ document.querySelector(".toolbar").addEventListener("click", e=>{
   }
 });
 
-$("#btnPhoto").onclick = ()=>{ saveCaret(); $("#bodyPhoto").click(); };
+$("#btnPhoto").onclick = ()=>{ freezeCaret(); $("#bodyPhoto").click(); };
 $("#bodyPhoto").onchange = e=>{
-  readPhoto(e.target.files[0], src=>{
+  const f = e.target.files[0];
+  if(!f){ thawCaret(); return; }
+  readPhoto(f, src=>{
     insertHTML(photoBlock(src));
     e.target.value = "";
   }, 1400);
 };
 
+$("#composer").addEventListener("mousedown", e=>{
+  if(e.target.closest(".mv, .kill, .blk-tools")){
+    e.preventDefault();
+    return;
+  }
+  thawCaret();
+});
 $("#composer").addEventListener("click", e=>{
+  const mv = e.target.closest(".mv");
+  if(mv){
+    e.preventDefault();
+    e.stopPropagation();
+    const blk = mv.closest(".blk");
+    if(blk) moveBlk(blk, Number(mv.dataset.dir));
+    return;
+  }
   const k = e.target.closest(".kill");
   if(k){
     e.preventDefault();
@@ -991,53 +1107,12 @@ $("#composer").addEventListener("click", e=>{
   if(blk && $("#composer").contains(blk)) blk.classList.add("sel");
 });
 $("#composer").addEventListener("dragstart", e=>{
-  const grip = e.target.closest(".grip");
-  const blk = grip && grip.closest(".blk");
-  if(!blk) return;
-  dragBlk = blk;
-  blk.classList.add("dragging","sel");
-  $("#composer").classList.add("moving");
-  e.dataTransfer.effectAllowed = "move";
-  e.dataTransfer.setData("text/plain", "move");
-});
-$("#composer").addEventListener("dragend", ()=>{
-  if(dragBlk) dragBlk.classList.remove("dragging");
-  dragBlk = null;
-  $("#composer").classList.remove("moving");
-  clearDropLine();
+  if(e.target.closest(".blk")) e.preventDefault();
 });
 $("#composer").addEventListener("dragover", e=>{
-  if(dragBlk){
-    e.preventDefault();
-    e.dataTransfer.dropEffect = "move";
-    clearDropLine();
-    const line = document.createElement("div");
-    line.className = "drop-line";
-    line.contentEditable = "false";
-    const before = dropAnchor(e);
-    if(before && before !== dragBlk) before.before(line);
-    else $("#composer").appendChild(line);
-    return;
-  }
   if(dropHasImage(e.dataTransfer)) e.preventDefault();
 });
 $("#composer").addEventListener("drop", e=>{
-  if(dragBlk){
-    e.preventDefault();
-    const line = $("#composer .drop-line");
-    if(line){
-      line.replaceWith(dragBlk);
-    }else{
-      const before = dropAnchor(e);
-      if(before && before !== dragBlk) before.before(dragBlk);
-      else $("#composer").appendChild(dragBlk);
-    }
-    dragBlk.classList.remove("dragging");
-    dragBlk = null;
-    $("#composer").classList.remove("moving");
-    clearDropLine();
-    return;
-  }
   caretFromPoint(e.clientX, e.clientY);
   takeDroppedImage(e, src=> insertHTML(photoBlock(src)), 1400);
 });
@@ -1066,14 +1141,15 @@ $("#composer").addEventListener("paste", e=>{
   }
 });
 
-function closeApple(){
+function closeApple(keepCaret){
   $("#appleModal").classList.add("hide");
   $("#applePrev").innerHTML = "";
   pendingApple = null;
+  if(!keepCaret) thawCaret();
 }
 function openApple(kind){
-  saveCaret();
-  closeYoutube();
+  closeYoutube(true);
+  freezeCaret();
   appleKind = kind;
   pendingApple = null;
   $("#appleTitle").textContent = kind==="album" ? "Apple album" : "Apple song";
@@ -1108,16 +1184,19 @@ $("#appleGo").onclick = async ()=>{
   if(!got){ toast("Paste a music.apple.com link"); return; }
   if(appleKind==="album" || got.kind==="album") insertHTML(appleBlock("album", got.album));
   else insertHTML(appleBlock("song", got.album, got.track));
-  closeApple();
+  $("#appleModal").classList.add("hide");
+  $("#applePrev").innerHTML = "";
+  pendingApple = null;
 };
 
-function closeYoutube(){
+function closeYoutube(keepCaret){
   $("#ytModal").classList.add("hide");
   $("#ytPrev").innerHTML = "";
+  if(!keepCaret) thawCaret();
 }
 function openYoutube(){
-  saveCaret();
-  closeApple();
+  closeApple(true);
+  freezeCaret();
   $("#ytUrl").value = "";
   $("#ytPrev").innerHTML = "";
   $("#ytModal").classList.remove("hide");
@@ -1138,9 +1217,24 @@ $("#ytGo").onclick = ()=>{
   const got = parseYouTube($("#ytUrl").value);
   if(!got){ toast("Paste a YouTube link"); return; }
   insertHTML(youtubeBlock(got.id, got.start));
-  closeYoutube();
+  $("#ytModal").classList.add("hide");
+  $("#ytPrev").innerHTML = "";
 };
-document.addEventListener("keydown", e=>{ if(e.key === "Escape"){ closeApple(); closeYoutube(); } });
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape"){ closeApple(); closeYoutube(); return; }
+  if(e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+  if(e.target && e.target.closest && e.target.closest("input,textarea,select,.modal")) return;
+  const blk = $("#composer .blk.sel");
+  if(!blk) return;
+  const sel = window.getSelection();
+  if(sel && sel.rangeCount && $("#composer").contains(sel.anchorNode)){
+    const n = sel.anchorNode;
+    const parent = n.nodeType===1 ? n : n.parentElement;
+    if(parent && parent.closest && !parent.closest(".blk") && parent.closest("#composer")) return;
+  }
+  e.preventDefault();
+  moveBlk(blk, e.key === "ArrowUp" ? -1 : 1);
+});
 
 $("#reset").onclick = ()=> fillForm(null);
 
