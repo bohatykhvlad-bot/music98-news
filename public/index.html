@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="glass-pill-4">
+<meta name="m98-build" content="play-col-6">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -38,7 +38,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 
 /* ---------- header ---------- */
 .topbar{--hp:0;position:fixed;top:0;left:0;right:0;z-index:60;background:transparent;border:0;box-shadow:none;padding:calc(var(--hp)*10px) calc(var(--hp)*14px + var(--sbw,0px)) calc(var(--hp)*10px) calc(var(--hp)*14px);backdrop-filter:none;-webkit-backdrop-filter:none}
-.topbar-in{max-width:1180px;margin:0 auto;padding:0 22px;height:calc(68px - var(--hp)*8px);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;background:rgba(255,255,255,calc(var(--hp)*.62));border:1px solid rgba(255,255,255,calc(var(--hp)*.75));box-shadow:none;border-radius:calc(var(--hp)*18px);overflow:hidden;backdrop-filter:blur(calc(var(--hp)*20px)) saturate(calc(100% + var(--hp)*80%));-webkit-backdrop-filter:blur(calc(var(--hp)*20px)) saturate(calc(100% + var(--hp)*80%))}
+.topbar-in{max-width:1180px;margin:0 auto;padding:0 22px;height:calc(68px - var(--hp)*8px);display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;background:rgba(255,255,255,calc(var(--hp)*.62));border:1px solid rgba(255,255,255,calc(var(--hp)*.75));box-shadow:none;border-radius:calc(var(--hp)*18px);overflow:visible;clip-path:inset(0 round calc(var(--hp)*18px));backdrop-filter:blur(calc(var(--hp)*20px)) saturate(calc(100% + var(--hp)*80%));-webkit-backdrop-filter:blur(calc(var(--hp)*20px)) saturate(calc(100% + var(--hp)*80%))}
 .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none;justify-self:start}
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text)}
@@ -111,7 +111,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- charts ---------- */
 .chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
-.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(0,1fr) var(--pw) auto;gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
+.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
@@ -291,7 +291,7 @@ textarea{resize:vertical;min-height:64px}
   .pbar{width:92px}
 }
 @media (max-width:900px){
-  .chart-row{grid-template-columns:40px 52px minmax(0,1fr) var(--pw) auto}
+  .chart-row{grid-template-columns:40px 52px minmax(90px,1fr) var(--pw) auto}
   .pextra .abadge{display:inline-flex}
   .foot-in{grid-template-columns:1fr 1fr}
   .hero{grid-template-columns:1fr}
@@ -323,7 +323,7 @@ textarea{resize:vertical;min-height:64px}
 @media (max-width:640px){
   .wrap{padding:0 16px}
   .topbar{background:rgba(255,255,255,.78);padding:0;box-shadow:0 1px 0 var(--line);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%)}
-  .topbar-in{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:8px 16px 10px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .topbar-in{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:8px 16px 10px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;clip-path:none;backdrop-filter:none;-webkit-backdrop-filter:none}
   .brand{height:36px}
   .brand-logo{width:32px;height:32px}
   .brand-name{font-size:17px}
@@ -339,7 +339,7 @@ textarea{resize:vertical;min-height:64px}
   .tab{padding-top:14px}
   .tab.rise{animation:none}
   .hd{margin-bottom:14px}
-  .hd-t{font-size:26px}
+  .hd-t{font-size:26px;white-space:nowrap}
   body{padding-top:calc(var(--header-h, 148px) + 8px)}
   .hero .body{padding:16px}
   .sub-in{padding:32px 16px}
@@ -851,7 +851,11 @@ function markRows(){
       if(on && !narrow){
         requestAnimationFrame(()=>{
           const pe = row.querySelector(".pextra");
-          const w = pe ? pe.scrollWidth : 0;
+          if(!pe) return;
+          const prevW = pe.style.width;
+          pe.style.width = "auto";
+          const w = pe.scrollWidth;
+          pe.style.width = prevW;
           if(w > 0 && row.classList.contains("playing")){
             cm.style.setProperty("--pexp", w+"px");
             row.style.setProperty("--pw", (w + 56)+"px");
@@ -1508,11 +1512,10 @@ function onScroll(){
     let t = Math.min(1, Math.max(0, y / 140));
     t = t*t*(3 - 2*t);
     if(window.matchMedia("(max-width: 640px)").matches){
-      /* Keep frost; do not slide the header as a floating card. */
-      t = Math.min(t, 0.35);
+      /* Phone header is a full-width frost bar, not the floating rounded plaque. */
+      t = 0;
     }
     topbar.style.setProperty("--hp", t.toFixed(3));
-    syncHeaderPad();
   });
 }
 function syncHeaderPad(){
