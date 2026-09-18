@@ -68,18 +68,25 @@ a{color:var(--text)}
 }
 .toolbar .tsep{width:1px;height:18px;background:var(--line);margin:0 4px}
 .stage-wrap{border:1px dashed var(--line);border-radius:12px;background:#111;overflow:hidden}
-.crop-row{display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:start}
+.crop-row{display:grid;grid-template-columns:1fr 200px;gap:10px;align-items:start}
 .stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;cursor:grab;background:#111;touch-action:none}
 .stage.hot{outline:2px solid var(--acc2);outline-offset:-2px}
 .stage:active,.stage.drag{cursor:grabbing}
 .stage img{position:absolute;left:0;top:0;max-width:none;user-select:none;pointer-events:none;will-change:transform}
 .stage .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;pointer-events:none;color:#fff;font-size:13px}
+.stage .hint.hide{display:none}
 .stage .grid{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .12s;background-image:linear-gradient(to right,rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.5) 1px,transparent 1px);background-size:calc(100%/3) 100%, 100% calc(100%/3);z-index:2}
 .stage:hover .grid,.stage.drag .grid{opacity:1}
-.mini{display:flex;flex-direction:column;gap:6px}
+.mini{display:flex;flex-direction:column;gap:8px}
 .mini-frame{aspect-ratio:1;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111}
-.mini-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.mini-frame img,.mini-hero-pic img{width:100%;height:100%;object-fit:cover;display:block}
 .mini .muted{text-align:center;font-size:11px}
+.mini-hero{display:grid;grid-template-columns:1.05fr .95fr;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;min-height:96px}
+.mini-hero-text{padding:8px 8px 8px 9px;display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:0}
+.mini-kicker{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
+.mini-hero-title{font-size:10px;font-weight:700;line-height:1.2;letter-spacing:-.02em;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;color:var(--text)}
+.mini-hero-pic{position:relative;min-height:96px;background:#111;overflow:hidden}
+.mini-hero-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .cropbar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2);flex-wrap:wrap}
 .cropbar input[type=range]{flex:1;min-width:100px}
 .cropbar .btn{padding:5px 10px;font-size:12px}
@@ -169,6 +176,14 @@ a{color:var(--text)}
         <div class="mini">
           <div class="mini-frame"><img id="miniImg" class="hide" alt=""></div>
           <p class="muted">Card</p>
+          <div class="mini-hero" id="miniHero">
+            <div class="mini-hero-text">
+              <span class="mini-kicker" id="miniHeroTag">News</span>
+              <span class="mini-hero-title" id="miniHeroTitle">Main story</span>
+            </div>
+            <div class="mini-hero-pic"><img id="miniHeroImg" class="hide" alt=""></div>
+          </div>
+          <p class="muted">Main news</p>
         </div>
       </div>
       <input id="photo" class="hide" type="file" accept="image/*">
@@ -418,15 +433,24 @@ function setAspect(a){
   layoutCrop();
 }
 function paintMini(){
-  const m = $("#miniImg");
-  if(!m) return;
-  if(!coverSrc){ m.classList.add("hide"); return; }
-  m.src = coverSrc;
-  m.classList.remove("hide");
   const pos = Math.round(crop.x*100)+"% "+Math.round(crop.y*100)+"%";
-  m.style.objectPosition = pos;
-  m.style.transformOrigin = pos;
-  m.style.transform = "scale("+(crop.zoom||1)+")";
+  const z = "scale("+(crop.zoom||1)+")";
+  const title = ($("#title") && $("#title").value.trim()) || "Main story";
+  const tag = ($("#tag") && $("#tag").value.trim()) || ($("#type") && $("#type").value === "release" ? "Album" : "News");
+  const ht = $("#miniHeroTitle");
+  const hg = $("#miniHeroTag");
+  if(ht) ht.textContent = title;
+  if(hg) hg.textContent = tag;
+  [["miniImg"],["miniHeroImg"]].forEach(([id])=>{
+    const m = $("#"+id);
+    if(!m) return;
+    if(!coverSrc){ m.classList.add("hide"); return; }
+    m.src = coverSrc;
+    m.classList.remove("hide");
+    m.style.objectPosition = pos;
+    m.style.transformOrigin = pos;
+    m.style.transform = z;
+  });
 }
 function layoutCrop(){
   const stage = $("#stage");
@@ -495,6 +519,8 @@ function fillForm(p){
     crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9"};
     $("#zoom").value = 1;
     $("#miniImg").classList.add("hide");
+    $("#miniHeroImg").classList.add("hide");
+    paintMini();
   }
 }
 
@@ -528,6 +554,10 @@ async function unlockDesk(){
 }
 $("#login").onclick = unlockDesk;
 $("#key").addEventListener("keydown", e=>{ if(e.key === "Enter") unlockDesk(); });
+["title","tag","type"].forEach(id=>{
+  const el = $("#"+id);
+  if(el) el.addEventListener("input", paintMini);
+});
 
 const stage = $("#stage");
 stage.addEventListener("click", e=>{
