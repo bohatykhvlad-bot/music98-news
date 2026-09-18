@@ -337,11 +337,17 @@ async function itunesLookup(title, artist) {
 async function enrichApple(tracks) {
   await Promise.all(tracks.map(async (t) => {
     if (t.url && isApplePreview(t.prev) && t.art) return;
+    const grab = (title, artist) => Promise.race([
+      itunesLookup(title, artist),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("itunes-timeout")), 6000)),
+    ]);
     try {
-      const extra = await Promise.race([
-        itunesLookup(t.title, t.artist),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("itunes-timeout")), 2500)),
-      ]);
+      let extra = await grab(t.title, t.artist);
+      const incomplete = !(extra.prev && isApplePreview(extra.prev)) || !extra.url;
+      if (incomplete) {
+        /* second chance without featured-artist noise in the term */
+        try { extra = await grab(t.title, ""); } catch {}
+      }
       if (extra.prev && isApplePreview(extra.prev)) t.prev = extra.prev;
       if (extra.url && !t.url) t.url = extra.url;
       if (extra.art && !t.art) t.art = extra.art;
