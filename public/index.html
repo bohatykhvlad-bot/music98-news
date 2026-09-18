@@ -904,6 +904,7 @@ let curKey = null;
 let playGen = 0;
 let previewTriedItunes = false;
 let userPaused = false;   /* icon follows intent, not the async play() handshake */
+let timeFrozen = false;   /* ignore the outgoing media's clock while a new preview arms */
 let actx = null;
 let blobUrl = "";
 let seekBar = null;
@@ -1042,6 +1043,7 @@ function stopPreview(){
   playGen++;
   curKey = null;
   userPaused = false;
+  timeFrozen = false;
   previewTriedItunes = false;
   pendingSeek = null;
   lastSeekT = null;
@@ -1149,6 +1151,7 @@ function selectTrack(key, title, artist, url, prev){
   const gen = playGen;
   curKey = key;
   userPaused = false;
+  timeFrozen = true;
   previewTriedItunes = false;
   pendingSeek = null;
   lastSeekT = null;
@@ -1165,6 +1168,7 @@ function selectTrack(key, title, artist, url, prev){
   playItunes(key, title, artist, url, gen);
 }
 audio.addEventListener("loadedmetadata", ()=>{
+  timeFrozen = false;
   deviceVol();
   if(pendingSeek != null) applySeek(pendingSeek, true);
   else {
@@ -1173,7 +1177,7 @@ audio.addEventListener("loadedmetadata", ()=>{
   }
 });
 audio.addEventListener("durationchange", ()=>{
-  if(seekBar || holdSeek || audio.seeking) return;
+  if(timeFrozen || seekBar || holdSeek || audio.seeking) return;
   if(pendingSeek != null && previewDur()) applySeek(pendingSeek, true);
   else {
     const d = previewDur() || 90;
@@ -1181,17 +1185,18 @@ audio.addEventListener("durationchange", ()=>{
   }
 });
 audio.addEventListener("seeked", ()=>{
+  if(timeFrozen) return;
   holdSeek = false;
   clearTimeout(holdSeekTimer);
   if(seekBar) return;
   const d = previewDur() || 90;
   progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
 });
-audio.addEventListener("playing", ()=>{ deviceVol(); markRows(); });
+audio.addEventListener("playing", ()=>{ timeFrozen = false; deviceVol(); markRows(); });
 audio.addEventListener("play", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
 audio.addEventListener("timeupdate", ()=>{
-  if(seekBar || holdSeek || audio.seeking) return;
+  if(timeFrozen || seekBar || holdSeek || audio.seeking) return;
   const d = previewDur() || 90;
   progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d);
 });
