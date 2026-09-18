@@ -78,15 +78,14 @@ a{color:var(--text)}
 .stage .grid{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .12s;background-image:linear-gradient(to right,rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.5) 1px,transparent 1px);background-size:calc(100%/3) 100%, 100% calc(100%/3);z-index:2}
 .stage:hover .grid,.stage.drag .grid{opacity:1}
 .mini{display:flex;flex-direction:column;gap:8px}
-.mini-frame{aspect-ratio:1;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111}
-.mini-frame img,.mini-hero-pic img{width:100%;height:100%;object-fit:cover;display:block}
+.mini-frame{position:relative;aspect-ratio:1;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111}
+.mini-frame img,.mini-hero-pic img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;display:block}
 .mini .muted{text-align:center;font-size:11px}
 .mini-hero{display:grid;grid-template-columns:1.05fr .95fr;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;min-height:96px}
 .mini-hero-text{padding:8px 8px 8px 9px;display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:0}
 .mini-kicker{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
 .mini-hero-title{font-size:10px;font-weight:700;line-height:1.2;letter-spacing:-.02em;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;color:var(--text)}
 .mini-hero-pic{position:relative;min-height:96px;background:#111;overflow:hidden}
-.mini-hero-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .cropbar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2);flex-wrap:wrap}
 .cropbar input[type=range]{flex:1;min-width:100px}
 .cropbar .btn{padding:5px 10px;font-size:12px}
@@ -473,6 +472,25 @@ function parsePos(p){
   if(m) return {x: Math.min(1, Math.max(0, +m[1]/100)), y: Math.min(1, Math.max(0, +m[2]/100))};
   return {x:0.5, y:0.5};
 }
+function fitCover(img, fx, fy, zoom){
+  const box = img && img.parentElement;
+  if(!box || !img.naturalWidth) return;
+  const x = Math.min(1, Math.max(0, Number(fx)));
+  const y = Math.min(1, Math.max(0, Number(fy)));
+  const z = Math.min(3, Math.max(1, Number(zoom)||1));
+  const sw = box.clientWidth, sh = box.clientHeight;
+  if(!sw || !sh) return;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const base = Math.max(sw/iw, sh/ih) * z;
+  const dw = iw * base, dh = ih * base;
+  let left = sw/2 - (Number.isFinite(x) ? x : 0.5) * dw;
+  let top = sh/2 - (Number.isFinite(y) ? y : 0.5) * dh;
+  left = Math.min(0, Math.max(sw - dw, left));
+  top = Math.min(0, Math.max(sh - dh, top));
+  img.style.width = dw+"px";
+  img.style.height = dh+"px";
+  img.style.transform = "translate("+left+"px,"+top+"px)";
+}
 function setZoom(z){
   crop.zoom = Math.min(3, Math.max(1, Number(z)||1));
   $("#zoom").value = crop.zoom;
@@ -487,23 +505,21 @@ function setAspect(a){
   layoutCrop();
 }
 function paintMini(){
-  const pos = Math.round(crop.x*100)+"% "+Math.round(crop.y*100)+"%";
-  const z = "scale("+(crop.zoom||1)+")";
   const title = ($("#title") && $("#title").value.trim()) || "Main story";
   const tag = ($("#tag") && $("#tag").value.trim()) || ($("#type") && $("#type").value === "release" ? "Album" : "News");
   const ht = $("#miniHeroTitle");
   const hg = $("#miniHeroTag");
   if(ht) ht.textContent = title;
   if(hg) hg.textContent = tag;
-  [["miniImg"],["miniHeroImg"]].forEach(([id])=>{
+  ["miniImg","miniHeroImg"].forEach(id=>{
     const m = $("#"+id);
     if(!m) return;
     if(!coverSrc){ m.classList.add("hide"); return; }
-    m.src = coverSrc;
+    if(m.getAttribute("src") !== coverSrc) m.src = coverSrc;
     m.classList.remove("hide");
-    m.style.objectPosition = pos;
-    m.style.transformOrigin = pos;
-    m.style.transform = z;
+    const go = ()=> fitCover(m, crop.x, crop.y, crop.zoom);
+    if(m.naturalWidth) go();
+    else m.onload = go;
   });
 }
 function layoutCrop(){
