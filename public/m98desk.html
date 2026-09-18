@@ -311,10 +311,19 @@ function readPhoto(file, cb, max=1800){
 }
 
 async function api(path, opt={}){
-  const r = await fetch(path, opt);
-  const j = await r.json().catch(()=>({}));
-  if(!r.ok) throw j;
-  return j;
+  const ctrl = new AbortController();
+  const t = setTimeout(()=> ctrl.abort(), 25000);
+  try{
+    const r = await fetch(path, Object.assign({}, opt, {signal: ctrl.signal}));
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw j;
+    return j;
+  }catch(e){
+    if(e && e.name === "AbortError") throw {error:"timeout"};
+    throw e;
+  }finally{
+    clearTimeout(t);
+  }
 }
 
 function parseApple(raw){
@@ -556,13 +565,17 @@ function setCover(src, pos, zoom){
 }
 
 function renderList(){
-  $("#list").innerHTML = posts.length ? posts.map(p=>`
+  $("#list").innerHTML = posts.length ? posts.map(p=>{
+    const src = (p.cover && p.cover.src) || "";
+    const tiny = src.indexOf("data:image/")===0 ? "" : src;
+    return `
     <div class="item">
-      <img src="${esc(p.cover && p.cover.src || "")}" alt="">
+      <img src="${esc(tiny)}" alt="" data-full="${tiny ? "" : "1"}">
       <div><b>${esc(p.title)}</b><div class="muted">${esc(p.type)} · ${esc(p.date||"")}</div></div>
       <button class="btn ghost" data-edit="${esc(p.id)}" type="button">Edit</button>
       <button class="btn danger" data-del="${esc(p.id)}" type="button">Delete</button>
-    </div>`).join("") : '<p class="muted">Nothing published yet.</p>';
+    </div>`;
+  }).join("") : '<p class="muted">Nothing published yet.</p>';
 }
 
 function fillForm(p){
@@ -611,15 +624,26 @@ async function unlockDesk(){
   const key = $("#key").value.trim();
   if(!key){ toast("Enter the password"); return; }
   sessionStorage.setItem(KEY, key);
+  const btn = $("#login");
+  const prev = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Opening…";
   try{
     await api("/api/desk?auth=1", {headers: headers(false)});
-    await reload();
     $("#gate").classList.add("hide");
     $("#desk").classList.remove("hide");
     setAspect("16/9");
+    try{
+      await reload();
+    }catch(e){
+      toast("Desk is open. Stories are still loading — wait a moment and refresh if the list is empty.");
+    }
   }catch(e){
     sessionStorage.removeItem(KEY);
-    toast("Wrong password");
+    toast(e && e.error === "timeout" ? "The site is slow. Try again." : "Wrong password");
+  }finally{
+    btn.disabled = false;
+    btn.textContent = prev;
   }
 }
 $("#login").onclick = unlockDesk;
@@ -909,10 +933,11 @@ $("#send").onclick = async ()=>{
 
 $("#date").value = today();
 if(auth()){
-  api("/api/desk?auth=1", {headers: headers(false)}).then(()=> reload()).then(()=>{
+  api("/api/desk?auth=1", {headers: headers(false)}).then(()=>{
     $("#gate").classList.add("hide");
     $("#desk").classList.remove("hide");
     setAspect("16/9");
+    return reload();
   }).catch(()=> sessionStorage.removeItem(KEY));
 }
 
