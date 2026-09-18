@@ -850,6 +850,7 @@ function markRows(){
     const cm = row.querySelector(".cmid");
     if(cm){
       const narrow = window.matchMedia("(max-width: 640px)").matches;
+      const tx = row.querySelector(".ctext");
       if(on && !narrow){
         requestAnimationFrame(()=>{
           const pe = row.querySelector(".pextra");
@@ -857,12 +858,14 @@ function markRows(){
           if(w > 0 && row.classList.contains("playing")){
             row.style.setProperty("--pexp", w+"px");
             cm.style.setProperty("--pexp", w+"px");
+            if(tx) tx.style.paddingRight = (w + 16) + "px";
           }
         });
       } else {
         cm.style.removeProperty("--pexp");
         row.style.removeProperty("--pexp");
         row.style.removeProperty("--pw");
+        if(tx) tx.style.paddingRight = "";
       }
     }
   });
