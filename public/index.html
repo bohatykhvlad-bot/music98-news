@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-42">
+<meta name="m98-build" content="editorial-43">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -684,8 +684,8 @@ function fmtDate(iso){
   const d = new Date(iso + "T12:00:00"), t = new Date();
   const day = x => new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime();
   const diff = Math.round((day(t)-day(d))/86400000);
-  if(diff === 0) return "today";
-  if(diff === 1) return "yesterday";
+  if(diff === 0) return "Today";
+  if(diff === 1) return "Yesterday";
   if(diff > 1 && diff < 6) return diff + " days ago";
   return d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
 }
