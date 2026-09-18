@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="play-edge-2">
+<meta name="m98-build" content="play-pos-3">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -111,7 +111,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- charts ---------- */
 .chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
-.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(0,1fr) 40px auto;gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease}
+.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(0,1fr) var(--pw) auto;gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
@@ -125,13 +125,13 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
-.cmid{--pexp:0px;position:relative;z-index:2;width:max-content;max-width:none;min-width:0;justify-self:end;display:flex;align-items:center;justify-content:flex-end;gap:8px;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
+.cmid{--pexp:0px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:8px;z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
 .chart-row.playing .cmid{background:rgba(255,255,255,.85);border-color:rgba(15,60,64,.10);backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);padding:3px}
 .rplay{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transition:background .16s ease,color .16s ease,transform .16s ease}
 .rplay svg{width:15px;height:15px}
 .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.04)}
 .chart-row.playing .rplay{background:var(--accent);border-color:transparent;color:#03282b}
-.pextra{display:flex;align-items:center;gap:8px;width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease,width .45s cubic-bezier(.3,.65,.25,1)}
+.pextra{display:flex;align-items:center;gap:8px;width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
 .chart-row.playing .pextra{opacity:1}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
 .pbar{width:108px;height:5px;border-radius:999px;background:var(--line);overflow:hidden;display:block}
@@ -142,8 +142,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .tinfo span{color:var(--muted);font-size:13px}
 
 .tnames{min-width:0;max-width:100%;overflow:hidden}
-.ctext{min-width:0;max-width:100%;overflow:hidden;transition:padding-right .45s cubic-bezier(.3,.65,.25,1)}
-.chart-row.playing .ctext{padding-right:calc(var(--pexp) + 16px)}
+.ctext{min-width:0;max-width:100%;overflow:hidden}
 .ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .cyear{color:var(--muted2);font-size:11.5px}
 .chart-row.playing{background:var(--bg2)}
@@ -292,7 +291,7 @@ textarea{resize:vertical;min-height:64px}
   .pbar{width:92px}
 }
 @media (max-width:900px){
-  .chart-row{grid-template-columns:40px 52px minmax(0,1fr) 40px auto}
+  .chart-row{grid-template-columns:40px 52px minmax(0,1fr) var(--pw) auto}
   .pextra .abadge{display:inline-flex}
   .foot-in{grid-template-columns:1fr 1fr}
   .hero{grid-template-columns:1fr}
@@ -360,7 +359,6 @@ textarea{resize:vertical;min-height:64px}
   .artwrap{grid-area:art;width:48px;height:48px;padding:2px;border-radius:10px;align-self:start}
   .artwrap img{border-radius:8px}
   .ctext{grid-area:names;align-self:start;min-width:0}
-  .chart-row.playing .ctext{padding-right:0}
   .cname{font-size:14px;line-height:1.2}
   .chart-row .pos{margin-inline-end:8px}
   .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
@@ -850,23 +848,16 @@ function markRows(){
     const cm = row.querySelector(".cmid");
     if(cm){
       const narrow = window.matchMedia("(max-width: 640px)").matches;
-      const tx = row.querySelector(".ctext");
       if(on && !narrow){
         requestAnimationFrame(()=>{
           const pe = row.querySelector(".pextra");
           const w = pe ? pe.scrollWidth : 0;
           if(w > 0 && row.classList.contains("playing")){
-            row.style.setProperty("--pexp", w+"px");
             cm.style.setProperty("--pexp", w+"px");
-            if(tx) tx.style.paddingRight = (w + 16) + "px";
+            row.style.setProperty("--pw", (w + 56)+"px");
           }
         });
-      } else {
-        cm.style.removeProperty("--pexp");
-        row.style.removeProperty("--pexp");
-        row.style.removeProperty("--pw");
-        if(tx) tx.style.paddingRight = "";
-      }
+      } else { cm.style.removeProperty("--pexp"); row.style.removeProperty("--pw"); }
     }
   });
 }
