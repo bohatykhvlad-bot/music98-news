@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-64">
+<meta name="m98-build" content="editorial-65">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -252,19 +252,18 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 #articlePage .atext p{margin:0 0 16px}
 .aembed{margin:6px auto 22px;max-width:660px;background:transparent;border-radius:12px;overflow:visible}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
-.aembed.album{width:100%;max-width:660px;height:450px;overflow:hidden;border-radius:12px}
-.aembed-lock{width:660px;height:450px;transform-origin:top left}
-.aembed.album iframe{width:660px!important;max-width:none!important;height:450px!important;border-radius:0;overflow:hidden}
+.aembed.album{max-width:660px;height:450px;overflow:hidden;border-radius:12px}
+.aembed.album iframe{height:450px;border-radius:0}
 .aembed.song{max-width:600px;width:100%;margin:6px auto 22px}
 .aembed.song iframe{height:166px;max-width:100%}
 .yembed{margin:6px auto 22px;max-width:660px;width:100%}
 .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
 .yembed iframe{position:absolute;inset:0;width:100%;height:100%;max-width:none;border:0;display:block}
-#appleBoot{position:fixed;left:0;top:0;width:660px;height:450px;overflow:hidden;opacity:.001;pointer-events:none;z-index:0}
+#appleBoot{position:fixed;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:0}
 iframe.apple-park{
   position:fixed!important;
   left:0!important;
-  top:0!important;
+  top:72px!important;
   width:660px!important;
   max-width:660px!important;
   opacity:.001!important;
@@ -1804,58 +1803,32 @@ function parkAppleFrame(f){
 }
 function dropAppleBoots(){
   appleWatchers.splice(0).forEach(w=>{ try{ w.disconnect(); }catch(e){} });
-  const host = appleBootHost();
-  Object.values(appleBoots).forEach(f=>{
-    if(!f || !f.isConnected) return;
-    parkAppleFrame(f);
-    if(f.parentElement !== host) host.appendChild(f);
-  });
-}
-function fitAppleAlbum(slot){
-  if(!slot || !slot.classList.contains("album")) return;
-  const lock = slot.querySelector(".aembed-lock");
-  if(!lock) return;
-  const w = slot.clientWidth || 660;
-  const s = Math.min(1, w / 660);
-  lock.style.transform = s < 0.999 ? "scale("+s+")" : "";
-  slot.style.height = Math.round(450 * s) + "px";
-}
-function fitAppleAlbums(root){
-  (root || document).querySelectorAll(".aembed.album").forEach(fitAppleAlbum);
-}
-function placeAppleFrame(slot){
-  if(!slot) return;
-  const src = slot.dataset.appleSrc || "";
-  if(!src) return;
-  const h = Number(slot.dataset.appleH) || 450;
-  let f = appleBoots[src];
-  if(!f || !f.isConnected) f = ensureAppleBoot(src, h);
-  if(!f) return;
-  const album = slot.classList.contains("album") || h >= 400;
-  let lock = slot.querySelector(".aembed-lock");
-  if(album && !lock){
-    lock = document.createElement("div");
-    lock.className = "aembed-lock";
-    slot.appendChild(lock);
-  }
-  const home = album && lock ? lock : slot;
-  if(f.parentElement !== home) home.appendChild(f);
-  f.classList.remove("apple-park");
-  f.removeAttribute("aria-hidden");
-  if(album){
-    f.setAttribute("scrolling", "no");
-    f.setAttribute("width", "660");
-    f.setAttribute("height", "450");
-    f.style.width = "660px";
-    f.style.height = "450px";
-    f.style.maxWidth = "none";
-    fitAppleAlbum(slot);
-  }
+  Object.values(appleBoots).forEach(parkAppleFrame);
 }
 function parkAppleEmbeds(root){
   appleWatchers.splice(0).forEach(w=>{ try{ w.disconnect(); }catch(e){} });
-  const slots = [...(root||document).querySelectorAll(".aembed[data-apple-src]")];
-  slots.forEach(placeAppleFrame);
+  const frames = [...(root||document).querySelectorAll(".aembed iframe")];
+  frames.forEach(f=>{
+    const src = f.getAttribute("src") || f.dataset.keepSrc || "";
+    if(!src || src === "about:blank") return;
+    f.loading = "eager";
+    f.setAttribute("fetchpriority","high");
+    f.classList.add("apple-park");
+    const slot = f.closest(".aembed") || f;
+    const place = ()=> {
+      f.classList.remove("apple-park");
+      f.removeAttribute("aria-hidden");
+    };
+    if(!("IntersectionObserver" in window)){ place(); return; }
+    const io = new IntersectionObserver(entries=>{
+      if(entries.some(e=>e.isIntersecting)){
+        place();
+        io.disconnect();
+      }
+    }, {root:null, rootMargin:"0px", threshold:0});
+    io.observe(slot);
+    appleWatchers.push(io);
+  });
 }
 function ensureAppleBoot(src, h){
   if(!src) return null;
@@ -1869,7 +1842,10 @@ function ensureAppleBoot(src, h){
   f.setAttribute("sandbox", APPLE_IFRAME_SANDBOX);
   f.setAttribute("title", "Listen on Apple Music");
   f.setAttribute("height", String(h||166));
-  if((h||166) >= 400) f.setAttribute("width", "660");
+  if((h||166) >= 400){
+    f.setAttribute("width", "660");
+    f.setAttribute("scrolling", "no");
+  }
   f.setAttribute("loading", "eager");
   f.setAttribute("fetchpriority", "high");
   f.dataset.appleBoot = "1";
@@ -1888,7 +1864,7 @@ function bootAppleFromPosts(posts){
   });
 }
 function appleIframeHTML(src, h){
-  const w = h >= 400 ? ' width="660"' : "";
+  const w = h >= 400 ? ' width="660" scrolling="no"' : "";
   return `<iframe class="apple-park" allow="${APPLE_IFRAME_ALLOW}" frameborder="0"${w} height="${h}" loading="eager" fetchpriority="high" sandbox="${APPLE_IFRAME_SANDBOX}" src="${esc(src)}" title="Listen on Apple Music"></iframe>`;
 }
 function appleEmbed(albumId, songId){
@@ -1899,8 +1875,7 @@ function appleEmbed(albumId, songId){
   const src = appleEmbedUrl(id, track);
   const kind = track ? " song" : " album";
   ensureAppleBoot(src, h);
-  const lock = track ? "" : `<div class="aembed-lock"></div>`;
-  return `<div class="aembed${kind}" data-apple-src="${esc(src)}" data-apple-h="${h}" style="min-height:${h}px">${lock}</div>`;
+  return `<div class="aembed${kind}" style="min-height:${h}px">${appleIframeHTML(src, h)}</div>`;
 }
 function youtubeEmbed(id, start){
   if(!/^[A-Za-z0-9_-]{11}$/.test(id||"")) return "";
@@ -2057,8 +2032,8 @@ function syncHeaderPad(){
   if(q) q.placeholder = window.matchMedia("(max-width: 640px)").matches ? "Search" : "Search: artist, album, track…";
 }
 window.addEventListener("scroll", onScroll, {passive:true});
-window.addEventListener("resize", ()=>{ onScroll(); syncHeaderPad(); fitAppleAlbums(); });
-window.addEventListener("orientationchange", ()=>{ onScroll(); syncHeaderPad(); fitAppleAlbums(); });
+window.addEventListener("resize", ()=>{ onScroll(); syncHeaderPad(); });
+window.addEventListener("orientationchange", ()=>{ onScroll(); syncHeaderPad(); });
 onScroll();
 syncHeaderPad();
 setTimeout(syncHeaderPad, 50);
