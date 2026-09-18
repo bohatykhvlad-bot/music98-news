@@ -4,6 +4,7 @@ import { onRequestGet as preview } from "./functions/api/preview.js";
 import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
 import { onRequestGet as subscribers } from "./functions/api/subscribers.js";
 import { onRequestPost as broadcast } from "./functions/api/broadcast.js";
+import { onRequest as mail } from "./functions/api/mail.js";
 
 export default {
   async fetch(request, env, ctx) {
@@ -15,6 +16,7 @@ export default {
     if (path === "/api/subscribe" && request.method === "POST") return subscribe(c);
     if (path === "/api/subscribers" && request.method === "GET") return subscribers(c);
     if (path === "/api/broadcast" && request.method === "POST") return broadcast(c);
+    if (path === "/api/mail") return mail(c);
     const res = await env.ASSETS.fetch(request);
     const type = (res.headers.get("content-type") || "").toLowerCase();
     const headers = new Headers(res.headers);

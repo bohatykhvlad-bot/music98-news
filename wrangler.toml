@@ -3,6 +3,9 @@ main = "worker.js"
 compatibility_date = "2026-09-17"
 keep_vars = true
 
+[vars]
+FROM_EMAIL = "music98.news <beth.t@example.com>"
+
 [assets]
 directory = "./public"
 binding = "ASSETS"

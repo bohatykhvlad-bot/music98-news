@@ -234,6 +234,7 @@ a{color:var(--text)}
 
     <div class="card">
       <h2>Mail</h2>
+      <p class="muted" id="mailStatus">Checking mail…</p>
       <p class="muted" id="subCount">No addresses yet.</p>
       <label for="msubject">Subject</label>
       <input id="msubject" placeholder="This week on music98.news">
@@ -683,9 +684,17 @@ async function reload(){
   try{
     const s = await api("/api/subscribers", {headers: headers(false)});
     const n = (s.subscribers||[]).length;
-    $("#subCount").textContent = n ? n + " subscriber" + (n===1?"":"s") + " on the list." : "No addresses yet.";
+    $("#subCount").textContent = n ? n + " subscriber" + (n===1?"":"s") + " on the list." : "No addresses yet. Use Subscribe on the public site first.";
   }catch(e){
     $("#subCount").textContent = "Could not load the list.";
+  }
+  try{
+    const m = await api("/api/mail", {headers: headers(false)});
+    $("#mailStatus").textContent = m.configured
+      ? "Mail is connected. Letters send through Resend."
+      : "Mail is not connected yet.";
+  }catch(e){
+    $("#mailStatus").textContent = "Could not check mail.";
   }
 }
 
@@ -1009,10 +1018,12 @@ $("#send").onclick = async ()=>{
       method:"POST", headers: headers(),
       body: JSON.stringify({subject: $("#msubject").value.trim(), text: $("#mtext").value.trim()})
     });
-    toast("Sent to " + (j.sent||0) + " addresses");
+    if((j.sent||0) > 0) toast("Sent to " + j.sent + " addresses");
+    else if((j.failed||0) > 0) toast("Resend did not send. Until the domain is verified, it only delivers to the inbox you used to sign up.");
+    else toast("Nothing sent");
   }catch(e){
-    if(e.error==="missing_resend_key") toast("Addresses are saved. Add a Resend key to actually send.");
-    else if(e.error==="no_subscribers") toast("Nobody has subscribed yet");
+    if(e.error==="missing_resend_key") toast("Mail is not connected yet");
+    else if(e.error==="no_subscribers") toast("Nobody has subscribed yet. Use Subscribe on the public site first.");
     else toast("Could not send");
   }
 };

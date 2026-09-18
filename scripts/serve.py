@@ -35,6 +35,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
 API = runpy.run_path(str(ROOT / "api" / "top50.py"))
 DESK = PUBLIC / "data" / "desk.json"
+MAIL_FILE = ROOT / ".mail.json"
+TEST_FROM = "music98.news <beth.t@example.com>"
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
@@ -71,7 +73,28 @@ def desk_read() -> dict:
 
 def desk_write(data: dict) -> None:
     DESK.parent.mkdir(exist_ok=True)
-    DESK.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    out = {
+        "posts": data.get("posts") or [],
+        "subscribers": data.get("subscribers") or [],
+    }
+    DESK.write_text(json.dumps(out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def mail_file_read() -> dict:
+    try:
+        data = json.loads(MAIL_FILE.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            return data
+    except Exception:
+        pass
+    return {}
+
+
+def mail_config() -> tuple[str, str]:
+    stored = mail_file_read()
+    key = str(os.environ.get("RESEND_API_KEY") or stored.get("resendKey") or "").strip()
+    sender = str(stored.get("fromEmail") or os.environ.get("FROM_EMAIL") or TEST_FROM).strip()
+    return key, sender
 
 
 def post_status(p: dict) -> str:
@@ -327,6 +350,11 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._send(*json_bytes({"error": "unauthorized"}, 401))
             d = desk_read()
             return self._send(*json_bytes({"subscribers": d["subscribers"]}))
+        if path == "/api/mail":
+            if not self._authed():
+                return self._send(*json_bytes({"error": "unauthorized"}, 401))
+            key, sender = mail_config()
+            return self._send(*json_bytes({"ok": True, "configured": bool(key), "from": sender}))
         if path == "/m98desk":
             self.path = "/m98desk.html"
         return super().do_GET()
@@ -362,8 +390,7 @@ class Handler(SimpleHTTPRequestHandler):
             text = str(payload.get("text") or "").strip()
             if not subject or not text:
                 return self._send(*json_bytes({"error": "subject_and_text_required"}, 400))
-            key = os.environ.get("RESEND_API_KEY", "").strip()
-            sender = os.environ.get("FROM_EMAIL", "music98.news <news@music98.news>").strip()
+            key, sender = mail_config()
             d = desk_read()
             emails = d["subscribers"]
             if not emails:
@@ -374,12 +401,12 @@ class Handler(SimpleHTTPRequestHandler):
                         {
                             "error": "missing_resend_key",
                             "saved": len(emails),
-                            "hint": "Add RESEND_API_KEY to .env. Addresses are already stored.",
                         },
                         400,
                     )
                 )
             sent, failed = 0, 0
+            last_err = ""
             html = "<pre style='font-family:Georgia,serif;font-size:16px;white-space:pre-wrap'>" + (
                 text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
             ) + "</pre>"
@@ -392,6 +419,7 @@ class Handler(SimpleHTTPRequestHandler):
                     headers={
                         "Authorization": f"Bearer {key}",
                         "Content-Type": "application/json",
+                        "User-Agent": PAGE_UA,
                     },
                     method="POST",
                 )
@@ -401,9 +429,33 @@ class Handler(SimpleHTTPRequestHandler):
                             sent += 1
                         else:
                             failed += 1
-                except Exception:
+                except Exception as exc:
                     failed += 1
-            return self._send(*json_bytes({"ok": True, "sent": sent, "failed": failed}))
+                    if not last_err:
+                        body = ""
+                        if hasattr(exc, "read"):
+                            try:
+                                body = exc.read().decode("utf-8", "replace")
+                            except Exception:
+                                body = ""
+                        last_err = (body or str(exc))[:280]
+                        if key:
+                            last_err = last_err.replace(key, "[key]")
+            return self._send(*json_bytes({"ok": True, "sent": sent, "failed": failed, "from": sender, "detail": last_err or None}))
+        if path == "/api/mail":
+            if not self._authed():
+                return self._send(*json_bytes({"error": "unauthorized"}, 401))
+            payload = self._read_json()
+            stored = mail_file_read()
+            next_key = str(payload.get("resendKey") or payload.get("RESEND_API_KEY") or "").strip()
+            next_from = str(payload.get("fromEmail") or payload.get("FROM_EMAIL") or "").strip()
+            if next_key:
+                stored["resendKey"] = next_key
+            if next_from:
+                stored["fromEmail"] = next_from
+            MAIL_FILE.write_text(json.dumps(stored) + "\n", encoding="utf-8")
+            key, sender = mail_config()
+            return self._send(*json_bytes({"ok": True, "configured": bool(key), "from": sender}))
         self.send_error(404)
 
     def log_message(self, fmt, *args):

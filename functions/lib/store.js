@@ -1,5 +1,23 @@
+export const TEST_FROM = "music98.news <beth.t@example.com>";
+
 function empty() {
-  return { posts: [], subscribers: [] };
+  return { posts: [], subscribers: [], mail: {} };
+}
+
+function mailOf(v) {
+  const m = v && v.mail && typeof v.mail === "object" ? v.mail : {};
+  return {
+    resendKey: String(m.resendKey || "").trim(),
+    fromEmail: String(m.fromEmail || "").trim(),
+  };
+}
+
+function shapeDesk(v) {
+  return {
+    posts: Array.isArray(v && v.posts) ? v.posts : [],
+    subscribers: Array.isArray(v && v.subscribers) ? v.subscribers : [],
+    mail: mailOf(v),
+  };
 }
 
 async function bakedDesk(request) {
@@ -9,7 +27,11 @@ async function bakedDesk(request) {
     if (!r.ok) return empty();
     const j = await r.json();
     if (j && Array.isArray(j.posts)) {
-      return { posts: j.posts, subscribers: Array.isArray(j.subscribers) ? j.subscribers : [] };
+      return {
+        posts: j.posts,
+        subscribers: Array.isArray(j.subscribers) ? j.subscribers : [],
+        mail: {},
+      };
     }
   } catch {}
   return empty();
@@ -18,17 +40,24 @@ async function bakedDesk(request) {
 export async function readDesk(env, request) {
   if (env && env.DESK) {
     const v = await env.DESK.get("desk", { type: "json" });
-    if (v && Array.isArray(v.posts)) return { posts: v.posts, subscribers: v.subscribers || [] };
+    if (v && Array.isArray(v.posts)) return shapeDesk(v);
     return empty();
   }
   return bakedDesk(request);
+}
+
+export function mailConfig(desk, env) {
+  const mail = mailOf(desk);
+  const key = String((env && env.RESEND_API_KEY) || mail.resendKey || "").trim();
+  const sender = String(mail.fromEmail || (env && env.FROM_EMAIL) || TEST_FROM).trim();
+  return { key, sender, configured: Boolean(key) };
 }
 
 export async function writeDesk(env, data) {
   if (!env || !env.DESK) {
     throw new Error("kv_missing");
   }
-  await env.DESK.put("desk", JSON.stringify(data));
+  await env.DESK.put("desk", JSON.stringify(shapeDesk(data)));
 }
 
 export function adminOk(request, env) {

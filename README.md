@@ -47,16 +47,11 @@ Until you publish at least one post, the homepage keeps the demo stories.
 
 The Subscribe box saves the address to the same notebook (`/api/subscribe`).
 
-A normal mailbox (Gmail, iCloud) is the wrong tool for a list: providers block bulk send, and there is no API meant for this.
+Letters go out through [Resend](https://resend.com). The live site stores the send key on the private desk (not in the public repo). Until `music98.news` is verified in Resend, the sender is their test address `beth.t@example.com`, which only delivers to the inbox used to sign up there.
 
-Use a mail API, free tier is enough to start:
+Open the desk → Mail → write subject and text → **Send to the list**.
 
-1. Create a [Resend](https://resend.com) account.
-2. Put `RESEND_API_KEY` and `FROM_EMAIL` in `.env` (local) or in Cloudflare / Vercel env vars.
-3. Verify your domain in Resend (or use their onboarding sender while testing).
-4. Open the desk → Mail → write subject and text → **Send to the list**.
-
-The server sends the letters. They do not go “from Gmail” unless you later connect a domain mailbox to Resend.
+The server sends the letters. They do not go “from Gmail”.
 
 ## Vercel
 
