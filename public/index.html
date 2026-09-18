@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-49">
+<meta name="m98-build" content="editorial-50">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -1058,11 +1058,9 @@ function pageIsAway(){
   return document.hidden || document.visibilityState === "hidden";
 }
 document.addEventListener("visibilitychange", ()=>{
-  if(pageIsAway()) pauseAllMedia();
-  else restoreAppleFrames();
+  if(document.hidden) return;
+  try{ if(actx && actx.state === "suspended" && audio && !audio.paused) actx.resume(); }catch(e){}
 });
-window.addEventListener("pagehide", pauseAllMedia);
-document.addEventListener("freeze", pauseAllMedia);
 function setBadge(key, track){
   $$(".abadge[data-lk]").forEach(a=>{ if(a.dataset.lk === key){ a.href = aff(track); a.hidden = false; } });
 }
@@ -1826,6 +1824,8 @@ function renderBody(text){
   }).join("");
 }
 function showArticle(p){
+  pauseAllMedia();
+  stopPreview();
   listY = window.scrollY || document.documentElement.scrollTop || 0;
   const page = $("#articlePage");
   document.body.classList.add("articlepage");
