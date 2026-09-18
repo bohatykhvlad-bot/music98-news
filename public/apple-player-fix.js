@@ -253,7 +253,35 @@
     rsT = setTimeout(lockAlbumGrid, 180);
   });
 
+  /* Prev on track 1 makes Apple re-queue the album, which remounts the left
+     chrome and flashes the layout. Restart the track ourselves instead. */
+  function onPrevGesture(ev) {
+    if (ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
+    var path = ev.composedPath ? ev.composedPath() : [];
+    var hit = null;
+    for (var i = 0; i < path.length; i++) {
+      var n = path[i];
+      if (n && n.classList && n.classList.contains("button--previous")) { hit = n; break; }
+    }
+    if (!hit) return;
+    var mk = music();
+    if (!mk || !mk.queue) return;
+    if ((mk.queue.position || 0) !== 0) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (typeof ev.stopImmediatePropagation === "function") ev.stopImmediatePropagation();
+    Promise.resolve()
+      .then(function () {
+        if (typeof mk.skipToBeginning === "function") return mk.skipToBeginning();
+        mk.queue.position = 0;
+        if (!mk.isPlaying && mk.play) return mk.play();
+      })
+      .catch(function () {});
+  }
+
   document.addEventListener("click", onTrackGesture, true);
+  document.addEventListener("click", onPrevGesture, true);
+  document.addEventListener("keydown", onPrevGesture, true);
   document.addEventListener("keydown", onTrackGesture, true);
 
   function watch() {
