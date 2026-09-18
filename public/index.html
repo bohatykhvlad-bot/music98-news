@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="chart-title-14">
+<meta name="m98-build" content="chart-pad-eq-1">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -79,7 +79,7 @@ main{position:relative;z-index:1}
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .hero .cover{height:100%;min-height:300px}
 .hero .cover img{width:100%;height:100%;object-fit:cover;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
-.hero .body{padding:28px 30px;display:flex;flex-direction:column;gap:12px}
+.hero .body{padding:28px;display:flex;flex-direction:column;gap:12px}
 .hero h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.22;letter-spacing:-.02em}
 .hero p{margin:0;color:var(--muted);font-size:15px}
 .hero:active,.hero:focus,.hero:focus-visible{border-color:var(--line);outline:none;box-shadow:none}
@@ -94,7 +94,7 @@ a.card,a.hero{color:inherit;text-decoration:none}
 .card.square .cover{aspect-ratio:1/1}
 .tag{position:absolute;left:10px;top:10px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.86);backdrop-filter:blur(6px);color:var(--acc2);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;line-height:1;padding:6px 11px;border-radius:999px;border:1px solid rgba(0,0,0,.18)}
 .tag.pink{color:var(--pink);border-color:rgba(255,61,129,.4)}
-.card .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card .body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
 .card h3{margin:0;font-size:16px;line-height:1.32;letter-spacing:-.01em}
 .card p{margin:0;color:var(--muted);font-size:13.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .meta{margin-top:auto;display:flex;align-items:center;gap:8px;color:var(--muted2);font-size:12px;padding-top:4px}
@@ -123,7 +123,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .delta.new{color:#03282b;background:var(--amber);border-radius:6px;padding:2px 0;font-size:10.5px;letter-spacing:.08em}
 .artwrap{position:relative;width:56px;height:56px;border-radius:12px;overflow:hidden;background:var(--card2);flex:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block}
-.chart-row.playing .artwrap{box-shadow:0 0 0 2px var(--accent)}
+.chart-row.playing .artwrap{box-shadow:none;outline:2px solid var(--accent);outline-offset:-2px}
 .cmid{--pexp:0px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:10px;z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
 .chart-row.playing .cmid{background:rgba(255,255,255,.85);border-color:rgba(15,60,64,.10);backdrop-filter:blur(10px) saturate(160%);-webkit-backdrop-filter:blur(10px) saturate(160%);padding:4px}
 .rplay{width:52px;height:52px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transition:background .16s ease,color .16s ease,transform .16s ease}
@@ -334,7 +334,7 @@ textarea{resize:vertical;min-height:64px}
   .search input:focus,
   .search input:focus-visible,
   .search.on input{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent)}
-  .foot-in{grid-template-columns:1fr}
+  .foot-in{grid-template-columns:1fr;padding:32px 16px 36px}
   .tab{padding-top:14px}
   .tab.rise{animation:none}
   .hd{margin-bottom:14px}
@@ -349,7 +349,7 @@ textarea{resize:vertical;min-height:64px}
     grid-template-columns:48px minmax(0,1fr);
     grid-template-areas:"art names" "play extra" "week week";
     gap:8px 10px;
-    padding:14px 12px;
+    padding:14px;
     align-items:start;
     transition:background .15s ease;
   }
@@ -360,7 +360,7 @@ textarea{resize:vertical;min-height:64px}
   .chart-row .pos{margin-inline-end:8px}
   .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
-  .rplay{grid-area:play;justify-self:center;align-self:center;width:36px;height:36px}
+  .rplay{grid-area:play;justify-self:start;align-self:center;width:36px;height:36px}
   .rplay svg{width:16px;height:16px}
   .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:0;opacity:0;overflow:hidden;transform:translateY(-12px);pointer-events:none;transition:height .32s ease,opacity .28s ease,transform .32s ease}
   .chart-row.playing .pextra{height:36px;opacity:1;overflow:visible;transform:none;pointer-events:auto}
