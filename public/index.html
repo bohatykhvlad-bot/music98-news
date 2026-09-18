@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-45">
+<meta name="m98-build" content="editorial-46">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -88,7 +88,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 main{position:relative;z-index:1}
 .tab{display:none;padding:20px 0 8px}
 .tab.active{display:block}
-.tab.rise{animation:rise .28s ease both}
+.tab.rise,#articlePage.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .hd{margin:0 0 22px}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
@@ -309,8 +309,8 @@ textarea{resize:vertical;min-height:64px}
 .related h2{margin:0 0 4px;font-size:22px;letter-spacing:-.02em}
 .related .rel-sub{margin:0 0 16px;color:var(--muted);font-size:13.5px}
 .rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
-.rcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
-.rcard:active,.rcard:focus,.rcard:focus-visible{border-color:var(--line);outline:none;box-shadow:none}
+.rcard{display:flex;flex-direction:column;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
+.rcard:active,.rcard:focus,.rcard:focus-visible{border-color:var(--line);outline:none;box-shadow:none;transform:none}
 .rcard .rcover{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--card2)}
 .rcard .rbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
 .rcard .rtag{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
@@ -353,7 +353,7 @@ textarea{resize:vertical;min-height:64px}
   .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.04)}
   .card:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
   .hero:hover{border-color:var(--accent-dim)}
-  .rcard:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--accent-dim)}
+  .rcard:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
   .btn:hover{border-color:var(--accent-dim);color:var(--acc2)}
 }
 @media (hover:none){
@@ -385,7 +385,7 @@ textarea{resize:vertical;min-height:64px}
   .search.on input{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent)}
   .foot-in{grid-template-columns:1fr;padding:32px 16px 36px}
   .tab{padding-top:14px}
-  .tab.rise{animation:none}
+  .tab.rise,#articlePage.rise{animation:none}
   .hd{margin-bottom:14px}
   .hd-t{font-size:26px;white-space:nowrap}
   body{padding-top:calc(var(--header-h, 148px) + 8px)}
@@ -1802,6 +1802,7 @@ function showArticle(p){
   listY = window.scrollY || document.documentElement.scrollTop || 0;
   const page = $("#articlePage");
   document.body.classList.add("articlepage");
+  page.classList.remove("rise");
   page.hidden = false;
   page.innerHTML = `
     <a class="aback" href="#" id="aback">Back</a>
@@ -1812,6 +1813,8 @@ function showArticle(p){
     <div class="ameta"><span>${fmtDate(p.date)}</span></div>
     <div class="atext">${renderBody(p.body||p.excerpt||"")}</div>
     ${relatedHTML(p)}`;
+  void page.offsetWidth;
+  page.classList.add("rise");
   jumpY(0);
   bindCovers(page);
   parkAppleEmbeds(page);
@@ -1830,8 +1833,10 @@ function hideArticle(){
   pauseAllMedia();
   dropAppleBoots();
   $$(".tab").forEach(s => s.classList.remove("rise"));
-  $("#articlePage").innerHTML = "";
-  $("#articlePage").hidden = true;
+  const page = $("#articlePage");
+  page.classList.remove("rise");
+  page.innerHTML = "";
+  page.hidden = true;
   document.body.classList.remove("articlepage");
 }
 function closeArticle(){
