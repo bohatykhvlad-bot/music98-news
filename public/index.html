@@ -791,6 +791,7 @@ let actx = null;
 let blobUrl = "";
 let seekBar = null;
 let seekLock = 0;
+let pendingSeek = null;
 function dropBlob(){
   if(!blobUrl) return;
   try{ URL.revokeObjectURL(blobUrl); }catch(e){}
@@ -861,7 +862,24 @@ function previewDur(){
       if(end && isFinite(end) && end > 0) return end;
     }
   }catch(e){}
-  return 90;
+  return 0;
+}
+function applySeek(x){
+  const d = previewDur();
+  if(!d){
+    pendingSeek = x;
+    progTo(x * 100, x * 90, 90);
+    return;
+  }
+  pendingSeek = null;
+  const t = Math.max(0, Math.min(d - 0.05, x * d));
+  try{
+    if(typeof audio.fastSeek === "function") audio.fastSeek(t);
+    else audio.currentTime = t;
+  }catch(err){
+    try{ audio.currentTime = t; }catch(err2){}
+  }
+  progTo((t / d) * 100, t, d);
 }
 function progTo(p, cur, dur){
   $$("#chartList .chart-row.playing").forEach(row=>{
@@ -899,6 +917,7 @@ function stopPreview(){
   playGen++;
   curKey = null;
   previewTriedItunes = false;
+  pendingSeek = null;
   try{ audio.pause(); audio.removeAttribute("src"); audio.load(); }catch(e){}
   dropBlob();
   progTo(0,0,90);
@@ -938,6 +957,7 @@ function selectTrack(key, title, artist, url, prev){
   const gen = playGen;
   curKey = key;
   previewTriedItunes = false;
+  pendingSeek = null;
   progTo(0,0,90);
   markRows();
   const src = previewPlayUrl(prev, url);
@@ -950,19 +970,25 @@ function selectTrack(key, title, artist, url, prev){
 }
 audio.addEventListener("loadedmetadata", ()=>{
   deviceVol();
-  const d = previewDur();
-  progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
+  if(pendingSeek != null) applySeek(pendingSeek);
+  else {
+    const d = previewDur() || 90;
+    progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
+  }
 });
 audio.addEventListener("durationchange", ()=>{
-  const d = previewDur();
-  progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
+  if(pendingSeek != null && previewDur()) applySeek(pendingSeek);
+  else {
+    const d = previewDur() || 90;
+    progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
+  }
 });
 audio.addEventListener("playing", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("play", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
 audio.addEventListener("timeupdate", ()=>{
   if(seekBar) return;
-  const d = previewDur();
+  const d = previewDur() || 90;
   progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d);
 });
 audio.addEventListener("ended", ()=>{ stopPreview(); });
@@ -985,18 +1011,10 @@ function pointerX(e){
 function seekFromEvent(e, bar){
   const row = bar && bar.closest(".chart-row");
   if(!row || row.dataset.key !== curKey) return;
-  const d = previewDur();
   const r = bar.getBoundingClientRect();
   if(!r.width) return;
   const x = Math.max(0, Math.min(1, (pointerX(e) - r.left) / r.width));
-  const t = x * d;
-  try{
-    if(typeof audio.fastSeek === "function") audio.fastSeek(t);
-    else audio.currentTime = t;
-  }catch(err){
-    try{ audio.currentTime = t; }catch(err2){}
-  }
-  progTo(x * 100, t, d);
+  applySeek(x);
 }
 function endSeek(e){
   if(!seekBar) return;
@@ -1357,6 +1375,7 @@ function renderCharts(){
   }).join("");
   $("#chartEmpty").hidden = rows.length > 0;
   hydrateArts();
+  markRows();
 }
 function renderHints(){
   const box = $("#searchHints");
