@@ -293,7 +293,9 @@ iframe.apple-park{
   z-index:0!important;
   border:0!important;
 }
-.abody-pic{margin:8px 0 22px}
+.abody-pic{margin:8px auto 22px;max-width:660px;width:100%}
+.abody-pic.sz-full{max-width:none}
+.abody-pic.sz-half{max-width:420px}
 .abody-pic img{width:100%;border-radius:14px;display:block}
 .aback{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin-bottom:16px}
 .aback::before{content:"";width:7px;height:7px;flex:none;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-1px}
@@ -1920,8 +1922,14 @@ function youtubeEmbed(id, start){
 function renderBody(text){
   return String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
     const t = raw.trim();
-    const pic = t.match(/^\[photo:(.+?)\]$/i);
-    if(pic) return `<figure class="abody-pic"><img src="${esc(pic[1])}" alt=""></figure>`;
+    const pic = t.match(/^\[photo:([^|]+)(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?\]$/i);
+    if(pic){
+      const sz = (pic[4]||"wide").trim();
+      const cls = (sz==="full"||sz==="half") ? " sz-"+sz : "";
+      const author = (pic[2]||"").trim(), link = (pic[3]||"").trim();
+      const cred = author ? `<p class="pcred">Photo: ${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(author)}</a>`:esc(author)}</p>` : "";
+      return `<figure class="abody-pic${cls}"><img src="${esc(pic[1].trim())}" alt="">${cred}</figure>`;
+    }
     const album = t.match(/^\[apple:album:(\d+)\]$/i);
     if(album) return appleEmbed(album[1]);
     const song = t.match(/^\[apple:song:(\d+):(\d+)\]$/i);

@@ -123,8 +123,13 @@ a{color:var(--text)}
 .composer .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
 .composer .yembed iframe{position:absolute;inset:0;width:100%;height:100%;border-radius:0}
 .composer iframe{width:100%;border:0;border-radius:10px;display:block;background:transparent}
-.composer .abody-pic{max-width:320px;margin:12px auto}
-.composer .abody-pic img{width:100%;max-height:220px;object-fit:contain;border-radius:10px;display:block;background:var(--bg2)}
+.composer .abody-pic{max-width:520px;width:100%;margin:12px auto}
+.composer .abody-pic.sz-full{max-width:100%}
+.composer .abody-pic.sz-half{max-width:300px}
+.composer .abody-pic img{width:100%;border-radius:10px;display:block}
+.ppanel{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--bg2)}
+.ppanel input,.ppanel select{flex:1 1 150px;padding:6px 8px;font-size:12px;border-radius:8px}
+.composer .abody-pic .pcred{margin:8px 2px 0;font-size:11px}
 .modal{position:fixed;inset:0;background:rgba(10,16,18,.45);align-items:center;justify-content:center;padding:16px;z-index:30}
 .modal:not(.hide){display:flex}
 .modal.hide{display:none}
@@ -469,8 +474,16 @@ function appleBlock(kind, album, track){
   const token = song ? ("song:"+album+":"+track) : ("album:"+album);
   return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}">${blkChrome()}<iframe height="${h}" src="${esc(src)}" title="Apple Music" loading="eager"></iframe></figure>`;
 }
-function photoBlock(src){
-  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}">${blkChrome()}<img src="${esc(src)}" alt="" draggable="false"></figure>`;
+function pcredFor(author, link){
+  if(!author) return "";
+  const inner = link ? `<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(author)}</a>` : esc(author);
+  return `<p class="pcred">Photo: ${inner}</p>`;
+}
+function photoBlock(src, author, link, size){
+  author = author||""; link = link||"";
+  size = (size==="full"||size==="half") ? size : "wide";
+  const cls = size==="wide" ? "" : " sz-"+size;
+  return `<figure class="blk abody-pic${cls}" contenteditable="false" data-photo="${esc(src)}" data-pauthor="${esc(author)}" data-plink="${esc(link)}" data-psize="${size}">${blkChrome()}<img src="${esc(src)}" alt="" draggable="false"><span class="ppanel" contenteditable="false"><input class="pp-author" placeholder="Credit: author / source" value="${esc(author)}"><input class="pp-link" placeholder="Link to the photo" value="${esc(link)}"><select class="pp-size"><option value="wide"${size==="wide"?" selected":""}>Wide, as video</option><option value="full"${size==="full"?" selected":""}>Full column</option><option value="half"${size==="half"?" selected":""}>Half width</option></select></span>${pcredFor(author,link)}</figure>`;
 }
 function parseYouTube(raw){
   const s = String(raw||"").trim();
@@ -760,7 +773,12 @@ function serialize(){
     }
     if(node.nodeName==="FIGURE"){
       if(node.dataset.apple) parts.push("[apple:"+node.dataset.apple+"]");
-      if(node.dataset.photo) parts.push("[photo:"+node.dataset.photo+"]");
+      if(node.dataset.photo){
+        const pa = node.dataset.pauthor||"", pl = node.dataset.plink||"", pz = node.dataset.psize||"wide";
+        let tag = node.dataset.photo;
+        if(pa || pl || pz!=="wide") tag += "|"+pa+"|"+pl+"|"+pz;
+        parts.push("[photo:"+tag+"]");
+      }
       if(node.dataset.youtube) parts.push("[youtube:"+node.dataset.youtube+"]");
       return;
     }
@@ -777,8 +795,8 @@ function serialize(){
 function bodyToComposer(text){
   const html = String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
     const t = raw.trim();
-    const pic = t.match(/^\[photo:(.+?)\]$/i);
-    if(pic) return photoBlock(pic[1]);
+    const pic = t.match(/^\[photo:([^|]+)(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?\]$/i);
+    if(pic) return photoBlock(pic[1], pic[2]||"", pic[3]||"", pic[4]||"wide");
     const album = t.match(/^\[apple:album:(\d+)\]$/i);
     if(album) return appleBlock("album", album[1]);
     const song = t.match(/^\[apple:song:(\d+):(\d+)\]$/i);
@@ -1096,6 +1114,21 @@ document.querySelector(".toolbar").addEventListener("click", e=>{
   }
 });
 
+$("#composer").addEventListener("input", e=>{
+  const fig = e.target.closest ? e.target.closest("figure[data-photo]") : null;
+  if(!fig) return;
+  if(e.target.classList.contains("pp-author")) fig.dataset.pauthor = e.target.value;
+  if(e.target.classList.contains("pp-link")) fig.dataset.plink = e.target.value;
+  const old = fig.querySelector(".pcred"); if(old) old.remove();
+  fig.insertAdjacentHTML("beforeend", pcredFor(fig.dataset.pauthor||"", fig.dataset.plink||""));
+});
+$("#composer").addEventListener("change", e=>{
+  const fig = e.target.closest ? e.target.closest("figure[data-photo]") : null;
+  if(!fig || !e.target.classList.contains("pp-size")) return;
+  fig.dataset.psize = e.target.value;
+  fig.classList.remove("sz-full","sz-half");
+  if(e.target.value!=="wide") fig.classList.add("sz-"+e.target.value);
+});
 $("#btnPhoto").onclick = ()=>{ freezeCaret(); $("#bodyPhoto").click(); };
 $("#bodyPhoto").onchange = e=>{
   const f = e.target.files[0];
