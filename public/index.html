@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="head-ink-3">
+<meta name="m98-build" content="head-xheight-4">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -91,8 +91,6 @@ main{position:relative;z-index:1}
   min-height:0;
   line-height:1;
   font-family:inherit;
-  text-box-trim:trim-both;
-  text-box-edge:cap alphabetic;
 }
 .tab-head .tab-title{
   font-size:var(--head);
@@ -1229,26 +1227,20 @@ function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHint
 
 /* ============ tabs & search events ============ */
 const _inkCtx = document.createElement("canvas").getContext("2d");
-function inkMid(el){
+function xHeightMid(el){
   if(!el) return 0;
-  const text = (el.textContent || "").replace(/\s+/g, " ").trim();
   const box = el.getBoundingClientRect();
-  if(!text) return box.top + box.height / 2;
   const cs = getComputedStyle(el);
   _inkCtx.font = cs.font;
-  let m;
-  try { m = _inkCtx.measureText(text); } catch(e){ m = null; }
+  let xh = 0;
+  try { xh = _inkCtx.measureText("x").actualBoundingBoxAscent || 0; } catch(e){ xh = 0; }
   const probe = document.createElement("span");
   probe.setAttribute("aria-hidden", "true");
   probe.style.cssText = "display:inline-block;width:0;height:0;overflow:hidden;padding:0;margin:0;border:0;vertical-align:baseline";
   el.appendChild(probe);
   const baseline = probe.getBoundingClientRect().top;
   el.removeChild(probe);
-  if(m && typeof m.actualBoundingBoxAscent === "number"){
-    const top = baseline - m.actualBoundingBoxAscent;
-    const bottom = baseline + (m.actualBoundingBoxDescent || 0);
-    return (top + bottom) / 2;
-  }
+  if(xh > 0) return baseline - xh / 2;
   return box.top + box.height / 2;
 }
 function boxMid(el){
@@ -1257,7 +1249,6 @@ function boxMid(el){
 }
 function alignTabHeads(){
   $$(".tab.active .tab-head").forEach(head=>{
-    if(!head.offsetParent && getComputedStyle(head).display === "none") return;
     if(!head.getClientRects().length) return;
     const title = head.querySelector(".tab-title");
     const sub = head.querySelector(".sub");
@@ -1266,8 +1257,8 @@ function alignTabHeads(){
     title.style.transform = "none";
     sub.style.transform = "none";
     bar.style.transform = "none";
-    const target = inkMid(title);
-    sub.style.transform = "translateY(" + (target - inkMid(sub)).toFixed(2) + "px)";
+    const target = xHeightMid(title);
+    sub.style.transform = "translateY(" + (target - xHeightMid(sub)).toFixed(2) + "px)";
     bar.style.transform = "translateY(" + (target - boxMid(bar)).toFixed(2) + "px)";
   });
 }
