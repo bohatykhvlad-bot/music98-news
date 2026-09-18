@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-32">
+<meta name="m98-build" content="editorial-33">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -227,10 +227,11 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 #articlePage .ameta{color:var(--muted2);font-size:13.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #articlePage .atext{margin-top:18px;font-size:16.5px;line-height:1.7;color:var(--body-text)}
 #articlePage .atext p{margin:0 0 16px}
-.aembed{margin:6px auto 22px;max-width:660px;background:transparent;border-radius:12px;overflow:hidden}
+.aembed{margin:6px auto 22px;max-width:660px;background:transparent;border-radius:12px;overflow:visible}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
 .aembed.song{max-width:600px;width:100%;margin:6px auto 22px}
 .aembed.song iframe{height:166px;max-width:100%}
+.aembed iframe.apple-park{position:fixed!important;left:8px;opacity:.05;pointer-events:none;z-index:2;max-width:360px}
 .abody-pic{margin:8px 0 22px}
 .abody-pic img{width:100%;border-radius:14px;display:block}
 .aback{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin-bottom:16px}
@@ -1627,9 +1628,14 @@ function appleEmbedUrl(albumId, songId){
   return src;
 }
 const applePrefetched = {};
-let appleBoots = [];
+let appleWatchers = [];
 function dropAppleBoots(){
-  appleBoots.splice(0).forEach(n=>{ try{ n.remove(); }catch(e){} });
+  appleWatchers.splice(0).forEach(w=>{ try{ w.disconnect(); }catch(e){} });
+  $$(".apple-park").forEach(f=>{
+    f.classList.remove("apple-park");
+    f.style.top = "";
+    f.style.height = "";
+  });
 }
 function appleIframeHTML(src, h){
   return `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${h}" loading="eager" fetchpriority="high" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${esc(src)}" title="Listen on Apple Music"></iframe>`;
@@ -1649,33 +1655,34 @@ function prefetchAppleFromPosts(posts){
     });
   });
 }
-function bootAppleEmbeds(root){
+function parkAppleEmbeds(root){
   dropAppleBoots();
   const frames = [...(root||document).querySelectorAll(".aembed iframe")];
-  frames.forEach(f=>{
+  frames.forEach((f, i)=>{
+    const h = parseInt(f.getAttribute("height"), 10) || 166;
     const src = f.getAttribute("src");
     if(!src) return;
     f.loading = "eager";
     f.setAttribute("fetchpriority", "high");
-    const boot = document.createElement("iframe");
-    boot.src = src;
-    boot.loading = "eager";
-    boot.setAttribute("fetchpriority", "high");
-    boot.setAttribute("aria-hidden", "true");
-    boot.tabIndex = -1;
-    boot.title = "";
-    boot.style.cssText = "position:fixed;top:0;left:0;width:360px;height:175px;opacity:0;pointer-events:none;border:0;z-index:-1";
-    document.body.appendChild(boot);
-    appleBoots.push(boot);
-    const drop = ()=>{
-      const i = appleBoots.indexOf(boot);
-      if(i>=0) appleBoots.splice(i,1);
-      try{ boot.remove(); }catch(e){}
-    };
-    boot.addEventListener("load", drop, {once:true});
-    f.addEventListener("load", drop, {once:true});
-    setTimeout(drop, 15000);
+    f.classList.add("apple-park");
+    f.style.top = (8 + i * 14) + "px";
+    f.style.height = Math.min(h, 220) + "px";
     f.src = src;
+    const place = ()=>{
+      f.classList.remove("apple-park");
+      f.style.top = "";
+      f.style.height = "";
+    };
+    const slot = f.closest(".aembed") || f;
+    if(!("IntersectionObserver" in window)){ place(); return; }
+    const io = new IntersectionObserver(entries=>{
+      if(entries.some(e=>e.isIntersecting)){
+        place();
+        io.disconnect();
+      }
+    }, {root:null, rootMargin:"40px 0px", threshold:0.01});
+    io.observe(slot);
+    appleWatchers.push(io);
   });
 }
 function appleEmbed(albumId, songId){
@@ -1714,7 +1721,7 @@ function showArticle(p){
     <div class="atext">${renderBody(p.body||p.excerpt||"")}</div>
     ${relatedHTML(p)}`;
   jumpY(0);
-  bootAppleEmbeds(page);
+  parkAppleEmbeds(page);
   $("#aback").addEventListener("click", e=>{ e.preventDefault(); closeArticle(); });
 }
 function jumpY(y){
