@@ -126,6 +126,8 @@ a{color:var(--text)}
 .composer .abody-pic{max-width:520px;width:100%;margin:12px auto}
 .composer .abody-box{position:relative;display:block;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:var(--bg2);cursor:grab}
 .composer .abody-box.drag{cursor:grabbing}
+.composer .abody-box .grid{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .12s;background-image:linear-gradient(to right,rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.5) 1px,transparent 1px);background-size:calc(100%/3) 100%, 100% calc(100%/3);z-index:2}
+.composer .abody-box:hover .grid,.composer .abody-box.drag .grid{opacity:1}
 .composer .abody-box img{position:absolute;left:0;top:0;max-width:none;pointer-events:none}
 .ppanel{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:10px 0 0;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--bg2)}
 .ppanel input[type=text]{flex:1 1 150px;padding:6px 8px;font-size:12px;border-radius:8px}
@@ -488,7 +490,7 @@ function photoBlock(src, author, link, pos, zoom){
   zoom = Math.min(3, Math.max(1, Number(zoom)||1));
   const m = pos.match(/([\d.]+)%\s+([\d.]+)%/);
   const fx = +m[1]/100, fy = +m[2]/100;
-  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}" data-pauthor="${esc(author)}" data-plink="${esc(link)}" data-ppos="${esc(pos)}" data-pzoom="${zoom}">${blkChrome()}<span class="abody-box"><img src="${esc(src)}" alt="" draggable="false" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"></span><span class="ppanel" contenteditable="false"><input type="text" class="pp-author" placeholder="Credit: author / source" value="${esc(author)}"><input type="text" class="pp-link" placeholder="Link to the photo" value="${esc(link)}"><span class="pp-zoomrow"><button class="btn ghost" type="button" data-pz="-1" aria-label="Zoom out">−</button><input type="range" class="pp-zoom" min="1" max="3" step="0.01" value="${zoom}"><button class="btn ghost" type="button" data-pz="1" aria-label="Zoom in">+</button><button class="btn ghost pp-center" type="button">Center</button></span></span>${pcredFor(author,link)}</figure>`;
+  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}" data-pauthor="${esc(author)}" data-plink="${esc(link)}" data-ppos="${esc(pos)}" data-pzoom="${zoom}">${blkChrome()}<span class="abody-box"><img src="${esc(src)}" alt="" draggable="false" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"><span class="grid"></span></span><span class="ppanel" contenteditable="false"><input type="text" class="pp-author" placeholder="Credit: author / source" value="${esc(author)}"><input type="text" class="pp-link" placeholder="Link to the photo" value="${esc(link)}"><span class="pp-zoomrow"><button class="btn ghost" type="button" data-pz="-1" aria-label="Zoom out">−</button><input type="range" class="pp-zoom" min="1" max="3" step="0.01" value="${zoom}"><button class="btn ghost" type="button" data-pz="1" aria-label="Zoom in">+</button><button class="btn ghost pp-center" type="button">Center</button></span></span>${pcredFor(author,link)}</figure>`;
 }
 function fitPhotoFig(fig){
   const img = fig.querySelector(".abody-box img");
