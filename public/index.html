@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-37">
+<meta name="m98-build" content="editorial-38">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -1734,7 +1734,7 @@ function showArticle(p){
     ${creditHTML(p)}
     <span class="tag" style="position:static;margin-top:14px">${esc(p.tag || (p.type==="release" ? (p.rtype||"Release") : "News"))}</span>
     <h1>${titleHTML(p)}</h1>
-    <div class="ameta"><span>${fmtDate(p.date)}</span><span class="dot" style="width:3px;height:3px;border-radius:50%;background:var(--faint)"></span><span>music98.news</span></div>
+    <div class="ameta"><span>${fmtDate(p.date)}</span></div>
     <div class="atext">${renderBody(p.body||p.excerpt||"")}</div>
     ${relatedHTML(p)}`;
   jumpY(0);
