@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-53">
+<meta name="m98-build" content="editorial-54">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -886,6 +886,11 @@ let blobUrl = "";
 let seekBar = null;
 let seekLock = 0;
 let pendingSeek = null;
+let lastSeekT = null;
+let holdSeek = false;
+let holdSeekTimer = 0;
+let scrubMoved = false;
+let scrubStartX = 0;
 function dropBlob(){
   if(!blobUrl) return;
   try{ URL.revokeObjectURL(blobUrl); }catch(e){}
@@ -959,7 +964,8 @@ function previewDur(){
   }catch(e){}
   return 0;
 }
-function applySeek(x){
+function applySeek(x, commit){
+  x = Math.max(0, Math.min(1, Number(x) || 0));
   const d = previewDur();
   if(!d){
     pendingSeek = x;
@@ -968,13 +974,14 @@ function applySeek(x){
   }
   pendingSeek = null;
   const t = Math.max(0, Math.min(d - 0.05, x * d));
-  try{
-    if(typeof audio.fastSeek === "function") audio.fastSeek(t);
-    else audio.currentTime = t;
-  }catch(err){
-    try{ audio.currentTime = t; }catch(err2){}
-  }
   progTo((t / d) * 100, t, d);
+  if(commit === false) return;
+  if(lastSeekT != null && Math.abs(lastSeekT - t) < 0.04) return;
+  lastSeekT = t;
+  holdSeek = true;
+  clearTimeout(holdSeekTimer);
+  holdSeekTimer = setTimeout(()=>{ holdSeek = false; }, 400);
+  try{ audio.currentTime = t; }catch(err){ holdSeek = false; }
 }
 function progTo(p, cur, dur){
   $$("#chartList .chart-row.playing").forEach(row=>{
@@ -1013,6 +1020,9 @@ function stopPreview(){
   curKey = null;
   previewTriedItunes = false;
   pendingSeek = null;
+  lastSeekT = null;
+  holdSeek = false;
+  clearTimeout(holdSeekTimer);
   try{ audio.pause(); audio.removeAttribute("src"); audio.load(); }catch(e){}
   dropBlob();
   progTo(0,0,90);
@@ -1106,6 +1116,9 @@ function selectTrack(key, title, artist, url, prev){
   curKey = key;
   previewTriedItunes = false;
   pendingSeek = null;
+  lastSeekT = null;
+  holdSeek = false;
+  clearTimeout(holdSeekTimer);
   progTo(0,0,90);
   markRows();
   const src = previewPlayUrl(prev, url);
@@ -1118,24 +1131,32 @@ function selectTrack(key, title, artist, url, prev){
 }
 audio.addEventListener("loadedmetadata", ()=>{
   deviceVol();
-  if(pendingSeek != null) applySeek(pendingSeek);
+  if(pendingSeek != null) applySeek(pendingSeek, true);
   else {
     const d = previewDur() || 90;
     progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
   }
 });
 audio.addEventListener("durationchange", ()=>{
-  if(pendingSeek != null && previewDur()) applySeek(pendingSeek);
+  if(seekBar || holdSeek || audio.seeking) return;
+  if(pendingSeek != null && previewDur()) applySeek(pendingSeek, true);
   else {
     const d = previewDur() || 90;
     progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
   }
 });
+audio.addEventListener("seeked", ()=>{
+  holdSeek = false;
+  clearTimeout(holdSeekTimer);
+  if(seekBar) return;
+  const d = previewDur() || 90;
+  progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
+});
 audio.addEventListener("playing", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("play", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
 audio.addEventListener("timeupdate", ()=>{
-  if(seekBar) return;
+  if(seekBar || holdSeek || audio.seeking) return;
   const d = previewDur() || 90;
   progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d);
 });
@@ -1156,18 +1177,19 @@ function pointerX(e){
   if(e.changedTouches && e.changedTouches[0]) return e.changedTouches[0].clientX;
   return e.clientX;
 }
-function seekFromEvent(e, bar){
+function seekFromEvent(e, bar, commit){
   const row = bar && bar.closest(".chart-row");
   if(!row || row.dataset.key !== curKey) return;
   const r = bar.getBoundingClientRect();
   if(!r.width) return;
   const x = Math.max(0, Math.min(1, (pointerX(e) - r.left) / r.width));
-  applySeek(x);
+  applySeek(x, commit);
 }
 function endSeek(e){
   if(!seekBar) return;
-  if(e) seekFromEvent(e, seekBar);
+  if(e && scrubMoved) seekFromEvent(e, seekBar, true);
   seekBar = null;
+  scrubMoved = false;
   seekLock = Date.now();
 }
 document.addEventListener("pointerdown", e=>{
@@ -1179,13 +1201,16 @@ document.addEventListener("pointerdown", e=>{
   e.stopPropagation();
   attachOut();
   seekBar = bar;
+  scrubMoved = false;
+  scrubStartX = pointerX(e);
   try{ bar.setPointerCapture(e.pointerId); }catch(err){}
-  seekFromEvent(e, bar);
+  seekFromEvent(e, bar, true);
 }, true);
 document.addEventListener("pointermove", e=>{
   if(!seekBar) return;
   e.preventDefault();
-  seekFromEvent(e, seekBar);
+  if(Math.abs(pointerX(e) - scrubStartX) > 4) scrubMoved = true;
+  seekFromEvent(e, seekBar, false);
 }, true);
 document.addEventListener("pointerup", endSeek, true);
 document.addEventListener("pointercancel", endSeek, true);
