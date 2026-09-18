@@ -137,6 +137,11 @@
       if (!mk.isPlaying && mk.play) await mk.play();
       return true;
     }
+    if (typeof mk.changeToMediaAtIndex === "function") {
+      await mk.changeToMediaAtIndex(target);
+      if (!mk.isPlaying && mk.play) await mk.play();
+      return true;
+    }
     if (typeof mk.skipToNextItem !== "function" || typeof mk.skipToPreviousItem !== "function") {
       if (mk.queue) mk.queue.position = target;
       if (!mk.isPlaying && mk.play) await mk.play();
