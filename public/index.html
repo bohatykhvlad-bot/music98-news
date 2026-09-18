@@ -294,9 +294,8 @@ iframe.apple-park{
   border:0!important;
 }
 .abody-pic{margin:8px auto 22px;max-width:660px;width:100%}
-.abody-pic.sz-full{max-width:none}
-.abody-pic.sz-half{max-width:420px}
-.abody-pic img{width:100%;border-radius:14px;display:block}
+.abody-box{position:relative;display:block;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--card2)}
+.abody-box img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;border:0;display:block}
 .aback{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin-bottom:16px}
 .aback::before{content:"";width:7px;height:7px;flex:none;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-1px}
 .aback:hover{text-decoration:underline}
@@ -1922,13 +1921,16 @@ function youtubeEmbed(id, start){
 function renderBody(text){
   return String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
     const t = raw.trim();
-    const pic = t.match(/^\[photo:([^|]+)(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?\]$/i);
+    const pic = t.match(/^\[photo:([^|]+)(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?\]$/i);
     if(pic){
-      const sz = (pic[4]||"wide").trim();
-      const cls = (sz==="full"||sz==="half") ? " sz-"+sz : "";
       const author = (pic[2]||"").trim(), link = (pic[3]||"").trim();
+      let pos = (pic[4]||"").trim(), zoom = Number(pic[5]||1);
+      if(!/^[\d.]+%\s+[\d.]+%$/.test(pos)) pos = "50% 50%";
+      if(!(zoom >= 1 && zoom <= 3)) zoom = 1;
+      const m = pos.match(/([\d.]+)%\s+([\d.]+)%/);
+      const fx = (+m[1]/100).toFixed(4), fy = (+m[2]/100).toFixed(4);
       const cred = author ? `<p class="pcred">Photo: ${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(author)}</a>`:esc(author)}</p>` : "";
-      return `<figure class="abody-pic${cls}"><img src="${esc(pic[1].trim())}" alt="">${cred}</figure>`;
+      return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" src="${esc(pic[1].trim())}" alt="" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"></span>${cred}</figure>`;
     }
     const album = t.match(/^\[apple:album:(\d+)\]$/i);
     if(album) return appleEmbed(album[1]);

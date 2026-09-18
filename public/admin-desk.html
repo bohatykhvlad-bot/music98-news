@@ -124,11 +124,14 @@ a{color:var(--text)}
 .composer .yembed iframe{position:absolute;inset:0;width:100%;height:100%;border-radius:0}
 .composer iframe{width:100%;border:0;border-radius:10px;display:block;background:transparent}
 .composer .abody-pic{max-width:520px;width:100%;margin:12px auto}
-.composer .abody-pic.sz-full{max-width:100%}
-.composer .abody-pic.sz-half{max-width:300px}
-.composer .abody-pic img{width:100%;border-radius:10px;display:block}
-.ppanel{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--bg2)}
-.ppanel input,.ppanel select{flex:1 1 150px;padding:6px 8px;font-size:12px;border-radius:8px}
+.composer .abody-box{position:relative;display:block;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:var(--bg2);cursor:grab}
+.composer .abody-box.drag{cursor:grabbing}
+.composer .abody-box img{position:absolute;left:0;top:0;max-width:none;pointer-events:none}
+.ppanel{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:10px 0 0;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--bg2)}
+.ppanel input[type=text]{flex:1 1 150px;padding:6px 8px;font-size:12px;border-radius:8px}
+.ppanel .pp-zoomrow{display:flex;gap:6px;align-items:center;flex:1 1 100%;}
+.ppanel input[type=range]{flex:1}
+.ppanel .btn{padding:4px 10px;font-size:11px}
 .composer .abody-pic .pcred{margin:8px 2px 0;font-size:11px}
 .modal{position:fixed;inset:0;background:rgba(10,16,18,.45);align-items:center;justify-content:center;padding:16px;z-index:30}
 .modal:not(.hide){display:flex}
@@ -479,11 +482,34 @@ function pcredFor(author, link){
   const inner = link ? `<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(author)}</a>` : esc(author);
   return `<p class="pcred">Photo: ${inner}</p>`;
 }
-function photoBlock(src, author, link, size){
+function photoBlock(src, author, link, pos, zoom){
   author = author||""; link = link||"";
-  size = (size==="full"||size==="half") ? size : "wide";
-  const cls = size==="wide" ? "" : " sz-"+size;
-  return `<figure class="blk abody-pic${cls}" contenteditable="false" data-photo="${esc(src)}" data-pauthor="${esc(author)}" data-plink="${esc(link)}" data-psize="${size}">${blkChrome()}<img src="${esc(src)}" alt="" draggable="false"><span class="ppanel" contenteditable="false"><input class="pp-author" placeholder="Credit: author / source" value="${esc(author)}"><input class="pp-link" placeholder="Link to the photo" value="${esc(link)}"><select class="pp-size"><option value="wide"${size==="wide"?" selected":""}>Wide, as video</option><option value="full"${size==="full"?" selected":""}>Full column</option><option value="half"${size==="half"?" selected":""}>Half width</option></select></span>${pcredFor(author,link)}</figure>`;
+  if(!/^[\d.]+%\s+[\d.]+%$/.test(pos||"")) pos = "50% 50%";
+  zoom = Math.min(3, Math.max(1, Number(zoom)||1));
+  const m = pos.match(/([\d.]+)%\s+([\d.]+)%/);
+  const fx = +m[1]/100, fy = +m[2]/100;
+  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}" data-pauthor="${esc(author)}" data-plink="${esc(link)}" data-ppos="${esc(pos)}" data-pzoom="${zoom}">${blkChrome()}<span class="abody-box"><img src="${esc(src)}" alt="" draggable="false" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"></span><span class="ppanel" contenteditable="false"><input type="text" class="pp-author" placeholder="Credit: author / source" value="${esc(author)}"><input type="text" class="pp-link" placeholder="Link to the photo" value="${esc(link)}"><span class="pp-zoomrow"><button class="btn ghost" type="button" data-pz="-1" aria-label="Zoom out">−</button><input type="range" class="pp-zoom" min="1" max="3" step="0.01" value="${zoom}"><button class="btn ghost" type="button" data-pz="1" aria-label="Zoom in">+</button><button class="btn ghost pp-center" type="button">Center</button></span></span>${pcredFor(author,link)}</figure>`;
+}
+function fitPhotoFig(fig){
+  const img = fig.querySelector(".abody-box img");
+  if(!img) return;
+  fitCover(img, img.dataset.fx, img.dataset.fy, img.dataset.zoom);
+}
+function bindPhotoFit(fig){
+  const img = fig.querySelector(".abody-box img");
+  if(!img) return;
+  const go = ()=> fitPhotoFig(fig);
+  if(img.complete && img.naturalWidth) go();
+  else img.addEventListener("load", go, {once:true});
+  if(typeof ResizeObserver !== "undefined" && !fig._pro){
+    fig._pro = new ResizeObserver(go);
+    fig._pro.observe(fig.querySelector(".abody-box"));
+  }
+}
+function photoPosOf(fig){
+  const fx = Math.min(1, Math.max(0, Number(fig.querySelector(".abody-box img").dataset.fx)));
+  const fy = Math.min(1, Math.max(0, Number(fig.querySelector(".abody-box img").dataset.fy)));
+  return (fx*100).toFixed(1).replace(/\.0$/,"")+"% "+(fy*100).toFixed(1).replace(/\.0$/,"")+"%";
 }
 function parseYouTube(raw){
   const s = String(raw||"").trim();
@@ -774,9 +800,10 @@ function serialize(){
     if(node.nodeName==="FIGURE"){
       if(node.dataset.apple) parts.push("[apple:"+node.dataset.apple+"]");
       if(node.dataset.photo){
-        const pa = node.dataset.pauthor||"", pl = node.dataset.plink||"", pz = node.dataset.psize||"wide";
+        const pa = node.dataset.pauthor||"", pl = node.dataset.plink||"";
+        const pp = node.dataset.ppos||"50% 50%", pz = Number(node.dataset.pzoom||1);
         let tag = node.dataset.photo;
-        if(pa || pl || pz!=="wide") tag += "|"+pa+"|"+pl+"|"+pz;
+        if(pa || pl || pp!=="50% 50%" || pz!==1) tag += "|"+pa+"|"+pl+"|"+pp+"|"+pz;
         parts.push("[photo:"+tag+"]");
       }
       if(node.dataset.youtube) parts.push("[youtube:"+node.dataset.youtube+"]");
@@ -795,8 +822,12 @@ function serialize(){
 function bodyToComposer(text){
   const html = String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
     const t = raw.trim();
-    const pic = t.match(/^\[photo:([^|]+)(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?\]$/i);
-    if(pic) return photoBlock(pic[1], pic[2]||"", pic[3]||"", pic[4]||"wide");
+    const pic = t.match(/^\[photo:([^|]+)(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?\]$/i);
+    if(pic){
+      let pos = pic[4]||"", zoom = pic[5]||"";
+      if(!zoom && /^[\d.]+$/.test(pos||"") ) { zoom = pos; pos = ""; }  /* legacy size slot */
+      return photoBlock(pic[1], pic[2]||"", pic[3]||"", pos, zoom);
+    }
     const album = t.match(/^\[apple:album:(\d+)\]$/i);
     if(album) return appleBlock("album", album[1]);
     const song = t.match(/^\[apple:song:(\d+):(\d+)\]$/i);
@@ -806,6 +837,7 @@ function bodyToComposer(text){
     return "<p>"+rich(raw)+"</p>";
   }).join("");
   $("#composer").innerHTML = html || "<p><br></p>";
+  document.querySelectorAll("#composer figure[data-photo]").forEach(bindPhotoFit);
 }
 
 function parsePos(p){
@@ -1122,12 +1154,57 @@ $("#composer").addEventListener("input", e=>{
   const old = fig.querySelector(".pcred"); if(old) old.remove();
   fig.insertAdjacentHTML("beforeend", pcredFor(fig.dataset.pauthor||"", fig.dataset.plink||""));
 });
-$("#composer").addEventListener("change", e=>{
+$("#composer").addEventListener("input", e=>{
   const fig = e.target.closest ? e.target.closest("figure[data-photo]") : null;
-  if(!fig || !e.target.classList.contains("pp-size")) return;
-  fig.dataset.psize = e.target.value;
-  fig.classList.remove("sz-full","sz-half");
-  if(e.target.value!=="wide") fig.classList.add("sz-"+e.target.value);
+  if(!fig || !e.target.classList.contains("pp-zoom")) return;
+  const img = fig.querySelector(".abody-box img");
+  img.dataset.zoom = e.target.value;
+  fig.dataset.pzoom = e.target.value;
+  fitPhotoFig(fig);
+});
+$("#composer").addEventListener("click", e=>{
+  const fig = e.target.closest ? e.target.closest("figure[data-photo]") : null;
+  if(!fig) return;
+  const img = fig.querySelector(".abody-box img");
+  if(e.target.dataset.pz){
+    const z = Math.min(3, Math.max(1, (Number(img.dataset.zoom)||1) + Number(e.target.dataset.pz)*0.1));
+    img.dataset.zoom = z; fig.dataset.pzoom = z;
+    const r = fig.querySelector(".pp-zoom"); if(r) r.value = z;
+    fitPhotoFig(fig);
+  }
+  if(e.target.classList.contains("pp-center")){
+    img.dataset.fx = 0.5; img.dataset.fy = 0.5;
+    fig.dataset.ppos = "50% 50%";
+    fitPhotoFig(fig);
+  }
+});
+let pdrag = null;
+$("#composer").addEventListener("mousedown", e=>{
+  const box = e.target.closest ? e.target.closest(".abody-box") : null;
+  if(!box) return;
+  const fig = box.closest("figure[data-photo]");
+  const img = box.querySelector("img");
+  pdrag = {fig, img, x:e.clientX, y:e.clientY, fx:Number(img.dataset.fx), fy:Number(img.dataset.fy)};
+  box.classList.add("drag");
+  e.preventDefault();
+});
+window.addEventListener("mousemove", e=>{
+  if(!pdrag) return;
+  const b = pdrag.img.parentElement.getBoundingClientRect();
+  const z = Math.min(3, Math.max(1, Number(pdrag.img.dataset.zoom)||1));
+  const dw = b.width * z, dh = b.height * z;
+  let fx = pdrag.fx - (e.clientX - pdrag.x)/Math.max(1,dw);
+  let fy = pdrag.fy - (e.clientY - pdrag.y)/Math.max(1,dh);
+  fx = Math.min(1, Math.max(0, fx)); fy = Math.min(1, Math.max(0, fy));
+  pdrag.img.dataset.fx = fx; pdrag.img.dataset.fy = fy;
+  pdrag.fig.dataset.ppos = (fx*100).toFixed(1).replace(/\.0$/,"")+"% "+(fy*100).toFixed(1).replace(/\.0$/,"")+"%";
+  fitPhotoFig(pdrag.fig);
+});
+window.addEventListener("mouseup", ()=>{
+  if(!pdrag) return;
+  const box = pdrag.img.parentElement;
+  box.classList.remove("drag");
+  pdrag = null;
 });
 $("#btnPhoto").onclick = ()=>{ freezeCaret(); $("#bodyPhoto").click(); };
 $("#bodyPhoto").onchange = e=>{
@@ -1135,6 +1212,7 @@ $("#bodyPhoto").onchange = e=>{
   if(!f){ thawCaret(); return; }
   readPhoto(f, src=>{
     insertHTML(photoBlock(src));
+    document.querySelectorAll("#composer figure[data-photo]").forEach(bindPhotoFit);
     e.target.value = "";
   }, 1400);
 };
