@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-35">
+<meta name="m98-build" content="editorial-36">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -231,17 +231,25 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
 .aembed.song{max-width:600px;width:100%;margin:6px auto 22px}
 .aembed.song iframe{height:166px;max-width:100%}
-/* Boot the real iframe in the viewport, but paint nothing — never overlay the header. */
-.aembed iframe.apple-park{
+#appleBoot{position:fixed;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:0}
+iframe.apple-park{
   position:fixed!important;
   left:0!important;
   top:0!important;
-  opacity:0!important;
+  width:660px!important;
+  max-width:660px!important;
+  opacity:.001!important;
   pointer-events:none!important;
-  z-index:-1!important;
-  clip:rect(0,0,0,0)!important;
-  clip-path:inset(100%)!important;
-  -webkit-clip-path:inset(100%)!important;
+  z-index:0!important;
+  border:0!important;
+}
+iframe.apple-live{
+  position:fixed!important;
+  border:0;
+  border-radius:12px;
+  z-index:5;
+  background:transparent;
+  pointer-events:auto;
 }
 .abody-pic{margin:8px 0 22px}
 .abody-pic img{width:100%;border-radius:14px;display:block}
@@ -980,6 +988,11 @@ function pauseAllMedia(){
     if(!keep) return;
     f.dataset.keepSrc = keep;
     try{ f.contentWindow && f.contentWindow.postMessage("pause", "*"); }catch(e){}
+    if(f.dataset.appleBoot){
+      parkAppleFrame(f);
+      if(pageIsAway()) f.src = "about:blank";
+      return;
+    }
     const n = document.createElement("iframe");
     for(const a of f.attributes){
       if(a.name === "src") continue;
@@ -990,14 +1003,19 @@ function pauseAllMedia(){
     n.setAttribute("aria-hidden", "true");
     f.replaceWith(n);
   });
-  dropAppleBoots();
 }
 function restoreAppleFrames(){
   $$("iframe").forEach(f=>{
     if(!f.dataset.keepSrc) return;
-    f.src = f.dataset.keepSrc;
+    if(f.getAttribute("src") === "about:blank" || !f.getAttribute("src")) f.src = f.dataset.keepSrc;
+    if(f.dataset.appleBoot){
+      appleBoots[f.dataset.keepSrc] = f;
+      parkAppleFrame(f);
+      return;
+    }
     f.removeAttribute("aria-hidden");
   });
+  if(document.body.classList.contains("articlepage")) bindAppleEmbeds($("#articlePage"));
 }
 function pageIsAway(){
   return document.hidden || document.visibilityState === "hidden";
@@ -1149,7 +1167,7 @@ function loadPublishedDesk(){
     data.posts = j.posts;
     renderNews(); renderReleases(); renderHints();
     if($("#ef_list")) renderPostList();
-    prefetchAppleFromPosts(j.posts);
+    bootAppleFromPosts(j.posts);
   }).catch(()=>{});
 }
 function readPhoto(file, cb){
@@ -1638,62 +1656,100 @@ function appleEmbedUrl(albumId, songId){
   src += "at="+APPLE_AT+"&ct="+encodeURIComponent(APPLE_CT||"music98");
   return src;
 }
-const applePrefetched = {};
+const appleBoots = {};
 let appleWatchers = [];
+let applePins = [];
+let applePinRaf = 0;
+const APPLE_IFRAME_ALLOW = "autoplay *; encrypted-media *; fullscreen *; clipboard-write";
+const APPLE_IFRAME_SANDBOX = "allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation";
+function appleBootHost(){
+  let h = $("#appleBoot");
+  if(!h){
+    h = document.createElement("div");
+    h.id = "appleBoot";
+    h.setAttribute("aria-hidden","true");
+    document.body.appendChild(h);
+  }
+  return h;
+}
+function parkAppleFrame(f){
+  if(!f) return;
+  f.classList.add("apple-park");
+  f.classList.remove("apple-live");
+  ["left","top","width","height","opacity","zIndex","pointerEvents","position"].forEach(k=> f.style[k] = "");
+  f.setAttribute("aria-hidden","true");
+}
 function dropAppleBoots(){
   appleWatchers.splice(0).forEach(w=>{ try{ w.disconnect(); }catch(e){} });
-  $$(".apple-park").forEach(f=>{
-    f.classList.remove("apple-park");
-    f.style.top = "";
-    f.style.height = "";
-    f.removeAttribute("aria-hidden");
+  applePins = [];
+  Object.values(appleBoots).forEach(parkAppleFrame);
+}
+function tickApplePins(){
+  applePinRaf = 0;
+  applePins.forEach(p=>{
+    if(!p.slot || !p.slot.isConnected || !p.frame) return;
+    const r = p.slot.getBoundingClientRect();
+    const f = p.frame;
+    f.style.left = r.left+"px";
+    f.style.top = r.top+"px";
+    f.style.width = r.width+"px";
+    f.style.height = p.h+"px";
   });
 }
-function appleIframeHTML(src, h){
-  return `<iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${h}" loading="eager" fetchpriority="high" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${esc(src)}" title="Listen on Apple Music"></iframe>`;
+function askApplePins(){
+  if(!applePinRaf) applePinRaf = requestAnimationFrame(tickApplePins);
 }
-function prefetchApple(url){
-  if(!url || applePrefetched[url]) return;
-  applePrefetched[url] = 1;
-  const l = document.createElement("link");
-  l.rel = "prefetch";
-  l.href = url;
-  document.head.appendChild(l);
+function pinAppleFrame(f, slot, h){
+  if(!f || !slot) return;
+  f.classList.remove("apple-park");
+  f.classList.add("apple-live");
+  f.removeAttribute("aria-hidden");
+  f.style.position = "fixed";
+  f.style.opacity = "1";
+  f.style.zIndex = "5";
+  f.style.pointerEvents = "auto";
+  f.style.borderRadius = "12px";
+  if(!applePins.some(p=>p.frame===f)) applePins.push({frame:f, slot, h});
+  else applePins.filter(p=>p.frame===f).forEach(p=>{ p.slot = slot; p.h = h; });
+  tickApplePins();
 }
-function prefetchAppleFromPosts(posts){
+function ensureAppleBoot(src, h){
+  if(!src) return null;
+  const old = appleBoots[src];
+  if(old && old.isConnected){
+    if((old.getAttribute("src")||"") === "about:blank" && old.dataset.keepSrc) old.src = old.dataset.keepSrc;
+    return old;
+  }
+  const f = document.createElement("iframe");
+  f.setAttribute("allow", APPLE_IFRAME_ALLOW);
+  f.setAttribute("sandbox", APPLE_IFRAME_SANDBOX);
+  f.setAttribute("title", "Listen on Apple Music");
+  f.setAttribute("height", String(h||166));
+  f.setAttribute("loading", "eager");
+  f.setAttribute("fetchpriority", "high");
+  f.dataset.appleBoot = "1";
+  f.dataset.keepSrc = src;
+  f.className = "apple-park";
+  f.src = src;
+  appleBootHost().appendChild(f);
+  appleBoots[src] = f;
+  return f;
+}
+function bootAppleFromPosts(posts){
   (posts||[]).forEach(p=>{
     String(p.body||"").replace(/\[apple:(album|song):(\d+)(?::(\d+))?\]/gi, (_, kind, a, s)=>{
-      prefetchApple(appleEmbedUrl(a, s));
+      ensureAppleBoot(appleEmbedUrl(a, s), s ? 166 : 450);
     });
   });
 }
-function parkAppleEmbeds(root){
+function bindAppleEmbeds(root){
   dropAppleBoots();
-  const frames = [...(root||document).querySelectorAll(".aembed iframe")];
-  frames.forEach(f=>{
-    const src = f.getAttribute("src");
-    if(!src) return;
-    f.loading = "eager";
-    f.setAttribute("fetchpriority", "high");
-    f.setAttribute("aria-hidden", "true");
-    f.classList.add("apple-park");
-    f.src = src;
-    const place = ()=>{
-      f.classList.remove("apple-park");
-      f.style.top = "";
-      f.style.height = "";
-      f.removeAttribute("aria-hidden");
-    };
-    const slot = f.closest(".aembed") || f;
-    if(!("IntersectionObserver" in window)){ place(); return; }
-    const io = new IntersectionObserver(entries=>{
-      if(entries.some(e=>e.isIntersecting)){
-        place();
-        io.disconnect();
-      }
-    }, {root:null, rootMargin:"40px 0px", threshold:0.01});
-    io.observe(slot);
-    appleWatchers.push(io);
+  const slots = [...(root||document).querySelectorAll(".aembed[data-apple-src]")];
+  slots.forEach(slot=>{
+    const src = slot.dataset.appleSrc;
+    const h = slot.classList.contains("song") ? 166 : 450;
+    const f = ensureAppleBoot(src, h);
+    if(f) pinAppleFrame(f, slot, h);
   });
 }
 function appleEmbed(albumId, songId){
@@ -1703,7 +1759,8 @@ function appleEmbed(albumId, songId){
   const h = track ? 166 : 450;
   const src = appleEmbedUrl(id, track);
   const kind = track ? " song" : " album";
-  return `<div class="aembed${kind}" style="min-height:${h}px">${appleIframeHTML(src, h)}</div>`;
+  ensureAppleBoot(src, h);
+  return `<div class="aembed${kind}" data-apple-src="${esc(src)}" style="min-height:${h}px"></div>`;
 }
 function renderBody(text){
   return String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
@@ -1732,7 +1789,8 @@ function showArticle(p){
     <div class="atext">${renderBody(p.body||p.excerpt||"")}</div>
     ${relatedHTML(p)}`;
   jumpY(0);
-  parkAppleEmbeds(page);
+  bindAppleEmbeds(page);
+  page.querySelectorAll("img").forEach(im=> im.addEventListener("load", askApplePins, {once:true}));
   $("#aback").addEventListener("click", e=>{ e.preventDefault(); closeArticle(); });
 }
 function jumpY(y){
@@ -1986,7 +2044,9 @@ $("#es_reset").addEventListener("click", ()=>{
 });
 
 /* ---- init ---- */
-S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); loadPublishedDesk(); prefetchAppleFromPosts(data.posts); route();
+S.feed = "us-songs"; saveS(); setLogos(); renderAll(); renderSwitch(); refreshDailyTop50(); loadPublishedDesk(); bootAppleFromPosts(data.posts); route();
+window.addEventListener("scroll", askApplePins, {passive:true});
+window.addEventListener("resize", askApplePins);
 </script>
 </body>
 </html>
