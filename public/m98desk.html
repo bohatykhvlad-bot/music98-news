@@ -86,11 +86,15 @@ a{color:var(--text)}
       <input id="title">
       <label for="excerpt">Short teaser</label>
       <textarea id="excerpt" style="min-height:70px"></textarea>
-      <label for="body">Body (blank line = new paragraph)</label>
+      <label for="body">Body (blank line = new paragraph; album titles in *asterisks* for italics; songs in "quotes"; Apple Music: [apple:album:ID] or [apple:song:ALBUM:TRACK])</label>
       <textarea id="body"></textarea>
       <label for="photo">Cover photo</label>
       <input id="photo" type="file" accept="image/*">
       <img id="preview" class="cover hide" alt="">
+      <label for="credit">Photo credit (under the picture)</label>
+      <input id="credit" placeholder="Photographer / Wikimedia Commons (CC BY 4.0)">
+      <label for="creditUrl">Credit link</label>
+      <input id="creditUrl" placeholder="https://commons.wikimedia.org/wiki/File:...">
       <label><input id="pinned" type="checkbox" style="width:auto"> Pin to the top of News</label>
       <div class="actions">
         <button class="btn primary" id="save" type="button">Publish to the site</button>
@@ -124,6 +128,7 @@ const $ = s => document.querySelector(s);
 const KEY = "music98_admin_key";
 let posts = [];
 let cover = "";
+let coverMeta = {pos:"center 20%"};
 let editing = null;
 
 function toast(m){
@@ -184,7 +189,10 @@ function fillForm(p){
   $("#excerpt").value = p?.excerpt || "";
   $("#body").value = p?.body || "";
   $("#pinned").checked = !!p?.pinned;
+  $("#credit").value = (p?.cover && p.cover.credit) || "";
+  $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
   cover = (p?.cover && p.cover.src) || "";
+  coverMeta = p?.cover && p.cover.kind === "img" ? {pos: p.cover.pos || "center 20%"} : {pos:"center 20%"};
   const prev = $("#preview");
   if(cover){ prev.src = cover; prev.classList.remove("hide"); } else { prev.classList.add("hide"); }
 }
@@ -238,7 +246,13 @@ $("#save").onclick = async ()=>{
     body: $("#body").value.trim(),
     date: $("#date").value || today(),
     pinned: $("#pinned").checked,
-    cover: cover ? {kind:"img", src:cover} : {kind:"preset", i:0}
+    cover: cover ? {
+      kind:"img",
+      src:cover,
+      credit: $("#credit").value.trim(),
+      creditUrl: $("#creditUrl").value.trim(),
+      pos: coverMeta.pos || "center 20%"
+    } : {kind:"preset", i:0}
   };
   const ix = posts.findIndex(p=>p.id===rec.id);
   if(ix>=0) posts[ix] = rec; else posts.unshift(rec);
