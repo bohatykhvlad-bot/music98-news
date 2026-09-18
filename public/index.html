@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-23">
+<meta name="m98-build" content="editorial-24">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -215,8 +215,8 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 #articlePage .atext p{margin:0 0 16px}
 .aembed{margin:6px 0 22px;max-width:660px;background:transparent;border-radius:12px;overflow:hidden}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
-.aembed.song{max-width:520px}
-.aembed.song iframe{height:150px}
+.aembed.song{max-width:360px;width:100%;margin:6px auto 22px}
+.aembed.song iframe{height:140px;max-width:100%}
 .aback{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin-bottom:16px}
 .aback::before{content:"";width:7px;height:7px;flex:none;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-1px}
 .aback:hover{text-decoration:underline}
@@ -1571,7 +1571,7 @@ function appleEmbed(albumId, songId){
   const id = String(albumId||"").replace(/\D/g,"");
   const track = String(songId||"").replace(/\D/g,"");
   if(!id) return "";
-  const h = track ? 150 : 450;
+  const h = track ? 140 : 450;
   const src = appleEmbedUrl(id, track);
   const kind = track ? " song" : " album";
   return `<div class="aembed${kind}" style="min-height:${h}px"><iframe allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write" frameborder="0" height="${h}" loading="${track ? "lazy" : "eager"}" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="${esc(src)}" title="Listen on Apple Music"></iframe></div>`;
