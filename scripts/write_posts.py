@@ -62,8 +62,8 @@ POSTS = [
         "artist": "Olivia Rodrigo",
         "cover": {
             "kind": "img",
-            "src": "photos/olivia-rodrigo-glastonbury-2025.jpg",
-            "pos": "center top",
+            "src": "photos/olivia-rodrigo-glastonbury-2025-banner.jpg",
+            "pos": "center center",
             "credit": "Raph_PH / Wikimedia Commons (CC BY 4.0)",
             "creditUrl": "https://commons.wikimedia.org/wiki/File:Olivia_Rodrigo_2.jpeg",
         },
@@ -80,8 +80,8 @@ POSTS = [
         "date": "2026-09-18",
         "cover": {
             "kind": "img",
-            "src": "photos/carly-rae-jepsen-primavera-2019.jpg",
-            "pos": "center top",
+            "src": "photos/carly-rae-jepsen-primavera-2019-banner.jpg",
+            "pos": "center center",
             "credit": "Raph_PH / Wikimedia Commons (CC BY 2.0)",
             "creditUrl": "https://commons.wikimedia.org/wiki/File:Carly_Rae_Jepsen_Primavera19_-146_(48986111926)_(cropped).jpg",
         },

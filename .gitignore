@@ -13,3 +13,4 @@ tmp-scaffold/
 download.html
 .agents/
 skills-lock.json
+scripts/*.onnx
