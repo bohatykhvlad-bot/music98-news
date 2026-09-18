@@ -180,6 +180,7 @@
     var path = ev.composedPath ? ev.composedPath() : [];
     var host = hostFromPath(path);
     if (!host) return;
+    lockAlbumGrid();
     var mk = music();
     if (!mk) return;
     patch(mk);
@@ -196,6 +197,47 @@
     });
   }
 
+  /* The embed recomputes its two-column grid for a frame or two while a
+     track row is pressed, which reads as a sideways jump. Pin the columns
+     to whatever the large layout computed, and re-pin on real resizes. */
+  function deepQuery(sel) {
+    var stack = [document];
+    while (stack.length) {
+      var root = stack.pop();
+      var hit = root.querySelector ? root.querySelector(sel) : null;
+      if (hit) return hit;
+      var els = root.querySelectorAll ? root.querySelectorAll("*") : [];
+      for (var i = 0; i < els.length; i++) if (els[i].shadowRoot) stack.push(els[i].shadowRoot);
+    }
+    return null;
+  }
+
+  function lockAlbumGrid() {
+    var el = deepQuery(".container-player");
+    if (!el) return;
+    var cs = window.getComputedStyle(el);
+    if (cs.display.indexOf("grid") < 0) return;
+    var parts = cs.gridTemplateColumns.trim().split(/\s+/);
+    var mid = Math.round(parseFloat(parts[1] || "0"));
+    if (parts.length === 3 && mid >= 200 && mid <= 260) {
+      if (el.__m98Lock !== cs.gridTemplateColumns) {
+        el.style.setProperty("grid-template-columns", cs.gridTemplateColumns, "important");
+        el.__m98Lock = cs.gridTemplateColumns;
+      }
+    } else if (el.__m98Lock) {
+      el.style.removeProperty("grid-template-columns");
+      el.__m98Lock = "";
+    }
+  }
+
+  var rsT = null;
+  window.addEventListener("resize", function () {
+    var el = deepQuery(".container-player");
+    if (el && el.__m98Lock) { el.style.removeProperty("grid-template-columns"); el.__m98Lock = ""; }
+    clearTimeout(rsT);
+    rsT = setTimeout(lockAlbumGrid, 180);
+  });
+
   document.addEventListener("click", onTrackGesture, true);
   document.addEventListener("keydown", onTrackGesture, true);
 
@@ -205,9 +247,12 @@
   }
   document.addEventListener("musickitloaded", watch);
   watch();
+  lockAlbumGrid();
   var n = 0;
   var t = setInterval(function () {
     watch();
+    lockAlbumGrid();
     if (++n > 240) clearInterval(t);
   }, 50);
+  setInterval(lockAlbumGrid, 400);
 })();
