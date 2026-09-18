@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-57">
+<meta name="m98-build" content="editorial-58">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -1255,6 +1255,15 @@ function isLivePost(p){
   }
   return s === "live";
 }
+function postTime(p){
+  const at = Date.parse((p && p.publishAt) || "");
+  if(Number.isFinite(at)) return at;
+  const d = Date.parse((p && p.date) || "");
+  return Number.isFinite(d) ? d : 0;
+}
+function byFresh(a,b){
+  return (b.pinned?1:0)-(a.pinned?1:0) || postTime(b)-postTime(a);
+}
 function loadPublishedDesk(){
   const grab = u => fetch(u, {cache:"no-store"}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   const paint = posts => {
@@ -1493,8 +1502,7 @@ function chartMatches(r){
 
 /* ============ render ============ */
 function renderNews(){
-  const posts = data.posts.filter(p=>p.type==="news" && matches(p))
-    .sort((a,b)=> (b.pinned?1:0)-(a.pinned?1:0) || (b.date||"").localeCompare(a.date||""));
+  const posts = data.posts.filter(p=>p.type==="news" && matches(p)).sort(byFresh);
   const hero = posts[0], rest = posts.slice(1);
   $("#heroSlot").innerHTML = hero ? `
     <a class="hero" href="#post/${hero.id}">
@@ -1519,7 +1527,7 @@ function renderNews(){
 }
 function renderReleases(){
   const posts = data.posts.filter(p=>p.type==="release" && matches(p))
-    .sort((a,b)=> (b.date||"").localeCompare(a.date||""));
+    .sort((a,b)=> postTime(b)-postTime(a));
   $("#relGrid").innerHTML = posts.map(p=>`
     <a class="card square" href="#post/${p.id}">
       <div class="cover">${coverImg(p,true,true)}
@@ -1732,7 +1740,7 @@ function relatedPosts(p){
   const out = scored.slice(0,3).map(x=>x.q);
   if(out.length<3){
     data.posts.filter(q=>q.id!==p.id && !out.includes(q))
-      .sort((a,b)=>(b.date||"").localeCompare(a.date||""))
+      .sort((a,b)=> postTime(b)-postTime(a))
       .forEach(q=>{ if(out.length<3) out.push(q); });
   }
   return out;

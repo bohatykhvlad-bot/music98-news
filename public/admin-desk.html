@@ -1308,8 +1308,11 @@ function collectPost(status){
 async function writePost(status){
   const rec = collectPost(status);
   if(!rec) return;
-  if(!rec.publishAt) delete rec.publishAt;
   const ix = posts.findIndex(p=>p.id===rec.id);
+  const prev = ix>=0 ? posts[ix] : null;
+  const wasLive = prev && ((prev.status || "live") === "live");
+  if(status === "live" && !wasLive) rec.publishAt = new Date().toISOString();
+  if(!rec.publishAt) delete rec.publishAt;
   if(ix>=0) posts[ix] = rec; else posts.unshift(rec);
   try{
     await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts})});
