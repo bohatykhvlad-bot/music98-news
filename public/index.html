@@ -704,10 +704,9 @@ function lockFocus(p, yVal){
   return {x, y};
 }
 function cardFocus(p){ return lockFocus(p, p && p.cover && p.cover.cardY); }
-function heroFocus(p){ return lockFocus(p, p && p.cover && p.cover.heroY); }
 function coverImg(p, square, lazy, mode){
   const extra = lazy ? ' loading="lazy"' : '';
-  const f = mode === "card" ? cardFocus(p) : (mode === "hero" ? heroFocus(p) : coverFocus(p));
+  const f = mode === "card" ? cardFocus(p) : coverFocus(p);
   const z = coverZoom(p);
   return `<img class="js-cover" src="${esc(coverOf(p, square))}" alt="" draggable="true"${extra} data-fx="${f.x}" data-fy="${f.y}" data-zoom="${z}">`;
 }
@@ -1565,7 +1564,7 @@ function renderNews(){
   const hero = posts[0], rest = posts.slice(1);
   $("#heroSlot").innerHTML = hero ? `
     <a class="hero" href="#post/${hero.id}">
-      <div class="cover">${coverImg(hero,false,false,"hero")}</div>
+      <div class="cover">${coverImg(hero,false)}</div>
       <div class="body">
         <h2>${titleHTML(hero)}</h2>
         <p>${rich(hero.excerpt||"")}</p>

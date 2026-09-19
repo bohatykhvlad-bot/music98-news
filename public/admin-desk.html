@@ -203,7 +203,6 @@ a{color:var(--text)}
             <button class="btn ghost" type="button" id="centerCover">Center</button>
             <button class="btn primary" type="button" id="modeMain" title="Full crop, both axes">Main</button>
             <button class="btn ghost" type="button" id="modeCard" title="Square card: vertical only">Card</button>
-            <button class="btn ghost" type="button" id="modeHero" title="Main news card: vertical only">Main news</button>
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><input id="lockH" type="checkbox" style="width:auto"> Lock horizontal for previews</label>
             <button class="btn primary" type="button" data-aspect="16/9" id="asp169">16:9</button>
             <button class="btn ghost" type="button" data-aspect="1/1" id="asp11">1:1</button>
@@ -312,7 +311,7 @@ const KEY = "music98_admin_key";
 const APPLE_AT = "1001l3aZW";
 let posts = [];
 let coverSrc = "";
-let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, heroY:0.5, lockX:null, lockH:false};
+let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, lockX:null, lockH:false};
 let cropMode = "main";   /* main | card | hero */
 let editing = null;
 let appleKind = "song";
@@ -892,20 +891,16 @@ function lockFx(){
   return (cropMode !== "main" && crop.lockH && crop.lockX != null) ? crop.lockX : crop.x;
 }
 function setCropMode(m){
-  cropMode = m;
+  cropMode = (m === "card") ? "card" : "main";
   const stage = $("#stage");
-  stage.classList.toggle("cardmode", m !== "main");
-  stage.style.aspectRatio = m === "card" ? "1 / 1" : (m === "hero" ? "16 / 9" : (crop.aspect === "1/1" ? "1 / 1" : "16 / 9"));
-  stage.style.maxWidth = m === "hero" ? "610px" : "";
-  stage.style.marginInline = m === "hero" ? "auto" : "";
-  $("#miniFrame").classList.toggle("active", m === "card");
-  $("#miniHero").classList.toggle("active", m === "hero");
-  $("#modeMain").classList.toggle("primary", m === "main");
-  $("#modeCard").classList.toggle("primary", m === "card");
-  $("#modeHero").classList.toggle("primary", m === "hero");
-  $("#modeCard").classList.toggle("ghost", m !== "card");
-  $("#modeHero").classList.toggle("ghost", m !== "hero");
-  $("#modeMain").classList.toggle("ghost", m !== "main");
+  stage.classList.toggle("cardmode", cropMode === "card");
+  stage.style.aspectRatio = cropMode === "card" ? "1 / 1" : (crop.aspect === "1/1" ? "1 / 1" : "16 / 9");
+  $("#miniFrame").classList.toggle("active", cropMode === "card");
+  $("#miniHero").classList.toggle("active", false);
+  $("#modeMain").classList.toggle("primary", cropMode === "main");
+  $("#modeCard").classList.toggle("primary", cropMode === "card");
+  $("#modeMain").classList.toggle("ghost", cropMode !== "main");
+  $("#modeCard").classList.toggle("ghost", cropMode !== "card");
   layoutCrop();
 }
 function paintMini(){
@@ -926,14 +921,13 @@ function paintMini(){
     else m.onload = go;
   };
   paint("miniImg", lockFx(), crop.cardY);
-  paint("miniHeroImg", lockFx(), crop.heroY);
+  paint("miniHeroImg", crop.x, crop.y);
 }
 function layoutCrop(){
   const stage = $("#stage");
   const img = $("#stageImg");
   if(!coverSrc || !img.naturalWidth){ paintMini(); return; }
   if(cropMode === "card"){ fitCover(img, lockFx(), crop.cardY, crop.zoom); paintMini(); return; }
-  if(cropMode === "hero"){ fitCover(img, lockFx(), crop.heroY, crop.zoom); paintMini(); return; }
   const sw = stage.clientWidth, sh = stage.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
   const z = crop.zoom || 1;
@@ -956,9 +950,7 @@ function setCover(src, pos, zoom, cardY){
   crop.x = parsed.x; crop.y = parsed.y; crop.zoom = Number(zoom)||1;
   const cy = Number(cardY);
   crop.cardY = (cy >= 0 && cy <= 1) ? cy : parsed.y;
-  const hy = Number(arguments[4]);
-  crop.heroY = (hy >= 0 && hy <= 1) ? hy : parsed.y;
-  const lxRaw = arguments[5];
+  const lxRaw = arguments[4];
   const lx = (lxRaw == null || lxRaw === "") ? NaN : Number(lxRaw);
   crop.lockX = (lx >= 0 && lx <= 1) ? lx : null;
   crop.lockH = crop.lockX != null;
@@ -974,10 +966,9 @@ function setCover(src, pos, zoom, cardY){
 }
 
 $("#miniFrame").addEventListener("click", ()=> setCropMode("card"));
-$("#miniHero").addEventListener("click", ()=> setCropMode("hero"));
+$("#miniHero").addEventListener("click", ()=> setCropMode("main"));
 $("#modeMain").addEventListener("click", ()=> setCropMode("main"));
 $("#modeCard").addEventListener("click", ()=> setCropMode("card"));
-$("#modeHero").addEventListener("click", ()=> setCropMode("hero"));
 $("#lockH").addEventListener("change", e=>{
   crop.lockH = e.target.checked;
   if(crop.lockH) crop.lockX = Math.round(crop.x*100)/100;
@@ -1026,13 +1017,13 @@ function fillForm(p){
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
   const src = (p?.cover && p.cover.src) || "";
-  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.heroY, p.cover.lockX);
+  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.lockX);
   else {
     coverSrc = "";
     $("#stageImg").classList.add("hide");
     $("#stageImg").removeAttribute("src");
     $("#coverHint").classList.remove("hide");
-    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, heroY:0.5, lockX:null, lockH:false};
+    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, lockX:null, lockH:false};
     $("#zoom").value = 1;
     $("#miniImg").classList.add("hide");
     $("#miniHeroImg").classList.add("hide");
@@ -1112,7 +1103,7 @@ $("#photo").onchange = e=> readPhoto(e.target.files[0], src=>{ crop.dirty = true
 $("#zoom").oninput = ()=> setZoom($("#zoom").value);
 $("#zoomIn").onclick = ()=> setZoom((crop.zoom||1)+0.12);
 $("#zoomOut").onclick = ()=> setZoom((crop.zoom||1)-0.12);
-$("#centerCover").onclick = ()=>{ if(cropMode === "card"){ crop.cardY = 0.5; } else if(cropMode === "hero"){ crop.heroY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; } crop.dirty = true; layoutCrop(); };
+$("#centerCover").onclick = ()=>{ if(cropMode === "card"){ crop.cardY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; } crop.dirty = true; layoutCrop(); };
 $("#asp169").onclick = ()=> setAspect("16/9");
 $("#asp11").onclick = ()=> setAspect("1/1");
 window.addEventListener("resize", layoutCrop);
@@ -1135,7 +1126,7 @@ stage.addEventListener("pointerdown", e=>{
     drag = null;
   }else{
     pinch = null;
-    drag = {x:e.clientX, y:e.clientY, cx:crop.x, cy: cropMode === "card" ? crop.cardY : (cropMode === "hero" ? crop.heroY : crop.y)};
+    drag = {x:e.clientX, y:e.clientY, cx:crop.x, cy: cropMode === "card" ? crop.cardY : crop.y};
   }
 });
 stage.addEventListener("pointermove", e=>{
@@ -1153,8 +1144,6 @@ stage.addEventListener("pointermove", e=>{
   const dh = parseFloat(img.style.height)||1;
   if(cropMode === "card"){
     crop.cardY = Math.min(1, Math.max(0, drag.cy - (e.clientY - drag.y) / dh));
-  }else if(cropMode === "hero"){
-    crop.heroY = Math.min(1, Math.max(0, drag.cy - (e.clientY - drag.y) / dh));
   }else{
     crop.x = drag.cx - (e.clientX - drag.x) / dw;
     crop.y = drag.cy - (e.clientY - drag.y) / dh;
@@ -1172,7 +1161,7 @@ stage.addEventListener("pointercancel", endPtr);
 stage.addEventListener("dblclick", e=>{
   if(!coverSrc) return;
   e.preventDefault();
-  if(cropMode === "card"){ crop.cardY = 0.5; } else if(cropMode === "hero"){ crop.heroY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; }
+  if(cropMode === "card"){ crop.cardY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; }
   crop.dirty = true; layoutCrop();
 });
 
@@ -1480,7 +1469,6 @@ function collectPost(status){
       pos: Math.round(crop.x*100)+"% "+Math.round(crop.y*100)+"%",
       zoom: Math.round((crop.zoom||1)*100)/100,
       cardY: Math.round((crop.cardY!=null?crop.cardY:0.5)*100)/100,
-      heroY: Math.round((crop.heroY!=null?crop.heroY:0.5)*100)/100,
       lockX: crop.lockH ? Math.round((crop.lockX!=null?crop.lockX:crop.x)*100)/100 : null
     } : {kind:"preset", i:0}
   };
