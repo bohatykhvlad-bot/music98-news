@@ -167,7 +167,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .chart-row .pos{flex:none;margin-inline-end:10px}
 .cartist{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
-.delta.up{color:var(--accent)} .delta.down{color:var(--accent)} .delta.same{color:var(--text)}
+.delta.up .darr,.delta.down .darr{color:var(--accent)} .delta .dnum,.delta.same{color:var(--text)}
 .delta.new{color:#fff;background:var(--text);border-radius:999px;padding:3px 8px;font-size:10.5px;letter-spacing:.08em;text-indent:.08em;line-height:1;width:fit-content;justify-self:center}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
@@ -841,7 +841,7 @@ const lsSet = v => lsSetRaw(KEY, v);
 
 /* ============ settings & Apple integrations ============ */
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v4";
+const DAILYKEY = "music98news_daily_v5";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -1332,7 +1332,8 @@ function playItunes(key, title, artist, url, gen){
 }
 function useItunes(key, r, url, gen){
     previewTriedItunes = true;
-    armSrc(previewPlayUrl(r.preview));
+    const sm = String(r.track||"").match(/[?&]i=(\d+)/);
+    armSrc(previewPlayUrl(r.preview, sm ? sm[1] : ""));
     if(r.track) setBadge(key, r.track);
     else if(url) setBadge(key, url);
     setRowArt(key, r.art);
@@ -1801,7 +1802,7 @@ function renderCharts(){
     let dcls="same", dtxt="—";
     if(String(r.delta).toLowerCase()==="new"){ dcls="new"; dtxt="NEW"; }
     else { const n = parseInt(r.delta,10)||0;
-      if(n>0){ dcls="up"; dtxt="▲"+n; } else if(n<0){ dcls="down"; dtxt="▼"+Math.abs(n); } }
+      if(n>0){ dcls="up"; dtxt="<span class=\"darr\">▲</span><span class=\"dnum\">"+n+"</span>"; } else if(n<0){ dcls="down"; dtxt="<span class=\"darr\">▼</span><span class=\"dnum\">"+Math.abs(n)+"</span>"; } }
     const w = parseInt(r.weeks,10)||0;
     const wk = w === 1 ? "1 day on chart" : w + " days on chart";
     const key = (r.title||"")+"|"+(r.artist||"");

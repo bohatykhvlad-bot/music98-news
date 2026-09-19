@@ -2,7 +2,7 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-const TOP50_KV = "top50v5";
+const TOP50_KV = "top50v6";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -34,29 +34,17 @@ function chartWeek() {
 function tenureKey(title, artist) {
   return `${String(title || "").trim().toLowerCase()}|${String(artist || "").trim().toLowerCase()}`;
 }
-const TENURE_KV = "tenure_v2";
-async function applyTenure(env, tracks, origin) {
+const TENURE_KV = "tenure_v3";
+async function applyTenure(env, tracks) {
   const week = chartWeek();
-  /* week starts at -1 so the very first daily run counts as a rollover and
-     shows movement against the launch-day order immediately. */
+  /* week starts at -1 so the very first daily run opens the registry fresh. */
   let ten = { launch: "2026-09-17", epoch: "daily", week: -1, keys: [], seen: {} };
   if (env && env.DESK) {
     const v = await env.DESK.get(TENURE_KV, { type: "json" });
     if (v && v.epoch === "daily") ten = v;
   }
-  let prevKeys = ten.keys || [];
+  const prevKeys = ten.keys || [];
   const seen = ten.seen || {};
-  if (!prevKeys.length && origin) {
-    /* First daily run: yesterday's order is the baked launch-day chart, so
-       the first rebuild already shows real movement instead of flat zeros. */
-    try {
-      const baked = await getJson(origin + "/data/top50.json");
-      prevKeys = (baked.tracks || []).map((t) => tenureKey(t.title, t.artist));
-      prevKeys.forEach((key, idx) => {
-        if (!seen[key]) seen[key] = { weeks: chartWeek() + 1, lastPos: idx, lastWeek: week, delta: "0" };
-      });
-    } catch {}
-  }
   const first = !prevKeys.length;
   const rolled = !first && ten.week !== week;
   const newKeys = [];
@@ -429,7 +417,7 @@ export async function onRequestGet({ env, request }) {
   }
   try {
     const payload = await withTimeout(buildTop50(new URL(request.url).origin), 14000);
-    payload.tracks = await applyTenure(env, payload.tracks, new URL(request.url).origin);
+    payload.tracks = await applyTenure(env, payload.tracks);
     if (env && env.DESK && payload.tracks && payload.tracks.length) {
       try { await env.DESK.put(TOP50_KV, JSON.stringify(payload)); } catch {}
     }
