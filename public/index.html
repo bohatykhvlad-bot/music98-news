@@ -703,11 +703,15 @@ function lockFocus(p, yVal){
   const y = (cy >= 0 && cy <= 1) ? cy : f.y;
   return {x, y};
 }
+function cardZoom(p){
+  const cz = Number(p && p.cover && p.cover.cardZoom);
+  return (cz >= 1 && cz <= 3) ? cz : coverZoom(p);
+}
 function cardFocus(p){ return lockFocus(p, p && p.cover && p.cover.cardY); }
 function coverImg(p, square, lazy, mode){
   const extra = lazy ? ' loading="lazy"' : '';
   const f = mode === "card" ? cardFocus(p) : coverFocus(p);
-  const z = coverZoom(p);
+  const z = mode === "card" ? cardZoom(p) : coverZoom(p);
   return `<img class="js-cover" src="${esc(coverOf(p, square))}" alt="" draggable="true"${extra} data-fx="${f.x}" data-fy="${f.y}" data-zoom="${z}">`;
 }
 function creditHTML(p){

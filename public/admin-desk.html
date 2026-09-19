@@ -873,9 +873,13 @@ function fitCover(img, fx, fy, zoom){
   img.style.height = dh+"px";
   img.style.transform = "translate("+left+"px,"+top+"px)";
 }
+function zoomNow(){
+  return cropMode === "card" ? (crop.cardZoom||1) : (crop.zoom||1);
+}
 function setZoom(z){
-  crop.zoom = Math.min(3, Math.max(1, Number(z)||1));
-  $("#zoom").value = crop.zoom;
+  const v = Math.min(3, Math.max(1, Number(z)||1));
+  if(cropMode === "card") crop.cardZoom = v; else crop.zoom = v;
+  $("#zoom").value = v;
   crop.dirty = true;
   layoutCrop();
 }
@@ -901,6 +905,7 @@ function setCropMode(m){
   $("#modeCard").classList.toggle("primary", cropMode === "card");
   $("#modeMain").classList.toggle("ghost", cropMode !== "main");
   $("#modeCard").classList.toggle("ghost", cropMode !== "card");
+  $("#zoom").value = zoomNow();
   layoutCrop();
 }
 function paintMini(){
@@ -910,24 +915,24 @@ function paintMini(){
   const hg = $("#miniHeroTag");
   if(ht) ht.textContent = title;
   if(hg) hg.textContent = tag;
-  const paint = (id, fx, fy)=>{
+  const paint = (id, fx, fy, fz)=>{
     const m = $("#"+id);
     if(!m) return;
     if(!coverSrc){ m.classList.add("hide"); return; }
     if(m.getAttribute("src") !== coverSrc) m.src = coverSrc;
     m.classList.remove("hide");
-    const go = ()=> fitCover(m, fx, fy, crop.zoom);
+    const go = ()=> fitCover(m, fx, fy, fz||crop.zoom||1);
     if(m.naturalWidth) go();
     else m.onload = go;
   };
-  paint("miniImg", lockFx(), crop.cardY);
-  paint("miniHeroImg", crop.x, crop.y);
+  paint("miniImg", lockFx(), crop.cardY, crop.cardZoom||1);
+  paint("miniHeroImg", crop.x, crop.y, crop.zoom||1);
 }
 function layoutCrop(){
   const stage = $("#stage");
   const img = $("#stageImg");
   if(!coverSrc || !img.naturalWidth){ paintMini(); return; }
-  if(cropMode === "card"){ fitCover(img, lockFx(), crop.cardY, crop.zoom); paintMini(); return; }
+  if(cropMode === "card"){ fitCover(img, lockFx(), crop.cardY, crop.cardZoom||1); paintMini(); return; }
   const sw = stage.clientWidth, sh = stage.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
   const z = crop.zoom || 1;
@@ -950,7 +955,9 @@ function setCover(src, pos, zoom, cardY){
   crop.x = parsed.x; crop.y = parsed.y; crop.zoom = Number(zoom)||1;
   const cy = Number(cardY);
   crop.cardY = (cy >= 0 && cy <= 1) ? cy : parsed.y;
-  const lxRaw = arguments[4];
+  const cz = Number(arguments[4]);
+  crop.cardZoom = (cz >= 1 && cz <= 3) ? cz : (crop.zoom||1);
+  const lxRaw = arguments[5];
   const lx = (lxRaw == null || lxRaw === "") ? NaN : Number(lxRaw);
   crop.lockX = (lx >= 0 && lx <= 1) ? lx : null;
   crop.lockH = crop.lockX != null;
@@ -1017,14 +1024,14 @@ function fillForm(p){
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
   const src = (p?.cover && p.cover.src) || "";
-  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.lockX);
+  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.cardZoom, p.cover.lockX);
   else {
     coverSrc = "";
     $("#stageImg").classList.add("hide");
     $("#stageImg").removeAttribute("src");
     $("#coverHint").classList.remove("hide");
-    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, lockX:null, lockH:false};
-    $("#zoom").value = 1;
+    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, cardZoom:1, lockX:null, lockH:false};
+    $("#zoom").value = zoomNow();
     $("#miniImg").classList.add("hide");
     $("#miniHeroImg").classList.add("hide");
     paintMini();
@@ -1101,8 +1108,8 @@ stage.addEventListener("drop", e=>{
 });
 $("#photo").onchange = e=> readPhoto(e.target.files[0], src=>{ crop.dirty = true; setCover(src); e.target.value=""; });
 $("#zoom").oninput = ()=> setZoom($("#zoom").value);
-$("#zoomIn").onclick = ()=> setZoom((crop.zoom||1)+0.12);
-$("#zoomOut").onclick = ()=> setZoom((crop.zoom||1)-0.12);
+$("#zoomIn").onclick = ()=> setZoom(zoomNow()+0.12);
+$("#zoomOut").onclick = ()=> setZoom(zoomNow()-0.12);
 $("#centerCover").onclick = ()=>{ if(cropMode === "card"){ crop.cardY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; } crop.dirty = true; layoutCrop(); };
 $("#asp169").onclick = ()=> setAspect("16/9");
 $("#asp11").onclick = ()=> setAspect("1/1");
@@ -1469,6 +1476,7 @@ function collectPost(status){
       pos: Math.round(crop.x*100)+"% "+Math.round(crop.y*100)+"%",
       zoom: Math.round((crop.zoom||1)*100)/100,
       cardY: Math.round((crop.cardY!=null?crop.cardY:0.5)*100)/100,
+      cardZoom: Math.round((crop.cardZoom!=null?crop.cardZoom:1)*100)/100,
       lockX: crop.lockH ? Math.round((crop.lockX!=null?crop.lockX:crop.x)*100)/100 : null
     } : {kind:"preset", i:0}
   };
