@@ -1590,7 +1590,7 @@ function renderReleases(){
     .sort((a,b)=> postTime(b)-postTime(a));
   $("#relGrid").innerHTML = posts.map(p=>`
     <a class="card square" href="#post/${p.id}">
-      <div class="cover">${coverImg(p,true,true)}
+      <div class="cover">${coverImg(p,true,true,"card")}
         <span class="tag">${esc(p.rtype||"Release")}</span></div>
       <div class="body"><h3>${titleHTML(p)}</h3>
         <p>${rich(p.excerpt||"")}</p>
