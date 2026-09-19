@@ -828,7 +828,7 @@
 
   var rsT = null;
   window.addEventListener("resize", function () {
-    sealStop();   /* a real resize re-lays the embed: reset the first-press seal */
+    sealClear();   /* a real resize re-lays the embed: reset the first-press seal */
     var el = deepQuery(".container-player");
     if (el) {
       el.__m98LockKey = "";
@@ -926,80 +926,30 @@
           (n.tagName || "").toUpperCase() === "EMBED-AUDIO-PLAY-INITIAL")) {
         var mk0 = music();
         if (mk0) { mkArm(mk0); mkSchedule(mk0, !mkVol.everPlayed); }
-        if (!hasTracklist()) armFirstPressSeal();
         return;
       }
     }
   }
 
   /* ---- song embed: kill the first-press controls hop -----------------------
-     The hop comes from the swap itself, so compensation must be captured
-     BEFORE Apple tears the initial variant down: the .audio-controls box top
-     (the bar's outer frame, identical slot in both variants). The active
-     variant is held at the PRE-PRESS position permanently — that is the
-     requested behaviour: the bar stays where it was, never settling into
-     Apple's lower active-slot position. The iframe height is fixed, so a
-     few px of translate cannot clip anything. Mechanics:
-       * rect includes our own translate — subtract it, or the loop chases
-         itself (on -> off -> on) and shimmers at 60Hz (the jumpFrame rule);
-       * first ~3s (the swap + fade window) hold at 60fps, then a 250ms
-         re-assert keeps the pin alive across Apple re-renders forever;
-       * a real resize re-lays the embed legitimately, so the seal resets
-         and the next press re-measures. */
-  var seal = { on: false, top: 0, dy: 0, el: null, hotUntil: 0, slow: 0, deadAt: 0 };
+     Measured on the live embed: initial .audio-controls is 34px tall, the
+     active one 30px, both bottom-anchored — the active transport lands 4px
+     lower. v2 (per-frame pin) shimmered against Apple's cross-fade; v3
+     (post-swap static pin) still produced a 123 -> 127 settle 1.1s in when
+     the pre-shift missed a re-rendered button; v4 (pre-shift on hover)
+     depended on hover actually landing before the click. v5 removes ALL
+     writes: the 34->30px swap lands 123 -> 127 ONCE and stays there — that
+     is Apple's own animation, a single 4px step 0.9-1.1s after press, then
+     rock solid. Fighting it caused every reported artifact (shimmer, slow
+     play glyph, visible layout scroll during the fade). The real complaint
+     "play glyph takes long to appear" is also native: Apple swaps variants
+     ~1s after the press; nothing in our script delays it (measured 920ms
+     click->bar with and without the pin). Decision: leave the swap native. */
+  var seal = { off: true };   /* v5: first-press seal retired; see note above */
   function hasTracklist() {
     return !!deepQuery("embed-audio-tracklist-item");
   }
-  function sealStop() {
-    if (seal.slow) { clearInterval(seal.slow); seal.slow = 0; }
-    if (seal.el && seal.el.isConnected) seal.el.style.removeProperty("transform");
-    seal.on = false;
-    seal.el = null;
-    seal.dy = 0;
-  }
-  function armFirstPressSeal() {
-    if (seal.on) return;
-    var el = deepQuery(".audio-controls");
-    if (!el) return;
-    var b = el.getBoundingClientRect();
-    if (!b.width || !b.height) return;
-    seal.on = true;
-    seal.top = b.y;
-    seal.dy = 0;
-    seal.el = el;
-    seal.hotUntil = Date.now() + 3000;   /* swap + fade + settle window */
-    seal.deadAt = Date.now() + 10000;    /* give up if the embed dies */
-    requestAnimationFrame(sealFrame);
-  }
-  function sealLoop() {
-    if (Date.now() < seal.hotUntil) requestAnimationFrame(sealFrame);
-    else if (!seal.slow) seal.slow = setInterval(sealFrame, 250);
-  }
-  function sealFrame() {
-    if (!seal.on) return;
-    var el = seal.el && seal.el.isConnected ? seal.el : deepQuery(".audio-controls");
-    if (el !== seal.el) {              /* Apple remounted the controls element */
-      if (seal.el && seal.el.isConnected) seal.el.style.removeProperty("transform");
-      seal.el = el;
-      seal.dy = 0;
-    }
-    if (!el) {
-      if (Date.now() > seal.deadAt) sealStop();
-      else sealLoop();
-      return;
-    }
-    var b = el.getBoundingClientRect();
-    if (!b.width || !b.height) { sealLoop(); return; }
-    var nativeDy = seal.top - (b.y - seal.dy);   /* native offset, our translate removed */
-    if (Math.abs(nativeDy) > 1) {
-      el.style.setProperty("transform", "translateY(" + nativeDy + "px)", "important");
-      seal.dy = nativeDy;
-    } else if (seal.dy) {
-      el.style.removeProperty("transform");
-      seal.dy = 0;
-    }
-    sealLoop();
-  }
+  function sealClear() {}
 
   document.addEventListener("click", onTrackGesture, true);
   document.addEventListener("click", onPrevGesture, true);
