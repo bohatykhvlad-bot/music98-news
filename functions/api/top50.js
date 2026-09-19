@@ -385,7 +385,7 @@ function top50Response(payload) {
   return new Response(JSON.stringify(payload), {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=300",
     },
   });
 }
