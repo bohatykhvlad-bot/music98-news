@@ -316,25 +316,34 @@
     return out;
   }
 
-  /* While audio plays, nothing may sit on top of the transport: on narrow
-     layouts Apple's red "listen on Apple Music" affordances can overlap the
-     play button during transitions. Hide exactly the intersecting ones. */
+  /* While audio plays, nothing may sit on top of the transport: Apple's red
+     "listen on Apple Music" affordances can overlap the play button during
+     variant transitions. Hide exactly the intersecting ones.
+     The target is the play/pause button itself (padded), NOT the whole
+     .audio-controls container: on the large breakpoint Apple renders its own
+     active-state "listen on Apple Music" link INSIDE .audio-controls (class
+     audio-controls__more), so a container intersection test hid that link on
+     every desktop playback — the pristine embed keeps it. Runs on every
+     breakpoint now: the same seal covers the mobile upsell flash. */
   var ovCands = null, ovCandsT = 0;
+  function playButtonRect() {
+    var els = [deepQuery(".playback-play__play"), deepQuery(".playback-play__pause")];
+    for (var i = 0; i < els.length; i++) {
+      var b = els[i] ? els[i].getBoundingClientRect() : null;
+      if (b && b.width > 0 && b.height > 0) {
+        return { x: b.x - 6, y: b.y - 6, w: b.width + 12, h: b.height + 12 };
+      }
+    }
+    return null;
+  }
   function fixOverlaps() {
-    if (!appleWide()) return;
-    var ctr = deepQuery(".audio-controls");
-    if (!ctr) return;
-    var cb = ctr.getBoundingClientRect();
-    if (!cb.width || !cb.height) return;
     if (!ovCands || Date.now() - ovCandsT > 500) {
       ovCands = deepQueryAll("a, .launch-client");
       ovCandsT = Date.now();
     }
-    var pb = deepQuery(".playback-play__play");
-    var pba = deepQuery(".playback-play__pause");
-    var transportOn = (pb && pb.getBoundingClientRect().width > 0) || (pba && pba.getBoundingClientRect().width > 0);
+    var cb = playButtonRect();
     var cands = ovCands;
-    if (!transportOn) {
+    if (!cb) {
       cands.forEach(function (el) {
         if (el.__m98ov) { el.style.removeProperty("visibility"); el.__m98ov = 0; }
       });
@@ -343,8 +352,8 @@
     cands.forEach(function (el) {
       var b = el.getBoundingClientRect();
       if (!b.width || !b.height) return;
-      var ix = Math.min(b.x + b.width, cb.x + cb.width) - Math.max(b.x, cb.x);
-      var iy = Math.min(b.y + b.height, cb.y + cb.height) - Math.max(b.y, cb.y);
+      var ix = Math.min(b.x + b.width, cb.x + cb.w) - Math.max(b.x, cb.x);
+      var iy = Math.min(b.y + b.height, cb.y + cb.h) - Math.max(b.y, cb.y);
       if (ix > 0 && iy > 0) {
         el.style.setProperty("visibility", "hidden", "important");
         el.__m98ov = 1;
@@ -356,6 +365,13 @@
   }
   (function loop(){ fixOverlaps(); requestAnimationFrame(loop); })();
   var MK_ANDROID = /Android/i.test(navigator.userAgent);
+  /* The onset guard is the PC sound fix signed for mobile: Apple devices get
+     the same dB-shaped slew-limited ramp instead of a full-volume first
+     buffer. iOS honours MusicKit volume from the first sample, so its ramp
+     schedules sooner than Android's mixer-delayed one. */
+  var MK_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var MK_MOBILE = MK_ANDROID || MK_IOS;
   var playedOnce = false;
   var mkVol = { pending: false, timer: 0, raf: 0, wasPlaying: false, ramping: false };
   /* dB-shaped, slew-limited fade: equal loudness steps instead of a linear
@@ -387,7 +403,7 @@
      300ms after playback has actually begun. Setting the volume inside the
      'playing' event is too late: the first buffers are already audible. */
   function mkArm(mk) {
-    if (!MK_ANDROID || !mk) return;
+    if (!MK_MOBILE || !mk) return;
     try { mk.volume = 0; } catch (err) {}
     mkVol.pending = true;
     mkVol.ramping = false;
@@ -395,12 +411,12 @@
     if (mkVol.raf) { cancelAnimationFrame(mkVol.raf); mkVol.raf = 0; }
   }
   function mkSchedule(mk) {
-    if (!MK_ANDROID || !mkVol.pending || mkVol.timer) return;
+    if (!MK_MOBILE || !mkVol.pending || mkVol.timer) return;
     mkVol.timer = setTimeout(function () {
       mkVol.timer = 0;
       mkVol.pending = false;
       mkRamp(mk);
-    }, 300);
+    }, MK_ANDROID ? 300 : 120);
   }
   setInterval(function () {
     var mk = music();
@@ -410,7 +426,8 @@
       try {
         mk.addEventListener("playbackStateDidChange", function (ev) {
           fixOverlaps(); armJumpFix(800);
-          if (!MK_ANDROID) return;
+          holdControls(900);   /* seal the transient loading variant: the bottom glitch */
+          if (!MK_MOBILE) return;
           var playing = mk.isPlaying;
           if (playing) {
             playedOnce = true;
@@ -425,12 +442,12 @@
           fixOverlaps(); armJumpFix(800);
           holdControls(1500);   /* a natural track advance re-renders the bar too */
           scrub.active = false; setScrubbing(scrub.el, false);
-          if (!MK_ANDROID) return;
+          if (!MK_MOBILE) return;
           mkArm(mk);   /* next track's buffers start at zero too */
           if (mk.isPlaying) mkSchedule(mk);
         });
       } catch (err) {}
-    } else if (mk && MK_ANDROID && mkVol.pending && mk.isPlaying && !mkVol.timer) {
+    } else if (mk && MK_MOBILE && mkVol.pending && mk.isPlaying && !mkVol.timer) {
       mkSchedule(mk);   /* failsafe: a missed state event must not mute forever */
     }
   }, 200);
@@ -625,7 +642,8 @@
      cached refs, active only inside a short window after a gesture or a
      MusicKit state change. No grid pins and no size forcing on mobile. */
   var JUMP_SELS = [".audio-controls", "embed-audio-progress", "embed-auth-control",
-    ".auth-control__sign-in", "amp-artwork", ".container-player__logo-header"];
+    ".auth-control__sign-in", "amp-artwork", ".container-player__logo-header",
+    "embed-launch-client", "embed-legal-link"];
   var jumpUntil = 0, jumpRefs = null, loopOn = false;
   function clearRef(it) {
     if (it.el && it.el.isConnected) it.el.style.removeProperty("transform");
@@ -635,9 +653,10 @@
     return !!(el && el.__m98LockKey);
   }
   function armJumpFix(ms, fromGesture) {
-    /* On narrow only a gesture-time baseline is trustworthy: an event-driven
-       arm would capture the layout after it already moved and pin the damage. */
-    if (!appleWide() && !fromGesture) return;
+    /* On narrow only a gesture-time baseline is trustworthy before the first
+       play; once playback is live the layout is settled, so state changes may
+       arm the compensator there too — that is what seals the bottom strip. */
+    if (!appleWide() && !fromGesture && !playedOnce) return;
     if (pinEngaged() && !fromGesture) return;   /* pin already holds the layout */
     if (jumpRefs) jumpRefs.forEach(function (it) { it.dx = 0; it.dy = 0; clearRef(it); });
     jumpRefs = JUMP_SELS.map(function (sel) {
@@ -693,6 +712,10 @@
        when implicit columns appear, so probe track sizes instead. */
     var wide = appleWide() &&
       parts.some(function (x) { var v = parseFloat(x); return v >= 200 && v <= 260; });
+    /* Mobile gets the desktop size pin once playback is live: a pinned
+       controls height is what keeps the embed's bottom edge from breathing
+       when Apple swaps control variants. */
+    var sizePin = wide || playedOnce;
     /* Gates: boot done; on narrow layouts wait for the first real playback so
        the pin can never capture a boot or pre-play state. */
     if (!deepQuery("embed-audio-tracklist-item") || !deepQuery(".audio-controls")) return;
@@ -724,9 +747,9 @@
         var c2 = window.getComputedStyle(el2);
         rule += sel + "{grid-column:" + c2.gridColumnStart + " !important;" +
           "grid-row:" + c2.gridRowStart + " !important;";
-        if (wide && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
+        if (sizePin && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
           if (parseFloat(c2.height) > 0) rule += "height:" + c2.height + " !important;";
-          if (sel === "embed-audio-progress" && parseFloat(c2.width) > 0) rule += "width:" + c2.width + " !important;";
+          if (wide && sel === "embed-audio-progress" && parseFloat(c2.width) > 0) rule += "width:" + c2.width + " !important;";
         }
         rule += "}";
       });
@@ -746,9 +769,9 @@
       var c2 = window.getComputedStyle(el2);
       el2.style.setProperty("grid-column", c2.gridColumnStart, "important");
       el2.style.setProperty("grid-row", c2.gridRowStart, "important");
-      if (wide && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
+      if (sizePin && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
         if (parseFloat(c2.height) > 0) el2.style.setProperty("height", c2.height, "important");
-        if (sel === "embed-audio-progress" && parseFloat(c2.width) > 0) el2.style.setProperty("width", c2.width, "important");
+        if (wide && sel === "embed-audio-progress" && parseFloat(c2.width) > 0) el2.style.setProperty("width", c2.width, "important");
       }
     });
   }

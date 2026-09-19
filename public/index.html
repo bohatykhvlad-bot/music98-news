@@ -940,6 +940,13 @@ audio.muted = false;
 audio.defaultMuted = false;
 audio.volume = 1;         /* 100% of the device volume; Android ramps in, see volArm */
 const IS_ANDROID = /Android/i.test(navigator.userAgent);
+/* iOS gets the same onset guard as Android: the PC build never blasts because
+   desktop browsers honour element volume instantly, mobile WebKit can hand
+   back the first buffers before a volume write lands. Same dB-shaped ramp,
+   signed for mobile. */
+const IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+const IS_MOBILE = IS_ANDROID || IS_IOS;
 let volPending = false, volRaf = 0, volTimer = 0, volRamping = false, volWarm = false;
 /* The fade is shaped in dB, not in raw amplitude: equal loudness steps, so the
    onset creeps in instead of stepping. Each frame is also slew-limited — a long
@@ -973,12 +980,12 @@ function volRamp(){
   volRaf = requestAnimationFrame(step);
 }
 function volArm(warm){
-  if(!IS_ANDROID) return;
+  if(!IS_MOBILE) return;
   volWarm = !!warm;
   audio.muted = true; audio.volume = 0; volPending = true;
 }
 function volPlaying(){
-  if(!IS_ANDROID || !volPending) return;
+  if(!IS_MOBILE || !volPending) return;
   if(volTimer) clearTimeout(volTimer);
   /* Cold start (new src): Android only honours element volume ~500ms into the
      stream — arming shorter is what blasted at full volume.
@@ -992,7 +999,10 @@ function volPlaying(){
     volTimer = 0;
     volPending = false;
     volRamp();
-  }, volWarm ? 0 : VOL_COLD_WAIT);
+  }, volWarm ? 0 : (IS_ANDROID ? VOL_COLD_WAIT : 0));
+  /* iOS honours element volume from the first buffer: no silent hole needed,
+     the -42dB ramp onset is the blast guard there. Android keeps the 500ms
+     wait — its mixer ignores volume writes at the very start of a stream. */
 }
 let curKey = null;
 let playGen = 0;
@@ -1009,13 +1019,76 @@ let holdSeek = false;
 let holdSeekTimer = 0;
 let scrubMoved = false;
 let scrubStartX = 0;
+/* ---- preview warm cache ----------------------------------------------------
+   The old path fetched the whole clip with cache:"no-store" on every click:
+   proxy round-trip + full download before the first sample played — that was
+   the chart's long dead silence. Now:
+     * hover / touch / idle prefetch lands blobs here (memory, max 8 clips);
+     * a click on a warm row starts from memory — zero network;
+     * a cold click streams straight from the range-aware /api/preview proxy:
+       playback begins at the first buffered bytes, the blob keeps loading in
+       the background for instant replay;
+     * fetches honour HTTP caching (the proxy sends max-age=86400). */
+const PREV_CACHE = new Map();   /* url -> { p, blobUrl } */
+function prevFetch(url){
+  if(!url) return null;
+  let ent = PREV_CACHE.get(url);
+  if(ent) return ent.p;
+  ent = { p: null, blobUrl: "" };
+  PREV_CACHE.set(url, ent);
+  ent.p = fetch(url).then(r=>{
+    if(!r.ok) throw 0;
+    return r.blob();
+  }).then(b=>{
+    ent.blobUrl = URL.createObjectURL(b);
+    const ks = [...PREV_CACHE.keys()];
+    for(let i=0; i<ks.length-8; i++){
+      const e = PREV_CACHE.get(ks[i]);
+      if(e && e.blobUrl && e.blobUrl !== blobUrl){ try{ URL.revokeObjectURL(e.blobUrl); }catch(err){} }
+      PREV_CACHE.delete(ks[i]);
+    }
+    return ent.blobUrl;
+  }).catch(()=>{ PREV_CACHE.delete(url); return ""; });
+  return ent.p;
+}
+function cachedBlob(url){
+  const ent = PREV_CACHE.get(url);
+  return ent && ent.blobUrl ? ent.blobUrl : "";
+}
+function warmRow(row){
+  if(!row || row.dataset.warm) return;
+  const prev = row.dataset.prev || "";
+  if(!prev) return;
+  row.dataset.warm = "1";
+  prevFetch(previewPlayUrl(prev));
+}
+let warmT = 0;
+function schedulePrevWarm(){
+  clearTimeout(warmT);
+  warmT = setTimeout(()=>{
+    $("#chartList .chart-row[data-prev]").slice(0, 6)
+      .forEach((row, i)=> setTimeout(()=>{ if(!document.hidden) warmRow(row); }, i*260));
+  }, 900);
+}
+(function(){
+  const list = $("#chartList");
+  if(!list) return;
+  const warm = e=>{
+    const row = e.target && e.target.closest ? e.target.closest(".chart-row") : null;
+    if(row) warmRow(row);
+  };
+  list.addEventListener("mouseover", warm, {passive:true});
+  list.addEventListener("touchstart", warm, {passive:true});
+})();
 function dropBlob(){
   if(!blobUrl) return;
-  try{ URL.revokeObjectURL(blobUrl); }catch(e){}
+  let owned = false;
+  PREV_CACHE.forEach(e=>{ if(e.blobUrl === blobUrl) owned = true; });
+  if(!owned){ try{ URL.revokeObjectURL(blobUrl); }catch(e){} }
   blobUrl = "";
 }
 function deviceVol(){
-  if(IS_ANDROID && (volPending || volRamping)){
+  if(IS_MOBILE && (volPending || volRamping)){
     if(volPending){ audio.muted = true; audio.volume = 0; }
     return;                       /* the arm / fade owns the volume right now */
   }
@@ -1058,19 +1131,15 @@ function armSrc(url){
   try{ audio.pause(); }catch(e){}
   const go = ()=>{
     if(gen !== playGen) return;
-    fetch(url, { cache: "no-store" }).then(r=>{
-      if(gen !== playGen) return null;
-      if(!r.ok) throw 0;
-      return r.blob();
-    }).then(b=>{
-      if(gen !== playGen || !b) return;
+    const hit = cachedBlob(url);
+    if(hit){                 /* warmed: memory start, no network at all */
       dropBlob();
-      blobUrl = URL.createObjectURL(b);
-      applySrc(blobUrl);
-    }).catch(()=>{
-      if(gen !== playGen) return;
-      applySrc(url);
-    });
+      blobUrl = hit;
+      applySrc(hit);
+      return;
+    }
+    applySrc(url);           /* cold: stream from the first buffered bytes */
+    prevFetch(url);          /* ...and cache the clip for replay/resume */
   };
   if(ready && typeof ready.then === "function") ready.then(go, go);
   else go();
@@ -1232,7 +1301,7 @@ function playItunes(key, title, artist, url, gen){
 }
 function useItunes(key, r, url, gen){
     previewTriedItunes = true;
-    armSrc(previewPlayUrl(r.preview, r.track || url));
+    armSrc(previewPlayUrl(r.preview));
     if(r.track) setBadge(key, r.track);
     else if(url) setBadge(key, url);
     setRowArt(key, r.art);
@@ -1258,7 +1327,10 @@ function selectTrack(key, title, artist, url, prev){
   clearTimeout(holdSeekTimer);
   progTo(0,0,90);
   markRows();
-  const src = previewPlayUrl(prev, url);
+  /* No song param on the play path: it made the proxy scrape Apple's song
+     page server-side before answering (the 90s clip), adding a second of
+     dead air to every cold start. The 30s chart clip is what the row plays. */
+  const src = previewPlayUrl(prev);
   if(src){
     armSrc(src);
     markRows();
@@ -1296,7 +1368,7 @@ audio.addEventListener("play", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
 audio.addEventListener("timeupdate", ()=>{
   /* failsafe: a build that never fires "playing" must not stay muted forever */
-  if(IS_ANDROID && volPending && !volTimer && !volRamping && !audio.paused) volPlaying();
+  if(IS_MOBILE && volPending && !volTimer && !volRamping && !audio.paused) volPlaying();
   if(timeFrozen || seekBar || holdSeek || audio.seeking) return;
   const d = previewDur() || 90;
   progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d);
@@ -1720,6 +1792,7 @@ function renderCharts(){
   $("#chartEmpty").hidden = rows.length > 0;
   hydrateArts();
   markRows();
+  schedulePrevWarm();
 }
 function renderHints(){
   const box = $("#searchHints");
