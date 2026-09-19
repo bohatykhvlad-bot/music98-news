@@ -1079,12 +1079,16 @@ function cachedBlob(url){
   const ent = PREV_CACHE.get(url);
   return ent && ent.blobUrl ? ent.blobUrl : "";
 }
+function rowSongId(row){
+  /* The row's Apple link carries ?i=<songId>: the handle the 90s proxy resolution needs. */
+  try{ const u = new URL(row.dataset.url || "", "https://music.apple.com"); return (u.searchParams.get("i") || "").replace(/\D/g,""); }catch(e){ return ""; }
+}
 function warmRow(row){
   if(!row || row.dataset.warm) return;
   const prev = row.dataset.prev || "";
   if(!prev) return;
   row.dataset.warm = "1";
-  prevFetch(previewPlayUrl(prev));
+  prevFetch(previewPlayUrl(prev, rowSongId(row)));
 }
 let warmT = 0;
 function schedulePrevWarm(){
@@ -1354,10 +1358,10 @@ function selectTrack(key, title, artist, url, prev){
   clearTimeout(holdSeekTimer);
   progTo(0,0,90);
   markRows();
-  /* No song param on the play path: it made the proxy scrape Apple's song
-     page server-side before answering (the 90s clip), adding a second of
-     dead air to every cold start. The 30s chart clip is what the row plays. */
-  const src = previewPlayUrl(prev);
+  /* The row's ?i= song id rides along: the proxy resolves the 90s clip.
+     Cold clicks wait ~0.5s longer on first play; warm blobs (hover/touch
+     prefetch, which carries the same id) start instantly at 90s. */
+  const src = previewPlayUrl(prev, rowSongId(row));
   if(src){
     armSrc(src);
     markRows();
