@@ -24,7 +24,7 @@ function rewriteAppleEmbed(html) {
   out = out.replace(/(["'])\/build\//g, "$1/apple-static/build/");
   out = out.replace(/(["'])\/assets\//g, "$1/apple-static/assets/");
   out = out.replace(/<script[^>]*static\.cloudflareinsights\.com[^>]*>\s*<\/script>/g, "");  /* Apple analytics: blocked by our CSP, no need inside the embed */
-  const tag = '<script src="/apple-player-fix.js?v=editorial-84"></script>';
+  const tag = '<script src="/apple-player-fix.js?v=editorial-85"></script>';
   if (/<head([^>]*)>/i.test(out)) out = out.replace(/<head([^>]*)>/i, "<head$1>" + tag);
   else out = tag + out;
   return out;

@@ -202,7 +202,7 @@
     var host = hostFromPath(path);
     if (!host) return;
     lockAlbumGrid();
-    armJumpFix(2000);
+    armJumpFix(1200);
     var mk = music();
     if (!mk) return;
     patch(mk);
@@ -294,15 +294,20 @@
   /* While audio plays, nothing may sit on top of the transport: on narrow
      layouts Apple's red "listen on Apple Music" affordances can overlap the
      play button during transitions. Hide exactly the intersecting ones. */
+  var ovCands = null, ovCandsT = 0;
   function fixOverlaps() {
     var ctr = deepQuery(".audio-controls");
     if (!ctr) return;
     var cb = ctr.getBoundingClientRect();
     if (!cb.width || !cb.height) return;
+    if (!ovCands || Date.now() - ovCandsT > 500) {
+      ovCands = deepQueryAll("a, .launch-client");
+      ovCandsT = Date.now();
+    }
     var pb = deepQuery(".playback-play__play");
     var pba = deepQuery(".playback-play__pause");
     var transportOn = (pb && pb.getBoundingClientRect().width > 0) || (pba && pba.getBoundingClientRect().width > 0);
-    var cands = deepQueryAll("a, .launch-client");
+    var cands = ovCands;
     if (!transportOn) {
       cands.forEach(function (el) {
         if (el.__m98ov) { el.style.removeProperty("visibility"); el.__m98ov = 0; }
@@ -323,62 +328,7 @@
       }
     });
   }
-  /* Transition jump compensation for parts that live in nested shadows and
-     ignore the stylesheet pin: cancel any displacement with a transform. */
-  var jumpUntil = 0, jumpRefs = null, loopOn = false;
-  function clearRef(it) {
-    if (it.el && it.el.isConnected) {
-      it.el.style.removeProperty("transform");
-      it.el.style.removeProperty("width");
-      it.el.style.removeProperty("height");
-    }
-  }
-  function armJumpFix(ms) {
-    jumpRefs = PIN_PARTS.map(function (sel) {
-      var el = deepQuery(sel);
-      if (!el) return null;
-      var b = el.getBoundingClientRect();
-      return (b.width || b.height) ? { sel: sel, el: el, x: b.x, y: b.y, w: b.width, h: b.height } : null;
-    }).filter(Boolean);
-    jumpUntil = Math.max(jumpUntil, Date.now() + (ms || 1500));
-    startLoop();
-  }
-  function startLoop() {
-    if (loopOn) return;
-    loopOn = true;
-    requestAnimationFrame(frame);
-  }
-  function frame() {
-    if (Date.now() >= jumpUntil) {
-      loopOn = false;
-      if (jumpRefs) jumpRefs.forEach(clearRef);
-      jumpRefs = null;
-      return;
-    }
-    correctFrame();
-    requestAnimationFrame(frame);
-  }
-  function correctFrame() {
-    if (!jumpRefs) return;
-    jumpRefs.forEach(function (it) {
-      if (!it.el || !it.el.isConnected) {
-        it.el = deepQuery(it.sel);
-        if (!it.el) return;
-      }
-      var b = it.el.getBoundingClientRect();
-      if (!b.width && !b.height) return;
-      var dx = it.x - b.x, dy = it.y - b.y;
-      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-        it.el.style.setProperty("transform", "translate(" + dx + "px," + dy + "px)", "important");
-      } else {
-        it.el.style.removeProperty("transform");
-      }
-      if (it.sel === "embed-audio-progress") {
-        if (Math.abs(b.width - it.w) > 1) it.el.style.setProperty("width", it.w + "px", "important");
-        if (Math.abs(b.height - it.h) > 1) it.el.style.setProperty("height", it.h + "px", "important");
-      }
-    });
-  }
+  (function loop(){ fixOverlaps(); requestAnimationFrame(loop); })();
   setInterval(function () {
     var mk = music();
     if (mk && !mk.__m98ovHook) {
@@ -389,89 +339,129 @@
       } catch (err) {}
     }
   }, 200);
-  setInterval(function () { try { fixOverlaps(); } catch (err) {} }, 200);
 
-  var PIN_PARTS = [".audio-controls", "embed-audio-tracklist", "amp-artwork",
-    "embed-auth-control", ".container-player__logo-header", "embed-audio-progress"];
-  function partsState() {
-    var out = [];
-    PIN_PARTS.forEach(function (sel) {
-      var el = deepQuery(sel);
-      if (!el) { out.push(sel + ":none"); return; }
-      var cs = window.getComputedStyle(el);
-      out.push(sel + ":" + cs.gridColumnStart + "," + cs.gridRowStart + "," + cs.width + "," + cs.height);
-    });
-    return out.join(";");
+  /* Narrow-layout transition stabiliser: position-only compensation with
+     cached refs, active only inside a short window after a gesture or a
+     MusicKit state change. No grid pins and no size forcing on mobile. */
+  var JUMP_SELS = [".audio-controls", "embed-audio-progress", "embed-auth-control",
+    ".auth-control__sign-in", "amp-artwork", ".container-player__logo-header"];
+  var jumpUntil = 0, jumpRefs = null, loopOn = false;
+  function clearRef(it) {
+    if (it.el && it.el.isConnected) it.el.style.removeProperty("transform");
   }
+  function armJumpFix(ms) {
+    jumpRefs = JUMP_SELS.map(function (sel) {
+      var el = deepQuery(sel);
+      if (!el) return null;
+      var b = el.getBoundingClientRect();
+      return (b.width || b.height) ? { sel: sel, el: el, x: b.x, y: b.y } : null;
+    }).filter(Boolean);
+    jumpUntil = Math.max(jumpUntil, Date.now() + (ms || 1200));
+    if (!loopOn) { loopOn = true; requestAnimationFrame(jumpFrame); }
+  }
+  function jumpFrame() {
+    if (Date.now() >= jumpUntil) {
+      loopOn = false;
+      if (jumpRefs) jumpRefs.forEach(clearRef);
+      jumpRefs = null;
+      return;
+    }
+    if (jumpRefs) {
+      jumpRefs.forEach(function (it) {
+        if (!it.el || !it.el.isConnected) {
+          it.el = deepQuery(it.sel);
+          if (!it.el) return;
+        }
+        var b = it.el.getBoundingClientRect();
+        if (!b.width && !b.height) return;
+        var dx = it.x - b.x, dy = it.y - b.y;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+          it.el.style.setProperty("transform", "translate(" + dx + "px," + dy + "px)", "important");
+        } else {
+          it.el.style.removeProperty("transform");
+        }
+      });
+    }
+    requestAnimationFrame(jumpFrame);
+  }
+
   function lockAlbumGrid() {
     var el = deepQuery(".container-player");
     if (!el) return;
+    var root = el.getRootNode ? el.getRootNode() : document;
     var cs = window.getComputedStyle(el);
     if (cs.display.indexOf("grid") < 0) return;
-    var cols = cs.gridTemplateColumns, rows = cs.gridTemplateRows;
-    var key = cols + " | " + rows + " | " + partsState();
-    if (el.__m98LockKey === key) return;
-    if (el.__m98SeenKey !== key) { el.__m98SeenKey = key; return; }  /* pin only stable layouts */
-    var root = el.getRootNode ? el.getRootNode() : document;
-    var oldStyle = root.getElementById ? root.getElementById("m98-grid-lock") : null;
-    if (oldStyle && (oldStyle.getAttribute("data-m98") || "") !== key) {
-      if (oldStyle.parentNode) oldStyle.parentNode.removeChild(oldStyle);
-      oldStyle = null;
+    var parts = cs.gridTemplateColumns.trim().split(/\s+/);
+    var mid = Math.round(parseFloat(parts[1] || "0"));
+    var large = parts.length === 3 && mid >= 200 && mid <= 260;
+    var old = null;
+    try { old = root.getElementById ? root.getElementById("m98-grid-lock") : null; } catch (err) {}
+    if (!large) {
+      if (old && old.parentNode) old.parentNode.removeChild(old);
+      if (el.__m98Lock) {
+        el.style.removeProperty("grid-template-columns");
+        el.style.removeProperty("grid-template-rows");
+        el.__m98Lock = "";
+      }
+      return;
     }
-    if (!oldStyle) {
-      var rule = ".container-player{grid-template-columns:" + cols + " !important;" +
-        "grid-template-rows:" + rows + " !important;}";
-      PIN_PARTS.forEach(function (sel) {
-        var el2 = deepQuery(sel);
-        if (!el2) return;
-        var c2 = window.getComputedStyle(el2);
-        rule += sel + "{grid-column:" + c2.gridColumnStart + " !important;" +
-          "grid-row:" + c2.gridRowStart + " !important;";
-        if (sel === "embed-audio-progress") rule += "width:" + c2.width + " !important;height:" + c2.height + " !important;";
-        rule += "}";
-      });
+    var val = cs.gridTemplateColumns;
+    var rows = cs.gridTemplateRows;
+    var prog = deepQuery("embed-audio-progress");
+    var pcs = prog ? window.getComputedStyle(prog) : null;
+    var progNow = pcs ? pcs.height : "";
+    /* Only trust a full-size reading: sampling during the loading stub
+       would pin the collapsed geometry forever. */
+    if (parseFloat(progNow) >= 20 && parseFloat(pcs.width) >= 100) {
+      el.__m98ProgBox = {
+        h: progNow,
+        w: pcs.width,
+        gc: pcs.gridColumnStart,
+        gr: pcs.gridRowStart
+      };
+    }
+    var box = el.__m98ProgBox || null;
+    var progH = box ? box.h : "";
+    var rule = val + " | " + rows + " | " + (box ? box.h + box.w + box.gc + box.gr : "");
+    /* A stylesheet rule survives the embed remounting its own nodes, an
+       inline style does not - prev-at-track-1 rebuilds the container.
+       Rows are pinned too: the loading variant of the controls reshapes
+       them, which is what made the progress bar and transport row hop. */
+    if (!old || (old.getAttribute("data-m98") || "") !== rule) {
+      if (old && old.parentNode) old.parentNode.removeChild(old);
       var st = document.createElement("style");
       st.id = "m98-grid-lock";
-      st.setAttribute("data-m98", key);
-      st.textContent = rule;
+      st.setAttribute("data-m98", rule);
+      st.textContent = "@media (min-width: 560px) { .container-player { grid-template-columns: " +
+        val + " !important; grid-template-rows: " + rows + " !important; }" +
+        (box ? " .container-player embed-audio-progress { height: " + box.h + " !important;" +
+          " width: " + box.w + " !important;" +
+          (box.gc && box.gc !== "auto" ? " grid-column: " + box.gc + " !important;" : "") +
+          (box.gr && box.gr !== "auto" ? " grid-row: " + box.gr + " !important;" : "") +
+          " }" : "") + " }";
       try { root.appendChild(st); } catch (err) {}
     }
-    el.__m98LockKey = key;
-    el.style.setProperty("grid-template-columns", cols, "important");
-    el.style.setProperty("grid-template-rows", rows, "important");
-    PIN_PARTS.forEach(function (sel) {
-      var el2 = deepQuery(sel);
-      if (!el2) return;
-      var c2 = window.getComputedStyle(el2);
-      el2.style.setProperty("grid-column", c2.gridColumnStart, "important");
-      el2.style.setProperty("grid-row", c2.gridRowStart, "important");
-      if (sel === "embed-audio-progress") {
-        el2.style.setProperty("width", c2.width, "important");
-        el2.style.setProperty("height", c2.height, "important");
+    if (el.__m98Lock !== rule) {
+      el.style.setProperty("grid-template-columns", val, "important");
+      el.style.setProperty("grid-template-rows", rows, "important");
+      if (prog && box) {
+        prog.style.setProperty("height", box.h, "important");
+        prog.style.setProperty("width", box.w, "important");
+        if (box.gc && box.gc !== "auto") prog.style.setProperty("grid-column", box.gc, "important");
+        if (box.gr && box.gr !== "auto") prog.style.setProperty("grid-row", box.gr, "important");
       }
-    });
+      el.__m98Lock = rule;
+    }
   }
 
   var rsT = null;
   window.addEventListener("resize", function () {
     var el = deepQuery(".container-player");
-    if (el) {
-      el.__m98LockKey = "";
-      el.__m98SeenKey = "";
+    if (el && el.__m98Lock) {
       el.style.removeProperty("grid-template-columns");
       el.style.removeProperty("grid-template-rows");
-      var root = el.getRootNode ? el.getRootNode() : document;
-      var st = root.getElementById ? root.getElementById("m98-grid-lock") : null;
-      if (st && st.parentNode) st.parentNode.removeChild(st);
-      PIN_PARTS.forEach(function (sel) {
-        var el2 = deepQuery(sel);
-        if (!el2) return;
-        ["grid-column", "grid-row", "width", "height"].forEach(function (k) { el2.style.removeProperty(k); });
-      });
+      el.__m98Lock = "";
     }
-    jumpUntil = 0;
-    if (jumpRefs) { jumpRefs.forEach(clearRef); jumpRefs = null; }
-    loopOn = false;
     clearTimeout(rsT);
     rsT = setTimeout(lockAlbumGrid, 180);
   });
