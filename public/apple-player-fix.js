@@ -408,7 +408,8 @@
       var el2 = deepQuery(sel);
       if (!el2) return sel + ":none";
       var c2 = window.getComputedStyle(el2);
-      return sel + ":" + c2.gridColumnStart + "," + c2.gridRowStart;
+      var extra = (sel === ".audio-controls" || sel === "embed-audio-progress") ? "," + c2.height : "";
+      return sel + ":" + c2.gridColumnStart + "," + c2.gridRowStart + extra;
     }).join(";");
     var key = cs.gridTemplateColumns + " | " + rows + " | " + place;
     if (el.__m98LockKey === key) return;
@@ -430,8 +431,8 @@
         rule += sel + "{grid-column:" + c2.gridColumnStart + " !important;" +
           "grid-row:" + c2.gridRowStart + " !important;";
         if (sel === ".audio-controls" || sel === "embed-audio-progress") {
-          rule += "height:" + c2.height + " !important;";
-          if (sel === "embed-audio-progress") rule += "width:" + c2.width + " !important;";
+          if (parseFloat(c2.height) > 0) rule += "height:" + c2.height + " !important;";
+          if (sel === "embed-audio-progress" && parseFloat(c2.width) > 0) rule += "width:" + c2.width + " !important;";
         }
         rule += "}";
       });
@@ -451,8 +452,8 @@
       el2.style.setProperty("grid-column", c2.gridColumnStart, "important");
       el2.style.setProperty("grid-row", c2.gridRowStart, "important");
       if (sel === ".audio-controls" || sel === "embed-audio-progress") {
-        el2.style.setProperty("height", c2.height, "important");
-        if (sel === "embed-audio-progress") el2.style.setProperty("width", c2.width, "important");
+        if (parseFloat(c2.height) > 0) el2.style.setProperty("height", c2.height, "important");
+        if (sel === "embed-audio-progress" && parseFloat(c2.width) > 0) el2.style.setProperty("width", c2.width, "important");
       }
     });
   }
