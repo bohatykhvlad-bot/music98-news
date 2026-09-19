@@ -412,7 +412,8 @@
     }).join(";");
     var key = cs.gridTemplateColumns + " | " + rows + " | " + place;
     if (el.__m98LockKey === key) return;
-    if (el.__m98SeenKey !== key) { el.__m98SeenKey = key; return; }   /* stability gate */
+    if (el.__m98SeenKey !== key) { el.__m98SeenKey = key; el.__m98KeyT = Date.now(); return; }
+    if (Date.now() - (el.__m98KeyT || 0) < 300) return;   /* outlive any loading variant */
     var root = el.getRootNode ? el.getRootNode() : document;
     var oldStyle = root.getElementById ? root.getElementById("m98-grid-lock") : null;
     if (oldStyle && (oldStyle.getAttribute("data-m98") || "") !== key) {
@@ -427,15 +428,13 @@
         if (!el2) return;
         var c2 = window.getComputedStyle(el2);
         rule += sel + "{grid-column:" + c2.gridColumnStart + " !important;" +
-          "grid-row:" + c2.gridRowStart + " !important;}";
-      });
-      if (wide) {
-        var prog = deepQuery("embed-audio-progress");
-        if (prog) {
-          var pc = window.getComputedStyle(prog);
-          rule += "embed-audio-progress{width:" + pc.width + " !important;height:" + pc.height + " !important;}";
+          "grid-row:" + c2.gridRowStart + " !important;";
+        if (sel === ".audio-controls" || sel === "embed-audio-progress") {
+          rule += "height:" + c2.height + " !important;";
+          if (sel === "embed-audio-progress") rule += "width:" + c2.width + " !important;";
         }
-      }
+        rule += "}";
+      });
       var st = document.createElement("style");
       st.id = "m98-grid-lock";
       st.setAttribute("data-m98", key);
@@ -451,6 +450,10 @@
       var c2 = window.getComputedStyle(el2);
       el2.style.setProperty("grid-column", c2.gridColumnStart, "important");
       el2.style.setProperty("grid-row", c2.gridRowStart, "important");
+      if (sel === ".audio-controls" || sel === "embed-audio-progress") {
+        el2.style.setProperty("height", c2.height, "important");
+        if (sel === "embed-audio-progress") el2.style.setProperty("width", c2.width, "important");
+      }
     });
   }
 
@@ -470,6 +473,8 @@
         if (!el2) return;
         el2.style.removeProperty("grid-column");
         el2.style.removeProperty("grid-row");
+        el2.style.removeProperty("height");
+        el2.style.removeProperty("width");
       });
     }
     clearTimeout(rsT);
