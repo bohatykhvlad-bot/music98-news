@@ -91,7 +91,9 @@ a{color:var(--text)}
 .stage.cardmode{cursor:ns-resize}
 .mini-frame img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;display:block}
 .mini .muted{text-align:center;font-size:11px}
-.cropbar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2);flex-wrap:wrap}
+.cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
+.cropbar-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cropbar-row.replace{justify-content:center}
 .cropbar input[type=range]{flex:1;min-width:100px}
 .cropbar .btn{padding:5px 10px;font-size:12px}
 @media (max-width:900px){ .crop-row{grid-template-columns:1fr} }
@@ -194,14 +196,18 @@ a{color:var(--text)}
             <p class="muted hint" id="coverHint">Drop a photo</p>
           </div>
           <div class="cropbar">
-            <button class="btn ghost" type="button" id="zoomOut" aria-label="Zoom out">−</button>
-            <input id="zoom" type="range" min="1" max="3" step="0.01" value="1">
-            <button class="btn ghost" type="button" id="zoomIn" aria-label="Zoom in">+</button>
-            <button class="btn ghost" type="button" id="centerCover">Center</button>
-            <button class="btn primary" type="button" id="modeMain" title="Full crop, both axes">Main</button>
-            <button class="btn ghost" type="button" id="modeCard" title="Square card: vertical only">Card</button>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><input id="lockH" type="checkbox" style="width:auto"> Lock horizontal for previews</label>
-            <button class="btn ghost" type="button" id="replaceCover">Replace</button>
+            <div class="cropbar-row">
+              <button class="btn ghost" type="button" id="zoomOut" aria-label="Zoom out">−</button>
+              <input id="zoom" type="range" min="1" max="3" step="0.01" value="1">
+              <button class="btn ghost" type="button" id="zoomIn" aria-label="Zoom in">+</button>
+              <button class="btn ghost" type="button" id="centerCover">Center</button>
+              <button class="btn primary" type="button" id="modeMain" title="Full crop, both axes">Main</button>
+              <button class="btn ghost" type="button" id="modeCard" title="Square card: vertical only">Card</button>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><input id="lockH" type="checkbox" style="width:auto"> Lock horizontal for previews</label>
+            </div>
+            <div class="cropbar-row replace">
+              <button class="btn ghost" type="button" id="replaceCover">Replace</button>
+            </div>
           </div>
         </div>
         <div class="mini">
