@@ -288,7 +288,7 @@ iframe.apple-park{
   top:72px!important;
   width:660px!important;
   max-width:660px!important;
-  opacity:.001!important;
+  visibility:hidden!important;
   pointer-events:none!important;
   z-index:0!important;
   border:0!important;
@@ -948,6 +948,19 @@ const IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const IS_MOBILE = IS_ANDROID || IS_IOS;
 let volPending = false, volRaf = 0, volTimer = 0, volRamping = false, volWarm = false;
+let outGain = null, gainOwns = false;   /* WebAudio gain node owns the mobile onset fade */
+function gainZero(){
+  if(!outGain || !actx || actx.state === "closed") return false;
+  try{
+    const t = actx.currentTime;
+    outGain.gain.cancelScheduledValues(t);
+    outGain.gain.setValueAtTime(0, t);
+    return true;
+  }catch(e){ return false; }
+}
+function gainSet(v){
+  try{ if(outGain && actx && actx.state !== "closed") outGain.gain.value = v; }catch(e){}
+}
 /* The fade is shaped in dB, not in raw amplitude: equal loudness steps, so the
    onset creeps in instead of stepping. Each frame is also slew-limited — a long
    (janky) frame advances the fade by at most VOL_MAX_DT, which is what used to
@@ -957,11 +970,11 @@ function volRamp(){
   if(volRaf) cancelAnimationFrame(volRaf);
   const ms = volWarm ? VOL_FADE_WARM : VOL_FADE_COLD;
   volWarm = false;
-  audio.muted = false;              /* already at digital zero: no unmute click */
+  if(!gainOwns) audio.muted = false;  /* already at digital zero: no unmute click */
   volRamping = true;
   let acc = 0, prev = performance.now(), last = 0;
   function step(rafNow){
-    if(audio.paused){ volRamping = false; volRaf = 0; try{ audio.volume = 0; }catch(e){} return; }
+    if(audio.paused){ volRamping = false; volRaf = 0; if(gainOwns) gainSet(0); else try{ audio.volume = 0; }catch(e){} return; }
     /* rAF timestamps are vsync-aligned: they can precede `prev` (dt <= 0) and a
        stalled tab can hand back a huge dt. Both are clamped, never negative. */
     const now = (typeof rafNow === "number" && rafNow > 0) ? rafNow : performance.now();
@@ -973,15 +986,24 @@ function volRamp(){
     let v = (t >= 1) ? 1 : Math.pow(10, -VOL_DB * (1 - t) / 20);
     if(v < last) v = last;          /* monotonic: never dip mid-fade */
     last = v;
-    try{ audio.volume = v; }catch(e){}
+    if(gainOwns) gainSet(v); else try{ audio.volume = v; }catch(e){}
     if(t < 1) volRaf = requestAnimationFrame(step);
-    else { volRaf = 0; volRamping = false; try{ audio.volume = 1; audio.muted = false; }catch(e){} }
+    else { volRaf = 0; volRamping = false; gainOwns = false; if(outGain) gainSet(1); try{ audio.volume = 1; audio.muted = false; }catch(e){} }
   }
   volRaf = requestAnimationFrame(step);
 }
 function volArm(warm){
   if(!IS_MOBILE) return;
   volWarm = !!warm;
+  if(volRaf){ cancelAnimationFrame(volRaf); volRaf = 0; }   /* a stale fade must not write the new track */
+  volRamping = false;
+  if(gainZero()){                     /* sample-accurate zero: no mixer delay, no wait hole */
+    gainOwns = true; volPending = true;
+    audio.muted = false;
+    try{ audio.volume = 1; }catch(e){}
+    return;
+  }
+  gainOwns = false;
   audio.muted = true; audio.volume = 0; volPending = true;
 }
 function volPlaying(){
@@ -999,7 +1021,7 @@ function volPlaying(){
     volTimer = 0;
     volPending = false;
     volRamp();
-  }, volWarm ? 0 : (IS_ANDROID ? VOL_COLD_WAIT : 0));
+  }, gainOwns ? 0 : (volWarm ? 0 : (IS_ANDROID ? VOL_COLD_WAIT : 0)));
   /* iOS honours element volume from the first buffer: no silent hole needed,
      the -42dB ramp onset is the blast guard there. Android keeps the 500ms
      wait — its mixer ignores volume writes at the very start of a stream. */
@@ -1066,7 +1088,7 @@ let warmT = 0;
 function schedulePrevWarm(){
   clearTimeout(warmT);
   warmT = setTimeout(()=>{
-    $("#chartList .chart-row[data-prev]").slice(0, 6)
+    $$("#chartList .chart-row[data-prev]").slice(0, 6)
       .forEach((row, i)=> setTimeout(()=>{ if(!document.hidden) warmRow(row); }, i*260));
   }, 900);
 }
@@ -1089,7 +1111,7 @@ function dropBlob(){
 }
 function deviceVol(){
   if(IS_MOBILE && (volPending || volRamping)){
-    if(volPending){ audio.muted = true; audio.volume = 0; }
+    if(volPending){ if(gainOwns) gainZero(); else { audio.muted = true; audio.volume = 0; } }
     return;                       /* the arm / fade owns the volume right now */
   }
   audio.muted = false;
@@ -1103,10 +1125,13 @@ function attachOut(){
   try{
     if(!actx){
       actx = new AC();
-      actx.createMediaElementSource(audio).connect(actx.destination);
+      outGain = actx.createGain();
+      actx.createMediaElementSource(audio).connect(outGain);
+      outGain.connect(actx.destination);
     }
   }catch(e){
     actx = false;
+    outGain = null;
     return Promise.resolve();
   }
   if(actx.state === "running") return Promise.resolve();
@@ -1967,13 +1992,31 @@ function appleEmbedUrl(albumId, songId){
   const track = String(songId||"").replace(/\D/g,"");
   if(!id) return "";
   const qs = "at="+APPLE_AT+"&ct="+encodeURIComponent(APPLE_CT||"music98");
-  if(track) return "https://embed.music.apple.com/us/album/"+id+"?i="+track+"&"+qs;
-  return "/apple-embed/us/album/"+id+"?"+qs;
+  /* Songs ride the /apple-embed proxy like albums: same-origin embeds get
+     apple-player-fix.js injected (Android onset guard, layout seal, track
+     routing). Direct embed.music.apple.com iframes got none of it, which is
+     why solo-song players still jumped on Android. The worker forwards the
+     whole query (i=, at=, ct=), so the affiliate token survives. */
+  return "/apple-embed/us/album/"+id+(track ? "?i="+track+"&"+qs : "?"+qs);
 }
 const appleBoots = {};
 let appleWatchers = [];
 const APPLE_IFRAME_ALLOW = "autoplay *; encrypted-media *; fullscreen *; clipboard-write";
 const APPLE_IFRAME_SANDBOX = "allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation";
+const MAX_BOOT = 4;   /* cap live boot frames: hovering the feed must not stack up players */
+function dropBootFor(src){
+  const b = appleBoots[src];
+  if(b && b.parentNode) b.parentNode.removeChild(b);
+  delete appleBoots[src];
+}
+function trimBoots(){
+  const keys = Object.keys(appleBoots);
+  for(let i = 0; i < keys.length - MAX_BOOT; i++){
+    const b = appleBoots[keys[i]];
+    if(b && b.parentNode) b.parentNode.removeChild(b);
+    delete appleBoots[keys[i]];
+  }
+}
 function appleBootHost(){
   let h = $("#appleBoot");
   if(!h){
@@ -2007,6 +2050,7 @@ function parkAppleEmbeds(root){
     const place = ()=> {
       f.classList.remove("apple-park");
       f.removeAttribute("aria-hidden");
+      dropBootFor(src);   /* the boot warmed the cache; the placed iframe took over */
     };
     if(!("IntersectionObserver" in window)){ place(); return; }
     const io = new IntersectionObserver(entries=>{
@@ -2039,6 +2083,7 @@ function ensureAppleBoot(src, h){
   f.src = src;
   appleBootHost().appendChild(f);
   appleBoots[src] = f;
+  trimBoots();
   return f;
 }
 function bootAppleFromPosts(posts){

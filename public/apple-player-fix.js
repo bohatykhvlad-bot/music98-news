@@ -189,7 +189,6 @@
       return true;
     }
     return false;
-    return true;
   }
 
   async function playTrack(mk, id, fallbackIndex) {
@@ -355,7 +354,25 @@
       }
     });
   }
-  (function loop(){ fixOverlaps(); requestAnimationFrame(loop); })();
+  /* The overlap seal only has something to do while playback is live or a
+     gesture / state change just landed. Outside those windows a parked boot
+     frame or an offscreen embed would otherwise run a full intersect scan at
+     60fps on a phone. Idle: restore anything hidden, drop the cache, wait. */
+  var lastMkActivity = 0;
+  (function loop(){
+    requestAnimationFrame(loop);
+    var mk = music();
+    if (!inLiveStates(mk) && Date.now() - lastMkActivity > 1500) {
+      if (ovCands) {
+        ovCands.forEach(function (el) {
+          if (el.__m98ov) { el.style.removeProperty("visibility"); el.__m98ov = 0; }
+        });
+        ovCands = null;
+      }
+      return;
+    }
+    fixOverlaps();
+  })();
   var MK_ANDROID = /Android/i.test(navigator.userAgent);
   /* The onset guard is the PC sound fix signed for mobile: Apple devices get
      the same dB-shaped slew-limited ramp instead of a full-volume first
@@ -365,7 +382,7 @@
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   var MK_MOBILE = MK_ANDROID || MK_IOS;
   var playedOnce = false;
-  var mkVol = { pending: false, timer: 0, raf: 0, wasPlaying: false, ramping: false };
+  var mkVol = { pending: false, timer: 0, raf: 0, wasPlaying: false, ramping: false, everPlayed: false };
   /* dB-shaped, slew-limited fade: equal loudness steps instead of a linear
      amplitude climb, and one janky frame can never advance the fade by more
      than MK_MAX_DT ms. A stalled frame leaping the ramp was still audible as
@@ -402,13 +419,13 @@
     if (mkVol.timer) { clearTimeout(mkVol.timer); mkVol.timer = 0; }
     if (mkVol.raf) { cancelAnimationFrame(mkVol.raf); mkVol.raf = 0; }
   }
-  function mkSchedule(mk) {
+  function mkSchedule(mk, cold) {
     if (!MK_MOBILE || !mkVol.pending || mkVol.timer) return;
     mkVol.timer = setTimeout(function () {
       mkVol.timer = 0;
       mkVol.pending = false;
       mkRamp(mk);
-    }, MK_ANDROID ? 300 : 120);
+    }, MK_ANDROID ? (cold ? 500 : 120) : 120);   /* cold: Android mixer honours volume ~500ms into a stream (chart's VOL_COLD_WAIT) */
   }
   setInterval(function () {
     var mk = music();
@@ -422,8 +439,8 @@
           var playing = mk.isPlaying;
           if (playing) {
             playedOnce = true;
-            if (!mkVol.wasPlaying) { mkArm(mk); mkSchedule(mk); }
-            mkVol.wasPlaying = true;
+            if (!mkVol.wasPlaying) { mkArm(mk); mkSchedule(mk, !mkVol.everPlayed); }
+            mkVol.everPlayed = true; mkVol.wasPlaying = true;
           } else {
             mkVol.wasPlaying = false;
             if (mkVol.timer) { clearTimeout(mkVol.timer); mkVol.timer = 0; }
@@ -435,11 +452,12 @@
           scrub.active = false; setScrubbing(scrub.el, false);
           if (!MK_MOBILE) return;
           mkArm(mk);   /* next track's buffers start at zero too */
-          if (mk.isPlaying) mkSchedule(mk);
+          mkVol.everPlayed = false;   /* new stream: the next onset is cold */
+          if (mk.isPlaying) mkSchedule(mk, true);
         });
       } catch (err) {}
     } else if (mk && MK_MOBILE && mkVol.pending && mk.isPlaying && !mkVol.timer) {
-      mkSchedule(mk);   /* failsafe: a missed state event must not mute forever */
+      mkSchedule(mk, !mkVol.everPlayed);   /* failsafe: a missed state event must not mute forever */
     }
   }, 200);
 
@@ -576,6 +594,7 @@
     if (!el) return;
     scrub.el = el;
     scrub.active = true;
+    lastMkActivity = Date.now();
     scrub.released = false;
     setScrubbing(el, true);
     try {
@@ -643,6 +662,7 @@
     return !!(el && el.__m98LockKey);
   }
   function armJumpFix(ms, fromGesture) {
+    lastMkActivity = Date.now();
     /* On narrow only a gesture-time baseline is trustworthy: an event-driven
        arm would capture the layout after it already moved and pin the damage. */
     if (!appleWide() && !fromGesture) return;
