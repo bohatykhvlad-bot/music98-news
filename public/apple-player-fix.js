@@ -202,6 +202,7 @@
     var host = hostFromPath(path);
     if (!host) return;
     lockAlbumGrid();
+    armJumpFix(2000);
     var mk = music();
     if (!mk) return;
     patch(mk);
@@ -322,94 +323,170 @@
       }
     });
   }
-  (function loop(){ fixOverlaps(); requestAnimationFrame(loop); })();
+  (function loop(){
+    try {
+      fixOverlaps(); lockAlbumGrid(); runJumpFix();
+    } catch (e) {}
+    requestAnimationFrame(loop);
+  })();
+  /* Transition jump compensation for parts that live in nested shadows and
+     ignore the stylesheet pin: cancel any displacement with a transform. */
+  var jumpUntil = 0, jumpBase = null, jumpBaseT = 0;
+  function refreshBase() {
+    jumpBase = {};
+    PIN_PARTS.forEach(function (sel) {
+      var el = deepQuery(sel);
+      if (!el) return;
+      var b = el.getBoundingClientRect();
+      if (b.width || b.height) jumpBase[sel] = { x: b.x, y: b.y, w: b.width, h: b.height };
+    });
+    jumpBaseT = Date.now();
+  }
+  function armJumpFix(ms) {
+    armedOnce = true;
+    if (!jumpBase || !jumpBaseT || Date.now() - jumpBaseT > 500) refreshBase();
+    jumpUntil = Math.max(jumpUntil, Date.now() + (ms || 2000));
+    if (!jumpMO && typeof MutationObserver !== "undefined") {
+      var anchor = deepQuery(".container-player");
+      var root = anchor && anchor.getRootNode ? anchor.getRootNode() : document;
+      jumpMO = new MutationObserver(function () { correctNow(); });
+      try { jumpMO.observe(root, { childList: true, subtree: true, attributes: true }); } catch (err) {}
+    }
+  }
+  function clearJump() {
+    PIN_PARTS.forEach(function (sel) {
+      var el = deepQuery(sel);
+      if (!el) return;
+      el.style.removeProperty("transform");
+      el.style.removeProperty("width");
+      el.style.removeProperty("height");
+    });
+  }
+  var lastCorrT = 0;
+  var armedOnce = false;
+  function correctNow() {
+    if (!deepQuery(".audio-controls")) return;
+    if (!armedOnce) {
+      if (!jumpBase || Date.now() - jumpBaseT > 500) refreshBase();
+      return;
+    }
+    if (!jumpBase || !jumpBaseT) refreshBase();
+    if (Object.keys(jumpBase || {}).length < 3) return;
+    var corrected = false;
+    PIN_PARTS.forEach(function (sel) {
+      var base = jumpBase[sel];
+      if (!base) return;
+      var el = deepQuery(sel);
+      if (!el) return;
+      var b = el.getBoundingClientRect();
+      if (!b.width && !b.height) return;
+      var dx = base.x - b.x, dy = base.y - b.y;
+      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+        el.style.setProperty("transform", "translate(" + dx + "px," + dy + "px)", "important");
+        corrected = true;
+      } else {
+        el.style.removeProperty("transform");
+      }
+      if (sel === "embed-audio-progress") {
+        if (base.w && Math.abs(b.width - base.w) > 1) { el.style.setProperty("width", base.w + "px", "important"); corrected = true; }
+        if (base.h && Math.abs(b.height - base.h) > 1) { el.style.setProperty("height", base.h + "px", "important"); corrected = true; }
+      }
+    });
+    if (corrected) lastCorrT = Date.now();
+    else if (Date.now() - lastCorrT > 1000 && Date.now() - jumpBaseT > 2000) refreshBase();
+  }
+  var jumpMO = null;
+  function runJumpFix() {
+    correctNow();
+  }
   setInterval(function () {
     var mk = music();
     if (mk && !mk.__m98ovHook) {
       mk.__m98ovHook = 1;
       try {
-        mk.addEventListener("playbackStateDidChange", function () { fixOverlaps(); });
-        mk.addEventListener("mediaItemDidChange", function () { fixOverlaps(); });
+        mk.addEventListener("playbackStateDidChange", function () { fixOverlaps(); armJumpFix(800); });
+        mk.addEventListener("mediaItemDidChange", function () { fixOverlaps(); armJumpFix(800); });
       } catch (err) {}
     }
   }, 200);
 
+  var PIN_PARTS = [".audio-controls", "embed-audio-tracklist", "amp-artwork",
+    "embed-auth-control", ".container-player__logo-header", "embed-audio-progress"];
+  function partsState() {
+    var out = [];
+    PIN_PARTS.forEach(function (sel) {
+      var el = deepQuery(sel);
+      if (!el) { out.push(sel + ":none"); return; }
+      var cs = window.getComputedStyle(el);
+      out.push(sel + ":" + cs.gridColumnStart + "," + cs.gridRowStart + "," + cs.width + "," + cs.height);
+    });
+    return out.join(";");
+  }
   function lockAlbumGrid() {
     var el = deepQuery(".container-player");
     if (!el) return;
-    var root = el.getRootNode ? el.getRootNode() : document;
     var cs = window.getComputedStyle(el);
     if (cs.display.indexOf("grid") < 0) return;
-    var parts = cs.gridTemplateColumns.trim().split(/\s+/);
-    var mid = Math.round(parseFloat(parts[1] || "0"));
-    var large = parts.length === 3 && mid >= 200 && mid <= 260;
-    var old = null;
-    try { old = root.getElementById ? root.getElementById("m98-grid-lock") : null; } catch (err) {}
-    if (!large) {
-      if (old && old.parentNode) old.parentNode.removeChild(old);
-      if (el.__m98Lock) {
-        el.style.removeProperty("grid-template-columns");
-        el.style.removeProperty("grid-template-rows");
-        el.__m98Lock = "";
-      }
-      return;
+    var cols = cs.gridTemplateColumns, rows = cs.gridTemplateRows;
+    var key = cols + " | " + rows + " | " + partsState();
+    if (el.__m98LockKey === key) return;
+    if (el.__m98SeenKey !== key) { el.__m98SeenKey = key; return; }  /* pin only stable layouts */
+    var root = el.getRootNode ? el.getRootNode() : document;
+    var oldStyle = root.getElementById ? root.getElementById("m98-grid-lock") : null;
+    if (oldStyle && (oldStyle.getAttribute("data-m98") || "") !== key) {
+      if (oldStyle.parentNode) oldStyle.parentNode.removeChild(oldStyle);
+      oldStyle = null;
     }
-    var val = cs.gridTemplateColumns;
-    var rows = cs.gridTemplateRows;
-    var prog = deepQuery("embed-audio-progress");
-    var pcs = prog ? window.getComputedStyle(prog) : null;
-    var progNow = pcs ? pcs.height : "";
-    /* Only trust a full-size reading: sampling during the loading stub
-       would pin the collapsed geometry forever. */
-    if (parseFloat(progNow) >= 20 && parseFloat(pcs.width) >= 100) {
-      el.__m98ProgBox = {
-        h: progNow,
-        w: pcs.width,
-        gc: pcs.gridColumnStart,
-        gr: pcs.gridRowStart
-      };
-    }
-    var box = el.__m98ProgBox || null;
-    var progH = box ? box.h : "";
-    var rule = val + " | " + rows + " | " + (box ? box.h + box.w + box.gc + box.gr : "");
-    /* A stylesheet rule survives the embed remounting its own nodes, an
-       inline style does not - prev-at-track-1 rebuilds the container.
-       Rows are pinned too: the loading variant of the controls reshapes
-       them, which is what made the progress bar and transport row hop. */
-    if (!old || (old.getAttribute("data-m98") || "") !== rule) {
-      if (old && old.parentNode) old.parentNode.removeChild(old);
+    if (!oldStyle) {
+      var rule = ".container-player{grid-template-columns:" + cols + " !important;" +
+        "grid-template-rows:" + rows + " !important;}";
+      PIN_PARTS.forEach(function (sel) {
+        var el2 = deepQuery(sel);
+        if (!el2) return;
+        var c2 = window.getComputedStyle(el2);
+        rule += sel + "{grid-column:" + c2.gridColumnStart + " !important;" +
+          "grid-row:" + c2.gridRowStart + " !important;";
+        if (sel === "embed-audio-progress") rule += "width:" + c2.width + " !important;height:" + c2.height + " !important;";
+        rule += "}";
+      });
       var st = document.createElement("style");
       st.id = "m98-grid-lock";
-      st.setAttribute("data-m98", rule);
-      st.textContent = "@media (min-width: 560px) { .container-player { grid-template-columns: " +
-        val + " !important; grid-template-rows: " + rows + " !important; }" +
-        (box ? " .container-player embed-audio-progress { height: " + box.h + " !important;" +
-          " width: " + box.w + " !important;" +
-          (box.gc && box.gc !== "auto" ? " grid-column: " + box.gc + " !important;" : "") +
-          (box.gr && box.gr !== "auto" ? " grid-row: " + box.gr + " !important;" : "") +
-          " }" : "") + " }";
+      st.setAttribute("data-m98", key);
+      st.textContent = rule;
       try { root.appendChild(st); } catch (err) {}
     }
-    if (el.__m98Lock !== rule) {
-      el.style.setProperty("grid-template-columns", val, "important");
-      el.style.setProperty("grid-template-rows", rows, "important");
-      if (prog && box) {
-        prog.style.setProperty("height", box.h, "important");
-        prog.style.setProperty("width", box.w, "important");
-        if (box.gc && box.gc !== "auto") prog.style.setProperty("grid-column", box.gc, "important");
-        if (box.gr && box.gr !== "auto") prog.style.setProperty("grid-row", box.gr, "important");
+    el.__m98LockKey = key;
+    el.style.setProperty("grid-template-columns", cols, "important");
+    el.style.setProperty("grid-template-rows", rows, "important");
+    PIN_PARTS.forEach(function (sel) {
+      var el2 = deepQuery(sel);
+      if (!el2) return;
+      var c2 = window.getComputedStyle(el2);
+      el2.style.setProperty("grid-column", c2.gridColumnStart, "important");
+      el2.style.setProperty("grid-row", c2.gridRowStart, "important");
+      if (sel === "embed-audio-progress") {
+        el2.style.setProperty("width", c2.width, "important");
+        el2.style.setProperty("height", c2.height, "important");
       }
-      el.__m98Lock = rule;
-    }
+    });
   }
 
   var rsT = null;
   window.addEventListener("resize", function () {
     var el = deepQuery(".container-player");
-    if (el && el.__m98Lock) {
+    if (el) {
+      el.__m98LockKey = "";
+      el.__m98SeenKey = "";
       el.style.removeProperty("grid-template-columns");
       el.style.removeProperty("grid-template-rows");
-      el.__m98Lock = "";
+      var root = el.getRootNode ? el.getRootNode() : document;
+      var st = root.getElementById ? root.getElementById("m98-grid-lock") : null;
+      if (st && st.parentNode) st.parentNode.removeChild(st);
+      PIN_PARTS.forEach(function (sel) {
+        var el2 = deepQuery(sel);
+        if (!el2) return;
+        ["grid-column", "grid-row", "width", "height"].forEach(function (k) { el2.style.removeProperty(k); });
+      });
     }
     clearTimeout(rsT);
     rsT = setTimeout(lockAlbumGrid, 180);
