@@ -1464,12 +1464,12 @@ function collectPost(status){
     excerpt: $("#excerpt").value.trim(),
     body: serialize(),
     date: (()=>{ const tl = today(); const dv = $("#date").value || tl;
-      const prevPa = editing ? ((data.posts.find(x=>x.id===editing)||{}).publishAt || "") : "";
+      const prevPa = editing ? ((posts.find(x=>x.id===editing)||{}).publishAt || "") : "";
       const paLocal = (publishAt || prevPa) ? toLocalInput(publishAt || prevPa).slice(0,10) : "";
       return (status==="live" && dv < tl && (paLocal === tl || !prevPa)) ? tl : dv; })(),
     pinned: $("#pinned").checked,
     status,
-    publishAt: publishAt || (editing ? ((data.posts.find(x=>x.id===editing)||{}).publishAt || "") : "") || (status==="live" ? new Date().toISOString() : ""),
+    publishAt: publishAt || (editing ? ((posts.find(x=>x.id===editing)||{}).publishAt || "") : "") || (status==="live" ? new Date().toISOString() : ""),
     cover: coverSrc ? {
       kind:"img",
       src: originalCover(coverSrc),
