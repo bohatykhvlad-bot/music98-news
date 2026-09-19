@@ -168,7 +168,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .cartist{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta.up{color:var(--accent)} .delta.down{color:var(--accent)} .delta.same{color:var(--text)}
-.delta.new{color:var(--text);background:var(--accent);border-radius:6px;padding:2px 0;font-size:10.5px;letter-spacing:.08em}
+.delta.new{color:#fff;background:var(--text);border-radius:999px;padding:3px 8px;font-size:10.5px;letter-spacing:.08em;text-indent:.08em;line-height:1;width:fit-content;justify-self:center}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
@@ -460,9 +460,9 @@ textarea{resize:vertical;min-height:64px}
     transition:background .15s ease;
   }
   .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0}
-  .delta.new{padding:2px 3px;font-size:9px;letter-spacing:.04em}
+  .delta.new{padding:3px 7px;font-size:9px;letter-spacing:.04em;text-indent:.04em;line-height:1}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
-  .delta.new{background:var(--accent);color:var(--text)}
+  .delta.new{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
   .artwrap img{border-radius:8px}
   .ctext{grid-area:names;align-self:center;min-width:0}
