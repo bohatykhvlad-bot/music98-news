@@ -83,14 +83,17 @@ a{color:var(--text)}
 .stage .grid{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .12s;background-image:linear-gradient(to right,rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.5) 1px,transparent 1px);background-size:calc(100%/3) 100%, 100% calc(100%/3);z-index:2}
 .stage:hover .grid,.stage.drag .grid{opacity:1}
 .mini{display:flex;flex-direction:column;gap:8px}
-.mini-frame{position:relative;aspect-ratio:1;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111}
+.mini-frame{position:relative;aspect-ratio:1;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize}
+.mini-frame.active,.mini-hero-pic.active{outline:2px solid var(--acc2);outline-offset:2px}
+.mini-hero-pic{cursor:pointer}
+.stage.cardmode{cursor:ns-resize}
 .mini-frame img,.mini-hero-pic img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;display:block}
 .mini .muted{text-align:center;font-size:11px}
 .mini-hero{display:grid;grid-template-columns:1.05fr .95fr;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;min-height:96px}
 .mini-hero-text{padding:8px 8px 8px 9px;display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:0}
 .mini-kicker{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
 .mini-hero-title{font-size:10px;font-weight:700;line-height:1.2;letter-spacing:-.02em;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;color:var(--text)}
-.mini-hero-pic{position:relative;min-height:96px;background:#111;overflow:hidden}
+.mini-hero-pic{position:relative;aspect-ratio:16/9;min-height:0;background:#111;overflow:hidden}
 .cropbar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2);flex-wrap:wrap}
 .cropbar input[type=range]{flex:1;min-width:100px}
 .cropbar .btn{padding:5px 10px;font-size:12px}
@@ -204,14 +207,14 @@ a{color:var(--text)}
           </div>
         </div>
         <div class="mini">
-          <div class="mini-frame"><img id="miniImg" class="hide" alt=""></div>
+          <div class="mini-frame" id="miniFrame" title="Card crop: vertical only"><img id="miniImg" class="hide" alt=""></div>
           <p class="muted">Card</p>
           <div class="mini-hero" id="miniHero">
             <div class="mini-hero-text">
               <span class="mini-kicker" id="miniHeroTag">News</span>
               <span class="mini-hero-title" id="miniHeroTitle">Main story</span>
             </div>
-            <div class="mini-hero-pic"><img id="miniHeroImg" class="hide" alt=""></div>
+            <div class="mini-hero-pic" id="miniHero" title="Main news crop"><img id="miniHeroImg" class="hide" alt=""></div>
           </div>
           <p class="muted">Main news</p>
         </div>
@@ -305,7 +308,8 @@ const KEY = "music98_admin_key";
 const APPLE_AT = "1001l3aZW";
 let posts = [];
 let coverSrc = "";
-let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9"};
+let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5};
+let cardMode = false;
 let editing = null;
 let appleKind = "song";
 let pendingApple = null;
@@ -873,10 +877,20 @@ function setZoom(z){
   layoutCrop();
 }
 function setAspect(a){
+  setCardMode(false);
   crop.aspect = a === "1/1" ? "1/1" : "16/9";
   $("#stage").style.aspectRatio = crop.aspect === "1/1" ? "1 / 1" : "16 / 9";
   $("#asp169").classList.toggle("primary", crop.aspect === "16/9");
   $("#asp11").classList.toggle("primary", crop.aspect === "1/1");
+  layoutCrop();
+}
+function setCardMode(on){
+  cardMode = !!on;
+  const stage = $("#stage");
+  stage.classList.toggle("cardmode", cardMode);
+  stage.style.aspectRatio = cardMode ? "1 / 1" : (crop.aspect === "1/1" ? "1 / 1" : "16 / 9");
+  $("#miniFrame").classList.toggle("active", cardMode);
+  $("#miniHero").classList.toggle("active", !cardMode);
   layoutCrop();
 }
 function paintMini(){
@@ -886,21 +900,24 @@ function paintMini(){
   const hg = $("#miniHeroTag");
   if(ht) ht.textContent = title;
   if(hg) hg.textContent = tag;
-  ["miniImg","miniHeroImg"].forEach(id=>{
+  const paint = (id, fx, fy)=>{
     const m = $("#"+id);
     if(!m) return;
     if(!coverSrc){ m.classList.add("hide"); return; }
     if(m.getAttribute("src") !== coverSrc) m.src = coverSrc;
     m.classList.remove("hide");
-    const go = ()=> fitCover(m, crop.x, crop.y, crop.zoom);
+    const go = ()=> fitCover(m, fx, fy, crop.zoom);
     if(m.naturalWidth) go();
     else m.onload = go;
-  });
+  };
+  paint("miniImg", 0.5, crop.cardY);
+  paint("miniHeroImg", crop.x, crop.y);
 }
 function layoutCrop(){
   const stage = $("#stage");
   const img = $("#stageImg");
   if(!coverSrc || !img.naturalWidth){ paintMini(); return; }
+  if(cardMode){ fitCover(img, 0.5, crop.cardY, crop.zoom); paintMini(); return; }
   const sw = stage.clientWidth, sh = stage.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
   const z = crop.zoom || 1;
@@ -917,10 +934,12 @@ function layoutCrop(){
   img.style.transform = "translate("+left+"px,"+top+"px)";
   paintMini();
 }
-function setCover(src, pos, zoom){
+function setCover(src, pos, zoom, cardY){
   coverSrc = src;
   const parsed = parsePos(pos);
   crop.x = parsed.x; crop.y = parsed.y; crop.zoom = Number(zoom)||1;
+  const cy = Number(cardY);
+  crop.cardY = (cy >= 0 && cy <= 1) ? cy : parsed.y;
   $("#zoom").value = crop.zoom;
   const img = $("#stageImg");
   img.onload = ()=> layoutCrop();
@@ -930,6 +949,8 @@ function setCover(src, pos, zoom){
   paintMini();
 }
 
+$("#miniFrame").addEventListener("click", ()=> setCardMode(true));
+$("#miniHero").addEventListener("click", ()=> setCardMode(false));
 function renderList(){
   $("#list").innerHTML = posts.length ? posts.map(p=>{
     const src = (p.cover && p.cover.src) || "";
@@ -972,13 +993,13 @@ function fillForm(p){
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
   const src = (p?.cover && p.cover.src) || "";
-  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom);
+  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY);
   else {
     coverSrc = "";
     $("#stageImg").classList.add("hide");
     $("#stageImg").removeAttribute("src");
     $("#coverHint").classList.remove("hide");
-    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9"};
+    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5};
     $("#zoom").value = 1;
     $("#miniImg").classList.add("hide");
     $("#miniHeroImg").classList.add("hide");
@@ -1058,7 +1079,7 @@ $("#photo").onchange = e=> readPhoto(e.target.files[0], src=>{ crop.dirty = true
 $("#zoom").oninput = ()=> setZoom($("#zoom").value);
 $("#zoomIn").onclick = ()=> setZoom((crop.zoom||1)+0.12);
 $("#zoomOut").onclick = ()=> setZoom((crop.zoom||1)-0.12);
-$("#centerCover").onclick = ()=>{ crop.x = 0.5; crop.y = 0.5; crop.dirty = true; layoutCrop(); };
+$("#centerCover").onclick = ()=>{ if(cardMode){ crop.cardY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; } crop.dirty = true; layoutCrop(); };
 $("#asp169").onclick = ()=> setAspect("16/9");
 $("#asp11").onclick = ()=> setAspect("1/1");
 window.addEventListener("resize", layoutCrop);
@@ -1081,7 +1102,7 @@ stage.addEventListener("pointerdown", e=>{
     drag = null;
   }else{
     pinch = null;
-    drag = {x:e.clientX, y:e.clientY, cx:crop.x, cy:crop.y};
+    drag = {x:e.clientX, y:e.clientY, cx:crop.x, cy: cardMode ? crop.cardY : crop.y};
   }
 });
 stage.addEventListener("pointermove", e=>{
@@ -1097,8 +1118,12 @@ stage.addEventListener("pointermove", e=>{
   const img = $("#stageImg");
   const dw = parseFloat(img.style.width)||1;
   const dh = parseFloat(img.style.height)||1;
-  crop.x = drag.cx - (e.clientX - drag.x) / dw;
-  crop.y = drag.cy - (e.clientY - drag.y) / dh;
+  if(cardMode){
+    crop.cardY = Math.min(1, Math.max(0, drag.cy - (e.clientY - drag.y) / dh));
+  }else{
+    crop.x = drag.cx - (e.clientX - drag.x) / dw;
+    crop.y = drag.cy - (e.clientY - drag.y) / dh;
+  }
   crop.dirty = true;
   layoutCrop();
 });
@@ -1112,7 +1137,8 @@ stage.addEventListener("pointercancel", endPtr);
 stage.addEventListener("dblclick", e=>{
   if(!coverSrc) return;
   e.preventDefault();
-  crop.x = 0.5; crop.y = 0.5; crop.dirty = true; layoutCrop();
+  if(cardMode){ crop.cardY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; }
+  crop.dirty = true; layoutCrop();
 });
 
 document.querySelector(".toolbar").addEventListener("mousedown", e=>{
@@ -1404,7 +1430,10 @@ function collectPost(status){
     title,
     excerpt: $("#excerpt").value.trim(),
     body: serialize(),
-    date: $("#date").value || today(),
+    date: (()=>{ const tl = today(); const dv = $("#date").value || tl;
+      const prevPa = editing ? ((data.posts.find(x=>x.id===editing)||{}).publishAt || "") : "";
+      const paLocal = (publishAt || prevPa) ? toLocalInput(publishAt || prevPa).slice(0,10) : "";
+      return (status==="live" && dv < tl && (paLocal === tl || !prevPa)) ? tl : dv; })(),
     pinned: $("#pinned").checked,
     status,
     publishAt: publishAt || (editing ? ((data.posts.find(x=>x.id===editing)||{}).publishAt || "") : "") || (status==="live" ? new Date().toISOString() : ""),
@@ -1414,7 +1443,8 @@ function collectPost(status){
       credit: $("#credit").value.trim(),
       creditUrl: $("#creditUrl").value.trim(),
       pos: Math.round(crop.x*100)+"% "+Math.round(crop.y*100)+"%",
-      zoom: Math.round((crop.zoom||1)*100)/100
+      zoom: Math.round((crop.zoom||1)*100)/100,
+      cardY: Math.round((crop.cardY!=null?crop.cardY:0.5)*100)/100
     } : {kind:"preset", i:0}
   };
 }

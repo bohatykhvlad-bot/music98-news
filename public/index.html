@@ -113,7 +113,7 @@ main{position:relative;z-index:1}
 
 /* hero — left cell matches the text column; photo fills and crops to the face */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:26px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
-.hero .cover{position:relative;min-height:300px;height:100%;overflow:hidden;background:var(--card2)}
+.hero .cover{position:relative;aspect-ratio:16/9;min-height:0;height:auto;overflow:hidden;background:var(--card2)}
 #heroSlot:empty{min-height:300px}
 .hero .cover img,.card .cover img,.article .acover img,#articlePage .acover img,.rcard .rcover img{
   position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;border:0;display:block;
@@ -694,9 +694,14 @@ function bindCovers(root){
     }
   });
 }
-function coverImg(p, square, lazy){
+function cardFocus(p){
+  const cy = Number(p && p.cover && p.cover.cardY);
+  const y = (cy >= 0 && cy <= 1) ? cy : coverFocus(p).y;
+  return {x: 0.5, y};
+}
+function coverImg(p, square, lazy, mode){
   const extra = lazy ? ' loading="lazy"' : '';
-  const f = coverFocus(p);
+  const f = mode === "card" ? cardFocus(p) : coverFocus(p);
   const z = coverZoom(p);
   return `<img class="js-cover" src="${esc(coverOf(p, square))}" alt="" draggable="true"${extra} data-fx="${f.x}" data-fy="${f.y}" data-zoom="${z}">`;
 }
@@ -1563,7 +1568,7 @@ function renderNews(){
     </a>` : "";
   $("#newsGrid").innerHTML = rest.map(p=>`
     <a class="card" href="#post/${p.id}">
-      <div class="cover">${coverImg(p,false,true)}</div>
+      <div class="cover">${coverImg(p,false,true,"card")}</div>
       <div class="body"><h3>${titleHTML(p)}</h3><p>${rich(p.excerpt||"")}</p>
         <div class="meta"><span>${fmtDate(p.date)}</span></div></div>
     </a>`).join("");
