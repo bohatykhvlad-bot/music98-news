@@ -385,82 +385,87 @@
     requestAnimationFrame(jumpFrame);
   }
 
+  var PIN_PARTS = [".audio-controls", "embed-audio-progress", "embed-auth-control",
+    ".auth-control__sign-in", "amp-artwork", ".container-player__logo-header"];
   function lockAlbumGrid() {
     var el = deepQuery(".container-player");
     if (!el) return;
-    var root = el.getRootNode ? el.getRootNode() : document;
     var cs = window.getComputedStyle(el);
     if (cs.display.indexOf("grid") < 0) return;
     var parts = cs.gridTemplateColumns.trim().split(/\s+/);
     var mid = Math.round(parseFloat(parts[1] || "0"));
-    var large = parts.length === 3 && mid >= 200 && mid <= 260;
-    var old = null;
-    try { old = root.getElementById ? root.getElementById("m98-grid-lock") : null; } catch (err) {}
-    if (!large) {
-      if (old && old.parentNode) old.parentNode.removeChild(old);
-      if (el.__m98Lock) {
-        el.style.removeProperty("grid-template-columns");
-        el.style.removeProperty("grid-template-rows");
-        el.__m98Lock = "";
-      }
-      return;
-    }
-    var val = cs.gridTemplateColumns;
+    var wide = parts.length === 3 && mid >= 200 && mid <= 260;
+    var narrow = parts.length === 7;
+    if (!wide && !narrow) return;                       /* not a final template */
+    if (!deepQuery("embed-audio-tracklist-item") || !deepQuery(".audio-controls")) return;  /* boot not done */
     var rows = cs.gridTemplateRows;
-    var prog = deepQuery("embed-audio-progress");
-    var pcs = prog ? window.getComputedStyle(prog) : null;
-    var progNow = pcs ? pcs.height : "";
-    /* Only trust a full-size reading: sampling during the loading stub
-       would pin the collapsed geometry forever. */
-    if (parseFloat(progNow) >= 20 && parseFloat(pcs.width) >= 100) {
-      el.__m98ProgBox = {
-        h: progNow,
-        w: pcs.width,
-        gc: pcs.gridColumnStart,
-        gr: pcs.gridRowStart
-      };
+    var place = PIN_PARTS.map(function (sel) {
+      var el2 = deepQuery(sel);
+      if (!el2) return sel + ":none";
+      var c2 = window.getComputedStyle(el2);
+      return sel + ":" + c2.gridColumnStart + "," + c2.gridRowStart;
+    }).join(";");
+    var key = cs.gridTemplateColumns + " | " + rows + " | " + place;
+    if (el.__m98LockKey === key) return;
+    if (el.__m98SeenKey !== key) { el.__m98SeenKey = key; return; }   /* stability gate */
+    var root = el.getRootNode ? el.getRootNode() : document;
+    var oldStyle = root.getElementById ? root.getElementById("m98-grid-lock") : null;
+    if (oldStyle && (oldStyle.getAttribute("data-m98") || "") !== key) {
+      if (oldStyle.parentNode) oldStyle.parentNode.removeChild(oldStyle);
+      oldStyle = null;
     }
-    var box = el.__m98ProgBox || null;
-    var progH = box ? box.h : "";
-    var rule = val + " | " + rows + " | " + (box ? box.h + box.w + box.gc + box.gr : "");
-    /* A stylesheet rule survives the embed remounting its own nodes, an
-       inline style does not - prev-at-track-1 rebuilds the container.
-       Rows are pinned too: the loading variant of the controls reshapes
-       them, which is what made the progress bar and transport row hop. */
-    if (!old || (old.getAttribute("data-m98") || "") !== rule) {
-      if (old && old.parentNode) old.parentNode.removeChild(old);
+    if (!oldStyle) {
+      var rule = ".container-player{grid-template-columns:" + cs.gridTemplateColumns + " !important;" +
+        "grid-template-rows:" + rows + " !important;}";
+      PIN_PARTS.forEach(function (sel) {
+        var el2 = deepQuery(sel);
+        if (!el2) return;
+        var c2 = window.getComputedStyle(el2);
+        rule += sel + "{grid-column:" + c2.gridColumnStart + " !important;" +
+          "grid-row:" + c2.gridRowStart + " !important;}";
+      });
+      if (wide) {
+        var prog = deepQuery("embed-audio-progress");
+        if (prog) {
+          var pc = window.getComputedStyle(prog);
+          rule += "embed-audio-progress{width:" + pc.width + " !important;height:" + pc.height + " !important;}";
+        }
+      }
       var st = document.createElement("style");
       st.id = "m98-grid-lock";
-      st.setAttribute("data-m98", rule);
-      st.textContent = "@media (min-width: 560px) { .container-player { grid-template-columns: " +
-        val + " !important; grid-template-rows: " + rows + " !important; }" +
-        (box ? " .container-player embed-audio-progress { height: " + box.h + " !important;" +
-          " width: " + box.w + " !important;" +
-          (box.gc && box.gc !== "auto" ? " grid-column: " + box.gc + " !important;" : "") +
-          (box.gr && box.gr !== "auto" ? " grid-row: " + box.gr + " !important;" : "") +
-          " }" : "") + " }";
+      st.setAttribute("data-m98", key);
+      st.textContent = rule;
       try { root.appendChild(st); } catch (err) {}
     }
-    if (el.__m98Lock !== rule) {
-      el.style.setProperty("grid-template-columns", val, "important");
-      el.style.setProperty("grid-template-rows", rows, "important");
-      if (prog && box) {
-        prog.style.setProperty("height", box.h, "important");
-        prog.style.setProperty("width", box.w, "important");
-        if (box.gc && box.gc !== "auto") prog.style.setProperty("grid-column", box.gc, "important");
-        if (box.gr && box.gr !== "auto") prog.style.setProperty("grid-row", box.gr, "important");
-      }
-      el.__m98Lock = rule;
-    }
+    el.__m98LockKey = key;
+    el.style.setProperty("grid-template-columns", cs.gridTemplateColumns, "important");
+    el.style.setProperty("grid-template-rows", rows, "important");
+    PIN_PARTS.forEach(function (sel) {
+      var el2 = deepQuery(sel);
+      if (!el2) return;
+      var c2 = window.getComputedStyle(el2);
+      el2.style.setProperty("grid-column", c2.gridColumnStart, "important");
+      el2.style.setProperty("grid-row", c2.gridRowStart, "important");
+    });
   }
 
   var rsT = null;
   window.addEventListener("resize", function () {
     var el = deepQuery(".container-player");
-    if (el && el.__m98Lock) {
+    if (el) {
+      el.__m98LockKey = "";
+      el.__m98SeenKey = "";
       el.style.removeProperty("grid-template-columns");
       el.style.removeProperty("grid-template-rows");
-      el.__m98Lock = "";
+      var root = el.getRootNode ? el.getRootNode() : document;
+      var st = root.getElementById ? root.getElementById("m98-grid-lock") : null;
+      if (st && st.parentNode) st.parentNode.removeChild(st);
+      PIN_PARTS.forEach(function (sel) {
+        var el2 = deepQuery(sel);
+        if (!el2) return;
+        el2.style.removeProperty("grid-column");
+        el2.style.removeProperty("grid-row");
+      });
     }
     clearTimeout(rsT);
     rsT = setTimeout(lockAlbumGrid, 180);
