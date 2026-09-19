@@ -207,8 +207,6 @@ a{color:var(--text)}
             <button class="btn primary" type="button" id="modeMain" title="Full crop, both axes">Main</button>
             <button class="btn ghost" type="button" id="modeCard" title="Square card: vertical only">Card</button>
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><input id="lockH" type="checkbox" style="width:auto"> Lock horizontal for previews</label>
-            <button class="btn primary" type="button" data-aspect="16/9" id="asp169">16:9</button>
-            <button class="btn ghost" type="button" data-aspect="1/1" id="asp11">1:1</button>
             <button class="btn ghost" type="button" id="replaceCover">Replace</button>
           </div>
         </div>
@@ -909,8 +907,6 @@ function setAspect(a){
   setCropMode("main");
   crop.aspect = a === "1/1" ? "1/1" : "16/9";
   $("#stage").style.aspectRatio = crop.aspect === "1/1" ? "1 / 1" : "16 / 9";
-  $("#asp169").classList.toggle("primary", crop.aspect === "16/9");
-  $("#asp11").classList.toggle("primary", crop.aspect === "1/1");
   layoutCrop();
 }
 function lockFx(){
@@ -1142,8 +1138,7 @@ $("#zoom").oninput = ()=> setZoom($("#zoom").value);
 $("#zoomIn").onclick = ()=> setZoom(zoomNow()+0.12);
 $("#zoomOut").onclick = ()=> setZoom(zoomNow()-0.12);
 $("#centerCover").onclick = ()=>{ if(cropMode === "card"){ crop.cardY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; } crop.dirty = true; layoutCrop(); };
-$("#asp169").onclick = ()=> setAspect("16/9");
-$("#asp11").onclick = ()=> setAspect("1/1");
+
 window.addEventListener("resize", layoutCrop);
 
 stage.addEventListener("wheel", e=>{
