@@ -828,6 +828,7 @@
 
   var rsT = null;
   window.addEventListener("resize", function () {
+    sealStop();   /* a real resize re-lays the embed: reset the first-press seal */
     var el = deepQuery(".container-player");
     if (el) {
       el.__m98LockKey = "";
@@ -932,55 +933,70 @@
   /* ---- song embed: kill the first-press controls hop -----------------------
      The hop comes from the swap itself, so compensation must be captured
      BEFORE Apple tears the initial variant down: the .audio-controls box top
-     (the bar's outer frame, identical slot in both variants). Once the active
-     variant mounts, the bar is held at the pre-press screen position until
-     either Apple's layout settles and agrees with the baseline, or the hold
-     expires. One-shot: later play/pause toggles stay inside the active
-     variant and never re-measure a swap. */
-  var seal = { armed: false, done: false, until: 0, top: 0, el: null };
+     (the bar's outer frame, identical slot in both variants). The active
+     variant is held at the PRE-PRESS position permanently — that is the
+     requested behaviour: the bar stays where it was, never settling into
+     Apple's lower active-slot position. The iframe height is fixed, so a
+     few px of translate cannot clip anything. Mechanics:
+       * rect includes our own translate — subtract it, or the loop chases
+         itself (on -> off -> on) and shimmers at 60Hz (the jumpFrame rule);
+       * first ~3s (the swap + fade window) hold at 60fps, then a 250ms
+         re-assert keeps the pin alive across Apple re-renders forever;
+       * a real resize re-lays the embed legitimately, so the seal resets
+         and the next press re-measures. */
+  var seal = { on: false, top: 0, dy: 0, el: null, hotUntil: 0, slow: 0, deadAt: 0 };
   function hasTracklist() {
     return !!deepQuery("embed-audio-tracklist-item");
   }
+  function sealStop() {
+    if (seal.slow) { clearInterval(seal.slow); seal.slow = 0; }
+    if (seal.el && seal.el.isConnected) seal.el.style.removeProperty("transform");
+    seal.on = false;
+    seal.el = null;
+    seal.dy = 0;
+  }
   function armFirstPressSeal() {
-    if (seal.done || seal.armed) return;
+    if (seal.on) return;
     var el = deepQuery(".audio-controls");
     if (!el) return;
     var b = el.getBoundingClientRect();
     if (!b.width || !b.height) return;
-    seal.armed = true;
-    seal.done = false;
+    seal.on = true;
     seal.top = b.y;
+    seal.dy = 0;
     seal.el = el;
-    seal.until = Date.now() + 2500;   /* swap + fade + settle headroom */
+    seal.hotUntil = Date.now() + 3000;   /* swap + fade + settle window */
+    seal.deadAt = Date.now() + 10000;    /* give up if the embed dies */
     requestAnimationFrame(sealFrame);
   }
+  function sealLoop() {
+    if (Date.now() < seal.hotUntil) requestAnimationFrame(sealFrame);
+    else if (!seal.slow) seal.slow = setInterval(sealFrame, 250);
+  }
   function sealFrame() {
-    if (!seal.armed) return;
-    if (seal.done || Date.now() > seal.until) {
-      if (seal.el) seal.el.style.removeProperty("transform");
-      seal.armed = false;
-      seal.el = null;
+    if (!seal.on) return;
+    var el = seal.el && seal.el.isConnected ? seal.el : deepQuery(".audio-controls");
+    if (el !== seal.el) {              /* Apple remounted the controls element */
+      if (seal.el && seal.el.isConnected) seal.el.style.removeProperty("transform");
+      seal.el = el;
+      seal.dy = 0;
+    }
+    if (!el) {
+      if (Date.now() > seal.deadAt) sealStop();
+      else sealLoop();
       return;
     }
-    var el = seal.el && seal.el.isConnected ? seal.el : deepQuery(".audio-controls");
-    seal.el = el;
-    if (el) {
-      var b = el.getBoundingClientRect();
-      if (b.width && b.height) {
-        var dy = seal.top - b.y;
-        if (Math.abs(dy) > 1) el.style.setProperty("transform", "translateY(" + dy + "px)", "important");
-        else if (el.style.getPropertyValue("transform")) el.style.removeProperty("transform");
-        /* Baseline confirmed by the native layout: the swap has finished and
-           agreed with where the bar was before the press. Release cleanly. */
-        if (Math.abs(dy) <= 1 && deepQuery("embed-audio-progress")) {
-          seal.armed = false;
-          seal.done = true;
-          seal.el = null;
-          return;
-        }
-      }
+    var b = el.getBoundingClientRect();
+    if (!b.width || !b.height) { sealLoop(); return; }
+    var nativeDy = seal.top - (b.y - seal.dy);   /* native offset, our translate removed */
+    if (Math.abs(nativeDy) > 1) {
+      el.style.setProperty("transform", "translateY(" + nativeDy + "px)", "important");
+      seal.dy = nativeDy;
+    } else if (seal.dy) {
+      el.style.removeProperty("transform");
+      seal.dy = 0;
     }
-    requestAnimationFrame(sealFrame);
+    sealLoop();
   }
 
   document.addEventListener("click", onTrackGesture, true);
