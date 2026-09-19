@@ -349,7 +349,12 @@
   function clearRef(it) {
     if (it.el && it.el.isConnected) it.el.style.removeProperty("transform");
   }
+  function pinEngaged() {
+    var el = deepQuery(".container-player");
+    return !!(el && el.__m98LockKey);
+  }
   function armJumpFix(ms) {
+    if (pinEngaged()) return;   /* pin already holds the layout; backstop would only add flicker */
     jumpRefs = JUMP_SELS.map(function (sel) {
       var el = deepQuery(sel);
       if (!el) return null;
@@ -395,9 +400,9 @@
     var parts = cs.gridTemplateColumns.trim().split(/\s+/);
     var mid = Math.round(parseFloat(parts[1] || "0"));
     var wide = parts.length === 3 && mid >= 200 && mid <= 260;
-    var narrow = parts.length === 7;
-    if (!wide && !narrow) return;                       /* not a final template */
-    if (!deepQuery("embed-audio-tracklist-item") || !deepQuery(".audio-controls")) return;  /* boot not done */
+    /* Device-agnostic gates: content present (boot done) and the template
+       stable across two samples. No hardcoded column counts. */
+    if (!deepQuery("embed-audio-tracklist-item") || !deepQuery(".audio-controls")) return;
     var rows = cs.gridTemplateRows;
     var place = PIN_PARTS.map(function (sel) {
       var el2 = deepQuery(sel);
