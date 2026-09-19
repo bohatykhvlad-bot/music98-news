@@ -240,11 +240,13 @@
      for ~30ms: the progress bar hops to another row and a metadata lockup
      pops in. Cancel both visually for a short settle window. */
   var settleRaf = 0;
+  var settleUntil = 0;
   function settleWindow(ms) {
     if (settleRaf) cancelAnimationFrame(settleRaf);
     var prog = deepQuery("embed-audio-progress");
     var lockup = deepQuery("embed-metadata-lockup");
     var until = Date.now() + (ms || 250);
+    settleUntil = until;
     var fixed = false, hidLock = false;
     var b = prog ? prog.getBoundingClientRect() : null;
     var base = b ? { x: b.x, y: b.y, w: b.width, h: b.height } : null;
@@ -726,6 +728,12 @@
        the pin can never capture a boot or pre-play state. */
     if (!deepQuery("embed-audio-tracklist-item") || !deepQuery(".audio-controls")) return;
     if (!wide && !playedOnce) return;
+    /* Never (re-)capture while a managed switch is in flight: mid-jump the grid
+       goes through a transient placement, and a pin frozen from that moment
+       stretched the progress bar across both columns — the hanging strip.
+       The pre-existing lock keeps sealing the layout; recapture resumes once
+       the settle window and the controls hold have expired. */
+    if (Date.now() < settleUntil || Date.now() < ctrl.until) return;
     var rows = cs.gridTemplateRows;
     var place = PIN_PARTS.map(function (sel) {
       var el2 = deepQuery(sel);
@@ -755,7 +763,6 @@
           "grid-row:" + c2.gridRowStart + " !important;";
         if (sizePin && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
           if (parseFloat(c2.height) > 0) rule += "height:" + c2.height + " !important;";
-          if (wide && sel === "embed-audio-progress" && parseFloat(c2.width) > 0) rule += "width:" + c2.width + " !important;";
         }
         rule += "}";
       });
@@ -777,7 +784,6 @@
       el2.style.setProperty("grid-row", c2.gridRowStart, "important");
       if (sizePin && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
         if (parseFloat(c2.height) > 0) el2.style.setProperty("height", c2.height, "important");
-        if (wide && sel === "embed-audio-progress" && parseFloat(c2.width) > 0) el2.style.setProperty("width", c2.width, "important");
       }
     });
   }
