@@ -1508,7 +1508,7 @@ $("#save").onclick = ()=> writePost("live");
 $("#schedule").onclick = ()=> writePost("scheduled");
 $("#draft").onclick = ()=> writePost("draft");
 
-$("#list").onclick = async e=>{
+["#listNews", "#listReleases"].forEach(sel=>{ $(sel).onclick = async e=>{
   const del = e.target.closest("[data-del]");
   const ed = e.target.closest("[data-edit]");
   if(ed){
@@ -1523,6 +1523,7 @@ $("#list").onclick = async e=>{
     $("#delModal").classList.remove("hide");
   }
 };
+});
 $("#delGo").onclick = async ()=>{
   const id = $("#delModal").dataset.id;
   $("#delModal").classList.add("hide");
