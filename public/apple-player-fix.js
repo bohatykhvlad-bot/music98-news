@@ -240,46 +240,49 @@
      for ~30ms: the progress bar hops to another row and a metadata lockup
      pops in. Cancel both visually for a short settle window. */
   var settleRaf = 0;
-  var settleUntil = 0;
   function settleWindow(ms) {
     if (settleRaf) cancelAnimationFrame(settleRaf);
     var prog = deepQuery("embed-audio-progress");
-    /* Cover the whole managed switch: the controls hold is exactly how long a
-       transient layout can live, and the progress bar must keep its active
-       placement and size for all of it — a shorter window let the bar stretch
-       full-width over the tracklist (the hanging strip). */
-    var until = Math.max(Date.now() + (ms || 250), ctrl.until);
-    settleUntil = until;
-    var fixed = false;
+    var lockup = deepQuery("embed-metadata-lockup");
+    var until = Date.now() + (ms || 250);
+    var fixed = false, hidLock = false;
     var b = prog ? prog.getBoundingClientRect() : null;
     var base = b ? { x: b.x, y: b.y, w: b.width, h: b.height } : null;
-    var pcs = prog ? window.getComputedStyle(prog) : null;
-    var basePlace = pcs ? { gc: pcs.gridColumn, gr: pcs.gridRow } : null;
+    var lb = lockup ? lockup.getBoundingClientRect() : null;
+    var lockBase = lb ? { x: lb.x, y: lb.y, h: lb.height } : null;
     function frame() {
       if (Date.now() > until) {
         if (prog && fixed) {
-          ["grid-column", "grid-row", "width", "height"].forEach(function (k) {
+          ["position", "left", "top", "width", "height", "margin", "zIndex", "transform"].forEach(function (k) {
             prog.style.removeProperty(k);
           });
         }
+        if (lockup && hidLock) lockup.style.removeProperty("display");
         settleRaf = 0;
         return;
       }
       fixOverlaps();
       var wide = appleWide();
-      if (prog && base && basePlace && !fixed && wide) {
-        /* In-flow pin: the bar keeps its active grid cell and size no matter
-           which transient state class the container wears mid-switch. */
-        prog.style.setProperty("grid-column", basePlace.gc, "important");
-        prog.style.setProperty("grid-row", basePlace.gr, "important");
+      if (prog && base && !fixed && wide) {
+        prog.style.setProperty("position", "fixed", "important");
+        prog.style.setProperty("left", base.x + "px", "important");
+        prog.style.setProperty("top", base.y + "px", "important");
         prog.style.setProperty("width", base.w + "px", "important");
         prog.style.setProperty("height", base.h + "px", "important");
+        prog.style.setProperty("margin", "0", "important");
+        prog.style.setProperty("z-index", "3", "important");
         fixed = true;
       }
-      /* The metadata lockup is left to Apple: holdControls keeps the loading
-         variant (the only one that popped a lockup) out of the DOM, and the
-         native cross-fade of the title/artist is what the switch should look
-         like. display:none-ing it here made the title vanish in one frame. */
+      /* Only cancel a lockup that really moved or popped in — hiding an
+         unchanged one just makes the album title blink for no reason. */
+      if (lockup && !hidLock && lockBase) {
+        var r2 = lockup.getBoundingClientRect();
+        if (r2.height > 0 && (Math.abs(r2.height - lockBase.h) > 2 ||
+            Math.abs(r2.y - lockBase.y) > 2 || Math.abs(r2.x - lockBase.x) > 2)) {
+          lockup.style.setProperty("display", "none", "important");
+          hidLock = true;
+        }
+      }
       settleRaf = requestAnimationFrame(frame);
     }
     settleRaf = requestAnimationFrame(frame);
@@ -316,12 +319,12 @@
   /* While audio plays, nothing may sit on top of the transport: Apple's red
      "listen on Apple Music" affordances can overlap the play button during
      variant transitions. Hide exactly the intersecting ones.
-     The target is the play/pause button itself (padded), NOT the whole
+     The intersection target is the play/pause button (padded), NOT the whole
      .audio-controls container: on the large breakpoint Apple renders its own
      active-state "listen on Apple Music" link INSIDE .audio-controls (class
-     audio-controls__more), so a container intersection test hid that link on
-     every desktop playback — the pristine embed keeps it. Runs on every
-     breakpoint now: the same seal covers the mobile upsell flash. */
+     audio-controls__more), so a container test hid that link on every desktop
+     playback — the pristine embed keeps it. Candidates are only the red launch
+     upsells: the static legal footer link must never blink. */
   var ovCands = null, ovCandsT = 0;
   function playButtonRect() {
     var els = [deepQuery(".playback-play__play"), deepQuery(".playback-play__pause")];
@@ -334,11 +337,8 @@
     return null;
   }
   function fixOverlaps() {
+    if (!appleWide()) return;
     if (!ovCands || Date.now() - ovCandsT > 500) {
-      /* Only the red launch upsells are overlap candidates: the legal footer
-         link is a static row that a mid-switch reflow can momentarily slide
-         under the play button — hiding it then read as a blink at the bottom
-         of the embed. */
       ovCands = deepQueryAll("embed-launch-client, .launch-client");
       ovCandsT = Date.now();
     }
@@ -427,17 +427,6 @@
       try {
         mk.addEventListener("playbackStateDidChange", function (ev) {
           fixOverlaps(); armJumpFix(800);
-          /* Seal the transient loading variant while playback is live (the
-             bottom glitch). Never hold a stop: renderContent() of the active
-             variant returns EMPTY once nowPlayingItem is gone, so a hold left
-             the controls area blank for ~1s before the initial variant landed
-             — exactly the "disappears for a second, then appears" report. */
-          /* A dip through a non-live state mid-switch must not drop the grid
-             lock (that exposed the transient full-width progress); only a
-             stop that persists gets the lock released, so the initial variant
-             renders natively. */
-          if (inLiveStates(mk)) { holdControls(900); stopClearCancel(); }
-          else stopClearArm();
           if (!MK_MOBILE) return;
           var playing = mk.isPlaying;
           if (playing) {
@@ -653,8 +642,7 @@
      cached refs, active only inside a short window after a gesture or a
      MusicKit state change. No grid pins and no size forcing on mobile. */
   var JUMP_SELS = [".audio-controls", "embed-audio-progress", "embed-auth-control",
-    ".auth-control__sign-in", "amp-artwork", ".container-player__logo-header",
-    "embed-launch-client", "embed-legal-link"];
+    ".auth-control__sign-in", "amp-artwork", ".container-player__logo-header"];
   var jumpUntil = 0, jumpRefs = null, loopOn = false;
   function clearRef(it) {
     if (it.el && it.el.isConnected) it.el.style.removeProperty("transform");
@@ -664,10 +652,9 @@
     return !!(el && el.__m98LockKey);
   }
   function armJumpFix(ms, fromGesture) {
-    /* On narrow only a gesture-time baseline is trustworthy before the first
-       play; once playback is live the layout is settled, so state changes may
-       arm the compensator there too — that is what seals the bottom strip. */
-    if (!appleWide() && !fromGesture && !playedOnce) return;
+    /* On narrow only a gesture-time baseline is trustworthy: an event-driven
+       arm would capture the layout after it already moved and pin the damage. */
+    if (!appleWide() && !fromGesture) return;
     if (pinEngaged() && !fromGesture) return;   /* pin already holds the layout */
     if (jumpRefs) jumpRefs.forEach(function (it) { it.dx = 0; it.dy = 0; clearRef(it); });
     jumpRefs = JUMP_SELS.map(function (sel) {
@@ -723,20 +710,10 @@
        when implicit columns appear, so probe track sizes instead. */
     var wide = appleWide() &&
       parts.some(function (x) { var v = parseFloat(x); return v >= 200 && v <= 260; });
-    /* Mobile gets the desktop size pin once playback is live: a pinned
-       controls height is what keeps the embed's bottom edge from breathing
-       when Apple swaps control variants. */
-    var sizePin = wide || playedOnce;
     /* Gates: boot done; on narrow layouts wait for the first real playback so
        the pin can never capture a boot or pre-play state. */
     if (!deepQuery("embed-audio-tracklist-item") || !deepQuery(".audio-controls")) return;
     if (!wide && !playedOnce) return;
-    /* Never (re-)capture while a managed switch is in flight: mid-jump the grid
-       goes through a transient placement, and a pin frozen from that moment
-       stretched the progress bar across both columns — the hanging strip.
-       The pre-existing lock keeps sealing the layout; recapture resumes once
-       the settle window and the controls hold have expired. */
-    if (Date.now() < settleUntil || Date.now() < ctrl.until) return;
     var rows = cs.gridTemplateRows;
     var place = PIN_PARTS.map(function (sel) {
       var el2 = deepQuery(sel);
@@ -764,8 +741,9 @@
         var c2 = window.getComputedStyle(el2);
         rule += sel + "{grid-column:" + c2.gridColumnStart + " !important;" +
           "grid-row:" + c2.gridRowStart + " !important;";
-        if (sizePin && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
+        if (wide && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
           if (parseFloat(c2.height) > 0) rule += "height:" + c2.height + " !important;";
+          if (sel === "embed-audio-progress" && parseFloat(c2.width) > 0) rule += "width:" + c2.width + " !important;";
         }
         rule += "}";
       });
@@ -785,42 +763,33 @@
       var c2 = window.getComputedStyle(el2);
       el2.style.setProperty("grid-column", c2.gridColumnStart, "important");
       el2.style.setProperty("grid-row", c2.gridRowStart, "important");
-      if (sizePin && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
+      if (wide && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
         if (parseFloat(c2.height) > 0) el2.style.setProperty("height", c2.height, "important");
+        if (sel === "embed-audio-progress" && parseFloat(c2.width) > 0) el2.style.setProperty("width", c2.width, "important");
       }
     });
   }
 
-  function clearGridLock() {
-    var el = deepQuery(".container-player");
-    if (!el) return;
-    el.__m98LockKey = "";
-    el.__m98SeenKey = "";
-    el.style.removeProperty("grid-template-columns");
-    el.style.removeProperty("grid-template-rows");
-    var root = el.getRootNode ? el.getRootNode() : document;
-    var st = root.getElementById ? root.getElementById("m98-grid-lock") : null;
-    if (st && st.parentNode) st.parentNode.removeChild(st);
-    PIN_PARTS.forEach(function (sel) {
-      var el2 = deepQuery(sel);
-      if (!el2) return;
-      el2.style.removeProperty("grid-column");
-      el2.style.removeProperty("grid-row");
-      el2.style.removeProperty("height");
-      el2.style.removeProperty("width");
-    });
-  }
-  var stopT = 0;
-  function stopClearArm() {
-    if (stopT) return;
-    stopT = setTimeout(function () { stopT = 0; clearGridLock(); }, 450);
-  }
-  function stopClearCancel() {
-    if (stopT) { clearTimeout(stopT); stopT = 0; }
-  }
   var rsT = null;
   window.addEventListener("resize", function () {
-    clearGridLock();
+    var el = deepQuery(".container-player");
+    if (el) {
+      el.__m98LockKey = "";
+      el.__m98SeenKey = "";
+      el.style.removeProperty("grid-template-columns");
+      el.style.removeProperty("grid-template-rows");
+      var root = el.getRootNode ? el.getRootNode() : document;
+      var st = root.getElementById ? root.getElementById("m98-grid-lock") : null;
+      if (st && st.parentNode) st.parentNode.removeChild(st);
+      PIN_PARTS.forEach(function (sel) {
+        var el2 = deepQuery(sel);
+        if (!el2) return;
+        el2.style.removeProperty("grid-column");
+        el2.style.removeProperty("grid-row");
+        el2.style.removeProperty("height");
+        el2.style.removeProperty("width");
+      });
+    }
     clearTimeout(rsT);
     rsT = setTimeout(lockAlbumGrid, 180);
   });
@@ -857,10 +826,9 @@
   }
 
   /* Next on the last track: pristine Apple stops the queue and drops the embed
-     into the initial variant — a full controls swap that reads as a jump (and
-     left the pinned grid distorting the stopped layout: gap instead of the
-     metadata lockup). Wrap to the first track through the sealed jump path
-     instead, the same way track-name clicks move. */
+     into the initial variant — a full controls swap that reads as a jump and
+     blanks the transport for a moment. Wrap to the first track through the
+     sealed jump path instead, mirroring the prev-on-track-1 restart. */
   function onNextGesture(ev) {
     if (ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
     var path = ev.composedPath ? ev.composedPath() : [];
