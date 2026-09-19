@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import runpy
 import urllib.error
 import urllib.parse
@@ -647,8 +648,12 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    try:  # Windows consoles (cp1251/cp866) cannot print the arrow in the banner
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
     port = int(os.environ.get("PORT", "43123"))
     httpd = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    print(f"music98.news → http://127.0.0.1:{port}")
-    print("Desk → http://127.0.0.1:%s/admin-desk" % port)
+    print(f"music98.news -> http://127.0.0.1:{port}")
+    print("Desk -> http://127.0.0.1:%s/admin-desk" % port)
     httpd.serve_forever()

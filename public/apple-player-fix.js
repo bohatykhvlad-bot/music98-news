@@ -388,6 +388,13 @@
      than MK_MAX_DT ms. A stalled frame leaping the ramp was still audible as
      a small volume jump at the start of a track. */
   var MK_FADE_MS = 460, MK_FADE_DB = 42, MK_MAX_DT = 40;
+  /* The pending timer can be a setTimeout (warm) or a setInterval (the cold
+     adaptive waiter); clear both shapes everywhere. */
+  function mkDisarm(mk) {
+    if (mkVol.timer) { clearTimeout(mkVol.timer); clearInterval(mkVol.timer); mkVol.timer = 0; }
+    if (mkVol.raf) { cancelAnimationFrame(mkVol.raf); mkVol.raf = 0; }
+    mkVol.ramping = false;
+  }
   function mkRamp(mk) {
     if (mkVol.raf) cancelAnimationFrame(mkVol.raf);
     mkVol.ramping = true;
@@ -416,16 +423,37 @@
     try { mk.volume = 0; } catch (err) {}
     mkVol.pending = true;
     mkVol.ramping = false;
-    if (mkVol.timer) { clearTimeout(mkVol.timer); mkVol.timer = 0; }
-    if (mkVol.raf) { cancelAnimationFrame(mkVol.raf); mkVol.raf = 0; }
+    mkDisarm(mk);
   }
   function mkSchedule(mk, cold) {
     if (!MK_MOBILE || !mkVol.pending || mkVol.timer) return;
-    mkVol.timer = setTimeout(function () {
-      mkVol.timer = 0;
-      mkVol.pending = false;
-      mkRamp(mk);
-    }, MK_ANDROID ? (cold ? 500 : 120) : 120);   /* cold: Android mixer honours volume ~500ms into a stream (chart's VOL_COLD_WAIT) */
+    if (!cold) {
+      mkVol.timer = setTimeout(function () {
+        mkVol.timer = 0;
+        mkVol.pending = false;
+        mkRamp(mk);
+      }, 120);
+      return;
+    }
+    /* Android cold start: the mixer queues volume writes for the first few
+       hundred ms of a new stream, so an early ramp can leak the pre-arm
+       volume (the blast). Wait adaptively instead of a flat 500ms: start the
+       fade as soon as playback time has advanced ~0.25s — buffers are
+       rendering and the write has landed — but never before 250ms and never
+       after 500ms. Same worst case, faster on devices whose mixer starts
+       promptly. */
+    var t0 = Date.now();
+    mkVol.timer = setInterval(function () {
+      var el = Date.now() - t0;
+      var pt = 0;
+      try { pt = Number(mk.currentPlaybackTime) || 0; } catch (err) {}
+      if (el >= 500 || (el >= 250 && pt > 0.25)) {
+        clearInterval(mkVol.timer);
+        mkVol.timer = 0;
+        mkVol.pending = false;
+        mkRamp(mk);
+      }
+    }, 50);
   }
   setInterval(function () {
     var mk = music();
@@ -443,7 +471,7 @@
             mkVol.everPlayed = true; mkVol.wasPlaying = true;
           } else {
             mkVol.wasPlaying = false;
-            if (mkVol.timer) { clearTimeout(mkVol.timer); mkVol.timer = 0; }
+            mkDisarm(mk);
           }
         });
         mk.addEventListener("mediaItemDidChange", function () {
