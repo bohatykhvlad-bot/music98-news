@@ -290,7 +290,7 @@ def rewrite_apple_embed(html: str) -> str:
         "'/assets/", "'/apple-static/assets/"
     )
     out = re.sub(r"<script[^>]*static\.cloudflareinsights\.com[^>]*>\s*</script>", "", out)  # Apple analytics: blocked by our CSP anyway
-    tag = '<script src="/apple-player-fix.js?v=editorial-92"></script>'
+    tag = '<script src="/apple-player-fix.js?v=editorial-106"></script>'
     if os.environ.get("M98_NO_FIX") == "1":
         tag = ""  # QA: vanilla Apple embed through the proxy, no injected script
     if re.search(r"<head([^>]*)>", out, re.I):

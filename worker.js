@@ -24,7 +24,7 @@ function rewriteAppleEmbed(html) {
   out = out.replace(/(["'])\/build\//g, "$1/apple-static/build/");
   out = out.replace(/(["'])\/assets\//g, "$1/apple-static/assets/");
   out = out.replace(/<script[^>]*static\.cloudflareinsights\.com[^>]*>\s*<\/script>/g, "");  /* Apple analytics: blocked by our CSP, no need inside the embed */
-  const tag = '<script src="/apple-player-fix.js?v=editorial-104"></script>';
+  const tag = '<script src="/apple-player-fix.js?v=editorial-106"></script>';
   if (/<head([^>]*)>/i.test(out)) out = out.replace(/<head([^>]*)>/i, "<head$1>" + tag);
   else out = tag + out;
   return out;
@@ -49,7 +49,7 @@ async function proxyAppleAlbum(request, path) {
     status: 200,
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=60",
+      "Cache-Control": "public, max-age=300",
       "Content-Security-Policy": APPLE_EMBED_CSP,
       "Referrer-Policy": "strict-origin-when-cross-origin",
     },

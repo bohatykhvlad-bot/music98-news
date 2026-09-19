@@ -907,7 +907,13 @@
 
   /* Transport play buttons (initial/loading variant big play, active play)
      had no gesture hook: the first play() after them started buffers at
-     volume 1 — the remaining Android blast. Arm before Apple handles it. */
+     volume 1 — the remaining Android blast. Arm before Apple handles it.
+     Song embeds have no tracklist, so this is also the ONLY gesture hook
+     they ever get: the first press rides the initial -> active controls
+     swap, and Apple lands the active transport a couple of px lower (row
+     margins + progress bar remount), which reads as the whole bar hopping
+     down. First press gets a one-shot alignment baseline plus a short
+     position hold, exactly what onTrackGesture gives album embeds. */
   function onTransportPlayGesture(ev) {
     if (ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
     var path = ev.composedPath ? ev.composedPath() : [];
@@ -917,9 +923,64 @@
           n.classList.contains("playback-play__play"))) {
         var mk0 = music();
         if (mk0) { mkArm(mk0); mkSchedule(mk0, !mkVol.everPlayed); }
+        if (!hasTracklist()) armFirstPressSeal();
         return;
       }
     }
+  }
+
+  /* ---- song embed: kill the first-press controls hop -----------------------
+     The hop comes from the swap itself, so compensation must be captured
+     BEFORE Apple tears the initial variant down: the .audio-controls box top
+     (the bar's outer frame, identical slot in both variants). Once the active
+     variant mounts, the bar is held at the pre-press screen position until
+     either Apple's layout settles and agrees with the baseline, or the hold
+     expires. One-shot: later play/pause toggles stay inside the active
+     variant and never re-measure a swap. */
+  var seal = { armed: false, done: false, until: 0, top: 0, el: null };
+  function hasTracklist() {
+    return !!deepQuery("embed-audio-tracklist-item");
+  }
+  function armFirstPressSeal() {
+    if (seal.done || seal.armed) return;
+    var el = deepQuery(".audio-controls");
+    if (!el) return;
+    var b = el.getBoundingClientRect();
+    if (!b.width || !b.height) return;
+    seal.armed = true;
+    seal.done = false;
+    seal.top = b.y;
+    seal.el = el;
+    seal.until = Date.now() + 2500;   /* swap + fade + settle headroom */
+    requestAnimationFrame(sealFrame);
+  }
+  function sealFrame() {
+    if (!seal.armed) return;
+    if (seal.done || Date.now() > seal.until) {
+      if (seal.el) seal.el.style.removeProperty("transform");
+      seal.armed = false;
+      seal.el = null;
+      return;
+    }
+    var el = seal.el && seal.el.isConnected ? seal.el : deepQuery(".audio-controls");
+    seal.el = el;
+    if (el) {
+      var b = el.getBoundingClientRect();
+      if (b.width && b.height) {
+        var dy = seal.top - b.y;
+        if (Math.abs(dy) > 1) el.style.setProperty("transform", "translateY(" + dy + "px)", "important");
+        else if (el.style.getPropertyValue("transform")) el.style.removeProperty("transform");
+        /* Baseline confirmed by the native layout: the swap has finished and
+           agreed with where the bar was before the press. Release cleanly. */
+        if (Math.abs(dy) <= 1 && deepQuery("embed-audio-progress")) {
+          seal.armed = false;
+          seal.done = true;
+          seal.el = null;
+          return;
+        }
+      }
+    }
+    requestAnimationFrame(sealFrame);
   }
 
   document.addEventListener("click", onTrackGesture, true);
