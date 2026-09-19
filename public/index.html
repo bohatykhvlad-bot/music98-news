@@ -174,8 +174,8 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
 .cmid{--pexp:0px;--pin:8px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:var(--pin);z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
 .chart-row.playing .cmid{background:rgba(255,255,255,.92);border-color:rgba(15,60,64,.10);padding:4px var(--pin)}
-.rplay{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;transition:background .16s ease,color .16s ease,transform .16s ease}
-.rplay svg{width:19px;height:19px}
+.rplay{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;transition:background .22s cubic-bezier(.34,1.4,.64,1),color .22s ease,border-color .22s ease,transform .28s cubic-bezier(.34,1.56,.64,1)}
+.rplay svg{width:24px;height:24px}
 .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.07)}
 .chart-row.playing .rplay{background:var(--accent);border-color:transparent;color:#03282b}
 .chart-row.playing .rplay:hover{transform:scale(1.07)}
@@ -472,7 +472,7 @@ textarea{resize:vertical;min-height:64px}
   .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}
-  .rplay svg{width:18px;height:18px}
+  .rplay svg{width:21px;height:21px}
   .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:auto;min-height:0;opacity:0;overflow:hidden;transform:none;pointer-events:none;max-height:0;margin:0;transition:opacity .28s ease,max-height .32s ease}
   .chart-row.playing .pextra{opacity:1;overflow:hidden;pointer-events:auto;max-height:36px}
   .ptime{display:flex;align-items:center;flex:1;min-width:0;padding:0;gap:8px;background:none;border:0;border-radius:0}
