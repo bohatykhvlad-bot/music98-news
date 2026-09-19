@@ -426,7 +426,13 @@
       try {
         mk.addEventListener("playbackStateDidChange", function (ev) {
           fixOverlaps(); armJumpFix(800);
-          holdControls(900);   /* seal the transient loading variant: the bottom glitch */
+          /* Seal the transient loading variant while playback is live (the
+             bottom glitch). Never hold a stop: renderContent() of the active
+             variant returns EMPTY once nowPlayingItem is gone, so a hold left
+             the controls area blank for ~1s before the initial variant landed
+             — exactly the "disappears for a second, then appears" report. */
+          if (inLiveStates(mk)) holdControls(900);
+          else clearGridLock();   /* stopped: let the initial variant render natively */
           if (!MK_MOBILE) return;
           var playing = mk.isPlaying;
           if (playing) {
@@ -776,26 +782,28 @@
     });
   }
 
+  function clearGridLock() {
+    var el = deepQuery(".container-player");
+    if (!el) return;
+    el.__m98LockKey = "";
+    el.__m98SeenKey = "";
+    el.style.removeProperty("grid-template-columns");
+    el.style.removeProperty("grid-template-rows");
+    var root = el.getRootNode ? el.getRootNode() : document;
+    var st = root.getElementById ? root.getElementById("m98-grid-lock") : null;
+    if (st && st.parentNode) st.parentNode.removeChild(st);
+    PIN_PARTS.forEach(function (sel) {
+      var el2 = deepQuery(sel);
+      if (!el2) return;
+      el2.style.removeProperty("grid-column");
+      el2.style.removeProperty("grid-row");
+      el2.style.removeProperty("height");
+      el2.style.removeProperty("width");
+    });
+  }
   var rsT = null;
   window.addEventListener("resize", function () {
-    var el = deepQuery(".container-player");
-    if (el) {
-      el.__m98LockKey = "";
-      el.__m98SeenKey = "";
-      el.style.removeProperty("grid-template-columns");
-      el.style.removeProperty("grid-template-rows");
-      var root = el.getRootNode ? el.getRootNode() : document;
-      var st = root.getElementById ? root.getElementById("m98-grid-lock") : null;
-      if (st && st.parentNode) st.parentNode.removeChild(st);
-      PIN_PARTS.forEach(function (sel) {
-        var el2 = deepQuery(sel);
-        if (!el2) return;
-        el2.style.removeProperty("grid-column");
-        el2.style.removeProperty("grid-row");
-        el2.style.removeProperty("height");
-        el2.style.removeProperty("width");
-      });
-    }
+    clearGridLock();
     clearTimeout(rsT);
     rsT = setTimeout(lockAlbumGrid, 180);
   });
@@ -831,9 +839,36 @@
       .catch(function () {});
   }
 
+  /* Next on the last track: pristine Apple stops the queue and drops the embed
+     into the initial variant — a full controls swap that reads as a jump (and
+     left the pinned grid distorting the stopped layout: gap instead of the
+     metadata lockup). Wrap to the first track through the sealed jump path
+     instead, the same way track-name clicks move. */
+  function onNextGesture(ev) {
+    if (ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
+    var path = ev.composedPath ? ev.composedPath() : [];
+    var hit = null;
+    for (var i = 0; i < path.length; i++) {
+      var n = path[i];
+      if (n && n.classList && n.classList.contains("button--next")) { hit = n; break; }
+    }
+    if (!hit) return;
+    var mk = music();
+    if (!mk || !mk.queue) return;
+    var last = queueItems(mk).length - 1;
+    if (last < 0 || (mk.queue.position || 0) !== last) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    if (typeof ev.stopImmediatePropagation === "function") ev.stopImmediatePropagation();
+    lockAlbumGrid();
+    Promise.resolve(goToIndex(mk, 0)).catch(function () {});
+  }
+
   document.addEventListener("click", onTrackGesture, true);
   document.addEventListener("click", onPrevGesture, true);
+  document.addEventListener("click", onNextGesture, true);
   document.addEventListener("keydown", onPrevGesture, true);
+  document.addEventListener("keydown", onNextGesture, true);
   document.addEventListener("keydown", onTrackGesture, true);
 
   function watch() {
