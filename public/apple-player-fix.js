@@ -243,13 +243,10 @@
   function settleWindow(ms) {
     if (settleRaf) cancelAnimationFrame(settleRaf);
     var prog = deepQuery("embed-audio-progress");
-    var lockup = deepQuery("embed-metadata-lockup");
     var until = Date.now() + (ms || 250);
-    var fixed = false, hidLock = false;
+    var fixed = false;
     var b = prog ? prog.getBoundingClientRect() : null;
     var base = b ? { x: b.x, y: b.y, w: b.width, h: b.height } : null;
-    var lb = lockup ? lockup.getBoundingClientRect() : null;
-    var lockBase = lb ? { x: lb.x, y: lb.y, h: lb.height } : null;
     function frame() {
       if (Date.now() > until) {
         if (prog && fixed) {
@@ -257,7 +254,6 @@
             prog.style.removeProperty(k);
           });
         }
-        if (lockup && hidLock) lockup.style.removeProperty("display");
         settleRaf = 0;
         return;
       }
@@ -273,16 +269,11 @@
         prog.style.setProperty("z-index", "3", "important");
         fixed = true;
       }
-      /* Only cancel a lockup that really moved or popped in — hiding an
-         unchanged one just makes the album title blink for no reason. */
-      if (lockup && !hidLock && lockBase) {
-        var r2 = lockup.getBoundingClientRect();
-        if (r2.height > 0 && (Math.abs(r2.height - lockBase.h) > 2 ||
-            Math.abs(r2.y - lockBase.y) > 2 || Math.abs(r2.x - lockBase.x) > 2)) {
-          lockup.style.setProperty("display", "none", "important");
-          hidLock = true;
-        }
-      }
+      /* The metadata lockup is left entirely to Apple: holdControls keeps the
+         loading variant (the only one that ever popped a stray lockup) out of
+         the DOM, and the native cross-fade must run in BOTH directions — the
+         old display:none guard killed the outgoing fade in a single frame
+         whenever the new title changed the lockup's height. */
       settleRaf = requestAnimationFrame(frame);
     }
     settleRaf = requestAnimationFrame(frame);
