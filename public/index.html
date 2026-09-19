@@ -940,30 +940,59 @@ audio.muted = false;
 audio.defaultMuted = false;
 audio.volume = 1;         /* 100% of the device volume; Android ramps in, see volArm */
 const IS_ANDROID = /Android/i.test(navigator.userAgent);
-let volPending = false, volRaf = 0, volTimer = 0;
+let volPending = false, volRaf = 0, volTimer = 0, volRamping = false, volWarm = false;
+/* The fade is shaped in dB, not in raw amplitude: equal loudness steps, so the
+   onset creeps in instead of stepping. Each frame is also slew-limited — a long
+   (janky) frame advances the fade by at most VOL_MAX_DT, which is what used to
+   leap the ramp straight to near-full volume and stay audible as a jump. */
+const VOL_FADE_COLD = 460, VOL_FADE_WARM = 150, VOL_DB = 42, VOL_MAX_DT = 40, VOL_COLD_WAIT = 500;
 function volRamp(){
   if(volRaf) cancelAnimationFrame(volRaf);
-  audio.muted = false;
-  const start = performance.now(), ms = 180;
-  (function step(rafNow){
-    if(audio.paused){ audio.volume = 0; return; }
-    /* rAF timestamps are vsync-aligned and can precede `start` — clamp,
-       or a negative k throws and kills the ramp (silent track). */
+  const ms = volWarm ? VOL_FADE_WARM : VOL_FADE_COLD;
+  volWarm = false;
+  audio.muted = false;              /* already at digital zero: no unmute click */
+  volRamping = true;
+  let acc = 0, prev = performance.now(), last = 0;
+  function step(rafNow){
+    if(audio.paused){ volRamping = false; volRaf = 0; try{ audio.volume = 0; }catch(e){} return; }
+    /* rAF timestamps are vsync-aligned: they can precede `prev` (dt <= 0) and a
+       stalled tab can hand back a huge dt. Both are clamped, never negative. */
     const now = (typeof rafNow === "number" && rafNow > 0) ? rafNow : performance.now();
-    const k = Math.max(0, Math.min(1, (now - start) / ms));
-    try{ audio.volume = k; }catch(e){}
-    if(k < 1) volRaf = requestAnimationFrame(step); else volRaf = 0;
-  })(performance.now());
+    let dt = now - prev; prev = now;
+    if(!(dt > 0)) dt = 0;
+    if(dt > VOL_MAX_DT) dt = VOL_MAX_DT;
+    acc += dt;
+    const t = acc / ms;
+    let v = (t >= 1) ? 1 : Math.pow(10, -VOL_DB * (1 - t) / 20);
+    if(v < last) v = last;          /* monotonic: never dip mid-fade */
+    last = v;
+    try{ audio.volume = v; }catch(e){}
+    if(t < 1) volRaf = requestAnimationFrame(step);
+    else { volRaf = 0; volRamping = false; try{ audio.volume = 1; audio.muted = false; }catch(e){} }
+  }
+  volRaf = requestAnimationFrame(step);
 }
-function volArm(){
+function volArm(warm){
   if(!IS_ANDROID) return;
+  volWarm = !!warm;
   audio.muted = true; audio.volume = 0; volPending = true;
 }
 function volPlaying(){
   if(!IS_ANDROID || !volPending) return;
-  volPending = false;
   if(volTimer) clearTimeout(volTimer);
-  volTimer = setTimeout(volRamp, 500);   /* wait for the media-volume stream */
+  /* Cold start (new src): Android only honours element volume ~500ms into the
+     stream — arming shorter is what blasted at full volume.
+     Warm (resume of the same src): the stream is already open, so fade in at
+     once instead of sitting silent for half a second.
+     volPending stays set until the fade actually begins: clearing it early let
+     deviceVol() (fired by the very same "playing" event) restore volume 1
+     unmuted for the whole wait, which leaked a full-volume instant at the top
+     of every track — the last audible "jump". */
+  volTimer = setTimeout(()=>{
+    volTimer = 0;
+    volPending = false;
+    volRamp();
+  }, volWarm ? 0 : VOL_COLD_WAIT);
 }
 let curKey = null;
 let playGen = 0;
@@ -986,9 +1015,9 @@ function dropBlob(){
   blobUrl = "";
 }
 function deviceVol(){
-  if(IS_ANDROID){
-    if(volPending){ audio.muted = true; audio.volume = 0; return; }
-    if(audio.volume < 1 && !audio.paused) return;   /* ramp in progress */
+  if(IS_ANDROID && (volPending || volRamping)){
+    if(volPending){ audio.muted = true; audio.volume = 0; }
+    return;                       /* the arm / fade owns the volume right now */
   }
   audio.muted = false;
   audio.defaultMuted = false;
@@ -1010,8 +1039,8 @@ function attachOut(){
   if(actx.state === "running") return Promise.resolve();
   try{ return actx.resume(); }catch(e){ return Promise.resolve(); }
 }
-function tryPlay(){
-  volArm();
+function tryPlay(warm){
+  volArm(warm);
   deviceVol();
   try{ if(actx && actx.state === "suspended") actx.resume(); }catch(e){}
   try{ const p = audio.play(); if(p && p.catch) p.catch(()=>{}); }catch(e){}
@@ -1212,7 +1241,7 @@ function useItunes(key, r, url, gen){
 function selectTrack(key, title, artist, url, prev){
   attachOut();
   if(curKey === key){           /* same row: play/pause toggle */
-    if(audio.paused){ userPaused = false; tryPlay(); }
+    if(audio.paused){ userPaused = false; tryPlay(true); }   /* resume: warm fade, no 500ms hole */
     else { userPaused = true; audio.pause(); }
     markRows();
     return;
@@ -1266,6 +1295,8 @@ audio.addEventListener("playing", ()=>{ timeFrozen = false; volPlaying(); device
 audio.addEventListener("play", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
 audio.addEventListener("timeupdate", ()=>{
+  /* failsafe: a build that never fires "playing" must not stay muted forever */
+  if(IS_ANDROID && volPending && !volTimer && !volRamping && !audio.paused) volPlaying();
   if(timeFrozen || seekBar || holdSeek || audio.seeking) return;
   const d = previewDur() || 90;
   progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d);

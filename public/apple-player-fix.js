@@ -15,6 +15,20 @@
     "sf-api-token-service.itunes.apple.com": 1
   };
 
+  /* Apple sizes the embed itself and writes the result on the host:
+     <embed-root class="root ltr xsmall music"> with xsmall <340, small <425,
+     medium <480, large >=480 (embed px). Trust that when present; keep the
+     viewport probe as a fallback so nothing changes before the class lands. */
+  function appleBreak() {
+    var root = document.querySelector("embed-root");
+    var cn = (root && typeof root.className === "string") ? root.className : "";
+    var m = cn.match(/(?:^|\s)(xsmall|small|medium|large)(?:\s|$)/);
+    return m ? m[1] : "";
+  }
+  function appleWide() {
+    return appleBreak() === "large" || window.matchMedia("(min-width: 560px)").matches;
+  }
+
   function gateUrl(raw) {
     try {
       var u = new URL(raw, location.href);
@@ -153,6 +167,7 @@
        the album. The brief loading variant this call triggers is neutralised
        by the pinned grid below. */
     if (typeof mk.changeToMediaAtIndex === "function") {
+      holdControls(2600);
       settleWindow(300);
       await mk.changeToMediaAtIndex(target);
       settleWindow(300);
@@ -202,7 +217,8 @@
     var host = hostFromPath(path);
     if (!host) return;
     lockAlbumGrid();
-    armJumpFix(1200);
+    holdControls(2600);
+    armJumpFix(appleWide() ? 1200 : 900, true);
     var mk = music();
     if (!mk) return;
     patch(mk);
@@ -232,6 +248,8 @@
     var fixed = false, hidLock = false;
     var b = prog ? prog.getBoundingClientRect() : null;
     var base = b ? { x: b.x, y: b.y, w: b.width, h: b.height } : null;
+    var lb = lockup ? lockup.getBoundingClientRect() : null;
+    var lockBase = lb ? { x: lb.x, y: lb.y, h: lb.height } : null;
     function frame() {
       if (Date.now() > until) {
         if (prog && fixed) {
@@ -244,7 +262,7 @@
         return;
       }
       fixOverlaps();
-      var wide = window.matchMedia("(min-width: 560px)").matches;
+      var wide = appleWide();
       if (prog && base && !fixed && wide) {
         prog.style.setProperty("position", "fixed", "important");
         prog.style.setProperty("left", base.x + "px", "important");
@@ -255,9 +273,15 @@
         prog.style.setProperty("z-index", "3", "important");
         fixed = true;
       }
-      if (lockup && lockup.getBoundingClientRect().height > 0) {
-        lockup.style.setProperty("display", "none", "important");
-        hidLock = true;
+      /* Only cancel a lockup that really moved or popped in — hiding an
+         unchanged one just makes the album title blink for no reason. */
+      if (lockup && !hidLock && lockBase) {
+        var r2 = lockup.getBoundingClientRect();
+        if (r2.height > 0 && (Math.abs(r2.height - lockBase.h) > 2 ||
+            Math.abs(r2.y - lockBase.y) > 2 || Math.abs(r2.x - lockBase.x) > 2)) {
+          lockup.style.setProperty("display", "none", "important");
+          hidLock = true;
+        }
       }
       settleRaf = requestAnimationFrame(frame);
     }
@@ -297,7 +321,7 @@
      play button during transitions. Hide exactly the intersecting ones. */
   var ovCands = null, ovCandsT = 0;
   function fixOverlaps() {
-    if (!window.matchMedia("(min-width: 560px)").matches) return;
+    if (!appleWide()) return;
     var ctr = deepQuery(".audio-controls");
     if (!ctr) return;
     var cb = ctr.getBoundingClientRect();
@@ -333,16 +357,29 @@
   (function loop(){ fixOverlaps(); requestAnimationFrame(loop); })();
   var MK_ANDROID = /Android/i.test(navigator.userAgent);
   var playedOnce = false;
-  var mkVol = { pending: false, timer: 0, raf: 0, wasPlaying: false };
+  var mkVol = { pending: false, timer: 0, raf: 0, wasPlaying: false, ramping: false };
+  /* dB-shaped, slew-limited fade: equal loudness steps instead of a linear
+     amplitude climb, and one janky frame can never advance the fade by more
+     than MK_MAX_DT ms. A stalled frame leaping the ramp was still audible as
+     a small volume jump at the start of a track. */
+  var MK_FADE_MS = 460, MK_FADE_DB = 42, MK_MAX_DT = 40;
   function mkRamp(mk) {
     if (mkVol.raf) cancelAnimationFrame(mkVol.raf);
-    var start = performance.now(), ms = 180;
+    mkVol.ramping = true;
+    var acc = 0, prev = performance.now(), last = 0;
     (function step(rafNow) {
-      /* clamp: rAF timestamps can precede `start` (vsync alignment) */
       var now = (typeof rafNow === "number" && rafNow > 0) ? rafNow : performance.now();
-      var k = Math.max(0, Math.min(1, (now - start) / ms));
-      try { mk.volume = k; } catch (err) {}
-      if (k < 1) mkVol.raf = requestAnimationFrame(step); else mkVol.raf = 0;
+      var dt = now - prev; prev = now;
+      if (!(dt > 0)) dt = 0;
+      if (dt > MK_MAX_DT) dt = MK_MAX_DT;
+      acc += dt;
+      var t = acc / MK_FADE_MS;
+      var v = (t >= 1) ? 1 : Math.pow(10, -MK_FADE_DB * (1 - t) / 20);
+      if (v < last) v = last;            /* monotonic */
+      last = v;
+      try { mk.volume = v; } catch (err) {}
+      if (t < 1) mkVol.raf = requestAnimationFrame(step);
+      else { mkVol.raf = 0; mkVol.ramping = false; try { mk.volume = 1; } catch (err) {} }
     })(performance.now());
   }
   /* Android blast guard: zero the volume BEFORE any buffer can start — at
@@ -353,6 +390,7 @@
     if (!MK_ANDROID || !mk) return;
     try { mk.volume = 0; } catch (err) {}
     mkVol.pending = true;
+    mkVol.ramping = false;
     if (mkVol.timer) { clearTimeout(mkVol.timer); mkVol.timer = 0; }
     if (mkVol.raf) { cancelAnimationFrame(mkVol.raf); mkVol.raf = 0; }
   }
@@ -385,6 +423,8 @@
         });
         mk.addEventListener("mediaItemDidChange", function () {
           fixOverlaps(); armJumpFix(800);
+          holdControls(1500);   /* a natural track advance re-renders the bar too */
+          scrub.active = false; setScrubbing(scrub.el, false);
           if (!MK_ANDROID) return;
           mkArm(mk);   /* next track's buffers start at zero too */
           if (mk.isPlaying) mkSchedule(mk);
@@ -394,6 +434,192 @@
       mkSchedule(mk);   /* failsafe: a missed state event must not mute forever */
     }
   }, 200);
+
+  /* ---- hold Apple's "loading" control variant out of the DOM --------------
+     embed-audio-controls renders three different subtrees from one state:
+       initial -> big play button + "listen on Apple Music"
+       loading -> spinner + "listen on Apple Music", and <embed-audio-progress>
+                  is NOT rendered at all
+       active  -> progress bar + prev/play/next
+     It flips to "loading" 500ms after playback leaves playing/paused/seeking/
+     waiting. skipToNextItem stays inside those states (arrows = smooth), but
+     changeToMediaAtIndex — what a track-name click goes through — parks the
+     player in loading, so the whole bottom bar is unmounted and remounted:
+     the transport hops up-left and the red Apple button flashes in. Pinning
+     the grid cannot help, because the element that owns the space is gone.
+     Swallow the state change instead: no re-render, no reflow, nothing to
+     compensate. The deferred state is applied when the hold expires if the
+     player genuinely is not back in a live state. */
+  var ctrl = { until: 0, el: null, timer: 0, tick: 0 };
+  function descFor(el, prop) {
+    var o = el;
+    while (o && o !== Object.prototype) {
+      var d = Object.getOwnPropertyDescriptor(o, prop);
+      if (d && (d.get || d.set)) return d;
+      o = Object.getPrototypeOf(o);
+    }
+    return null;
+  }
+  function inLiveStates(mk) {          /* mirrors Apple's own q() helper */
+    try {
+      var PS = window.MusicKit && window.MusicKit.PlaybackStates;
+      if (mk && PS) {
+        var st = mk.playbackState;
+        return st === PS.playing || st === PS.paused || st === PS.seeking || st === PS.waiting;
+      }
+    } catch (err) {}
+    return !!(mk && mk.isPlaying);
+  }
+  function guardControls(el) {
+    if (!el || el.__m98CtrlGuard) return;
+    var d = descFor(el, "controlState");
+    if (!d || !d.set) return;
+    var hadActive = false;
+    try { hadActive = (el.controlState === "active"); } catch (err) {}
+    el.__m98CtrlHadActive = hadActive;
+    el.__m98CtrlDeferred = null;
+    try {
+      Object.defineProperty(el, "controlState", {
+        configurable: true,
+        get: function () { return d.get ? d.get.call(this) : undefined; },
+        set: function (v) {
+          if (v === "active") {
+            this.__m98CtrlHadActive = true;
+            this.__m98CtrlDeferred = null;
+            d.set.call(this, v);
+            return;
+          }
+          if (Date.now() < ctrl.until && this.__m98CtrlHadActive) {
+            this.__m98CtrlDeferred = v;      /* keep the transport on screen */
+            return;
+          }
+          this.__m98CtrlDeferred = null;
+          d.set.call(this, v);
+        }
+      });
+      el.__m98CtrlGuard = 1;
+    } catch (err) {}
+  }
+  function holdControls(ms) {
+    ctrl.until = Math.max(ctrl.until, Date.now() + (ms || 2000));
+    var el = deepQuery("embed-audio-controls");
+    if (!el) return;
+    ctrl.el = el;
+    guardControls(el);
+    if (!el.__m98CtrlGuard) return;
+    try { if (el.controlState === "active") el.__m98CtrlHadActive = true; } catch (err) {}
+    if (ctrl.timer) clearTimeout(ctrl.timer);
+    ctrl.timer = setTimeout(releaseControls, Math.max(30, ctrl.until - Date.now()) + 60);
+    /* Apple could swap the element mid-hold; keep the guard on the live one. */
+    if (!ctrl.tick) {
+      ctrl.tick = setInterval(function () {
+        if (Date.now() >= ctrl.until) { clearInterval(ctrl.tick); ctrl.tick = 0; return; }
+        var live = deepQuery("embed-audio-controls");
+        if (live && live !== ctrl.el) { ctrl.el = live; guardControls(live); }
+      }, 150);
+    }
+  }
+  function releaseControls() {
+    ctrl.timer = 0;
+    var el = ctrl.el || deepQuery("embed-audio-controls");
+    if (!el) return;
+    var pending = el.__m98CtrlDeferred;
+    el.__m98CtrlDeferred = null;
+    if (pending && !inLiveStates(music())) {
+      try { el.controlState = pending; } catch (err) {}
+    }
+  }
+
+  /* ---- scrubber thumb: tell Apple the user is scrubbing -------------------
+     amp-playback-controls-progress-range binds only mouse events. On touch the
+     synthetic mousedown arrives after touchend, so while the seek is in flight
+     isScrubbing is still false and playbackTimeDidChange writes the OLD time
+     back into the thumb: press point -> old position -> press point. Raise the
+     flag on pointerdown/touchstart and drop it once the seek has landed. */
+  var scrub = { el: null, active: false, released: true, target: -1, until: 0, timer: 0 };
+  function rangeFromPath(path) {
+    for (var i = 0; i < path.length; i++) {
+      var n = path[i];
+      if (!n || !n.tagName) continue;
+      if (n.tagName === "AMP-PLAYBACK-CONTROLS-PROGRESS-RANGE") return n;
+      if (n.classList && n.classList.contains("progress-range")) {
+        var rn = n.getRootNode && n.getRootNode();
+        if (rn && rn.host && rn.host.tagName === "AMP-PLAYBACK-CONTROLS-PROGRESS-RANGE") return rn.host;
+      }
+    }
+    return null;
+  }
+  function setScrubbing(el, on) {
+    if (!el) return;
+    try { if (el.isScrubbing !== on) el.isScrubbing = on; } catch (err) {}
+  }
+  function scrubRange() {
+    var el = scrub.el;
+    if (el && el.isConnected) return el;
+    el = deepQuery("amp-playback-controls-progress-range");
+    scrub.el = el;
+    return el;
+  }
+  function scrubStart(ev) {
+    /* Only a hit on the scrubber itself: a fallback deepQuery would freeze the
+       thumb on every unrelated tap inside the embed. */
+    var path = ev.composedPath ? ev.composedPath() : [];
+    var el = rangeFromPath(path);
+    if (!el) return;
+    scrub.el = el;
+    scrub.active = true;
+    scrub.released = false;
+    setScrubbing(el, true);
+    try {
+      var r = el.shadowRoot || el;
+      var inp = r.querySelector ? r.querySelector("input") : null;
+      scrub.target = inp ? parseFloat(inp.value) : -1;
+    } catch (err) { scrub.target = -1; }
+    if (!(scrub.target >= 0)) scrub.target = -1;
+    scrub.until = Date.now() + 8000;      /* hard ceiling: never freeze the thumb */
+    scrubLoop();
+  }
+  function scrubEnd() {
+    if (!scrub.active) return;
+    scrub.released = true;
+    /* the pointer is up; read the thumb so a stale time cannot beat our target */
+    try {
+      var el = scrub.el;
+      var r = el && (el.shadowRoot || el);
+      var inp = r && r.querySelector ? r.querySelector("input") : null;
+      if (inp) {
+        var v = parseFloat(inp.value);
+        if (v >= 0) scrub.target = v;
+      }
+    } catch (err) {}
+    scrub.until = Math.min(scrub.until, Date.now() + 2000);
+    scrubLoop();
+  }
+  function scrubLoop() {
+    if (scrub.timer) return;
+    scrub.timer = setTimeout(function tick() {
+      scrub.timer = 0;
+      if (!scrub.active) return;
+      var el = scrubRange();
+      if (!el) { scrub.active = false; return; }
+      setScrubbing(el, true);            /* re-assert across a re-render */
+      var done = Date.now() > scrub.until;
+      if (!done && scrub.released) {
+        var t = -1;
+        try { t = music() ? music().currentPlaybackTime : -1; } catch (err) {}
+        done = (typeof t === "number" && t >= 0 && scrub.target >= 0 &&
+                Math.abs(t - scrub.target) < 0.8);
+      }
+      if (done) { setScrubbing(el, false); scrub.active = false; return; }
+      scrub.timer = setTimeout(tick, 100);
+    }, 100);
+  }
+  ["pointerdown", "touchstart", "mousedown"].forEach(function (t) {
+    document.addEventListener(t, scrubStart, true);
+  });
+  ["pointerup", "pointercancel", "touchend", "touchcancel", "mouseup"].forEach(function (t) {
+    window.addEventListener(t, scrubEnd, true);
+  });
 
   /* Narrow-layout transition stabiliser: position-only compensation with
      cached refs, active only inside a short window after a gesture or a
@@ -408,22 +634,25 @@
     var el = deepQuery(".container-player");
     return !!(el && el.__m98LockKey);
   }
-  function armJumpFix(ms) {
-    if (!window.matchMedia("(min-width: 560px)").matches) return;
-    if (pinEngaged()) return;   /* pin already holds the layout; backstop would only add flicker */
+  function armJumpFix(ms, fromGesture) {
+    /* On narrow only a gesture-time baseline is trustworthy: an event-driven
+       arm would capture the layout after it already moved and pin the damage. */
+    if (!appleWide() && !fromGesture) return;
+    if (pinEngaged() && !fromGesture) return;   /* pin already holds the layout */
+    if (jumpRefs) jumpRefs.forEach(function (it) { it.dx = 0; it.dy = 0; clearRef(it); });
     jumpRefs = JUMP_SELS.map(function (sel) {
       var el = deepQuery(sel);
       if (!el) return null;
       var b = el.getBoundingClientRect();
-      return (b.width || b.height) ? { sel: sel, el: el, x: b.x, y: b.y } : null;
+      return (b.width || b.height) ? { sel: sel, el: el, x: b.x, y: b.y, dx: 0, dy: 0 } : null;
     }).filter(Boolean);
-    jumpUntil = Math.max(jumpUntil, Date.now() + (ms || 1200));
+    jumpUntil = fromGesture ? Date.now() + (ms || 900) : Math.max(jumpUntil, Date.now() + (ms || 1200));
     if (!loopOn) { loopOn = true; requestAnimationFrame(jumpFrame); }
   }
   function jumpFrame() {
     if (Date.now() >= jumpUntil) {
       loopOn = false;
-      if (jumpRefs) jumpRefs.forEach(clearRef);
+      if (jumpRefs) jumpRefs.forEach(function (it) { it.dx = 0; it.dy = 0; clearRef(it); });
       jumpRefs = null;
       return;
     }
@@ -431,15 +660,20 @@
       jumpRefs.forEach(function (it) {
         if (!it.el || !it.el.isConnected) {
           it.el = deepQuery(it.sel);
+          it.dx = 0; it.dy = 0;
           if (!it.el) return;
         }
         var b = it.el.getBoundingClientRect();
         if (!b.width && !b.height) return;
-        var dx = it.x - b.x, dy = it.y - b.y;
+        /* The rect already includes our own translate: subtract it, otherwise
+           the loop chases itself (on -> off -> on) and shimmers at 60Hz. */
+        var dx = it.x - (b.x - it.dx), dy = it.y - (b.y - it.dy);
         if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
           it.el.style.setProperty("transform", "translate(" + dx + "px," + dy + "px)", "important");
-        } else {
+          it.dx = dx; it.dy = dy;
+        } else if (it.dx || it.dy) {
           it.el.style.removeProperty("transform");
+          it.dx = 0; it.dy = 0;
         }
       });
     }
@@ -457,7 +691,7 @@
     /* "Wide" = the roomy album layout: viewport is desktop-width and some
        column matches the artwork track (~231px). Track-count checks break
        when implicit columns appear, so probe track sizes instead. */
-    var wide = window.matchMedia("(min-width: 560px)").matches &&
+    var wide = appleWide() &&
       parts.some(function (x) { var v = parseFloat(x); return v >= 200 && v <= 260; });
     /* Gates: boot done; on narrow layouts wait for the first real playback so
        the pin can never capture a boot or pre-play state. */
@@ -562,6 +796,7 @@
     if (typeof ev.stopImmediatePropagation === "function") ev.stopImmediatePropagation();
     /* Match the pristine embed: prev on track 1 restarts it from zero and
        plays, without Apple's re-queue remount. */
+    holdControls(1400);
     Promise.resolve()
       .then(function () {
         try {
