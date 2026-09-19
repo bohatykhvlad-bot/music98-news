@@ -921,7 +921,9 @@
     for (var i = 0; i < path.length; i++) {
       var n = path[i];
       if (n && n.classList && (n.classList.contains("playback-play") ||
-          n.classList.contains("playback-play__play"))) {
+          n.classList.contains("playback-play__play") ||
+          n.classList.contains("play-initial") ||
+          (n.tagName || "").toUpperCase() === "EMBED-AUDIO-PLAY-INITIAL")) {
         var mk0 = music();
         if (mk0) { mkArm(mk0); mkSchedule(mk0, !mkVol.everPlayed); }
         if (!hasTracklist()) armFirstPressSeal();
