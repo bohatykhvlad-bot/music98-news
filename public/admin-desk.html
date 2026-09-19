@@ -87,16 +87,10 @@ a{color:var(--text)}
 .stage:hover .grid,.stage.drag .grid{opacity:1}
 .mini{display:flex;flex-direction:column;gap:8px}
 .mini-frame{position:relative;aspect-ratio:1;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize}
-.mini-frame.active,.mini-hero-pic.active{outline:2px solid var(--acc2);outline-offset:2px}
-.mini-hero-pic{cursor:pointer}
+.mini-frame.active{outline:2px solid var(--acc2);outline-offset:2px}
 .stage.cardmode{cursor:ns-resize}
-.mini-frame img,.mini-hero-pic img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;display:block}
+.mini-frame img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;display:block}
 .mini .muted{text-align:center;font-size:11px}
-.mini-hero{display:grid;grid-template-columns:1.05fr .95fr;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;min-height:96px}
-.mini-hero-text{padding:8px 8px 8px 9px;display:flex;flex-direction:column;gap:4px;justify-content:center;min-width:0}
-.mini-kicker{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text)}
-.mini-hero-title{font-size:10px;font-weight:700;line-height:1.2;letter-spacing:-.02em;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;color:var(--text)}
-.mini-hero-pic{position:relative;aspect-ratio:16/9;min-height:0;background:#111;overflow:hidden}
 .cropbar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2);flex-wrap:wrap}
 .cropbar input[type=range]{flex:1;min-width:100px}
 .cropbar .btn{padding:5px 10px;font-size:12px}
@@ -213,14 +207,6 @@ a{color:var(--text)}
         <div class="mini">
           <div class="mini-frame" id="miniFrame" title="Card crop: vertical only"><img id="miniImg" class="hide" alt=""></div>
           <p class="muted">Card</p>
-          <div class="mini-hero" id="miniHero">
-            <div class="mini-hero-text">
-              <span class="mini-kicker" id="miniHeroTag">News</span>
-              <span class="mini-hero-title" id="miniHeroTitle">Main story</span>
-            </div>
-            <div class="mini-hero-pic" id="miniHero" title="Main news crop"><img id="miniHeroImg" class="hide" alt=""></div>
-          </div>
-          <p class="muted">Main news</p>
         </div>
       </div>
       <input id="photo" class="hide" type="file" accept="image/*">
@@ -918,7 +904,6 @@ function setCropMode(m){
   stage.classList.toggle("cardmode", cropMode === "card");
   stage.style.aspectRatio = cropMode === "card" ? "1 / 1" : (crop.aspect === "1/1" ? "1 / 1" : "16 / 9");
   $("#miniFrame").classList.toggle("active", cropMode === "card");
-  $("#miniHero").classList.toggle("active", false);
   $("#modeMain").classList.toggle("primary", cropMode === "main");
   $("#modeCard").classList.toggle("primary", cropMode === "card");
   $("#modeMain").classList.toggle("ghost", cropMode !== "main");
@@ -927,12 +912,6 @@ function setCropMode(m){
   layoutCrop();
 }
 function paintMini(){
-  const title = ($("#title") && $("#title").value.trim()) || "Main story";
-  const tag = ($("#tag") && $("#tag").value.trim()) || ($("#type") && $("#type").value === "release" ? "Album" : "News");
-  const ht = $("#miniHeroTitle");
-  const hg = $("#miniHeroTag");
-  if(ht) ht.textContent = title;
-  if(hg) hg.textContent = tag;
   const paint = (id, fx, fy, fz)=>{
     const m = $("#"+id);
     if(!m) return;
@@ -944,7 +923,6 @@ function paintMini(){
     else m.onload = go;
   };
   paint("miniImg", lockFx(), crop.cardY, crop.cardZoom||1);
-  paint("miniHeroImg", crop.x, crop.y, crop.zoom||1);
 }
 function layoutCrop(){
   const stage = $("#stage");
@@ -991,7 +969,6 @@ function setCover(src, pos, zoom, cardY){
 }
 
 $("#miniFrame").addEventListener("click", ()=> setCropMode("card"));
-$("#miniHero").addEventListener("click", ()=> setCropMode("main"));
 $("#modeMain").addEventListener("click", ()=> setCropMode("main"));
 $("#modeCard").addEventListener("click", ()=> setCropMode("card"));
 $("#lockH").addEventListener("change", e=>{
@@ -1060,7 +1037,6 @@ function fillForm(p){
     crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, cardZoom:1, lockX:null, lockH:false};
     $("#zoom").value = zoomNow();
     $("#miniImg").classList.add("hide");
-    $("#miniHeroImg").classList.add("hide");
     paintMini();
   }
 }
