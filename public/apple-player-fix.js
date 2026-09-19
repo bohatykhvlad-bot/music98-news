@@ -241,7 +241,9 @@
         settleRaf = 0;
         return;
       }
-      if (prog && base && !fixed) {
+      fixOverlaps();
+      var wide = window.matchMedia("(min-width: 560px)").matches;
+      if (prog && base && !fixed && wide) {
         prog.style.setProperty("position", "fixed", "important");
         prog.style.setProperty("left", base.x + "px", "important");
         prog.style.setProperty("top", base.y + "px", "important");
@@ -274,6 +276,63 @@
     }
     return null;
   }
+
+  function deepQueryAll(sel) {
+    var out = [];
+    var stack = [document];
+    while (stack.length) {
+      var root = stack.pop();
+      var hits = root.querySelectorAll ? root.querySelectorAll(sel) : [];
+      for (var i = 0; i < hits.length; i++) out.push(hits[i]);
+      var els = root.querySelectorAll ? root.querySelectorAll("*") : [];
+      for (var j = 0; j < els.length; j++) if (els[j].shadowRoot) stack.push(els[j].shadowRoot);
+    }
+    return out;
+  }
+
+  /* While audio plays, nothing may sit on top of the transport: on narrow
+     layouts Apple's red "listen on Apple Music" affordances can overlap the
+     play button during transitions. Hide exactly the intersecting ones. */
+  function fixOverlaps() {
+    var ctr = deepQuery(".audio-controls");
+    if (!ctr) return;
+    var cb = ctr.getBoundingClientRect();
+    if (!cb.width || !cb.height) return;
+    var pb = deepQuery(".playback-play__play");
+    var pba = deepQuery(".playback-play__pause");
+    var transportOn = (pb && pb.getBoundingClientRect().width > 0) || (pba && pba.getBoundingClientRect().width > 0);
+    var cands = deepQueryAll("a, .launch-client");
+    if (!transportOn) {
+      cands.forEach(function (el) {
+        if (el.__m98ov) { el.style.removeProperty("visibility"); el.__m98ov = 0; }
+      });
+      return;
+    }
+    cands.forEach(function (el) {
+      var b = el.getBoundingClientRect();
+      if (!b.width || !b.height) return;
+      var ix = Math.min(b.x + b.width, cb.x + cb.width) - Math.max(b.x, cb.x);
+      var iy = Math.min(b.y + b.height, cb.y + cb.height) - Math.max(b.y, cb.y);
+      if (ix > 0 && iy > 0) {
+        el.style.setProperty("visibility", "hidden", "important");
+        el.__m98ov = 1;
+      } else if (el.__m98ov) {
+        el.style.removeProperty("visibility");
+        el.__m98ov = 0;
+      }
+    });
+  }
+  (function loop(){ fixOverlaps(); requestAnimationFrame(loop); })();
+  setInterval(function () {
+    var mk = music();
+    if (mk && !mk.__m98ovHook) {
+      mk.__m98ovHook = 1;
+      try {
+        mk.addEventListener("playbackStateDidChange", function () { fixOverlaps(); });
+        mk.addEventListener("mediaItemDidChange", function () { fixOverlaps(); });
+      } catch (err) {}
+    }
+  }, 200);
 
   function lockAlbumGrid() {
     var el = deepQuery(".container-player");
