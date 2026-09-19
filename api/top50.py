@@ -446,7 +446,7 @@ def tenure_key(title: str, artist: str) -> str:
 
 
 def apply_tenure(tracks: list[dict]) -> list[dict]:
-    """Weeks start at 1 on launch week, then +1 each calendar week a title stays on the list."""
+    """Daily chart: delta/weeks vs the previous day's order (mirrors the worker)."""
     week = chart_week()
     try:
         ten = json.loads(TENURE_PATH.read_text(encoding="utf-8"))
