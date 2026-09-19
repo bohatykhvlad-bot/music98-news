@@ -27,7 +27,9 @@ function appleAff(url) {
 }
 
 function chartWeek() {
-  return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000 / 7));
+  /* The chart rebuilds daily, so movement is measured in days: the "week"
+     counter is really a day index since launch. Field name kept for KV compat. */
+  return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
 }
 function tenureKey(title, artist) {
   return `${String(title || "").trim().toLowerCase()}|${String(artist || "").trim().toLowerCase()}`;

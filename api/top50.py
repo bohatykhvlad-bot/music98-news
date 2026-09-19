@@ -436,8 +436,9 @@ def score_of(ranks: dict) -> int:
 
 
 def chart_week(day=None) -> int:
+    """The chart rebuilds daily: the period counter is a day index, not weeks."""
     day = day or datetime.now(timezone.utc).date()
-    return max(0, (day - LAUNCH).days // 7)
+    return max(0, (day - LAUNCH).days)
 
 
 def tenure_key(title: str, artist: str) -> str:

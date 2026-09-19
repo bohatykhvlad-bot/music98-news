@@ -191,7 +191,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .tnames{min-width:0;max-width:100%;overflow:hidden}
 .ctext{min-width:0;max-width:100%;overflow:hidden}
 .ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.cyear{color:var(--muted2);font-size:11.5px}
+
 .chart-row.playing{background:var(--bg2)}
 .chart-note{margin:14px 2px 0;color:var(--muted2);font-size:12.5px}
 .chart-switch{display:none!important}
@@ -1549,14 +1549,14 @@ function fetchJSON(url){
 const FEEDCACHE = "music98news_feedcache_v1";
 function feedCache(){ try{ const r = lsGetRaw(FEEDCACHE); return r ? JSON.parse(r) : {}; }catch(e){ return {}; } }
 function feedCacheSet(id, rows){ const c = feedCache(); c[id] = {ts:Date.now(), rows}; try{ lsSetRaw(FEEDCACHE, JSON.stringify(c)); }catch(e){} }
-function snapshotRows(id){ if(id==="us-songs") return TOP50.map(p=>({title:p.title, artist:p.artist, url:aff(p.url||""), art:p.art||"", prev:applePreview(p.prev||""), year:p.year||"", weeks:p.weeks, delta:p.delta})); return (SNAP[id]||[]).map(p=>({title:p[0], artist:p[1], url:"", art:""})); }
-/* movement + weeks: from the public launch date, not from each visitor's browser day */
+function snapshotRows(id){ if(id==="us-songs") return TOP50.map(p=>({title:p.title, artist:p.artist, url:aff(p.url||""), art:p.art||"", prev:applePreview(p.prev||""), year:p.year||"", weeks:p.weeks, delta:p.delta})); return (SNAP[id]||[]).map(p=>({title:p[0], artist:p[1], url:"", art:""})); }  /* movement + days on chart: from the public launch date, not each visitor's browser clock */
 function chartWeekId(d){
+  /* Daily chart: the period id is a day index since launch (name kept for storage compat). */
   d = d || new Date();
   const parts = CHART_LAUNCH.split("-").map(Number);
   const launch = Date.UTC(parts[0], parts[1]-1, parts[2]);
   const now = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
-  return Math.max(0, Math.floor((now - launch) / 86400000 / 7));
+  return Math.max(0, Math.floor((now - launch) / 86400000));
 }
 function computeMoves(feedId, rows){
   let prev = {}, hist = {};
@@ -1795,7 +1795,7 @@ function renderCharts(){
     else { const n = parseInt(r.delta,10)||0;
       if(n>0){ dcls="up"; dtxt="▲"+n; } else if(n<0){ dcls="down"; dtxt="▼"+Math.abs(n); } }
     const w = parseInt(r.weeks,10)||0;
-    const wk = w === 1 ? "1 week on chart" : w + " weeks on chart";
+    const wk = w === 1 ? "1 day on chart" : w + " days on chart";
     const key = (r.title||"")+"|"+(r.artist||"");
     const art = r.art ? esc(r.art) : presetCover(i, r.title || r.artist, true);
     const searchUrl = aff("https://music.apple.com/us/search?term=" + encodeURIComponent((r.title||"") + " " + (r.artist||"")));
@@ -1806,7 +1806,7 @@ function renderCharts(){
     return `<div class="chart-row${i<3?" top":""}" data-key="${esc(key)}" data-title="${esc(r.title)}" data-artist="${esc(r.artist)}" data-url="${esc(appleUrl==="#" ? "" : appleUrl)}" data-prev="${esc(applePreview(r.prev||""))}" tabindex="0" role="listitem" aria-label="Position ${i+1}: ${esc(r.title)} by ${esc(r.artist)} — press Enter to play the preview">
       <div class="delta ${dcls}">${dtxt}</div>
       <div class="artwrap"><img data-lk="${esc(key)}"${r.art ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} — ${esc(r.artist)}" loading="lazy"></div>
-      <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span><span class="cartist">${esc(r.artist)}</span></div><div class="ctrack">${esc(r.title)}${r.year ? ' <span class="cyear">· '+esc(r.year)+'</span>' : ""}</div></div></div>
+      <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span><span class="cartist">${esc(r.artist)}</span></div><div class="ctrack">${esc(r.title)}</div></div></div>
       <div class="cmid">
         <button class="rplay" title="Play preview" aria-label="Play preview of ${esc(r.title)}">${ICON_PLAY}</button>
         <div class="pextra"><span class="ptime"><span class="pbar"><i></i></span><span class="pdur">0:00 / 1:30</span></span>${badge}</div>
