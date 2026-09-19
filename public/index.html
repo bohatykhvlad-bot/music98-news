@@ -162,9 +162,9 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
-.cname{display:flex;align-items:baseline;min-width:0;max-width:100%;font-size:clamp(14px,1.4vw,18px);line-height:1.2;font-weight:800;letter-spacing:-.01em;text-transform:uppercase}
+.cname{display:contents;font-size:clamp(14px,1.4vw,18px);line-height:1.2;font-weight:800;letter-spacing:-.01em;text-transform:uppercase}
 .chart-row .pos,.cartist{font:inherit;letter-spacing:inherit;line-height:inherit;font-weight:inherit;text-transform:inherit;color:inherit;margin:0;padding:0;border:0;text-align:start}
-.chart-row .pos{flex:none;margin-inline-end:10px}
+.chart-row .pos{min-width:2ch}
 .cartist{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta .darr,.delta .dnum,.delta.same{color:var(--text)}
@@ -189,9 +189,9 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .tinfo b{display:block;font-size:15.5px;letter-spacing:-.01em}
 .tinfo span{color:var(--muted);font-size:13px}
 
-.tnames{min-width:0;max-width:100%;overflow:hidden}
+.tnames{min-width:0;max-width:100%;overflow:hidden;display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:baseline}
 .ctext{min-width:0;max-width:100%;overflow:hidden}
-.ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;grid-column:2}
 
 .chart-row.playing{background:var(--bg2)}
 .chart-note{margin:14px 2px 0;color:var(--muted2);font-size:12.5px}
@@ -468,7 +468,7 @@ textarea{resize:vertical;min-height:64px}
   .artwrap img{border-radius:8px}
   .ctext{grid-area:names;align-self:center;min-width:0}
   .cname{font-size:13.5px;line-height:1.2}
-  .chart-row .pos{margin-inline-end:8px}
+  .tnames{column-gap:8px}
   .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}
