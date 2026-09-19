@@ -244,20 +244,17 @@
   function settleWindow(ms) {
     if (settleRaf) cancelAnimationFrame(settleRaf);
     var prog = deepQuery("embed-audio-progress");
-    var lockup = deepQuery("embed-metadata-lockup");
     /* Cover the whole managed switch: the controls hold is exactly how long a
        transient layout can live, and the progress bar must keep its active
        placement and size for all of it — a shorter window let the bar stretch
        full-width over the tracklist (the hanging strip). */
     var until = Math.max(Date.now() + (ms || 250), ctrl.until);
     settleUntil = until;
-    var fixed = false, hidLock = false;
+    var fixed = false;
     var b = prog ? prog.getBoundingClientRect() : null;
     var base = b ? { x: b.x, y: b.y, w: b.width, h: b.height } : null;
     var pcs = prog ? window.getComputedStyle(prog) : null;
     var basePlace = pcs ? { gc: pcs.gridColumn, gr: pcs.gridRow } : null;
-    var lb = lockup ? lockup.getBoundingClientRect() : null;
-    var lockBase = lb ? { x: lb.x, y: lb.y, h: lb.height } : null;
     function frame() {
       if (Date.now() > until) {
         if (prog && fixed) {
@@ -265,7 +262,6 @@
             prog.style.removeProperty(k);
           });
         }
-        if (lockup && hidLock) lockup.style.removeProperty("display");
         settleRaf = 0;
         return;
       }
@@ -280,16 +276,10 @@
         prog.style.setProperty("height", base.h + "px", "important");
         fixed = true;
       }
-      /* Only cancel a lockup that really moved or popped in — hiding an
-         unchanged one just makes the album title blink for no reason. */
-      if (lockup && !hidLock && lockBase) {
-        var r2 = lockup.getBoundingClientRect();
-        if (r2.height > 0 && (Math.abs(r2.height - lockBase.h) > 2 ||
-            Math.abs(r2.y - lockBase.y) > 2 || Math.abs(r2.x - lockBase.x) > 2)) {
-          lockup.style.setProperty("display", "none", "important");
-          hidLock = true;
-        }
-      }
+      /* The metadata lockup is left to Apple: holdControls keeps the loading
+         variant (the only one that popped a lockup) out of the DOM, and the
+         native cross-fade of the title/artist is what the switch should look
+         like. display:none-ing it here made the title vanish in one frame. */
       settleRaf = requestAnimationFrame(frame);
     }
     settleRaf = requestAnimationFrame(frame);
@@ -345,7 +335,11 @@
   }
   function fixOverlaps() {
     if (!ovCands || Date.now() - ovCandsT > 500) {
-      ovCands = deepQueryAll("a, .launch-client");
+      /* Only the red launch upsells are overlap candidates: the legal footer
+         link is a static row that a mid-switch reflow can momentarily slide
+         under the play button — hiding it then read as a blink at the bottom
+         of the embed. */
+      ovCands = deepQueryAll("embed-launch-client, .launch-client");
       ovCandsT = Date.now();
     }
     var cb = playButtonRect();
