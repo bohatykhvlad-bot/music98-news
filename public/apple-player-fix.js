@@ -245,17 +245,23 @@
     if (settleRaf) cancelAnimationFrame(settleRaf);
     var prog = deepQuery("embed-audio-progress");
     var lockup = deepQuery("embed-metadata-lockup");
-    var until = Date.now() + (ms || 250);
+    /* Cover the whole managed switch: the controls hold is exactly how long a
+       transient layout can live, and the progress bar must keep its active
+       placement and size for all of it — a shorter window let the bar stretch
+       full-width over the tracklist (the hanging strip). */
+    var until = Math.max(Date.now() + (ms || 250), ctrl.until);
     settleUntil = until;
     var fixed = false, hidLock = false;
     var b = prog ? prog.getBoundingClientRect() : null;
     var base = b ? { x: b.x, y: b.y, w: b.width, h: b.height } : null;
+    var pcs = prog ? window.getComputedStyle(prog) : null;
+    var basePlace = pcs ? { gc: pcs.gridColumn, gr: pcs.gridRow } : null;
     var lb = lockup ? lockup.getBoundingClientRect() : null;
     var lockBase = lb ? { x: lb.x, y: lb.y, h: lb.height } : null;
     function frame() {
       if (Date.now() > until) {
         if (prog && fixed) {
-          ["position", "left", "top", "width", "height", "margin", "zIndex", "transform"].forEach(function (k) {
+          ["grid-column", "grid-row", "width", "height"].forEach(function (k) {
             prog.style.removeProperty(k);
           });
         }
@@ -265,14 +271,13 @@
       }
       fixOverlaps();
       var wide = appleWide();
-      if (prog && base && !fixed && wide) {
-        prog.style.setProperty("position", "fixed", "important");
-        prog.style.setProperty("left", base.x + "px", "important");
-        prog.style.setProperty("top", base.y + "px", "important");
+      if (prog && base && basePlace && !fixed && wide) {
+        /* In-flow pin: the bar keeps its active grid cell and size no matter
+           which transient state class the container wears mid-switch. */
+        prog.style.setProperty("grid-column", basePlace.gc, "important");
+        prog.style.setProperty("grid-row", basePlace.gr, "important");
         prog.style.setProperty("width", base.w + "px", "important");
         prog.style.setProperty("height", base.h + "px", "important");
-        prog.style.setProperty("margin", "0", "important");
-        prog.style.setProperty("z-index", "3", "important");
         fixed = true;
       }
       /* Only cancel a lockup that really moved or popped in — hiding an
@@ -433,8 +438,12 @@
              variant returns EMPTY once nowPlayingItem is gone, so a hold left
              the controls area blank for ~1s before the initial variant landed
              — exactly the "disappears for a second, then appears" report. */
-          if (inLiveStates(mk)) holdControls(900);
-          else clearGridLock();   /* stopped: let the initial variant render natively */
+          /* A dip through a non-live state mid-switch must not drop the grid
+             lock (that exposed the transient full-width progress); only a
+             stop that persists gets the lock released, so the initial variant
+             renders natively. */
+          if (inLiveStates(mk)) { holdControls(900); stopClearCancel(); }
+          else stopClearArm();
           if (!MK_MOBILE) return;
           var playing = mk.isPlaying;
           if (playing) {
@@ -806,6 +815,14 @@
       el2.style.removeProperty("height");
       el2.style.removeProperty("width");
     });
+  }
+  var stopT = 0;
+  function stopClearArm() {
+    if (stopT) return;
+    stopT = setTimeout(function () { stopT = 0; clearGridLock(); }, 450);
+  }
+  function stopClearCancel() {
+    if (stopT) { clearTimeout(stopT); stopT = 0; }
   }
   var rsT = null;
   window.addEventListener("resize", function () {
