@@ -2,7 +2,7 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-const TOP50_KV = "top50v4";
+const TOP50_KV = "top50v5";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -34,15 +34,29 @@ function chartWeek() {
 function tenureKey(title, artist) {
   return `${String(title || "").trim().toLowerCase()}|${String(artist || "").trim().toLowerCase()}`;
 }
-async function applyTenure(env, tracks) {
+const TENURE_KV = "tenure_v2";
+async function applyTenure(env, tracks, origin) {
   const week = chartWeek();
-  let ten = { launch: "2026-09-17", week, keys: [], seen: {} };
+  /* week starts at -1 so the very first daily run counts as a rollover and
+     shows movement against the launch-day order immediately. */
+  let ten = { launch: "2026-09-17", epoch: "daily", week: -1, keys: [], seen: {} };
   if (env && env.DESK) {
-    const v = await env.DESK.get("tenure", { type: "json" });
-    if (v && v.seen) ten = v;
+    const v = await env.DESK.get(TENURE_KV, { type: "json" });
+    if (v && v.epoch === "daily") ten = v;
   }
-  const prevKeys = ten.keys || [];
+  let prevKeys = ten.keys || [];
   const seen = ten.seen || {};
+  if (!prevKeys.length && origin) {
+    /* First daily run: yesterday's order is the baked launch-day chart, so
+       the first rebuild already shows real movement instead of flat zeros. */
+    try {
+      const baked = await getJson(origin + "/data/top50.json");
+      prevKeys = (baked.tracks || []).map((t) => tenureKey(t.title, t.artist));
+      prevKeys.forEach((key, idx) => {
+        if (!seen[key]) seen[key] = { weeks: chartWeek() + 1, lastPos: idx, lastWeek: week, delta: "0" };
+      });
+    } catch {}
+  }
   const first = !prevKeys.length;
   const rolled = !first && ten.week !== week;
   const newKeys = [];
@@ -66,7 +80,7 @@ async function applyTenure(env, tracks) {
   if (first || rolled) ten.keys = newKeys;
   ten.week = week;
   ten.seen = seen;
-  if (env && env.DESK) await env.DESK.put("tenure", JSON.stringify(ten));
+  if (env && env.DESK) await env.DESK.put(TENURE_KV, JSON.stringify(ten));
   return tracks;
 }
 const UA = "Mozilla/5.0 (compatible; music98/1.0)";
@@ -415,7 +429,7 @@ export async function onRequestGet({ env, request }) {
   }
   try {
     const payload = await withTimeout(buildTop50(new URL(request.url).origin), 14000);
-    payload.tracks = await applyTenure(env, payload.tracks);
+    payload.tracks = await applyTenure(env, payload.tracks, new URL(request.url).origin);
     if (env && env.DESK && payload.tracks && payload.tracks.length) {
       try { await env.DESK.put(TOP50_KV, JSON.stringify(payload)); } catch {}
     }
