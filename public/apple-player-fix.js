@@ -296,6 +296,7 @@
      play button during transitions. Hide exactly the intersecting ones. */
   var ovCands = null, ovCandsT = 0;
   function fixOverlaps() {
+    if (!window.matchMedia("(min-width: 560px)").matches) return;
     var ctr = deepQuery(".audio-controls");
     if (!ctr) return;
     var cb = ctr.getBoundingClientRect();
@@ -329,12 +330,40 @@
     });
   }
   (function loop(){ fixOverlaps(); requestAnimationFrame(loop); })();
+  var MK_ANDROID = /Android/i.test(navigator.userAgent);
+  var mkVol = { pending: false, timer: 0, raf: 0, wasPlaying: false };
+  function mkRamp(mk) {
+    if (mkVol.raf) cancelAnimationFrame(mkVol.raf);
+    var start = performance.now(), ms = 180;
+    (function step(now) {
+      var k = Math.min(1, (now - start) / ms);
+      try { mk.volume = k; } catch (err) {}
+      if (k < 1) mkVol.raf = requestAnimationFrame(step); else mkVol.raf = 0;
+    })(start);
+  }
   setInterval(function () {
     var mk = music();
     if (mk && !mk.__m98ovHook) {
       mk.__m98ovHook = 1;
       try {
-        mk.addEventListener("playbackStateDidChange", function () { fixOverlaps(); armJumpFix(800); });
+        mk.addEventListener("playbackStateDidChange", function (ev) {
+          fixOverlaps(); armJumpFix(800);
+          if (!MK_ANDROID) return;
+          var playing = mk.isPlaying;
+          if (playing && !mkVol.wasPlaying) {
+            mkVol.wasPlaying = true;
+            mkVol.pending = true;
+            try { mk.volume = 0; } catch (err) {}
+            if (mkVol.timer) clearTimeout(mkVol.timer);
+            mkVol.timer = setTimeout(function () {
+              mkVol.pending = false;
+              mkRamp(mk);
+            }, 300);
+          } else if (!playing) {
+            mkVol.wasPlaying = false;
+            if (mkVol.pending) { mkVol.pending = false; clearTimeout(mkVol.timer); }
+          }
+        });
         mk.addEventListener("mediaItemDidChange", function () { fixOverlaps(); armJumpFix(800); });
       } catch (err) {}
     }
@@ -354,6 +383,7 @@
     return !!(el && el.__m98LockKey);
   }
   function armJumpFix(ms) {
+    if (!window.matchMedia("(min-width: 560px)").matches) return;
     if (pinEngaged()) return;   /* pin already holds the layout; backstop would only add flicker */
     jumpRefs = JUMP_SELS.map(function (sel) {
       var el = deepQuery(sel);
@@ -393,6 +423,7 @@
   var PIN_PARTS = [".audio-controls", "embed-audio-progress", "embed-auth-control",
     ".auth-control__sign-in", "amp-artwork", ".container-player__logo-header"];
   function lockAlbumGrid() {
+    if (!window.matchMedia("(min-width: 560px)").matches) return;   /* mobile stays native */
     var el = deepQuery(".container-player");
     if (!el) return;
     var cs = window.getComputedStyle(el);

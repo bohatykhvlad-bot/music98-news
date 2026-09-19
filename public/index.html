@@ -938,7 +938,30 @@ audio.setAttribute("webkit-playsinline", "");
 audio.crossOrigin = "anonymous";
 audio.muted = false;
 audio.defaultMuted = false;
-audio.volume = 1;         /* always 100% of the device volume; never fade, mute, or duck */
+audio.volume = 1;         /* 100% of the device volume; Android ramps in, see volArm */
+const IS_ANDROID = /Android/i.test(navigator.userAgent);
+let volPending = false, volRaf = 0, volTimer = 0;
+function volRamp(){
+  if(volRaf) cancelAnimationFrame(volRaf);
+  audio.muted = false;
+  const start = performance.now(), ms = 180;
+  (function step(now){
+    if(audio.paused){ audio.volume = 0; return; }
+    const k = Math.min(1, (now - start) / ms);
+    audio.volume = k;
+    if(k < 1) volRaf = requestAnimationFrame(step); else volRaf = 0;
+  })(start);
+}
+function volArm(){
+  if(!IS_ANDROID) return;
+  audio.muted = true; audio.volume = 0; volPending = true;
+}
+function volPlaying(){
+  if(!IS_ANDROID || !volPending) return;
+  volPending = false;
+  if(volTimer) clearTimeout(volTimer);
+  volTimer = setTimeout(volRamp, 300);   /* wait for the media-volume stream */
+}
 let curKey = null;
 let playGen = 0;
 let previewTriedItunes = false;
@@ -960,6 +983,10 @@ function dropBlob(){
   blobUrl = "";
 }
 function deviceVol(){
+  if(IS_ANDROID){
+    if(volPending){ audio.muted = true; audio.volume = 0; return; }
+    if(audio.volume < 1 && !audio.paused) return;   /* ramp in progress */
+  }
   audio.muted = false;
   audio.defaultMuted = false;
   audio.volume = 1;
@@ -981,6 +1008,7 @@ function attachOut(){
   try{ return actx.resume(); }catch(e){ return Promise.resolve(); }
 }
 function tryPlay(){
+  volArm();
   deviceVol();
   try{ if(actx && actx.state === "suspended") actx.resume(); }catch(e){}
   try{ const p = audio.play(); if(p && p.catch) p.catch(()=>{}); }catch(e){}
@@ -1231,7 +1259,7 @@ audio.addEventListener("seeked", ()=>{
   const d = previewDur() || 90;
   progTo(Math.min(100, (audio.currentTime||0)/d*100), audio.currentTime, d);
 });
-audio.addEventListener("playing", ()=>{ timeFrozen = false; deviceVol(); markRows(); });
+audio.addEventListener("playing", ()=>{ timeFrozen = false; volPlaying(); deviceVol(); markRows(); });
 audio.addEventListener("play", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
 audio.addEventListener("timeupdate", ()=>{
