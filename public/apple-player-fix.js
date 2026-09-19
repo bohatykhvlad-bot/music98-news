@@ -323,81 +323,61 @@
       }
     });
   }
-  (function loop(){
-    try {
-      fixOverlaps(); lockAlbumGrid(); runJumpFix();
-    } catch (e) {}
-    requestAnimationFrame(loop);
-  })();
   /* Transition jump compensation for parts that live in nested shadows and
      ignore the stylesheet pin: cancel any displacement with a transform. */
-  var jumpUntil = 0, jumpBase = null, jumpBaseT = 0;
-  function refreshBase() {
-    jumpBase = {};
-    PIN_PARTS.forEach(function (sel) {
-      var el = deepQuery(sel);
-      if (!el) return;
-      var b = el.getBoundingClientRect();
-      if (b.width || b.height) jumpBase[sel] = { x: b.x, y: b.y, w: b.width, h: b.height };
-    });
-    jumpBaseT = Date.now();
+  var jumpUntil = 0, jumpRefs = null, loopOn = false;
+  function clearRef(it) {
+    if (it.el && it.el.isConnected) {
+      it.el.style.removeProperty("transform");
+      it.el.style.removeProperty("width");
+      it.el.style.removeProperty("height");
+    }
   }
   function armJumpFix(ms) {
-    armedOnce = true;
-    if (!jumpBase || !jumpBaseT || Date.now() - jumpBaseT > 500) refreshBase();
-    jumpUntil = Math.max(jumpUntil, Date.now() + (ms || 2000));
-    if (!jumpMO && typeof MutationObserver !== "undefined") {
-      var anchor = deepQuery(".container-player");
-      var root = anchor && anchor.getRootNode ? anchor.getRootNode() : document;
-      jumpMO = new MutationObserver(function () { correctNow(); });
-      try { jumpMO.observe(root, { childList: true, subtree: true, attributes: true }); } catch (err) {}
-    }
-  }
-  function clearJump() {
-    PIN_PARTS.forEach(function (sel) {
+    jumpRefs = PIN_PARTS.map(function (sel) {
       var el = deepQuery(sel);
-      if (!el) return;
-      el.style.removeProperty("transform");
-      el.style.removeProperty("width");
-      el.style.removeProperty("height");
-    });
+      if (!el) return null;
+      var b = el.getBoundingClientRect();
+      return (b.width || b.height) ? { sel: sel, el: el, x: b.x, y: b.y, w: b.width, h: b.height } : null;
+    }).filter(Boolean);
+    jumpUntil = Math.max(jumpUntil, Date.now() + (ms || 1500));
+    startLoop();
   }
-  var lastCorrT = 0;
-  var armedOnce = false;
-  function correctNow() {
-    if (!deepQuery(".audio-controls")) return;
-    if (!armedOnce) {
-      if (!jumpBase || Date.now() - jumpBaseT > 500) refreshBase();
+  function startLoop() {
+    if (loopOn) return;
+    loopOn = true;
+    requestAnimationFrame(frame);
+  }
+  function frame() {
+    if (Date.now() >= jumpUntil) {
+      loopOn = false;
+      if (jumpRefs) jumpRefs.forEach(clearRef);
+      jumpRefs = null;
       return;
     }
-    if (!jumpBase || !jumpBaseT) refreshBase();
-    if (Object.keys(jumpBase || {}).length < 3) return;
-    var corrected = false;
-    PIN_PARTS.forEach(function (sel) {
-      var base = jumpBase[sel];
-      if (!base) return;
-      var el = deepQuery(sel);
-      if (!el) return;
-      var b = el.getBoundingClientRect();
-      if (!b.width && !b.height) return;
-      var dx = base.x - b.x, dy = base.y - b.y;
-      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
-        el.style.setProperty("transform", "translate(" + dx + "px," + dy + "px)", "important");
-        corrected = true;
-      } else {
-        el.style.removeProperty("transform");
+    correctFrame();
+    requestAnimationFrame(frame);
+  }
+  function correctFrame() {
+    if (!jumpRefs) return;
+    jumpRefs.forEach(function (it) {
+      if (!it.el || !it.el.isConnected) {
+        it.el = deepQuery(it.sel);
+        if (!it.el) return;
       }
-      if (sel === "embed-audio-progress") {
-        if (base.w && Math.abs(b.width - base.w) > 1) { el.style.setProperty("width", base.w + "px", "important"); corrected = true; }
-        if (base.h && Math.abs(b.height - base.h) > 1) { el.style.setProperty("height", base.h + "px", "important"); corrected = true; }
+      var b = it.el.getBoundingClientRect();
+      if (!b.width && !b.height) return;
+      var dx = it.x - b.x, dy = it.y - b.y;
+      if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+        it.el.style.setProperty("transform", "translate(" + dx + "px," + dy + "px)", "important");
+      } else {
+        it.el.style.removeProperty("transform");
+      }
+      if (it.sel === "embed-audio-progress") {
+        if (Math.abs(b.width - it.w) > 1) it.el.style.setProperty("width", it.w + "px", "important");
+        if (Math.abs(b.height - it.h) > 1) it.el.style.setProperty("height", it.h + "px", "important");
       }
     });
-    if (corrected) lastCorrT = Date.now();
-    else if (Date.now() - lastCorrT > 1000 && Date.now() - jumpBaseT > 2000) refreshBase();
-  }
-  var jumpMO = null;
-  function runJumpFix() {
-    correctNow();
   }
   setInterval(function () {
     var mk = music();
@@ -409,6 +389,7 @@
       } catch (err) {}
     }
   }, 200);
+  setInterval(function () { try { fixOverlaps(); } catch (err) {} }, 200);
 
   var PIN_PARTS = [".audio-controls", "embed-audio-tracklist", "amp-artwork",
     "embed-auth-control", ".container-player__logo-header", "embed-audio-progress"];
@@ -488,6 +469,9 @@
         ["grid-column", "grid-row", "width", "height"].forEach(function (k) { el2.style.removeProperty(k); });
       });
     }
+    jumpUntil = 0;
+    if (jumpRefs) { jumpRefs.forEach(clearRef); jumpRefs = null; }
+    loopOn = false;
     clearTimeout(rsT);
     rsT = setTimeout(lockAlbumGrid, 180);
   });
