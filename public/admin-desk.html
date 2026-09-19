@@ -896,6 +896,8 @@ function setCropMode(m){
   const stage = $("#stage");
   stage.classList.toggle("cardmode", m !== "main");
   stage.style.aspectRatio = m === "card" ? "1 / 1" : (m === "hero" ? "16 / 9" : (crop.aspect === "1/1" ? "1 / 1" : "16 / 9"));
+  stage.style.maxWidth = m === "hero" ? "610px" : "";
+  stage.style.marginInline = m === "hero" ? "auto" : "";
   $("#miniFrame").classList.toggle("active", m === "card");
   $("#miniHero").classList.toggle("active", m === "hero");
   $("#modeMain").classList.toggle("primary", m === "main");
