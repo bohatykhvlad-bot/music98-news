@@ -144,74 +144,6 @@
     return "";
   }
 
-  /* ---- synthesised cross-fade for the left chrome -------------------------
-     Apple's own switch animation (fade-in-content) keeps the incoming
-     playing-content invisible AND out of flow (position:absolute) for 480ms,
-     then steps it into the grid and fades only the last 120ms: the old title
-     dies in one frame and the column hops down mid-switch. That is pristine
-     behaviour, not a bug of ours — but it reads as choppy. Replace the
-     keyframes with an in-flow fade, ghost the old content out across the same
-     window, and hold the block height so nothing hops; the height eases to
-     the new natural value once the fade has landed. */
-  var XCF_MS = 420;
-  var xcfStyleDone = false, xcfT = 0;
-  function xcfEnsureStyle() {
-    if (xcfStyleDone) return;
-    var root = document.head || document.documentElement;
-    if (!root) return;
-    var st = document.createElement("style");
-    st.id = "m98-xcf";
-    st.textContent =
-      "@keyframes m98-xcf{from{opacity:0}to{opacity:1}}" +
-      ".audio-player--active .container-player__playing-content{" +
-      "animation-name:m98-xcf !important;animation-duration:" + XCF_MS + "ms !important;" +
-      "animation-timing-function:ease-out !important;}";
-    try { root.appendChild(st); xcfStyleDone = true; } catch (err) {}
-  }
-  function lockupCrossfade() {
-    if (!appleWide() || xcfT) return;
-    xcfEnsureStyle();
-    var pc = deepQuery(".container-player__playing-content");
-    if (!pc) return;
-    var b = pc.getBoundingClientRect();
-    if (!b.height) return;
-    var ghost = null;
-    try {
-      ghost = pc.cloneNode(true);
-      var gs = ghost.style;
-      gs.setProperty("position", "fixed", "important");
-      gs.setProperty("left", b.x + "px", "important");
-      gs.setProperty("top", b.y + "px", "important");
-      gs.setProperty("width", b.width + "px", "important");
-      gs.setProperty("height", b.height + "px", "important");
-      gs.setProperty("margin", "0", "important");
-      gs.setProperty("z-index", "4", "important");
-      gs.setProperty("pointer-events", "none", "important");
-      gs.setProperty("overflow", "hidden", "important");
-      gs.setProperty("opacity", "1", "important");
-      gs.setProperty("transition", "opacity " + XCF_MS + "ms ease-out", "important");
-      gs.setProperty("animation", "none", "important");
-      gs.setProperty("display", "block", "important");
-      (pc.parentNode || document.body).appendChild(ghost);
-      requestAnimationFrame(function () {
-        if (ghost) ghost.style.setProperty("opacity", "0", "important");
-      });
-    } catch (err) { ghost = null; }
-    pc.style.setProperty("height", b.height + "px", "important");
-    pc.style.setProperty("overflow", "hidden", "important");
-    xcfT = setTimeout(function () {
-      xcfT = 0;
-      if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
-      if (!pc.isConnected) return;
-      var target = pc.scrollHeight;
-      pc.style.setProperty("transition", "height 160ms ease", "important");
-      pc.style.setProperty("height", target + "px", "important");
-      setTimeout(function () {
-        ["height", "overflow", "transition"].forEach(function (k) { pc.style.removeProperty(k); });
-      }, 200);
-    }, XCF_MS + 20);
-  }
-
   async function goToIndex(mk, target) {
     if (!mk || target < 0) return false;
     var pos = mk.queue && typeof mk.queue.position === "number" ? mk.queue.position : 0;
@@ -237,7 +169,6 @@
     if (typeof mk.changeToMediaAtIndex === "function") {
       holdControls(2600);
       settleWindow(300);
-      lockupCrossfade();
       await mk.changeToMediaAtIndex(target);
       settleWindow(300);
       if (!mk.isPlaying && mk.play) await mk.play();
