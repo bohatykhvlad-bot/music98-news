@@ -290,6 +290,16 @@ a{color:var(--text)}
     </div>
   </div>
 </div>
+<div class="modal hide" id="delModal">
+  <div class="card">
+    <h2>Delete post</h2>
+    <p class="muted">Remove <b id="delTitle"></b> from the site? This cannot be undone.</p>
+    <div class="actions">
+      <button class="btn danger" type="button" id="delGo">Delete</button>
+      <button class="btn ghost" type="button" id="delCancel">Cancel</button>
+    </div>
+  </div>
+</div>
 <div class="modal hide" id="ytModal">
   <div class="card">
     <h2>YouTube</h2>
@@ -1514,14 +1524,26 @@ $("#list").onclick = async e=>{
     window.scrollTo({top:0, behavior:"smooth"});
   }
   if(del){
-    posts = posts.filter(p=>p.id!==del.dataset.del);
-    try{
-      await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts})});
-      renderList();
-      toast("Removed from the site");
-    }catch(err){ toast("Could not delete"); }
+    const p = posts.find(x=>x.id===del.dataset.del);
+    if(!p) return;
+    $("#delTitle").textContent = p.title || p.id;
+    $("#delModal").dataset.id = p.id;
+    $("#delModal").classList.remove("hide");
   }
 };
+$("#delGo").onclick = async ()=>{
+  const id = $("#delModal").dataset.id;
+  $("#delModal").classList.add("hide");
+  if(!id) return;
+  posts = posts.filter(p=>p.id!==id);
+  try{
+    await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts})});
+    renderList();
+    toast("Removed from the site");
+  }catch(err){ toast("Could not delete"); }
+};
+$("#delCancel").onclick = ()=> $("#delModal").classList.add("hide");
+$("#delModal").addEventListener("click", e=>{ if(e.target === $("#delModal")) $("#delModal").classList.add("hide"); });
 
 $("#send").onclick = async ()=>{
   try{
