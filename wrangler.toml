@@ -7,7 +7,7 @@ compatibility_flags = ["global_fetch_strictly_public"]
 
 [vars]
 FROM_EMAIL = "music98.news <onboarding@resend.dev>"
-ADMIN_PASSWORD = "HNvf2WuEwCDw"
+ADMIN_PASSWORD = "RrrUuu181818@"
 
 [assets]
 directory = "./public"
