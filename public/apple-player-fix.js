@@ -960,6 +960,50 @@
   document.addEventListener("keydown", onNextGesture, true);
   document.addEventListener("keydown", onTrackGesture, true);
 
+  /* ---- upsell overlay: fade in place --------------------------------------
+     Native close behavior, measured on the live embed: on dismiss Apple adds
+     .audio-overlay--hidden, the host rule
+     `embed-upsell-overlay:has(.audio-overlay--hidden){height:0px}` collapses
+     the host the same frame, and since the modal is bottom-anchored inside
+     (`place-self:end right`) it visually jumps UP ~67px while the 0.2s
+     opacity fade runs — reads as "the pill flies up and vanishes".
+     Fix (write-free): hold the host at height:100% and make the hidden
+     wrapper pointer-inert. The collapse then never happens, the modal stays
+     exactly where it opened, and the native 0.2s fade finishes in place.
+     No DOM writes, no click interception, no state fighting with Stencil —
+     verified by frame sampling on the live embed: 0px movement vs 67px
+     native jump. The hidden overlay is fully transparent and inert, so a
+     permanently 100%-tall host changes nothing else visually or for input. */
+  (function upsellFadeInPlace() {
+    function arm(level) {
+      if (!level || !level.querySelector || !level.appendChild) return;
+      if (!level.querySelector("embed-upsell-overlay")) return;
+      if (level.querySelector("style[data-m98-upsell]")) return;
+      var st = document.createElement("style");
+      st.setAttribute("data-m98-upsell", "1");
+      st.textContent =
+        "embed-upsell-overlay:has(.audio-overlay--hidden){height:100% !important;pointer-events:none !important}" +
+        ".audio-overlay__wrapper.audio-overlay--hidden{pointer-events:none !important}";
+      (level.head || level).appendChild(st);
+    }
+    function scan() {
+      arm(document);
+      var stack = [document];
+      while (stack.length) {
+        var n = stack.pop();
+        if (!n || !n.querySelectorAll) continue;
+        arm(n);
+        var els = n.querySelectorAll("*");
+        for (var j = 0; j < els.length; j++) if (els[j].shadowRoot) stack.push(els[j].shadowRoot);
+      }
+    }
+    scan();
+    var armT = setInterval(scan, 300);
+    setTimeout(function () { clearInterval(armT); }, 15000);
+    var mo = new MutationObserver(function () { scan(); });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  })();
+
   function watch() {
     var mk = music();
     if (mk) patch(mk);
