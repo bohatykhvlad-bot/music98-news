@@ -206,6 +206,7 @@
     var mk = music();
     if (!mk) return;
     patch(mk);
+    mkArm(mk);   /* zero before the switch's buffers can start */
     var id = hostId(host);
     var idx = hostIndex(host);
     if (!id && idx < 0) return;
@@ -331,41 +332,66 @@
   }
   (function loop(){ fixOverlaps(); requestAnimationFrame(loop); })();
   var MK_ANDROID = /Android/i.test(navigator.userAgent);
+  var playedOnce = false;
   var mkVol = { pending: false, timer: 0, raf: 0, wasPlaying: false };
   function mkRamp(mk) {
     if (mkVol.raf) cancelAnimationFrame(mkVol.raf);
     var start = performance.now(), ms = 180;
-    (function step(now) {
-      var k = Math.min(1, (now - start) / ms);
+    (function step(rafNow) {
+      /* clamp: rAF timestamps can precede `start` (vsync alignment) */
+      var now = (typeof rafNow === "number" && rafNow > 0) ? rafNow : performance.now();
+      var k = Math.max(0, Math.min(1, (now - start) / ms));
       try { mk.volume = k; } catch (err) {}
       if (k < 1) mkVol.raf = requestAnimationFrame(step); else mkVol.raf = 0;
-    })(start);
+    })(performance.now());
+  }
+  /* Android blast guard: zero the volume BEFORE any buffer can start — at
+     hook time, on a play intent, and on a track change — then ramp back in
+     300ms after playback has actually begun. Setting the volume inside the
+     'playing' event is too late: the first buffers are already audible. */
+  function mkArm(mk) {
+    if (!MK_ANDROID || !mk) return;
+    try { mk.volume = 0; } catch (err) {}
+    mkVol.pending = true;
+    if (mkVol.timer) { clearTimeout(mkVol.timer); mkVol.timer = 0; }
+    if (mkVol.raf) { cancelAnimationFrame(mkVol.raf); mkVol.raf = 0; }
+  }
+  function mkSchedule(mk) {
+    if (!MK_ANDROID || !mkVol.pending || mkVol.timer) return;
+    mkVol.timer = setTimeout(function () {
+      mkVol.timer = 0;
+      mkVol.pending = false;
+      mkRamp(mk);
+    }, 300);
   }
   setInterval(function () {
     var mk = music();
     if (mk && !mk.__m98ovHook) {
       mk.__m98ovHook = 1;
+      mkArm(mk);   /* the very first buffer must never see volume 1 */
       try {
         mk.addEventListener("playbackStateDidChange", function (ev) {
           fixOverlaps(); armJumpFix(800);
           if (!MK_ANDROID) return;
           var playing = mk.isPlaying;
-          if (playing && !mkVol.wasPlaying) {
+          if (playing) {
+            playedOnce = true;
+            if (!mkVol.wasPlaying) { mkArm(mk); mkSchedule(mk); }
             mkVol.wasPlaying = true;
-            mkVol.pending = true;
-            try { mk.volume = 0; } catch (err) {}
-            if (mkVol.timer) clearTimeout(mkVol.timer);
-            mkVol.timer = setTimeout(function () {
-              mkVol.pending = false;
-              mkRamp(mk);
-            }, 300);
-          } else if (!playing) {
+          } else {
             mkVol.wasPlaying = false;
-            if (mkVol.pending) { mkVol.pending = false; clearTimeout(mkVol.timer); }
+            if (mkVol.timer) { clearTimeout(mkVol.timer); mkVol.timer = 0; }
           }
         });
-        mk.addEventListener("mediaItemDidChange", function () { fixOverlaps(); armJumpFix(800); });
+        mk.addEventListener("mediaItemDidChange", function () {
+          fixOverlaps(); armJumpFix(800);
+          if (!MK_ANDROID) return;
+          mkArm(mk);   /* next track's buffers start at zero too */
+          if (mk.isPlaying) mkSchedule(mk);
+        });
       } catch (err) {}
+    } else if (mk && MK_ANDROID && mkVol.pending && mk.isPlaying && !mkVol.timer) {
+      mkSchedule(mk);   /* failsafe: a missed state event must not mute forever */
     }
   }, 200);
 
@@ -423,17 +449,20 @@
   var PIN_PARTS = [".audio-controls", "embed-audio-progress", "embed-auth-control",
     ".auth-control__sign-in", "amp-artwork", ".container-player__logo-header"];
   function lockAlbumGrid() {
-    if (!window.matchMedia("(min-width: 560px)").matches) return;   /* mobile stays native */
     var el = deepQuery(".container-player");
     if (!el) return;
     var cs = window.getComputedStyle(el);
     if (cs.display.indexOf("grid") < 0) return;
     var parts = cs.gridTemplateColumns.trim().split(/\s+/);
-    var mid = Math.round(parseFloat(parts[1] || "0"));
-    var wide = parts.length === 3 && mid >= 200 && mid <= 260;
-    /* Device-agnostic gates: content present (boot done) and the template
-       stable across two samples. No hardcoded column counts. */
+    /* "Wide" = the roomy album layout: viewport is desktop-width and some
+       column matches the artwork track (~231px). Track-count checks break
+       when implicit columns appear, so probe track sizes instead. */
+    var wide = window.matchMedia("(min-width: 560px)").matches &&
+      parts.some(function (x) { var v = parseFloat(x); return v >= 200 && v <= 260; });
+    /* Gates: boot done; on narrow layouts wait for the first real playback so
+       the pin can never capture a boot or pre-play state. */
     if (!deepQuery("embed-audio-tracklist-item") || !deepQuery(".audio-controls")) return;
+    if (!wide && !playedOnce) return;
     var rows = cs.gridTemplateRows;
     var place = PIN_PARTS.map(function (sel) {
       var el2 = deepQuery(sel);
@@ -445,7 +474,7 @@
     var key = cs.gridTemplateColumns + " | " + rows + " | " + place;
     if (el.__m98LockKey === key) return;
     if (el.__m98SeenKey !== key) { el.__m98SeenKey = key; el.__m98KeyT = Date.now(); return; }
-    if (Date.now() - (el.__m98KeyT || 0) < 300) return;   /* outlive any loading variant */
+    if (Date.now() - (el.__m98KeyT || 0) < (wide ? 300 : 500)) return;   /* outlive any loading variant */
     var root = el.getRootNode ? el.getRootNode() : document;
     var oldStyle = root.getElementById ? root.getElementById("m98-grid-lock") : null;
     if (oldStyle && (oldStyle.getAttribute("data-m98") || "") !== key) {
@@ -461,7 +490,7 @@
         var c2 = window.getComputedStyle(el2);
         rule += sel + "{grid-column:" + c2.gridColumnStart + " !important;" +
           "grid-row:" + c2.gridRowStart + " !important;";
-        if (sel === ".audio-controls" || sel === "embed-audio-progress") {
+        if (wide && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
           if (parseFloat(c2.height) > 0) rule += "height:" + c2.height + " !important;";
           if (sel === "embed-audio-progress" && parseFloat(c2.width) > 0) rule += "width:" + c2.width + " !important;";
         }
@@ -471,7 +500,8 @@
       st.id = "m98-grid-lock";
       st.setAttribute("data-m98", key);
       st.textContent = rule;
-      try { root.appendChild(st); } catch (err) {}
+      var host = root.head || root.documentElement || root;   /* document can't take raw children */
+      try { host.appendChild(st); } catch (err) { try { root.appendChild(st); } catch (e2) {} }
     }
     el.__m98LockKey = key;
     el.style.setProperty("grid-template-columns", cs.gridTemplateColumns, "important");
@@ -482,7 +512,7 @@
       var c2 = window.getComputedStyle(el2);
       el2.style.setProperty("grid-column", c2.gridColumnStart, "important");
       el2.style.setProperty("grid-row", c2.gridRowStart, "important");
-      if (sel === ".audio-controls" || sel === "embed-audio-progress") {
+      if (wide && (sel === ".audio-controls" || sel === "embed-audio-progress")) {
         if (parseFloat(c2.height) > 0) el2.style.setProperty("height", c2.height, "important");
         if (sel === "embed-audio-progress" && parseFloat(c2.width) > 0) el2.style.setProperty("width", c2.width, "important");
       }

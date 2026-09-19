@@ -945,12 +945,15 @@ function volRamp(){
   if(volRaf) cancelAnimationFrame(volRaf);
   audio.muted = false;
   const start = performance.now(), ms = 180;
-  (function step(now){
+  (function step(rafNow){
     if(audio.paused){ audio.volume = 0; return; }
-    const k = Math.min(1, (now - start) / ms);
-    audio.volume = k;
+    /* rAF timestamps are vsync-aligned and can precede `start` — clamp,
+       or a negative k throws and kills the ramp (silent track). */
+    const now = (typeof rafNow === "number" && rafNow > 0) ? rafNow : performance.now();
+    const k = Math.max(0, Math.min(1, (now - start) / ms));
+    try{ audio.volume = k; }catch(e){}
     if(k < 1) volRaf = requestAnimationFrame(step); else volRaf = 0;
-  })(start);
+  })(performance.now());
 }
 function volArm(){
   if(!IS_ANDROID) return;
@@ -960,7 +963,7 @@ function volPlaying(){
   if(!IS_ANDROID || !volPending) return;
   volPending = false;
   if(volTimer) clearTimeout(volTimer);
-  volTimer = setTimeout(volRamp, 300);   /* wait for the media-volume stream */
+  volTimer = setTimeout(volRamp, 500);   /* wait for the media-volume stream */
 }
 let curKey = null;
 let playGen = 0;
