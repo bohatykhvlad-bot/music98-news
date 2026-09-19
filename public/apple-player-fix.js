@@ -395,6 +395,27 @@
     if (mkVol.raf) { cancelAnimationFrame(mkVol.raf); mkVol.raf = 0; }
     mkVol.ramping = false;
   }
+  /* The chart player's concept: digital zero must be IN EFFECT before the
+     first buffer renders, and it must be VERIFIED, not assumed. On Android a
+     volume write races the stream: zero lands late and the first buffers
+     play at full volume, then our own ramp reads as "fading down" — the
+     reported blast-then-fade. So: re-assert zero on every pre-play event,
+     and during the hold re-assert at 60fps; the frame the mixer finally
+     accepts the write is the frame the ramp may start climbing. */
+  function mkHoldZero(mk, ms) {
+    mkDisarm(mk);
+    mkVol.ramping = true;   /* deviceVol-style guards stay out while we hold */
+    var until = Date.now() + (ms || 700);
+    (function tick() {
+      try { mk.volume = 0; } catch (err) {}
+      if (Date.now() < until) {
+        requestAnimationFrame(tick);
+      } else {
+        mkVol.ramping = false;
+        mkRamp(mk);   /* zero is now definitely in effect: climb */
+      }
+    })();
+  }
   function mkRamp(mk) {
     if (mkVol.raf) cancelAnimationFrame(mkVol.raf);
     mkVol.ramping = true;
@@ -415,9 +436,9 @@
     })(performance.now());
   }
   /* Android blast guard: zero the volume BEFORE any buffer can start — at
-     hook time, on a play intent, and on a track change — then ramp back in
-     300ms after playback has actually begun. Setting the volume inside the
-     'playing' event is too late: the first buffers are already audible. */
+     hook time, on a play intent, and on a track change — then hold zero and
+     ramp. Setting the volume inside the 'playing' event is too late: the
+     first buffers are already audible. */
   function mkArm(mk) {
     if (!MK_MOBILE || !mk) return;
     try { mk.volume = 0; } catch (err) {}
@@ -427,34 +448,11 @@
   }
   function mkSchedule(mk, cold) {
     if (!MK_MOBILE || !mkVol.pending || mkVol.timer) return;
-    if (!cold) {
-      mkVol.timer = setTimeout(function () {
-        mkVol.timer = 0;
-        mkVol.pending = false;
-        mkRamp(mk);
-      }, 120);
-      return;
-    }
-    /* Android cold start: the mixer queues volume writes for the first few
-       hundred ms of a new stream, so an early ramp can leak the pre-arm
-       volume (the blast). Wait adaptively instead of a flat 500ms: start the
-       fade as soon as playback time has advanced ~0.25s — buffers are
-       rendering and the write has landed — but never before 250ms and never
-       after 500ms. Same worst case, faster on devices whose mixer starts
-       promptly. */
-    var t0 = Date.now();
-    mkVol.timer = setInterval(function () {
-      var el = Date.now() - t0;
-      var pt = 0;
-      try { pt = Number(mk.currentPlaybackTime) || 0; } catch (err) {}
-      if (el >= 500 || (el >= 250 && pt > 0.25)) {
-        clearInterval(mkVol.timer);
-        mkVol.timer = 0;
-        mkVol.pending = false;
-        mkRamp(mk);
-      }
-    }, 50);
+    mkHoldZero(mk, MK_ANDROID && cold ? 650 : 260);   /* timers deprecated: the hold IS the scheduler */
   }
+    /* Android cold start: the mixer queues volume writes for the first few
+       hundred ms of a new stream. The adaptive waiter is superseded by the
+       always-on hold in mkSchedule (kept as a comment for history). */
   setInterval(function () {
     var mk = music();
     if (mk && !mk.__m98ovHook) {
@@ -467,7 +465,12 @@
           var playing = mk.isPlaying;
           if (playing) {
             playedOnce = true;
-            if (!mkVol.wasPlaying) { mkArm(mk); mkSchedule(mk, !mkVol.everPlayed); }
+            if (!mkVol.wasPlaying) {
+              mkVol.everPlayed = mkVol.everPlayed || mkVol.wasPlaying;
+              /* The chart's concept, ported: hold digital zero through the
+                 mixer's lag window, then ramp. No blind timers. */
+              mkHoldZero(mk, MK_ANDROID && !mkVol.everPlayed ? 650 : 260);
+            }
             mkVol.everPlayed = true; mkVol.wasPlaying = true;
           } else {
             mkVol.wasPlaying = false;
@@ -478,14 +481,15 @@
           fixOverlaps(); armJumpFix(800);
           holdControls(1500);   /* a natural track advance re-renders the bar too */
           scrub.active = false; setScrubbing(scrub.el, false);
+          releaseNatively();   /* Apple re-lays the bar; our stale pins must not fight it */
           if (!MK_MOBILE) return;
-          mkArm(mk);   /* next track's buffers start at zero too */
           mkVol.everPlayed = false;   /* new stream: the next onset is cold */
-          if (mk.isPlaying) mkSchedule(mk, true);
+          mkArm(mk);   /* next track's buffers start at zero too */
+          if (mk.isPlaying) mkHoldZero(mk, MK_ANDROID ? 650 : 260);
         });
       } catch (err) {}
-    } else if (mk && MK_MOBILE && mkVol.pending && mk.isPlaying && !mkVol.timer) {
-      mkSchedule(mk, !mkVol.everPlayed);   /* failsafe: a missed state event must not mute forever */
+    } else if (mk && MK_MOBILE && mkVol.pending && mk.isPlaying && !mkVol.timer && !mkVol.ramping) {
+      mkHoldZero(mk, MK_ANDROID ? 650 : 260);   /* failsafe: a missed state event must not mute forever */
     }
   }, 200);
 
@@ -691,9 +695,11 @@
   }
   function armJumpFix(ms, fromGesture) {
     lastMkActivity = Date.now();
-    /* On narrow only a gesture-time baseline is trustworthy: an event-driven
-       arm would capture the layout after it already moved and pin the damage. */
-    if (!appleWide() && !fromGesture) return;
+    /* Narrow layouts get NO translate compensation at all: the baseline is
+       captured pre-move, and if Apple re-centres during the switch (its own
+       cross-fade does), the frozen transform pins the shifted layout — the
+       reported off-centre transport. Wide keeps the compensator. */
+    if (!appleWide()) return;
     if (pinEngaged() && !fromGesture) return;   /* pin already holds the layout */
     if (jumpRefs) jumpRefs.forEach(function (it) { it.dx = 0; it.dy = 0; clearRef(it); });
     jumpRefs = JUMP_SELS.map(function (sel) {
@@ -734,6 +740,17 @@
       });
     }
     requestAnimationFrame(jumpFrame);
+  }
+
+  /* Drop every transform/pin the stabilisers own, so the next Apple render
+     is native. Cheap; called on track changes and on stop. */
+  function releaseNatively() {
+    if (jumpRefs) {
+      jumpRefs.forEach(function (it) { it.dx = 0; it.dy = 0; clearRef(it); });
+      jumpRefs = null;
+    }
+    jumpUntil = 0;
+    if (!appleWide()) clearGridLock();
   }
 
   var PIN_PARTS = [".audio-controls", "embed-audio-progress", "embed-auth-control",
@@ -888,9 +905,28 @@
     Promise.resolve(goToIndex(mk, 0)).catch(function () {});
   }
 
+  /* Transport play buttons (initial/loading variant big play, active play)
+     had no gesture hook: the first play() after them started buffers at
+     volume 1 — the remaining Android blast. Arm before Apple handles it. */
+  function onTransportPlayGesture(ev) {
+    if (ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
+    var path = ev.composedPath ? ev.composedPath() : [];
+    for (var i = 0; i < path.length; i++) {
+      var n = path[i];
+      if (n && n.classList && (n.classList.contains("playback-play") ||
+          n.classList.contains("playback-play__play"))) {
+        var mk0 = music();
+        if (mk0) { mkArm(mk0); mkSchedule(mk0, !mkVol.everPlayed); }
+        return;
+      }
+    }
+  }
+
   document.addEventListener("click", onTrackGesture, true);
   document.addEventListener("click", onPrevGesture, true);
   document.addEventListener("click", onNextGesture, true);
+  document.addEventListener("click", onTransportPlayGesture, true);
+  document.addEventListener("keydown", onTransportPlayGesture, true);
   document.addEventListener("keydown", onPrevGesture, true);
   document.addEventListener("keydown", onNextGesture, true);
   document.addEventListener("keydown", onTrackGesture, true);
