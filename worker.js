@@ -7,6 +7,7 @@ import { onRequestPost as broadcast } from "./functions/api/broadcast.js";
 import { onRequest as mail } from "./functions/api/mail.js";
 
 const APPLE_ALBUM = /^\/apple-embed\/([a-z]{2})\/album\/(\d+)$/;
+const PHOTO_FILE = /^\/photos\/([a-z0-9._-]+)\.(jpe?g|png|webp)$/;
 const APPLE_STATIC = /^\/apple-static\/(build|assets)\/([A-Za-z0-9._/-]+)$/;
 const APPLE_GW = /^\/apple-gw\/(amp-api\.music\.apple\.com|amp-api-edge\.music\.apple\.com|api\.music\.apple\.com|play\.itunes\.apple\.com|sf-api-token-service\.itunes\.apple\.com)(\/.*)?$/;
 const APPLE_EMBED_CSP = [
@@ -28,6 +29,35 @@ function rewriteAppleEmbed(html) {
   if (/<head([^>]*)>/i.test(out)) out = out.replace(/<head([^>]*)>/i, "<head$1>" + tag);
   else out = tag + out;
   return out;
+}
+
+/* runtime-uploaded photos live in KV (photo:<name>), NOT in the git assets -
+   desk.json keeps only the "photos/<name>" reference, so the payload stays
+   small. Long cache: file names are unique per upload, so content never
+   changes under the same name. */
+async function servePhoto(env, name) {
+  if (!env || !env.DESK) return new Response("not found", { status: 404 });
+  const v = await env.DESK.getWithMetadata("photo:" + name);
+  if (!v || !v.value) return new Response("not found", { status: 404 });
+  const type = (v.metadata && v.metadata.type) || "image/jpeg";
+  const ext = name.split(".").pop().toLowerCase();
+  if (!type.endsWith(ext.replace("jpg", "jpeg"))) {
+    /* metadata mismatch guard: trust the stored type, not the URL */
+  }
+  return new Response(b64ToBytes(v.value), {
+    status: 200,
+    headers: {
+      "Content-Type": type,
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+  });
+}
+
+function b64ToBytes(b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
 }
 
 async function proxyAppleAlbum(request, path) {
@@ -131,11 +161,22 @@ export default {
       const u = new URL("/admin-desk", request.url);
       return Response.redirect(u, 301);
     }
+    const photo = path.match(PHOTO_FILE);
+    if (photo) {
+      const fromKV = await servePhoto(env, photo[1] + "." + photo[2]);
+      if (fromKV.status !== 404) return fromKV;
+      /* fall through to the git asset (pre-deploy photos in public/photos/) */
+    }
     const res = await env.ASSETS.fetch(request);
     const type = (res.headers.get("content-type") || "").toLowerCase();
     const headers = new Headers(res.headers);
-    if (type.includes("text/html") || path.startsWith("/photos/") || path === "/data/desk.json") {
+    if (type.includes("text/html") || path === "/data/desk.json") {
       headers.set("Cache-Control", "no-store, max-age=0");
+      return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+    }
+    if (path.startsWith("/photos/")) {
+      /* git-backed photos: content changes only on deploy, cache for an hour */
+      headers.set("Cache-Control", "public, max-age=3600");
       return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
     }
     return res;

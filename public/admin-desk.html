@@ -445,10 +445,21 @@ function readPhoto(file, cb, max=1800){
     const c = document.createElement("canvas"); c.width=w; c.height=h;
     c.getContext("2d").drawImage(img,0,0,w,h);
     URL.revokeObjectURL(url);
-    cb(c.toDataURL("image/jpeg", 0.86));
+    const data = c.toDataURL("image/jpeg", 0.86);
+    /* the blob goes to KV via /api/photo; the post keeps only the URL -
+       desk.json stays tiny (a data: URL here would bloat every page load) */
+    uploadPhoto(data, src=> cb(src), ()=> cb(data));
   };
   img.onerror = ()=> URL.revokeObjectURL(url);
   img.src = url;
+}
+let photoSeq = 0;
+function uploadPhoto(data, ok, fail){
+  const ext = /^data:image\/(jpeg|png|webp)/i.exec(data);
+  const name = "u" + Date.now().toString(36) + (photoSeq++).toString(36) + "." + (ext ? ext[1].replace("jpeg","jpg") : "jpg");
+  api("/api/photo", {method:"POST", headers: headers(), body: JSON.stringify({name, data})})
+    .then(j => (j && j.url) ? ok(j.url) : fail())
+    .catch(fail);
 }
 function dropHasImage(dt){
   if(!dt) return false;
