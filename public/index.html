@@ -189,7 +189,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .tinfo b{display:block;font-size:15.5px;letter-spacing:-.01em}
 .tinfo span{color:var(--muted);font-size:13px}
 
-.tnames{min-width:0;max-width:100%;overflow:hidden;display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:baseline}
+.tnames{min-width:0;max-width:100%;overflow:hidden;display:grid;grid-template-columns:2ch 1fr;column-gap:12px;align-items:baseline}
 .ctext{min-width:0;max-width:100%;overflow:hidden}
 .ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;grid-column:2}
 
@@ -468,7 +468,7 @@ textarea{resize:vertical;min-height:64px}
   .artwrap img{border-radius:8px}
   .ctext{grid-area:names;align-self:center;min-width:0}
   .cname{font-size:13.5px;line-height:1.2}
-  .tnames{column-gap:8px}
+  .tnames{grid-template-columns:2ch 1fr;column-gap:8px}
   .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}
@@ -672,7 +672,7 @@ function fitCover(img){
   if(!box || !img.naturalWidth) return;
   const fx = Math.min(1, Math.max(0, Number(img.dataset.fx)));
   const fy = Math.min(1, Math.max(0, Number(img.dataset.fy)));
-  const z = Math.min(3, Math.max(1, Number(img.dataset.zoom) || 1));
+  const z = Math.min(8, Math.max(1, Number(img.dataset.zoom) || 1));
   const sw = box.clientWidth, sh = box.clientHeight;
   if(!sw || !sh) return;
   const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -708,7 +708,7 @@ function lockFocus(p, yVal){
 }
 function cardZoom(p){
   const cz = Number(p && p.cover && p.cover.cardZoom);
-  return (cz >= 1 && cz <= 3) ? cz : coverZoom(p);
+  return (cz >= 1 && cz <= 8) ? cz : coverZoom(p);
 }
 function cardFocus(p){ return lockFocus(p, p && p.cover && p.cover.cardY); }
 function coverImg(p, square, lazy, mode){
@@ -968,12 +968,27 @@ function gainSet(v){
    onset creeps in instead of stepping. Each frame is also slew-limited — a long
    (janky) frame advances the fade by at most VOL_MAX_DT, which is what used to
    leap the ramp straight to near-full volume and stay audible as a jump. */
+/* editorial-111: the "playing" event fires when the media element starts
+   feeding buffers, but on Android the element -> WebAudio route settles over
+   its first frames: before the route is live the element plays OUT LOUD -
+   the reported blast. The gain ramp alone could never cover that window.
+   Fix: keep the ELEMENT hard-muted (audio.muted, a fast OS path) while the
+   gain route settles, unmute on a 120ms floor, and only then let the gain
+   climb. No blast, and no 500ms silent hole. */
 const VOL_FADE_COLD = 460, VOL_FADE_WARM = 150, VOL_DB = 42, VOL_MAX_DT = 40, VOL_COLD_WAIT = 500;
 function volRamp(){
   if(volRaf) cancelAnimationFrame(volRaf);
-  const ms = volWarm ? VOL_FADE_WARM : VOL_FADE_COLD;
+  const warm = volWarm;
+  const ms = warm ? VOL_FADE_WARM : VOL_FADE_COLD;
   volWarm = false;
-  if(!gainOwns) audio.muted = false;  /* already at digital zero: no unmute click */
+  /* editorial-111: on a cold start the hard mute stays over the 120ms
+     pre-route window, then the ramp lifts it and the gain owns every sample.
+     A warm resume must unmute AT ONCE: its route is already live, and a
+     muted element feeds silence into the WebAudio graph - holding the mute
+     through the warm ramp only re-creates the silent hole it was meant
+     to fix. */
+  let un = warm ? 0 : 120;
+  if(un === 0){ try{ audio.muted = false; }catch(e){} }
   volRamping = true;
   let acc = 0, prev = performance.now(), last = 0;
   function step(rafNow){
@@ -985,6 +1000,10 @@ function volRamp(){
     if(!(dt > 0)) dt = 0;
     if(dt > VOL_MAX_DT) dt = VOL_MAX_DT;
     acc += dt;
+    /* editorial-111: lift the element's hard mute only after the cold floor -
+       by then the AudioContext route is running and the gain owns every
+       sample; unmuting earlier re-opened the Android pre-route blast. */
+    if(un > 0 && acc >= un){ un = 0; try{ audio.muted = false; }catch(e){} }
     const t = acc / ms;
     let v = (t >= 1) ? 1 : Math.pow(10, -VOL_DB * (1 - t) / 20);
     if(v < last) v = last;          /* monotonic: never dip mid-fade */
@@ -1002,8 +1021,12 @@ function volArm(warm){
   volRamping = false;
   if(gainZero()){                     /* sample-accurate zero: no mixer delay, no wait hole */
     gainOwns = true; volPending = true;
-    audio.muted = false;
-    try{ audio.volume = 1; }catch(e){}
+    /* editorial-111: NEVER unmute here. On a cold start the element stays
+       hard-muted while the gain route settles; unmuting immediately re-opened
+       the pre-route blast window (the "explosion" the owner kept hearing).
+       The ramp lifts the mute itself: at once when warm, after a 120ms floor
+       when cold. */
+    try{ audio.muted = true; audio.volume = 1; }catch(e){}
     return;
   }
   gainOwns = false;

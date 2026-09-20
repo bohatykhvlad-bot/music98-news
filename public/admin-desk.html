@@ -76,7 +76,7 @@ a{color:var(--text)}
 }
 .toolbar .tsep{width:1px;height:18px;background:var(--line);margin:0 4px}
 .stage-wrap{border:1px dashed var(--line);border-radius:12px;background:#111;overflow:hidden}
-.crop-row{display:grid;grid-template-columns:1fr 200px;gap:10px;align-items:start}
+.crop-row{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:10px;align-items:start;max-width:640px}
 .stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;cursor:default;background:#111;touch-action:none}
 .stage.hot{outline:2px solid var(--acc2);outline-offset:-2px}
 .stage:active,.stage.drag{cursor:default}
@@ -93,6 +93,7 @@ a{color:var(--text)}
 .mini .muted{text-align:center;font-size:11px}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
 .cropbar-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cropbar-row.modes{justify-content:center}
 .cropbar-row.replace{justify-content:center}
 .cropbar input[type=range]{flex:1;min-width:100px}
 .cropbar .btn{padding:5px 10px;font-size:12px}
@@ -196,14 +197,15 @@ a{color:var(--text)}
             <p class="muted hint" id="coverHint">Drop a photo</p>
           </div>
           <div class="cropbar">
-            <div class="cropbar-row">
+            <div class="cropbar-row zoom">
               <button class="btn ghost" type="button" id="zoomOut" aria-label="Zoom out">−</button>
-              <input id="zoom" type="range" min="1" max="3" step="0.01" value="1">
+              <input id="zoom" type="range" min="1" max="8" step="0.01" value="1">
               <button class="btn ghost" type="button" id="zoomIn" aria-label="Zoom in">+</button>
+            </div>
+            <div class="cropbar-row modes">
               <button class="btn ghost" type="button" id="centerCover">Center</button>
               <button class="btn primary" type="button" id="modeMain" title="Full crop, both axes">Main</button>
               <button class="btn ghost" type="button" id="modeCard" title="Square card: vertical only">Card</button>
-              <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><input id="lockH" type="checkbox" style="width:auto"> Lock horizontal for previews</label>
             </div>
             <div class="cropbar-row replace">
               <button class="btn ghost" type="button" id="replaceCover">Replace</button>
@@ -323,7 +325,7 @@ const KEY = "music98_admin_key";
 const APPLE_AT = "1001l3aZW";
 let posts = [];
 let coverSrc = "";
-let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, lockX:null, lockH:false};
+let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, lockX:null};
 let cropMode = "main";   /* main | card | hero */
 let editing = null;
 let appleKind = "song";
@@ -871,7 +873,7 @@ function fitCover(img, fx, fy, zoom){
   if(!box || !img.naturalWidth) return;
   const x = Math.min(1, Math.max(0, Number(fx)));
   const y = Math.min(1, Math.max(0, Number(fy)));
-  const z = Math.min(3, Math.max(1, Number(zoom)||1));
+  const z = Math.min(8, Math.max(1, Number(zoom)||1));
   const sw = box.clientWidth, sh = box.clientHeight;
   if(!sw || !sh) return;
   const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -888,8 +890,22 @@ function fitCover(img, fx, fy, zoom){
 function zoomNow(){
   return cropMode === "card" ? (crop.cardZoom||1) : (crop.zoom||1);
 }
+function zoomCap(){
+  const stage = $("#stage");
+  const img = $("#stageImg");
+  if(!coverSrc || !img || !img.naturalWidth || !stage.clientWidth) return 3;
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const fx = (cropMode === "card") ? lockFx() : (Number.isFinite(crop.x) ? crop.x : 0.5);
+  const fy = (cropMode === "card") ? (Number.isFinite(crop.cardY) ? crop.cardY : 0.5) : (Number.isFinite(crop.y) ? crop.y : 0.5);
+  const need = (px, f) => 2 * Math.max(f, 1 - f) * px;
+  const zw = sw ? need(iw, fx) / sw : 1;
+  const zh = sh ? need(ih, fy) / sh : 1;
+  return Math.min(8, Math.max(3, Math.max(zw, zh) * 1.02));
+}
 function setZoom(z){
-  const v = Math.min(3, Math.max(1, Number(z)||1));
+  const cap = zoomCap();
+  const v = Math.min(cap, Math.max(1, Number(z)||1));
   if(cropMode === "card") crop.cardZoom = v; else crop.zoom = v;
   $("#zoom").value = v;
   crop.dirty = true;
@@ -902,7 +918,11 @@ function setAspect(a){
   layoutCrop();
 }
 function lockFx(){
-  return (cropMode !== "main" && crop.lockH && crop.lockX != null) ? crop.lockX : crop.x;
+  /* editorial-111: the checkbox is gone - the card is ALWAYS horizontally
+     bound to the main crop (main edits move the card's x with them, its own
+     y/zoom stay independent). Old posts with a stored lockX simply render
+     the same: lockX equalled crop.x at save time. */
+  return (cropMode !== "main" && crop.lockX != null) ? crop.lockX : crop.x;
 }
 function setCropMode(m){
   cropMode = (m === "card") ? "card" : "main";
@@ -958,12 +978,10 @@ function setCover(src, pos, zoom, cardY){
   const cy = Number(cardY);
   crop.cardY = (cy >= 0 && cy <= 1) ? cy : parsed.y;
   const cz = Number(arguments[4]);
-  crop.cardZoom = (cz >= 1 && cz <= 3) ? cz : (crop.zoom||1);
+  crop.cardZoom = (cz >= 1 && cz <= 8) ? cz : (crop.zoom||1);
   const lxRaw = arguments[5];
   const lx = (lxRaw == null || lxRaw === "") ? NaN : Number(lxRaw);
   crop.lockX = (lx >= 0 && lx <= 1) ? lx : null;
-  crop.lockH = crop.lockX != null;
-  const lcb = $("#lockH"); if(lcb) lcb.checked = crop.lockH;
   setCropMode("main");
   $("#zoom").value = crop.zoom;
   const img = $("#stageImg");
@@ -977,12 +995,6 @@ function setCover(src, pos, zoom, cardY){
 $("#miniFrame").addEventListener("click", ()=> setCropMode("card"));
 $("#modeMain").addEventListener("click", ()=> setCropMode("main"));
 $("#modeCard").addEventListener("click", ()=> setCropMode("card"));
-$("#lockH").addEventListener("change", e=>{
-  crop.lockH = e.target.checked;
-  if(crop.lockH) crop.lockX = Math.round(crop.x*100)/100;
-  crop.dirty = true;
-  layoutCrop();
-});
 function renderList(){
   const item = p=>{
     const src = (p.cover && p.cover.src) || "";
@@ -1040,7 +1052,7 @@ function fillForm(p){
     $("#stageImg").classList.add("hide");
     $("#stageImg").removeAttribute("src");
     $("#coverHint").classList.remove("hide");
-    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, cardZoom:1, lockX:null, lockH:false};
+    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, cardZoom:1, lockX:null};
     $("#zoom").value = zoomNow();
     $("#miniImg").classList.add("hide");
     paintMini();
@@ -1123,10 +1135,22 @@ $("#centerCover").onclick = ()=>{ if(cropMode === "card"){ crop.cardY = 0.5; } e
 
 window.addEventListener("resize", layoutCrop);
 
+let wheelAcc = 0, wheelRaf = 0;
 stage.addEventListener("wheel", e=>{
   if(!coverSrc) return;
   e.preventDefault();
-  setZoom((crop.zoom||1) + (e.deltaY < 0 ? 0.08 : -0.08));
+  /* editorial-111: proportional step (deltaY), coalesced through one rAF -
+     the fixed 0.08 notch fired per wheel event and read as a jerk. */
+  const d = Math.max(-120, Math.min(120, e.deltaY || 0));
+  wheelAcc += -d * 0.0022;
+  if(!wheelRaf){
+    wheelRaf = requestAnimationFrame(()=>{
+      wheelRaf = 0;
+      if(!wheelAcc) return;
+      setZoom(zoomNow() * (1 + wheelAcc));
+      wheelAcc = 0;
+    });
+  }
 }, {passive:false});
 
 stage.addEventListener("pointerdown", e=>{
@@ -1162,6 +1186,8 @@ stage.addEventListener("pointermove", e=>{
   }else{
     crop.x = drag.cx - (e.clientX - drag.x) / dw;
     crop.y = drag.cy - (e.clientY - drag.y) / dh;
+    /* keep the card's horizontal lock glued to the main crop (default now) */
+    if(cropMode !== "card") crop.lockX = crop.x;
   }
   crop.dirty = true;
   layoutCrop();
@@ -1485,7 +1511,7 @@ function collectPost(status){
       zoom: Math.round((crop.zoom||1)*100)/100,
       cardY: Math.round((crop.cardY!=null?crop.cardY:0.5)*100)/100,
       cardZoom: Math.round((crop.cardZoom!=null?crop.cardZoom:1)*100)/100,
-      lockX: crop.lockH ? Math.round((crop.lockX!=null?crop.lockX:crop.x)*100)/100 : null
+      lockX: Math.round((crop.lockX!=null?crop.lockX:crop.x)*100)/100
     } : {kind:"preset", i:0}
   };
 }

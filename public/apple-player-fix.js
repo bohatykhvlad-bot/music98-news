@@ -221,7 +221,6 @@
     var mk = music();
     if (!mk) return;
     patch(mk);
-    mkArm(mk);   /* zero before the switch's buffers can start */
     var id = hostId(host);
     var idx = hostIndex(host);
     if (!id && idx < 0) return;
@@ -373,123 +372,35 @@
     }
     fixOverlaps();
   })();
+  /* ---- mobile onset: NO volume surgery on the MusicKit path ----------------
+     editorial-111. History: the dB-shaped mkArm/mkHoldZero/mkRamp machinery
+     (zero held at 60fps through Android's mixer-lag window, then a climb)
+     raced Apple's own playback state machine. mkVol.pending was never
+     cleared, so the 200ms failsafe re-armed the hold on every pass while
+     playing: audio started, went silent, faded back, forever — the reported
+     "starts and stops" regression. volume=0 also sits adjacent to Apple's own
+     internal muting, so a held zero could park the player paused. This is an
+     iframe over Apple's own player: every other site just lets it play.
+     Decision (owner-approved direction): do not touch mk.volume at all. The
+     element path on the chart keeps its WebAudio fade; the embed stays native. */
   var MK_ANDROID = /Android/i.test(navigator.userAgent);
-  /* The onset guard is the PC sound fix signed for mobile: Apple devices get
-     the same dB-shaped slew-limited ramp instead of a full-volume first
-     buffer. iOS honours MusicKit volume from the first sample, so its ramp
-     schedules sooner than Android's mixer-delayed one. */
-  var MK_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  var MK_MOBILE = MK_ANDROID || MK_IOS;
-  var playedOnce = false;
-  var mkVol = { pending: false, timer: 0, raf: 0, wasPlaying: false, ramping: false, everPlayed: false };
-  /* dB-shaped, slew-limited fade: equal loudness steps instead of a linear
-     amplitude climb, and one janky frame can never advance the fade by more
-     than MK_MAX_DT ms. A stalled frame leaping the ramp was still audible as
-     a small volume jump at the start of a track. */
-  var MK_FADE_MS = 460, MK_FADE_DB = 42, MK_MAX_DT = 40;
-  /* The pending timer can be a setTimeout (warm) or a setInterval (the cold
-     adaptive waiter); clear both shapes everywhere. */
-  function mkDisarm(mk) {
-    if (mkVol.timer) { clearTimeout(mkVol.timer); clearInterval(mkVol.timer); mkVol.timer = 0; }
-    if (mkVol.raf) { cancelAnimationFrame(mkVol.raf); mkVol.raf = 0; }
-    mkVol.ramping = false;
-  }
-  /* The chart player's concept: digital zero must be IN EFFECT before the
-     first buffer renders, and it must be VERIFIED, not assumed. On Android a
-     volume write races the stream: zero lands late and the first buffers
-     play at full volume, then our own ramp reads as "fading down" — the
-     reported blast-then-fade. So: re-assert zero on every pre-play event,
-     and during the hold re-assert at 60fps; the frame the mixer finally
-     accepts the write is the frame the ramp may start climbing. */
-  function mkHoldZero(mk, ms) {
-    mkDisarm(mk);
-    mkVol.ramping = true;   /* deviceVol-style guards stay out while we hold */
-    var until = Date.now() + (ms || 700);
-    (function tick() {
-      try { mk.volume = 0; } catch (err) {}
-      if (Date.now() < until) {
-        requestAnimationFrame(tick);
-      } else {
-        mkVol.ramping = false;
-        mkRamp(mk);   /* zero is now definitely in effect: climb */
-      }
-    })();
-  }
-  function mkRamp(mk) {
-    if (mkVol.raf) cancelAnimationFrame(mkVol.raf);
-    mkVol.ramping = true;
-    var acc = 0, prev = performance.now(), last = 0;
-    (function step(rafNow) {
-      var now = (typeof rafNow === "number" && rafNow > 0) ? rafNow : performance.now();
-      var dt = now - prev; prev = now;
-      if (!(dt > 0)) dt = 0;
-      if (dt > MK_MAX_DT) dt = MK_MAX_DT;
-      acc += dt;
-      var t = acc / MK_FADE_MS;
-      var v = (t >= 1) ? 1 : Math.pow(10, -MK_FADE_DB * (1 - t) / 20);
-      if (v < last) v = last;            /* monotonic */
-      last = v;
-      try { mk.volume = v; } catch (err) {}
-      if (t < 1) mkVol.raf = requestAnimationFrame(step);
-      else { mkVol.raf = 0; mkVol.ramping = false; try { mk.volume = 1; } catch (err) {} }
-    })(performance.now());
-  }
-  /* Android blast guard: zero the volume BEFORE any buffer can start — at
-     hook time, on a play intent, and on a track change — then hold zero and
-     ramp. Setting the volume inside the 'playing' event is too late: the
-     first buffers are already audible. */
-  function mkArm(mk) {
-    if (!MK_MOBILE || !mk) return;
-    try { mk.volume = 0; } catch (err) {}
-    mkVol.pending = true;
-    mkVol.ramping = false;
-    mkDisarm(mk);
-  }
-  function mkSchedule(mk, cold) {
-    if (!MK_MOBILE || !mkVol.pending || mkVol.timer) return;
-    mkHoldZero(mk, MK_ANDROID && cold ? 650 : 260);   /* timers deprecated: the hold IS the scheduler */
-  }
-    /* Android cold start: the mixer queues volume writes for the first few
-       hundred ms of a new stream. The adaptive waiter is superseded by the
-       always-on hold in mkSchedule (kept as a comment for history). */
+  var playedOnce = false;   /* narrow-layout grid pin waits for the first real playback */
   setInterval(function () {
     var mk = music();
     if (mk && !mk.__m98ovHook) {
       mk.__m98ovHook = 1;
-      mkArm(mk);   /* the very first buffer must never see volume 1 */
       try {
-        mk.addEventListener("playbackStateDidChange", function (ev) {
+        mk.addEventListener("playbackStateDidChange", function () {
+          if (mk.isPlaying) playedOnce = true;
           fixOverlaps(); armJumpFix(800);
-          if (!MK_MOBILE) return;
-          var playing = mk.isPlaying;
-          if (playing) {
-            playedOnce = true;
-            if (!mkVol.wasPlaying) {
-              mkVol.everPlayed = mkVol.everPlayed || mkVol.wasPlaying;
-              /* The chart's concept, ported: hold digital zero through the
-                 mixer's lag window, then ramp. No blind timers. */
-              mkHoldZero(mk, MK_ANDROID && !mkVol.everPlayed ? 650 : 260);
-            }
-            mkVol.everPlayed = true; mkVol.wasPlaying = true;
-          } else {
-            mkVol.wasPlaying = false;
-            mkDisarm(mk);
-          }
         });
         mk.addEventListener("mediaItemDidChange", function () {
           fixOverlaps(); armJumpFix(800);
           holdControls(1500);   /* a natural track advance re-renders the bar too */
           scrub.active = false; setScrubbing(scrub.el, false);
           releaseNatively();   /* Apple re-lays the bar; our stale pins must not fight it */
-          if (!MK_MOBILE) return;
-          mkVol.everPlayed = false;   /* new stream: the next onset is cold */
-          mkArm(mk);   /* next track's buffers start at zero too */
-          if (mk.isPlaying) mkHoldZero(mk, MK_ANDROID ? 650 : 260);
         });
       } catch (err) {}
-    } else if (mk && MK_MOBILE && mkVol.pending && mk.isPlaying && !mkVol.timer && !mkVol.ramping) {
-      mkHoldZero(mk, MK_ANDROID ? 650 : 260);   /* failsafe: a missed state event must not mute forever */
     }
   }, 200);
 
@@ -906,15 +817,11 @@
     Promise.resolve(goToIndex(mk, 0)).catch(function () {});
   }
 
-  /* Transport play buttons (initial/loading variant big play, active play)
-     had no gesture hook: the first play() after them started buffers at
-     volume 1 — the remaining Android blast. Arm before Apple handles it.
-     Song embeds have no tracklist, so this is also the ONLY gesture hook
-     they ever get: the first press rides the initial -> active controls
-     swap, and Apple lands the active transport a couple of px lower (row
-     margins + progress bar remount), which reads as the whole bar hopping
-     down. First press gets a one-shot alignment baseline plus a short
-     position hold, exactly what onTrackGesture gives album embeds. */
+  /* Transport play buttons (initial/loading variant big play, active play).
+     Song embeds have no tracklist, so this is the only gesture hook they get:
+     it exists so the changeToMediaItem patch is installed before Apple's own
+     handler runs. No volume writes here (editorial-111: the MusicKit path
+     must stay native — see the mobile onset note). */
   function onTransportPlayGesture(ev) {
     if (ev.type === "keydown" && ev.key !== "Enter" && ev.key !== " ") return;
     var path = ev.composedPath ? ev.composedPath() : [];
@@ -925,7 +832,7 @@
           n.classList.contains("play-initial") ||
           (n.tagName || "").toUpperCase() === "EMBED-AUDIO-PLAY-INITIAL")) {
         var mk0 = music();
-        if (mk0) { mkArm(mk0); mkSchedule(mk0, !mkVol.everPlayed); }
+        if (mk0) patch(mk0);
         return;
       }
     }
