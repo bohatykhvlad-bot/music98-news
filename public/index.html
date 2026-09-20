@@ -136,7 +136,7 @@ main{position:relative;z-index:1}
 #tab-releases .rail{padding-right:66px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
-.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;overscroll-behavior-x:contain;padding:4px 0 4px;scrollbar-width:none;-ms-overflow-style:none}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;overscroll-behavior-x:contain;padding:0;scrollbar-width:none;-ms-overflow-style:none}
 .rail::-webkit-scrollbar{display:none}
 .rail>*{scroll-snap-align:none}
 @media (max-width:900px){ .rail{--cardw:255px} }
@@ -241,7 +241,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 /* ---------- subscribe ---------- */
 .subscribe{
   position:relative;
-  margin:40px 0 0;
+  margin:18px 0 0;
   border-top:1px solid var(--line);
   /* slightly grey textured layer for the glass to frost */
   background:
