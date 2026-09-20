@@ -252,10 +252,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .subscribe::before{
   content:"";
   position:absolute;
-  left:max(14px, calc(50% - 590px));
-  right:max(14px, calc(50% - 590px));
-  top:14px;
-  bottom:14px;
+  left:max(20px, calc(50% - 590px));
+  right:max(20px, calc(50% - 590px));
+  top:20px;
+  bottom:20px;
   border-radius:22px;
   background:rgba(255,255,255,.6);
   border:1px solid rgba(255,255,255,.85);
@@ -264,11 +264,12 @@ body.editmode .card .tag{top:auto;bottom:10px}
   box-shadow:0 18px 44px rgba(18,28,32,.10), 0 1px 0 rgba(255,255,255,.9) inset;
   pointer-events:none;
 }
-.sub-in{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:46px 20px;text-align:center}
+.sub-in{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:44px 24px;text-align:center}
 .sub-in h2{margin:0 0 8px;font-size:26px;letter-spacing:-.02em}
 .sub-in p{margin:0 0 20px;color:var(--muted);font-size:14.5px}
-.sub-in form{display:flex;gap:10px;max-width:440px;margin:0 auto}
-.sub-in input{border-radius:999px}
+.sub-in form{display:flex;gap:12px;max-width:460px;margin:0 auto}
+.sub-in input{border-radius:999px;height:43px;padding:0 18px;background:rgba(255,255,255,.75)}
+.sub-in .btn{height:43px;padding:0 24px;display:inline-flex;align-items:center;justify-content:center}
 .btn{border:1px solid var(--line);background:var(--bg2);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
 .btn:hover{border-color:var(--accent-dim);color:var(--acc2)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#03282b}
