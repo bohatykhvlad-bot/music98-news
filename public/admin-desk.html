@@ -96,7 +96,9 @@ a{color:var(--text)}
 .cropbar-row.modes{justify-content:center}
 .cropbar-row.replace{justify-content:center}
 .cropbar input[type=range]{flex:1;min-width:100px}
-.cropbar .btn{padding:5px 10px;font-size:12px}
+.cropbar .btn{padding:5px 10px;font-size:12px;flex:none}
+.cropbar-row.zoom{flex-wrap:nowrap}
+@media (max-width:640px){ .cropbar{padding:10px 12px} .cropbar-row{gap:8px} }
 @media (max-width:900px){ .crop-row{grid-template-columns:1fr} }
 .composer{min-height:380px;padding:12px 14px 28px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:15px;line-height:1.55;outline:none}
 .composer:empty:before{content:attr(data-placeholder);color:var(--muted)}
@@ -950,11 +952,30 @@ function paintMini(){
   };
   paint("miniImg", lockFx(), crop.cardY, crop.cardZoom||1);
 }
+/* The slider's right end IS the zoom cap (owner request): the track maps
+   [1..cap] of the CURRENT focus, so dragging to the end always lands exactly
+   on "the image covers the stage on both axes" and the thumb never stops
+   short. focus/mode changes re-sync the max and clamp a now-over-the-cap
+   zoom in the same pass. */
+function syncZoomUI(){
+  const s = $("#zoom");
+  const cap = Math.max(1.05, Math.round(zoomCap() * 100) / 100);
+  s.min = 1;
+  s.max = cap;
+  const z = zoomNow();
+  if(z > cap){
+    if(cropMode === "card") crop.cardZoom = cap; else crop.zoom = cap;
+    s.value = cap;
+    return true;   /* clamped: caller re-layouts once with the new zoom */
+  }
+  s.value = z;
+  return false;
+}
 function layoutCrop(){
   const stage = $("#stage");
   const img = $("#stageImg");
   if(!coverSrc || !img.naturalWidth){ paintMini(); return; }
-  if(cropMode === "card"){ fitCover(img, lockFx(), crop.cardY, crop.cardZoom||1); paintMini(); return; }
+  if(cropMode === "card"){ fitCover(img, lockFx(), crop.cardY, crop.cardZoom||1); paintMini(); if(syncZoomUI()) layoutCrop(); return; }
   const sw = stage.clientWidth, sh = stage.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
   const z = crop.zoom || 1;
@@ -970,6 +991,7 @@ function layoutCrop(){
   img.style.height = dh+"px";
   img.style.transform = "translate("+left+"px,"+top+"px)";
   paintMini();
+  if(syncZoomUI()) layoutCrop();
 }
 function setCover(src, pos, zoom, cardY){
   coverSrc = src;
