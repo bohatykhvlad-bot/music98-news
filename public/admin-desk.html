@@ -76,7 +76,7 @@ a{color:var(--text)}
 }
 .toolbar .tsep{width:1px;height:18px;background:var(--line);margin:0 4px}
 .stage-wrap{border:1px dashed var(--line);border-radius:12px;background:#111;overflow:hidden}
-.crop-row{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:10px;align-items:start;max-width:640px}
+.crop-row{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:10px;align-items:start}
 .stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;cursor:default;background:#111;touch-action:none}
 .stage.hot{outline:2px solid var(--acc2);outline-offset:-2px}
 .stage:active,.stage.drag{cursor:default}
@@ -93,11 +93,9 @@ a{color:var(--text)}
 .mini .muted{text-align:center;font-size:11px}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
 .cropbar-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.cropbar-row.modes{justify-content:center}
 .cropbar-row.replace{justify-content:center}
-.cropbar input[type=range]{flex:1;min-width:100px}
+.cropbar input[type=range]{flex:0 1 220px;min-width:140px}
 .cropbar .btn{padding:5px 10px;font-size:12px;flex:none}
-.cropbar-row.zoom{flex-wrap:nowrap}
 @media (max-width:640px){ .cropbar{padding:10px 12px} .cropbar-row{gap:8px} }
 @media (max-width:900px){ .crop-row{grid-template-columns:1fr} }
 .composer{min-height:380px;padding:12px 14px 28px;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:15px;line-height:1.55;outline:none}
@@ -199,12 +197,10 @@ a{color:var(--text)}
             <p class="muted hint" id="coverHint">Drop a photo</p>
           </div>
           <div class="cropbar">
-            <div class="cropbar-row zoom">
+            <div class="cropbar-row">
               <button class="btn ghost" type="button" id="zoomOut" aria-label="Zoom out">−</button>
-              <input id="zoom" type="range" min="1" max="8" step="0.01" value="1">
+              <input id="zoom" type="range" min="1" max="6" step="0.01" value="1">
               <button class="btn ghost" type="button" id="zoomIn" aria-label="Zoom in">+</button>
-            </div>
-            <div class="cropbar-row modes">
               <button class="btn ghost" type="button" id="centerCover">Center</button>
               <button class="btn primary" type="button" id="modeMain" title="Full crop, both axes">Main</button>
               <button class="btn ghost" type="button" id="modeCard" title="Square card: vertical only">Card</button>
@@ -903,7 +899,7 @@ function zoomCap(){
   const need = (px, f) => 2 * Math.max(f, 1 - f) * px;
   const zw = sw ? need(iw, fx) / sw : 1;
   const zh = sh ? need(ih, fy) / sh : 1;
-  return Math.min(8, Math.max(3, Math.max(zw, zh) * 1.02));
+  return Math.min(6, Math.max(1.5, Math.max(zw, zh) * 1.04));
 }
 function setZoom(z){
   const cap = zoomCap();
@@ -1000,7 +996,7 @@ function setCover(src, pos, zoom, cardY){
   const cy = Number(cardY);
   crop.cardY = (cy >= 0 && cy <= 1) ? cy : parsed.y;
   const cz = Number(arguments[4]);
-  crop.cardZoom = (cz >= 1 && cz <= 8) ? cz : (crop.zoom||1);
+  crop.cardZoom = (cz >= 1 && cz <= 6) ? cz : (crop.zoom||1);
   const lxRaw = arguments[5];
   const lx = (lxRaw == null || lxRaw === "") ? NaN : Number(lxRaw);
   crop.lockX = (lx >= 0 && lx <= 1) ? lx : null;
@@ -1151,8 +1147,8 @@ stage.addEventListener("drop", e=>{
 });
 $("#photo").onchange = e=> readPhoto(e.target.files[0], src=>{ crop.dirty = true; setCover(src); e.target.value=""; });
 $("#zoom").oninput = ()=> setZoom($("#zoom").value);
-$("#zoomIn").onclick = ()=> setZoom(zoomNow()+0.12);
-$("#zoomOut").onclick = ()=> setZoom(zoomNow()-0.12);
+$("#zoomIn").onclick = ()=> setZoom(zoomNow() + Math.max(0.06, (zoomCap()-1)/12));
+$("#zoomOut").onclick = ()=> setZoom(zoomNow() - Math.max(0.06, (zoomCap()-1)/12));
 $("#centerCover").onclick = ()=>{ if(cropMode === "card"){ crop.cardY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; } crop.dirty = true; layoutCrop(); };
 
 window.addEventListener("resize", layoutCrop);
