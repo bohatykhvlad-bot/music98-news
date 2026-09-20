@@ -132,6 +132,8 @@ main{position:relative;z-index:1}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px}
 /* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
 .rail-wrap{position:relative;margin-top:2px;padding-right:66px}
+#tab-releases .rail-wrap{padding-right:0;margin-right:-22px}
+#tab-releases .rail{padding-right:66px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px + 7px)}
 .rail-wrap .rail-btn.next{right:-52px}
 .rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;overscroll-behavior-x:contain;padding:4px 0 10px;scrollbar-width:none;-ms-overflow-style:none}
