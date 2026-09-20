@@ -136,7 +136,8 @@ main{position:relative;z-index:1}
 #tab-releases .rail{padding-right:66px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
-.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;overscroll-behavior-x:contain;padding:0;scrollbar-width:none;-ms-overflow-style:none}
+#tab-releases .rail-wrap .rail-btn.next{right:22px}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:0;scrollbar-width:none;-ms-overflow-style:none}
 .rail::-webkit-scrollbar{display:none}
 .rail>*{scroll-snap-align:none}
 @media (max-width:900px){ .rail{--cardw:255px} }
@@ -144,11 +145,11 @@ main{position:relative;z-index:1}
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
   .rail-btn{display:none}
 }
-.rail-btn{position:absolute;top:calc(50% - 70px);z-index:5;width:52px;height:140px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .22s ease,color .18s ease,transform .18s ease;-webkit-tap-highlight-color:transparent;touch-action:none}
+.rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .22s ease,color .18s ease,transform .18s ease;-webkit-tap-highlight-color:transparent;touch-action:none}
 /* next is ALWAYS lit (owner spec); prev lights up once the rail has been
    scrolled away from the start and there is something to scroll back to */
 .rail-btn.next{opacity:1;pointer-events:auto}
-.rail-btn svg{width:20px;height:20px}
+.rail-btn svg{width:26px;height:26px}
 .rail-btn.prev{left:-14px}
 .rail-btn.next{right:-14px}
 .rail-wrap:hover .rail-btn.ok,.rail-btn.hold{opacity:1;pointer-events:auto}
@@ -567,9 +568,9 @@ textarea{resize:vertical;min-height:64px}
     <div class="hd"><h1 class="hd-t">Latest stories</h1></div>
     <div id="heroSlot"></div>
     <div class="rail-wrap">
-      <button class="rail-btn prev" id="newsPrev" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button class="rail-btn prev" id="newsPrev" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 4l-9 8 9 8"/></svg></button>
       <div class="rail grid-rail" id="newsGrid" tabindex="0"></div>
-      <button class="rail-btn next" id="newsNext" aria-label="Scroll forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="rail-btn next" id="newsNext" aria-label="Scroll forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l9 8-9 8"/></svg></button>
     </div>
     <div class="empty" id="newsEmpty" hidden>Nothing found for your query. Try another search.</div>
   </section>
@@ -577,9 +578,9 @@ textarea{resize:vertical;min-height:64px}
   <section class="tab" id="tab-releases">
     <div class="hd"><h1 class="hd-t">Albums, EPs & singles</h1></div>
     <div class="rail-wrap">
-      <button class="rail-btn prev" id="relPrev" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <button class="rail-btn prev" id="relPrev" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 4l-9 8 9 8"/></svg></button>
       <div class="rail grid-rail" id="relGrid" tabindex="0"></div>
-      <button class="rail-btn next" id="relNext" aria-label="Scroll forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="rail-btn next" id="relNext" aria-label="Scroll forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l9 8-9 8"/></svg></button>
     </div>
     <div class="empty" id="relEmpty" hidden>Nothing found for your query.</div>
   </section>
