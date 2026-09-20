@@ -2028,7 +2028,11 @@ function wireRail(gridSel, prevSel, nextSel){
     drag.raf = requestAnimationFrame(tick);
   };
   rail.addEventListener("pointerdown", e=>{
-    if(e.target.closest(".rail-btn, a, button")) return;   /* buttons/links keep native behavior */
+    /* cards ARE <a> links, so links must stay draggable - only the arrow
+       pills are excluded (they have their own hold-to-scroll logic).
+       A tap (no movement) still produces a native click and opens the post. */
+    if(e.target.closest(".rail-btn")) return;
+    if(e.button !== undefined && e.button !== 0) return;  /* left button / touch / pen only */
     drag.on = true; drag.id = e.pointerId; drag.moved = false;
     drag.x = e.clientX; drag.sl = rail.scrollLeft;
     drag.vx = 0; drag.lx = e.clientX; drag.lt = performance.now();
