@@ -219,6 +219,12 @@ body.editmode .card .tag{top:auto;bottom:10px}
    center, so the expanded plate would sit 4px off the neighbor-rows' axis */
 .chart-row.playing .cmid{background:rgba(255,255,255,.92);border-color:rgba(15,60,64,.10);padding:4px var(--pin);gap:var(--pin)}
 .rplay{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;transition:background .22s cubic-bezier(.34,1.4,.64,1),color .22s ease,border-color .22s ease,transform .28s cubic-bezier(.34,1.56,.64,1)}
+/* pause->play sequencing (owner): the accent must NOT evaporate while the
+   plate is folding - the morph to the play triangle rides at full size/accent,
+   and the visual shrink (accent, fill) lands only at the very end, once the
+   plate has mostly closed. .accent-hold keeps the playing look; JS removes
+   it with a delay; transitions below ride out the last 0.3s. */
+.chart-row.accent-hold .rplay{background:var(--accent);border-color:transparent;color:#03282b}
 .rplay svg{width:24px;height:24px}
 .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.07)}
 .chart-row.playing .rplay{background:var(--accent);border-color:transparent;color:#03282b}
@@ -1332,6 +1338,16 @@ function markRows(){
     row.classList.toggle("playing", live);
     const ic = row.querySelector(".rplay");
     if(ic) ic.innerHTML = live ? ICON_PAUSE : ICON_PLAY;
+    /* pause: hold the accent until the fold is nearly done, then release it -
+       the icon settles into the small play circle only at the very end.
+       play/resume: drop the hold immediately (no double-transition). */
+    row.classList.remove("accent-hold");
+    let holdT = row._accentT;
+    if(holdT){ clearTimeout(holdT); row._accentT = 0; }
+    if(!live && on !== false){
+      row.classList.add("accent-hold");
+      row._accentT = setTimeout(()=>{ row.classList.remove("accent-hold"); row._accentT = 0; }, 320);
+    }
     const cm = row.querySelector(".cmid");
     if(cm){
       const narrow = window.matchMedia("(max-width: 640px)").matches;
