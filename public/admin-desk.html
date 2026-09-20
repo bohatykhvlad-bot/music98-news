@@ -89,15 +89,19 @@ a{color:var(--text)}
    the owner asked for a side-cropped view at main height, not a full square.
    Exact height is synced from JS in paintMini (stage width * 9/16). */
 .mini{display:flex;flex-direction:column;gap:8px}
-.mini-frame{position:relative;width:70%;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize}
+.mini-frame{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize}
 .mini-frame.active{outline:2px solid var(--acc2);outline-offset:2px}
-.stage.cardmode{cursor:ns-resize}
+.stage.cardmode{cursor:ns-resize;background:repeating-linear-gradient(45deg,#0c1011 0 12px,#0a0d0e 12px 24px)}
+/* card crop window: a centered square INSIDE the stage - the stage keeps the
+   main height, the square is cut to it, sides are letterboxed */
+.cardwin{position:absolute;left:50%;top:0;height:100%;aspect-ratio:1/1;transform:translateX(-50%);overflow:hidden;background:#0d1112}
+.stage:not(.cardmode) .cardwin{left:0;top:0;width:100%;height:100%;aspect-ratio:auto;transform:none}
 .stage.cardmode.free{cursor:move}
 /* axis pill on the card stage: one glass capsule with an up+down arrow pair.
    Click it -> it turns into a four-way cross (move = free, horizontal too). */
-.axis-pill{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:6;height:34px;min-width:56px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.78);backdrop-filter:blur(10px) saturate(170%);-webkit-backdrop-filter:blur(10px) saturate(170%);box-shadow:0 3px 14px rgba(15,60,64,.16);display:none;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#20343a;transition:transform .16s ease,background .16s ease;-webkit-tap-highlight-color:transparent}
+.axis-pill{position:absolute;right:14px;bottom:14px;z-index:6;height:34px;min-width:56px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.78);backdrop-filter:blur(10px) saturate(170%);-webkit-backdrop-filter:blur(10px) saturate(170%);box-shadow:0 3px 14px rgba(15,60,64,.16);display:none;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#20343a;transition:transform .16s ease,background .16s ease;-webkit-tap-highlight-color:transparent}
 .stage.cardmode .axis-pill{display:flex}
-.axis-pill:hover{transform:translateX(-50%) scale(1.05)}
+.axis-pill:hover{transform:scale(1.05)}
 .axis-pill svg{width:20px;height:20px;display:block}
 .axis-pill .ic-cross{display:none}
 .axis-pill.free .ic-updown{display:none}
@@ -222,8 +226,10 @@ a{color:var(--text)}
       <label>Cover</label>        <div class="crop-row">
         <div class="stage-wrap">
           <div class="stage" id="stage">
-            <img id="stageImg" class="hide" alt="">
-            <div class="grid" id="grid"></div>
+            <div class="cardwin" id="cardwin">
+              <img id="stageImg" class="hide" alt="">
+              <div class="grid" id="grid"></div>
+            </div>
             <p class="muted hint" id="coverHint">Drop a photo</p>
             <button class="axis-pill" id="axisPill" type="button" title="Vertical only. Click to unlock horizontal">
               <svg class="ic-updown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M12 3l-4 4M12 3l4 4M12 21l-4-4M12 21l4-4"/></svg>
@@ -927,10 +933,10 @@ function zoomNow(){
   return cropMode === "card" ? (crop.cardZoom||1) : (crop.zoom||1);
 }
 function zoomCap(){
-  const stage = $("#stage");
   const img = $("#stageImg");
-  if(!coverSrc || !img || !img.naturalWidth || !stage.clientWidth) return 3;
-  const sw = stage.clientWidth, sh = stage.clientHeight;
+  const box = img && img.parentElement;
+  if(!coverSrc || !img || !img.naturalWidth || !box || !box.clientWidth) return 3;
+  const sw = box.clientWidth, sh = box.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
   const fx = (cropMode === "card") ? cardFx() : (Number.isFinite(crop.x) ? crop.x : 0.5);
   const fy = (cropMode === "card") ? (Number.isFinite(crop.cardY) ? crop.cardY : 0.5) : (Number.isFinite(crop.y) ? crop.y : 0.5);
@@ -946,9 +952,9 @@ function setZoom(z){
     /* card zoom pivots around the CURRENT view center: recompute which image
        point sits at the frame center before resizing and anchor the new zoom
        on that same point - otherwise the view drifts toward the top edge */
-    const stage = $("#stage"), img = $("#stageImg");
-    if(img.naturalWidth && stage.clientWidth){
-      const sw = stage.clientWidth, sh = stage.clientHeight;
+    const img = $("#stageImg"), box = img.parentElement;
+    if(img.naturalWidth && box && box.clientWidth){
+      const sw = box.clientWidth, sh = box.clientHeight;
       const iw = img.naturalWidth, ih = img.naturalHeight;
       const base = Math.max(sw/iw, sh/ih);
       const dhOld = ih * base * (crop.cardZoom||1);
@@ -984,6 +990,7 @@ function syncAxisPill(){
   pill.classList.toggle("free", !!crop.cardFree);
   $("#stage").classList.toggle("free", cropMode === "card" && !!crop.cardFree);
 }
+$("#axisPill").addEventListener("pointerdown", e=>e.stopPropagation());
 $("#axisPill").addEventListener("click", e=>{
   e.stopPropagation();
   if(cropMode !== "card") setCropMode("card");
@@ -997,7 +1004,7 @@ function setCropMode(m){
   cropMode = (m === "card") ? "card" : "main";
   const stage = $("#stage");
   stage.classList.toggle("cardmode", cropMode === "card");
-  stage.style.aspectRatio = cropMode === "card" ? "1 / 1" : (crop.aspect === "1/1" ? "1 / 1" : "16 / 9");
+  if(cropMode === "main") stage.style.aspectRatio = crop.aspect === "1/1" ? "1 / 1" : "16 / 9";
   $("#miniFrame").classList.toggle("active", cropMode === "card");
   $("#modeMain").classList.toggle("primary", cropMode === "main");
   $("#modeCard").classList.toggle("primary", cropMode === "card");
@@ -1010,9 +1017,13 @@ function setCropMode(m){
 function paintMini(){
   const frame = $("#miniFrame");
   if(frame){
-    /* keep the preview at the main stage's 16/9 height, sides cropped */
+    /* owner mockup: card preview ~3/4 of the stage height, sides cropped */
     const st = $("#stage");
-    if(st && st.clientWidth) frame.style.height = Math.round(st.clientWidth * 9 / 16) + "px";
+    if(st && st.clientHeight){
+      const h = Math.round(st.clientHeight * 0.76);
+      frame.style.height = h + "px";
+      frame.style.width = Math.min(280, Math.round(h * 0.78)) + "px";
+    }
   }
   const paint = (id, fx, fy, fz)=>{
     const m = $("#"+id);
@@ -1266,6 +1277,7 @@ stage.addEventListener("wheel", e=>{
 }, {passive:false});
 
 stage.addEventListener("pointerdown", e=>{
+  if(e.target.closest && e.target.closest(".axis-pill")) return;
   if(!coverSrc) return;
   e.preventDefault();
   stage.setPointerCapture(e.pointerId);
