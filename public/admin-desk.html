@@ -100,6 +100,8 @@ a{color:var(--text)}
 .cropbar input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:29px;height:29px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
 .cropbar input[type=range]::-moz-range-thumb{width:25px;height:25px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer}
 .cropbar input[type=range]::-moz-range-track{height:29px;border-radius:999px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%))}
+/* no photo yet: zoom controls are inert, so show them locked */
+.cropbar input[type=range]:disabled,.cropbar .btn:disabled{opacity:.4;cursor:not-allowed}
 .cropbar .btn{padding:5px 10px;font-size:12px;flex:none}
 @media (max-width:640px){ .cropbar{padding:10px 12px} .cropbar-row{gap:8px} }
 @media (max-width:900px){ .crop-row{grid-template-columns:1fr} }
@@ -974,7 +976,19 @@ function syncZoomUI(){
   s.style.setProperty("--fill", (Math.max(0, Math.min(1, (v - 1) / (cap - 1))) * 100).toFixed(1) + "%");
   return clamped;
 }
+function syncZoomEnabled(){
+  /* without a photo the zoom has nothing to act on: keep the slider pinned
+     at its very start and disable it (with +/-) until a cover is loaded */
+  const off = !coverSrc;
+  ["#zoom","#zoomOut","#zoomIn"].forEach(sel=>{ const el=$(sel); if(el) el.disabled = off; });
+  if(off){
+    const s = $("#zoom");
+    s.value = 1;
+    s.style.setProperty("--fill", "0%");
+  }
+}
 function layoutCrop(){
+  syncZoomEnabled();
   const stage = $("#stage");
   const img = $("#stageImg");
   if(!coverSrc || !img.naturalWidth){ paintMini(); return; }
