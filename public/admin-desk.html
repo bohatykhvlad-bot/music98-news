@@ -94,12 +94,13 @@ a{color:var(--text)}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
 .cropbar-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 /* slider rides the same height as its buttons: the input IS a 29px pill
-   (button = 17.4px line + 2x5px pad + hairline border = 28.7px), and the
-   thumb fills the strip's full height as a circle */
-.cropbar input[type=range]{-webkit-appearance:none;appearance:none;flex:1 1 240px;min-width:160px;max-width:380px;height:29px;min-height:0;padding:0;margin:0;border:0;border-radius:999px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%));outline:none}
+   (button = 17.4px line + 2x5px pad + hairline border = 28.7px), the thumb
+   fills the strip's full height as a circle; no fill - the thumb alone
+   shows the value (a %-fill can never match the thumb's inset travel) */
+.cropbar input[type=range]{-webkit-appearance:none;appearance:none;flex:1 1 240px;min-width:160px;max-width:380px;height:29px;min-height:0;padding:0;margin:0;border:0;border-radius:999px;background:var(--line);outline:none}
 .cropbar input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:29px;height:29px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
 .cropbar input[type=range]::-moz-range-thumb{width:25px;height:25px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer}
-.cropbar input[type=range]::-moz-range-track{height:29px;border-radius:999px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%))}
+.cropbar input[type=range]::-moz-range-track{height:29px;border-radius:999px;background:var(--line)}
 /* no photo yet: zoom controls are inert, so show them locked */
 .cropbar input[type=range]:disabled,.cropbar .btn:disabled{opacity:.4;cursor:not-allowed}
 .cropbar .btn{padding:5px 10px;font-size:12px;flex:none}
@@ -971,9 +972,6 @@ function syncZoomUI(){
     clamped = true;   /* caller re-layouts once with the new zoom */
   }
   s.value = v;
-  /* fill the track exactly edge-to-edge: at min and max the gradient touches
-     both ends, so the slider never looks like it stops short */
-  s.style.setProperty("--fill", (Math.max(0, Math.min(1, (v - 1) / (cap - 1))) * 100).toFixed(1) + "%");
   return clamped;
 }
 function syncZoomEnabled(){
@@ -984,7 +982,6 @@ function syncZoomEnabled(){
   if(off){
     const s = $("#zoom");
     s.value = 1;
-    s.style.setProperty("--fill", "0%");
   }
 }
 function layoutCrop(){
