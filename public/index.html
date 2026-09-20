@@ -149,15 +149,21 @@ main{position:relative;z-index:1}
   .rail-btn{display:none}
 }
 .rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .22s ease,color .18s ease;-webkit-tap-highlight-color:transparent;touch-action:none}
-/* next is ALWAYS lit (owner spec); prev lights up once the rail has been
-   scrolled away from the start and there is something to scroll back to */
-.rail-btn.next{opacity:1;pointer-events:auto}
+/* visibility model (owner spec): next is lit whenever there is something to
+   the right (syncRail toggles .ok), prev lights up once scrolled away from
+   the start. At the very end next goes dark - nothing left to scroll to. */
+.rail-btn.ok{opacity:1;pointer-events:auto}
 /* chart-play principle: the PILL never transforms - hover/press feedback
    scales only the chevron (centered icon, symmetric path), so the capsule
    cannot drift sideways on press */
 .rail-btn svg{width:26px;height:26px;display:block;margin-left:.21px;transform-origin:center;transition:transform .18s cubic-bezier(.34,1.3,.64,1)}
-.rail-btn.ok:hover{color:var(--text)}
-.rail-btn.ok:hover svg{transform:scale(1.14)}
+/* darken the chevron ONLY while genuinely hovering/holding: bare :hover rules
+   latch on touch (a tap leaves the hover state), which read as a stuck black
+   arrow. Touch feedback goes through .hold only. */
+@media (hover:hover) and (pointer:fine){
+  .rail-btn.ok:hover{color:var(--text)}
+  .rail-btn.ok:hover svg{transform:scale(1.14)}
+}
 .rail-btn.hold{color:var(--text)}
 .rail-btn.hold svg{transform:scale(1.18)}
 .rail-btn:active svg{transform:scale(.9)}
