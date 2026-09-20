@@ -93,10 +93,13 @@ a{color:var(--text)}
 .mini .muted{text-align:center;font-size:11px}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
 .cropbar-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.cropbar input[type=range]{-webkit-appearance:none;appearance:none;flex:1 1 240px;min-width:160px;max-width:380px;height:6px;border-radius:999px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%));outline:none}
-.cropbar input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
-.cropbar input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer}
-.cropbar input[type=range]::-moz-range-track{height:6px;border-radius:999px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%))}
+/* slider rides the same height as its buttons: the input IS a 29px pill
+   (button = 17.4px line + 2x5px pad + hairline border = 28.7px), and the
+   thumb fills the strip's full height as a circle */
+.cropbar input[type=range]{-webkit-appearance:none;appearance:none;flex:1 1 240px;min-width:160px;max-width:380px;height:29px;min-height:0;padding:0;margin:0;border:0;border-radius:999px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%));outline:none}
+.cropbar input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:29px;height:29px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
+.cropbar input[type=range]::-moz-range-thumb{width:25px;height:25px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer}
+.cropbar input[type=range]::-moz-range-track{height:29px;border-radius:999px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%))}
 .cropbar .btn{padding:5px 10px;font-size:12px;flex:none}
 @media (max-width:640px){ .cropbar{padding:10px 12px} .cropbar-row{gap:8px} }
 @media (max-width:900px){ .crop-row{grid-template-columns:1fr} }
