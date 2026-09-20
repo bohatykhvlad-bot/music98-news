@@ -1239,13 +1239,17 @@ function progTo(p, cur, dur){
 function markRows(){
   $$("#chartList .chart-row").forEach(row=>{
     const on = row.dataset.key === curKey;
-    row.classList.toggle("playing", on);
+    /* A user-paused row folds back to its resting look: the plate collapses,
+       the button loses its accent - only the play icon says "resume here".
+       Tapping the row again flips userPaused and the plate expands back. */
+    const live = on && !userPaused;
+    row.classList.toggle("playing", live);
     const ic = row.querySelector(".rplay");
-    if(ic) ic.innerHTML = (on && !userPaused) ? ICON_PAUSE : ICON_PLAY;
+    if(ic) ic.innerHTML = live ? ICON_PAUSE : ICON_PLAY;
     const cm = row.querySelector(".cmid");
     if(cm){
       const narrow = window.matchMedia("(max-width: 640px)").matches;
-      if(on && !narrow){
+      if(live && !narrow){
         requestAnimationFrame(()=>{
           const pe = row.querySelector(".pextra");
           if(!pe) return;
