@@ -316,7 +316,10 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 #articlePage .atext p{margin:0 0 16px}
 .aembed{margin:6px auto 22px;max-width:660px;background:transparent;border-radius:12px;overflow:visible}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
-.aembed.song{max-width:600px;width:100%;margin:6px auto 22px}
+/* Apple's song embed paints ~10px of dead space inside the iframe at the
+   bottom; -10px margin-bottom makes the visible gap equal top and bottom */
+.aembed.song{max-width:600px;width:100%;margin:6px auto 12px}
+.aembed.song iframe{margin-bottom:-10px;display:block}
 .aembed.song iframe{height:166px;max-width:100%}
 .yembed{margin:6px auto 22px;max-width:660px;width:100%}
 .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
