@@ -101,8 +101,11 @@ a{color:var(--text)}
 .cropbar input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:29px;height:29px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
 .cropbar input[type=range]::-moz-range-thumb{width:25px;height:25px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer}
 .cropbar input[type=range]::-moz-range-track{height:29px;border-radius:999px;background:var(--line)}
-/* no photo yet: zoom controls are inert, so show them locked */
-.cropbar input[type=range]:disabled,.cropbar .btn:disabled{opacity:.4;cursor:not-allowed}
+/* no photo yet: zoom controls are inert, so show them locked - and no
+   not-allowed/hand cursors anywhere on the strip */
+.cropbar input[type=range]:disabled,.cropbar .btn:disabled{opacity:.4;cursor:default}
+.cropbar input[type=range]:disabled::-webkit-slider-thumb{cursor:default}
+.cropbar input[type=range]:disabled::-moz-range-thumb{cursor:default}
 .cropbar .btn{padding:5px 10px;font-size:12px;flex:none}
 @media (max-width:640px){ .cropbar{padding:10px 12px} .cropbar-row{gap:8px} }
 @media (max-width:900px){ .crop-row{grid-template-columns:1fr} }
