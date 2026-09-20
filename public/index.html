@@ -511,8 +511,8 @@ textarea{resize:vertical;min-height:64px}
     align-items:center;
     transition:background .15s ease;
   }
-  .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0}
-  .delta.new{padding:3px 7px;font-size:9px;letter-spacing:.04em;text-indent:.04em;line-height:1}
+  .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0;max-width:100%;overflow:hidden}
+  .delta.new{padding:3px 5px;font-size:8.5px;letter-spacing:.03em;text-indent:.03em;line-height:1;max-width:28px;box-sizing:border-box}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
   .delta.new{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
