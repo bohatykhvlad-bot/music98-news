@@ -22,7 +22,18 @@ export async function onRequest({ request, env }) {
     let payload = {};
     try { payload = await request.json(); } catch { payload = {}; }
     if (!Array.isArray(payload.posts)) return json({ error: "posts_required" }, 400);
-    const desk = await readDesk(env, request);
+    /* wipe guard: an empty list is only accepted with an explicit flag.
+      A buggy/partial client used to be able to erase the whole desk with
+      one POST - the owner lost all posts once because of that. */
+    if (payload.posts.length === 0 && payload.confirmEmpty !== true) {
+      return json({ error: "empty_posts_refused", hint: "Send confirmEmpty:true to deliberately wipe the desk." }, 409);
+    }
+    /* sanity guard: refuse mass deletion without an explicit flag too */
+    const current = await readDesk(env, request);
+    if (current.posts.length >= 3 && payload.posts.length <= Math.floor(current.posts.length / 3) && payload.confirmShrink !== true) {
+      return json({ error: "mass_delete_refused", current: current.posts.length, incoming: payload.posts.length, hint: "Send confirmShrink:true if this reduction is intentional." }, 409);
+    }
+    const desk = current;
     desk.posts = payload.posts;
     /* self-healing: if a client pushes old-style base64 covers, offload them
        to KV right here - desk.json in storage stays lean regardless of who
