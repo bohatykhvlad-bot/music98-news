@@ -603,7 +603,7 @@ function parseYouTube(raw){
   return {id, start: start||0};
 }
 function youtubeSrc(id, start){
-  let src = "https://www.youtube-nocookie.com/embed/"+id+"?rel=0&modestbranding=1&enablejsapi=1";
+  let src = "https://www.youtube-nocookie.com/embed/"+id+"?rel=0&modestbranding=1&enablejsapi=1&hl=en&cc_lang_pref=en";
   if(start) src += "&start="+start;
   return src;
 }
