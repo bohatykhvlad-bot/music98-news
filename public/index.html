@@ -148,26 +148,29 @@ main{position:relative;z-index:1}
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
   .rail-btn{display:none}
 }
-.rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .22s ease,color .18s ease;-webkit-tap-highlight-color:transparent;touch-action:none}
-/* visibility model (owner spec): next is lit whenever there is something to
-   the right (syncRail toggles .ok), prev lights up once scrolled away from
-   the start. At the very end next goes dark - nothing left to scroll to. */
-.rail-btn.ok{opacity:1;pointer-events:auto}
-/* chart-play principle: the PILL never transforms - hover/press feedback
-   scales only the chevron (centered icon, symmetric path), so the capsule
-   cannot drift sideways on press */
-.rail-btn svg{width:26px;height:26px;display:block;margin-left:.21px;transform-origin:center;transition:transform .18s cubic-bezier(.34,1.3,.64,1)}
+.rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;touch-action:none}
+/* visibility model (owner spec): the next pill is ALWAYS on screen (it anchors
+   the right edge); the prev pill appears only after scrolling away from the
+   start (.ok from syncRail). A pill with nowhere left to go dims its chevron
+   to a quarter - readable but clearly inactive. */
+.rail-btn.prev:not(.ok){opacity:0;pointer-events:none}
+.rail-btn svg{width:26px;height:26px;display:block;margin-left:.21px;transform-origin:center;transition:transform .18s cubic-bezier(.34,1.3,.64,1),opacity .2s ease}
+.rail-btn.next:not(.ok) svg{opacity:.25}
 /* darken the chevron ONLY while genuinely hovering/holding: bare :hover rules
    latch on touch (a tap leaves the hover state), which read as a stuck black
    arrow. Touch feedback goes through .hold only. */
 @media (hover:hover) and (pointer:fine){
-  .rail-btn.ok:hover{color:var(--text)}
-  .rail-btn.ok:hover svg{transform:scale(1.14)}
+  .rail-btn:hover{color:var(--text)}
+  .rail-btn:hover svg{transform:scale(1.14)}
 }
 .rail-btn.hold{color:var(--text)}
 .rail-btn.hold svg{transform:scale(1.18)}
 .rail-btn:active svg{transform:scale(.9)}
-@media (hover:none){ .rail-btn.ok{opacity:.9;pointer-events:auto} }
+/* native link/image drag hijacks the pointer after a few px and kills the JS
+   drag (the owner saw the URL ghost + a cyan drag outline on cards): nothing
+   inside a rail may start a native drag or a text selection */
+.rail{-webkit-user-select:none;user-select:none}
+.rail a,.rail img{-webkit-user-drag:none}
 .loadmore{display:flex;justify-content:center;margin:14px 0 0}
 .loadmore-btn{border:1px solid var(--line);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);border-radius:999px;padding:11px 22px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent}
 .loadmore-btn:hover{color:var(--text);border-color:var(--muted2)}
@@ -1355,7 +1358,7 @@ function markRows(){
     if(holdT){ clearTimeout(holdT); row._accentT = 0; }
     if(!live && on !== false){
       row.classList.add("accent-hold");
-      row._accentT = setTimeout(()=>{ row.classList.remove("accent-hold"); row._accentT = 0; }, 320);
+      row._accentT = setTimeout(()=>{ row.classList.remove("accent-hold"); row._accentT = 0; }, 450);
     }
     const cm = row.querySelector(".cmid");
     if(cm){
@@ -1983,15 +1986,18 @@ function wireRail(gridSel, prevSel, nextSel){
     if(!btn) return;
     btn.addEventListener("pointerdown", e=>{
       e.preventDefault();
-      btn.setPointerCapture(e.pointerId);
+      try{ btn.setPointerCapture(e.pointerId); }catch(_){}
       btn.classList.add("hold");
       rail._holding = true;
       hold.dir = dir; hold.v = 0; hold.t0 = performance.now();
       hold.raf = requestAnimationFrame(glide);
     });
     const release = ()=>{
-      if(!rail._holding) return;
+      /* ALWAYS drop the visual hold first: stopHold clears rail._holding when
+         the glide hit the rail edge on its own, and the early-return below used
+         to leave the .hold class latched - a stuck dark arrow */
       btn.classList.remove("hold");
+      if(!rail._holding) { cancelAnimationFrame(hold.raf); return; }
       cancelAnimationFrame(hold.raf);
       /* a quick tap = one card step; a long hold = inertia glide */
       const held = performance.now() - hold.t0;
@@ -2047,6 +2053,10 @@ function wireRail(gridSel, prevSel, nextSel){
     drag.vx = 0; drag.lx = e.clientX; drag.lt = performance.now();
     dragStop();
   });
+  /* native link/image drag used to hijack the pointer mid-drag: after ~5px
+     Chrome started its own drag (URL ghost + cyan outline) and our pointermove
+     stream died. Killing dragstart keeps the gesture ours. */
+  rail.addEventListener("dragstart", e=>{ e.preventDefault(); });
   rail.addEventListener("pointermove", e=>{
     if(!drag.on || e.pointerId !== drag.id) return;
     const dx = e.clientX - drag.x;
@@ -2173,6 +2183,9 @@ function setTab(t){
     s.classList.toggle("rise", on);
   });
   window.scrollTo(0, 0);
+  /* the newly shown rail had zero size while hidden - its .ok state is stale;
+     a frame later it has real geometry, so re-evaluate the arrows */
+  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); });
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{

@@ -5,6 +5,7 @@ import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
 import { onRequestGet as subscribers } from "./functions/api/subscribers.js";
 import { onRequestPost as broadcast } from "./functions/api/broadcast.js";
 import { onRequest as mail } from "./functions/api/mail.js";
+import { onRequestPost as photoUpload } from "./functions/api/photo.js";
 
 const APPLE_ALBUM = /^\/apple-embed\/([a-z]{2})\/album\/(\d+)$/;
 const PHOTO_FILE = /^\/photos\/([a-z0-9._-]+)\.(jpe?g|png|webp)$/;
@@ -157,6 +158,7 @@ export default {
     if (path === "/api/subscribers" && request.method === "GET") return subscribers(c);
     if (path === "/api/broadcast" && request.method === "POST") return broadcast(c);
     if (path === "/api/mail") return mail(c);
+    if (path === "/api/photo" && request.method === "POST") return photoUpload(c);
     if (path === "/m98desk" || path === "/m98desk.html") {
       const u = new URL("/admin-desk", request.url);
       return Response.redirect(u, 301);
