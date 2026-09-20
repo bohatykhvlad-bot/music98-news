@@ -1142,9 +1142,14 @@ function renderList(){
     const badge = st==="draft" ? "draft" : st==="scheduled" ? "sched" : "live";
     const badgeLabel = st==="draft" ? "Draft" : st==="scheduled" ? "Scheduled" : "Live";
     const when = st==="scheduled" && p.publishAt ? " · "+fmtWhen(p.publishAt) : (p.date ? " · "+esc(p.date) : "");
+    /* thumbnails show the crop the post actually carries (pos/zoom), not a
+       blind center fit - otherwise the list contradicts the live site */
+    const cpos = (p.cover && p.cover.pos) || "50% 50%";
+    const czoom = Math.min(6, Math.max(1, Number(p.cover && p.cover.zoom) || 1));
+    const cstyle = `object-position:${cpos}` + (czoom>1 ? `;transform:scale(${czoom});transform-origin:${cpos}` : "");
     const thumb = tiny
-      ? `<img src="${esc(tiny)}" alt="">`
-      : (src ? `<img data-thumb="${esc(p.id)}" alt="">` : `<div class="ph"></div>`);
+      ? `<img style="${cstyle}" src="${esc(tiny)}" alt="">`
+      : (src ? `<img data-thumb="${esc(p.id)}" style="${cstyle}" alt="">` : `<div class="ph"></div>`);
     return `
     <div class="item">
       ${thumb}
