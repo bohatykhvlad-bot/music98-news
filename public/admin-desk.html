@@ -147,11 +147,12 @@ a{color:var(--text)}
   background:#fff;color:#15181a;font-weight:700;font-size:18px;line-height:1;cursor:pointer
 }
 .composer .blk.sel{outline:2px solid var(--accent);outline-offset:2px}
-/* same bottom compensation as the public page: Apple paints ~10px dead strip
-   inside the song iframe; pull it up so the editor view matches the article */
+/* match the public page: song embed's bottom dead strip is clipped in a
+   rounded box (166 -> visible 150), album margins aligned to 16px */
 .composer .aembed{max-width:520px;width:100%;margin:12px auto 16px}
-.composer .aembed.song{max-width:420px;margin-bottom:10px}
-.composer .aembed.song iframe{height:166px;margin-bottom:-16px;display:block;position:relative;z-index:0}
+.composer .aembed.song{max-width:420px}
+.composer .aembed.song .songclip{height:150px;overflow:hidden;border-radius:10px}
+.composer .aembed.song iframe{height:166px;display:block;position:relative;z-index:0}
 .composer .blk .kill{z-index:7}
 .composer .blk-tools{z-index:7}
 .composer .aembed.album iframe{height:320px}
@@ -538,7 +539,8 @@ function appleBlock(kind, album, track){
   const song = kind==="song" || track;
   const h = song ? 166 : 320;
   const token = song ? ("song:"+album+":"+track) : ("album:"+album);
-  return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}">${blkChrome()}<iframe height="${h}" src="${esc(src)}" title="Apple Music" loading="eager"></iframe></figure>`;
+  const frame = `<iframe height="${h}" src="${esc(src)}" title="Apple Music" loading="eager"></iframe>`;
+  return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}">${blkChrome()}${song?`<span class="songclip">${frame}</span>`:frame}</figure>`;
 }
 function pcredFor(author, link){
   if(!author) return "";
