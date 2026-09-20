@@ -1980,6 +1980,59 @@ function wireRail(gridSel, prevSel, nextSel){
   rail.addEventListener("scroll", ()=> syncRail(gridSel), {passive:true});
   new MutationObserver(()=> syncRail(gridSel)).observe(rail, {childList:true});
   syncRail(gridSel);
+  /* drag the cards themselves: press + move = the rail follows the pointer,
+     release = momentum. A real click (no meaningful drag) still opens the
+     post - the click is suppressed only when the pointer actually moved. */
+  const drag = {on:false, id:0, x:0, sl:0, moved:false, vx:0, lx:0, lt:0, raf:0};
+  const dragStop = ()=>{ cancelAnimationFrame(drag.raf); drag.raf = 0; };
+  const momentum = ()=>{
+    drag.raf = 0;
+    if(Math.abs(drag.vx) < 0.3){ return; }
+    rail.style.scrollBehavior = "auto";
+    const tick = ()=>{
+      rail.scrollLeft -= drag.vx * 16.7;
+      drag.vx *= 0.94;
+      const max = rail.scrollWidth - rail.clientWidth - 1;
+      if(Math.abs(drag.vx) >= 0.3 && rail.scrollLeft > 0 && rail.scrollLeft < max){
+        drag.raf = requestAnimationFrame(tick);
+      }else{ rail.style.scrollBehavior = ""; }
+    };
+    drag.raf = requestAnimationFrame(tick);
+  };
+  rail.addEventListener("pointerdown", e=>{
+    if(e.target.closest(".rail-btn, a, button")) return;   /* buttons/links keep native behavior */
+    drag.on = true; drag.id = e.pointerId; drag.moved = false;
+    drag.x = e.clientX; drag.sl = rail.scrollLeft;
+    drag.vx = 0; drag.lx = e.clientX; drag.lt = performance.now();
+    dragStop();
+  });
+  rail.addEventListener("pointermove", e=>{
+    if(!drag.on || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x;
+    if(!drag.moved && Math.abs(dx) > 6){
+      drag.moved = true;
+      try{ rail.setPointerCapture(e.pointerId); }catch(_){}
+      rail.style.scrollBehavior = "auto";
+    }
+    if(!drag.moved) return;
+    const now = performance.now();
+    const dt = Math.max(8, now - drag.lt);
+    drag.vx = (e.clientX - drag.lx) / dt;   /* px per ms, signed with movement */
+    drag.lx = e.clientX; drag.lt = now;
+    rail.scrollLeft = drag.sl - dx;
+  });
+  const endDrag = e=>{
+    if(!drag.on || e.pointerId !== drag.id) return;
+    drag.on = false;
+    if(drag.moved){
+      rail.style.scrollBehavior = "";
+      momentum();
+      /* swallow the click that follows a real drag so the post does not open */
+      rail.addEventListener("click", ev=>{ ev.preventDefault(); ev.stopPropagation(); }, {capture:true, once:true});
+    }
+  };
+  rail.addEventListener("pointerup", endDrag);
+  rail.addEventListener("pointercancel", endDrag);
 }
 wireRail("#newsGrid", "#newsPrev", "#newsNext");
 wireRail("#relGrid", "#relPrev", "#relNext");
