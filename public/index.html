@@ -941,7 +941,7 @@ audio.setAttribute("webkit-playsinline", "");
 audio.crossOrigin = "anonymous";
 audio.muted = false;
 audio.defaultMuted = false;
-audio.volume = 1;         /* 100% of the device volume; Android ramps in, see volArm */
+audio.volume = 1;         /* 100% of the device volume; every start fades in from here, see volArm */
 const IS_ANDROID = /Android/i.test(navigator.userAgent);
 /* iOS gets the same onset guard as Android: the PC build never blasts because
    desktop browsers honour element volume instantly, mobile WebKit can hand
@@ -950,8 +950,10 @@ const IS_ANDROID = /Android/i.test(navigator.userAgent);
 const IS_IOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
   (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 const IS_MOBILE = IS_ANDROID || IS_IOS;
-let volPending = false, volRaf = 0, volTimer = 0, volRamping = false, volWarm = false;
-let outGain = null, gainOwns = false;   /* WebAudio gain node owns the mobile onset fade */
+let volPending = false, volRaf = 0, volRamping = false, volWarm = false;
+let volMuted = false;   /* our hard mute owns the element right now */
+let volLevel = 0;       /* last written fade level, 0..1 */
+let outGain = null, gainOwns = false;
 function gainZero(){
   if(!outGain || !actx || actx.state === "closed") return false;
   try{
@@ -964,93 +966,112 @@ function gainZero(){
 function gainSet(v){
   try{ if(outGain && actx && actx.state !== "closed") outGain.gain.value = v; }catch(e){}
 }
-/* The fade is shaped in dB, not in raw amplitude: equal loudness steps, so the
-   onset creeps in instead of stepping. Each frame is also slew-limited — a long
-   (janky) frame advances the fade by at most VOL_MAX_DT, which is what used to
-   leap the ramp straight to near-full volume and stay audible as a jump. */
-/* editorial-111: the "playing" event fires when the media element starts
-   feeding buffers, but on Android the element -> WebAudio route settles over
-   its first frames: before the route is live the element plays OUT LOUD -
-   the reported blast. The gain ramp alone could never cover that window.
-   Fix: keep the ELEMENT hard-muted (audio.muted, a fast OS path) while the
-   gain route settles, unmute on a 120ms floor, and only then let the gain
-   climb. No blast, and no 500ms silent hole. */
-const VOL_FADE_COLD = 460, VOL_FADE_WARM = 150, VOL_DB = 42, VOL_MAX_DT = 40, VOL_COLD_WAIT = 500;
-function volRamp(){
+/* Universal volume fader (owner request): every start rises along a smooth
+   dB curve - ~1s on a cold start, ~0.45s on resume - on EVERY platform, PC
+   included, and pause falls back down the same curve before the element
+   stops. The curve is shaped in dB (equal-loudness steps) and slew-limited
+   per rAF frame: a long (janky) frame advances the fade by at most
+   VOL_MAX_DT. It drives BOTH the WebAudio gain and the element volume, so
+   every possible output path gets the same curve.
+   The jump killer: the element starts HARD-MUTED (audio.muted, a fast OS
+   path an Android mixer cannot ignore) with the gain pinned at 0, and the
+   mute lifts only when the AudioContext is RUNNING - a running context means
+   the element -> graph route is live and the gain owns every sample, so
+   nothing can hand back first buffers at full volume. A failsafe window
+   lifts the mute anyway; by then the curve has already written a near-zero
+   element volume. Without WebAudio at all the mute holds over Android's
+   early volume-blind window instead. */
+const VOL_FADE_IN_COLD = 1000, VOL_FADE_IN_WARM = 450, VOL_FADE_OUT = 300;
+const VOL_DB = 60, VOL_MAX_DT = 40, VOL_UNMUTE_LATEST = 600, VOL_FALLBACK_WAIT = 500;
+function volWrite(v){
+  volLevel = v;
+  gainSet(v);
+  try{ audio.volume = v; }catch(e){}
+}
+function volUnmute(acc){
+  if(!volMuted) return;
+  const ready = gainOwns
+    ? ((actx && actx.state === "running") || acc >= VOL_UNMUTE_LATEST)
+    : (!IS_ANDROID || acc >= VOL_FALLBACK_WAIT);
+  if(ready){ volMuted = false; try{ audio.muted = false; }catch(e){} }
+}
+function volStopFade(){
+  if(volRaf){ cancelAnimationFrame(volRaf); volRaf = 0; }
+  volRamping = false;
+  volWrite(0);
+  if(gainOwns) gainZero();
+}
+function volFadeIn(){
   if(volRaf) cancelAnimationFrame(volRaf);
   const warm = volWarm;
-  const ms = warm ? VOL_FADE_WARM : VOL_FADE_COLD;
+  const ms = warm ? VOL_FADE_IN_WARM : VOL_FADE_IN_COLD;
   volWarm = false;
-  /* editorial-111: on a cold start the hard mute stays over the 120ms
-     pre-route window, then the ramp lifts it and the gain owns every sample.
-     A warm resume must unmute AT ONCE: its route is already live, and a
-     muted element feeds silence into the WebAudio graph - holding the mute
-     through the warm ramp only re-creates the silent hole it was meant
-     to fix. */
-  let un = warm ? 0 : 120;
-  if(un === 0){ try{ audio.muted = false; }catch(e){} }
   volRamping = true;
-  let acc = 0, prev = performance.now(), last = 0;
+  let acc = 0, prev = performance.now();
   function step(rafNow){
-    if(audio.paused){ volRamping = false; volRaf = 0; if(gainOwns) gainSet(0); else try{ audio.volume = 0; }catch(e){} return; }
-    /* rAF timestamps are vsync-aligned: they can precede `prev` (dt <= 0) and a
-       stalled tab can hand back a huge dt. Both are clamped, never negative. */
+    if(audio.paused){ volStopFade(); return; }
+    /* rAF timestamps are vsync-aligned: they can precede `prev` (dt <= 0) and
+       a stalled tab can hand back a huge dt. Both are clamped, never negative. */
     const now = (typeof rafNow === "number" && rafNow > 0) ? rafNow : performance.now();
     let dt = now - prev; prev = now;
     if(!(dt > 0)) dt = 0;
     if(dt > VOL_MAX_DT) dt = VOL_MAX_DT;
     acc += dt;
-    /* editorial-111: lift the element's hard mute only after the cold floor -
-       by then the AudioContext route is running and the gain owns every
-       sample; unmuting earlier re-opened the Android pre-route blast. */
-    if(un > 0 && acc >= un){ un = 0; try{ audio.muted = false; }catch(e){} }
+    volUnmute(acc);
     const t = acc / ms;
-    let v = (t >= 1) ? 1 : Math.pow(10, -VOL_DB * (1 - t) / 20);
-    if(v < last) v = last;          /* monotonic: never dip mid-fade */
-    last = v;
-    if(gainOwns) gainSet(v); else try{ audio.volume = v; }catch(e){}
-    if(t < 1) volRaf = requestAnimationFrame(step);
-    else { volRaf = 0; volRamping = false; gainOwns = false; if(outGain) gainSet(1); try{ audio.volume = 1; audio.muted = false; }catch(e){} }
+    const v = (t >= 1) ? 1 : Math.pow(10, -VOL_DB * (1 - t) / 20);
+    volWrite(v);
+    if(t < 1){ volRaf = requestAnimationFrame(step); return; }
+    volRaf = 0; volRamping = false;
+    volWrite(1);
+    volMuted = false;
+    try{ audio.muted = false; }catch(e){}
   }
   volRaf = requestAnimationFrame(step);
 }
 function volArm(warm){
-  if(!IS_MOBILE) return;
   volWarm = !!warm;
-  if(volRaf){ cancelAnimationFrame(volRaf); volRaf = 0; }   /* a stale fade must not write the new track */
-  volRamping = false;
-  if(gainZero()){                     /* sample-accurate zero: no mixer delay, no wait hole */
-    gainOwns = true; volPending = true;
-    /* editorial-111: NEVER unmute here. On a cold start the element stays
-       hard-muted while the gain route settles; unmuting immediately re-opened
-       the pre-route blast window (the "explosion" the owner kept hearing).
-       The ramp lifts the mute itself: at once when warm, after a 120ms floor
-       when cold. */
-    try{ audio.muted = true; audio.volume = 1; }catch(e){}
-    return;
-  }
-  gainOwns = false;
-  audio.muted = true; audio.volume = 0; volPending = true;
+  volStopFade();          /* a stale fade must not write the new track */
+  gainOwns = gainZero();  /* sample-accurate zero when the graph exists */
+  volPending = true;
+  volMuted = true;
+  try{ audio.muted = true; audio.volume = 0; }catch(e){}
 }
 function volPlaying(){
-  if(!IS_MOBILE || !volPending) return;
-  if(volTimer) clearTimeout(volTimer);
-  /* Cold start (new src): Android only honours element volume ~500ms into the
-     stream — arming shorter is what blasted at full volume.
-     Warm (resume of the same src): the stream is already open, so fade in at
-     once instead of sitting silent for half a second.
-     volPending stays set until the fade actually begins: clearing it early let
-     deviceVol() (fired by the very same "playing" event) restore volume 1
-     unmuted for the whole wait, which leaked a full-volume instant at the top
-     of every track — the last audible "jump". */
-  volTimer = setTimeout(()=>{
-    volTimer = 0;
-    volPending = false;
-    volRamp();
-  }, gainOwns ? 0 : (volWarm ? 0 : (IS_ANDROID ? VOL_COLD_WAIT : 0)));
-  /* iOS honours element volume from the first buffer: no silent hole needed,
-     the -42dB ramp onset is the blast guard there. Android keeps the 500ms
-     wait — its mixer ignores volume writes at the very start of a stream. */
+  if(!volPending) return;
+  /* Cleared BEFORE the fade: deviceVol() fires on the very same "playing"
+     event and must not restore volume 1 while the curve is still near zero. */
+  volPending = false;
+  volFadeIn();
+}
+function volPause(){
+  /* The user asked for silence: fall back down the same curve (~0.3s), then
+     stop the element. A pending or barely-started fade-in has nothing worth
+     falling - stop it straight away. */
+  if(volRaf){ cancelAnimationFrame(volRaf); volRaf = 0; }
+  volPending = false;
+  if(!volRamping || volLevel <= 0.004){
+    volStopFade();
+    try{ audio.pause(); }catch(e){}
+    return;
+  }
+  const start = volLevel;
+  volRamping = true;
+  let acc = 0, prev = performance.now();
+  function step(rafNow){
+    if(audio.paused){ volStopFade(); return; }
+    const now = (typeof rafNow === "number" && rafNow > 0) ? rafNow : performance.now();
+    let dt = now - prev; prev = now;
+    if(!(dt > 0)) dt = 0;
+    if(dt > VOL_MAX_DT) dt = VOL_MAX_DT;
+    acc += dt;
+    const t = acc / VOL_FADE_OUT;
+    volWrite((t >= 1) ? 0 : start * Math.pow(10, -VOL_DB * t / 20));
+    if(t < 1){ volRaf = requestAnimationFrame(step); return; }
+    volStopFade();
+    try{ audio.pause(); }catch(e){}
+  }
+  volRaf = requestAnimationFrame(step);
 }
 let curKey = null;
 let playGen = 0;
@@ -1140,7 +1161,7 @@ function dropBlob(){
   blobUrl = "";
 }
 function deviceVol(){
-  if(IS_MOBILE && (volPending || volRamping)){
+  if(volPending || volRamping){
     if(volPending){ if(gainOwns) gainZero(); else { audio.muted = true; audio.volume = 0; } }
     return;                       /* the arm / fade owns the volume right now */
   }
@@ -1371,7 +1392,7 @@ function selectTrack(key, title, artist, url, prev, row){
   attachOut();
   if(curKey === key){           /* same row: play/pause toggle */
     if(audio.paused){ userPaused = false; tryPlay(true); }   /* resume: warm fade, no 500ms hole */
-    else { userPaused = true; audio.pause(); }
+    else { userPaused = true; volPause(); }
     markRows();
     return;
   }
@@ -1428,7 +1449,7 @@ audio.addEventListener("play", ()=>{ deviceVol(); markRows(); });
 audio.addEventListener("pause", ()=>{ markRows(); });
 audio.addEventListener("timeupdate", ()=>{
   /* failsafe: a build that never fires "playing" must not stay muted forever */
-  if(IS_MOBILE && volPending && !volTimer && !volRamping && !audio.paused) volPlaying();
+  if(volPending && !volRamping && !audio.paused) volPlaying();
   if(timeFrozen || seekBar || holdSeek || audio.seeking) return;
   const d = previewDur() || 90;
   progTo(Math.min(100, audio.currentTime/d*100), audio.currentTime, d);
