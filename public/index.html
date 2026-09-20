@@ -131,8 +131,10 @@ main{position:relative;z-index:1}
 /* cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px}
 /* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
-.rail-wrap{position:relative;margin-top:2px}
-.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;overscroll-behavior-x:contain;padding:4px 2px 10px;scrollbar-width:none;-ms-overflow-style:none}
+.rail-wrap{position:relative;margin-top:2px;padding-right:66px}
+.rail-wrap .rail-btn.prev{right:calc(100% - 66px + 7px)}
+.rail-wrap .rail-btn.next{right:-52px}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;overscroll-behavior-x:contain;padding:4px 0 10px;scrollbar-width:none;-ms-overflow-style:none}
 .rail::-webkit-scrollbar{display:none}
 .rail>*{scroll-snap-align:none}
 @media (max-width:900px){ .rail{--cardw:255px} }
@@ -140,7 +142,7 @@ main{position:relative;z-index:1}
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
   .rail-btn{display:none}
 }
-.rail-btn{position:absolute;top:38%;z-index:5;width:52px;height:52px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .22s ease,color .18s ease,transform .18s ease;-webkit-tap-highlight-color:transparent;touch-action:none}
+.rail-btn{position:absolute;top:-14px;z-index:5;width:52px;height:52px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .22s ease,color .18s ease,transform .18s ease;-webkit-tap-highlight-color:transparent;touch-action:none}
 /* next is always lit (there is always more to the right); prev lights up
    once the rail has been scrolled away from the start */
 .rail-btn.next.lit,.rail-btn.next.ok{opacity:1;pointer-events:auto}
