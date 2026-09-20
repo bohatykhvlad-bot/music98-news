@@ -147,9 +147,11 @@ a{color:var(--text)}
   background:#fff;color:#15181a;font-weight:700;font-size:18px;line-height:1;cursor:pointer
 }
 .composer .blk.sel{outline:2px solid var(--accent);outline-offset:2px}
+/* same bottom compensation as the public page: Apple paints ~10px dead strip
+   inside the song iframe; pull it up so the editor view matches the article */
 .composer .aembed{max-width:520px;width:100%;margin:12px auto 16px}
-.composer .aembed.song{max-width:420px}
-.composer .aembed.song iframe{height:166px}
+.composer .aembed.song{max-width:420px;margin-bottom:10px}
+.composer .aembed.song iframe{height:166px;margin-bottom:-16px;display:block}
 .composer .aembed.album iframe{height:320px}
 .composer .yembed{max-width:520px;width:100%}
 .composer .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
