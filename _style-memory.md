@@ -32,6 +32,19 @@
 
 ⚠️ КОДИРОВКА (инцидент 20.09.2026, ROSÉ → «ROSГ‰»): пайплайн публикации на Windows ОБЯЗАН читать ответ API как байты и декодировать UTF-8 явно (subprocess без text=True, `.decode("utf-8")`), а payload писать с `ensure_ascii=True` — тогда не-ASCII уходит в \uXXXX и кодировка его не тронет. Перед каждым POST прогонять diff «что изменилось» (только добавленные посты). После любой записи — контрольный GET с посимвольным сканом (кириллица U+0400..04FF, U+2030, U+FFFD = артефакты). Скрипт восстановления: `site/scripts/repair-desk-encoding.py` (round-trip cp1251→utf-8 + верификация).
 
+## Фильтр выбора тем (калибровка владельца 20.09)
+- Размер темы меряем аудиторией артиста, а не фактом хедлайна у Billboard/NME. НЕ хвататься за новость только потому, что её 10 минут назад написал крупный сайт.
+- Ориентир — Spotify monthly listeners (kworb.net/spotify/listeners.html или профиль артиста): приоритет — верхний эшелон (топ-150, десятки миллионов слушателей), Pop / K-Pop / Country / Hip-Hop, аудитория США. Событие должно либо НЕСТИ ИЗВЕСТНОЕ ИМЯ (Taylor Swift), либо ИНТЕРЕСНУЮ ИСТОРИЮ саму по себе (кроссовер миров в GTA VI: The Album).
+- Нишевый порог: < ~15 млн monthly listeners и без мейнстрим-узнаваемости = НЕ публикуем ради свежести. Отклонены на калибровке 20.09: Beck (~7.4M) — «нишево», Gnarls Barkley (~11M, ~1147-е место kworb) — тоже. Легаси-статус сам по себе не пропускает: их пишут СМИ «для количества» или по пейроллу.
+- ЖЁСТКИЙ АЛГОРИТМ ОТБОРА (указание владельца 20.09, откалибровано его цифрами): проверка слушателей идёт ПЕРВОЙ, до ресёрча деталей. Источник правды: kworb.net/spotify/listeners.html (monthly listeners, живые цифры) или карточка open.spotify.com. Три тира:
+  • ТИР A — приоритет: топ-150 kworb по monthly listeners (сейчас ≈ 36M+) ЛИБО мейнстрим-суперстар с узнаваемостью вне стриминга (пример: Cardi B, 32.2M / #191 — проходит как суперстар Hip-Hop, ядро аудитории USA).
+  • ТИР B — вторичный приоритет: ~20–35M listeners (якорь владельца: Tove Lo 28,072,601). Допустимо, но только на КРУПНОЕ событие (большой альбом, тур по аренам, премия) — не писать ради свежей мелочи.
+  • ТИР C — откидывать: <15M. Якоря владельца: Beck ~7.4M («нишево»), Gnarls Barkley ~11M (#1147 на kworb). Легаси-статус и хедлайн у крупных СМИ сам по себе НЕ пропускают. Единственное исключение — событие первой величины, о котором узнает вся аудитория вне стриминга (смерть суперзвезды, исторический рекорд, скандал/суд первой величины).
+  Порядок: (1) кандидат из ленты СМИ → (2) listeners артиста по kworb → мимо порога = стоп, не тратить время на ресёрч → (3) прошёл = обычный Pass 0 фактчек по первоисточникам.
+- QUALITY > QUANTITY: цель — задержать читателя одним сильным постом, а не наполнить ленту. Один GTA-пост стоит трёх нишевых перепечаток.
+- Исключения из порога слушателей (пишем и без топ-тира): смерть суперзвезды, скандал/суд первой величины, историческое рекордное событие в чартах/наградах — то, о чём узнает вся аудитория вне стриминга.
+- Порог проверять ДО ресерча деталей: сначала смотреть listeners, потом тратить время на фактчек.
+
 ## Писатель
 - Пишу ОТ СЕБЯ: читаю 3–5 крупных изданий + интервью, делаю выжимку фактов, сводю и переосмысляю. Рерайт своими словами, НИКОГДА не копирую формулировки источников.
 - Критическое мышление: сверять факты между источниками, выкидывать хайповые клише изданий.
@@ -84,3 +97,54 @@
 - Expansion by pasting = highest tautology risk: recheck every repeated title/noun in the touched paragraphs specifically.
 
 - Anchor nouns are not fat: words like "record", "album", "release" after "the first / the last" disambiguate the referent (track? album? era?). Before cutting such a word, ask what the phrase points at; if the answer needs the noun, keep it. (Came from cutting "first record released without a Cyrus" to "first without a Cyrus" - ambiguous.)
+
+- Kicker variety is mandatory. There is no house kicker yet; every closing paragraph must earn its own shape. Retired as a template: "The shows will pass / the record stays". A post may keep a short punchy kicker ONLY if the construction differs from the previous posts in the feed. Check the last 2-3 published posts before writing a close.
+- Do not describe own devices as "signature/house style" - the style is being written now, and naming a habit a brand is how habits calcify.
+
+- Tour routing: never more than 2-3 city names in one sentence. Keep the anchors (opener, marquee room, closer, hometown), compress the middle into route shape ("three arcs: East Coast, a West Coast week, a Vegas close"). Album-recording cities and other context cities are exempt when they carry meaning. Owner's brief rule "don't lean on dates and cities" applies to tour paragraphs especially.
+
+### Third-pass reader audit (20.09, fresh-eyes rules)
+- Voice crutches are the real ctrl-c/ctrl-v: watch recurring constructions, not words. Retired/rationed after audit: "That is a ... , not a ..." (negation-pair), "map" as metaphor for any plan/list, "argument" as record metaphor, "the part that stays" closers. Before publishing, scan own last 3 posts for these.
+- Every promise a sentence makes must be paid: "the song that explains the title" requires the explanation to actually be there; if it is interpretation, soften the claim ("carries the title's mood").
+- Date style: full month names everywhere (September 17, not Sept. 17).
+- Register check: avoid corporate nouns in emotional contexts ("part of the product" -> "part of the deal").
+- Verified color only: a juicy quote/fact goes in only after finding the primary source (Drake's "Nobody is coming to save you" - Complex, from his premiere note). No reason speculated for the FOMO takedown - no official statement exists.
+
+### CANONICAL: Five-pass proofing pipeline (20.09, owner-approved) — run on EVERY post before publish
+
+Pass 0 — at research time (before writing): every fact carries a source in notes; two-source rule for track/album titles; quotes verbatim from primary sources only.
+
+Pass 1 — EDITOR / STRUCTURE. Paragraph integrity (no one-sentence stubs under ~25 words); embed placement (media breaks a text wall at its most meaningful joint, never decorates the end; lead-in names the embed's subject); frame honesty (announced vs released — a not-yet-out record must not read as out); teaser/headline/lead division of labor (teaser never duplicates the headline, it sells a different angle); kicker placement and variety (check last 2-3 posts' closers first); time/subject logic inside paragraphs (one subject per sentence, no invented travel math).
+
+Pass 2 — JOURNALIST-PEDANT (before flavor passes: a found fact error rewrites paragraphs). Re-verify every number, date, age, chart position, name against sources; attribution on every quote; no speculation stated as fact (if no official reason exists, the reason stays absent); risky turns softened; every sentence-promise paid ("the song that explains the title" must actually explain it, otherwise soften the claim); interpretation labeled as interpretation.
+
+Pass 3 — VOICE / ECHO (scanner + human). Run the 4-gram echo scanner; title/name echoes inside one paragraph; cross-post crutch check against the last 2-3 posts (retired list: "That is a X, not a Y" rationing, "map" as universal metaphor, "argument" as record metaphor, "the part that stays" closers); corporate register out of emotional contexts ("part of the product"); date style: full month names everywhere.
+
+Pass 4 — MUSIC FOLLOWER (the target reader). Interest test: is the best verified fact buried mid-paragraph? would a fan ask "but what about X?" and the post ignores it? Add verified color from primary sources only (Drake's "Nobody is coming to save you" - Complex quote). Cut PR-brochure sentences that a follower already knows.
+
+Pass 5 — ZERO-CONTEXT LAY READER (FINAL gate, closes the pipeline). Read the RENDERED page, not the data; read aloud once (catches broken grammar like the two-"since" slip). Every first mention = name + role (husband, Chiefs tight end Travis Kelce). Niche references either explained in-line in one clause or cut. A person who does not follow music must finish the post without a single google. Any fix made here re-runs the Pass 3 scanner on touched paragraphs.
+
+Loop rule: every later-pass edit triggers a mini re-run of mechanical checks on the touched paragraph — fixes have introduced defects twice (duplicated trailer marker, glued embed marker).
+
+Surface rule: never proof only in the editor/data view; at least one pass on the rendered page (embeds visible, teaser separate, photo crop, length feel).
+
+Freshness rule: never run two passes back-to-back from memory; fresh GET between passes, and a time gap (even 10 minutes) before Pass 4/5 when possible.
+
+Saturation note: five passes is the ceiling by design. Each pass class catches a distinct defect class (structure -> claims -> voice -> interest -> accessibility) and the classes converge after five; a sixth pass over-polishes and flattens the living voice the site is built on.
+
+### CANONICAL ADDITION: Visual & Media track (owner-approved, 20.09) — runs in parallel with the text passes
+
+Two tracks per post:
+- TEXT = sequential cutting table: Pass 1 -> 2 -> 3 -> 4 -> 5, each persona cuts after the previous one, final owner-style re-read + review of every edit made -> publish.
+- VISUAL & MEDIA (cover photo, in-body photos, embeds) = the same personas inspect each pass, each gives their OWN verdict, and the operator synthesizes the optimal choice from all for/against — WITHOUT breaking the standing rules already recorded (official promo first / photographer or owner credit hierarchy / freshness floor (2020 = stale) / event-matched sources / no text-on-crop / face centered + air above head / embeds on their own lines / album vs song embed correctness).
+
+What each persona watches on the visual track:
+- Pass 1 editor: photo belongs to THIS post's subject and era; crop works structurally (stage 16:9 + square card), no title text cut on either surface.
+- Pass 2 pedant: credit correct (photographer vs art owner vs label partner); source link = first source per hierarchy; date/freshness claim honest; embed IDs correct (song vs album, official channel for videos).
+- Pass 3 voice: visual consistency with the feed (era, color mood) — no stylistic off-note between neighboring posts.
+- Pass 4 fan: is this THE photo for this news? (right album era, right event for festival/award news, not a stale promo of a previous cycle); would the fan say "wrong pic, that's from another era"?
+- Pass 5 lay reader: instantly legible — face visible and centered, quality high on both surfaces, nothing confusing at first glance (no mystery text, no half-cropped figure).
+
+Synthesis rule: collect verdicts, weigh for/against, pick optimal — but standing rules are hard constraints, personas cannot vote them away (e.g. a fan preferring a nicer but pre-2020 photo loses to the freshness rule). If verdicts tie between two compliant options, prefer the one better for Pass 5 (legibility) — the lay reader is the final gate.
+
+Conflict precedent (recorded): pass 4 fan wants era-accurate fresh photo, pass 1 editor notes crop removes title text, pass 5 wants max legibility -> the vinyl-portrait case was resolved by denser crop at zoom that drops the title out of frame (compliant on all three).
