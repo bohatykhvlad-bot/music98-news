@@ -85,10 +85,24 @@ a{color:var(--text)}
 .stage .hint.hide{display:none}
 .stage .grid{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .12s;background-image:linear-gradient(to right,rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.5) 1px,transparent 1px);background-size:calc(100%/3) 100%, 100% calc(100%/3);z-index:2}
 .stage:hover .grid,.stage.drag .grid{opacity:1}
+/* card preview: same height as the main 16/9 stage, narrower width (sides cut) -
+   the owner asked for a side-cropped view at main height, not a full square.
+   Exact height is synced from JS in paintMini (stage width * 9/16). */
 .mini{display:flex;flex-direction:column;gap:8px}
-.mini-frame{position:relative;aspect-ratio:1;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize}
+.mini-frame{position:relative;width:70%;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize}
 .mini-frame.active{outline:2px solid var(--acc2);outline-offset:2px}
 .stage.cardmode{cursor:ns-resize}
+.stage.cardmode.free{cursor:move}
+/* axis pill on the card stage: one glass capsule with an up+down arrow pair.
+   Click it -> it turns into a four-way cross (move = free, horizontal too). */
+.axis-pill{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:6;height:34px;min-width:56px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.78);backdrop-filter:blur(10px) saturate(170%);-webkit-backdrop-filter:blur(10px) saturate(170%);box-shadow:0 3px 14px rgba(15,60,64,.16);display:none;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#20343a;transition:transform .16s ease,background .16s ease;-webkit-tap-highlight-color:transparent}
+.stage.cardmode .axis-pill{display:flex}
+.axis-pill:hover{transform:translateX(-50%) scale(1.05)}
+.axis-pill svg{width:20px;height:20px;display:block}
+.axis-pill .ic-cross{display:none}
+.axis-pill.free .ic-updown{display:none}
+.axis-pill.free .ic-cross{display:block}
+.axis-pill.free{background:rgba(0,253,251,.16);border-color:rgba(0,253,251,.55)}
 .mini-frame img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;display:block}
 .mini .muted{text-align:center;font-size:11px}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
@@ -205,13 +219,16 @@ a{color:var(--text)}
       <label for="excerpt">Short teaser</label>
       <textarea id="excerpt"></textarea>
 
-      <label>Cover</label>
-      <div class="crop-row">
+      <label>Cover</label>        <div class="crop-row">
         <div class="stage-wrap">
           <div class="stage" id="stage">
             <img id="stageImg" class="hide" alt="">
             <div class="grid" id="grid"></div>
             <p class="muted hint" id="coverHint">Drop a photo</p>
+            <button class="axis-pill" id="axisPill" type="button" title="Vertical only. Click to unlock horizontal">
+              <svg class="ic-updown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M12 3l-4 4M12 3l4 4M12 21l-4-4M12 21l4-4"/></svg>
+              <svg class="ic-cross" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>
+            </button>
           </div>
           <div class="cropbar">
             <div class="cropbar-row">
@@ -338,7 +355,7 @@ const KEY = "music98_admin_key";
 const APPLE_AT = "1001l3aZW";
 let posts = [];
 let coverSrc = "";
-let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, lockX:null};
+let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, lockX:null, cardFree:false, cardX:null};
 let cropMode = "main";   /* main | card | hero */
 let editing = null;
 let appleKind = "song";
@@ -881,6 +898,12 @@ function parsePos(p){
   if(m) return {x: Math.min(1, Math.max(0, +m[1]/100)), y: Math.min(1, Math.max(0, +m[2]/100))};
   return {x:0.5, y:0.5};
 }
+function cardFx(){
+  /* before the pill is clicked the card follows the main crop horizontally;
+     after unlocking, it keeps its own x (cardX) */
+  if(cropMode === "card" && crop.cardFree && Number.isFinite(crop.cardX)) return crop.cardX;
+  return lockFx();
+}
 function fitCover(img, fx, fy, zoom){
   const box = img && img.parentElement;
   if(!box || !img.naturalWidth) return;
@@ -909,7 +932,7 @@ function zoomCap(){
   if(!coverSrc || !img || !img.naturalWidth || !stage.clientWidth) return 3;
   const sw = stage.clientWidth, sh = stage.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
-  const fx = (cropMode === "card") ? lockFx() : (Number.isFinite(crop.x) ? crop.x : 0.5);
+  const fx = (cropMode === "card") ? cardFx() : (Number.isFinite(crop.x) ? crop.x : 0.5);
   const fy = (cropMode === "card") ? (Number.isFinite(crop.cardY) ? crop.cardY : 0.5) : (Number.isFinite(crop.y) ? crop.y : 0.5);
   const need = (px, f) => 2 * Math.max(f, 1 - f) * px;
   const zw = sw ? need(iw, fx) / sw : 1;
@@ -955,6 +978,21 @@ function lockFx(){
      the same: lockX equalled crop.x at save time. */
   return (cropMode !== "main" && crop.lockX != null) ? crop.lockX : crop.x;
 }
+function syncAxisPill(){
+  const pill = $("#axisPill");
+  if(!pill) return;
+  pill.classList.toggle("free", !!crop.cardFree);
+  $("#stage").classList.toggle("free", cropMode === "card" && !!crop.cardFree);
+}
+$("#axisPill").addEventListener("click", e=>{
+  e.stopPropagation();
+  if(cropMode !== "card") setCropMode("card");
+  crop.cardFree = !crop.cardFree;
+  if(crop.cardFree && !Number.isFinite(crop.cardX)) crop.cardX = lockFx();
+  crop.dirty = true;
+  syncAxisPill();
+  layoutCrop();
+});
 function setCropMode(m){
   cropMode = (m === "card") ? "card" : "main";
   const stage = $("#stage");
@@ -966,9 +1004,16 @@ function setCropMode(m){
   $("#modeMain").classList.toggle("ghost", cropMode !== "main");
   $("#modeCard").classList.toggle("ghost", cropMode !== "card");
   $("#zoom").value = zoomNow();
+  syncAxisPill();
   layoutCrop();
 }
 function paintMini(){
+  const frame = $("#miniFrame");
+  if(frame){
+    /* keep the preview at the main stage's 16/9 height, sides cropped */
+    const st = $("#stage");
+    if(st && st.clientWidth) frame.style.height = Math.round(st.clientWidth * 9 / 16) + "px";
+  }
   const paint = (id, fx, fy, fz)=>{
     const m = $("#"+id);
     if(!m) return;
@@ -979,7 +1024,7 @@ function paintMini(){
     if(m.naturalWidth) go();
     else m.onload = go;
   };
-  paint("miniImg", lockFx(), crop.cardY, crop.cardZoom||1);
+  paint("miniImg", cardFx(), crop.cardY, crop.cardZoom||1);
 }
 /* The slider's right end IS the zoom cap (owner request): the track maps
    [1..cap] of the CURRENT focus, so dragging to the end always lands exactly
@@ -1016,7 +1061,7 @@ function layoutCrop(){
   const stage = $("#stage");
   const img = $("#stageImg");
   if(!coverSrc || !img.naturalWidth){ paintMini(); return; }
-  if(cropMode === "card"){ fitCover(img, lockFx(), crop.cardY, crop.cardZoom||1); paintMini(); if(syncZoomUI()) layoutCrop(); return; }
+  if(cropMode === "card"){ fitCover(img, cardFx(), crop.cardY, crop.cardZoom||1); paintMini(); if(syncZoomUI()) layoutCrop(); return; }
   const sw = stage.clientWidth, sh = stage.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
   const z = crop.zoom || 1;
@@ -1045,6 +1090,10 @@ function setCover(src, pos, zoom, cardY){
   const lxRaw = arguments[5];
   const lx = (lxRaw == null || lxRaw === "") ? NaN : Number(lxRaw);
   crop.lockX = (lx >= 0 && lx <= 1) ? lx : null;
+  const cxRaw = arguments[6];
+  const cx = (cxRaw == null || cxRaw === "") ? NaN : Number(cxRaw);
+  crop.cardFree = Number.isFinite(cx);
+  crop.cardX = Number.isFinite(cx) ? cx : null;
   setCropMode("main");
   $("#zoom").value = crop.zoom;
   const img = $("#stageImg");
@@ -1109,13 +1158,13 @@ function fillForm(p){
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
   const src = (p?.cover && p.cover.src) || "";
-  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.cardZoom, p.cover.lockX);
+  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.cardZoom, p.cover.lockX, p.cover.cardX);
   else {
     coverSrc = "";
     $("#stageImg").classList.add("hide");
     $("#stageImg").removeAttribute("src");
     $("#coverHint").classList.remove("hide");
-    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, cardZoom:1, lockX:null};
+    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, cardZoom:1, lockX:null, cardFree:false, cardX:null};
     $("#zoom").value = zoomNow();
     $("#miniImg").classList.add("hide");
     paintMini();
@@ -1194,7 +1243,7 @@ $("#photo").onchange = e=> readPhoto(e.target.files[0], src=>{ crop.dirty = true
 $("#zoom").oninput = ()=> setZoom($("#zoom").value);
 $("#zoomIn").onclick = ()=> setZoom(zoomNow() + Math.max(0.06, (zoomCap()-1)/12));
 $("#zoomOut").onclick = ()=> setZoom(zoomNow() - Math.max(0.06, (zoomCap()-1)/12));
-$("#centerCover").onclick = ()=>{ if(cropMode === "card"){ crop.cardY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; } crop.dirty = true; layoutCrop(); };
+$("#centerCover").onclick = ()=>{ if(cropMode === "card"){ crop.cardY = 0.5; if(crop.cardFree) crop.cardX = 0.5; } else { crop.x = 0.5; crop.y = 0.5; } crop.dirty = true; layoutCrop(); };
 
 window.addEventListener("resize", layoutCrop);
 
@@ -1229,6 +1278,7 @@ stage.addEventListener("pointerdown", e=>{
   }else{
     pinch = null;
     drag = {x:e.clientX, y:e.clientY, cx:crop.x, cy: cropMode === "card" ? crop.cardY : crop.y};
+    if(cropMode === "card") drag.cx = cardFx();
   }
 });
 stage.addEventListener("pointermove", e=>{
@@ -1245,6 +1295,9 @@ stage.addEventListener("pointermove", e=>{
   const dw = parseFloat(img.style.width)||1;
   const dh = parseFloat(img.style.height)||1;
   if(cropMode === "card"){
+    if(crop.cardFree && Number.isFinite(crop.cardX)){
+      crop.cardX = Math.min(1, Math.max(0, drag.cx - (e.clientX - drag.x) / dw));
+    }
     crop.cardY = Math.min(1, Math.max(0, drag.cy - (e.clientY - drag.y) / dh));
   }else{
     crop.x = drag.cx - (e.clientX - drag.x) / dw;
@@ -1265,7 +1318,7 @@ stage.addEventListener("pointercancel", endPtr);
 stage.addEventListener("dblclick", e=>{
   if(!coverSrc) return;
   e.preventDefault();
-  if(cropMode === "card"){ crop.cardY = 0.5; } else { crop.x = 0.5; crop.y = 0.5; }
+  if(cropMode === "card"){ crop.cardY = 0.5; if(crop.cardFree) crop.cardX = 0.5; } else { crop.x = 0.5; crop.y = 0.5; }
   crop.dirty = true; layoutCrop();
 });
 
@@ -1574,7 +1627,8 @@ function collectPost(status){
       zoom: Math.round((crop.zoom||1)*100)/100,
       cardY: Math.round((crop.cardY!=null?crop.cardY:0.5)*100)/100,
       cardZoom: Math.round((crop.cardZoom!=null?crop.cardZoom:1)*100)/100,
-      lockX: Math.round((crop.lockX!=null?crop.lockX:crop.x)*100)/100
+      lockX: Math.round((crop.lockX!=null?crop.lockX:crop.x)*100)/100,
+      cardX: crop.cardFree && Number.isFinite(crop.cardX) ? Math.round(crop.cardX*100)/100 : undefined
     } : {kind:"preset", i:0}
   };
 }

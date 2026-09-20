@@ -757,7 +757,13 @@ function cardZoom(p){
   const cz = Number(p && p.cover && p.cover.cardZoom);
   return (cz >= 1 && cz <= 8) ? cz : coverZoom(p);
 }
-function cardFocus(p){ return lockFocus(p, p && p.cover && p.cover.cardY); }
+function cardFocus(p){
+  /* a card with an unlocked horizontal keeps its own x (cardX, set in the
+     admin via the cross pill); otherwise it follows the main crop x */
+  const f = lockFocus(p, p && p.cover && p.cover.cardY);
+  const cx = Number(p && p.cover && p.cover.cardX);
+  return Number.isFinite(cx) ? {x: Math.min(1, Math.max(0, cx)), y: f.y} : f;
+}
 function coverImg(p, square, lazy, mode){
   const extra = lazy ? ' loading="lazy"' : '';
   const f = mode === "card" ? cardFocus(p) : coverFocus(p);
