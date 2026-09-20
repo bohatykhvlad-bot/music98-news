@@ -93,8 +93,10 @@ a{color:var(--text)}
 .mini .muted{text-align:center;font-size:11px}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
 .cropbar-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.cropbar-row.replace{justify-content:center}
-.cropbar input[type=range]{flex:0 1 220px;min-width:140px}
+.cropbar input[type=range]{-webkit-appearance:none;appearance:none;flex:1 1 240px;min-width:160px;max-width:380px;height:6px;border-radius:999px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%));outline:none}
+.cropbar input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
+.cropbar input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:#fff;border:2px solid var(--accent);cursor:pointer}
+.cropbar input[type=range]::-moz-range-track{height:6px;border-radius:999px;background:linear-gradient(to right,var(--accent) var(--fill,0%),var(--line) var(--fill,0%))}
 .cropbar .btn{padding:5px 10px;font-size:12px;flex:none}
 @media (max-width:640px){ .cropbar{padding:10px 12px} .cropbar-row{gap:8px} }
 @media (max-width:900px){ .crop-row{grid-template-columns:1fr} }
@@ -202,11 +204,9 @@ a{color:var(--text)}
               <input id="zoom" type="range" min="1" max="6" step="0.01" value="1">
               <button class="btn ghost" type="button" id="zoomIn" aria-label="Zoom in">+</button>
               <button class="btn ghost" type="button" id="centerCover">Center</button>
+              <button class="btn ghost" type="button" id="replaceCover">Replace</button>
               <button class="btn primary" type="button" id="modeMain" title="Full crop, both axes">Main</button>
               <button class="btn ghost" type="button" id="modeCard" title="Square card: vertical only">Card</button>
-            </div>
-            <div class="cropbar-row replace">
-              <button class="btn ghost" type="button" id="replaceCover">Replace</button>
             </div>
           </div>
         </div>
@@ -899,7 +899,7 @@ function zoomCap(){
   const need = (px, f) => 2 * Math.max(f, 1 - f) * px;
   const zw = sw ? need(iw, fx) / sw : 1;
   const zh = sh ? need(ih, fy) / sh : 1;
-  return Math.min(6, Math.max(1.5, Math.max(zw, zh) * 1.04));
+  return Math.max(1.2, Math.max(zw, zh) * 1.02);
 }
 function setZoom(z){
   const cap = zoomCap();
@@ -959,13 +959,17 @@ function syncZoomUI(){
   s.min = 1;
   s.max = cap;
   const z = zoomNow();
+  let v = z, clamped = false;
   if(z > cap){
     if(cropMode === "card") crop.cardZoom = cap; else crop.zoom = cap;
-    s.value = cap;
-    return true;   /* clamped: caller re-layouts once with the new zoom */
+    v = cap;
+    clamped = true;   /* caller re-layouts once with the new zoom */
   }
-  s.value = z;
-  return false;
+  s.value = v;
+  /* fill the track exactly edge-to-edge: at min and max the gradient touches
+     both ends, so the slider never looks like it stops short */
+  s.style.setProperty("--fill", (Math.max(0, Math.min(1, (v - 1) / (cap - 1))) * 100).toFixed(1) + "%");
+  return clamped;
 }
 function layoutCrop(){
   const stage = $("#stage");
