@@ -88,8 +88,8 @@ a{color:var(--text)}
 /* card preview: same height as the main 16/9 stage, narrower width (sides cut) -
    the owner asked for a side-cropped view at main height, not a full square.
    Exact height is synced from JS in paintMini (stage width * 9/16). */
-.mini{display:flex;flex-direction:column;gap:8px}
-.mini-frame{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize}
+.mini{display:flex;flex-direction:column;gap:8px;align-items:center;max-width:100%;overflow:hidden}
+.mini-frame{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize;max-width:100%}
 .mini-frame.active{outline:2px solid var(--acc2);outline-offset:2px}
 .stage.cardmode{cursor:ns-resize;background:#0a0d0e}
 /* card crop window: a centered square INSIDE the stage - the stage keeps the
@@ -151,9 +151,10 @@ a{color:var(--text)}
    rounded box (166 -> visible 150), album margins aligned to 16px */
 .composer .aembed{max-width:520px;width:100%;margin:12px auto 16px}
 .composer .aembed.song{max-width:420px}
-.composer .aembed.song .songclip{height:150px;overflow:hidden;border-radius:10px}
+.composer .aembed.song .songclip{display:block;height:150px;overflow:hidden;border-radius:10px}
 .composer .aembed.song iframe{height:166px;display:block;position:relative;z-index:0}
 .composer .blk .kill{z-index:7}
+.composer .aembed iframe,.composer .yembed iframe{position:relative;z-index:0}
 .composer .blk-tools{z-index:7}
 .composer .aembed.album iframe{height:320px}
 .composer .yembed{max-width:520px;width:100%}
@@ -1027,14 +1028,15 @@ function paintMini(){
        preview; in CARD show the horizontal main crop as a 16/9 strip */
     const st = $("#stage");
     if(st && st.clientWidth){
-      const sw = st.clientWidth;
+      const col = frame.parentElement.clientWidth || 200;
+      const w = Math.min(col, 300);
       if(cropMode === "card"){
-        frame.style.height = Math.round(sw * 9 / 16) + "px";
-        frame.style.width = "100%";
+        /* same width as the square, horizontal 16/9 window */
+        frame.style.width = w + "px";
+        frame.style.height = Math.round(w * 9 / 16) + "px";
       }else{
-        const side = Math.min(sw, 300);
-        frame.style.height = side + "px";
-        frame.style.width = side + "px";
+        frame.style.width = w + "px";
+        frame.style.height = w + "px";
       }
     }
   }
