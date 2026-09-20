@@ -1,4 +1,5 @@
 import { adminOk, json, migratePublishAt, promoteScheduled, publicPosts, readDesk, writeDesk } from "../lib/store.js";
+import { normalizeCovers } from "../lib/covers.js";
 
 export async function onRequest({ request, env }) {
   if (request.method === "GET") {
@@ -23,6 +24,11 @@ export async function onRequest({ request, env }) {
     if (!Array.isArray(payload.posts)) return json({ error: "posts_required" }, 400);
     const desk = await readDesk(env, request);
     desk.posts = payload.posts;
+    /* self-healing: if a client pushes old-style base64 covers, offload them
+       to KV right here - desk.json in storage stays lean regardless of who
+       writes (owner request after a racing writer overwrote the swap) */
+    let coverDirty = false;
+    try { coverDirty = await normalizeCovers(desk, env); } catch {}
     try {
       await writeDesk(env, desk);
     } catch (e) {
@@ -34,7 +40,7 @@ export async function onRequest({ request, env }) {
       }
       throw e;
     }
-    return json({ ok: true, count: desk.posts.length });
+    return json({ ok: true, count: desk.posts.length, coversNormalized: coverDirty });
   }
   return json({ error: "method" }, 405);
 }
