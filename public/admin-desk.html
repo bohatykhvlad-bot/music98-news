@@ -91,7 +91,7 @@ a{color:var(--text)}
 .mini{display:flex;flex-direction:column;gap:8px}
 .mini-frame{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize}
 .mini-frame.active{outline:2px solid var(--acc2);outline-offset:2px}
-.stage.cardmode{cursor:ns-resize;background:repeating-linear-gradient(45deg,#0c1011 0 12px,#0a0d0e 12px 24px)}
+.stage.cardmode{cursor:ns-resize;background:#0a0d0e}
 /* card crop window: a centered square INSIDE the stage - the stage keeps the
    main height, the square is cut to it, sides are letterboxed */
 .cardwin{position:absolute;left:50%;top:0;height:100%;aspect-ratio:1/1;transform:translateX(-50%);overflow:hidden;background:#0d1112}
@@ -151,7 +151,9 @@ a{color:var(--text)}
    inside the song iframe; pull it up so the editor view matches the article */
 .composer .aembed{max-width:520px;width:100%;margin:12px auto 16px}
 .composer .aembed.song{max-width:420px;margin-bottom:10px}
-.composer .aembed.song iframe{height:166px;margin-bottom:-16px;display:block}
+.composer .aembed.song iframe{height:166px;margin-bottom:-16px;display:block;position:relative;z-index:0}
+.composer .blk .kill{z-index:7}
+.composer .blk-tools{z-index:7}
 .composer .aembed.album iframe{height:320px}
 .composer .yembed{max-width:520px;width:100%}
 .composer .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
@@ -1019,12 +1021,19 @@ function setCropMode(m){
 function paintMini(){
   const frame = $("#miniFrame");
   if(frame){
-    /* owner mockup: card preview ~3/4 of the stage height, sides cropped */
+    /* the preview flips with the mode: in MAIN show the full SQUARE card
+       preview; in CARD show the horizontal main crop as a 16/9 strip */
     const st = $("#stage");
-    if(st && st.clientHeight){
-      const h = Math.round(st.clientHeight * 0.76);
-      frame.style.height = h + "px";
-      frame.style.width = Math.min(280, Math.round(h * 0.78)) + "px";
+    if(st && st.clientWidth){
+      const sw = st.clientWidth;
+      if(cropMode === "card"){
+        frame.style.height = Math.round(sw * 9 / 16) + "px";
+        frame.style.width = "100%";
+      }else{
+        const side = Math.min(sw, 300);
+        frame.style.height = side + "px";
+        frame.style.width = side + "px";
+      }
     }
   }
   const paint = (id, fx, fy, fz)=>{
@@ -1037,7 +1046,8 @@ function paintMini(){
     if(m.naturalWidth) go();
     else m.onload = go;
   };
-  paint("miniImg", cardFx(), crop.cardY, crop.cardZoom||1);
+  if(cropMode === "card") paint("miniImg", Number.isFinite(crop.x)?crop.x:0.5, Number.isFinite(crop.y)?crop.y:0.5, crop.zoom||1);
+  else paint("miniImg", cardFx(), crop.cardY, crop.cardZoom||1);
 }
 /* The slider's right end IS the zoom cap (owner request): the track maps
    [1..cap] of the CURRENT focus, so dragging to the end always lands exactly
