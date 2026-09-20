@@ -918,9 +918,27 @@ function zoomCap(){
 }
 function setZoom(z){
   const cap = zoomCap();
-  const v = Math.min(cap, Math.max(1, Number(z)||1));
-  if(cropMode === "card") crop.cardZoom = v; else crop.zoom = v;
-  $("#zoom").value = v;
+  const target = Math.min(cap, Math.max(1, Number(z)||1));
+  if(cropMode === "card" && coverSrc){
+    /* card zoom pivots around the CURRENT view center: recompute which image
+       point sits at the frame center before resizing and anchor the new zoom
+       on that same point - otherwise the view drifts toward the top edge */
+    const stage = $("#stage"), img = $("#stageImg");
+    if(img.naturalWidth && stage.clientWidth){
+      const sw = stage.clientWidth, sh = stage.clientHeight;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const base = Math.max(sw/iw, sh/ih);
+      const dhOld = ih * base * (crop.cardZoom||1);
+      const m = /translate\(-?[\d.]+px,\s*(-?[\d.]+)px\)/.exec(img.style.transform||"");
+      const topOld = m ? parseFloat(m[1]) : (sh - dhOld)/2;
+      const cy = (sh/2 - topOld) / dhOld;
+      crop.cardY = Math.min(1, Math.max(0, cy));
+    }
+    crop.cardZoom = target;
+  } else {
+    crop.zoom = target;
+  }
+  $("#zoom").value = target;
   crop.dirty = true;
   layoutCrop();
 }
