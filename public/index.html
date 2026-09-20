@@ -130,6 +130,29 @@ main{position:relative;z-index:1}
 
 /* cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px}
+/* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
+.rail-wrap{position:relative;margin-top:2px}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 54px)/3);gap:18px;overflow-x:auto;overscroll-behavior-x:contain;padding:4px 2px 10px;scrollbar-width:none;-ms-overflow-style:none}
+.rail::-webkit-scrollbar{display:none}
+.rail>*{scroll-snap-align:none}
+@media (max-width:900px){ .rail{grid-auto-columns:calc((100% - 36px)/2)} }
+@media (max-width:640px){ 
+  .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
+  .rail-btn{display:none}
+}
+.rail-btn{position:absolute;top:38%;z-index:5;width:52px;height:52px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .22s ease,color .18s ease,transform .18s ease;-webkit-tap-highlight-color:transparent;touch-action:none}
+.rail-btn svg{width:20px;height:20px}
+.rail-btn.prev{left:-14px}
+.rail-btn.next{right:-14px}
+.rail-wrap:hover .rail-btn.ok,.rail-btn.hold{opacity:1;pointer-events:auto}
+.rail-btn.ok:hover{color:var(--text);transform:scale(1.05)}
+.rail-btn.hold{transform:scale(1.06);color:var(--text)}
+.rail-btn:active{transform:scale(.97)}
+@media (hover:none){ .rail-btn.ok{opacity:.9;pointer-events:auto} }
+.loadmore{display:flex;justify-content:center;margin:18px 0 6px}
+.loadmore-btn{border:1px solid var(--line);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);border-radius:999px;padding:11px 22px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent}
+.loadmore-btn:hover{color:var(--text);border-color:var(--muted2)}
+.loadmore-btn:active{transform:scale(.98)}
 a.card,a.hero{color:inherit;text-decoration:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;display:flex;flex-direction:column;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .card:active,.card:focus,.card:focus-visible{border-color:var(--line);outline:none;box-shadow:none;transform:none}
@@ -529,13 +552,21 @@ textarea{resize:vertical;min-height:64px}
   <section class="tab active" id="tab-news">
     <div class="hd"><h1 class="hd-t">Latest stories</h1></div>
     <div id="heroSlot"></div>
-    <div class="grid" id="newsGrid"></div>
+    <div class="rail-wrap">
+      <button class="rail-btn prev" id="newsPrev" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="rail grid-rail" id="newsGrid" tabindex="0"></div>
+      <button class="rail-btn next" id="newsNext" aria-label="Scroll forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
     <div class="empty" id="newsEmpty" hidden>Nothing found for your query. Try another search.</div>
   </section>
 
   <section class="tab" id="tab-releases">
     <div class="hd"><h1 class="hd-t">Albums, EPs & singles</h1></div>
-    <div class="grid" id="relGrid"></div>
+    <div class="rail-wrap">
+      <button class="rail-btn prev" id="relPrev" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="rail grid-rail" id="relGrid" tabindex="0"></div>
+      <button class="rail-btn next" id="relNext" aria-label="Scroll forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
     <div class="empty" id="relEmpty" hidden>Nothing found for your query.</div>
   </section>
 
@@ -1789,6 +1820,7 @@ function chartMatches(r){
 }
 
 /* ============ render ============ */
+const RAIL_PAGE = 9;   /* cards per batch on mobile Load More */
 function renderNews(){
   const posts = data.posts.filter(p=>p.type==="news" && matches(p)).sort(byFresh);
   const hero = posts[0], rest = posts.slice(1);
@@ -1801,15 +1833,34 @@ function renderNews(){
         <div class="meta"><span>${fmtDate(hero.date)}</span></div>
       </div>
     </a>` : "";
-  $("#newsGrid").innerHTML = rest.map(p=>`
+  /* mobile (<=640px): the rail becomes a vertical column and shows one batch
+     at a time; a Load More pill appends older posts. Desktop: full rail. */
+  const narrow = window.matchMedia("(max-width: 640px)");
+  const shown = narrow.matches ? rest.slice(0, Math.max(RAIL_PAGE, (data._newsShown||RAIL_PAGE))) : rest;
+  $("#newsGrid").innerHTML = shown.map(p=>`
     <a class="card" href="#post/${p.id}">
       <div class="cover">${coverImg(p,false,true,"card")}</div>
       <div class="body"><h3>${titleHTML(p)}</h3><p>${rich(p.excerpt||"")}</p>
         <div class="meta"><span>${fmtDate(p.date)}</span></div></div>
     </a>`).join("");
+  let lm = $("#newsMore");
+  if(!lm){
+    lm = document.createElement("div");
+    lm.id = "newsMore"; lm.className = "loadmore"; lm.hidden = true;
+    lm.innerHTML = `<button class="loadmore-btn" type="button">Load more stories</button>`;
+    $("#newsGrid").after(lm);
+    lm.querySelector("button").addEventListener("click", ()=>{
+      data._newsShown = (data._newsShown||RAIL_PAGE) + RAIL_PAGE;
+      renderNews();
+    });
+  }
+  const remaining = rest.length - shown.length;
+  lm.hidden = !(narrow.matches && remaining > 0);
+  lm.querySelector("button").textContent = remaining > 0 ? `Load more stories (${remaining})` : "Load more stories";
   $("#newsEmpty").hidden = posts.length > 0;
   bindCovers($("#heroSlot"));
   bindCovers($("#newsGrid"));
+  syncRail("#newsGrid");
 }
 function renderReleases(){
   const posts = data.posts.filter(p=>p.type==="release" && matches(p))
@@ -1824,7 +1875,91 @@ function renderReleases(){
     </a>`).join("");
   $("#relEmpty").hidden = posts.length > 0;
   bindCovers($("#relGrid"));
+  syncRail("#relGrid");
 }
+/* --- rails: arrows with press-and-hold auto-scroll + inertia ----------
+   A short click steps one card; holding the button accelerates the glide;
+   on release the remaining velocity decays smoothly (inertia). Arrows only
+   appear when the rail actually overflows. */
+function syncRail(sel){
+  const rail = $(sel);
+  if(!rail) return;
+  const wrap = rail.parentElement;
+  const prev = wrap.querySelector(".rail-btn.prev");
+  const next = wrap.querySelector(".rail-btn.next");
+  const update = ()=>{
+    const max = rail.scrollWidth - rail.clientWidth - 1;
+    prev.classList.toggle("ok", max > 0 && rail.scrollLeft > 4);
+    next.classList.toggle("ok", max > 0 && rail.scrollLeft < max);
+  };
+  if(!rail._railWired){
+    rail._railWired = true;
+    rail.addEventListener("scroll", ()=>{ update(); }, {passive:true});
+    window.addEventListener("resize", update);
+  }
+  update();
+}
+function wireRail(gridSel, prevSel, nextSel){
+  const rail = $(gridSel);
+  if(!rail) return;
+  const step = ()=> (rail.firstElementChild ? rail.firstElementChild.getBoundingClientRect().width + 18 : 300);
+  const hold = {raf:0, v:0, dir:0, t0:0};
+  const stopHold = ()=>{ hold.raf = 0; hold.v = 0; hold.dir = 0; rail._holding = false; rail.style.scrollBehavior = ""; };
+  const glide = ()=>{
+    if(!hold.dir){ stopHold(); return; }
+    const dt = Math.min(50, performance.now() - hold.t0); hold.t0 = performance.now();
+    /* accelerate while held: 0 -> ~26px/frame, ease-out ramp;
+       direct scrollLeft writes need instant behavior - CSS smooth would
+       re-animate every write and the rail would crawl */
+    rail.style.scrollBehavior = "auto";
+    hold.v = Math.min(26, hold.v + dt * 0.045);
+    rail.scrollLeft += hold.dir * hold.v * (dt/16.7);
+    const max = rail.scrollWidth - rail.clientWidth - 1;
+    if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=max)){ stopHold(); return; }
+    hold.raf = requestAnimationFrame(glide);
+  };
+  const inertia = ()=>{
+    if(Math.abs(hold.v) < 0.4 || !hold.dir){ stopHold(); return; }
+    const dt = 16.7;
+    rail.scrollLeft += hold.dir * hold.v * (dt/16.7);
+    hold.v *= 0.94;
+    const max = rail.scrollWidth - rail.clientWidth - 1;
+    if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=max)){ stopHold(); return; }
+    hold.raf = requestAnimationFrame(inertia);
+  };
+  [ [prevSel,-1], [nextSel,1] ].forEach(([sel,dir])=>{
+    const btn = $(sel);
+    if(!btn) return;
+    btn.addEventListener("pointerdown", e=>{
+      e.preventDefault();
+      btn.setPointerCapture(e.pointerId);
+      btn.classList.add("hold");
+      rail._holding = true;
+      hold.dir = dir; hold.v = 0; hold.t0 = performance.now();
+      hold.raf = requestAnimationFrame(glide);
+    });
+    const release = ()=>{
+      if(!rail._holding) return;
+      btn.classList.remove("hold");
+      cancelAnimationFrame(hold.raf);
+      /* a quick tap = one card step; a long hold = inertia glide */
+      const held = performance.now() - hold.t0;
+      if(held < 240){
+        stopHold();
+        rail.scrollBy({left: dir * step(), behavior:"smooth"});
+      }else{
+        hold.raf = requestAnimationFrame(inertia);
+      }
+    };
+    btn.addEventListener("pointerup", release);
+    btn.addEventListener("pointercancel", release);
+  });
+  rail.addEventListener("scroll", ()=> syncRail(gridSel), {passive:true});
+  new MutationObserver(()=> syncRail(gridSel)).observe(rail, {childList:true});
+  syncRail(gridSel);
+}
+wireRail("#newsGrid", "#newsPrev", "#newsNext");
+wireRail("#relGrid", "#relPrev", "#relNext");
 $("#chartList").addEventListener("pointerdown", attachOut);
 $("#chartList").addEventListener("click", e=>{
   if(Date.now() - seekLock < 500) return;
