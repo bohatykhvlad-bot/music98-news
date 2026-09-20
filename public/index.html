@@ -135,7 +135,7 @@ main{position:relative;z-index:1}
 #tab-releases .rail-wrap{padding-right:0;margin-right:-22px}
 #tab-releases .rail{padding-right:66px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px + 7px)}
-.rail-wrap .rail-btn.next{right:-52px}
+.rail-wrap .rail-btn.next{right:0}
 .rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;overscroll-behavior-x:contain;padding:4px 0 4px;scrollbar-width:none;-ms-overflow-style:none}
 .rail::-webkit-scrollbar{display:none}
 .rail>*{scroll-snap-align:none}
@@ -144,7 +144,7 @@ main{position:relative;z-index:1}
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
   .rail-btn{display:none}
 }
-.rail-btn{position:absolute;top:calc(50% - 26px);z-index:5;width:52px;height:52px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .22s ease,color .18s ease,transform .18s ease;-webkit-tap-highlight-color:transparent;touch-action:none}
+.rail-btn{position:absolute;top:calc(50% - 70px);z-index:5;width:52px;height:140px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);opacity:0;pointer-events:none;transition:opacity .22s ease,color .18s ease,transform .18s ease;-webkit-tap-highlight-color:transparent;touch-action:none}
 /* next is ALWAYS lit (owner spec); prev lights up once the rail has been
    scrolled away from the start and there is something to scroll back to */
 .rail-btn.next{opacity:1;pointer-events:auto}
