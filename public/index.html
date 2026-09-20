@@ -200,7 +200,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
 .cname{display:contents;font-size:clamp(14px,1.4vw,18px);line-height:1.2;font-weight:800;letter-spacing:-.01em;text-transform:uppercase}
 .chart-row .pos,.cartist{font:inherit;letter-spacing:inherit;line-height:inherit;font-weight:inherit;text-transform:inherit;color:inherit;margin:0;padding:0;border:0;text-align:start}
-.chart-row .pos{min-width:2ch}
+/* tabular figures: every digit gets the same advance width, so "10" and "11"
+   have equal width - both edges of the numbers column align exactly
+   (proportional digits made "1" narrower and shifted "11" right of "10") */
+.chart-row .pos{min-width:2ch;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1}
 /* single digits hug the artist too: the digit rides the right edge of its
    fixed track, so the number->artist gap is identical on every row; the
    track is 1.4em (not 2ch) so two bold digits never clip, and the container
