@@ -1142,10 +1142,17 @@ function renderList(){
     const badge = st==="draft" ? "draft" : st==="scheduled" ? "sched" : "live";
     const badgeLabel = st==="draft" ? "Draft" : st==="scheduled" ? "Scheduled" : "Live";
     const when = st==="scheduled" && p.publishAt ? " · "+fmtWhen(p.publishAt) : (p.date ? " · "+esc(p.date) : "");
-    /* thumbnails show the crop the post actually carries (pos/zoom), not a
-       blind center fit - otherwise the list contradicts the live site */
-    const cpos = (p.cover && p.cover.pos) || "50% 50%";
-    const czoom = Math.min(6, Math.max(1, Number(p.cover && p.cover.zoom) || 1));
+    /* thumbnails show the crop the post actually carries - and since the
+       thumb is square, it previews the CARD crop (cardY/cardZoom/cardX),
+       exactly what the live site renders in the card */
+    const c = p.cover || {};
+    const pxy = String(c.pos || "50% 50%").split(/\s+/);
+    const mx = Number(pxy[0]); const my = Number(pxy[1]);
+    const cyPct = (c.cardY == null) ? (my || 50) : Math.round(Number(c.cardY)*100);
+    const cxPct = c.cardX != null ? Math.round(Number(c.cardX)*100)
+      : (c.lockX != null ? Math.round(Number(c.lockX)*100) : (mx || 50));
+    const czoom = Math.min(6, Math.max(1, Number(c.cardZoom ?? c.zoom) || 1));
+    const cpos = cxPct + "% " + cyPct + "%";
     const cstyle = `object-position:${cpos}` + (czoom>1 ? `;transform:scale(${czoom});transform-origin:${cpos}` : "");
     const thumb = tiny
       ? `<img style="${cstyle}" src="${esc(tiny)}" alt="">`
