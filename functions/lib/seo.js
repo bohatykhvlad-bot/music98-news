@@ -14,11 +14,21 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-/* identical to client buildSlugs(): strip curly quotes, keep [a-z0-9], cap 60, dedupe with id */
+/* cap slug at 80 chars without cutting a word — must mirror client slugCap() */
+function slugCap(s) {
+  if (s.length <= 80) return s;
+  const words = s.split("-");
+  let out = "";
+  for (const w of words) { if (out && (out.length + 1 + w.length) > 80) break; out = out ? out + "-" + w : w; }
+  return out || s.slice(0, 80);
+}
+
+/* identical to client buildSlugs(): strip curly quotes, keep [a-z0-9], cap 80 at word boundary, dedupe with id */
 export function slugify(title, id) {
-  return String(title || id).toLowerCase()
+  const base = String(title || id).toLowerCase()
     .replace(/[\u2018\u2019\u201C\u201D`\u00B4]/g, "")
-    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "post";
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "post";
+  return slugCap(base);
 }
 
 export function buildSlugMap(posts) {

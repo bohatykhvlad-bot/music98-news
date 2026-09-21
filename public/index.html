@@ -2683,11 +2683,20 @@ function buildSlugs(){
   data.posts.forEach(p=>{
     let s = String(p.title||p.id).toLowerCase()
       .replace(/[\u2018\u2019\u201C\u201D`\u00B4]/g,"")
-      .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60) || "post";
+      .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"") || "post";
+    s = slugCap(s);
     if(used[s]) s = s + "-" + p.id;
     used[s] = p.id;
     POST_SLUGS[p.id] = s;
   });
+}
+/* cap the slug at 80 chars without cutting a word in half */
+function slugCap(s){
+  if(s.length <= 80) return s;
+  const words = s.split("-");
+  let out = "";
+  for(const w of words){ if(out && (out.length + 1 + w.length) > 80) break; out = out ? out + "-" + w : w; }
+  return out || s.slice(0,80);
 }
 function postPath(p){ buildSlugs(); return "/post/" + (POST_SLUGS[p.id] || p.id); }
 document.addEventListener("mouseover", intentBootEvent, {passive:true});
