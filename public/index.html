@@ -2616,7 +2616,7 @@ function renderBody(text){
       const m = pos.match(/([\d.]+)%\s+([\d.]+)%/);
       const fx = (+m[1]/100).toFixed(4), fy = (+m[2]/100).toFixed(4);
       const cred = author ? `<p class="pcred">Photo: ${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(author)}</a>`:esc(author)}</p>` : "";
-      return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" src="${esc(assetPath(pic[1].trim()))}" alt="" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"></span>${cred}</figure>`;
+      return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" src="${esc(assetPath(pic[1].trim()))}" alt="" loading="lazy" decoding="async" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"></span>${cred}</figure>`;
     }
     const album = t.match(/^\[apple:album:(\d+)\]$/i);
     if(album) return appleEmbed(album[1]);
@@ -3027,7 +3027,17 @@ $("#es_reset").addEventListener("click", ()=>{
 });
 
 /* ---- init ---- */
-window.addEventListener("resize", ()=> document.querySelectorAll("img.js-cover").forEach(fitCover));
+/* perf: mobile browsers fire resize when the URL bar collapses/expands
+   during scroll; re-fitting every cover on each event = layout thrash
+   mid-scroll. Cover boxes are aspect-locked, so a height-only resize never
+   changes them: re-fit only when width actually changed, coalesced in rAF. */
+let _rsRaf = 0, _rsW = window.innerWidth;
+window.addEventListener("resize", ()=>{
+  if(window.innerWidth === _rsW) return;
+  _rsW = window.innerWidth;
+  if(_rsRaf) return;
+  _rsRaf = requestAnimationFrame(()=>{ _rsRaf = 0; document.querySelectorAll("img.js-cover").forEach(fitCover); });
+});
 window.addEventListener("pageshow", e=>{ if(e.persisted) loadPublishedDesk(); });
 S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refreshDailyTop50();
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
