@@ -80,13 +80,19 @@
     </div>
     <div class="foot-col">
       <h3>Sections</h3>
-      <a class="flink" href="/about">About us</a>
-      <a class="flink" href="/contacts">Contacts</a>
-      <a class="flink" href="/">News</a>
-      <a class="flink" href="/#releases">Releases</a>
-      <a class="flink" href="/#charts">Chart</a>
-      <a class="flink" href="/privacy">Privacy</a>
-      <a class="flink" href="/terms">Terms of Use</a>
+      <div class="fcols">
+        <div>
+          <a class="flink" href="/">News</a>
+          <a class="flink" href="/#releases">Releases</a>
+          <a class="flink" href="/#charts">Chart</a>
+          <a class="flink" href="/about">About us</a>
+        </div>
+        <div>
+          <a class="flink" href="/contacts">Contacts</a>
+          <a class="flink" href="/privacy">Privacy</a>
+          <a class="flink" href="/terms">Terms of Use</a>
+        </div>
+      </div>
     </div>
     <div class="foot-col social">
       <h3>Follow us</h3>
@@ -106,12 +112,13 @@
   .foot-col h3{margin:0 0 14px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
   .foot-col p{margin:0;color:var(--muted);font-size:13.5px;max-width:340px}
   .flink{display:block;color:var(--muted);text-decoration:none;font-size:14px;padding:5px 0;transition:.15s}
+  .fcols{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
   .flink:hover{color:var(--text)}
   .social .icons{display:flex;gap:10px;flex-wrap:wrap}
   .social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);text-decoration:none}
   .social svg{width:18px;height:18px}
   @media(max-width:900px){.foot-in{grid-template-columns:1fr 1fr}}
-  @media(max-width:600px){.foot-in{grid-template-columns:1fr;padding:32px 20px 36px}}
+  @media(max-width:600px){.foot-in{grid-template-columns:1fr;padding:32px 20px 36px}.fcols{grid-template-columns:1fr}}
 </style>
 </body>
 </html>
