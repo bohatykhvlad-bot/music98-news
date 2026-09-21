@@ -112,6 +112,14 @@ export function articleHtml(shell, p, slug, origin) {
   const jsonld = JSON.stringify(articleJsonLd(p, slug, origin)).replace(/</g, "\\u003c");
 
   let out = shell;
+  /* strip shell-level homepage tags first: two canonicals/og:images would
+     confuse crawlers (they read the first occurrence) */
+  out = out.replace(/<link rel="canonical"[^>]*>\s*/gi, "");
+  out = out.replace(/<meta property="og:url"[^>]*>\s*/gi, "");
+  out = out.replace(/<meta property="og:image"[^>]*>\s*/gi, "");
+  out = out.replace(/<meta property="article:[^"]*"[^>]*>\s*/gi, "");
+  out = out.replace(/<meta name="twitter:[^"]*"[^>]*>\s*/gi, "");
+  out = out.replace(/<link rel="sitemap"[^>]*>\s*/gi, "");
   out = rep(out, /<title>[\s\S]*?<\/title>/i, `<title>${title} — music98.news</title>`);
   out = rep(out, /<meta name="description" content="[^"]*">/i, `<meta name="description" content="${desc}">`);
   out = rep(out, /<meta property="og:title" content="[^"]*">/i, `<meta property="og:title" content="${title} — music98.news">`);
