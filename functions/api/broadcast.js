@@ -15,7 +15,9 @@ export async function onRequestPost({ request, env }) {
   const text = String(payload.text || "").trim();
   if (!subject || !text) return json({ error: "subject_and_text_required" }, 400);
   const desk = await readDesk(env, request);
-  const emails = newsletterRecipients(desk);
+  /* test mode: send only to one explicit address, never the whole list */
+  const testEmail = String(payload.testEmail || "").trim().toLowerCase();
+  const emails = testEmail ? [testEmail] : newsletterRecipients(desk);
   if (!emails.length) return json({ error: "no_subscribers" }, 400);
   const mail = mailConfig(desk, env);
   if (!mail.key) {
@@ -26,8 +28,13 @@ export async function onRequestPost({ request, env }) {
   }
   const html = "<pre style='font-family:Georgia,serif;font-size:16px;white-space:pre-wrap'>" +
     text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</pre>";
+  /* RFC 2369 / 8058 one-click unsubscribe - Gmail and Yahoo expect this from senders */
+  const unsubBase = "https://music98.news/api/unsubscribe?e=";
   let sent = 0, failed = 0, lastErr = "";
   for (const email of emails) {
+    const unsub = unsubBase + encodeURIComponent(email);
+    const footText = "\n\n---\nYou receive this because you subscribed at music98.news. Unsubscribe: " + unsub;
+    const footHtml = "<div style=\"margin-top:24px;padding-top:12px;border-top:1px solid #ddd;font-family:Arial,sans-serif;font-size:12px;color:#888\">You receive this because you subscribed at music98.news. <a href=\"" + unsub + "\" style=\"color:#888\">Unsubscribe</a>.</div>";
     try {
       const r = await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -36,7 +43,17 @@ export async function onRequestPost({ request, env }) {
           "Content-Type": "application/json",
           "User-Agent": "music98.news",
         },
-        body: JSON.stringify({ from: mail.sender, to: [email], subject, html, text }),
+        body: JSON.stringify({
+          from: mail.sender,
+          to: [email],
+          subject,
+          html: html + footHtml,
+          text: text + footText,
+          headers: {
+            "List-Unsubscribe": "<" + unsub + ">",
+            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+          },
+        }),
       });
       if (r.ok) sent += 1;
       else {

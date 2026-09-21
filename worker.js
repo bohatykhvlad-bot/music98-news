@@ -4,6 +4,7 @@ import { onRequestGet as preview } from "./functions/api/preview.js";
 import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
 import { onRequestGet as subscribers, onRequestDelete as subscribersRemove } from "./functions/api/subscribers.js";
 import { onRequestPost as broadcast } from "./functions/api/broadcast.js";
+import { onRequest as unsubscribe } from "./functions/api/unsubscribe.js";
 import { onRequest as mail } from "./functions/api/mail.js";
 import { onRequestPost as photoUpload } from "./functions/api/photo.js";
 
@@ -158,6 +159,7 @@ export default {
     if (path === "/api/subscribers" && request.method === "GET") return subscribers(c);
     if (path === "/api/subscribers" && request.method === "DELETE") return subscribersRemove(c);
     if (path === "/api/broadcast" && request.method === "POST") return broadcast(c);
+    if (path === "/api/unsubscribe") return unsubscribe(c);
     if (path === "/api/mail") return mail(c);
     if (path === "/api/photo" && request.method === "POST") return photoUpload(c);
     if (path === "/m98desk" || path === "/m98desk.html") {
