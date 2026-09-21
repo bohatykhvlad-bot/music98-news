@@ -173,8 +173,10 @@ export default {
       const u = new URL(request.url);
       return env.ASSETS.fetch(new Request(u.origin + legal[1] + ".html", request));
     }
-    /* clean article URLs with server-side SEO meta + dynamic sitemap/RSS */
-    const post = path.match(/^\/post\/([^\/]+)\/?$/);
+    /* clean article URLs with server-side SEO meta + dynamic sitemap/RSS.
+       /news/<slug> and /releases/<slug> are canonical; /post/<slug> stays
+       alive so links shared before the category split keep resolving. */
+    const post = path.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/);
     if (post && (request.method === "GET" || request.method === "HEAD")) return serveArticle(request, env);
     if (path === "/sitemap.xml") return serveSitemap(request, env);
     if (path === "/news-sitemap.xml") return serveNewsSitemap(request, env);

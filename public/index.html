@@ -2682,7 +2682,7 @@ function intentBootEvent(e){
   const href = a.getAttribute("href")||"";
   const m = href.match(/^#post\/(.+)$/);
   if(m){ intentBootPost(m[1]); return; }
-  const sm = href.match(/^\/post\/([^\/]+)\/?$/);
+  const sm = href.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/);
   if(sm){
     try{
       const slug = decodeURIComponent(sm[1]);
@@ -2728,11 +2728,11 @@ function slugCap(s){
   for(const w of words){ if(out && (out.length + 1 + w.length) > 80) break; out = out ? out + "-" + w : w; }
   return out || s.slice(0,80);
 }
-function postPath(p){ buildSlugs(); return "/post/" + (POST_SLUGS[p.id] || p.id); }
+function postPath(p){ buildSlugs(); return "/" + (p.type==="release" ? "releases" : "news") + "/" + (POST_SLUGS[p.id] || p.id); }
 document.addEventListener("mouseover", intentBootEvent, {passive:true});
 document.addEventListener("focusin", intentBootEvent);
 function route(){
-  const pm = location.pathname.match(/^\/post\/([^\/]+)\/?$/);
+  const pm = location.pathname.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/);
   if(pm){
     buildSlugs();
     try{
@@ -2761,7 +2761,7 @@ window.addEventListener("popstate", route);
 /* SPA navigation for clean URLs: intercept clicks, keep the no-reload experience */
 document.addEventListener("click", e=>{
   if(e.defaultPrevented || e.button!==0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-  const a = e.target && e.target.closest ? e.target.closest('a[href^="/post/"]') : null;
+  const a = e.target && e.target.closest ? e.target.closest('a[href^="/post/"], a[href^="/news/"], a[href^="/releases/"]') : null;
   if(!a) return;
   e.preventDefault();
   const to = a.getAttribute("href");

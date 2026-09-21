@@ -76,8 +76,13 @@ function firstImage(p) {
   return m ? m[1] : "";
 }
 
+/* canonical article path: /news/<slug> or /releases/<slug> */
+export function articlePath(p, slug) {
+  return "/" + ((p && p.type) === "release" ? "releases" : "news") + "/" + slug;
+}
+
 function articleJsonLd(p, slug, origin) {
-  const url = `${SITE}/post/${slug}`;
+  const url = SITE + articlePath(p, slug);
   const img = firstImage(p);
   const image = img ? (img.startsWith("http") ? img : origin + (img.startsWith("/") ? "" : "/") + img) : absCover(p, origin);
   const iso = isoDate(p);
@@ -104,7 +109,7 @@ function rep(html, re, to) {
 export function articleHtml(shell, p, slug, origin) {
   const title = escapeHtml(String(p.title || "music98.news"));
   const desc = escapeHtml(plainText(p.excerpt || p.body || "").slice(0, 160));
-  const url = `${SITE}/post/${slug}`;
+  const url = SITE + articlePath(p, slug);
   const image = escapeHtml(absCover(p, origin));
   const iso = isoDate(p);
   /* JSON-LD must stay raw JSON: entities are not decoded inside <script>.
@@ -166,7 +171,7 @@ export async function serveSitemap(request, env) {
     { loc: `${SITE}/contacts`, priority: "0.5" },
     { loc: `${SITE}/privacy`, priority: "0.3" },
     { loc: `${SITE}/terms`, priority: "0.3" },
-    ...posts.map((p) => ({ loc: `${SITE}/post/${slugs[p.id]}`, lastmod: isoDate(p).slice(0, 10), priority: "0.8" })),
+    ...posts.map((p) => ({ loc: SITE + articlePath(p, slugs[p.id]), lastmod: isoDate(p).slice(0, 10), priority: "0.8" })),
   ];
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
@@ -193,7 +198,7 @@ export async function serveNewsSitemap(request, env) {
       const iso = isoDate(p);
       return (
         `  <url>\n` +
-        `    <loc>${SITE}/post/${slugs[p.id]}</loc>\n` +
+        `    <loc>${SITE + articlePath(p, slugs[p.id])}</loc>\n` +
         `    <news:news>\n` +
         `      <news:publication>\n` +
         `        <news:name>music98.news</news:name>\n` +
@@ -219,7 +224,7 @@ export async function serveRss(request, env) {
     .sort((a, b) => (Date.parse(b.publishAt || b.date || 0) || 0) - (Date.parse(a.publishAt || a.date || 0) || 0))
     .slice(0, 30)
     .map((p) => {
-      const link = `${SITE}/post/${slugs[p.id]}`;
+      const link = SITE + articlePath(p, slugs[p.id]);
       const t = Date.parse(p.publishAt || p.date || "") || Date.now();
       return (
         `    <item>\n` +
