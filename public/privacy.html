@@ -12,11 +12,12 @@
   html,body{margin:0}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
   .page{max-width:720px;margin:0 auto;padding:48px 20px 64px}
-  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:8px 10px 8px 16px;border-radius:999px}
+  .top{display:inline-flex;align-items:center;margin-bottom:28px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:8px 18px 8px 10px;border-radius:999px}
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:19px;letter-spacing:-.015em}
   .brand img{width:34px;height:34px;border-radius:50%}
-  .home{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border:1px solid #15181a;border-radius:999px;background:#15181a;color:#ffffff;text-decoration:none;font-size:13.5px;font-weight:600;transition:.15s}
-  .home:hover{background:#2a3033;border-color:#2a3033}
+  .aback{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin:0 0 18px}
+  .aback::before{content:"";width:7px;height:7px;flex:none;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-1px}
+  .aback:hover{text-decoration:underline}
   .kicker{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin:0 0 10px}
   h1{margin:0 0 20px;font-size:clamp(30px,6vw,40px);letter-spacing:-.02em;line-height:1.1}
   h2{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);margin:30px 0 10px}
@@ -33,9 +34,9 @@
 <div class="page">
   <div class="top">
     <a class="brand" href="/"><img src="/logo.png" alt="music98.news logo">music98.news</a>
-    <a class="home" href="/">Back to the site</a>
   </div>
 
+  <a class="aback" href="/">Back</a>
   <p class="kicker">Last updated 21 September 2026</p>
   <h1>Privacy Policy</h1>
   <p>music98.news is an independent music publication. This page covers what we collect and how Apple Music is used on the site.</p>
