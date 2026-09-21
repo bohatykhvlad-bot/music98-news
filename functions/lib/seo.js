@@ -63,10 +63,14 @@ function isoDate(p) {
   return new Date(t).toISOString();
 }
 
+/* keep in sync with PHOTO_VER in public/index.html */
+const PHOTO_VER = "v2";
+
 function absCover(p, origin) {
   const c = p.cover;
   if (c && c.kind === "img" && c.src && !/^data:|^blob:/i.test(c.src)) {
-    return c.src.startsWith("http") ? c.src : origin + (c.src.startsWith("/") ? "" : "/") + c.src;
+    if (c.src.startsWith("http")) return c.src;
+    return origin + (c.src.startsWith("/") ? "" : "/") + c.src + "?v=" + PHOTO_VER;
   }
   return origin + "/logo.png";
 }

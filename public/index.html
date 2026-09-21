@@ -917,11 +917,15 @@ function assetPath(src){
   if(!s || /^(data:|blob:|https?:|\/)/i.test(s)) return s;
   return "/" + s;
 }
+/* photo cache version: bump (v2, v3, ...) whenever photos/*.jpg are
+   re-encoded in place - URLs change, so year-long immutable caches
+   (browser + Cloudflare edge) pick up the new bytes */
+const PHOTO_VER = "v2";
 function coverOf(p, square){
   if (p.cover && p.cover.kind === "img" && p.cover.src){
     const src = assetPath(p.cover.src);
     if(/^data:|^blob:/i.test(src)) return src;
-    const sig = [p.id||"", p.cover.pos||"", p.cover.zoom||"", (src.length+"")].join(".");
+    const sig = [p.id||"", p.cover.pos||"", p.cover.zoom||"", (src.length+""), PHOTO_VER].join(".");
     return src + (src.indexOf("?")>=0 ? "&" : "?") + "m98="+encodeURIComponent(sig);
   }
   return presetCover(p.cover ? p.cover.i : 0, p.artist || p.title, square);
@@ -2616,7 +2620,9 @@ function renderBody(text){
       const m = pos.match(/([\d.]+)%\s+([\d.]+)%/);
       const fx = (+m[1]/100).toFixed(4), fy = (+m[2]/100).toFixed(4);
       const cred = author ? `<p class="pcred">Photo: ${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(author)}</a>`:esc(author)}</p>` : "";
-      return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" src="${esc(assetPath(pic[1].trim()))}" alt="" loading="lazy" decoding="async" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"></span>${cred}</figure>`;
+      const bsrc = assetPath(pic[1].trim());
+const bvq = /^\/photos\//.test(bsrc) ? "?v=" + PHOTO_VER : "";
+return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" src="${esc(bsrc)}${bvq}" alt="" loading="lazy" decoding="async" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"></span>${cred}</figure>`;
     }
     const album = t.match(/^\[apple:album:(\d+)\]$/i);
     if(album) return appleEmbed(album[1]);
