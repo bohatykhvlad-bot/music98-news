@@ -10,23 +10,19 @@
   :root{--bg:#ffffff;--bg2:#f4f6f7;--card:#ffffff;--card2:#edf1f2;--line:#e2e8ea;--text:#15181a;--muted:#5c6a70;--muted2:#93a0a6;--accent:#00fdfb}
   *{box-sizing:border-box}
   html,body{margin:0}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55}
-
-  /* ===== header: same topbar as main, brand only (no tabs) ===== */
+  body{padding-top:70px;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55}
   .topbar{position:fixed;top:0;left:0;right:0;z-index:60}
-  .topbar-glass{position:absolute;top:0;height:68px;left:max(0px, calc(50% - 590px));right:max(0px, calc(50% - 590px));background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);border-top:0;border-radius:0 0 18px 18px;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);pointer-events:none}
-  @media (max-width:1180px){.topbar-glass{left:0;right:0;border-radius:0 0 18px 18px}}
-  .topbar-in{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 20px;height:68px;display:grid;grid-template-columns:1fr 1fr;align-items:center}
-  .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none;justify-self:start}
+  .topbar-glass{position:absolute;top:0;height:68px;left:max(0px, calc(50% - 590px));right:max(0px, calc(50% - 590px));background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);border-top:0;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);pointer-events:none}
+  @media (max-width:1180px){.topbar-glass{left:0;right:0}}
+  .topbar-in{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 20px;height:68px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none}
   .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
   .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
-  .top-actions{justify-self:end}
-  @media (max-width:560px){.brand-name{font-size:17px}
-}
-  body{padding-top:70px}
-
-  /* ===== content ===== */
-  .page{max-width:1080px;margin:0 auto;padding:40px 24px 0}
+  .home{display:inline-flex;align-items:center;height:40px;padding:0 20px;border:1px solid rgba(15,60,64,.14);border-radius:999px;background:rgba(255,255,255,.55);color:var(--text);text-decoration:none;font-size:14px;font-weight:600;transition:.18s}
+  .home:hover{background:#ffffff}
+  @media (max-width:560px){.brand-name{font-size:17px}.home{height:36px;padding:0 14px;font-size:13px}}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+  .content{max-width:760px;padding:40px 0 0}
   .aback{display:flex;width:max-content;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin:0 0 18px}
   .aback::before{content:"";width:7px;height:7px;flex:none;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-1px}
   .aback:hover{text-decoration:underline}
@@ -35,8 +31,8 @@
   .lead{font-size:17.5px;line-height:1.65;color:var(--muted);margin:0 0 22px}
   h2{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text);margin:24px 0 10px}
   p{font-size:15.5px;line-height:1.7;margin:0 0 14px;color:var(--text)}
-  a.mail{color:var(--text);text-decoration:none;font-weight:600;border-bottom:1.5px solid var(--text)}
-  a.mail:hover{color:var(--muted);border-color:var(--muted)}
+  .content a{color:var(--text);text-decoration:none;font-weight:600;border-bottom:1.5px solid var(--text)}
+  .content a:hover{color:var(--muted);border-color:var(--muted)}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 26px}
   @media(max-width:760px){.grid{grid-template-columns:1fr}}
   .pill{display:flex;flex-direction:column;gap:4px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
@@ -52,44 +48,29 @@
       <img class="brand-logo" src="/logo.png" alt="music98.news" width="44" height="44">
       <span class="brand-name">music98.news</span>
     </a>
-    <div class="top-actions">
-      <a class="home" href="/">Back to the site</a>
-    </div>
+    <a class="home" href="/">Back to the site</a>
   </div>
 </header>
 
-<div class="page">
-  <a class="aback" href="/">Back</a>
-  <p class="kicker">Last updated 21 September 2026</p>
-  <h1>Terms of Use</h1>
-
-  <p>By using music98.news you agree to these terms. They are short on purpose.</p>
-
-  <h2>Content ownership</h2>
-  <p>Original texts, the site design and the daily Top 50 chart compilation belong to music98.news. Artist photos and artwork are used under license, from official press materials, or under Creative Commons licenses with attribution shown on each post; they belong to their respective owners.</p>
-
-  <h2>Acceptable use</h2>
-  <p>You may read, link to and quote our pages with attribution and a link. You may not republish full articles without written permission, scrape the site at scale, or use it to distribute spam or harmful content.</p>
-
-  <h2>Music and external services</h2>
-  <p>Audio previews, playback and "Listen on Apple Music" links are provided by Apple under its own terms. We do not host music files. We are not responsible for the content or availability of third-party services linked from our pages.</p>
-
-  <h2>Affiliate disclosure</h2>
-  <p>Links to Apple Music are affiliate links. If you start an Apple Music subscription through them, we may earn a commission at no extra cost to you. This never affects editorial choices or chart positions.</p>
-
-  <h2>No professional advice</h2>
-  <p>The site is editorial content for information and entertainment. It is not legal, financial or other professional advice.</p>
-
-  <h2>Liability</h2>
-  <p>We work to keep facts accurate and the site available, but we provide everything "as is" and are not liable for decisions made based on the content, or for temporary unavailability of the service.</p>
-
-  <h2>Changes</h2>
-  <p>These terms may be updated; the date above always shows the current version. Questions — <a href="mailto:info@music98.news">info@music98.news</a>.</p>
-
-
+<div class="wrap">
+  <div class="content">
+    <a class="aback" href="/">Back</a>
+    <p class="kicker">Last updated 21 September 2026</p>
+    <h1>Terms of Use</h1>
+    <p class="lead">By using music98.news you agree to these terms. They are short on purpose.</p>
+<h2>Content ownership</h2>
+<p>Original texts, the site design and the daily Top 50 chart compilation belong to music98.news. Artist photos and artwork are used under license, from official press materials, or under Creative Commons licenses with attribution shown on each post; they belong to their respective owners.</p>
+<h2>Acceptable use</h2>
+<p>You may read, link to and quote our pages with attribution and a link. You may not republish full articles without written permission, scrape the site at scale, or use it to distribute spam or harmful content.</p>
+<h2>Music and external services</h2>
+<p>Audio previews, playback and "Listen on Apple Music" links are provided by Apple under its own terms. We do not host music files. We are not responsible for the content or availability of third-party services linked from our pages.</p>
+<h2>Affiliate disclosure</h2>
+<p>Links to Apple Music are affiliate links. If you start an Apple Music subscription through them, we may earn a commission at no extra cost to you. This never affects editorial choices or chart positions.</p>
+<h2>General</h2>
+<p>The site is editorial content for information and entertainment, not professional advice. Everything is provided "as is". These terms may be updated; questions — <a href="mailto:info@music98.news">info@music98.news</a>.</p>
+  </div>
 </div>
 
-<!-- same footer as the main site (static copy for legal pages) -->
 <footer>
   <div class="foot-in">
     <div class="foot-col">
@@ -109,19 +90,18 @@
     <div class="foot-col social">
       <h3>Follow us</h3>
       <div class="icons">
-        <a href="https://www.youtube.com/@music9898" aria-label="music98.news on YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12z"/></svg></a>
-        <a href="https://www.tiktok.com/@yourmusic98" aria-label="music98.news on TikTok" title="TikTok"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.7 7.4a5.7 5.7 0 0 1-3.5-1.2 5.7 5.7 0 0 1-2-3.2h-3.4v13.4a2.9 2.9 0 1 1-2-2.7v-3.5a6.3 6.3 0 1 0 5.4 6.2V9.8a9 9 0 0 0 5.5 1.9V8.3c-.4 0-.7-.4-.7-.9z"/></svg></a>
-        <a href="https://www.instagram.com/instmusic98" aria-label="music98.news on Instagram" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.2" fill="currentColor" stroke="none"/></svg></a>
-        <a href="https://www.facebook.com/yourmusic98" aria-label="music98.news on Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.3-1.5 1.6-1.5h1.7V4.6c-.3 0-1.3-.1-2.5-.1-2.4 0-4 1.5-4 4.1v2.3H7.6V14h2.7v8h3.2z"/></svg></a>
+        <a href="https://www.youtube.com/@music9898" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12z"/></svg></a>
+        <a href="https://www.tiktok.com/@yourmusic98" aria-label="TikTok" title="TikTok"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19.7 7.4a5.7 5.7 0 0 1-3.5-1.2 5.7 5.7 0 0 1-2-3.2h-3.4v13.4a2.9 2.9 0 1 1-2-2.7v-3.5a6.3 6.3 0 1 0 5.4 6.2V9.8a9 9 0 0 0 5.5 1.9V8.3c-.4 0-.7-.4-.7-.9z"/></svg></a>
+        <a href="https://www.instagram.com/instmusic98" aria-label="Instagram" title="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.2" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://www.facebook.com/yourmusic98" aria-label="Facebook" title="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.3-1.5 1.6-1.5h1.7V4.6c-.3 0-1.3-.1-2.5-.1-2.4 0-4 1.5-4 4.1v2.3H7.6V14h2.7v8h3.2z"/></svg></a>
       </div>
     </div>
   </div>
 </footer>
 
 <style>
-  /* footer styles copied from the main site so legal pages match it exactly */
   footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:56px}
-  .foot-in{max-width:1180px;margin:0 auto;padding:40px 24px 44px;display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:34px}
+  .foot-in{max-width:1180px;margin:0 auto;padding:40px 20px 44px;display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:34px}
   .foot-col h3{margin:0 0 14px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
   .foot-col p{margin:0;color:var(--muted);font-size:13.5px;max-width:340px}
   .flink{display:block;color:var(--muted);text-decoration:none;font-size:14px;padding:5px 0;transition:.15s}
