@@ -118,6 +118,10 @@ export function articleHtml(shell, p, slug, origin) {
     `<meta property="og:url" content="${url}">\n` +
     `<meta property="og:image" content="${image}">\n` +
     `<meta property="article:published_time" content="${iso}">\n` +
+    `<meta name="twitter:card" content="summary_large_image">\n` +
+    `<meta name="twitter:title" content="${escapeHtml(String(p.title||""))}">\n` +
+    `<meta name="twitter:description" content="${desc}">\n` +
+    `<meta name="twitter:image" content="${image}">\n` +
     `<script type="application/ld+json">${jsonld}</script>\n`;
   out = rep(out, /<\/head>/i, extra + "</head>");
   return out;
@@ -159,6 +163,39 @@ export async function serveSitemap(request, env) {
     ).join("\n") +
     "\n</urlset>";
   return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=1800" } });
+}
+
+/* GET /news-sitemap.xml: Google News sitemap, posts from the last 48 hours only */
+export async function serveNewsSitemap(request, env) {
+  const posts = env ? publicPosts(await readDesk(env, request)) : [];
+  const slugs = buildSlugMap(posts);
+  const cutoff = Date.now() - 48 * 3600 * 1000;
+  const fresh = posts
+    .filter((p) => (Date.parse(p.publishAt || p.date || 0) || 0) >= cutoff)
+    .sort((a, b) => (Date.parse(b.publishAt || b.date || 0) || 0) - (Date.parse(a.publishAt || a.date || 0) || 0))
+    .slice(0, 50);
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">\n` +
+    fresh.map((p) => {
+      const iso = isoDate(p);
+      return (
+        `  <url>\n` +
+        `    <loc>${SITE}/post/${slugs[p.id]}</loc>\n` +
+        `    <news:news>\n` +
+        `      <news:publication>\n` +
+        `        <news:name>music98.news</news:name>\n` +
+        `        <news:language>en</news:language>\n` +
+        `      </news:publication>\n` +
+        `      <news:publication_date>${iso}</news:publication_date>\n` +
+        `      <news:title>${escapeHtml(p.title || "")}</news:title>\n` +
+        `    </news:news>\n` +
+        `  </url>`
+      );
+    })
+      .join("\n") +
+    `\n</urlset>`;
+  return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=900" } });
 }
 
 /* GET /rss.xml: latest 30 posts, RSS 2.0 */

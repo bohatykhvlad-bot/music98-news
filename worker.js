@@ -7,7 +7,7 @@ import { onRequestPost as broadcast } from "./functions/api/broadcast.js";
 import { onRequest as unsubscribe } from "./functions/api/unsubscribe.js";
 import { onRequest as mail } from "./functions/api/mail.js";
 import { onRequestPost as photoUpload } from "./functions/api/photo.js";
-import { serveArticle, serveSitemap, serveRss } from "./functions/lib/seo.js";
+import { serveArticle, serveSitemap, serveRss, serveNewsSitemap } from "./functions/lib/seo.js";
 
 const APPLE_ALBUM = /^\/apple-embed\/([a-z]{2})\/album\/(\d+)$/;
 const PHOTO_FILE = /^\/photos\/([a-z0-9._-]+)\.(jpe?g|png|webp)$/;
@@ -177,6 +177,7 @@ export default {
     const post = path.match(/^\/post\/([^\/]+)\/?$/);
     if (post && (request.method === "GET" || request.method === "HEAD")) return serveArticle(request, env);
     if (path === "/sitemap.xml") return serveSitemap(request, env);
+    if (path === "/news-sitemap.xml") return serveNewsSitemap(request, env);
     if (path === "/rss.xml") return serveRss(request, env);
     const photo = path.match(PHOTO_FILE);
     if (photo) {

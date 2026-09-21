@@ -899,9 +899,16 @@ function presetCover(i, label, square){
 </svg>`;
   return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
 }
+/* absolute-ify a data-relative asset path: covers live at site root,
+   and clean /post/<slug> URLs change the base, breaking bare "photos/..." */
+function assetPath(src){
+  const s = String(src||"");
+  if(!s || /^(data:|blob:|https?:|\/)/i.test(s)) return s;
+  return "/" + s;
+}
 function coverOf(p, square){
   if (p.cover && p.cover.kind === "img" && p.cover.src){
-    const src = p.cover.src;
+    const src = assetPath(p.cover.src);
     if(/^data:|^blob:/i.test(src)) return src;
     const sig = [p.id||"", p.cover.pos||"", p.cover.zoom||"", (src.length+"")].join(".");
     return src + (src.indexOf("?")>=0 ? "&" : "?") + "m98="+encodeURIComponent(sig);
@@ -2598,7 +2605,7 @@ function renderBody(text){
       const m = pos.match(/([\d.]+)%\s+([\d.]+)%/);
       const fx = (+m[1]/100).toFixed(4), fy = (+m[2]/100).toFixed(4);
       const cred = author ? `<p class="pcred">Photo: ${link?`<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(author)}</a>`:esc(author)}</p>` : "";
-      return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" src="${esc(pic[1].trim())}" alt="" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"></span>${cred}</figure>`;
+      return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" src="${esc(assetPath(pic[1].trim()))}" alt="" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"></span>${cred}</figure>`;
     }
     const album = t.match(/^\[apple:album:(\d+)\]$/i);
     if(album) return appleEmbed(album[1]);
@@ -2676,15 +2683,26 @@ function intentBootEvent(e){
 /* ---- clean article URLs: /post/<slug> (SEO) with legacy #/post/<id> support ---- */
 const POST_SLUGS = {};
 let _slugsBuilt = false;
+/* slug base: artist + title (artist prepended only when the title doesn't name them) */
+function slugBase(p){
+  let t = String((p && p.title) || (p && p.id) || "");
+  const a = String((p && p.artist) || "").trim();
+  if(a && t.toLowerCase().indexOf(a.toLowerCase()) < 0) t = a + " " + t;
+  return t;
+}
+/* must stay byte-identical to server slugify() in functions/lib/seo.js */
+function slugify(p){
+  const base = slugBase(p).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[\u2018\u2019\u201C\u201D`\u00B4']/g,"")
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"") || "post";
+  return slugCap(base);
+}
 function buildSlugs(){
   if(_slugsBuilt) return;
   _slugsBuilt = true;
   const used = {};
   data.posts.forEach(p=>{
-    let s = String(p.title||p.id).toLowerCase()
-      .replace(/[\u2018\u2019\u201C\u201D`\u00B4]/g,"")
-      .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"") || "post";
-    s = slugCap(s);
+    let s = slugify(p);
     if(used[s]) s = s + "-" + p.id;
     used[s] = p.id;
     POST_SLUGS[p.id] = s;
