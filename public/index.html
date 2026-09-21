@@ -37,7 +37,7 @@
   --r:16px; --shadow:0 12px 34px rgba(15,45,55,.10);
   --font:"Pretendard",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
-@property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
+@property --pplay{syntax:"<number>";inherits:true;initial-value:0}
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -258,7 +258,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- charts ---------- */
 .chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
-.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
+.chart-row{--pw:40px;--pwid:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) 40px minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,--pplay .45s cubic-bezier(.3,.65,.25,1)}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
@@ -280,12 +280,36 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
-.cmid{--pexp:0px;--pin:8px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:0;z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
-/* gap:0 while collapsed - the invisible zero-width .pextra otherwise keeps an
-   8px slot after the play button and shifts the icon 4px off the column
-   center, so the expanded plate would sit 4px off the neighbor-rows' axis */
-.chart-row.playing .cmid{background:rgba(255,255,255,.92);border-color:rgba(15,60,64,.10);padding:4px var(--pin);gap:var(--pin)}
-.rplay{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;transition:background .16s ease,color .16s ease,transform .16s ease}
+/* PINNED PLAY BUTTON (desktop) - why the old design slid the icon:
+   growing the --pw grid column shrank the names 1fr column, so the CELL
+   slid left (measured: button center 778->624px; owner: "съезжает при
+   нажатии, пауза доезжает влево"). Now NOTHING in the row reflows: the
+   4th column and .cmid are frozen at 40px, and the plate is an absolute
+   overlay growing rightward from under the button, driven by ONE
+   registered progress --pplay (0->1, .45s cubic-bezier). The button's
+   position is invariant by construction (no layout property near it
+   changes), so rest -> mid-flight -> playing is pixel-identical.
+   .pextra covers the button zone visually but is pointer-events:none;
+   its interactive children (.ptime/.abadge) re-enable events, so the
+   pause click passes through the padding straight to the button.
+   The weeks column yields via transform (never covered, never reflows). */
+.cmid{width:40px;justify-self:center;position:relative;display:flex;align-items:center;justify-content:center;z-index:2}
+.chart-row.playing .cmid{z-index:2}
+@media (min-width:1201px){
+  .chart-row.playing .weeks{transform:translateX(calc((var(--pwid,0px) + 2px)*var(--pplay)))}
+}
+/* 641-1200px: legacy in-flow regime - the plate lives inside the capsule and
+   the --pw grid column grows (JS sets it). The pinned overlay needs ~300px of
+   room to the right that middle widths don't have; owner tests PC (>=1440)
+   and phone (<=640), each with its own regime. */
+@media (max-width:1200px){
+  .chart-row{grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);transition:background .15s ease,--pplay .45s cubic-bezier(.3,.65,.25,1),grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
+  .cmid{width:100%}
+  .chart-row.playing .cmid{background:rgba(255,255,255,.92);border-color:rgba(15,60,64,.10);padding:4px 8px;gap:8px}
+  .pextra{position:static;left:auto;top:auto;transform:none;height:auto;width:auto;border:0;padding:0;background:none;transition:opacity .3s ease}
+  .chart-row.playing .pextra{opacity:1;visibility:visible;background:none;border:0}
+}
+.rplay{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;transition:background .16s ease,color .16s ease,transform .16s ease;position:relative;z-index:3}
 /* pause->play sequencing (owner): the accent must NOT evaporate while the
    plate is folding - the morph to the play triangle rides at full size/accent,
    and the visual shrink (accent, fill) lands only at the very end, once the
@@ -306,7 +330,16 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.07)}
 .chart-row.playing .rplay{background:var(--accent);border-color:transparent;color:#03282b}
 .chart-row.playing .rplay:hover{transform:scale(1.07)}
-.pextra{display:flex;align-items:center;gap:var(--pin, 8px);width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
+/* the plate IS the white capsule now: absolutely positioned over/around
+   the button (left -9px = 1px border + 8px pad of the old capsule),
+   width (66px + plate)*p wipes it out rightward; 66 = 2*1 border + 40 button
+   + 8 gap + 8 pad-right, and padding-left 56 clears the button zone so the
+   seekbar never sits over the icon. pointer-events none on the capsule
+   (clicks over the button fall through to it); the seekbar and the Apple
+   badge re-enable events for themselves. */
+.pextra{position:absolute;left:-9px;top:50%;transform:translateY(-50%);height:50px;width:calc((66px + var(--pwid,0px))*var(--pplay));display:flex;align-items:center;gap:8px;padding:4px 8px 4px 56px;border:1px solid transparent;border-radius:999px;flex:none;opacity:0;overflow:hidden;visibility:hidden;pointer-events:none;transition:opacity .25s ease,visibility 0s linear .25s}
+.chart-row.playing .pextra{opacity:1;visibility:visible;background:rgba(255,255,255,.92);border-color:rgba(15,60,64,.10);transition:opacity .25s ease,visibility 0s}
+.pextra .ptime,.pextra .abadge{pointer-events:auto}
 .chart-row.playing .pextra{opacity:1}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
 .pbar{width:108px;height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:block;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none}
@@ -320,7 +353,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .ctext{min-width:0;max-width:100%;overflow:hidden}
 .ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;grid-column:2}
 
-.chart-row.playing{background:var(--bg2)}
+.chart-row.playing{--pplay:1;background:var(--bg2)}
 .chart-note{margin:14px 2px 0;color:var(--muted2);font-size:12.5px}
 .chart-switch{display:none!important}
 .cs-btn{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:.18s}
@@ -554,7 +587,7 @@ textarea{resize:vertical;min-height:64px}
   .nav-btn.active:hover,.nav-btn.active:active{background:var(--accent);color:#03282b}
   .nav-btn:active{background:transparent;color:var(--muted)}
   .chart-row:hover{background:transparent}
-  .chart-row.playing{background:var(--bg2)}
+  .chart-row.playing{--pplay:1;background:var(--bg2)}
   .rplay:hover{background:rgba(255,255,255,.65);color:var(--acc2);border-color:var(--line);transform:none}
   .chart-row.playing .rplay:hover,.chart-row.playing .rplay:active{background:var(--accent);color:#03282b;border-color:transparent}
   .card:hover,.hero:hover,.rcard:hover{transform:none;border-color:var(--line);box-shadow:none}
@@ -598,7 +631,6 @@ textarea{resize:vertical;min-height:64px}
      size it to its text and center it; the email input stays full width */
   .sub-in .btn{width:auto;align-self:center;padding:0 42px}
   .chart-row{
-    --pw:auto;
     display:grid;
     grid-template-columns:28px 44px minmax(0,1fr) 36px;
     grid-template-areas:
@@ -623,8 +655,10 @@ textarea{resize:vertical;min-height:64px}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}
   .rplay svg{width:21px;height:21px}
-  .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:auto;min-height:0;opacity:0;overflow:hidden;transform:none;pointer-events:none;max-height:0;margin:0;transition:opacity .28s ease,max-height .32s ease}
-  .chart-row.playing .pextra{opacity:1;overflow:hidden;pointer-events:auto;max-height:36px}
+  /* phone: the plate folds back into the grid (its own row below the
+     names) - undo the desktop absolute overlay completely */
+  .pextra{grid-area:extra;position:static;left:auto;top:auto;transform:none;height:auto;width:100%;max-width:100%;min-height:0;max-height:0;opacity:0;overflow:hidden;pointer-events:none;visibility:hidden;transition:opacity .28s ease,max-height .32s ease,visibility 0s linear .32s}
+  .chart-row.playing .pextra{opacity:1;overflow:hidden;pointer-events:auto;visibility:visible;max-height:36px;background:none;border:0;transition:opacity .28s ease,max-height .32s ease,visibility 0s}
   .ptime{display:flex;align-items:center;flex:1;min-width:0;padding:0;gap:8px;background:none;border:0;border-radius:0}
   .pbar{flex:1;min-width:40px;width:auto;max-width:none;height:6px}
   .pdur{font-size:11px;flex:none}
@@ -1117,27 +1151,17 @@ function itunesLookup(title, artist, cb){
 }
 /* ---- one shared <audio>; the whole player UI lives inside each chart row ---- */
 const APPLE_GLYPH = '<svg viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.5 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>';
-/* Play triangle: FINAL. Original path M3.2 2.2v11.6L12.8 8 - the only
-   owner-approved glyph ("как было, там всё норм было"). Its ink margins are
-   SYMMETRIC: left 3.2u, right 3.2u -> the drawn triangle sits exactly in the
-   circle's center. The ink MASS leans left (any triangle does), which the
-   owner's eye accepts as correct - mass is NOT the metric to tune.
-   History of failed re-tunes (do NOT repeat any of them):
-     M5.53 (1fd6a43): margins 5.53/3.07 - ink visibly RIGHT + jump on swap
-     translate hack (b791b3b, reverted): same disease at another offset
-     M4 "balanced" (this session, reverted): margins 4.0/2.4 -> ink RIGHT
-       +1.2px at rest, obvious on the cyan hover fill ("ВПРАВО ПРИ НАВЕДЕНИИ"),
-       and the play->pause swap shifted ink 0.8u ("ПАУЗА ТОЖЕ ДВИГАЕТСЯ").
-   The metric the eye reads against the circle is the ink ENVELOPE (outer
-   margins), and it must stay symmetric. Pause 3.6/3.6 is symmetric.
-   Hover zoom scale(1.07) with transform-origin:center is symmetric - safe.
-   Do NOT re-tune this path. Ever. */
-const ICON_PLAY = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.2 2.2v11.6L12.8 8z"/></svg>';
+/* Play triangle: byte-exact glyph of the owner-approved BIG era (43ae49f).
+   At 24px the owner's eye tracks the ink MASS, and this glyph is mass-centered
+   (centroid 8.00 = pause 8.00). The M3.2 small-era glyph at 24px reads
+   "не в центре" (mass −2.1px left) - measured on prod, owner rejected.
+   Do NOT swap these two glyphs again: M3.2 belongs to 19px, M5.53 to 24px. */
+const ICON_PLAY = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5.53 2.2v11.6L12.93 8z"/></svg>';
 const ICON_PAUSE = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></svg>';
 /* icon crossfade: both glyphs live stacked inside the button; swapping
    toggles opacity instead of replacing innerHTML. Both glyphs are
    envelope-symmetric, so the swap is pixel-stable as well. */
-const ICON_STACK = '<svg class="ic-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></svg><svg class="ic-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.2 2.2v11.6L12.8 8z"/></svg>';
+const ICON_STACK = '<svg class="ic-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></svg><svg class="ic-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5.53 2.2v11.6L12.93 8z"/></svg>';
 const audio = new Audio();
 audio.preload = "auto";
 audio.playsInline = true;
@@ -1494,11 +1518,21 @@ function markRows(){
           const w = pe.scrollWidth;
           pe.style.width = prevW;
           if(w > 0 && row.classList.contains("playing")){
-            cm.style.setProperty("--pexp", w+"px");
+            row.style.setProperty("--pwid", w+"px");
+            /* --pw is read only by the <=1200px in-flow regime; at >=1201px
+               the base grid is fixed 40px and ignores it. Always writing it
+               keeps resize across the 1201px boundary safe. */
             row.style.setProperty("--pw", (w + 66)+"px");
           }
         });
-      } else { cm.style.removeProperty("--pexp"); row.style.removeProperty("--pw"); }
+      } else {
+        /* fold: --pw closes now (in-flow regimes animate the column via
+           grid-template-columns transition); --pwid lingers 520ms so the
+           desktop wipe rides the --pplay curve down instead of snapping */
+        row.style.removeProperty("--pw");
+        clearTimeout(row._pwidT);
+        row._pwidT = setTimeout(()=>{ row.style.removeProperty("--pwid"); row._pwidT = 0; }, 520);
+      }
     }
   });
 }
