@@ -2321,7 +2321,7 @@ function setTab(t){
   window.scrollTo(0, 0);
   /* the newly shown rail had zero size while hidden - its .ok state is stale;
      a frame later it has real geometry, so re-evaluate the arrows */
-  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); });
+  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
