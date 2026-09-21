@@ -4,3 +4,7 @@ Disallow: /admin-desk
 Disallow: /admin-desk.html
 Disallow: /m98desk
 Disallow: /m98desk.html
+Disallow: /api/
+
+Sitemap: https://music98.news/sitemap.xml
+Sitemap: https://music98.news/news-sitemap.xml

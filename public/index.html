@@ -15,6 +15,17 @@
 <meta property="og:title" content="music98.news — Music News, Releases & Charts">
 <meta property="og:description" content="Music news, new releases and a weekly Top 50.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://music98.news/">
+<meta property="og:image" content="https://music98.news/logo.png">
+<meta property="og:site_name" content="music98.news">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="music98.news — Music News, Releases & Charts">
+<meta name="twitter:description" content="Music news, new releases and a weekly Top 50.">
+<meta name="twitter:image" content="https://music98.news/logo.png">
+<link rel="canonical" href="https://music98.news/">
+<link rel="alternate" type="application/rss+xml" title="music98.news — RSS" href="/rss.xml">
+<link rel="apple-touch-icon" href="/logo.png">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="icon" href="/logo.png" type="image/png">
 <style>
 :root{
@@ -2687,7 +2698,8 @@ let _slugsBuilt = false;
 function slugBase(p){
   let t = String((p && p.title) || (p && p.id) || "");
   const a = String((p && p.artist) || "").trim();
-  if(a && t.toLowerCase().indexOf(a.toLowerCase()) < 0) t = a + " " + t;
+  const norm = s => String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  if(a && norm(t).indexOf(norm(a)) < 0) t = a + " " + t;
   return t;
 }
 /* must stay byte-identical to server slugify() in functions/lib/seo.js */

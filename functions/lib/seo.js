@@ -24,9 +24,13 @@ function slugCap(s) {
 }
 
 /* identical to client buildSlugs(): strip curly quotes, keep [a-z0-9], cap 80 at word boundary, dedupe with id */
-export function slugify(title, id) {
-  const base = String(title || id).toLowerCase()
-    .replace(/[\u2018\u2019\u201C\u201D`\u00B4]/g, "")
+export function slugify(post) {
+  let t = String((post && post.title) || (post && post.id) || "");
+  const a = String((post && post.artist) || "").trim();
+  const norm = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (a && norm(t).indexOf(norm(a)) < 0) t = a + " " + t;
+  const base = t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u2018\u2019\u201C\u201D`\u00B4']/g, "")
     .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "post";
   return slugCap(base);
 }
@@ -35,7 +39,7 @@ export function buildSlugMap(posts) {
   const used = {};
   const slugs = {}; /* id -> slug */
   (posts || []).forEach((p) => {
-    let s = slugify(p.title || p.id, p.id);
+    let s = slugify(p);
     if (used[s]) s = s + "-" + p.id;
     used[s] = p.id;
     slugs[p.id] = s;
