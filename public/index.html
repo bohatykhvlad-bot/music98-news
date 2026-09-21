@@ -143,6 +143,18 @@ main{position:relative;z-index:1}
 .rail{will-change:scroll-position}
 .rail::-webkit-scrollbar{display:none}
 .rail>*{scroll-snap-align:none}
+/* hand-drag in progress: cards freeze at their pre-press position - the
+   pressed card must not slide down from its hover lift (owner request).
+   .grab keeps the grabbed desktop card exactly where hover had it (zero
+   motion at grab), everything else sits flat; touch gets flat everywhere. */
+.rail.dragging .card{transition:none}
+.rail.dragging .card{transform:none!important}
+@media (hover:hover) and (pointer:fine){
+  .rail.dragging .card.grab{transform:translateY(-4px)!important}
+}
+@media (hover:none){
+  .rail.dragging .card{transform:none!important}
+}
 @media (max-width:900px){ .rail{--cardw:255px} }
 @media (max-width:640px){ 
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
@@ -2064,6 +2076,11 @@ function wireRail(gridSel, prevSel, nextSel){
     drag.on = true; drag.id = e.pointerId; drag.moved = false;
     drag.x = e.clientX; drag.sl = rail.scrollLeft;
     drag.vx = 0; drag.lx = e.clientX; drag.lt = performance.now();
+    /* freeze cards at their pre-press position for the whole gesture: the
+       pressed card must not slide down off its hover lift while dragging */
+    drag.grabCard = e.target.closest(".card, .rcard");
+    rail.classList.add("dragging");
+    if(drag.grabCard) drag.grabCard.classList.add("grab");
     dragStop();
   });
   /* native link/image drag used to hijack the pointer mid-drag: after ~5px
@@ -2090,6 +2107,8 @@ function wireRail(gridSel, prevSel, nextSel){
     if(!drag.on || e.pointerId !== drag.id) return;
     drag.on = false;
     if(drag.raf2){ cancelAnimationFrame(drag.raf2); drag.raf2 = 0; rail.scrollLeft = drag.pendX; }
+    rail.classList.remove("dragging");
+    if(drag.grabCard){ drag.grabCard.classList.remove("grab"); drag.grabCard = null; }
     if(drag.moved){
       rail.style.scrollBehavior = "";
       momentum();
