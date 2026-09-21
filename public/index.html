@@ -158,8 +158,15 @@ main{position:relative;z-index:1}
 @media (max-width:900px){ .rail{--cardw:255px} }
 @media (max-width:640px){ 
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
+  /* equal card heights on phone: in a single column every card stands alone,
+     so a 2-line title vs a 1-line one wobbled heights by ~21px (owner saw
+     "разный по высоте"). Clamp the text block to a fixed 2-line title +
+     3-line teaser - all cards get the same silhouette. Desktop is untouched:
+     grid rows already equalize there. */
+  .card h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:calc(2*1.32em)}
+  .card p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;min-height:calc(3*1.45em)}
 }
-.rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;touch-action:none;transition:opacity .22s ease}
+.rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;touch-action:none;transition:opacity .5s ease}
 /* visibility model (owner spec): the next pill is ALWAYS on screen (it anchors
    the right edge); the prev pill appears only after scrolling away from the
    start (.ok from syncRail). A pill with nowhere left to go dims its chevron
@@ -318,6 +325,13 @@ body.editmode .card .tag{top:auto;bottom:10px}
   pointer-events:none;
 }
 .sub-in{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:44px 24px;text-align:center}
+/* phone: the glass panel sits 20px in from the section edge while .sub-in
+   padding is 16px - the input/button stuck out 4px past the frosted panel
+   and over its rounded corners. Align content inside the panel. */
+@media (max-width:640px){
+  .sub-in{padding:32px 22px}
+  .sub-in form{gap:10px}
+}
 .sub-in h2{margin:0 0 8px;font-size:26px;letter-spacing:-.02em}
 .sub-in p{margin:0 0 20px;color:var(--muted);font-size:14.5px}
 .sub-in form{display:flex;gap:12px;max-width:460px;margin:0 auto}
@@ -543,7 +557,6 @@ textarea{resize:vertical;min-height:64px}
   .rel-grid{grid-template-columns:1fr 1fr;gap:10px}
   .toasts{left:12px;right:12px;bottom:12px}
   .toast{max-width:none}
-  .sub-in{padding:32px 16px}
   .sub-in form{flex-direction:column;max-width:none;width:100%}
   .sub-in input,.sub-in .btn{width:100%;box-sizing:border-box;min-width:0}
   .chart-row{
@@ -1904,7 +1917,7 @@ function chartMatches(r){
 }
 
 /* ============ render ============ */
-const RAIL_PAGE = 9;   /* cards per batch on mobile Load More */
+const RAIL_PAGE = 4;   /* cards per batch on mobile Load More (owner: 4, matches the desktop first screen) */
 function renderNews(){
   const posts = data.posts.filter(p=>p.type==="news" && matches(p)).sort(byFresh);
   const hero = posts[0], rest = posts.slice(1);
@@ -2082,23 +2095,25 @@ function wireRail(gridSel, prevSel, nextSel){
   const dragStop = ()=>{ cancelAnimationFrame(drag.raf); drag.raf = 0; };
   const momentum = ()=>{
     drag.raf = 0;
-    const v0 = drag.vx;                  /* px per ms, signed with the movement */
-    if(Math.abs(v0) < 0.3){ return; }
+    const v0raw = drag.vx;               /* px per ms, signed with the movement */
+    if(Math.abs(v0raw) < 0.3){ return; }
     rail.style.scrollBehavior = "auto";
     /* ease-out glide instead of exponential decay + hard cutoff: the old
        v*=0.94/frame tail was chopped mid-motion at ~5px per frame and the
        scroll ended abruptly. This glide starts exactly at the release speed
        (first-frame velocity matches the finger - no hitch at the seam) and
-       lands at zero with a flat slope, so the tail melts away. Travel
-       distance matches the old decay (v0 * ~300ms); time-based, so 120Hz
-       screens play the same curve instead of a 2x-speed one. */
-    const dist = v0 * 300;
-    const dur = 780;                     /* = 300 * 2.6, keeps the start slope seamless */
+       lands at zero with a flat slope, so the tail melts away. Time-based,
+       so 120Hz screens play the same curve instead of a 2x-speed one.
+       Owner tune-down: launch speed capped and flight shortened ~13% so a
+       hard flick no longer whips - seam preserved via dur = dist*k/v0. */
+    const v0 = Math.max(-2.8, Math.min(2.8, v0raw));   /* cap the launch punch */
+    const dist = v0 * 260;
+    const dur = 624;                     /* = 260 * 2.4, keeps the start slope seamless */
     const from = rail.scrollLeft;
     const t0 = performance.now();
     const tick = now=>{
       const u = Math.min(1, (now - t0) / dur);
-      const e = 1 - Math.pow(1 - u, 2.6);
+      const e = 1 - Math.pow(1 - u, 2.4);
       rail.scrollLeft = from - dist * e;
       const max = rail.scrollWidth - rail.clientWidth - 1;
       if(u < 1 && rail.scrollLeft > 0 && rail.scrollLeft < max){
