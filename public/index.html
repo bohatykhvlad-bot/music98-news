@@ -2173,7 +2173,7 @@ function wireRail(gridSel, prevSel, nextSel){
        so 120Hz screens play the same curve instead of a 2x-speed one.
        Owner tune-down: launch speed capped and flight shortened ~13% so a
        hard flick no longer whips - seam preserved via dur = dist*k/v0. */
-    const v0 = Math.max(-2.8, Math.min(2.8, v0raw));   /* cap the launch punch */
+    const v0 = Math.max(-2.1, Math.min(2.1, v0raw));   /* cap the launch punch */
     const dist = v0 * 260;
     const dur = 624;                     /* = 260 * 2.4, keeps the start slope seamless */
     const from = rail.scrollLeft;
