@@ -133,11 +133,11 @@ main{position:relative;z-index:1}
 /* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
 .rail-wrap{position:relative;margin-top:2px;padding-right:66px}
 #tab-releases .rail-wrap{padding-right:0;margin-right:-22px}
-#tab-releases .rail{padding-right:66px}
+#tab-releases .rail{padding-right:66px;padding-top:12px;padding-bottom:14px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 #tab-releases .rail-wrap .rail-btn.next{right:22px}
-.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:0;scrollbar-width:none;-ms-overflow-style:none}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:12px 0;margin:-12px 0;scrollbar-width:none;-ms-overflow-style:none}
 /* compositor hint: the rail is the site's hot scroll surface - hinting
    its own layer keeps drag/momentum off the main-thread paint path */
 .rail{will-change:scroll-position}
@@ -158,9 +158,8 @@ main{position:relative;z-index:1}
 @media (max-width:900px){ .rail{--cardw:255px} }
 @media (max-width:640px){ 
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
-  .rail-btn{display:none}
 }
-.rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;touch-action:none}
+.rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;touch-action:none;transition:opacity .22s ease}
 /* visibility model (owner spec): the next pill is ALWAYS on screen (it anchors
    the right edge); the prev pill appears only after scrolling away from the
    start (.ok from syncRail). A pill with nowhere left to go dims its chevron
@@ -168,16 +167,34 @@ main{position:relative;z-index:1}
 .rail-btn.prev:not(.ok){opacity:0;pointer-events:none}
 .rail-btn svg{width:26px;height:26px;display:block;margin-left:.21px;transform-origin:center;transition:transform .18s cubic-bezier(.34,1.3,.64,1),opacity .2s ease}
 .rail-btn.next:not(.ok) svg{opacity:.25}
+/* the dimmed end-of-rail arrow still answers hover: this rule outranks
+   the dim selector above (it was eating the hover feedback - owner bug:
+   "на наведение не работает потом") */
+@media (hover:hover) and (pointer:fine){
+  .rail-btn.next:not(.ok):hover svg{opacity:1}
+}
 /* darken the chevron ONLY while genuinely hovering/holding: bare :hover rules
    latch on touch (a tap leaves the hover state), which read as a stuck black
    arrow. Touch feedback goes through .hold only. */
 @media (hover:hover) and (pointer:fine){
   .rail-btn:hover{color:var(--text)}
-  .rail-btn:hover svg{transform:scale(1.14)}
+  .rail-btn:hover svg{transform:scale(1.14);opacity:1}
 }
 .rail-btn.hold{color:var(--text)}
 .rail-btn.hold svg{transform:scale(1.18)}
 .rail-btn:active svg{transform:scale(.9)}
+/* mobile: rails are vertical columns - no side buttons and no desktop rail
+   chrome. Declared AFTER the base .rail-btn rule so display:none wins the
+   cascade: the old early media block was silently overridden by it, and the
+   phone showed a dead arrow pill floating over the cards. The -22px margin
+   and 66px paddings also stay desktop-only: they widened the page past the
+   screen and made it pan sideways (the "subscribe sticks out" artifact). */
+@media (max-width:640px){
+  .rail-btn{display:none}
+  .rail-wrap{padding-right:0}
+  #tab-releases .rail-wrap{margin-right:0}
+  #tab-releases .rail{padding-right:0}
+}
 /* native link/image drag hijacks the pointer after a few px and kills the JS
    drag (the owner saw the URL ghost + a cyan drag outline on cards): nothing
    inside a rail may start a native drag or a text selection */
@@ -527,7 +544,8 @@ textarea{resize:vertical;min-height:64px}
   .toasts{left:12px;right:12px;bottom:12px}
   .toast{max-width:none}
   .sub-in{padding:32px 16px}
-  .sub-in form{flex-direction:column;max-width:none}
+  .sub-in form{flex-direction:column;max-width:none;width:100%}
+  .sub-in input,.sub-in .btn{width:100%;box-sizing:border-box;min-width:0}
   .chart-row{
     --pw:auto;
     display:grid;
@@ -1931,7 +1949,10 @@ function renderNews(){
 function renderReleases(){
   const posts = data.posts.filter(p=>p.type==="release" && matches(p))
     .sort((a,b)=> postTime(b)-postTime(a));
-  $("#relGrid").innerHTML = posts.map(p=>`
+  /* mobile (<=640px): same paged column as news - one batch + Load More; */
+  const narrow = window.matchMedia("(max-width: 640px)");
+  const shown = narrow.matches ? posts.slice(0, Math.max(RAIL_PAGE, (data._relShown||RAIL_PAGE))) : posts;
+  $("#relGrid").innerHTML = shown.map(p=>`
     <a class="card square" href="#post/${p.id}">
       <div class="cover">${coverImg(p,true,true,"card")}
         <span class="tag">${esc(p.rtype||"Release")}</span></div>
@@ -1939,6 +1960,20 @@ function renderReleases(){
         <p>${rich(p.excerpt||"")}</p>
         <div class="meta"><span>${fmtDate(p.date)}</span></div></div>
     </a>`).join("");
+  let lm = $("#relMore");
+  if(!lm){
+    lm = document.createElement("div");
+    lm.id = "relMore"; lm.className = "loadmore"; lm.hidden = true;
+    lm.innerHTML = `<button class="loadmore-btn" type="button">Load more releases</button>`;
+    $("#relGrid").after(lm);
+    lm.querySelector("button").addEventListener("click", ()=>{
+      data._relShown = (data._relShown||RAIL_PAGE) + RAIL_PAGE;
+      renderReleases();
+    });
+  }
+  const remaining = posts.length - shown.length;
+  lm.hidden = !(narrow.matches && remaining > 0);
+  lm.querySelector("button").textContent = remaining > 0 ? `Load more releases (${remaining})` : "Load more releases";
   $("#relEmpty").hidden = posts.length > 0;
   bindCovers($("#relGrid"));
   syncRail("#relGrid");
@@ -1996,6 +2031,11 @@ function wireRail(gridSel, prevSel, nextSel){
   [ [prevSel,-1], [nextSel,1] ].forEach(([sel,dir])=>{
     const btn = $(sel);
     if(!btn) return;
+    /* safety: leaving the button in ANY way must clear the held look -
+       pointerup/pointercancel cover most cases, pointerleave catches the
+       cursor escaping mid-hold (the "lights up once then never again" bug:
+       a latched .hold kept the dark chevron and hover read as dead) */
+    btn.addEventListener("pointerleave", ()=> btn.classList.remove("hold"));
     btn.addEventListener("pointerdown", e=>{
       e.preventDefault();
       try{ btn.setPointerCapture(e.pointerId); }catch(_){}
