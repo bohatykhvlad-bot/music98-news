@@ -15,7 +15,7 @@
 <meta property="og:title" content="music98.news — Music News, Releases & Charts">
 <meta property="og:description" content="Music news, new releases and a weekly Top 50.">
 <meta property="og:type" content="website">
-<link rel="icon" href="logo.png" type="image/png">
+<link rel="icon" href="/logo.png" type="image/png">
 <style>
 :root{
   --bg:#ffffff; --bg2:#f4f6f7; --card:#ffffff; --card2:#edf1f2; --line:#e2e8ea;
@@ -619,7 +619,7 @@ textarea{resize:vertical;min-height:64px}
   <div class="topbar-glass topbar-glass-isle" aria-hidden="true"></div>
   <div class="topbar-in">
     <a class="brand" href="#" id="brandHome" title="music98.news — home">
-      <img class="brand-logo" id="brandLogo" src="logo.png" alt="music98.news" width="44" height="44">
+      <img class="brand-logo" id="brandLogo" src="/logo.png" alt="music98.news" width="44" height="44">
       <span class="brand-name">music98.news</span>
     </a>
     <nav class="nav" id="nav">
@@ -1708,7 +1708,7 @@ function loadPublishedDesk(){
     if($("#ef_list")) renderPostList();
     route();
   };
-  grab("/api/desk").catch(()=> grab("data/desk.json")).then(j=>{
+  grab("/api/desk").catch(()=> grab("/data/desk.json")).then(j=>{
     const live = (j && Array.isArray(j.posts)) ? j.posts.filter(isLivePost) : [];
     paint(live.length ? live : JSON.parse(JSON.stringify(SEED.posts)));
   }).catch(()=>{
@@ -1969,7 +1969,7 @@ function renderNews(){
   const posts = data.posts.filter(p=>p.type==="news" && matches(p)).sort(byFresh);
   const hero = posts[0], rest = posts.slice(1);
   $("#heroSlot").innerHTML = hero ? `
-    <a class="hero" href="#post/${hero.id}">
+    <a class="hero" href="${postPath(hero)}">
       <div class="cover">${coverImg(hero,false)}</div>
       <div class="body">
         <h2>${titleHTML(hero)}</h2>
@@ -1982,7 +1982,7 @@ function renderNews(){
   const narrow = window.matchMedia("(max-width: 640px)");
   const shown = narrow.matches ? rest.slice(0, Math.max(RAIL_PAGE, (data._newsShown||RAIL_PAGE))) : rest;
   $("#newsGrid").innerHTML = shown.map(p=>`
-    <a class="card" href="#post/${p.id}">
+    <a class="card" href="${postPath(p)}">
       <div class="cover">${coverImg(p,false,true,"card")}</div>
       <div class="body"><h3>${titleHTML(p)}</h3><p>${rich(p.excerpt||"")}</p>
         <div class="meta"><span>${fmtDate(p.date)}</span></div></div>
@@ -2014,7 +2014,7 @@ function renderReleases(){
   const narrow = window.matchMedia("(max-width: 640px)");
   const shown = narrow.matches ? posts.slice(0, Math.max(RAIL_PAGE, (data._relShown||RAIL_PAGE))) : posts;
   $("#relGrid").innerHTML = shown.map(p=>`
-    <a class="card square" href="#post/${p.id}">
+    <a class="card square" href="${postPath(p)}">
       <div class="cover">${coverImg(p,true,true,"card")}
         <span class="tag">${esc(p.rtype||"Release")}</span></div>
       <div class="body"><h3>${titleHTML(p)}</h3>
@@ -2266,7 +2266,7 @@ function renderCharts(){
     const key = (r.title||"")+"|"+(r.artist||"");
     const art = r.art ? esc(r.art) : presetCover(i, r.title || r.artist, true);
     const searchUrl = aff("https://music.apple.com/us/search?term=" + encodeURIComponent((r.title||"") + " " + (r.artist||"")));
-    const badgeImg = '<img src="badges/listen-on-apple-music.svg" alt="Listen on Apple Music" height="28">';
+    const badgeImg = '<img src="/badges/listen-on-apple-music.svg" alt="Listen on Apple Music" height="28">';
     const cleanUrl = (r.url && r.url !== "#") ? r.url : "";
     const appleUrl = cleanUrl ? aff(cleanUrl) : searchUrl;
     const badge = `<a class="abadge"${r.url ? "" : ' data-lk="'+esc(key)+'"'} rel="nofollow sponsored" href="${esc(appleUrl)}" title="Listen on Apple Music" aria-label="Listen on Apple Music">${badgeImg}</a>`;
@@ -2326,7 +2326,7 @@ function setTab(t){
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
   e.preventDefault();
-  if(!$("#articlePage").hidden){ hideArticle(); try{ history.replaceState(null,"",location.pathname+location.search); }catch(err){} }
+  if(!$("#articlePage").hidden){ hideArticle(); try{ history.replaceState(null,"","/"); }catch(err){} }
   setTab("news");
 });
 document.addEventListener("click", e=>{
@@ -2443,7 +2443,7 @@ function relatedHTML(p){
     <section class="related">
       <h2>You might also like</h2>
       <div class="rel-grid">${rel.map(q=>`
-        <a class="rcard" href="#post/${q.id}">
+        <a class="rcard" href="${postPath(q)}">
           <div class="rcover">${coverImg(q,true,true)}</div>
           <div class="rbody">
             ${q.type==="release" ? `<span class="rtag">${esc(q.rtype||"Release")}</span>` : ""}
@@ -2650,7 +2650,7 @@ function hideArticle(){
 }
 function closeArticle(){
   hideArticle();
-  try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
+  try{ history.replaceState(null, "", "/"); }catch(e){}
   jumpY(listY);
 }
 function intentBootPost(id){
@@ -2659,24 +2659,77 @@ function intentBootPost(id){
   if(p && !p.__m98boot){ p.__m98boot = 1; bootAppleFromPosts([p]); }
 }
 function intentBootEvent(e){
-  const a = e.target && e.target.closest ? e.target.closest("a.hero, a.card") : null;
+  const a = e.target && e.target.closest ? e.target.closest("a.hero, a.card, a.rcard") : null;
   if(!a) return;
-  const m = (a.getAttribute("href")||"").match(/^#post\/(.+)$/);
-  if(m) intentBootPost(m[1]);
+  const href = a.getAttribute("href")||"";
+  const m = href.match(/^#post\/(.+)$/);
+  if(m){ intentBootPost(m[1]); return; }
+  const sm = href.match(/^\/post\/([^\/]+)\/?$/);
+  if(sm){
+    try{
+      const slug = decodeURIComponent(sm[1]);
+      const p = data.posts.find(x=>POST_SLUGS[x.id]===slug);
+      if(p) intentBootPost(p.id);
+    }catch(err){}
+  }
 }
+/* ---- clean article URLs: /post/<slug> (SEO) with legacy #/post/<id> support ---- */
+const POST_SLUGS = {};
+let _slugsBuilt = false;
+function buildSlugs(){
+  if(_slugsBuilt) return;
+  _slugsBuilt = true;
+  const used = {};
+  data.posts.forEach(p=>{
+    let s = String(p.title||p.id).toLowerCase()
+      .replace(/[\u2018\u2019\u201C\u201D`\u00B4]/g,"")
+      .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60) || "post";
+    if(used[s]) s = s + "-" + p.id;
+    used[s] = p.id;
+    POST_SLUGS[p.id] = s;
+  });
+}
+function postPath(p){ buildSlugs(); return "/post/" + (POST_SLUGS[p.id] || p.id); }
 document.addEventListener("mouseover", intentBootEvent, {passive:true});
 document.addEventListener("focusin", intentBootEvent);
 function route(){
+  const pm = location.pathname.match(/^\/post\/([^\/]+)\/?$/);
+  if(pm){
+    buildSlugs();
+    try{
+      const slug = decodeURIComponent(pm[1]);
+      const p = data.posts.find(x=>POST_SLUGS[x.id]===slug);
+      if(p){ intentBootPost(p.id); showArticle(p); return; }
+    }catch(e){}
+    hideArticle();
+    return;
+  }
   const m = location.hash.match(/^#post\/(.+)$/);
   if(m){
     intentBootPost(m[1]);       /* preload exactly this page's players */
     const p = data.posts.find(x=>x.id===decodeURIComponent(m[1]));
-    if(p){ showArticle(p); return; }
+    if(p){
+      showArticle(p);
+      try{ history.replaceState(null, "", postPath(p)); }catch(e){}   /* upgrade legacy hash to clean URL */
+      return;
+    }
   }
   hideArticle();
   jumpY(listY);
 }
 window.addEventListener("hashchange", route);
+window.addEventListener("popstate", route);
+/* SPA navigation for clean URLs: intercept clicks, keep the no-reload experience */
+document.addEventListener("click", e=>{
+  if(e.defaultPrevented || e.button!==0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const a = e.target && e.target.closest ? e.target.closest('a[href^="/post/"]') : null;
+  if(!a) return;
+  e.preventDefault();
+  const to = a.getAttribute("href");
+  try{ history.pushState({}, "", to); }
+  catch(err){ location.href = to; return; }
+  route();
+});
 
 function updateStorageInfo(){
   const el = $("#storageInfo"); if(!el) return;
