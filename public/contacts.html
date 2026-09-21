@@ -14,15 +14,13 @@
   .topbar{position:fixed;top:0;left:0;right:0;z-index:60}
   .topbar-glass{position:absolute;top:0;height:68px;left:max(0px, calc(50% - 590px));right:max(0px, calc(50% - 590px));background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);border-top:0;backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);pointer-events:none}
   @media (max-width:1180px){.topbar-glass{left:0;right:0}}
-  .topbar-in{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 20px;height:68px;display:flex;align-items:center;justify-content:space-between}
+  .topbar-in{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 20px;height:68px;display:flex;align-items:center}
   .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none}
   .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
   .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
-  .home{display:inline-flex;align-items:center;height:40px;padding:0 20px;border:1px solid rgba(15,60,64,.14);border-radius:999px;background:rgba(255,255,255,.55);color:var(--text);text-decoration:none;font-size:14px;font-weight:600;transition:.18s}
-  .home:hover{background:#ffffff}
-  @media (max-width:560px){.brand-name{font-size:17px}.home{height:36px;padding:0 14px;font-size:13px}}
+  .home{display:none}
   .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
-  .content{max-width:760px;padding:40px 0 0}
+  .content{max-width:780px;margin:0 auto;padding:40px 0 0}
   .aback{display:flex;width:max-content;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin:0 0 18px}
   .aback::before{content:"";width:7px;height:7px;flex:none;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-1px}
   .aback:hover{text-decoration:underline}
@@ -48,7 +46,6 @@
       <img class="brand-logo" src="/logo.png" alt="music98.news" width="44" height="44">
       <span class="brand-name">music98.news</span>
     </a>
-    <a class="home" href="/">Back to the site</a>
   </div>
 </header>
 
