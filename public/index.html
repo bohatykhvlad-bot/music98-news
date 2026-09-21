@@ -320,8 +320,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .subscribe::before{
   content:"";
   position:absolute;
-  left:max(20px, calc(50% - 590px));
-  right:max(20px, calc(50% - 590px));
+  /* aligned with the .wrap content line (cards, footer): for vw>=1180 the
+     content edge is exactly calc(50% - 570px); below that both sit at 20px */
+  left:max(20px, calc(50% - 570px));
+  right:max(20px, calc(50% - 570px));
   top:20px;
   bottom:20px;
   border-radius:22px;
