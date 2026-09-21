@@ -36,7 +36,7 @@ input:hover,textarea:hover,select:hover{border-color:#b7c4c8}
 /* neutral grey focus (owner: no blue/cyan on form fields) */
 input:focus,textarea:focus,select:focus{outline:none;border-color:#8a979c;box-shadow:0 0 0 2.5px rgba(92,106,112,.16)}
 input[type=date]::-webkit-calendar-picker-indicator,
-input[type=datetime-local]::-webkit-calendar-picker-indicator{filter:grayscale(1) opacity(.55);cursor:pointer}
+input[type=datetime-local]::-webkit-calendar-picker-indicator{filter:grayscale(1) opacity(.55);cursor:pointer;pointer-events:none}
 /* native controls brought in line with the design system */
 select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235c6a70' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px;cursor:pointer}
 input[type=date],input[type=datetime-local]{cursor:pointer}
@@ -1955,7 +1955,14 @@ function attachCal(input){
       close();
     }
   });
-  input.addEventListener("click", ()=>{
+  /* the whole field is a button: native date inputs have internal zones
+     (segments, indicator) that swallow clicks in the empty middle - owner
+     saw "нажимается только сюда". Catch pointerdown on the WRAP so every
+     pixel of the field toggles the calendar, and shield the internals. */
+  input.addEventListener("pointerdown", e => e.preventDefault());
+  wrap.addEventListener("pointerdown", e=>{
+    if(e.target.closest(".dcal")) return;
+    e.preventDefault();
     if(cal.classList.contains("open")){ close(); return; }
     view = input.value ? (()=>{ const p = input.value.split("-").map(Number); return new Date(p[0], p[1]-1, 1); })() : new Date();
     render();
