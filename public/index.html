@@ -164,7 +164,9 @@ main{position:relative;z-index:1}
      3-line teaser - all cards get the same silhouette. Desktop is untouched:
      grid rows already equalize there. */
   .card h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:calc(2*1.32em)}
-  .card p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;min-height:calc(3*1.45em)}
+  /* teaser always fits (owner: "чтобы влезал анонс"): no clamp on p.
+     Real teasers are written to similar length, so with the 2-line title
+     clamp heights stay visually even without cutting text. */
 }
 .rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;touch-action:none;transition:opacity .5s ease}
 /* visibility model (owner spec): the next pill is ALWAYS on screen (it anchors

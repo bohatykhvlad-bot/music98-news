@@ -42,6 +42,9 @@ input,textarea,select{width:100%;font:inherit;font-size:14px;padding:8px 10px;bo
 .list-col-title{margin:0 0 8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 @media (max-width:900px){ .list-cols{grid-template-columns:1fr} }
 .item img,.item canvas{width:40px;height:40px;object-fit:cover;border-radius:6px;background:var(--bg2);display:block}
+/* thumbs fitted by fitThumb (same math as the live site): the img is sized
+   in px and translated - object-fit would fight the transform */
+.item img.thimg{object-fit:fill;max-width:none;max-height:none;width:40px;height:40px}
 /* crop-scaled thumbs must stay inside the 40px box - the transform would
    otherwise spill over the row (Pylon/Day-and-Night bug) */
 .item [style*="transform:scale"]{overflow:hidden}
@@ -1171,23 +1174,24 @@ function renderList(){
     const badge = st==="draft" ? "draft" : st==="scheduled" ? "sched" : "live";
     const badgeLabel = st==="draft" ? "Draft" : st==="scheduled" ? "Scheduled" : "Live";
     const when = st==="scheduled" && p.publishAt ? " · "+fmtWhen(p.publishAt) : (p.date ? " · "+esc(p.date) : "");
-    /* thumbnails show the crop the post actually carries - and since the
-       thumb is square, it previews the CARD crop (cardY/cardZoom/cardX),
-       exactly what the live site renders in the card */
+    /* thumbnails must show EXACTLY what the live card renders. The site
+       fits covers with a JS formula (focus point -> CENTER of the box,
+       clamped translate) - CSS object-position aligns p% of image with p%
+       of box, which is a DIFFERENT crop. So the thumb carries the same
+       data-fx/fy/zoom attributes and is fitted by the same math (fitThumb
+       below) instead of object-position. */
     const c = p.cover || {};
     const pxy = String(c.pos || "50% 50%").split(/\s+/);
     const mx = Number(pxy[0]); const my = Number(pxy[1]);
     const cyPct = (c.cardY == null) ? (my || 50) : Math.round(Number(c.cardY)*100);
     const cxPct = c.cardX != null ? Math.round(Number(c.cardX)*100)
       : (c.lockX != null ? Math.round(Number(c.lockX)*100) : (mx || 50));
-    const czoom = Math.min(6, Math.max(1, Number(c.cardZoom ?? c.zoom) || 1));
-    const cpos = cxPct + "% " + cyPct + "%";
-    const cstyle = `object-position:${cpos}` + (czoom>1 ? `;transform:scale(${czoom});transform-origin:${cpos}` : "");
-    /* wrap in a clipping box: object-position alone cannot express zoom,
-       and the scale transform would paint outside the 40px cell */
+    const czoom = Math.min(8, Math.max(1, Number(c.cardZoom ?? c.zoom) || 1));
+    const tattr = `class="thimg" data-fx="${(cxPct/100).toFixed(4)}" data-fy="${(cyPct/100).toFixed(4)}" data-zoom="${czoom}"`;
+    /* thbox clips the fitted image to the 40px cell (zoom paints outside) */
     const thumb = tiny
-      ? `<span class="thbox"><img style="${cstyle}" src="${esc(tiny)}" alt=""></span>`
-      : (src ? `<span class="thbox"><img data-thumb="${esc(p.id)}" style="${cstyle}" alt=""></span>` : `<div class="ph"></div>`);
+      ? `<span class="thbox"><img ${tattr} src="${esc(tiny)}" alt=""></span>`
+      : (src ? `<span class="thbox"><img ${tattr} data-thumb="${esc(p.id)}" alt=""></span>` : `<div class="ph"></div>`);
     return `
     <div class="item">
       ${thumb}
@@ -1200,16 +1204,42 @@ function renderList(){
   const rel = posts.filter(p=>p.type!=="news");
   $("#listNews").innerHTML = news.length ? news.map(item).join("") : '<p class="muted">No news posts.</p>';
   $("#listReleases").innerHTML = rel.length ? rel.map(item).join("") : '<p class="muted">No releases.</p>';
-  $("#listNews").querySelectorAll("img[data-thumb]").forEach(img=>{
-    const p = posts.find(x => x.id === img.getAttribute("data-thumb"));
-    const src = p && p.cover && p.cover.src;
-    if(src) img.src = src;
-  });
-  $("#listReleases").querySelectorAll("img[data-thumb]").forEach(img=>{
-    const p = posts.find(x => x.id === img.getAttribute("data-thumb"));
-    const src = p && p.cover && p.cover.src;
-    if(src) img.src = src;
-  });
+  /* fitThumb = the site's fitCover math applied to a 40px thumb: base
+     cover scale * zoom, focus point mapped to the box CENTER, translate
+     clamped to the edges. Pixel-for-pixel the same crop as the live card. */
+  const fitThumb = img=>{
+    const box = img.parentElement;
+    if(!box || !img.naturalWidth) return;
+    const fx = Math.min(1, Math.max(0, Number(img.dataset.fx)));
+    const fy = Math.min(1, Math.max(0, Number(img.dataset.fy)));
+    const z = Math.min(8, Math.max(1, Number(img.dataset.zoom) || 1));
+    const sw = box.clientWidth, sh = box.clientHeight;
+    if(!sw || !sh) return;
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const base = Math.max(sw/iw, sh/ih) * z;
+    const dw = iw*base, dh = ih*base;
+    let left = sw/2 - fx*dw, top = sh/2 - fy*dh;
+    left = Math.min(0, Math.max(sw-dw, left));
+    top = Math.min(0, Math.max(sh-dh, top));
+    img.style.maxWidth = "none";
+    img.style.width = dw+"px";
+    img.style.height = dh+"px";
+    img.style.transform = "translate("+left+"px,"+top+"px)";
+  };
+  const wireList = sel=>{
+    document.querySelectorAll(sel+" img[data-thumb]").forEach(img=>{
+      const p = posts.find(x => x.id === img.getAttribute("data-thumb"));
+      const src = p && p.cover && p.cover.src;
+      if(src) img.src = src;
+    });
+    document.querySelectorAll(sel+" img.thimg").forEach(img=>{
+      const go = ()=> fitThumb(img);
+      if(img.complete && img.naturalWidth) go();
+      else img.addEventListener("load", go, {once:true});
+    });
+  };
+  wireList("#listNews");
+  wireList("#listReleases");
 }
 
 function fillForm(p){
