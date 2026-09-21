@@ -147,7 +147,7 @@ export function articleHtml(shell, p, slug, origin) {
 /* GET /post/<slug> handler body: shell + desk lookup, 404 -> plain shell */
 export async function serveArticle(request, env) {
   const origin = new URL(request.url).origin;
-  const slug = decodeURIComponent(new URL(request.url).pathname.replace(/^\/post\//, "").replace(/\/+$/, ""));
+  const slug = decodeURIComponent(new URL(request.url).pathname.replace(/^\/(?:post|news|releases)\//, "").replace(/\/+$/, ""));
   const shellRes = await env.ASSETS.fetch(new URL("/index.html", request.url));
   const shell = await shellRes.text();
   const posts = publicPosts(await readDesk(env, request));
