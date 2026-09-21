@@ -289,7 +289,12 @@ body.editmode .card .tag{top:auto;bottom:10px}
    plate has mostly closed. .accent-hold keeps the playing look; JS removes
    it with a delay; transitions below ride out the last 0.3s. */
 .chart-row.accent-hold .rplay{background:var(--accent);border-color:transparent;color:#03282b}
-.rplay svg{width:24px;height:24px}
+/* icon stack: play and pause overlay in the same grid cell; .live crossfades
+   between them - a state swap can never move the icon horizontally */
+.rplay svg{grid-area:1/1;width:24px;height:24px;transition:opacity .16s ease}
+.rplay .ic-pause{opacity:0}
+.rplay.live .ic-pause{opacity:1}
+.rplay.live .ic-play{opacity:0}
 .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.07)}
 .chart-row.playing .rplay{background:var(--accent);border-color:transparent;color:#03282b}
 .chart-row.playing .rplay:hover{transform:scale(1.07)}
@@ -1111,8 +1116,18 @@ const APPLE_GLYPH = '<svg viewBox="0 0 384 512" fill="currentColor" aria-hidden=
      translate hack: same envelope problem at another offset (b791b3b, reverted)
    Pause is envelope-centered (3.6/3.65) - with the original play both glyphs hold
    envelope 8.00, so play<->pause swaps do not jump. Do NOT re-tune this glyph. */
-const ICON_PLAY = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.2 2.2v11.6L12.8 8z"/></svg>';
+/* Balanced play triangle: splits the unavoidable asymmetry of a triangle
+   between the two metrics the eye reads. Measured on prod screenshots:
+   M3.2 original = envelope 0.0 but ink centroid −2.08px ("криво");
+   M5.53 = centroid 0 but envelope +1.75px + silhouette jump on swap.
+   M4 2.2v11.6L13.6 8 → centroid −1.2px, envelope +1.2px: both subliminal.
+   The crossfade (below) removes any residual perception of movement. */
+const ICON_PLAY = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.2v11.6L13.6 8z"/></svg>';
 const ICON_PAUSE = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></svg>';
+/* icon crossfade: both glyphs live stacked inside the button; swapping
+   toggles opacity instead of replacing innerHTML, so no state change can
+   ever read as a positional jump */
+const ICON_STACK = '<svg class="ic-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></svg><svg class="ic-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 2.2v11.6L13.6 8z"/></svg>';
 const audio = new Audio();
 audio.preload = "auto";
 audio.playsInline = true;
@@ -1446,7 +1461,7 @@ function markRows(){
     const live = on && !userPaused;
     row.classList.toggle("playing", live);
     const ic = row.querySelector(".rplay");
-    if(ic) ic.innerHTML = live ? ICON_PAUSE : ICON_PLAY;
+    if(ic) ic.classList.toggle("live", live);
     /* pause: hold the accent until the fold is nearly done, then release it -
        the icon settles into the small play circle only at the very end.
        play/resume: drop the hold immediately (no double-transition). */
@@ -2307,7 +2322,7 @@ function renderCharts(){
       <div class="artwrap"><img data-lk="${esc(key)}"${r.art ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} — ${esc(r.artist)}" loading="lazy"></div>
       <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span><span class="cartist">${esc(r.artist)}</span></div><div class="ctrack">${esc(r.title)}</div></div></div>
       <div class="cmid">
-        <button class="rplay" title="Play preview" aria-label="Play preview of ${esc(r.title)}">${ICON_PLAY}</button>
+        <button class="rplay" title="Play preview" aria-label="Play preview of ${esc(r.title)}">${ICON_STACK}</button>
         <div class="pextra"><span class="ptime"><span class="pbar"><i></i></span><span class="pdur">0:00 / 1:30</span></span>${badge}</div>
       </div>
       <div class="weeks">${wk}</div>
