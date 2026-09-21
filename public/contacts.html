@@ -11,7 +11,7 @@
   *{box-sizing:border-box}
   html,body{margin:0}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
-  .page{max-width:720px;margin:0 auto;padding:48px 20px 64px}
+  .page{max-width:1080px;margin:0 auto;padding:48px 24px 64px}
   .top{display:inline-flex;align-items:center;margin-bottom:28px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:8px 18px 8px 10px;border-radius:999px}
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:19px;letter-spacing:-.015em}
   .brand img{width:34px;height:34px;border-radius:50%}
@@ -30,7 +30,7 @@
   .socials{display:flex;gap:10px;margin:26px 0}
   .socials a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--acc2);text-decoration:none}
   .socials svg{width:18px;height:18px}
-  .foot{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);display:flex;gap:16px 26px;flex-wrap:wrap;max-width:420px}
+  .foot{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(2,minmax(0,max-content));gap:14px 64px;width:max-content}
   .foot a{color:var(--muted);text-decoration:none;font-size:13.5px}
   .foot a:hover{color:var(--acc2)}
 </style>
@@ -49,7 +49,7 @@
   <div class="row">
     <div class="card">
       <h2>Editorial &amp; news tips</h2>
-      <p>Story ideas, leaks, corrections — <a class="mail" href="mailto:hello@music98.news">hello@music98.news</a></p>
+      <p>Story ideas, leaks, corrections — <a class="mail" href="mailto:info@music98.news">info@music98.news</a></p>
     </div>
     <div class="card">
       <h2>Press releases &amp; music submissions</h2>
@@ -57,7 +57,7 @@
     </div>
     <div class="card">
       <h2>Advertising &amp; partnerships</h2>
-      <p>Media kits and placement options — <a class="mail" href="mailto:hello@music98.news">hello@music98.news</a>, subject "Ads".</p>
+      <p>Media kits and placement options — <a class="mail" href="mailto:info@music98.news">info@music98.news</a>, subject "Ads".</p>
     </div>
     <div class="card">
       <h2>Privacy requests</h2>
@@ -74,7 +74,7 @@
   </div>
 
   <div class="foot">
-    <a href="/">Front page</a>
+    <a href="/">Main</a>
     <a href="/about">About</a>
     <a href="/contacts">Contacts</a>
     <a href="/privacy">Privacy</a>

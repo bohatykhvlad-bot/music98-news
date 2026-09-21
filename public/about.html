@@ -11,7 +11,7 @@
   *{box-sizing:border-box}
   html,body{margin:0}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
-  .page{max-width:720px;margin:0 auto;padding:48px 20px 64px}
+  .page{max-width:1080px;margin:0 auto;padding:48px 24px 64px}
   .top{display:inline-flex;align-items:center;margin-bottom:28px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:8px 18px 8px 10px;border-radius:999px}
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:19px;letter-spacing:-.015em}
   .brand img{width:34px;height:34px;border-radius:50%}
@@ -32,7 +32,7 @@
   .pill span{font-size:13px;color:var(--muted);line-height:1.5}
   a.mail{color:var(--text);text-decoration:none;font-weight:600;border-bottom:1.5px solid var(--text)}
   a.mail:hover{color:var(--acc2);border-color:var(--acc2)}
-  .foot{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);display:flex;gap:16px 26px;flex-wrap:wrap;max-width:420px}
+  .foot{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(2,minmax(0,max-content));gap:14px 64px;width:max-content}
   .foot a{color:var(--muted);text-decoration:none;font-size:13.5px}
   .foot a:hover{color:var(--acc2)}
 </style>
@@ -65,11 +65,11 @@
   <p>music98.news is built and edited by a small independent team of music writers. We are readers of NME, Pitchfork and The Line of Best Fit ourselves — and we wanted a faster, cleaner daily read. That is the bar we hold our own pages to.</p>
 
   <div class="card">
-    <p><b>Get in touch:</b> for editorial questions, press releases, corrections or partnership offers — write to <a class="mail" href="mailto:hello@music98.news">hello@music98.news</a>. We read everything.</p>
+    <p><b>Get in touch:</b> for editorial questions, press releases, corrections or partnership offers — write to <a class="mail" href="mailto:info@music98.news">info@music98.news</a>. We read everything.</p>
   </div>
 
   <div class="foot">
-    <a href="/">Front page</a>
+    <a href="/">Main</a>
     <a href="/about">About</a>
     <a href="/contacts">Contacts</a>
     <a href="/privacy">Privacy</a>
