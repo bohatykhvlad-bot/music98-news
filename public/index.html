@@ -156,6 +156,12 @@ main{position:relative;z-index:1}
   .rail.dragging .card{transform:none!important}
 }
 @media (max-width:900px){ .rail{--cardw:255px} }
+/* news rail: 4 whole cards + a peek of the 5th inside the rail box
+   (1074px inner): 243px cards + 18px gaps fill 1044px, the 5th shows a
+   ~30px slice beside the next pill. The old fixed 255px filled the box
+   exactly and the 5th card never peeked (owner bug report). Releases keep
+   their own width (square covers). */
+#newsGrid{--cardw:243px}
 @media (max-width:640px){ 
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
   /* equal card heights on phone: in a single column every card stands alone,
