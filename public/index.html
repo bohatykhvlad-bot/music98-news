@@ -2058,7 +2058,7 @@ function renderNews(){
   }
   const remaining = rest.length - shown.length;
   lm.hidden = !(narrow.matches && remaining > 0);
-  lm.querySelector("button").textContent = remaining > 0 ? `More (${remaining})` : "More";
+  lm.querySelector("button").textContent = "More";
   $("#newsEmpty").hidden = posts.length > 0;
   equalizeCards("#newsGrid");
   bindCovers($("#heroSlot"));
@@ -2092,7 +2092,7 @@ function renderReleases(){
   }
   const remaining = posts.length - shown.length;
   lm.hidden = !(narrow.matches && remaining > 0);
-  lm.querySelector("button").textContent = remaining > 0 ? `More (${remaining})` : "More";
+  lm.querySelector("button").textContent = "More";
   $("#relEmpty").hidden = posts.length > 0;
   equalizeCards("#relGrid");
   bindCovers($("#relGrid"));
