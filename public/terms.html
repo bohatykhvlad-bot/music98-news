@@ -10,12 +10,10 @@
   :root{--bg:#f6f8f8;--card:#ffffff;--text:#15181a;--muted:#5c6a70;--muted2:#9aa6ab;--line:#e3e8ea;--accent:#00fdfb;--acc2:#0a8f8c}
   *{box-sizing:border-box}
   html,body{margin:0}
+  body{padding-top:70px}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
   .page{max-width:1080px;margin:0 auto;padding:48px 24px 64px}
-  .top{display:inline-flex;align-items:center;margin-bottom:28px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:8px 18px 8px 10px;border-radius:999px}
-  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:19px;letter-spacing:-.015em}
-  .brand img{width:34px;height:34px;border-radius:50%}
-  .aback{display:flex;width:max-content;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin:0 0 18px}
+              .aback{display:flex;width:max-content;align-items:center;gap:8px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;margin:0 0 18px}
   .aback::before{content:"";width:7px;height:7px;flex:none;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-1px}
   .aback:hover{text-decoration:underline}
   .kicker{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin:0 0 10px}
@@ -24,16 +22,36 @@
   p{font-size:15.5px;line-height:1.7;margin:0 0 14px;color:var(--text)}
   a{color:var(--text);text-decoration:none;font-weight:600;border-bottom:1.5px solid var(--text)}
   a:hover{color:var(--acc2);border-color:var(--acc2)}
-  .foot{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(2,minmax(0,max-content));gap:14px 64px;width:max-content}
-  .foot a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:400}
-  .foot a:hover{color:var(--acc2)}
-</style>
+      </style>
+<style>
+  /* footer styles copied from the main site so legal pages match it exactly */
+  footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:56px}
+  .foot-in{max-width:1180px;margin:0 auto;padding:40px 24px 44px;display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:34px}
+  .foot-col h3{margin:0 0 14px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+  .foot-col p{margin:0;color:var(--muted);font-size:13.5px;max-width:340px}
+  .flink{display:block;color:var(--muted);text-decoration:none;font-size:14px;padding:5px 0;transition:.15s}
+  .flink:hover{color:var(--text)}
+  .social .icons{display:flex;gap:10px;flex-wrap:wrap}
+  .social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);text-decoration:none}
+  .social svg{width:18px;height:18px}
+  @media(max-width:900px){.foot-in{grid-template-columns:1fr 1fr}}
+  @media(max-width:600px){.foot-in{grid-template-columns:1fr;padding:32px 20px 36px}}
+
 </head>
 <body>
 <div class="page">
-  <div class="top">
-    <a class="brand" href="/"><img src="/logo.png" alt="music98.news logo">music98.news</a>
+  <header class="topbar">
+  <div class="topbar-glass" aria-hidden="true"></div>
+  <div class="topbar-in">
+    <a class="brand" href="/" title="music98.news — home">
+      <img class="brand-logo" src="/logo.png" alt="music98.news" width="44" height="44">
+      <span class="brand-name">music98.news</span>
+    </a>
+    <div class="top-actions">
+      <a class="home" href="/">Back to the site</a>
+    </div>
   </div>
+</header>
 
   <a class="aback" href="/">Back</a>
   <p class="kicker">Last updated 21 September 2026</p>
@@ -61,13 +79,52 @@
   <h2>Changes</h2>
   <p>These terms may be updated; the date above always shows the current version. Questions — <a href="mailto:info@music98.news">info@music98.news</a>.</p>
 
-  <div class="foot">
-    <a href="/">Main</a>
-    <a href="/about">About</a>
-    <a href="/contacts">Contacts</a>
-    <a href="/privacy">Privacy</a>
-    <a href="/terms">Terms of Use</a>
-  </div>
 </div>
+
+  <!-- same footer as the main site (static copy for legal pages) -->
+<footer>
+  <div class="foot-in">
+    <div class="foot-col">
+      <h3>About us</h3>
+      <p>Independent music media: industry news, release reviews and up-to-date charts. Short, sharp and to the point.</p>
+    </div>
+    <div class="foot-col">
+      <h3>Sections</h3>
+      <a class="flink" href="/about">About us</a>
+      <a class="flink" href="/contacts">Contacts</a>
+      <a class="flink" href="/">News</a>
+      <a class="flink" href="/#releases">Releases</a>
+      <a class="flink" href="/#charts">Chart</a>
+      <a class="flink" href="/privacy">Privacy</a>
+      <a class="flink" href="/terms">Terms of Use</a>
+    </div>
+    <div class="foot-col social">
+      <h3>Follow us</h3>
+      <div class="icons">
+        <a href="https://www.youtube.com/@music9898" aria-label="music98.news on YouTube" title="YouTube"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12z"/></svg></a>
+        <a href="https://www.tiktok.com/@yourmusic98" aria-label="music98.news on TikTok" title="TikTok"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.7 7.4a5.7 5.7 0 0 1-3.5-1.2 5.7 5.7 0 0 1-2-3.2h-3.4v13.4a2.9 2.9 0 1 1-2-2.7v-3.5a6.3 6.3 0 1 0 5.4 6.2V9.8a9 9 0 0 0 5.5 1.9V8.3c-.4 0-.7-.4-.7-.9z"/></svg></a>
+        <a href="https://www.instagram.com/instmusic98" aria-label="music98.news on Instagram" title="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.2" fill="currentColor" stroke="none"/></svg></a>
+        <a href="https://www.facebook.com/yourmusic98" aria-label="music98.news on Facebook" title="Facebook"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.3-1.5 1.6-1.5h1.7V4.6c-.3 0-1.3-.1-2.5-.1-2.4 0-4 1.5-4 4.1v2.3H7.6V14h2.7v8h3.2z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* footer styles copied from the main site so legal pages match it exactly */
+  footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:56px}
+  .foot-in{max-width:1180px;margin:0 auto;padding:40px 24px 44px;display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:34px}
+  .foot-col h3{margin:0 0 14px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+  .foot-col p{margin:0;color:var(--muted);font-size:13.5px;max-width:340px}
+  .flink{display:block;color:var(--muted);text-decoration:none;font-size:14px;padding:5px 0;transition:.15s}
+  .flink:hover{color:var(--text)}
+  .social .icons{display:flex;gap:10px;flex-wrap:wrap}
+  .social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--text);text-decoration:none}
+  .social svg{width:18px;height:18px}
+  @media(max-width:900px){.foot-in{grid-template-columns:1fr 1fr}}
+  @media(max-width:600px){.foot-in{grid-template-columns:1fr;padding:32px 20px 36px}}
+</style>
+</body>
+
 </body>
 </html>
