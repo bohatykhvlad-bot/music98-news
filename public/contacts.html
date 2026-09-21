@@ -12,12 +12,11 @@
   html,body{margin:0}
   body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
   .page{max-width:720px;margin:0 auto;padding:48px 20px 64px}
-  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px}
-  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:18px}
+  .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:8px 10px 8px 16px;border-radius:999px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-weight:700;font-size:19px;letter-spacing:-.015em}
   .brand img{width:34px;height:34px;border-radius:50%}
-  .brand span{color:var(--acc2)}
-  .home{display:inline-block;padding:9px 18px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--text);text-decoration:none;font-size:13.5px;font-weight:600;transition:.15s}
-  .home:hover{border-color:var(--acc2);color:var(--acc2)}
+  .home{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border:1px solid #15181a;border-radius:999px;background:#15181a;color:#ffffff;text-decoration:none;font-size:13.5px;font-weight:600;transition:.15s}
+  .home:hover{background:#2a3033;border-color:#2a3033}
   .kicker{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin:0 0 10px}
   h1{margin:0 0 20px;font-size:clamp(30px,6vw,40px);letter-spacing:-.02em;line-height:1.1}
   .lead{font-size:17.5px;line-height:1.65;color:var(--muted);margin:0 0 28px}
@@ -25,12 +24,12 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
   .card h2{margin:0 0 6px;font-size:15.5px;letter-spacing:0;text-transform:none;color:var(--text)}
   .card p{margin:0;font-size:14.5px;line-height:1.65;color:var(--muted)}
-  .card a.mail{color:var(--acc2);text-decoration:none;font-weight:600}
-  .card a.mail:hover{text-decoration:underline}
+  .card a.mail{color:var(--text);text-decoration:none;font-weight:600;border-bottom:1.5px solid var(--text)}
+  .card a.mail:hover{color:var(--acc2);border-color:var(--acc2)}
   .socials{display:flex;gap:10px;margin:26px 0}
   .socials a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--acc2);text-decoration:none}
   .socials svg{width:18px;height:18px}
-  .foot{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);display:flex;gap:18px;flex-wrap:wrap}
+  .foot{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);display:flex;gap:16px 26px;flex-wrap:wrap;max-width:420px}
   .foot a{color:var(--muted);text-decoration:none;font-size:13.5px}
   .foot a:hover{color:var(--acc2)}
 </style>
@@ -38,7 +37,7 @@
 <body>
 <div class="page">
   <div class="top">
-    <a class="brand" href="/"><img src="/logo.png" alt="music98.news logo"><span>music98</span>.news</a>
+    <a class="brand" href="/"><img src="/logo.png" alt="music98.news logo">music98.news</a>
     <a class="home" href="/">Back to the site</a>
   </div>
 
@@ -61,7 +60,7 @@
     </div>
     <div class="card">
       <h2>Privacy requests</h2>
-      <p>Data access or deletion requests (GDPR/CCPA) — see our <a href="/privacy" style="color:var(--acc2);font-weight:600;text-decoration:none">Privacy Policy</a>, or email with subject "Privacy".</p>
+      <p>Data access or deletion requests (GDPR/CCPA) — see our <a href="/privacy">Privacy Policy</a>, or email with subject "Privacy".</p>
     </div>
   </div>
 
