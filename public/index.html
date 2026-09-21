@@ -2030,13 +2030,26 @@ function wireRail(gridSel, prevSel, nextSel){
   const dragStop = ()=>{ cancelAnimationFrame(drag.raf); drag.raf = 0; };
   const momentum = ()=>{
     drag.raf = 0;
-    if(Math.abs(drag.vx) < 0.3){ return; }
+    const v0 = drag.vx;                  /* px per ms, signed with the movement */
+    if(Math.abs(v0) < 0.3){ return; }
     rail.style.scrollBehavior = "auto";
-    const tick = ()=>{
-      rail.scrollLeft -= drag.vx * 16.7;
-      drag.vx *= 0.94;
+    /* ease-out glide instead of exponential decay + hard cutoff: the old
+       v*=0.94/frame tail was chopped mid-motion at ~5px per frame and the
+       scroll ended abruptly. This glide starts exactly at the release speed
+       (first-frame velocity matches the finger - no hitch at the seam) and
+       lands at zero with a flat slope, so the tail melts away. Travel
+       distance matches the old decay (v0 * ~300ms); time-based, so 120Hz
+       screens play the same curve instead of a 2x-speed one. */
+    const dist = v0 * 300;
+    const dur = 780;                     /* = 300 * 2.6, keeps the start slope seamless */
+    const from = rail.scrollLeft;
+    const t0 = performance.now();
+    const tick = now=>{
+      const u = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - u, 2.6);
+      rail.scrollLeft = from - dist * e;
       const max = rail.scrollWidth - rail.clientWidth - 1;
-      if(Math.abs(drag.vx) >= 0.3 && rail.scrollLeft > 0 && rail.scrollLeft < max){
+      if(u < 1 && rail.scrollLeft > 0 && rail.scrollLeft < max){
         drag.raf = requestAnimationFrame(tick);
       }else{ rail.style.scrollBehavior = ""; }
     };
