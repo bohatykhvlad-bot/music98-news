@@ -2780,7 +2780,7 @@ function closePrivacy(){
   unlockScroll();
   setTimeout(()=>{ po.hidden = true; }, 240);
 }
-$(function(){ /* footer Privacy is now a real link to /privacy; overlay stays for hash deep-links */ });
+/* footer Privacy is now a real link to /privacy; overlay stays for hash deep-links */
 $("#privacyBack").addEventListener("click", e=>{ e.preventDefault(); closePrivacy(); });
 $("#privacyOverlay").addEventListener("click", e=>{ if(e.target.id === "privacyOverlay") closePrivacy(); });
 
