@@ -164,12 +164,9 @@ main{position:relative;z-index:1}
 #newsGrid{--cardw:243px}
 @media (max-width:640px){ 
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
-  /* equal card heights on phone: in a single column every card stands alone,
-     so a 2-line title vs a 1-line one wobbled heights by ~21px (owner saw
-     "разный по высоте"). Clamp the text block to a fixed 2-line title +
-     3-line teaser - all cards get the same silhouette. Desktop is untouched:
-     grid rows already equalize there. */
-  .card h3{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:calc(2*1.32em)}
+  /* full titles (owner: no ellipsis) - heights are equalized in JS after
+     render: every card's title/teaser block gets the tallest sibling's
+     height as min-height, so cards align without cutting any text */
   /* teaser always fits (owner: "чтобы влезал анонс"): no clamp on p.
      Real teasers are written to similar length, so with the 2-line title
      clamp heights stay visually even without cutting text. */
@@ -1928,6 +1925,31 @@ function chartMatches(r){
 
 /* ============ render ============ */
 const RAIL_PAGE = 4;   /* cards per batch on mobile Load More (owner: 4, matches the desktop first screen) */
+/* mobile-only: equalize card text blocks per batch. Titles render in full
+   (no clamp); the tallest title/teaser in the batch sets a min-height for
+   all, so cards share one silhouette without hiding any text. */
+function equalizeCards(gridSel){
+  const grid = $(gridSel);
+  if(!grid) return;
+  const cards = [...grid.querySelectorAll(".card")];
+  if(!window.matchMedia("(max-width: 640px)").matches || !cards.length){
+    cards.forEach(c=>{ const h=c.querySelector("h3"), p=c.querySelector("p"); if(h) h.style.minHeight=""; if(p) p.style.minHeight=""; });
+    return;
+  }
+  cards.forEach(c=>{ const h=c.querySelector("h3"), p=c.querySelector("p"); if(h) h.style.minHeight=""; if(p) p.style.minHeight=""; });
+  let maxH = 0, maxP = 0;
+  cards.forEach(c=>{
+    const h = c.querySelector("h3"), p = c.querySelector("p");
+    if(h) maxH = Math.max(maxH, h.offsetHeight);
+    if(p) maxP = Math.max(maxP, p.offsetHeight);
+  });
+  cards.forEach(c=>{
+    const h = c.querySelector("h3"), p = c.querySelector("p");
+    if(h && maxH) h.style.minHeight = maxH+"px";
+    if(p && maxP) p.style.minHeight = maxP+"px";
+  });
+}
+window.addEventListener("load", ()=>{ equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
 function renderNews(){
   const posts = data.posts.filter(p=>p.type==="news" && matches(p)).sort(byFresh);
   const hero = posts[0], rest = posts.slice(1);
@@ -1954,7 +1976,7 @@ function renderNews(){
   if(!lm){
     lm = document.createElement("div");
     lm.id = "newsMore"; lm.className = "loadmore"; lm.hidden = true;
-    lm.innerHTML = `<button class="loadmore-btn" type="button">Load more stories</button>`;
+    lm.innerHTML = `<button class="loadmore-btn" type="button">More</button>`;
     $("#newsGrid").after(lm);
     lm.querySelector("button").addEventListener("click", ()=>{
       data._newsShown = (data._newsShown||RAIL_PAGE) + RAIL_PAGE;
@@ -1963,8 +1985,9 @@ function renderNews(){
   }
   const remaining = rest.length - shown.length;
   lm.hidden = !(narrow.matches && remaining > 0);
-  lm.querySelector("button").textContent = remaining > 0 ? `Load more stories (${remaining})` : "Load more stories";
+  lm.querySelector("button").textContent = remaining > 0 ? `More (${remaining})` : "More";
   $("#newsEmpty").hidden = posts.length > 0;
+  equalizeCards("#newsGrid");
   bindCovers($("#heroSlot"));
   bindCovers($("#newsGrid"));
   syncRail("#newsGrid");
@@ -1987,7 +2010,7 @@ function renderReleases(){
   if(!lm){
     lm = document.createElement("div");
     lm.id = "relMore"; lm.className = "loadmore"; lm.hidden = true;
-    lm.innerHTML = `<button class="loadmore-btn" type="button">Load more releases</button>`;
+    lm.innerHTML = `<button class="loadmore-btn" type="button">More</button>`;
     $("#relGrid").after(lm);
     lm.querySelector("button").addEventListener("click", ()=>{
       data._relShown = (data._relShown||RAIL_PAGE) + RAIL_PAGE;
@@ -1996,8 +2019,9 @@ function renderReleases(){
   }
   const remaining = posts.length - shown.length;
   lm.hidden = !(narrow.matches && remaining > 0);
-  lm.querySelector("button").textContent = remaining > 0 ? `Load more releases (${remaining})` : "Load more releases";
+  lm.querySelector("button").textContent = remaining > 0 ? `More (${remaining})` : "More";
   $("#relEmpty").hidden = posts.length > 0;
+  equalizeCards("#relGrid");
   bindCovers($("#relGrid"));
   syncRail("#relGrid");
 }
