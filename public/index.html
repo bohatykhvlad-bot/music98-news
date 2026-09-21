@@ -683,10 +683,13 @@ textarea{resize:vertical;min-height:64px}
     </div>
     <div class="foot-col">
       <h3>Sections</h3>
+      <a class="flink" href="/about">About us</a>
+      <a class="flink" href="/contacts">Contacts</a>
       <a class="flink" href="#" data-goto="news">News</a>
       <a class="flink" href="#" data-goto="releases">Releases</a>
       <a class="flink" href="#" data-goto="charts">Chart</a>
-      <a class="flink" href="#" id="footPrivacy">Privacy</a>
+      <a class="flink" href="/privacy" id="footPrivacy">Privacy</a>
+      <a class="flink" href="/terms">Terms of Use</a>
     </div>
     <div class="foot-col social">
       <h3>Follow us</h3>
@@ -2777,7 +2780,7 @@ function closePrivacy(){
   unlockScroll();
   setTimeout(()=>{ po.hidden = true; }, 240);
 }
-$("#footPrivacy").addEventListener("click", e=>{ e.preventDefault(); openPrivacy(); });
+$(function(){ /* footer Privacy is now a real link to /privacy; overlay stays for hash deep-links */ });
 $("#privacyBack").addEventListener("click", e=>{ e.preventDefault(); closePrivacy(); });
 $("#privacyOverlay").addEventListener("click", e=>{ if(e.target.id === "privacyOverlay") closePrivacy(); });
 

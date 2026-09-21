@@ -166,6 +166,12 @@ export default {
       const u = new URL("/admin-desk", request.url);
       return Response.redirect(u, 301);
     }
+    /* legal/info pages: clean URLs -> /about, /contacts, /privacy, /terms */
+    const legal = path.match(/^(\/about|\/contacts|\/privacy|\/terms)\/?$/);
+    if (legal) {
+      const u = new URL(request.url);
+      return env.ASSETS.fetch(new Request(u.origin + legal[1] + ".html", request));
+    }
     const photo = path.match(PHOTO_FILE);
     if (photo) {
       const fromKV = await servePhoto(env, photo[1] + "." + photo[2]);
