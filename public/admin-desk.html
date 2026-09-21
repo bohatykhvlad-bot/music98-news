@@ -931,8 +931,10 @@ function parsePos(p){
 }
 function cardFx(){
   /* before the pill is clicked the card follows the main crop horizontally;
-     after unlocking, it keeps its own x (cardX) */
-  if(cropMode === "card" && crop.cardFree && Number.isFinite(crop.cardX)) return crop.cardX;
+     after unlocking, it keeps its own x (cardX). Mode-independent: the public
+     site renders cardX regardless of which admin pane is open, so the mini
+     preview must show cardX in MAIN mode too (GTA/Pylon preview bug). */
+  if(crop.cardFree && Number.isFinite(crop.cardX)) return crop.cardX;
   return lockFx();
 }
 function fitCover(img, fx, fy, zoom){
@@ -1071,8 +1073,11 @@ function paintMini(){
     if(m.getAttribute("src") !== coverSrc) m.src = coverSrc;
     m.classList.remove("hide");
     const go = ()=> fitCover(m, fx, fy, fz||crop.zoom||1);
+    /* ALWAYS re-bind onload, even when a previous image is still decoded:
+       otherwise the in-flight load lands with the PREVIOUS crop's closure
+       and re-fits the new photo with stale coordinates (Olivia mini bug) */
+    m.onload = go;
     if(m.naturalWidth) go();
-    else m.onload = go;
   };
   if(cropMode === "card") paint("miniImg", Number.isFinite(crop.x)?crop.x:0.5, Number.isFinite(crop.y)?crop.y:0.5, crop.zoom||1);
   else paint("miniImg", cardFx(), crop.cardY, crop.cardZoom||1);
