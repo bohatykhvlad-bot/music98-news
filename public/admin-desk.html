@@ -1828,6 +1828,14 @@ function collectPost(status){
 async function writePost(status){
   const rec = collectPost(status);
   if(!rec) return;
+  /* guard: a live post must not carry tomorrow's date - the card would show
+     a full date string instead of Today/Yesterday (owner bug 2026-09-21).
+     Scheduled posts are exempt: their date is intentionally in the future. */
+  const tl = today();
+  if(status !== "scheduled" && rec.date && rec.date > tl){
+    const okFix = confirm("Date is in the future (" + rec.date + "). A live post with a future date shows a raw date string instead of Today. Reset date to today?");
+    if(okFix) rec.date = tl;
+  }
   const ix = posts.findIndex(p=>p.id===rec.id);
   const prev = ix>=0 ? posts[ix] : null;
   const wasLive = prev && ((prev.status || "live") === "live");

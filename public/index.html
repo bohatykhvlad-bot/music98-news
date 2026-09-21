@@ -908,6 +908,8 @@ function fmtDate(iso){
   if(diff === 0) return "Today";
   if(diff === 1) return "Yesterday";
   if(diff > 1 && diff < 6) return diff + " days ago";
+  /* future-dated live post slipped through - show Today, never a raw date (owner bug 2026-09-21) */
+  if(diff < 0) return "Today";
   return d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
 }
 
