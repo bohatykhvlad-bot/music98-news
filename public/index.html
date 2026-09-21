@@ -482,7 +482,7 @@ textarea{resize:vertical;min-height:64px}
 .rcard .rcover{position:relative;aspect-ratio:16/9;overflow:hidden;background:var(--card2)}
 .rcard .rbody{padding:10px 12px 12px;display:flex;flex-direction:column;gap:6px}
 .rcard .rtag{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2)}
-.rcard h3{margin:0;font-size:14px;line-height:1.35}
+.rcard h3{margin:0;font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rcard .rdate{color:var(--muted2);font-size:11.5px}
 
 /* ---------- privacy overlay ---------- */
@@ -508,6 +508,7 @@ textarea{resize:vertical;min-height:64px}
   .pbar{width:92px}
 }
 @media (max-width:900px){
+  .rcard h3{-webkit-line-clamp:1}
   .chart-row{grid-template-columns:40px 52px minmax(90px,1fr) var(--pw) auto}
   .pextra .abadge{display:inline-flex}
   .foot-in{grid-template-columns:1fr 1fr}
