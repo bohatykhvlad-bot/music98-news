@@ -81,7 +81,10 @@ a{color:var(--text)}
 .toolbar .tsep{width:1px;height:18px;background:var(--line);margin:0 4px}
 .stage-wrap{border:1px dashed var(--line);border-radius:12px;background:#111;overflow:hidden}
 .crop-row{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:10px;align-items:start}
-.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;cursor:default;background:#111;touch-action:none}
+/* the photo window rounds like the mini frame does: the wrap radius alone
+   clipped only the outer chrome, the photo's own corners stayed square */
+.stage{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;cursor:default;background:#111;touch-action:none;border-radius:11px}
+.stage img{position:absolute;left:0;top:0;max-width:none;user-select:none;pointer-events:none;will-change:transform;border-radius:11px}
 .stage.hot{outline:2px solid var(--acc2);outline-offset:-2px}
 .stage:active,.stage.drag{cursor:default}
 .stage img{position:absolute;left:0;top:0;max-width:none;user-select:none;pointer-events:none;will-change:transform}
@@ -971,9 +974,12 @@ function setZoom(z){
   const cap = zoomCap();
   const target = Math.min(cap, Math.max(1, Number(z)||1));
   if(cropMode === "card" && coverSrc){
-    /* card zoom pivots around the CURRENT view center: recompute which image
-       point sits at the frame center before resizing and anchor the new zoom
-       on that same point - otherwise the view drifts toward the top edge */
+    /* card zoom pivots around the CURRENT view center while the view can move
+       (unclamped) - otherwise the view drifts toward the top edge. When the
+       view is pinned to an edge (whole image visible, or the framing sits
+       beyond the visible range at this zoom) cardY is PARKED: recomputing it
+       from the clamped transform used to overwrite the owner's saved framing,
+       so zoom-out/zoom-in visibly re-centered the card. */
     const img = $("#stageImg"), box = img.parentElement;
     if(img.naturalWidth && box && box.clientWidth){
       const sw = box.clientWidth, sh = box.clientHeight;
@@ -982,8 +988,11 @@ function setZoom(z){
       const dhOld = ih * base * (crop.cardZoom||1);
       const m = /translate\(-?[\d.]+px,\s*(-?[\d.]+)px\)/.exec(img.style.transform||"");
       const topOld = m ? parseFloat(m[1]) : (sh - dhOld)/2;
-      const cy = (sh/2 - topOld) / dhOld;
-      crop.cardY = Math.min(1, Math.max(0, cy));
+      const pinned = dhOld <= sh + 0.5 || topOld >= -0.5 || topOld <= sh - dhOld + 0.5;
+      if(!pinned){
+        const cy = (sh/2 - topOld) / dhOld;
+        crop.cardY = Math.min(1, Math.max(0, cy));
+      }
     }
     crop.cardZoom = target;
   } else {
