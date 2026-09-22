@@ -292,7 +292,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .cmid{position:relative;width:40px;height:40px;justify-self:center;display:grid;place-items:center;gap:0;z-index:2}
 /* no local transition on .cmid: the button never changes any layout or paint
    property on play - zoom/hover transitions live on .rplay itself */
-.rplay{width:40px;height:40px;border:0;padding:0;background:none;box-shadow:none;color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;z-index:2;transition:transform .16s ease,color .16s ease}
+.rplay{width:40px;height:40px;border:0;padding:0;background:none;border-radius:50%;box-shadow:none;color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;z-index:2;transition:transform .16s ease,color .16s ease}
 /* MONOLITHIC GLYPH (owner, from Apple's player): ONE svg holds the ring AND
    both glyph groups in a single coordinate system; the state swap is a class
    flip inside the same element, so play/pause/ring cannot drift apart. */
@@ -331,7 +331,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .tinfo span{color:var(--muted);font-size:13px}
 
 .tnames{min-width:0;max-width:100%;display:grid;grid-template-columns:1.4em 1fr;column-gap:12px;align-items:baseline}
-.ctext{min-width:0;max-width:100%;overflow:hidden}
+.ctext{min-width:0;max-width:100%;overflow:hidden;transition:opacity .45s cubic-bezier(.3,.65,.25,1)}
+/* Apple pattern: while the pill is open the artist/track fades out and gives
+   its space to the player - the pill never sits on top of visible text */
+.chart-row.playing .ctext,.chart-row.accent-hold .ctext{opacity:0}
 .ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;grid-column:2}
 
 .chart-row.playing{background:var(--bg2)}
@@ -557,7 +560,7 @@ textarea{resize:vertical;min-height:64px}
 @media (hover:hover) and (pointer:fine){
   .nav-btn:hover{color:var(--text)}
   .chart-row:hover{background:var(--card2)}
-  .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.07)}
+  .rplay:hover{color:#03282b;transform:scale(1.07)}
   .card:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
   .hero:hover{border-color:var(--accent-dim)}
   .rcard:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
@@ -569,8 +572,8 @@ textarea{resize:vertical;min-height:64px}
   .nav-btn:active{background:transparent;color:var(--muted)}
   .chart-row:hover{background:transparent}
   .chart-row.playing{background:var(--bg2)}
-  .rplay:hover{background:rgba(255,255,255,.65);color:var(--acc2);border-color:var(--line);transform:none}
-  .chart-row.playing .rplay:hover,.chart-row.playing .rplay:active{background:var(--accent);color:#03282b;border-color:transparent}
+  .rplay:hover{color:var(--acc2);transform:none}
+  .chart-row.playing .rplay:hover,.chart-row.playing .rplay:active{color:#03282b;transform:none}
   .card:hover,.hero:hover,.rcard:hover{transform:none;border-color:var(--line);box-shadow:none}
   .card:active,.hero:active,.rcard:active{border-color:var(--line);transform:none;box-shadow:none}
 }
@@ -639,6 +642,9 @@ textarea{resize:vertical;min-height:64px}
   .rplay svg{width:100%;height:100%}
   /* desktop plate is absolute+right-pinned; the mobile stack needs it back
      in the extra grid row as a normal block */
+  /* on the phone stack the pill lives in its own grid row under the text -
+     nothing overlaps, so the title must stay visible */
+  .chart-row.playing .ctext,.chart-row.accent-hold .ctext{opacity:1}
   .pextra{position:static;right:auto;left:auto;grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:auto;min-height:0;opacity:0;overflow:hidden;transform:none;pointer-events:none;max-height:0;margin:0;background:none;box-shadow:none;transition:opacity .28s ease,max-height .32s ease}
   /* the desktop wipe machinery (gradient paint, --pwipe content fade,
      visibility gate) must not touch the mobile stack layout */
