@@ -148,7 +148,7 @@ main{position:relative;z-index:1}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 #tab-releases .rail-wrap .rail-btn.next{right:22px}
-.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:12px 0;margin:-12px 0;scrollbar-width:none;-ms-overflow-style:none}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:12px 0;margin:-12px 0;scrollbar-width:none;-ms-overflow-style:none;will-change:scroll-position;contain:layout style}
 /* compositor hint: the rail is the site's hot scroll surface - hinting
    its own layer keeps drag/momentum off the main-thread paint path */
 .rail{will-change:scroll-position}
@@ -160,6 +160,12 @@ main{position:relative;z-index:1}
    motion at grab), everything else sits flat; touch gets flat everywhere. */
 .rail.dragging .card{transition:none}
 .rail.dragging .card{transform:none!important}
+/* glide optimization: while the rail moves on its own (momentum, hold-scroll,
+   band spring) cards must not react to the cursor sweeping past them -
+   pointer-events:none kills hover recalc + lift transitions every frame,
+   which was the main desktop jank source (owner: scrolling now stutters) */
+.rail.gliding .card,.rail.gliding .rcard{pointer-events:none}
+.rail.dragging .card,.rail.dragging .rcard{pointer-events:none}
 @media (hover:hover) and (pointer:fine){
   .rail.dragging .card.grab{transform:translateY(-4px)!important}
 }
@@ -2143,14 +2149,18 @@ function syncRail(sel){
   const prev = wrap.querySelector(".rail-btn.prev");
   const next = wrap.querySelector(".rail-btn.next");
   const update = ()=>{
-    const max = rail.scrollWidth - rail.clientWidth - 1;
-    prev.classList.toggle("ok", max > 0 && rail.scrollLeft > 4);
-    next.classList.toggle("ok", max > 0 && rail.scrollLeft < max);
+    /* clientWidth/scrollWidth reads force layout; cache the max and refresh
+       it lazily (rAF-coalesced) so the scroll handler stays on the fast path */
+    if(rail._max == null){ rail._max = rail.scrollWidth - rail.clientWidth - 1; }
+    prev.classList.toggle("ok", rail._max > 0 && rail.scrollLeft > 4);
+    next.classList.toggle("ok", rail._max > 0 && rail.scrollLeft < rail._max);
   };
+  rail._invalidateMax = ()=>{ rail._max = null; };
   if(!rail._railWired){
     rail._railWired = true;
     rail.addEventListener("scroll", ()=>{ update(); }, {passive:true});
-    window.addEventListener("resize", update);
+    window.addEventListener("resize", ()=>{ rail._invalidateMax(); update(); });
+    new MutationObserver(()=>{ rail._invalidateMax(); update(); }).observe(rail, {childList:true});
   }
   update();
 }
@@ -2159,7 +2169,7 @@ function wireRail(gridSel, prevSel, nextSel){
   if(!rail) return;
   const step = ()=> (rail.firstElementChild ? rail.firstElementChild.getBoundingClientRect().width + 18 : 300);
   const hold = {raf:0, v:0, dir:0, t0:0};
-  const stopHold = ()=>{ hold.raf = 0; hold.v = 0; hold.dir = 0; rail._holding = false; rail.style.scrollBehavior = ""; };
+  const stopHold = ()=>{ hold.raf = 0; hold.v = 0; hold.dir = 0; rail._holding = false; rail.style.scrollBehavior = ""; rail.classList.remove("gliding"); };
   const glide = ()=>{
     if(!hold.dir){ stopHold(); return; }
     const dt = Math.min(50, performance.now() - hold.t0); hold.t0 = performance.now();
@@ -2167,10 +2177,11 @@ function wireRail(gridSel, prevSel, nextSel){
        direct scrollLeft writes need instant behavior - CSS smooth would
        re-animate every write and the rail would crawl */
     rail.style.scrollBehavior = "auto";
+    rail.classList.add("gliding");   /* hover-freeze while auto-scrolling */
     hold.v = Math.min(26, hold.v + dt * 0.045);
     rail.scrollLeft += hold.dir * hold.v * (dt/16.7);
-    const max = rail.scrollWidth - rail.clientWidth - 1;
-    if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=max)){ stopHold(); return; }
+    if(rail._max == null) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=rail._max)){ stopHold(); return; }
     hold.raf = requestAnimationFrame(glide);
   };
   const inertia = ()=>{
@@ -2178,8 +2189,8 @@ function wireRail(gridSel, prevSel, nextSel){
     const dt = 16.7;
     rail.scrollLeft += hold.dir * hold.v * (dt/16.7);
     hold.v *= 0.94;
-    const max = rail.scrollWidth - rail.clientWidth - 1;
-    if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=max)){ stopHold(); return; }
+    if(rail._max == null) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=rail._max)){ stopHold(); return; }
     hold.raf = requestAnimationFrame(inertia);
   };
   [ [prevSel,-1], [nextSel,1] ].forEach(([sel,dir])=>{
@@ -2250,7 +2261,7 @@ function wireRail(gridSel, prevSel, nextSel){
       const e = 1 - Math.pow(1 - u, 3);
       setOver(o0 * (1 - e));
       if(u < 1){ drag.raf = requestAnimationFrame(tick); }
-      else { setOver(0); drag.raf = 0; rail.style.scrollBehavior = ""; syncRail(gridSel); }
+      else { setOver(0); drag.raf = 0; rail.style.scrollBehavior = ""; rail.classList.remove("gliding"); syncRail(gridSel); }
     };
     drag.raf = requestAnimationFrame(tick);
   };
@@ -2261,7 +2272,8 @@ function wireRail(gridSel, prevSel, nextSel){
   const applyDrag = ()=>{
     drag.raf2 = 0;
     if(!drag.on) return;
-    const max = rail.scrollWidth - rail.clientWidth - 1;
+    if(rail._max == null) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    const max = rail._max;
     let x = drag.pendX, over = 0;
     if(x < 0){ over = x; x = 0; }
     else if(x > max){ over = x - max; x = max; }
@@ -2279,6 +2291,7 @@ function wireRail(gridSel, prevSel, nextSel){
     const v0raw = drag.vx;               /* px per ms, signed with the movement */
     if(Math.abs(v0raw) < 0.3){ return; }
     rail.style.scrollBehavior = "auto";
+    rail.classList.add("gliding");       /* hover-freeze while gliding */
     /* ease-out glide instead of exponential decay + hard cutoff: the old
        v*=0.94/frame tail was chopped mid-motion at ~5px per frame and the
        scroll ended abruptly. This glide starts exactly at the release speed
@@ -2296,7 +2309,8 @@ function wireRail(gridSel, prevSel, nextSel){
       const u = Math.min(1, (now - t0) / dur);
       const e = 1 - Math.pow(1 - u, 2.4);
       const x = from - dist * e;
-      const max = rail.scrollWidth - rail.clientWidth - 1;
+      if(rail._max == null) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+      const max = rail._max;
       if(x < 0 || x > max){
         /* glide reached the edge with speed left: clamp the scroll AT the
            bound (so the arrow states re-evaluate) and hand the leftover
@@ -2309,7 +2323,7 @@ function wireRail(gridSel, prevSel, nextSel){
       }
       rail.scrollLeft = x;
       if(u < 1){ drag.raf = requestAnimationFrame(tick); }
-      else{ rail.style.scrollBehavior = ""; }
+      else{ rail.style.scrollBehavior = ""; rail.classList.remove("gliding"); }
     };
     drag.raf = requestAnimationFrame(tick);
   };
@@ -2326,6 +2340,7 @@ function wireRail(gridSel, prevSel, nextSel){
        pressed card must not slide down off its hover lift while dragging */
     drag.grabCard = e.target.closest(".card, .rcard");
     rail.classList.add("dragging");
+    rail.classList.add("gliding");   /* hover-freeze for the whole gesture */
     if(drag.grabCard) drag.grabCard.classList.add("grab");
     dragStop();
     if(drag.over){ drag.over = 0; setOver(0); syncRail(gridSel); }   /* a new grab cancels the spring */
@@ -2358,8 +2373,12 @@ function wireRail(gridSel, prevSel, nextSel){
     if(drag.grabCard){ drag.grabCard.classList.remove("grab"); drag.grabCard = null; }
     if(drag.moved){
       rail.style.scrollBehavior = "";
+      /* keep .gliding through the momentum/spring phase - it is dropped when
+         the motion actually ends (momentum finish / springBack finish); a
+         plain stop without motion drops it right here */
       if(drag.over){ springBack(drag.over); drag.over = 0; }
-      else momentum();
+      else if(Math.abs(drag.vx) >= 0.3){ momentum(); }
+      else { rail.classList.remove("gliding"); }
       /* swallow the click that follows a real drag so the post does not open */
       rail.addEventListener("click", ev=>{ ev.preventDefault(); ev.stopPropagation(); }, {capture:true, once:true});
     }
