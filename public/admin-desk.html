@@ -1610,6 +1610,30 @@ $("#composer").addEventListener("input", e=>{
   const fig = e.target.closest ? e.target.closest("figure[data-photo]") : null;
   if(!fig || !e.target.classList.contains("pp-zoom")) return;
   const img = fig.querySelector(".abody-box img");
+  const box = img.parentElement;
+  /* zoom must pivot around the CURRENT VIEW CENTER (owner: "зумит в центр"),
+     not around the stored anchor fx/fy: recompute the anchor so the point
+     under the box center stays under the box center across the zoom change.
+     Mirrors the card-zoom logic in setZoom. */
+  const zOld = Math.min(3, Math.max(1, Number(img.dataset.zoom)||1));
+  const zNew = Math.min(3, Math.max(1, Number(e.target.value)||1));
+  if(zNew !== zOld && img.naturalWidth && box.clientWidth){
+    const sw = box.clientWidth, sh = box.clientHeight;
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const base = Math.max(sw/iw, sh/ih);
+    const fx = Math.min(1, Math.max(0, Number(img.dataset.fx)||0.5));
+    const fy = Math.min(1, Math.max(0, Number(img.dataset.fy)||0.5));
+    const m = /translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/.exec(img.style.transform||"");
+    if(m){
+      const dwOld = iw*base*zOld, dhOld = ih*base*zOld;
+      const leftOld = parseFloat(m[1]), topOld = parseFloat(m[2]);
+      const pinnedX = dwOld <= sw + .5 || leftOld >= -.5 || leftOld <= sw - dwOld + .5;
+      const pinnedY = dhOld <= sh + .5 || topOld >= -.5 || topOld <= sh - dhOld + .5;
+      if(!pinnedX) img.dataset.fx = Math.min(1, Math.max(0, (sw/2 - leftOld)/dwOld));
+      if(!pinnedY) img.dataset.fy = Math.min(1, Math.max(0, (sh/2 - topOld)/dhOld));
+      fig.dataset.ppos = (img.dataset.fx*100).toFixed(1).replace(/\.0$/,"")+"% "+(img.dataset.fy*100).toFixed(1).replace(/\.0$/,"")+"%";
+    }
+  }
   img.dataset.zoom = e.target.value;
   fig.dataset.pzoom = e.target.value;
   fitPhotoFig(fig);
@@ -1619,7 +1643,25 @@ $("#composer").addEventListener("click", e=>{
   if(!fig) return;
   const img = fig.querySelector(".abody-box img");
   if(e.target.dataset.pz){
-    const z = Math.min(3, Math.max(1, (Number(img.dataset.zoom)||1) + Number(e.target.dataset.pz)*0.1));
+    const zOld = Math.min(3, Math.max(1, Number(img.dataset.zoom)||1));
+    const z = Math.min(3, Math.max(1, zOld + Number(e.target.dataset.pz)*0.1));
+    const box = img.parentElement;
+    /* same view-center pivot as the slider (owner: "зумит в центр") */
+    if(z !== zOld && img.naturalWidth && box.clientWidth){
+      const sw = box.clientWidth, sh = box.clientHeight;
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const base = Math.max(sw/iw, sh/ih);
+      const m = /translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/.exec(img.style.transform||"");
+      if(m){
+        const dwOld = iw*base*zOld, dhOld = ih*base*zOld;
+        const leftOld = parseFloat(m[1]), topOld = parseFloat(m[2]);
+        const pinnedX = dwOld <= sw + .5 || leftOld >= -.5 || leftOld <= sw - dwOld + .5;
+        const pinnedY = dhOld <= sh + .5 || topOld >= -.5 || topOld <= sh - dhOld + .5;
+        if(!pinnedX) img.dataset.fx = Math.min(1, Math.max(0, (sw/2 - leftOld)/dwOld));
+        if(!pinnedY) img.dataset.fy = Math.min(1, Math.max(0, (sh/2 - topOld)/dhOld));
+        fig.dataset.ppos = (img.dataset.fx*100).toFixed(1).replace(/\.0$/,"")+"% "+(img.dataset.fy*100).toFixed(1).replace(/\.0$/,"")+"%";
+      }
+    }
     img.dataset.zoom = z; fig.dataset.pzoom = z;
     const r = fig.querySelector(".pp-zoom"); if(r) r.value = z;
     fitPhotoFig(fig);
