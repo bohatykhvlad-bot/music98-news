@@ -258,13 +258,14 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- charts ---------- */
 .chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
-.chart-row{--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) calc(40px + var(--pexp)) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,--pexp .45s cubic-bezier(.3,.65,.25,1)}
-/* PLAY-BUTTON INVARIANT (2026-09-22 redraw):
-   The play column grows exactly by var(--pexp); its left edge therefore moves
-   left by pexp/2 (both 1fr neighbours give half each). .cmid carries
-   transform:translateX(calc(var(--pexp)/2)) driven by the SAME registered,
-   SAME-eased --pexp -> button center = col_left + pexp/2 is constant in EVERY
-   frame, by construction. No magic constants, no jumps, works at any width. */
+.chart-row{--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) 40px minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,--pexp .45s cubic-bezier(.3,.65,.25,1)}
+/* PLAY-BUTTON INVARIANT (2026-09-22 redraw, live-verified):
+   The play column is FROZEN at 40px at EVERY width - the grid NEVER changes
+   on play, so the button center is constant BY CONSTRUCTION (probe: one
+   single coordinate through the whole press cycle). The plate (.pextra) is
+   an absolute overlay growing RIGHTWARD from under the button, driven by
+   the registered --pexp (same .45s curve as the etalon); JS sets --pexp on
+   .chart-row and it inherits down to the plate. */
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
@@ -286,7 +287,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
-.cmid{width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:0;z-index:2;transform:translateX(calc(var(--pexp)/2))}
+.cmid{position:relative;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:0;z-index:2}
 /* --pexp is set by JS on .chart-row (the grid reads it there) and INHERITS
    down to .cmid/.pextra; no local declaration here (it would block the
    inheritance), no local transition (the transform just follows the
@@ -317,10 +318,12 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .chart-row.playing .rplay>svg,
 .chart-row.accent-hold .rplay>svg,
 .rplay:hover>svg{background:var(--accent)}
-.pextra{display:flex;align-items:center;gap:8px;width:var(--pexp);height:48px;flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease;background:rgba(255,255,255,.92);border-radius:999px;box-shadow:0 0 0 1px rgba(15,60,64,.10);box-sizing:border-box;margin-left:-20px;padding:0 10px 0 28px;z-index:1}
-/* plate slides 20px UNDER the 40px button (z-index below it); content starts
-   at padding-left 28 = button right edge + 8px gap; JS-measured scrollWidth
-   already includes this padding, so width=--pexp fits exactly */
+.pextra{position:absolute;left:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;width:var(--pexp);height:48px;flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease;background:rgba(255,255,255,.92);border-radius:999px;box-shadow:0 0 0 1px rgba(15,60,64,.10);white-space:nowrap;z-index:1}
+/* plate is an ABSOLUTE overlay: starts 20px in (under the button's right
+   half, z below it) and grows rightward with --pexp; NO padding - spacing
+   rides on child margins so the plate collapses to a true 0px at rest */
+.pextra .ptime{margin-left:8px}
+.pextra .abadge{margin-right:8px}
 .chart-row.playing .pextra{opacity:1}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
 .pbar{width:108px;height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:block;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none}
@@ -550,7 +553,7 @@ textarea{resize:vertical;min-height:64px}
 }
 @media (max-width:900px){
   .rcard h3{-webkit-line-clamp:1}
-  .chart-row{grid-template-columns:40px 52px minmax(90px,1fr) calc(40px + var(--pexp)) auto}
+  .chart-row{grid-template-columns:40px 52px minmax(90px,1fr) 40px auto}
   .pextra .abadge{display:inline-flex}
   .foot-in{grid-template-columns:1fr 1fr}
   .hero{grid-template-columns:1fr}
@@ -641,7 +644,7 @@ textarea{resize:vertical;min-height:64px}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}
   .rplay svg{width:100%;height:100%}
-  .pextra{background:none;box-shadow:none;border-radius:0;height:auto;margin-left:0;padding:0}
+  .pextra{position:static;background:none;box-shadow:none;border-radius:0;height:auto;padding:0}
   .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:auto;min-height:0;opacity:0;overflow:hidden;transform:none;pointer-events:none;max-height:0;margin:0;transition:opacity .28s ease,max-height .32s ease}
   .chart-row.playing .pextra{opacity:1;overflow:hidden;pointer-events:auto;max-height:36px}
   .ptime{display:flex;align-items:center;flex:1;min-width:0;padding:0;gap:8px;background:none;border:0;border-radius:0}
