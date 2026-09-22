@@ -266,7 +266,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
    ring) rides the same width ramp via --pwipe so the reveal reads as one
    fluid wipe, no flash, no end hitch. Mobile (<=640px) keeps its own stack
    layout and is untouched by the override block below. */
-.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,--pexp .45s cubic-bezier(.3,.65,.25,1)}
+.chart-row{--pw:40px;--pexp:0px;--pwipe:0;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,--pexp .45s cubic-bezier(.3,.65,.25,1),--pwipe .45s cubic-bezier(.3,.65,.25,1)}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
@@ -637,7 +637,9 @@ textarea{resize:vertical;min-height:64px}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}
   .rplay svg{width:100%;height:100%}
-  .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:auto;min-height:0;opacity:0;overflow:hidden;transform:none;pointer-events:none;max-height:0;margin:0;transition:opacity .28s ease,max-height .32s ease}
+  /* desktop plate is absolute+right-pinned; the mobile stack needs it back
+     in the extra grid row as a normal block */
+  .pextra{position:static;right:auto;left:auto;grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:auto;min-height:0;opacity:0;overflow:hidden;transform:none;pointer-events:none;max-height:0;margin:0;background:none;box-shadow:none;transition:opacity .28s ease,max-height .32s ease}
   /* the desktop wipe machinery (gradient paint, --pwipe content fade,
      visibility gate) must not touch the mobile stack layout */
   .pextra > *{opacity:1}
