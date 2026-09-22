@@ -284,10 +284,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .cartist{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta .darr,.delta .dnum,.delta.same{color:var(--text)}
-.delta.new{color:#fff;background:var(--text);border-radius:999px;padding:4.2px calc(8px - .08em) 1.8px 8px;font-size:10.5px;letter-spacing:.08em;line-height:1;width:fit-content;justify-self:center}
+.delta.new{color:#fff;background:var(--text);border-radius:999px;padding:3.45px calc(8px - .08em) 2.55px 8px;font-size:10.5px;letter-spacing:.08em;line-height:1;width:fit-content;justify-self:center}
 /* vertical: all-caps ink sits high in the em box (descender space below the
-   baseline) - measured ink gaps were 3.5 top vs 6 bottom; +1.2px down centers
-   the INK optically, pill height and row axis unchanged */
+   baseline) - measured prod ink gaps 3.5 top vs 6 bottom; net +0.45px down
+   centers the INK on the live Pretendard render, pill height unchanged */
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
@@ -634,7 +634,7 @@ textarea{resize:vertical;min-height:64px}
     transition:background .15s ease;
   }
   .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0;max-width:100%;overflow:hidden}
-  .delta.new{padding:4.2px calc(5px - .03em) 1.8px 5px;font-size:8.5px;letter-spacing:.03em;line-height:1;max-width:28px;box-sizing:border-box}
+  .delta.new{padding:3.45px calc(5px - .03em) 2.55px 5px;font-size:8.5px;letter-spacing:.03em;line-height:1;max-width:28px;box-sizing:border-box}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
   .delta.new{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
