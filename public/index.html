@@ -1785,7 +1785,9 @@ function postTime(p){
   return Number.isFinite(d) ? d : 0;
 }
 function byFresh(a,b){
-  return (b.pinned?1:0)-(a.pinned?1:0) || postTime(b)-postTime(a);
+  /* pin no longer lifts a post out of its date slot - the feed is strictly
+     chronological (owner request 2026-09-22: pinned card jumped to the edge) */
+  return postTime(b)-postTime(a);
 }
 function loadPublishedDesk(){
   const grab = u => fetch(u, {cache:"no-store"}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
