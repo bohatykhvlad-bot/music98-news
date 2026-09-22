@@ -322,6 +322,23 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 .chart-row.playing{background:var(--bg2)}
 .chart-note{margin:14px 2px 0;color:var(--muted2);font-size:12.5px}
+/* ===== DESKTOP ONLY (>=901px): PINNED PLAY BUTTON =====
+   Owner directive: keep the etalon plate animation, but the button must stay
+   on the row axis. Column 4 is frozen at 40px (grid never reflows), and the
+   plate (.pextra) becomes an absolute overlay growing RIGHTWARD from the
+   button, still driven by the SAME animated --pexp (registered property on
+   .cmid, .45s cubic-bezier(.3,.65,.25,1)) - identical motion curve, zero
+   button drift: its center is invariant in every frame. Phones (<641px) keep
+   their own layout; tablets (641-900px) keep the etalon column growth. */
+@media (min-width:901px){
+  .chart-row{grid-template-columns:44px 56px minmax(180px,1fr) 40px minmax(110px,1fr)}
+  .cmid{position:relative}
+  .chart-row.playing .cmid{background:none;border-color:transparent;padding:0;gap:0}
+  .pextra{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);height:50px;width:calc(var(--pexp) + 2px);padding:0 8px;background:rgba(255,255,255,.92);border:1px solid rgba(15,60,64,.10);border-radius:999px;white-space:nowrap;pointer-events:none}
+  /* JS measures scrollWidth (content+padding, no border), so final width needs
+     exactly the 2px borders on top of --pexp for a pixel-tight pill */
+  .chart-row.playing .pextra{opacity:1;pointer-events:auto}
+}
 .chart-switch{display:none!important}
 .cs-btn{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:.18s}
 .cs-btn:hover{border-color:var(--text)}
