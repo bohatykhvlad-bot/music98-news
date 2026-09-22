@@ -984,6 +984,18 @@ function coverOf(p, square){
   }
   return presetCover(p.cover ? p.cover.i : 0, p.artist || p.title, square);
 }
+function postDateISO(p){
+  /* the display day: publishAt (actual go-live moment) wins over the manual
+     date field. A post scheduled at 6:00 that promoted itself overnight used
+     to keep yesterday's date field and the card read "Yesterday" although it
+     went live today (owner bug 2026-09-23) */
+  const at = Date.parse((p && p.publishAt) || "");
+  if(Number.isFinite(at)){
+    const d = new Date(at);
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  return (p && p.date) || "";
+}
 function fmtDate(iso){
   if(!iso) return "";
   const d = new Date(iso + "T12:00:00"), t = new Date();
@@ -2072,7 +2084,7 @@ function renderNews(){
       <div class="body">
         <h2>${titleHTML(hero)}</h2>
         <p>${rich(hero.excerpt||"")}</p>
-        <div class="meta"><span>${fmtDate(hero.date)}</span></div>
+        <div class="meta"><span>${fmtDate(postDateISO(hero))}</span></div>
       </div>
     </a>` : "";
   /* mobile (<=640px): the rail becomes a vertical column and shows one batch
@@ -2083,7 +2095,7 @@ function renderNews(){
     <a class="card" href="${postPath(p)}">
       <div class="cover">${coverImg(p,false,true,"card")}</div>
       <div class="body"><h3>${titleHTML(p)}</h3><p>${rich(p.excerpt||"")}</p>
-        <div class="meta"><span>${fmtDate(p.date)}</span></div></div>
+        <div class="meta"><span>${fmtDate(postDateISO(p))}</span></div></div>
     </a>`).join("");
   let lm = $("#newsMore");
   if(!lm){
@@ -2117,7 +2129,7 @@ function renderReleases(){
         <span class="tag">${esc(p.rtype||"Release")}</span></div>
       <div class="body"><h3>${titleHTML(p)}</h3>
         <p>${rich(p.excerpt||"")}</p>
-        <div class="meta"><span>${fmtDate(p.date)}</span></div></div>
+        <div class="meta"><span>${fmtDate(postDateISO(p))}</span></div></div>
     </a>`).join("");
   let lm = $("#relMore");
   if(!lm){
@@ -2623,7 +2635,7 @@ function relatedHTML(p){
           <div class="rbody">
             ${q.type==="release" ? `<span class="rtag">${esc(q.rtype||"Release")}</span>` : ""}
             <h3>${titleHTML(q)}</h3>
-            <span class="rdate">${fmtDate(q.date)}</span>
+            <span class="rdate">${fmtDate(postDateISO(q))}</span>
           </div>
         </a>`).join("")}
       </div>
@@ -2799,7 +2811,7 @@ function showArticle(p){
     ${creditHTML(p)}
     ${p.type==="release" ? `<span class="tag" style="position:static;margin-top:14px">${esc(p.rtype||p.tag||"Release")}</span>` : ""}
     <h1>${titleHTML(p)}</h1>
-    <div class="ameta"><span>${fmtDate(p.date)}</span></div>
+    <div class="ameta"><span>${fmtDate(postDateISO(p))}</span></div>
     <div class="atext">${renderBody(p.body||p.excerpt||"")}</div>
     ${relatedHTML(p)}`;
   jumpY(0);

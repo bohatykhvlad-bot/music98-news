@@ -485,6 +485,10 @@ function headers(json=true){
   return h;
 }
 function today(){ return new Date().toISOString().slice(0,10); }
+/* local calendar day of the browser (owner edits from Kyiv): toISOString()
+   above is UTC and before 03:00 Kyiv it returns "yesterday", which fed wrong
+   dates into the form. Everything user-facing uses local day. */
+function todayLocal(){ const d = new Date(); const pad = n => String(n).padStart(2,"0"); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function toLocalInput(iso){
   if(!iso) return "";
@@ -1932,10 +1936,12 @@ function collectPost(status){
     title,
     excerpt: $("#excerpt").value.trim(),
     body: serialize(),
-    date: (()=>{ const tl = today(); const dv = $("#date").value || tl;
+    date: (()=>{ const tl = todayLocal(); const dv = $("#date").value || tl;
       const prevPa = editing ? ((posts.find(x=>x.id===editing)||{}).publishAt || "") : "";
       const paLocal = (publishAt || prevPa) ? toLocalInput(publishAt || prevPa).slice(0,10) : "";
-      return (status==="live" && dv < tl && (paLocal === tl || !prevPa)) ? tl : dv; })(),
+      /* live post publishing/going live today always carries today's local
+         date, even if the form still held yesterday's (scheduled-at-6am case) */
+      return (status==="live" && (paLocal === tl || !prevPa)) ? tl : dv; })(),
     pinned: $("#pinned").checked,
     status,
     publishAt: publishAt || (editing ? ((posts.find(x=>x.id===editing)||{}).publishAt || "") : "") || (status==="live" ? new Date().toISOString() : ""),
@@ -1959,7 +1965,7 @@ async function writePost(status){
   /* guard: a live post must not carry tomorrow's date - the card would show
      a full date string instead of Today/Yesterday (owner bug 2026-09-21).
      Scheduled posts are exempt: their date is intentionally in the future. */
-  const tl = today();
+  const tl = todayLocal();
   if(status !== "scheduled" && rec.date && rec.date > tl){
     const okFix = confirm("Date is in the future (" + rec.date + "). A live post with a future date shows a raw date string instead of Today. Reset date to today?");
     if(okFix) rec.date = tl;
@@ -2032,7 +2038,7 @@ $("#send").onclick = async ()=>{
   }
 };
 
-$("#date").value = today();
+$("#date").value = todayLocal();
 initGoLive();
 initTypeDrop();
 if(auth()){
