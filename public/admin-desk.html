@@ -295,7 +295,14 @@ a{color:var(--text)}
       <div class="row">
         <div>
           <label for="type">Type</label>
-          <select id="type"><option value="news">News</option><option value="release">Release</option></select>
+          <div class="tdrop" id="typeDrop">
+            <input type="hidden" id="type" value="news">
+            <button class="tdrop-btn" id="typeBtn" type="button" aria-haspopup="listbox" aria-expanded="false"><span id="typeLabel">News</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="tdrop-list" id="typeList" role="listbox">
+              <button type="button" class="tdrop-opt" data-v="news">News</button>
+              <button type="button" class="tdrop-opt" data-v="release">Release</button>
+            </div>
+          </div>
         </div>
         <div>
           <label for="date">Date</label>
@@ -534,6 +541,34 @@ function initGoLive(){
   setVal("");
   /* the custom calendar dispatches "input" on the date field - keep goLive in sync */
   $("#goDate").addEventListener("input", syncGoLive);
+}
+/* Type selector: same custom dropdown as the time picker - no native select popup */
+function initTypeDrop(){
+  const drop = $("#typeDrop"), btn = $("#typeBtn"), list = $("#typeList"), label = $("#typeLabel"), hidden = $("#type");
+  const close = () => { drop.classList.remove("open"); btn.setAttribute("aria-expanded","false"); };
+  const open = () => {
+    const r = btn.getBoundingClientRect();
+    list.classList.toggle("up", r.bottom + 90 > window.innerHeight && r.top > 120);
+    list.querySelectorAll(".tdrop-opt").forEach(b => b.classList.toggle("sel", b.dataset.v === hidden.value));
+    drop.classList.add("open"); btn.setAttribute("aria-expanded","true");
+  };
+  const setVal = v => {
+    hidden.value = v;
+    const o = list.querySelector(`.tdrop-opt[data-v="${v}"]`);
+    label.textContent = o ? o.textContent : "News";
+    list.querySelectorAll(".tdrop-opt").forEach(b => b.classList.toggle("sel", b.dataset.v === v));
+  };
+  btn.addEventListener("click", () => drop.classList.contains("open") ? close() : open());
+  list.addEventListener("click", e => {
+    const b = e.target.closest(".tdrop-opt");
+    if(!b) return;
+    setVal(b.dataset.v);
+    close();
+  });
+  document.addEventListener("pointerdown", e => { if(!drop.contains(e.target)) close(); });
+  document.addEventListener("keydown", e => { if(e.key === "Escape") close(); });
+  btn._setVal = setVal;
+  setVal(hidden.value || "news");
 }
 function syncGoLive(){
   const d = $("#goDate").value, t = $("#tdropBtn")._v || "";
@@ -1388,6 +1423,7 @@ function fillForm(p){
   editing = p ? p.id : null;
   crop.dirty = false;
   $("#type").value = p?.type || "news";
+  const tv = $("#typeBtn") && $("#typeBtn")._setVal; if(tv) tv($("#type").value);
   $("#date").value = p?.date || today();
   $("#tag").value = p?.tag || "";
   $("#rtype").value = p?.rtype || "";
@@ -1998,6 +2034,7 @@ $("#send").onclick = async ()=>{
 
 $("#date").value = today();
 initGoLive();
+initTypeDrop();
 if(auth()){
   api("/api/desk?auth=1", {headers: headers(false)}).then(()=>{
     $("#gate").classList.add("hide");
