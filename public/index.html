@@ -311,6 +311,8 @@ body.editmode .card .tag{top:auto;bottom:10px}
    and the visual shrink (accent, fill) lands only at the very end, once the
    plate has mostly closed. .accent-hold keeps the playing look; JS removes
    it with a delay. */
+
+/* dark ink on the cyan disc (etalon): teal glyph on cyan would wash out */
 .chart-row.playing .rplay,
 .chart-row.accent-hold .rplay{color:#03282b}
 /* cyan disc behind the glyph is painted on the svg itself (not the button),
@@ -318,13 +320,17 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .chart-row.playing .rplay>svg,
 .chart-row.accent-hold .rplay>svg,
 .rplay:hover>svg{background:var(--accent)}
-.pextra{position:absolute;left:20px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;width:var(--pexp);height:48px;flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease;background:rgba(255,255,255,.92);border-radius:999px;box-shadow:0 0 0 1px rgba(15,60,64,.10);white-space:nowrap;z-index:1}
-/* plate is an ABSOLUTE overlay: starts 20px in (under the button's right
-   half, z below it) and grows rightward with --pexp; NO padding - spacing
-   rides on child margins so the plate collapses to a true 0px at rest */
-.pextra .ptime{margin-left:8px}
-.pextra .abadge{margin-right:8px}
-.chart-row.playing .pextra{opacity:1}
+/* the plate WRAPS the button like the etalon pill: 4px vertical / 8px
+   horizontal inset (left:-8px clears the button's left edge, padding-left:56px
+   keeps the time badge clear of the 40px button + 8px gap) - exactly the
+   geometry of the old centered capsule, only it GROWS rightward instead of
+   pushing the button aside. Paint (white fill + ring) switches on
+   .playing/.accent-hold instantly, so the only thing that animates is the
+   WIDTH wipe - the growth is visible instead of being masked by a fade.
+   width == var(--pexp): JS measures the plate's own natural (padded) width
+   and writes it here, border-box makes the two agree to the pixel. */
+.pextra{position:absolute;left:-8px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;width:var(--pexp);height:48px;flex:none;padding:0 8px 0 56px;box-sizing:border-box;opacity:1;overflow:hidden;background:none;border-radius:999px;box-shadow:none;white-space:nowrap;z-index:1}
+.chart-row.playing .pextra,.chart-row.accent-hold .pextra{background:rgba(255,255,255,.92);box-shadow:0 0 0 1px rgba(15,60,64,.10)}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
 .pbar{width:108px;height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:block;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none}
 .pbar i{display:block;height:100%;width:0;background:var(--accent);pointer-events:none}
@@ -339,9 +345,9 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 .chart-row.playing{background:var(--bg2)}
 .chart-note{margin:14px 2px 0;color:var(--muted2);font-size:12.5px}
-/* PINNED-BUTTON INVARIANT lives in the base grid (column grows by --pexp,
-   .cmid translates by --pexp/2 on the same curve) - identical motion at every
-   width >=641px, no desktop-only special case needed anymore. */
+/* PLAY-PLATE LAYOUT: the button column is FROZEN at 40px at every width
+   >=641px (see .chart-row grid above) - the grid never changes on play, so
+   the button center cannot move. The plate is the absolute overlay above. */
 .chart-switch{display:none!important}
 .cs-btn{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:.18s}
 .cs-btn:hover{border-color:var(--text)}
@@ -645,6 +651,9 @@ textarea{resize:vertical;min-height:64px}
   .rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}
   .rplay svg{width:100%;height:100%}
   .pextra{position:static;background:none;box-shadow:none;border-radius:0;height:auto;padding:0}
+  /* the desktop paint rule (.playing .pextra white pill) must not leak into
+     the mobile stack layout - mobile plate is a transparent row */
+  .chart-row.playing .pextra,.chart-row.accent-hold .pextra{background:none;box-shadow:none}
   .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:auto;min-height:0;opacity:0;overflow:hidden;transform:none;pointer-events:none;max-height:0;margin:0;transition:opacity .28s ease,max-height .32s ease}
   .chart-row.playing .pextra{opacity:1;overflow:hidden;pointer-events:auto;max-height:36px}
   .ptime{display:flex;align-items:center;flex:1;min-width:0;padding:0;gap:8px;background:none;border:0;border-radius:0}
@@ -1515,9 +1524,12 @@ function markRows(){
           const w = pe.scrollWidth;
           pe.style.width = prevW;
           if(w > 0 && row.classList.contains("playing")){
-            /* single source of truth: --pexp drives column growth, the
-               compensating translate, AND the plate width */
-            row.style.setProperty("--pexp", w+"px");
+            /* clamp: the wipe must stop at the weeks column, not slide under
+               it (plate is absolutely positioned and would overlap) */
+            const cw = row.getBoundingClientRect().width;
+            const weeks = row.querySelector(".weeks");
+            const cap = Math.max(80, Math.round(weeks ? weeks.getBoundingClientRect().left - pe.getBoundingClientRect().left + 8 : cw));
+            row.style.setProperty("--pexp", Math.min(w, cap)+"px");
           }
         });
       } else { row.style.removeProperty("--pexp"); }
