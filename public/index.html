@@ -2220,7 +2220,36 @@ function wireRail(gridSel, prevSel, nextSel){
   /* drag the cards themselves: press + move = the rail follows the pointer,
      release = momentum. A real click (no meaningful drag) still opens the
      post - the click is suppressed only when the pointer actually moved. */
-  const drag = {on:false, id:0, x:0, sl:0, moved:false, vx:0, lx:0, lt:0, raf:0, pendX:0, raf2:0};
+  const drag = {on:false, id:0, x:0, sl:0, moved:false, vx:0, lx:0, lt:0, raf:0, pendX:0, raf2:0, over:0};
+  /* --- rubber band: the rail can be pulled past its edges and springs back ---
+     scrollLeft clamps at 0/max, so the overshoot is drawn with a transform:
+     past the edge the content shifts with diminishing resistance (Apple-ish
+     curve), on release it springs back to the clamped spot. Weak drags and
+     normal glides never touch it - the band engages only past the bounds. */
+  const rubberMag = over => {
+    const d = rail.clientWidth || 900;
+    return d * (1 - 1/(Math.abs(over) * 0.55 / d + 1));
+  };
+  const setOver = tx => {
+    if(tx){ rail.style.willChange = "transform"; rail.style.transform = "translateX(" + tx.toFixed(1) + "px)"; }
+    else { rail.style.transform = ""; rail.style.willChange = ""; }
+  };
+  const springBack = (tx0, vx)=>{
+    /* flicking INTO the edge stretches the band a bit further before return */
+    const kick = Math.max(-70, Math.min(70, (vx||0) * 110));
+    const o0 = Math.sign(tx0) * Math.max(0, Math.abs(tx0) + (Math.sign(tx0) === Math.sign(kick) ? Math.abs(kick) : -Math.abs(kick)));
+    const t0 = performance.now(), dur = 520;
+    if(drag.raf){ cancelAnimationFrame(drag.raf); drag.raf = 0; }
+    rail.style.scrollBehavior = "auto";
+    const tick = now=>{
+      const u = Math.min(1, (now - t0) / dur);
+      const e = 1 - Math.pow(1 - u, 3);
+      setOver(o0 * (1 - e));
+      if(u < 1){ drag.raf = requestAnimationFrame(tick); }
+      else { setOver(0); drag.raf = 0; rail.style.scrollBehavior = ""; }
+    };
+    drag.raf = requestAnimationFrame(tick);
+  };
   /* coalesce pointermove writes into one scrollLeft write per frame:
      pointer events can fire at 120Hz+ on high-rate devices/touch, and each
      uncached write forces the browser to sync layout before compositing -
@@ -2228,7 +2257,14 @@ function wireRail(gridSel, prevSel, nextSel){
   const applyDrag = ()=>{
     drag.raf2 = 0;
     if(!drag.on) return;
-    rail.scrollLeft = drag.pendX;
+    const max = rail.scrollWidth - rail.clientWidth - 1;
+    let x = drag.pendX, over = 0;
+    if(x < 0){ over = x; x = 0; }
+    else if(x > max){ over = x - max; x = max; }
+    rail.scrollLeft = x;
+    /* past the bounds: shift the rail visually with diminishing resistance */
+    drag.over = over ? (over < 0 ? rubberMag(over) : -rubberMag(over)) : 0;
+    setOver(drag.over);
   };
   const dragStop = ()=>{ cancelAnimationFrame(drag.raf); drag.raf = 0; };
   const momentum = ()=>{
@@ -2252,11 +2288,18 @@ function wireRail(gridSel, prevSel, nextSel){
     const tick = now=>{
       const u = Math.min(1, (now - t0) / dur);
       const e = 1 - Math.pow(1 - u, 2.4);
-      rail.scrollLeft = from - dist * e;
+      const x = from - dist * e;
       const max = rail.scrollWidth - rail.clientWidth - 1;
-      if(u < 1 && rail.scrollLeft > 0 && rail.scrollLeft < max){
-        drag.raf = requestAnimationFrame(tick);
-      }else{ rail.style.scrollBehavior = ""; }
+      if(x < 0 || x > max){
+        /* glide reached the edge with speed left: hand the remaining energy
+           to the rubber band - stretch past the bound, then spring back */
+        const rem = Math.abs(dist) * (1 - e);
+        springBack(Math.sign(dist) * Math.min(110, rem * 0.42), 0);
+        return;
+      }
+      rail.scrollLeft = x;
+      if(u < 1){ drag.raf = requestAnimationFrame(tick); }
+      else{ rail.style.scrollBehavior = ""; }
     };
     drag.raf = requestAnimationFrame(tick);
   };
@@ -2275,6 +2318,7 @@ function wireRail(gridSel, prevSel, nextSel){
     rail.classList.add("dragging");
     if(drag.grabCard) drag.grabCard.classList.add("grab");
     dragStop();
+    if(drag.over){ drag.over = 0; setOver(0); }   /* a new grab cancels the spring */
   });
   /* native link/image drag used to hijack the pointer mid-drag: after ~5px
      Chrome started its own drag (URL ghost + cyan outline) and our pointermove
@@ -2304,7 +2348,8 @@ function wireRail(gridSel, prevSel, nextSel){
     if(drag.grabCard){ drag.grabCard.classList.remove("grab"); drag.grabCard = null; }
     if(drag.moved){
       rail.style.scrollBehavior = "";
-      momentum();
+      if(drag.over){ springBack(drag.over, drag.vx); drag.over = 0; }
+      else momentum();
       /* swallow the click that follows a real drag so the post does not open */
       rail.addEventListener("click", ev=>{ ev.preventDefault(); ev.stopPropagation(); }, {capture:true, once:true});
     }
