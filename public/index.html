@@ -307,8 +307,12 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .rplay.live .mg-pause{display:block}
 .rplay.live .mg-play{display:none}
 .rplay:hover{transform:scale(1.07);color:#03282b}
-/* press feedback: the button dips while held, springs back on release */
-.rplay:active{transform:scale(.9);transition-duration:.08s}
+/* press pop: plays on EVERY tap (JS adds .press on pointerdown). It animates
+   the independent `scale` property, so it composes with the hover transform -
+   the dip is visible on resting AND playing rows, and on quick clicks too
+   (unlike :active, which requires holding the button down). */
+@keyframes rpress{0%{scale:1}45%{scale:.84}100%{scale:1}}
+.rplay.press{animation:rpress .26s cubic-bezier(.34,1.56,.64,1)}
 /* pause->play sequencing (owner): the accent must NOT evaporate while the
    plate is folding - the morph to the play triangle rides at full size/accent,
    and the visual shrink (accent, fill) lands only at the very end, once the
@@ -574,8 +578,7 @@ textarea{resize:vertical;min-height:64px}
   .chart-row:hover{background:transparent}
   .chart-row.playing{background:var(--bg2)}
   .rplay:hover{color:var(--acc2);transform:none}
-  .rplay:active{transform:scale(.9);transition-duration:.08s}
-  .chart-row.playing .rplay:hover,.chart-row.playing .rplay:active{color:#03282b;transform:scale(.9)}
+  .chart-row.playing .rplay:hover,.chart-row.playing .rplay:active{color:#03282b;transform:none}
   .card:hover,.hero:hover,.rcard:hover{transform:none;border-color:var(--line);box-shadow:none}
   .card:active,.hero:active,.rcard:active{border-color:var(--line);transform:none;box-shadow:none}
 }
@@ -2312,6 +2315,14 @@ function wireRail(gridSel, prevSel, nextSel){
 wireRail("#newsGrid", "#newsPrev", "#newsNext");
 wireRail("#relGrid", "#relPrev", "#relNext");
 $("#chartList").addEventListener("pointerdown", attachOut);
+$("#chartList").addEventListener("pointerdown", e=>{
+  const bp = e.target.closest(".rplay");
+  if(!bp) return;
+  bp.classList.remove("press"); void bp.offsetWidth; bp.classList.add("press");
+});
+$("#chartList").addEventListener("animationend", e=>{
+  if(e.target.classList && e.target.classList.contains("press")) e.target.classList.remove("press");
+});
 $("#chartList").addEventListener("click", e=>{
   if(Date.now() - seekLock < 500) return;
   if(e.target.closest("a, .pbar, .ptime")) return;
