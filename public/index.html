@@ -329,7 +329,12 @@ body.editmode .card .tag{top:auto;bottom:10px}
    WIDTH wipe - the growth is visible instead of being masked by a fade.
    width == var(--pexp): JS measures the plate's own natural (padded) width
    and writes it here, border-box makes the two agree to the pixel. */
-.pextra{position:absolute;left:-8px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;width:var(--pexp);height:48px;flex:none;padding:0 8px 0 56px;box-sizing:border-box;opacity:1;overflow:hidden;background:none;border-radius:999px;box-shadow:none;white-space:nowrap;z-index:1}
+.pextra{position:absolute;left:-8px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:8px;width:var(--pexp);height:48px;flex:none;padding:0 8px 0 56px;box-sizing:border-box;visibility:hidden;overflow:hidden;background:none;border-radius:999px;box-shadow:none;white-space:nowrap;z-index:1}
+/* border-box padding leaves a 64px ghost box at --pexp:0 (padding cannot
+   shrink); visibility hides the content sliver AND makes the ghost
+   non-hit-testable. Paint rule below re-shows it instantly on play and
+   keeps it visible through .accent-hold so the closing fold stays seen. */
+.chart-row.playing .pextra,.chart-row.accent-hold .pextra{visibility:visible}
 .chart-row.playing .pextra,.chart-row.accent-hold .pextra{background:rgba(255,255,255,.92);box-shadow:0 0 0 1px rgba(15,60,64,.10)}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
 .pbar{width:108px;height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:block;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none}
