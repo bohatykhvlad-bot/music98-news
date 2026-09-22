@@ -1153,6 +1153,7 @@ const RMONO = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true">'
   + '<g class="mg-pause" fill="currentColor"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></g>'
   + '</g></svg>';
 /* ---- one shared <audio>; the whole player UI lives inside each chart row ---- */
+const audio = new Audio();
 audio.preload = "auto";
 audio.playsInline = true;
 audio.setAttribute("playsinline", "");
