@@ -258,7 +258,13 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- charts ---------- */
 .chart{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
-.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
+.chart-row{--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) calc(40px + var(--pexp)) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,--pexp .45s cubic-bezier(.3,.65,.25,1)}
+/* PLAY-BUTTON INVARIANT (2026-09-22 redraw):
+   The play column grows exactly by var(--pexp); its left edge therefore moves
+   left by pexp/2 (both 1fr neighbours give half each). .cmid carries
+   transform:translateX(calc(var(--pexp)/2)) driven by the SAME registered,
+   SAME-eased --pexp -> button center = col_left + pexp/2 is constant in EVERY
+   frame, by construction. No magic constants, no jumps, works at any width. */
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
@@ -280,33 +286,41 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
-.cmid{--pexp:0px;--pin:8px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:0;z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
-/* gap:0 while collapsed - the invisible zero-width .pextra otherwise keeps an
-   8px slot after the play button and shifts the icon 4px off the column
-   center, so the expanded plate would sit 4px off the neighbor-rows' axis */
-.chart-row.playing .cmid{background:rgba(255,255,255,.92);border-color:rgba(15,60,64,.10);padding:4px var(--pin);gap:var(--pin)}
-.rplay{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.65);color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;transition:background .16s ease,color .16s ease,transform .16s ease}
+.cmid{width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:0;z-index:2;transform:translateX(calc(var(--pexp)/2))}
+/* --pexp is set by JS on .chart-row (the grid reads it there) and INHERITS
+   down to .cmid/.pextra; no local declaration here (it would block the
+   inheritance), no local transition (the transform just follows the
+   parent's animated value frame by frame) */
+/* glyph = ONE monolithic svg: circle ring + play triangle + pause bars share
+   a single viewBox; the state swap is a class flip on inner <g> groups -
+   play, pause and ring are redrawn from one coordinate origin, so nothing
+   can drift relative to anything else (owner: "цельный элемент"). */
+.rplay{width:40px;height:40px;border:0;padding:0;background:none;box-shadow:none;color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;z-index:2;transition:transform .16s ease,color .16s ease}
+.rplay > svg{grid-area:1/1;width:100%;height:100%;display:block;background:rgba(255,255,255,.65);border-radius:50%;overflow:visible}
+.rplay svg circle{stroke:var(--line);transition:stroke .16s ease}
+.rplay:hover svg circle,.chart-row.playing .rplay svg circle,.chart-row.accent-hold .rplay svg circle{stroke:transparent}
+/* state: pause hidden by default; .live shows pause and hides play - a pure
+   redraw inside the one svg; no element is added, removed or moved */
+.rplay .mg-pause{display:none}
+.rplay.live .mg-pause{display:block}
+.rplay.live .mg-play{display:none}
+.rplay:hover{transform:scale(1.07);color:#03282b}
 /* pause->play sequencing (owner): the accent must NOT evaporate while the
    plate is folding - the morph to the play triangle rides at full size/accent,
    and the visual shrink (accent, fill) lands only at the very end, once the
    plate has mostly closed. .accent-hold keeps the playing look; JS removes
-   it with a delay; transitions below ride out the last 0.3s. */
-.chart-row.accent-hold .rplay{background:var(--accent);border-color:transparent;color:#03282b}
-/* icon stack: play and pause overlay in the same grid cell; .live crossfades
-   between them - a state swap can never move the icon horizontally */
-/* icon swap is INSTANT (no opacity crossfade): with both glyphs
-   envelope-centered (play 3.2/3.2, pause 3.6/3.6) the original instant swap
-   never moved - the 160ms crossfade superimposed two shapes and read as
-   morphing/sliding on press (owner: "съезжает при нажатии, пауза доезжает"). */
-.rplay svg{grid-area:1/1;width:24px;height:24px}
-/* instant swap: pause hidden, .live shows it and hides play (see note above) */
-.rplay .ic-pause{display:none}
-.rplay.live .ic-pause{display:block}
-.rplay.live .ic-play{display:none}
-.rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.07)}
-.chart-row.playing .rplay{background:var(--accent);border-color:transparent;color:#03282b}
-.chart-row.playing .rplay:hover{transform:scale(1.07)}
-.pextra{display:flex;align-items:center;gap:var(--pin, 8px);width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
+   it with a delay. */
+.chart-row.playing .rplay,
+.chart-row.accent-hold .rplay{color:#03282b}
+/* cyan disc behind the glyph is painted on the svg itself (not the button),
+   so its appearance can never shift the icon: same box, only paint changes */
+.chart-row.playing .rplay>svg,
+.chart-row.accent-hold .rplay>svg,
+.rplay:hover>svg{background:var(--accent)}
+.pextra{display:flex;align-items:center;gap:8px;width:var(--pexp);height:48px;flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease;background:rgba(255,255,255,.92);border-radius:999px;box-shadow:0 0 0 1px rgba(15,60,64,.10);box-sizing:border-box;margin-left:-20px;padding:0 10px 0 28px;z-index:1}
+/* plate slides 20px UNDER the 40px button (z-index below it); content starts
+   at padding-left 28 = button right edge + 8px gap; JS-measured scrollWidth
+   already includes this padding, so width=--pexp fits exactly */
 .chart-row.playing .pextra{opacity:1}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
 .pbar{width:108px;height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:block;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none}
@@ -322,23 +336,9 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 .chart-row.playing{background:var(--bg2)}
 .chart-note{margin:14px 2px 0;color:var(--muted2);font-size:12.5px}
-/* ===== DESKTOP ONLY (>=901px): PINNED PLAY BUTTON =====
-   Owner directive: keep the etalon plate animation, but the button must stay
-   on the row axis. Column 4 is frozen at 40px (grid never reflows), and the
-   plate (.pextra) becomes an absolute overlay growing RIGHTWARD from the
-   button, still driven by the SAME animated --pexp (registered property on
-   .cmid, .45s cubic-bezier(.3,.65,.25,1)) - identical motion curve, zero
-   button drift: its center is invariant in every frame. Phones (<641px) keep
-   their own layout; tablets (641-900px) keep the etalon column growth. */
-@media (min-width:901px){
-  .chart-row{grid-template-columns:44px 56px minmax(180px,1fr) 40px minmax(110px,1fr)}
-  .cmid{position:relative}
-  .chart-row.playing .cmid{background:none;border-color:transparent;padding:0;gap:0}
-  .pextra{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);height:50px;width:calc(var(--pexp) + 2px);padding:0 8px;background:rgba(255,255,255,.92);border:1px solid rgba(15,60,64,.10);border-radius:999px;white-space:nowrap;pointer-events:none}
-  /* JS measures scrollWidth (content+padding, no border), so final width needs
-     exactly the 2px borders on top of --pexp for a pixel-tight pill */
-  .chart-row.playing .pextra{opacity:1;pointer-events:auto}
-}
+/* PINNED-BUTTON INVARIANT lives in the base grid (column grows by --pexp,
+   .cmid translates by --pexp/2 on the same curve) - identical motion at every
+   width >=641px, no desktop-only special case needed anymore. */
 .chart-switch{display:none!important}
 .cs-btn{display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;color:var(--text);cursor:pointer;transition:.18s}
 .cs-btn:hover{border-color:var(--text)}
@@ -550,7 +550,7 @@ textarea{resize:vertical;min-height:64px}
 }
 @media (max-width:900px){
   .rcard h3{-webkit-line-clamp:1}
-  .chart-row{grid-template-columns:40px 52px minmax(90px,1fr) var(--pw) auto}
+  .chart-row{grid-template-columns:40px 52px minmax(90px,1fr) calc(40px + var(--pexp)) auto}
   .pextra .abadge{display:inline-flex}
   .foot-in{grid-template-columns:1fr 1fr}
   .hero{grid-template-columns:1fr}
@@ -560,7 +560,7 @@ textarea{resize:vertical;min-height:64px}
 @media (hover:hover) and (pointer:fine){
   .nav-btn:hover{color:var(--text)}
   .chart-row:hover{background:var(--card2)}
-  .rplay:hover{background:var(--accent);color:#03282b;border-color:transparent;transform:scale(1.07)}
+  .rplay:hover{color:#03282b;transform:scale(1.07)}
   .card:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
   .hero:hover{border-color:var(--accent-dim)}
   .rcard:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
@@ -572,8 +572,10 @@ textarea{resize:vertical;min-height:64px}
   .nav-btn:active{background:transparent;color:var(--muted)}
   .chart-row:hover{background:transparent}
   .chart-row.playing{background:var(--bg2)}
-  .rplay:hover{background:rgba(255,255,255,.65);color:var(--acc2);border-color:var(--line);transform:none}
-  .chart-row.playing .rplay:hover,.chart-row.playing .rplay:active{background:var(--accent);color:#03282b;border-color:transparent}
+  .rplay:hover{color:var(--acc2);transform:none}
+  .rplay:hover svg circle{stroke:var(--line)}
+  .rplay:hover>svg{background:rgba(255,255,255,.65)}
+  .chart-row.playing .rplay:hover,.chart-row.playing .rplay:active{color:#03282b}
   .card:hover,.hero:hover,.rcard:hover{transform:none;border-color:var(--line);box-shadow:none}
   .card:active,.hero:active,.rcard:active{border-color:var(--line);transform:none;box-shadow:none}
 }
@@ -615,7 +617,6 @@ textarea{resize:vertical;min-height:64px}
      size it to its text and center it; the email input stays full width */
   .sub-in .btn{width:auto;align-self:center;padding:0 42px}
   .chart-row{
-    --pw:auto;
     display:grid;
     grid-template-columns:28px 44px minmax(0,1fr) 36px;
     grid-template-areas:
@@ -639,7 +640,8 @@ textarea{resize:vertical;min-height:64px}
   .cmid{display:contents;background:none;border:0;padding:0;overflow:visible;width:auto;max-width:none;border-radius:0}
   .chart-row.playing .cmid{background:none;border:0;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}
-  .rplay svg{width:21px;height:21px}
+  .rplay svg{width:100%;height:100%}
+  .pextra{background:none;box-shadow:none;border-radius:0;height:auto;margin-left:0;padding:0}
   .pextra{grid-area:extra;display:flex;align-items:center;gap:8px;min-width:0;width:100%;max-width:100%;height:auto;min-height:0;opacity:0;overflow:hidden;transform:none;pointer-events:none;max-height:0;margin:0;transition:opacity .28s ease,max-height .32s ease}
   .chart-row.playing .pextra{opacity:1;overflow:hidden;pointer-events:auto;max-height:36px}
   .ptime{display:flex;align-items:center;flex:1;min-width:0;padding:0;gap:8px;background:none;border:0;border-radius:0}
@@ -1134,28 +1136,23 @@ function itunesLookup(title, artist, cb){
 }
 /* ---- one shared <audio>; the whole player UI lives inside each chart row ---- */
 const APPLE_GLYPH = '<svg viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.5 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>';
-/* Play triangle: FINAL. Original path M3.2 2.2v11.6L12.8 8 - the only
-   owner-approved glyph ("как было, там всё норм было"). Its ink margins are
-   SYMMETRIC: left 3.2u, right 3.2u -> the drawn triangle sits exactly in the
-   circle's center. The ink MASS leans left (any triangle does), which the
-   owner's eye accepts as correct - mass is NOT the metric to tune.
-   History of failed re-tunes (do NOT repeat any of them):
-     M5.53 (1fd6a43): margins 5.53/3.07 - ink visibly RIGHT + jump on swap
-     translate hack (b791b3b, reverted): same disease at another offset
-     M4 "balanced" (this session, reverted): margins 4.0/2.4 -> ink RIGHT
-       +1.2px at rest, obvious on the cyan hover fill ("ВПРАВО ПРИ НАВЕДЕНИИ"),
-       and the play->pause swap shifted ink 0.8u ("ПАУЗА ТОЖЕ ДВИГАЕТСЯ").
-   The metric the eye reads against the circle is the ink ENVELOPE (outer
-   margins), and it must stay symmetric. Pause 3.6/3.6 is symmetric.
-   Hover zoom scale(1.07) with transform-origin:center is symmetric - safe.
-   Do NOT re-tune this path. Ever. */
-const ICON_PLAY = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5.53 2.2v11.6L12.93 8z"/></svg>';
-const ICON_PAUSE = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></svg>';
-/* icon crossfade: both glyphs live stacked inside the button; swapping
-   toggles opacity instead of replacing innerHTML. Both glyphs are
-   envelope-symmetric, so the swap is pixel-stable as well. */
-const ICON_STACK = '<svg class="ic-pause" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></svg><svg class="ic-play" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5.53 2.2v11.6L12.93 8z"/></svg>';
-const audio = new Audio();
+/* ---- MONOLITHIC PLAY BUTTON (2026-09-22, full redraw) ----
+   One single <svg> = circle ring + play triangle + pause bars in the SAME
+   viewBox (0 0 16 16). Play and pause are two <g> groups; .live swaps them
+   by pure class CSS (display none/block) INSIDE the one svg element. The
+   glyph set is one atom: the renderer can never shift play vs pause apart,
+   never shift either vs the circle, and hover zoom scales the whole unit.
+   Geometry (ink-verified): triangle envelope 3.2u/3.2u (envelope-centered,
+   owner-approved at 19px era and re-confirmed at 24px); pause bars centered
+   8.00u = viewBox center; ring center 8.0/8.0 = r 7.5. Everything shares the
+   exact same coordinate origin - drift is physically impossible. */
+const RMONO = '<svg viewBox="0 0 16 16" fill="none" aria-hidden="true">'
+  + '<circle cx="8" cy="8" r="7.8" stroke="currentColor" stroke-width="0.4"/>'
+  + '<g transform="translate(8 8) scale(0.6) translate(-8 -8)">'
+  + '<g class="mg-play" fill="currentColor"><path d="M5.53 2.2v11.6L12.93 8z"/></g>'
+  + '<g class="mg-pause" fill="currentColor"><path d="M3.6 2h3.2v12H3.6zM9.2 2h3.2v12H9.2z"/></g>'
+  + '</g></svg>';
+/* ---- one shared <audio>; the whole player UI lives inside each chart row ---- */
 audio.preload = "auto";
 audio.playsInline = true;
 audio.setAttribute("playsinline", "");
@@ -1506,16 +1503,20 @@ function markRows(){
         requestAnimationFrame(()=>{
           const pe = row.querySelector(".pextra");
           if(!pe) return;
+          /* measure plate width: hide (display:none) -> content width -> restore;
+             no style.width, so the measure reads the PLATE's own natural width,
+             not a stale inline width from the previous state */
           const prevW = pe.style.width;
           pe.style.width = "auto";
           const w = pe.scrollWidth;
           pe.style.width = prevW;
           if(w > 0 && row.classList.contains("playing")){
-            cm.style.setProperty("--pexp", w+"px");
-            row.style.setProperty("--pw", (w + 66)+"px");
+            /* single source of truth: --pexp drives column growth, the
+               compensating translate, AND the plate width */
+            row.style.setProperty("--pexp", w+"px");
           }
         });
-      } else { cm.style.removeProperty("--pexp"); row.style.removeProperty("--pw"); }
+      } else { row.style.removeProperty("--pexp"); }
     }
   });
 }
@@ -2349,7 +2350,7 @@ function renderCharts(){
       <div class="artwrap"><img data-lk="${esc(key)}"${r.art ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} — ${esc(r.artist)}" loading="lazy"></div>
       <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span><span class="cartist">${esc(r.artist)}</span></div><div class="ctrack">${esc(r.title)}</div></div></div>
       <div class="cmid">
-        <button class="rplay" title="Play preview" aria-label="Play preview of ${esc(r.title)}">${ICON_STACK}</button>
+        <button class="rplay" title="Play preview" aria-label="Play preview of ${esc(r.title)}">${RMONO}</button>
         <div class="pextra"><span class="ptime"><span class="pbar"><i></i></span><span class="pdur">0:00 / 1:30</span></span>${badge}</div>
       </div>
       <div class="weeks">${wk}</div>
