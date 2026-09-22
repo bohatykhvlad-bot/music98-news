@@ -266,7 +266,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
    ring) rides the same width ramp via --pwipe so the reveal reads as one
    fluid wipe, no flash, no end hitch. Mobile (<=640px) keeps its own stack
    layout and is untouched by the override block below. */
-.chart-row{--pw:40px;--pexp:0px;--pwipe:0;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,--pexp .45s cubic-bezier(.3,.65,.25,1),--pwipe .45s cubic-bezier(.3,.65,.25,1)}
+.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
@@ -288,19 +288,21 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
-@property --pwipe{syntax:"<number>";inherits:true;initial-value:0}
-.cmid{position:relative;width:40px;height:40px;justify-self:center;display:grid;place-items:center;gap:0;z-index:2}
-/* no local transition on .cmid: the button never changes any layout or paint
-   property on play - zoom/hover transitions live on .rplay itself */
-.rplay{width:40px;height:40px;border:0;padding:0;background:none;border-radius:50%;box-shadow:none;color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;z-index:2;transition:transform .16s ease,color .16s ease}
+@property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
+.cmid{--pexp:0px;--pin:8px;width:100%;justify-self:center;display:flex;align-items:center;justify-content:center;gap:0;z-index:2;border:1px solid transparent;border-radius:999px;transition:--pexp .45s cubic-bezier(.3,.65,.25,1),padding .3s ease,background .3s ease,border-color .3s ease}
+/* gap:0 while collapsed - the plate's slot must not offset the button from
+   the column center (etalon note) */
+.chart-row.playing .cmid{background:rgba(255,255,255,.92);border-color:rgba(15,60,64,.10);padding:4px var(--pin);gap:var(--pin)}
+.rplay{width:40px;height:40px;border-radius:50%;border:0;padding:0;background:none;box-shadow:none;color:var(--acc2);cursor:pointer;display:grid;place-items:center;flex:none;transform-origin:center;z-index:2;transition:background .16s ease,color .16s ease,transform .16s ease}
 /* MONOLITHIC GLYPH (owner, from Apple's player): ONE svg holds the ring AND
    both glyph groups in a single coordinate system; the state swap is a class
-   flip inside the same element, so play/pause/ring cannot drift apart. */
+   flip inside the same element, so play/pause/ring cannot drift apart - even
+   while the whole button now RIDES the growing column (etalon motion). */
 .rplay > svg{grid-area:1/1;width:40px;height:40px;display:block;overflow:visible}
 .rplay svg circle{fill:rgba(255,255,255,.65);stroke:var(--line);stroke-width:1;transition:fill .16s ease,stroke .16s ease}
 .rplay:hover svg circle,.chart-row.playing .rplay svg circle,.chart-row.accent-hold .rplay svg circle{fill:var(--accent);stroke:transparent}
 /* state: pause hidden by default; .live shows pause and hides play - a pure
-   redraw inside the one svg; no element is added, removed or moved */
+   redraw inside the one svg */
 .rplay .mg-pause{display:none}
 .rplay.live .mg-pause{display:block}
 .rplay.live .mg-play{display:none}
@@ -312,16 +314,14 @@ body.editmode .card .tag{top:auto;bottom:10px}
    it with a delay. */
 .chart-row.playing .rplay,
 .chart-row.accent-hold .rplay{color:#03282b}
-/* the plate WRAPS the button from the LEFT: its RIGHT edge is pinned 8px
-   past the button and it GROWS LEFTWARD over the names column (owner: the
-   etalon reveal direction). Its paint is revealed by --pwipe (0->1, same
-   .45s curve, sweeping from the button toward the left), so the wipe is
-   soft and continuous - no opacity flash, no end hitch. --pexp is measured
-   by JS as the plate's natural width (border-box) and clamped to the names
-   column. border-box + padding keeps content clear of the button. */
-.pextra{position:absolute;right:-8px;left:auto;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:flex-end;gap:8px;width:var(--pexp);height:48px;flex:none;padding:0 56px 0 8px;box-sizing:border-box;overflow:hidden;background:linear-gradient(270deg,rgba(255,255,255,.92) calc(var(--pwipe)*100%),rgba(255,255,255,0) calc(var(--pwipe)*100% + 1px));border-radius:999px;box-shadow:0 0 0 1px rgba(15,60,64,calc(var(--pwipe)*.10));white-space:nowrap;z-index:1}
-.pextra > *{opacity:var(--pwipe);transition:none}
-.chart-row.playing .pextra,.chart-row.accent-hold .pextra{visibility:visible}
+.chart-row.playing .rplay svg circle,.chart-row.accent-hold .rplay svg circle{fill:var(--accent);stroke:transparent}
+/* the pill is a normal flex child INSIDE .cmid: when the row starts playing
+   the grid column grows (--pw) and the whole capsule with the button on its
+   right end RIDES LEFT in one smooth etalon gesture. No overlay, no wipe -
+   plain opacity for the plate content. The monolithic svg keeps the glyph
+   geometry locked while the button moves. */
+.pextra{display:flex;align-items:center;gap:var(--pin, 8px);width:var(--pexp);flex:none;opacity:0;overflow:hidden;transition:opacity .3s ease}
+.chart-row.playing .pextra{opacity:1}
 .ptime{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:999px;padding:5px 9px;flex:none}
 .pbar{width:108px;height:8px;border-radius:999px;background:var(--line);overflow:hidden;display:block;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none}
 .pbar i{display:block;height:100%;width:0;background:var(--accent);pointer-events:none}
@@ -1519,16 +1519,13 @@ function markRows(){
           const w = pe.scrollWidth;
           pe.style.width = prevW;
           if(w > 0 && row.classList.contains("playing")){
-            /* the pill's right edge is pinned at the button; it grows LEFT,
-               so clamp before the names column text (artist/track) */
-            const cmidR = cm.getBoundingClientRect();
-            const names = row.querySelector(".ctext");
-            const cap = Math.max(120, Math.round(names ? cmidR.right - names.getBoundingClientRect().left : 9999));
-            row.style.setProperty("--pexp", Math.min(w, cap)+"px");
-            row.style.setProperty("--pwipe", "1");
+            /* etalon motion: the grid column grows and RIDES the button left;
+               --pexp opens the plate inside the capsule */
+            cm.style.setProperty("--pexp", w+"px");
+            row.style.setProperty("--pw", (w + 66)+"px");
           }
         });
-      } else { row.style.removeProperty("--pexp"); row.style.removeProperty("--pwipe"); }
+      } else { cm.style.removeProperty("--pexp"); row.style.removeProperty("--pw"); }
     }
   });
 }
