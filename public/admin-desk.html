@@ -88,6 +88,23 @@ input[type=checkbox]{width:17px;height:17px;min-height:0;accent-color:#00fdfb;cu
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 /* Go live: date + time side by side, like YouTube's schedule row */
 .golive-row{display:grid;grid-template-columns:1.2fr 1fr;gap:10px}
+/* custom time dropdown (owner: the native <select> popup opened UPWARD,
+   huge and with the OS-blue highlight - browser-drawn, unstylable).
+   This is a real dropdown: opens DOWN from the trigger, caps at 320px and
+   flips up only if there is genuinely no room below. Neutral grey, no blue. */
+.tdrop{position:relative}
+.tdrop-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:40px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--text);font:inherit;font-size:14px;cursor:pointer;text-align:left;transition:border-color .15s ease,box-shadow .15s ease}
+.tdrop-btn:hover{border-color:#b7c4c8}
+.tdrop-btn:focus{outline:none;border-color:#8a979c;box-shadow:0 0 0 2.5px rgba(92,106,112,.16)}
+.tdrop-btn .ph{color:var(--muted2)}
+.tdrop-btn svg{flex:none;transition:transform .16s ease;color:var(--muted)}
+.tdrop.open .tdrop-btn svg{transform:rotate(180deg)}
+.tdrop-list{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:60;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 34px rgba(15,30,34,.16);max-height:320px;overflow-y:auto;padding:4px;display:none}
+.tdrop.open .tdrop-list{display:block}
+.tdrop-list.up{top:auto;bottom:calc(100% + 6px)}
+.tdrop-opt{display:block;width:100%;text-align:left;padding:8px 10px;border:0;border-radius:8px;background:none;font:inherit;font-size:14px;color:var(--text);cursor:pointer}
+.tdrop-opt:hover{background:#eef2f3}
+.tdrop-opt.sel{background:#e6ebec;font-weight:700}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 12px}
 .list{display:flex;flex-direction:column;gap:6px}
 .item{display:grid;grid-template-columns:40px 1fr auto auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px}
@@ -353,9 +370,10 @@ a{color:var(--text)}
       <label>Go live at</label>
       <div class="golive-row">
         <input id="goDate" type="date" autocomplete="off">
-        <select id="goTime" autocomplete="off">
-          <option value="">Time…</option>
-        </select>
+        <div class="tdrop" id="tdrop">
+          <button class="tdrop-btn" id="tdropBtn" type="button" aria-haspopup="listbox" aria-expanded="false"><span id="tdropLabel" class="ph">Time…</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="tdrop-list" id="tdropList" role="listbox"></div>
+        </div>
       </div>
       <input id="goLive" type="hidden">
       <p class="muted">Leave empty and press Publish to the site. To wait, set a time and press Schedule.</p>
@@ -469,9 +487,10 @@ function toLocalInput(iso){
   return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes());
 }
 /* Go live at: split into a date field + a YouTube-style time dropdown
-   (15-min steps, 12h AM/PM). The dropdown is a <select> - native, keyboard
-   and touch friendly, no custom popup to maintain. goLive still exists as
-   a hidden input so the rest of the form keeps reading one value. */
+   (15-min steps, 12h AM/PM). The list is a CUSTOM popup (owner: the native
+   <select> popup opened upward, huge, OS-blue) - it opens downward from the
+   trigger, flips up only when there is no room below. goLive still exists
+   as a hidden input so the rest of the form keeps reading one value. */
 function timeOptions(){
   const out = [];
   for(let h=0; h<24; h++) for(const m of [0,15,30,45]){
@@ -481,20 +500,50 @@ function timeOptions(){
   return out;
 }
 function initGoLive(){
-  const sel = $("#goTime");
-  sel.innerHTML = '<option value="">Time…</option>' + timeOptions().map(o => `<option value="${o.v}">${o.label}</option>`).join("");
-  const sync = () => {
-    const d = $("#goDate").value, t = $("#goTime").value;
-    $("#goLive").value = (d && t) ? d + "T" + t : "";
+  const drop = $("#tdrop"), btn = $("#tdropBtn"), list = $("#tdropList"), label = $("#tdropLabel");
+  const OPTS = timeOptions();
+  list.innerHTML = '<button type="button" class="tdrop-opt" data-v="">Time…</button>' + OPTS.map(o => `<button type="button" class="tdrop-opt" data-v="${o.v}">${o.label}</button>`).join("");
+  const close = () => { drop.classList.remove("open"); btn.setAttribute("aria-expanded","false"); };
+  const open = () => {
+    /* flip up only when the capped 320px list genuinely does not fit below */
+    const r = btn.getBoundingClientRect();
+    list.classList.toggle("up", r.bottom + 326 > window.innerHeight && r.top > 340);
+    /* keep the selected (or placeholder) option in view on open */
+    const cur = list.querySelector(".tdrop-opt.sel") || list.firstElementChild;
+    if(cur) cur.scrollIntoView({ block: "nearest" });
+    drop.classList.add("open"); btn.setAttribute("aria-expanded","true");
   };
-  $("#goDate").addEventListener("input", sync);
-  $("#goTime").addEventListener("input", sync);
-  sync();
+  const setVal = v => {
+    $("#goTime")._v = v;
+    const o = OPTS.find(x => x.v === v);
+    label.textContent = o ? o.label : "Time…";
+    label.classList.toggle("ph", !o);
+    list.querySelectorAll(".tdrop-opt").forEach(b => b.classList.toggle("sel", b.dataset.v === v && !!v));
+    syncGoLive();
+  };
+  btn.addEventListener("click", () => drop.classList.contains("open") ? close() : open());
+  list.addEventListener("click", e => {
+    const b = e.target.closest(".tdrop-opt");
+    if(!b) return;
+    setVal(b.dataset.v);
+    close();
+  });
+  document.addEventListener("pointerdown", e => { if(!drop.contains(e.target)) close(); });
+  document.addEventListener("keydown", e => { if(e.key === "Escape") close(); });
+  $("#goTime")._setVal = setVal;
+  setVal("");
+  /* the custom calendar dispatches "input" on the date field - keep goLive in sync */
+  $("#goDate").addEventListener("input", syncGoLive);
+}
+function syncGoLive(){
+  const d = $("#goDate").value, t = $("#goTime")._v || "";
+  $("#goLive").value = (d && t) ? d + "T" + t : "";
 }
 function setGoLive(localVal){
   const v = localVal || "";
   $("#goDate").value = v ? v.split("T")[0] : "";
-  $("#goTime").value = v && /T(..:..)$/.test(v) ? v.slice(-5) : "";
+  const t = v && /T(..:..)$/.test(v) ? v.slice(-5) : "";
+  if($("#goTime")._setVal) $("#goTime")._setVal(t); else $("#goTime")._v = t;
   $("#goLive").value = v;
 }
 function fromLocalInput(v){
