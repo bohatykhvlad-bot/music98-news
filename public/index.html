@@ -90,7 +90,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
 .nav{justify-self:center;display:flex;align-items:center;height:40px;gap:6px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}
-.nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+.nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:16px;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+/* optical: caps-only labels (Chart) have no descender ink, and the Windows
+   rasterizer snaps the baseline a further ~1px up - owner measurements 10.2
+   top vs 12.4 bottom. line-height 14->16px drops the baseline exactly 1px,
+   pill geometry untouched (height stays 32, box still centered). */
 .nav-btn:hover{color:var(--text)}
 .nav-btn.active{background:var(--accent);color:#03282b}
 .top-actions{display:flex;align-items:center;gap:10px;justify-self:end}
