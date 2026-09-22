@@ -307,12 +307,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .rplay.live .mg-pause{display:block}
 .rplay.live .mg-play{display:none}
 .rplay:hover{transform:scale(1.07);color:#03282b}
-/* press pop: plays on EVERY tap (JS adds .press on pointerdown). It animates
-   the independent `scale` property, so it composes with the hover transform -
-   the dip is visible on resting AND playing rows, and on quick clicks too
-   (unlike :active, which requires holding the button down). */
-@keyframes rpress{0%{scale:1}45%{scale:.84}100%{scale:1}}
-.rplay.press{animation:rpress .26s cubic-bezier(.34,1.56,.64,1)}
+/* press follows the pointer: pressed while HELD (JS keeps .press on), springs
+   back on release/pointer-leave. Shallow dip - owner: "сильно глубоко". */
+.rplay.press{scale:.92;transition:scale .09s ease}
+.rplay{transition:transform .16s ease,color .16s ease,scale .09s ease}
 /* pause->play sequencing (owner): the accent must NOT evaporate while the
    plate is folding - the morph to the play triangle rides at full size/accent,
    and the visual shrink (accent, fill) lands only at the very end, once the
@@ -2318,11 +2316,15 @@ $("#chartList").addEventListener("pointerdown", attachOut);
 $("#chartList").addEventListener("pointerdown", e=>{
   const bp = e.target.closest(".rplay");
   if(!bp) return;
-  bp.classList.remove("press"); void bp.offsetWidth; bp.classList.add("press");
+  bp.classList.add("press");
+  const up = () => { bp.classList.remove("press"); window.removeEventListener("pointerup", up); window.removeEventListener("pointercancel", up); };
+  window.addEventListener("pointerup", up);
+  window.addEventListener("pointercancel", up);
 });
-$("#chartList").addEventListener("animationend", e=>{
-  if(e.target.classList && e.target.classList.contains("press")) e.target.classList.remove("press");
-});
+$("#chartList").addEventListener("pointerleave", e=>{
+  const bp = e.target.closest(".rplay");
+  if(bp) bp.classList.remove("press");
+}, true);
 $("#chartList").addEventListener("click", e=>{
   if(Date.now() - seekLock < 500) return;
   if(e.target.closest("a, .pbar, .ptime")) return;
