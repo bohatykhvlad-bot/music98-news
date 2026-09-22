@@ -514,7 +514,7 @@ function initGoLive(){
     drop.classList.add("open"); btn.setAttribute("aria-expanded","true");
   };
   const setVal = v => {
-    $("#goTime")._v = v;
+    btn._v = v;
     const o = OPTS.find(x => x.v === v);
     label.textContent = o ? o.label : "Time…";
     label.classList.toggle("ph", !o);
@@ -530,20 +530,21 @@ function initGoLive(){
   });
   document.addEventListener("pointerdown", e => { if(!drop.contains(e.target)) close(); });
   document.addEventListener("keydown", e => { if(e.key === "Escape") close(); });
-  $("#goTime")._setVal = setVal;
+  btn._setVal = setVal;
   setVal("");
   /* the custom calendar dispatches "input" on the date field - keep goLive in sync */
   $("#goDate").addEventListener("input", syncGoLive);
 }
 function syncGoLive(){
-  const d = $("#goDate").value, t = $("#goTime")._v || "";
+  const d = $("#goDate").value, t = $("#tdropBtn")._v || "";
   $("#goLive").value = (d && t) ? d + "T" + t : "";
 }
 function setGoLive(localVal){
   const v = localVal || "";
   $("#goDate").value = v ? v.split("T")[0] : "";
   const t = v && /T(..:..)$/.test(v) ? v.slice(-5) : "";
-  if($("#goTime")._setVal) $("#goTime")._setVal(t); else $("#goTime")._v = t;
+  const sv = $("#tdropBtn")._setVal;
+  if(sv) sv(t); else $("#tdropBtn")._v = t;
   $("#goLive").value = v;
 }
 function fromLocalInput(v){
