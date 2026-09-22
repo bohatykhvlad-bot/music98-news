@@ -2227,19 +2227,19 @@ function wireRail(gridSel, prevSel, nextSel){
      curve), on release it springs back to the clamped spot. Weak drags and
      normal glides never touch it - the band engages only past the bounds. */
   const rubberMag = over => {
-    const d = rail.clientWidth || 900;
-    /* soft band: hard cap 46px and a gentler curve - a hard yank stretches a
-       little, not half a card (owner: too strong / jerky) */
-    return Math.min(46, d * (1 - 1/(Math.abs(over) * 0.28 / d + 1)));
+    /* gentle band (owner tune-down x2): smooth tanh curve - ~11px at a hard
+       120px yank, saturating at 22px. Never a wall, never a half-card. */
+    return 22 * Math.tanh(Math.abs(over) / 220);
   };
   const setOver = tx => {
-    if(tx){ rail.style.willChange = "transform"; rail.style.transform = "translateX(" + tx.toFixed(1) + "px)"; }
+    if(tx){ rail.style.willChange = "transform"; rail.style.transform = "translate3d(" + tx.toFixed(2) + "px,0,0)"; }
     else { rail.style.transform = ""; rail.style.willChange = ""; }
   };
   const springBack = tx0 =>{
-    /* plain ease-out return, no velocity kick: the kick read as a jerk */
-    const o0 = Math.max(-46, Math.min(46, tx0));
-    const t0 = performance.now(), dur = 460;
+    /* long, fully smooth ease-out return (owner: jerky before): no velocity
+       kick, no bounce - 560ms cubic so the band melts home */
+    const o0 = Math.max(-22, Math.min(22, tx0));
+    const t0 = performance.now(), dur = 560;
     if(drag.raf){ cancelAnimationFrame(drag.raf); drag.raf = 0; }
     rail.style.scrollBehavior = "auto";
     const tick = now=>{
@@ -2263,7 +2263,10 @@ function wireRail(gridSel, prevSel, nextSel){
     if(x < 0){ over = x; x = 0; }
     else if(x > max){ over = x - max; x = max; }
     rail.scrollLeft = x;
-    /* past the bounds: shift the rail visually with diminishing resistance */
+    /* past the bounds: shift the rail visually with the soft band. Applied
+       every frame from the LIVE pointer position (not a cached one) so the
+       shift follows the finger without lag - the lag/jerk came from
+       pointer events writing only through the rAF-coalesced scrollLeft path */
     drag.over = over ? (over < 0 ? rubberMag(over) : -rubberMag(over)) : 0;
     setOver(drag.over);
   };
@@ -2297,7 +2300,7 @@ function wireRail(gridSel, prevSel, nextSel){
            energy to a small, short band stretch */
         rail.scrollLeft = x < 0 ? 0 : max;
         const rem = Math.abs(dist) * (1 - e);
-        springBack(Math.sign(dist) * Math.min(30, rem * 0.18));
+        springBack(Math.sign(dist) * Math.min(20, rem * 0.12));
         syncRail(gridSel);
         return;
       }
@@ -3173,6 +3176,18 @@ window.addEventListener("resize", ()=>{
   _rsRaf = requestAnimationFrame(()=>{ _rsRaf = 0; document.querySelectorAll("img.js-cover").forEach(fitCover); });
 });
 window.addEventListener("pageshow", e=>{ if(e.persisted) loadPublishedDesk(); });
+/* snap the nav pill container to whole device pixels at load & resize: at odd
+   window widths the glass capsule landed on half-pixels, its 1px border smeared
+   over 2 physical px and read as "pills drift up/right" - rounding the grid
+   position kills the smear (owner report) */
+(function(){
+  const nav = document.querySelector(".nav");
+  if(!nav) return;
+  let snapCur = 0;
+  const snap = ()=>{ const x = nav.getBoundingClientRect().left; snapCur += Math.round(x) - x; nav.style.transform = "translateX(" + snapCur.toFixed(2) + "px)"; };
+  snap();
+  window.addEventListener("resize", ()=>requestAnimationFrame(snap));
+})();
 S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refreshDailyTop50();
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
