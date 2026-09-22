@@ -3187,6 +3187,8 @@ window.addEventListener("pageshow", e=>{ if(e.persisted) loadPublishedDesk(); })
   const snap = ()=>{ const x = nav.getBoundingClientRect().left; snapCur += Math.round(x) - x; nav.style.transform = "translateX(" + snapCur.toFixed(2) + "px)"; };
   snap();
   window.addEventListener("resize", ()=>requestAnimationFrame(snap));
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>snap());   /* late logo font shifts the grid */
+  setTimeout(snap, 1200);
 })();
 S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refreshDailyTop50();
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
