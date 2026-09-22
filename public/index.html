@@ -284,7 +284,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .cartist{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta .darr,.delta .dnum,.delta.same{color:var(--text)}
-.delta.new{color:#fff;background:var(--text);border-radius:999px;padding:3px 8px;font-size:10.5px;letter-spacing:.08em;text-indent:.08em;line-height:1;width:fit-content;justify-self:center}
+.delta.new{color:#fff;background:var(--text);border-radius:999px;padding:3px calc(8px - .08em) 3px 8px;font-size:10.5px;letter-spacing:.08em;line-height:1;width:fit-content;justify-self:center}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
@@ -631,7 +631,7 @@ textarea{resize:vertical;min-height:64px}
     transition:background .15s ease;
   }
   .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0;max-width:100%;overflow:hidden}
-  .delta.new{padding:3px 5px;font-size:8.5px;letter-spacing:.03em;text-indent:.03em;line-height:1;max-width:28px;box-sizing:border-box}
+  .delta.new{padding:3px calc(5px - .03em) 3px 5px;font-size:8.5px;letter-spacing:.03em;line-height:1;max-width:28px;box-sizing:border-box}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
   .delta.new{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
@@ -2228,17 +2228,18 @@ function wireRail(gridSel, prevSel, nextSel){
      normal glides never touch it - the band engages only past the bounds. */
   const rubberMag = over => {
     const d = rail.clientWidth || 900;
-    return d * (1 - 1/(Math.abs(over) * 0.55 / d + 1));
+    /* soft band: hard cap 46px and a gentler curve - a hard yank stretches a
+       little, not half a card (owner: too strong / jerky) */
+    return Math.min(46, d * (1 - 1/(Math.abs(over) * 0.28 / d + 1)));
   };
   const setOver = tx => {
     if(tx){ rail.style.willChange = "transform"; rail.style.transform = "translateX(" + tx.toFixed(1) + "px)"; }
     else { rail.style.transform = ""; rail.style.willChange = ""; }
   };
-  const springBack = (tx0, vx)=>{
-    /* flicking INTO the edge stretches the band a bit further before return */
-    const kick = Math.max(-70, Math.min(70, (vx||0) * 110));
-    const o0 = Math.sign(tx0) * Math.max(0, Math.abs(tx0) + (Math.sign(tx0) === Math.sign(kick) ? Math.abs(kick) : -Math.abs(kick)));
-    const t0 = performance.now(), dur = 520;
+  const springBack = tx0 =>{
+    /* plain ease-out return, no velocity kick: the kick read as a jerk */
+    const o0 = Math.max(-46, Math.min(46, tx0));
+    const t0 = performance.now(), dur = 460;
     if(drag.raf){ cancelAnimationFrame(drag.raf); drag.raf = 0; }
     rail.style.scrollBehavior = "auto";
     const tick = now=>{
@@ -2246,7 +2247,7 @@ function wireRail(gridSel, prevSel, nextSel){
       const e = 1 - Math.pow(1 - u, 3);
       setOver(o0 * (1 - e));
       if(u < 1){ drag.raf = requestAnimationFrame(tick); }
-      else { setOver(0); drag.raf = 0; rail.style.scrollBehavior = ""; }
+      else { setOver(0); drag.raf = 0; rail.style.scrollBehavior = ""; syncRail(gridSel); }
     };
     drag.raf = requestAnimationFrame(tick);
   };
@@ -2291,10 +2292,13 @@ function wireRail(gridSel, prevSel, nextSel){
       const x = from - dist * e;
       const max = rail.scrollWidth - rail.clientWidth - 1;
       if(x < 0 || x > max){
-        /* glide reached the edge with speed left: hand the remaining energy
-           to the rubber band - stretch past the bound, then spring back */
+        /* glide reached the edge with speed left: clamp the scroll AT the
+           bound (so the arrow states re-evaluate) and hand the leftover
+           energy to a small, short band stretch */
+        rail.scrollLeft = x < 0 ? 0 : max;
         const rem = Math.abs(dist) * (1 - e);
-        springBack(Math.sign(dist) * Math.min(110, rem * 0.42), 0);
+        springBack(Math.sign(dist) * Math.min(30, rem * 0.18));
+        syncRail(gridSel);
         return;
       }
       rail.scrollLeft = x;
@@ -2318,7 +2322,7 @@ function wireRail(gridSel, prevSel, nextSel){
     rail.classList.add("dragging");
     if(drag.grabCard) drag.grabCard.classList.add("grab");
     dragStop();
-    if(drag.over){ drag.over = 0; setOver(0); }   /* a new grab cancels the spring */
+    if(drag.over){ drag.over = 0; setOver(0); syncRail(gridSel); }   /* a new grab cancels the spring */
   });
   /* native link/image drag used to hijack the pointer mid-drag: after ~5px
      Chrome started its own drag (URL ghost + cyan outline) and our pointermove
@@ -2348,7 +2352,7 @@ function wireRail(gridSel, prevSel, nextSel){
     if(drag.grabCard){ drag.grabCard.classList.remove("grab"); drag.grabCard = null; }
     if(drag.moved){
       rail.style.scrollBehavior = "";
-      if(drag.over){ springBack(drag.over, drag.vx); drag.over = 0; }
+      if(drag.over){ springBack(drag.over); drag.over = 0; }
       else momentum();
       /* swallow the click that follows a real drag so the post does not open */
       rail.addEventListener("click", ev=>{ ev.preventDefault(); ev.stopPropagation(); }, {capture:true, once:true});
