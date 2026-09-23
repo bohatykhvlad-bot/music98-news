@@ -487,6 +487,9 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .aembed.song iframe{height:166px;max-width:100%}
 .yembed{margin:6px auto 22px;max-width:660px;width:100%}
 .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
+/* TikTok-карточка: кадр вертикальный, поэтому окно 9:16 и узкая колонка */
+.yembed.tk{max-width:400px}
+.yembed.tk .ytbox{aspect-ratio:9/16}
 .yembed iframe{position:absolute;inset:0;width:100%;height:100%;max-width:none;border:0;display:block}
 #appleBoot{position:fixed;left:0;top:0;width:0;height:0;overflow:visible;pointer-events:none;z-index:0}
 iframe.apple-park{
@@ -2864,6 +2867,16 @@ function youtubeEmbed(id, start){
   if(start) src += "&start="+Number(start);
   return `<div class="yembed"><div class="ytbox"><iframe src="${esc(src)}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>`;
 }
+function tiktokEmbed(id, handle){
+  /* Съёмка очевидца, а не чужой репортаж: загружаем оригинал так, как его выложил автор.
+     Рядом — подпись с аккаунтом, потому что у карточки иначе имени автора нет вовсе. */
+  if(!/^\d{6,25}$/.test(id||"")) return "";
+  const h = String(handle||"").replace(/^@/,"").trim();
+  const cred = /^[A-Za-z0-9._]{2,32}$/.test(h)
+    ? `<p class="pcred">Video: <a href="https://www.tiktok.com/@${esc(h)}/video/${id}" target="_blank" rel="noopener noreferrer">@${esc(h)}</a> via TikTok</p>`
+    : "";
+  return `<div class="yembed tk"><div class="ytbox"><iframe src="https://www.tiktok.com/embed/v2/${id}?lang=en" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>` + cred;
+}
 function renderBody(text){
   return String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
     const t = raw.trim();
@@ -2886,6 +2899,8 @@ return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" 
     if(song) return appleEmbed(song[1], song[2]);
     const yt = t.match(/^\[youtube:([A-Za-z0-9_-]{11})(?::(\d+))?\]$/i);
     if(yt) return youtubeEmbed(yt[1], yt[2] ? +yt[2] : 0);
+    const tt = t.match(/^\[tiktok:(\d{6,25})(?::@?([A-Za-z0-9._]{2,32}))?\]$/i);
+    if(tt) return tiktokEmbed(tt[1], tt[2]);
     return "<p>"+rich(raw)+"</p>";
   }).join("");
 }
