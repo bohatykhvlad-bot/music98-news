@@ -508,7 +508,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
    за край, а окно получает внутреннюю прокрутку (владелец, 24.09). Высоту берём измеренную:
    медиа = 160% ширины (TikTok) / 122% (Instagram), плюс фиксированная шапка+подпись. */
 .yembed.tk{max-width:400px}
-.yembed.tk .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(160% + 150px);background:#fff}
+.yembed.tk .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(160% + 75px);background:#fff}
 .yembed.ig{max-width:400px}
 .yembed.ig .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(122% + 210px);background:#fff}
 .yembed iframe{position:absolute;inset:0;width:100%;height:100%;max-width:none;border:0;display:block}
@@ -2484,16 +2484,11 @@ function wireRail(gridSel, prevSel, nextSel){
        own momentum from the live position) */
     if(!drag.moved || (Math.abs(drag.vx) < 0.3 && !drag.over)) dragLandedX = rail.scrollLeft;
     rail.classList.remove("dragging");
-    /* lift survives release BY DESIGN: whatever happens to the rail (inertia,
-       card sliding out from under a stationary cursor) the lift is dropped
-       only by a real pointer move off the card (pointermove arbiter above).
-       No release-time hit test: a stationary cursor "holds" the card. */
-  /* drag end: hand the lift to the arbiter (liftEl already set). If the card
-     slid from under the pointer during the drag, hitCard at the release point
-     differs from the grabbed card and the FIRST pointermove after release
-     drops it - exactly the owner's rule: only a real cursor move drops it. */
+    /* lift survives release: whatever happens to the rail (inertia, the card
+       sliding out from under a stationary pointer) the lift is dropped only
+       by a real pointer move off the card (pointermove arbiter above). */
     drag.grabCard = null;
-      rail.style.scrollBehavior = "";
+    if(drag.moved){
       /* kill any native smooth scrollBy that was still flying when the grab
          happened: without this the interrupted animation's remainder keeps
          scrolling AFTER the drag - the owner's "release: it jumps" bug */
