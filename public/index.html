@@ -91,6 +91,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
 .nav{justify-self:center;display:flex;align-items:center;height:40px;gap:6px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}
 .nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+/* optical ink centering (owner: text reads high even though the pixel
+   envelope is symmetric 11/11 and 19/18): cap-height words concentrate mass
+   above the midline, so the eye wants a hair more air on top. Nudge the text
+   node itself down half a pixel - layout, capsule and hit-area untouched: */
+.nav-btn{position:relative;top:.5px}
 /* optical, mechanism not numbers: trim-both cap alphabetic shrinks the text
    box to the real ink (cap top .. baseline) so flex centering centers the
    LETTERS on every OS/rasterizer - owner measured ink 1.1px high on Windows.
