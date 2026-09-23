@@ -48,7 +48,7 @@
    Rebalance: cards up (headline margin 30->26), rail floor down (24->20),
    plate pushed away (margin 18->24) => ~14/13 css px both sides, both tabs. */
   .tab .hd{margin:0 0 26px}
-  #tab-news .rail{padding-bottom:20px}
+  .tab .rail{padding-bottom:20px}
   .subscribe{margin-top:24px}
 }
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
@@ -171,20 +171,12 @@ main{position:relative;z-index:1}
 /* cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px}
 /* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
+/* unified rails (owner 2026-09-24): releases rail is now 1:1 with news - same
+   wrap (no -22px bleed past the content edge), same paddings, same pill
+   anchors. Every card slider on the site clips at the content edge. */
 .rail-wrap{position:relative;margin-top:2px}
-#tab-releases .rail-wrap{margin-right:-22px}
-#tab-releases .rail{padding-right:44px;padding-top:10px;padding-bottom:24px;margin-top:0}
-/* releases keeps 10px top padding inside the rail (headroom for the -8px hover
-   lift + shadow, the rail clips overflow) - so its heading margin is shortened
-   to land the SAME 30px ink gap as news: 20+10 = 30 */
-#tab-releases .hd{margin:0 0 16px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
-/* releases pill anchor: the wrap carries margin-right:-22px (lets the last
-   card bleed to the viewport edge), which pushed the pill 48px right of
-   news's pill (measured 1254 vs 1302). Compensate inside the button: sit at
-   right:48px relative to the widened wrap => same screen position as news. */
-#tab-releases .rail-wrap .rail-btn.next{right:23px}
 /* end clearance follows the slimmer pill (44px wide): next arrow sits 6px in
    from the edge, the 44px tail inside the rail lets the last card park clear
    of it at full scroll - same geometry on both rails */
@@ -279,8 +271,6 @@ main{position:relative;z-index:1}
 @media (max-width:640px){
   .rail-btn{display:none}
   .rail-wrap{padding-right:0}
-  #tab-releases .rail-wrap{margin-right:0}
-  #tab-releases .rail{padding-right:0}
 }
 /* native link/image drag hijacks the pointer after a few px and kills the JS
    drag (the owner saw the URL ghost + a cyan drag outline on cards): nothing
