@@ -174,6 +174,9 @@ a{color:var(--text)}
    Exact height is synced from JS in paintMini (stage width * 9/16). */
 .mini{display:flex;flex-direction:column;gap:8px;align-items:center;max-width:100%;overflow:hidden}
 .mini-frame{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize;max-width:100%}
+/* transformed img inside a rounded overflow-hidden box paints its corners
+   square in Chromium: the radius must ALSO live on the img itself */
+.mini-frame img{border-radius:9px}
 .mini-frame.active{outline:2px solid var(--acc2);outline-offset:2px}
 .stage.cardmode{cursor:ns-resize;background:#0a0d0e}
 /* card crop window: a centered square INSIDE the stage - the stage keeps the
@@ -1263,6 +1266,10 @@ function paintMini(){
     m.onload = go;
     if(m.naturalWidth) go();
   };
+  /* label mirrors the preview: it shows the OPPOSITE crop of the active mode,
+     so caption it by what is actually on screen, not by the active mode */
+  const cap = document.querySelector(".mini .muted");
+  if(cap) cap.textContent = (cropMode === "card") ? "Main" : "Card";
   if(cropMode === "card") paint("miniImg", Number.isFinite(crop.x)?crop.x:0.5, Number.isFinite(crop.y)?crop.y:0.5, crop.zoom||1);
   else paint("miniImg", cardFx(), crop.cardY, crop.cardZoom||1);
 }
