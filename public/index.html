@@ -90,11 +90,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
 .nav{justify-self:center;display:flex;align-items:center;height:40px;gap:6px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}
-.nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:16px;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
-/* optical: caps-only labels (Chart) have no descender ink, and the Windows
-   rasterizer snaps the baseline a further ~1px up - owner measurements 10.2
-   top vs 12.4 bottom. line-height 14->16px drops the baseline exactly 1px,
-   pill geometry untouched (height stays 32, box still centered). */
+.nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+/* optical, mechanism not numbers: trim-both cap alphabetic shrinks the text
+   box to the real ink (cap top .. baseline) so flex centering centers the
+   LETTERS on every OS/rasterizer - owner measured ink 1.1px high on Windows.
+   Browsers without text-box fall back to normal centering (already even). */
 .nav-btn:hover{color:var(--text)}
 .nav-btn.active{background:var(--accent);color:#03282b}
 .top-actions{display:flex;align-items:center;gap:10px;justify-self:end}
@@ -294,10 +294,9 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .cartist{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta .darr,.delta .dnum,.delta.same{color:var(--text)}
-.delta.new{color:#fff;background:var(--text);border-radius:999px;padding:3.45px calc(8px - .08em) 2.55px 8px;font-size:10.5px;letter-spacing:.08em;line-height:1;width:fit-content;justify-self:center}
-/* vertical: all-caps ink sits high in the em box (descender space below the
-   baseline) - measured prod ink gaps 3.5 top vs 6 bottom; net +0.45px down
-   centers the INK on the live Pretendard render, pill height unchanged */
+.delta.new{color:#fff;background:var(--text);border-radius:999px;padding:3px calc(8px - .08em) 3px 8px;font-size:10.5px;letter-spacing:.08em;line-height:1;text-box:trim-both cap alphabetic;width:fit-content;justify-self:center}
+/* vertical: ink-true centering via text-box (caps top .. baseline) - the
+   padding hack was tuned to one rasterizer; the mechanism works everywhere */
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
@@ -644,7 +643,7 @@ textarea{resize:vertical;min-height:64px}
     transition:background .15s ease;
   }
   .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0;max-width:100%;overflow:hidden}
-  .delta.new{padding:3.45px calc(5px - .03em) 2.55px 5px;font-size:8.5px;letter-spacing:.03em;line-height:1;max-width:28px;box-sizing:border-box}
+  .delta.new{padding:3px calc(5px - .03em) 3px 5px;font-size:8.5px;letter-spacing:.03em;line-height:1;max-width:28px;box-sizing:border-box}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
   .delta.new{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
@@ -881,7 +880,11 @@ function fitCover(img){
   if(!box || !img.naturalWidth) return;
   const fx = Math.min(1, Math.max(0, Number(img.dataset.fx)));
   const fy = Math.min(1, Math.max(0, Number(img.dataset.fy)));
-  const z = Math.min(8, Math.max(1, Number(img.dataset.zoom) || 1));
+  /* owner lag fix: over-zoomed covers render as giant layers (measured 665x893
+     in a 253px box = 9x the pixels) and the compositor resamples them every
+     scroll frame. 1.6 still shows real crop intent; the decoder also downscales
+     the source, keeping memory flat. */
+  const z = Math.min(1.6, Math.max(1, Number(img.dataset.zoom) || 1));
   const sw = box.clientWidth, sh = box.clientHeight;
   if(!sw || !sh) return;
   const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -893,7 +896,7 @@ function fitCover(img){
   top = Math.min(0, Math.max(sh - dh, top));
   img.style.width = dw+"px";
   img.style.height = dh+"px";
-  img.style.transform = "translate("+left+"px,"+top+"px)";
+  img.style.transform = "translate3d("+left+"px,"+top+"px,0)";
 }
 function bindCovers(root){
   (root||document).querySelectorAll("img.js-cover").forEach(img=>{
@@ -2346,8 +2349,12 @@ function wireRail(gridSel, prevSel, nextSel){
   rail.addEventListener("pointerdown", e=>{
     /* cards ARE <a> links, so links must stay draggable - only the arrow
        pills are excluded (they have their own hold-to-scroll logic).
-       A tap (no movement) still produces a native click and opens the post. */
+       A tap (no movement) still produces a native click and opens the post.
+       Grab zone = the card itself only: dragging from the gaps between cards
+       or the rail's own padding must NOT pan the rail (owner request) -
+       the browser's native scrollbar/space behavior stays intact there. */
     if(e.target.closest(".rail-btn")) return;
+    if(!e.target.closest(".card, .rcard, .hero")) return;
     if(e.button !== undefined && e.button !== 0) return;  /* left button / touch / pen only */
     drag.on = true; drag.id = e.pointerId; drag.moved = false;
     drag.x = e.clientX; drag.sl = rail.scrollLeft;
