@@ -165,7 +165,9 @@ main{position:relative;z-index:1}
 .rail-wrap .rail-btn.next{right:0}
 #tab-releases .rail-wrap .rail-btn.next{right:22px}
 .rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:12px 66px 12px 0;margin:-12px 0;scrollbar-width:none;-ms-overflow-style:none;will-change:scroll-position;contain:layout style}
-#newsGrid{padding-right:0}
+/* end-of-scroll clearance: the 66px tail lets the last card park left of the
+   floating pill at full scroll (owner: text must be readable in the final
+   phase) - mid-scroll cards still clip at the section edge as before */
 /* compositor hint: the rail is the site's hot scroll surface - hinting
    its own layer keeps drag/momentum off the main-thread paint path */
 .rail{will-change:scroll-position}
