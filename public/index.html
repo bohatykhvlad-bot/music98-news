@@ -2437,13 +2437,21 @@ function wireRail(gridSel, prevSel, nextSel){
   const grabLift = c => { c.style.transform = "translateY(-4px)"; };
   const grabDrop = c => { c.style.transform = ""; c.classList.remove("grab"); };
   let liftEl = null;
+  /* pointer capture: while the rail holds the pointer (drag), pointermove
+     events RETARGET to the rail itself (e.target = rail) - the trace proved
+     it. After release the capture is gone, so e.target works normally, but
+     e.target.closest can still miss when the card slid away. Use explicit
+     hit-testing: what is under the pointer RIGHT NOW. */
+  const hitCard = (x, y) => {
+    const el = document.elementFromPoint(x, y);
+    return el ? el.closest(".card, .rcard") : null;
+  };
   /* after release the ONLY drop path is a real cursor move onto something
      else (another card, the gaps, the rail padding). Hover-lift parity: the
      card under the moving cursor lifts as usual once the grabbed one is dropped. */
   rail.addEventListener("pointermove", e => {
     if(!liftEl || drag.on) return;             /* drag manages its own lift */
-    const c = e.target.closest(".card, .rcard");
-    if(c === liftEl) return;                   /* still over the grabbed card */
+    if(hitCard(e.clientX, e.clientY) === liftEl) return;  /* cursor still on the grabbed card */
     grabDrop(liftEl); liftEl = null;
   }, {passive:true});
   /* native link/image drag used to hijack the pointer mid-drag: after ~5px
@@ -2480,8 +2488,11 @@ function wireRail(gridSel, prevSel, nextSel){
        card sliding out from under a stationary cursor) the lift is dropped
        only by a real pointer move off the card (pointermove arbiter above).
        No release-time hit test: a stationary cursor "holds" the card. */
+  /* drag end: hand the lift to the arbiter (liftEl already set). If the card
+     slid from under the pointer during the drag, hitCard at the release point
+     differs from the grabbed card and the FIRST pointermove after release
+     drops it - exactly the owner's rule: only a real cursor move drops it. */
     drag.grabCard = null;
-    if(drag.moved){
       rail.style.scrollBehavior = "";
       /* kill any native smooth scrollBy that was still flying when the grab
          happened: without this the interrupted animation's remainder keeps
