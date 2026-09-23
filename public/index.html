@@ -169,7 +169,6 @@ main{position:relative;z-index:1}
    pointer-events:none kills hover recalc + lift transitions every frame,
    which was the main desktop jank source (owner: scrolling now stutters) */
 .rail.gliding .card,.rail.gliding .rcard{pointer-events:none}
-.rail.dragging .card,.rail.dragging .rcard{pointer-events:none}
 @media (hover:hover) and (pointer:fine){
   .rail.dragging .card.grab{transform:translateY(-4px)!important}
 }
@@ -2363,7 +2362,10 @@ function wireRail(gridSel, prevSel, nextSel){
        pressed card must not slide down off its hover lift while dragging */
     drag.grabCard = e.target.closest(".card, .rcard");
     rail.classList.add("dragging");
-    rail.classList.add("gliding");   /* hover-freeze for the whole gesture */
+    /* NOTE: .gliding (hover-freeze) is NOT set here - only .dragging. Freezing
+       pointer-events at press time retargets the release click away from the
+       card (hit-test misses the anchor) and the post never opens. The freeze
+       starts with the first real movement, see pointermove below. */
     if(drag.grabCard) drag.grabCard.classList.add("grab");
     dragStop();
     if(drag.over){ drag.over = 0; setOver(0); syncRail(gridSel); }   /* a new grab cancels the spring */
@@ -2379,6 +2381,7 @@ function wireRail(gridSel, prevSel, nextSel){
       drag.moved = true;
       try{ rail.setPointerCapture(e.pointerId); }catch(_){}
       rail.style.scrollBehavior = "auto";
+      rail.classList.add("gliding");   /* hover-freeze once it IS a drag */
     }
     if(!drag.moved) return;
     const now = performance.now();
@@ -2404,10 +2407,23 @@ function wireRail(gridSel, prevSel, nextSel){
       else { rail.classList.remove("gliding"); }
       /* swallow the click that follows a real drag so the post does not open */
       rail.addEventListener("click", ev=>{ ev.preventDefault(); ev.stopPropagation(); }, {capture:true, once:true});
+    } else {
+      /* plain tap / grab-release without movement: the gesture is over HERE.
+         .gliding MUST be dropped too - pointerdown set it unconditionally,
+         and leaving it stuck keeps cards at pointer-events:none forever:
+         clicks fall through, hover cursor dies, further drags never start
+         (owner bug: after one tap the whole rail is dead until reload). */
+      rail.style.scrollBehavior = "";
+      rail.classList.remove("gliding");
     }
   };
   rail.addEventListener("pointerup", endDrag);
   rail.addEventListener("pointercancel", endDrag);
+  /* safety net: a release that lands outside the rail (window-level) must
+     still end the gesture - without this a press dragged off the rail could
+     leave stale state behind */
+  window.addEventListener("pointerup", endDrag, true);
+  window.addEventListener("pointercancel", endDrag, true);
 }
 wireRail("#newsGrid", "#newsPrev", "#newsNext");
 wireRail("#relGrid", "#relPrev", "#relNext");
