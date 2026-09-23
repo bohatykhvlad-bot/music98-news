@@ -46,7 +46,7 @@
   /* ink-parity fix (owner 2026-09-24): heading->cards must equal cards->plate.
      Measured ink gaps: news top 34.9 / bottom 17.3 -> bottom pad 12->30 evens
      it to ~35 both sides. Releases gets its own 8/30 in its rule above. */
-  #tab-news .rail{padding-bottom:31px}
+  #tab-news .rail{padding-bottom:24px}
 }
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
@@ -138,10 +138,10 @@ body.searching .rail-btn{display:none}
 
 /* ---------- tabs / layout ---------- */
 main{position:relative;z-index:1}
-.tab{display:none;padding:26px 0 0}
+.tab{display:none;padding:14px 0 0}
 /* equal breathing around section headings (owner: blocks higher + equal gaps
    to the header above and the content below) */
-.tab .hd{margin:0 0 35px}
+.tab .hd{margin:0 0 30px}
 .tab.active{display:block}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
@@ -170,11 +170,11 @@ main{position:relative;z-index:1}
 /* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
 .rail-wrap{position:relative;margin-top:2px}
 #tab-releases .rail-wrap{margin-right:-22px}
-#tab-releases .rail{padding-right:44px;padding-top:8px;padding-bottom:31px;margin-top:0}
+#tab-releases .rail{padding-right:44px;padding-top:8px;padding-bottom:24px;margin-top:0}
 /* releases keeps 8px top padding inside the rail (headroom for the hover
    lift, the rail clips overflow) - so its heading margin is shortened by
-   the same 8 to land the SAME ink gap as news: 27+2+8 = 35+2 = 37 */
-#tab-releases .hd{margin:0 0 27px}
+   the same 8 to land the SAME ink gap as news: 22+8 = 30 */
+#tab-releases .hd{margin:0 0 22px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 /* releases pill anchor: the wrap carries margin-right:-22px (lets the last
@@ -202,7 +202,7 @@ main{position:relative;z-index:1}
    whole way; drops ONLY when the cursor physically leaves the card). */
 .rail.dragging .card,.rail.dragging .rcard{transition:none}
 .rail.dragging .card,.rail.dragging .rcard{transform:none!important}
-.rail.dragging .card.grab,.rail.dragging .rcard.grab{transform:translateY(-4px)!important;border-color:var(--accent-dim)!important}
+.rail.dragging .card.grab,.rail.dragging .rcard.grab{transform:translateY(-8px)!important;border-color:var(--accent-dim)!important}
 /* glide optimization v2: while the rail moves on its own (momentum, hold-scroll,
    band spring) hover must not lift/shadow cards sweeping under the cursor -
    that recalc+paint every frame was the jank source. But pointer-events:none
@@ -212,12 +212,12 @@ main{position:relative;z-index:1}
 .rail.gliding .card,.rail.gliding .rcard{transition:none}
 .rail.gliding .card:hover,.rail.gliding .rcard:hover{transform:none;box-shadow:none}
 /* gliding must not strip the GRABBED card either (inertia phase = still lifted) */
-.rail.gliding .card.grab,.rail.gliding .rcard.grab{transform:translateY(-4px)!important;box-shadow:var(--shadow)!important;border-color:var(--accent-dim)!important}
+.rail.gliding .card.grab,.rail.gliding .rcard.grab{transform:translateY(-8px)!important;box-shadow:var(--shadow)!important;border-color:var(--accent-dim)!important}
 /* grabbed card: the CSS lift lives OUTSIDE .dragging/.gliding scoping and is
    !important - it must survive release + inertia (owner rule 2026-09-23):
    drop happens ONLY in JS when the cursor physically moves off the card */
 @media (hover:hover) and (pointer:fine){
-  .card.grab,.rcard.grab{transform:translateY(-4px)!important;border-color:var(--accent-dim)!important;box-shadow:var(--shadow)!important}
+  .card.grab,.rcard.grab{transform:translateY(-8px)!important;border-color:var(--accent-dim)!important;box-shadow:var(--shadow)!important}
   /* smooth transition back on drop - but never during the gesture itself;
      the drop animates on the SAME curve as the lift (owner: release must
      not snap down faster than it rose) */
@@ -643,14 +643,14 @@ textarea{resize:vertical;min-height:64px}
   .nav-btn:hover{color:var(--text)}
   .chart-row:hover{background:var(--card2)}
   .rplay:hover{color:#03282b;transform:scale(1.07)}
-  .card:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
+  .card:hover{transform:translateY(-8px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
   .hero:hover{border-color:var(--accent-dim)}
-  .rcard:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
+  .rcard:hover{transform:translateY(-8px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
   .btn:hover{border-color:var(--accent-dim);color:var(--acc2)}
   /* grabbed card: the lift is owned by JS (inline transform survives release
      until the cursor physically leaves - owner rule 2026-09-23). Hover must
      not fight it during .dragging (freeze) nor strip it after release. */
-  .card.grab,.rcard.grab{transform:translateY(-4px)!important}
+  .card.grab,.rcard.grab{transform:translateY(-8px)!important}
 }
 @media (hover:none){
   .nav-btn:hover{color:var(--muted)}
@@ -2441,7 +2441,7 @@ function wireRail(gridSel, prevSel, nextSel){
        pointer-events at press time retargets the release click away from the
        card (hit-test misses the anchor) and the post never opens. The freeze
        starts with the first real movement, see pointermove below. */
-    if(drag.grabCard){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-4px)"; liftEl = drag.grabCard; }
+    if(drag.grabCard){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-8px)"; liftEl = drag.grabCard; }
     dragStop();
     if(drag.over){ drag.over = 0; setOver(0); syncRail(gridSel); }   /* a new grab cancels the spring */
   });
@@ -2451,7 +2451,7 @@ function wireRail(gridSel, prevSel, nextSel){
      the lift; only a real pointer position change over another element does.
      So the arbiter is pointermove hit-testing, not mouseout. Inline transform
      (not a class) so no CSS rule can reset it mid-gesture. */
-  const grabLift = c => { c.style.transform = "translateY(-4px)"; };
+  const grabLift = c => { c.style.transform = "translateY(-8px)"; };
   /* the drop must animate on the same curve as the lift even when the rail is
      still gliding (its scope sets transition:none): an INLINE transition beats
      every scoped rule, so the card eases down instead of snapping. The inline
