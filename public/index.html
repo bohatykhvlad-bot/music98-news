@@ -167,6 +167,10 @@ main{position:relative;z-index:1}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 #tab-releases .rail-wrap .rail-btn.next{right:22px}
+/* releases: the -22px wrap margin was eating the 6px pill inset - pill ended
+   16px from the viewport edge while news showed 6px. Anchor releases to the
+   real edge with the same 6px inset (owner: match news) */
+#tab-releases .rail-wrap .rail-btn.next{margin-right:-16px}
 /* end clearance follows the slimmer pill (44px wide): next arrow sits 6px in
    from the edge, the 44px tail inside the rail lets the last card park clear
    of it at full scroll - same geometry on both rails */
