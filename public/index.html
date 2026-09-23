@@ -170,11 +170,11 @@ main{position:relative;z-index:1}
 /* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
 .rail-wrap{position:relative;margin-top:2px}
 #tab-releases .rail-wrap{margin-right:-22px}
-#tab-releases .rail{padding-right:44px;padding-top:8px;padding-bottom:24px;margin-top:0}
-/* releases keeps 8px top padding inside the rail (headroom for the hover
-   lift, the rail clips overflow) - so its heading margin is shortened by
-   the same 8 to land the SAME ink gap as news: 22+8 = 30 */
-#tab-releases .hd{margin:0 0 22px}
+#tab-releases .rail{padding-right:44px;padding-top:10px;padding-bottom:24px;margin-top:0}
+/* releases keeps 10px top padding inside the rail (headroom for the -8px hover
+   lift + shadow, the rail clips overflow) - so its heading margin is shortened
+   to land the SAME 30px ink gap as news: 20+10 = 30 */
+#tab-releases .hd{margin:0 0 20px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 /* releases pill anchor: the wrap carries margin-right:-22px (lets the last
