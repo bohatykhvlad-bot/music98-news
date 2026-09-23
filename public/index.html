@@ -46,7 +46,7 @@
   /* ink-parity fix (owner 2026-09-24): heading->cards must equal cards->plate.
      Measured ink gaps: news top 34.9 / bottom 17.3 -> bottom pad 12->30 evens
      it to ~35 both sides. Releases gets its own 8/30 in its rule above. */
-  #tab-news .rail{padding-bottom:30px}
+  #tab-news .rail{padding-bottom:36px}
 }
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
@@ -141,7 +141,7 @@ main{position:relative;z-index:1}
 .tab{display:none;padding:26px 0 0}
 /* equal breathing around section headings (owner: blocks higher + equal gaps
    to the header above and the content below) */
-.tab .hd{margin:0 0 26px}
+.tab .hd{margin:0 0 35px}
 .tab.active{display:block}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
@@ -170,7 +170,7 @@ main{position:relative;z-index:1}
 /* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
 .rail-wrap{position:relative;margin-top:2px}
 #tab-releases .rail-wrap{margin-right:-22px}
-#tab-releases .rail{padding-right:44px;padding-top:8px;padding-bottom:30px;margin-top:0}
+#tab-releases .rail{padding-right:44px;padding-top:8px;padding-bottom:36px;margin-top:0}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 /* releases pill anchor: the wrap carries margin-right:-22px (lets the last
