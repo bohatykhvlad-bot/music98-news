@@ -173,7 +173,7 @@ a{color:var(--text)}
    the owner asked for a side-cropped view at main height, not a full square.
    Exact height is synced from JS in paintMini (stage width * 9/16). */
 .mini{display:flex;flex-direction:column;gap:8px;align-items:center;max-width:100%;overflow:hidden}
-.mini-frame{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:ns-resize;max-width:100%}
+.mini-frame{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line);background:#111;cursor:pointer;max-width:100%}
 /* transformed img inside a rounded overflow-hidden box paints its corners
    square in Chromium: the radius must ALSO live on the img itself */
 .mini-frame img{border-radius:9px}
@@ -186,14 +186,14 @@ a{color:var(--text)}
 .stage.cardmode.free{cursor:move}
 /* axis pill on the card stage: one glass capsule with an up+down arrow pair.
    Click it -> it turns into a four-way cross (move = free, horizontal too). */
-.axis-pill{position:absolute;right:14px;bottom:14px;z-index:6;height:34px;min-width:56px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.78);backdrop-filter:blur(10px) saturate(170%);-webkit-backdrop-filter:blur(10px) saturate(170%);box-shadow:0 3px 14px rgba(15,60,64,.16);display:none;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#20343a;transition:transform .16s ease,background .16s ease;-webkit-tap-highlight-color:transparent}
+.axis-pill{position:absolute;right:14px;bottom:14px;z-index:6;height:34px;min-width:56px;padding:0 12px;border-radius:999px;border:1px solid #c9d3d5;background:#f2f5f5;box-shadow:0 3px 14px rgba(15,60,64,.16);display:none;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:#15181a;transition:transform .16s ease,background .16s ease;-webkit-tap-highlight-color:transparent}
 .stage.cardmode .axis-pill{display:flex}
 .axis-pill:hover{transform:scale(1.05)}
-.axis-pill svg{width:20px;height:20px;display:block}
+.axis-pill svg{width:22px;height:22px;display:block;color:#15181a}
 .axis-pill .ic-cross{display:none}
 .axis-pill.free .ic-updown{display:none}
 .axis-pill.free .ic-cross{display:block}
-.axis-pill.free{background:rgba(0,253,251,.16);border-color:rgba(0,253,251,.55)}
+.axis-pill.free{background:#e4ebec;border-color:#b7c4c7}
 .mini-frame img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;display:block}
 .mini .muted{text-align:center;font-size:11px}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
@@ -1309,8 +1309,8 @@ function paintMini(){
      so caption it by what is actually on screen, not by the active mode */
   const cap = document.querySelector(".mini .muted");
   if(cap) cap.textContent = (cropMode === "card") ? "Main" : "Card";
-  if(cropMode === "card") paint("miniImg", Number.isFinite(crop.x)?crop.x:0.5, Number.isFinite(crop.y)?crop.y:0.5, crop.zoom||1);
-  else paint("miniImg", cardFx(), crop.cardY, crop.cardZoom||1);
+  if(cropMode === "card") paint("miniImg", Number.isFinite(crop.x)?crop.x:0.5, Number.isFinite(crop.y)?crop.y:0.5, Math.min(1.6, crop.zoom||1));
+  else paint("miniImg", cardFx(), crop.cardY, Math.min(1.6, crop.cardZoom||1));
 }
 /* The slider's right end IS the zoom cap (owner request): the track maps
    [1..cap] of the CURRENT focus, so dragging to the end always lands exactly

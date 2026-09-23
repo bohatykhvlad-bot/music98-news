@@ -121,10 +121,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .search input:focus-visible,
 .search.on input{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent)}
 .topbar ::placeholder{color:var(--muted2);opacity:1}
-.search-hints{max-width:1180px;margin:0 auto;padding:0 20px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--text)}
-.hint-chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:999px;padding:5px 11px;cursor:pointer;color:var(--text);font-size:12.5px;line-height:1}
+.search-hints{max-width:1180px;margin:0 auto;padding:0 20px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--text)}
+.hint-chip{display:inline-flex;align-items:center;border:1px solid var(--line);background:rgba(255,255,255,.75);border-radius:999px;padding:7px 14px;cursor:pointer;color:var(--text);font-size:14px;line-height:1}
 .hint-chip:hover{color:var(--text);border-color:var(--accent-dim)}
 .hint-chip b{color:var(--text)}
+/* search mode: no section heading, no rail arrows - just the match grid */
+body.searching .tab .hd{display:none}
+body.searching .rail-btn{display:none}
 
 /* ---------- marquee plate ---------- */
 
@@ -191,7 +194,7 @@ main{position:relative;z-index:1}
    whole way; drops ONLY when the cursor physically leaves the card). */
 .rail.dragging .card,.rail.dragging .rcard{transition:none}
 .rail.dragging .card,.rail.dragging .rcard{transform:none!important}
-.rail.dragging .card.grab,.rail.dragging .rcard.grab{transform:translateY(-4px)!important}
+.rail.dragging .card.grab,.rail.dragging .rcard.grab{transform:translateY(-4px)!important;border-color:var(--accent-dim)!important}
 /* glide optimization v2: while the rail moves on its own (momentum, hold-scroll,
    band spring) hover must not lift/shadow cards sweeping under the cursor -
    that recalc+paint every frame was the jank source. But pointer-events:none
@@ -201,14 +204,16 @@ main{position:relative;z-index:1}
 .rail.gliding .card,.rail.gliding .rcard{transition:none}
 .rail.gliding .card:hover,.rail.gliding .rcard:hover{transform:none;box-shadow:none}
 /* gliding must not strip the GRABBED card either (inertia phase = still lifted) */
-.rail.gliding .card.grab,.rail.gliding .rcard.grab{transform:translateY(-4px)!important;box-shadow:var(--shadow)!important}
+.rail.gliding .card.grab,.rail.gliding .rcard.grab{transform:translateY(-4px)!important;box-shadow:var(--shadow)!important;border-color:var(--accent-dim)!important}
 /* grabbed card: the CSS lift lives OUTSIDE .dragging/.gliding scoping and is
    !important - it must survive release + inertia (owner rule 2026-09-23):
    drop happens ONLY in JS when the cursor physically moves off the card */
 @media (hover:hover) and (pointer:fine){
-  .card.grab,.rcard.grab{transform:translateY(-4px)!important}
-  /* smooth transition back on drop - but never during the gesture itself */
-  .card.grab,.rcard.grab{transition:transform .18s ease,box-shadow .18s ease}
+  .card.grab,.rcard.grab{transform:translateY(-4px)!important;border-color:var(--accent-dim)!important;box-shadow:var(--shadow)!important}
+  /* smooth transition back on drop - but never during the gesture itself;
+     the drop animates on the SAME curve as the lift (owner: release must
+     not snap down faster than it rose) */
+  .card.grab,.rcard.grab{transition:transform .2s cubic-bezier(.3,.7,.4,1),box-shadow .2s cubic-bezier(.3,.7,.4,1),border-color .2s ease}
   .rail.dragging .card.grab,.rail.gliding .card.grab,.rail.dragging .rcard.grab,.rail.gliding .rcard.grab{transition:none}
 }
 @media (hover:none){
@@ -2120,10 +2125,10 @@ function equalizeCards(gridSel){
 window.addEventListener("load", ()=>{ equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
 function renderNews(){
   const posts = data.posts.filter(p=>p.type==="news" && matches(p)).sort(byFresh);
-  /* hero = the PINNED post (owner: newest must not auto-become main news while
-     a pin exists); feed order stays strictly chronological (2026-09-22 fix:
-     non-hero pinned posts keep their date slot, never jump to the edge) */
-  const hero = posts.find(p=>p.pinned) || posts[0], rest = posts.filter(p=>p!==hero);
+  /* searching: NO hero - every match renders as a card in the rail (owner:
+     an artist with many posts must show the same scrollable card grid, not
+     one big photo); hero only in browse mode */
+  const hero = query ? null : (posts.find(p=>p.pinned) || posts[0]), rest = posts.filter(p=>p!==hero);
   $("#heroSlot").innerHTML = hero ? `
     <a class="hero" href="${postPath(hero)}">
       <div class="cover">${coverImg(hero,false)}</div>
@@ -2435,7 +2440,16 @@ function wireRail(gridSel, prevSel, nextSel){
      So the arbiter is pointermove hit-testing, not mouseout. Inline transform
      (not a class) so no CSS rule can reset it mid-gesture. */
   const grabLift = c => { c.style.transform = "translateY(-4px)"; };
-  const grabDrop = c => { c.style.transform = ""; c.classList.remove("grab"); };
+  /* the drop must animate on the same curve as the lift even when the rail is
+     still gliding (its scope sets transition:none): an INLINE transition beats
+     every scoped rule, so the card eases down instead of snapping. The inline
+     is self-cleaning after the animation window. */
+  const grabDrop = c => {
+    c.style.transition = "transform .2s cubic-bezier(.3,.7,.4,1), box-shadow .2s cubic-bezier(.3,.7,.4,1), border-color .2s ease";
+    c.style.transform = "";
+    c.classList.remove("grab");
+    setTimeout(()=>{ if(!c.classList.contains("grab")) c.style.transition = ""; }, 240);
+  };
   let liftEl = null;
   /* pointer capture: while the rail holds the pointer (drag), pointermove
      events RETARGET to the rail itself (e.target = rail) - the trace proved
@@ -2602,8 +2616,8 @@ function renderHints(){
   const nR = data.posts.filter(p=>p.type==="release"&&matches(p)).length;
   const nC = lastChartCount;
   box.hidden = false;
-  box.innerHTML = `<span>Results for “${esc(query)}”:</span>
-    <button class="hint-chip" data-goto="news">News: <b>${nN}</b></button>
+  /* owner: pills only, no "Results for ..." caption before them */
+  box.innerHTML = `<button class="hint-chip" data-goto="news">News: <b>${nN}</b></button>
     <button class="hint-chip" data-goto="releases">Releases: <b>${nR}</b></button>
     <button class="hint-chip" data-goto="charts">Chart: <b>${nC}</b></button>`;
   requestAnimationFrame(syncHeaderPad);
@@ -2644,7 +2658,22 @@ document.addEventListener("click", e=>{
 });
 $("#search").addEventListener("input", e=>{
   query = e.target.value.trim().toLowerCase();
+  document.body.classList.toggle("searching", !!query);
   renderNews(); renderReleases(); renderCharts(); renderHints();
+  /* auto-follow the artist: if the current tab shows zero matches, jump to
+     the first tab that has some (news -> releases -> chart). Tabs with
+     results are never yanked away from. */
+  if(query){
+    const counts = {
+      news: data.posts.filter(p=>p.type==="news"&&matches(p)).length,
+      releases: data.posts.filter(p=>p.type==="release"&&matches(p)).length,
+      charts: lastChartCount
+    };
+    if(!counts[activeTab]){
+      const alt = ["news","releases","charts"].find(t=>counts[t] > 0);
+      if(alt) setTab(alt);
+    }
+  }
 });
 (function(){
   const inp = $("#search");
