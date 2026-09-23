@@ -158,12 +158,13 @@ main{position:relative;z-index:1}
 .rail{will-change:scroll-position}
 .rail::-webkit-scrollbar{display:none}
 .rail>*{scroll-snap-align:none}
-/* hand-drag in progress: cards freeze at their pre-press position - the
-   pressed card must not slide down from its hover lift (owner request).
-   .grab keeps the grabbed desktop card exactly where hover had it (zero
-   motion at grab), everything else sits flat; touch gets flat everywhere. */
-.rail.dragging .card{transition:none}
-.rail.dragging .card{transform:none!important}
+/* hand-drag in progress: cards freeze at their pre-press position - cards
+   must not bob up/down from hover as they sweep under the cursor (owner:
+   releases scroll jumps). The grabbed card KEEPS its raised position for
+   the whole drag (owner request) - .grab re-applies the lift on top of the
+   freeze, for news cards and release cards alike. */
+.rail.dragging .card,.rail.dragging .rcard{transition:none}
+.rail.dragging .card,.rail.dragging .rcard{transform:none!important}
 /* glide optimization v2: while the rail moves on its own (momentum, hold-scroll,
    band spring) hover must not lift/shadow cards sweeping under the cursor -
    that recalc+paint every frame was the jank source. But pointer-events:none
@@ -173,7 +174,7 @@ main{position:relative;z-index:1}
 .rail.gliding .card,.rail.gliding .rcard{transition:none}
 .rail.gliding .card:hover,.rail.gliding .rcard:hover{transform:none;box-shadow:none}
 @media (hover:hover) and (pointer:fine){
-  .rail.dragging .card.grab{transform:translateY(-4px)!important}
+  .rail.dragging .card.grab,.rail.dragging .rcard.grab{transform:translateY(-4px)!important}
 }
 @media (hover:none){
   .rail.dragging .card{transform:none!important}
@@ -296,7 +297,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .cartist{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta .darr,.delta .dnum,.delta.same{color:var(--text)}
-.delta.new{color:#fff;background:var(--text);border-radius:999px;padding:3px calc(8px - .08em) 3px 8px;font-size:10.5px;letter-spacing:.08em;line-height:1;text-box:trim-both cap alphabetic;width:fit-content;justify-self:center}
+/* NEW badge = same pill construction as the top nav pills (owner: unified
+   style): inline-flex capsule, fixed height, equal side padding, ink-centered
+   via text-box. Ratio matches .nav-btn (32px height / 14px font -> 24px / 10.5px). */
+.delta.new{color:#fff;background:var(--text);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 calc(13px - .08em) 0 13px;font-size:10.5px;letter-spacing:.08em;line-height:1;text-box:trim-both cap alphabetic;width:fit-content;justify-self:center}
 /* vertical: ink-true centering via text-box (caps top .. baseline) - the
    padding hack was tuned to one rasterizer; the mechanism works everywhere */
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
@@ -645,7 +649,7 @@ textarea{resize:vertical;min-height:64px}
     transition:background .15s ease;
   }
   .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0;max-width:100%;overflow:hidden}
-  .delta.new{padding:3px calc(5px - .03em) 3px 5px;font-size:8.5px;letter-spacing:.03em;line-height:1;max-width:28px;box-sizing:border-box}
+  .delta.new{height:20px;padding:0 calc(9px - .03em) 0 9px;font-size:8.5px;letter-spacing:.03em;line-height:1;box-sizing:border-box}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
   .delta.new{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
@@ -2171,8 +2175,13 @@ function syncRail(sel){
   const next = wrap.querySelector(".rail-btn.next");
   const update = ()=>{
     /* clientWidth/scrollWidth reads force layout; cache the max and refresh
-       it lazily (rAF-coalesced) so the scroll handler stays on the fast path */
-    if(rail._max == null){ rail._max = rail.scrollWidth - rail.clientWidth - 1; }
+       it lazily (rAF-coalesced) so the scroll handler stays on the fast path.
+       Hidden-tab guard: while a tab is display:none its rail measures 0 wide,
+       so the cached max would be -1 and EVERY scroll write would clamp to it
+       (owner bug: releases rail jumped back to the start). A non-positive max
+       must never be cached; retry on the next call when the tab is visible. */
+    const max = rail.scrollWidth - rail.clientWidth - 1;
+    if(max > 0 || rail._max == null){ if(max > 0) rail._max = max; }
     prev.classList.toggle("ok", rail._max > 0 && rail.scrollLeft > 4);
     next.classList.toggle("ok", rail._max > 0 && rail.scrollLeft < rail._max);
   };
@@ -2201,7 +2210,7 @@ function wireRail(gridSel, prevSel, nextSel){
     rail.classList.add("gliding");   /* hover-freeze while auto-scrolling */
     hold.v = Math.min(26, hold.v + dt * 0.045);
     rail.scrollLeft += hold.dir * hold.v * (dt/16.7);
-    if(rail._max == null) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    if(rail._max == null || rail._max < 0) rail._max = rail.scrollWidth - rail.clientWidth - 1;
     if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=rail._max)){ stopHold(); return; }
     hold.raf = requestAnimationFrame(glide);
   };
@@ -2210,7 +2219,7 @@ function wireRail(gridSel, prevSel, nextSel){
     const dt = 16.7;
     rail.scrollLeft += hold.dir * hold.v * (dt/16.7);
     hold.v *= 0.94;
-    if(rail._max == null) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    if(rail._max == null || rail._max < 0) rail._max = rail.scrollWidth - rail.clientWidth - 1;
     if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=rail._max)){ stopHold(); return; }
     hold.raf = requestAnimationFrame(inertia);
   };
@@ -2256,6 +2265,18 @@ function wireRail(gridSel, prevSel, nextSel){
      release = momentum. A real click (no meaningful drag) still opens the
      post - the click is suppressed only when the pointer actually moved. */
   const drag = {on:false, id:0, x:0, sl:0, moved:false, vx:0, lx:0, lt:0, raf:0, pendX:0, raf2:0, over:0};
+  /* a release must land ON the grabbed position, not rewind: Chromium fires
+     pointerup BEFORE the click, but certain builds deliver pointercancel via
+     the native drag fallback path even when dragstart never fired, and the
+     browser's own post-release scroll restore then snaps scrollLeft back to
+     the press-time offset. Guard: one delayed re-assert of the position the
+     rail actually had when the pointer was released. */
+  let dragLandedX = null;
+  const landGuard = ()=>{
+    if(dragLandedX == null) return;
+    const want = dragLandedX; dragLandedX = null;
+    if(Math.abs(rail.scrollLeft - want) > 1){ rail.style.scrollBehavior = "auto"; rail.scrollLeft = want; rail.style.scrollBehavior = ""; }
+  };
   /* --- rubber band: the rail can be pulled past its edges and springs back ---
      scrollLeft clamps at 0/max, so the overshoot is drawn with a transform:
      past the edge the content shifts with diminishing resistance (Apple-ish
@@ -2293,8 +2314,8 @@ function wireRail(gridSel, prevSel, nextSel){
   const applyDrag = ()=>{
     drag.raf2 = 0;
     if(!drag.on) return;
-    if(rail._max == null) rail._max = rail.scrollWidth - rail.clientWidth - 1;
-    const max = rail._max;
+    if(rail._max == null || rail._max < 0) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    const max = Math.max(0, rail._max);   /* hidden-tab guard: never clamp to -1 */
     let x = drag.pendX, over = 0;
     if(x < 0){ over = x; x = 0; }
     else if(x > max){ over = x - max; x = max; }
@@ -2330,7 +2351,8 @@ function wireRail(gridSel, prevSel, nextSel){
       const u = Math.min(1, (now - t0) / dur);
       const e = 1 - Math.pow(1 - u, 2.4);
       const x = from - dist * e;
-      if(rail._max == null) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    if(rail._max == null || rail._max < 0) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    if(rail._max < 0) rail._max = 0;   /* hidden tab: nothing to clamp against */
       const max = rail._max;
       if(x < 0 || x > max){
         /* glide reached the edge with speed left: clamp the scroll AT the
@@ -2398,10 +2420,19 @@ function wireRail(gridSel, prevSel, nextSel){
     if(!drag.on || e.pointerId !== drag.id) return;
     drag.on = false;
     if(drag.raf2){ cancelAnimationFrame(drag.raf2); drag.raf2 = 0; rail.scrollLeft = drag.pendX; }
+    /* remember where the rail really is at release - the guard re-asserts it
+       if the browser tries to rewind (releases only; a moved drag handles its
+       own momentum from the live position) */
+    if(!drag.moved || (Math.abs(drag.vx) < 0.3 && !drag.over)) dragLandedX = rail.scrollLeft;
     rail.classList.remove("dragging");
     if(drag.grabCard){ drag.grabCard.classList.remove("grab"); drag.grabCard = null; }
     if(drag.moved){
       rail.style.scrollBehavior = "";
+      /* kill any native smooth scrollBy that was still flying when the grab
+         happened: without this the interrupted animation's remainder keeps
+         scrolling AFTER the drag - the owner's "release: it jumps" bug */
+      const kill = rail.scrollLeft;
+      rail.scrollLeft = kill;
       /* keep .gliding through the momentum/spring phase - it is dropped when
          the motion actually ends (momentum finish / springBack finish); a
          plain stop without motion drops it right here */
@@ -2420,13 +2451,13 @@ function wireRail(gridSel, prevSel, nextSel){
       rail.classList.remove("gliding");
     }
   };
-  rail.addEventListener("pointerup", endDrag);
-  rail.addEventListener("pointercancel", endDrag);
+  rail.addEventListener("pointerup", e=>{ endDrag(e); setTimeout(landGuard, 0); setTimeout(landGuard, 60); });
+  rail.addEventListener("pointercancel", e=>{ endDrag(e); setTimeout(landGuard, 0); setTimeout(landGuard, 60); });
   /* safety net: a release that lands outside the rail (window-level) must
      still end the gesture - without this a press dragged off the rail could
      leave stale state behind */
-  window.addEventListener("pointerup", endDrag, true);
-  window.addEventListener("pointercancel", endDrag, true);
+  window.addEventListener("pointerup", e=>{ endDrag(e); setTimeout(landGuard, 0); setTimeout(landGuard, 60); }, true);
+  window.addEventListener("pointercancel", e=>{ endDrag(e); setTimeout(landGuard, 0); setTimeout(landGuard, 60); }, true);
 }
 wireRail("#newsGrid", "#newsPrev", "#newsNext");
 wireRail("#relGrid", "#relPrev", "#relNext");
