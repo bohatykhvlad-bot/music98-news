@@ -164,11 +164,14 @@ main{position:relative;z-index:1}
    motion at grab), everything else sits flat; touch gets flat everywhere. */
 .rail.dragging .card{transition:none}
 .rail.dragging .card{transform:none!important}
-/* glide optimization: while the rail moves on its own (momentum, hold-scroll,
-   band spring) cards must not react to the cursor sweeping past them -
-   pointer-events:none kills hover recalc + lift transitions every frame,
-   which was the main desktop jank source (owner: scrolling now stutters) */
-.rail.gliding .card,.rail.gliding .rcard{pointer-events:none}
+/* glide optimization v2: while the rail moves on its own (momentum, hold-scroll,
+   band spring) hover must not lift/shadow cards sweeping under the cursor -
+   that recalc+paint every frame was the jank source. But pointer-events:none
+   also killed the cursor (arrow instead of pointer) and clicks for the whole
+   glide fraction of a second - so instead of hiding cards we neutralize only
+   the hover visuals; hit-testing stays alive the whole time. */
+.rail.gliding .card,.rail.gliding .rcard{transition:none}
+.rail.gliding .card:hover,.rail.gliding .rcard:hover{transform:none;box-shadow:none}
 @media (hover:hover) and (pointer:fine){
   .rail.dragging .card.grab{transform:translateY(-4px)!important}
 }
