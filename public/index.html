@@ -151,13 +151,14 @@ main{position:relative;z-index:1}
 /* cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px}
 /* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
-.rail-wrap{position:relative;margin-top:2px;padding-right:66px}
-#tab-releases .rail-wrap{padding-right:0;margin-right:-22px}
+.rail-wrap{position:relative;margin-top:2px}
+#tab-releases .rail-wrap{margin-right:-22px}
 #tab-releases .rail{padding-right:66px;padding-top:12px;padding-bottom:14px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 #tab-releases .rail-wrap .rail-btn.next{right:22px}
-.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:12px 0;margin:-12px 0;scrollbar-width:none;-ms-overflow-style:none;will-change:scroll-position;contain:layout style}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:12px 66px 12px 0;margin:-12px 0;scrollbar-width:none;-ms-overflow-style:none;will-change:scroll-position;contain:layout style}
+#newsGrid{padding-right:0}
 /* compositor hint: the rail is the site's hot scroll surface - hinting
    its own layer keeps drag/momentum off the main-thread paint path */
 .rail{will-change:scroll-position}
