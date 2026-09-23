@@ -160,12 +160,16 @@ main{position:relative;z-index:1}
 /* --- carousel: posts 4+ scroll sideways, glass arrows on the flanks --- */
 .rail-wrap{position:relative;margin-top:2px}
 #tab-releases .rail-wrap{margin-right:-22px}
-#tab-releases .rail{padding-right:66px;padding-top:12px;padding-bottom:14px}
+#tab-releases .rail{padding-right:44px;padding-top:12px;padding-bottom:14px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 #tab-releases .rail-wrap .rail-btn.next{right:22px}
-.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:12px 66px 12px 0;margin:-12px 0;scrollbar-width:none;-ms-overflow-style:none;will-change:scroll-position;contain:layout style}
-/* end-of-scroll clearance: the 66px tail lets the last card park left of the
+/* end clearance follows the slimmer pill (44px wide): next arrow sits 6px in
+   from the edge, the 44px tail inside the rail lets the last card park clear
+   of it at full scroll - same geometry on both rails */
+.rail-wrap .rail-btn.next{margin-right:6px}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:12px 44px 12px 0;margin:-12px 0;scrollbar-width:none;-ms-overflow-style:none;will-change:scroll-position;contain:layout style}
+/* end-of-scroll clearance: the 44px tail lets the last card park left of the
    floating pill at full scroll (owner: text must be readable in the final
    phase) - mid-scroll cards still clip at the section edge as before */
 /* compositor hint: the rail is the site's hot scroll surface - hinting
@@ -210,7 +214,7 @@ main{position:relative;z-index:1}
      Real teasers are written to similar length, so with the 2-line title
      clamp heights stay visually even without cutting text. */
 }
-.rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:44px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;touch-action:none;transition:opacity .5s ease}
+.rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:38px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;touch-action:none;transition:opacity .5s ease}
 /* visibility model (owner spec): the next pill is ALWAYS on screen (it anchors
    the right edge); the prev pill appears only after scrolling away from the
    start (.ok from syncRail). A pill with nowhere left to go dims its chevron
