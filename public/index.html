@@ -192,8 +192,11 @@ main{position:relative;z-index:1}
    the hover visuals; hit-testing stays alive the whole time. */
 .rail.gliding .card,.rail.gliding .rcard{transition:none}
 .rail.gliding .card:hover,.rail.gliding .rcard:hover{transform:none;box-shadow:none}
+/* grabbed card: the CSS lift lives OUTSIDE .dragging/.gliding scoping and is
+   !important - it must survive release + inertia (owner rule 2026-09-23):
+   drop happens ONLY in JS when the cursor physically moves off the card */
 @media (hover:hover) and (pointer:fine){
-  .rail.dragging .card.grab,.rail.dragging .rcard.grab{transform:translateY(-4px)!important}
+  .card.grab,.rcard.grab{transform:translateY(-4px)!important}
 }
 @media (hover:none){
   .rail.dragging .card{transform:none!important}
