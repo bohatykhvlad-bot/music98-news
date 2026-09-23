@@ -246,6 +246,9 @@ a{color:var(--text)}
 .composer .aembed.album iframe{height:320px}
 .composer .yembed{max-width:520px;width:100%}
 .composer .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
+.composer .yembed.tk{max-width:340px}
+.composer .yembed.tk .ytbox{aspect-ratio:9/16}
+.composer .yembed .tkcred{margin:8px 0 0;font-size:12px;color:var(--muted2);text-align:center}
 .composer .yembed iframe{position:absolute;inset:0;width:100%;height:100%;border-radius:0}
 .composer iframe{width:100%;border:0;border-radius:10px;display:block;background:transparent}
 .composer .abody-pic{max-width:520px;width:100%;margin:12px auto}
@@ -371,6 +374,7 @@ a{color:var(--text)}
         <button class="ico wide" type="button" id="btnSong" title="Apple song">♪ Song</button>
         <button class="ico wide" type="button" id="btnAlbum" title="Apple album">Album</button>
         <button class="ico wide" type="button" id="btnYoutube" title="YouTube">YouTube</button>
+        <button class="ico wide" type="button" id="btnTiktok" title="TikTok — оригинал съёмки события">TikTok</button>
       </div>
       <input id="bodyPhoto" class="hide" type="file" accept="image/*">
       <div class="composer" id="composer" contenteditable="true" data-placeholder="Write here"></div>
@@ -457,6 +461,21 @@ a{color:var(--text)}
     <div class="actions">
       <button class="btn primary" type="button" id="ytGo">Insert</button>
       <button class="btn ghost" type="button" id="ytCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+<div class="modal hide" id="ttModal">
+  <div class="card">
+    <h2>TikTok</h2>
+    <p class="muted">Paste a tiktok.com link like <b>/@account/video/7688…</b> — a full link, not the short vm.tiktok.com one. This card is for footage filmed at the event itself; a broadcaster's report is not inserted.</p>
+    <label for="ttUrl">Link</label>
+    <input id="ttUrl" placeholder="https://www.tiktok.com/@account/video/…">
+    <label for="ttAcc">Account shown in the credit</label>
+    <input id="ttAcc" placeholder="account">
+    <div id="ttPrev"></div>
+    <div class="actions">
+      <button class="btn primary" type="button" id="ttGo">Insert</button>
+      <button class="btn ghost" type="button" id="ttCancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -807,6 +826,29 @@ function parseYouTube(raw){
   }
   return {id, start: start||0};
 }
+function parseTikTok(raw){
+  /* Принимает id цифрами или полную ссылку вида /@account/video/<id>.
+     Короткие vm.tiktok.com/<код> не разворачиваются из браузера (CORS), поэтому честно
+     говорим открыть ссылку и скопировать полную — вместо тихой ошибки. */
+  const s = String(raw||"").trim();
+  if(/^\d{6,25}$/.test(s)) return {id:s, handle:""};
+  let u;
+  try{ u = new URL(s); }catch(e){ return null; }
+  const host = (u.hostname||"").replace(/^www\./,"").toLowerCase();
+  if(host === "vm.tiktok.com" || /(^|\.)tiktok\.com$/.test(host) && /^\/t\//.test(u.pathname)) return {short:true};
+  if(!["tiktok.com","m.tiktok.com","tiktok.com"].includes(host)) return null;
+  const m = u.pathname.match(/\/@([A-Za-z0-9._]{2,32})\/(?:video|photo)\/(\d{6,25})/);
+  const id = m ? m[2] : (u.pathname.match(/\/(\d{15,25})/)||[])[1];
+  if(!id) return null;
+  return {id, handle: m ? m[1] : ""};
+}
+function tiktokSrc(id){ return "https://www.tiktok.com/embed/v2/"+id+"?lang=en"; }
+function tiktokBlock(id, handle){
+  const h = String(handle||"").replace(/^@/,"").trim();
+  const token = h ? id+":"+h : id;
+  const cred = h ? `<p class="tkcred">Video: <a href="https://www.tiktok.com/@${esc(h)}/video/${esc(id)}" target="_blank" rel="noopener noreferrer">@${esc(h)}</a> via TikTok</p>` : "";
+  return `<figure class="blk yembed tk" contenteditable="false" data-tiktok="${esc(token)}">${blkChrome()}<div class="ytbox"><iframe src="${esc(tiktokSrc(id))}" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="eager"></iframe></div>${cred}</figure>`;
+}
 function youtubeSrc(id, start){
   let src = "https://www.youtube-nocookie.com/embed/"+id+"?rel=0&modestbranding=1&enablejsapi=1&hl=en&cc_lang_pref=en";
   if(start) src += "&start="+start;
@@ -1078,6 +1120,7 @@ function serialize(){
         parts.push("[photo:"+tag+"]");
       }
       if(node.dataset.youtube) parts.push("[youtube:"+node.dataset.youtube+"]");
+      if(node.dataset.tiktok) parts.push("[tiktok:"+node.dataset.tiktok+"]");
       return;
     }
     if(node.querySelector && node.querySelector("figure")){
@@ -1105,6 +1148,8 @@ function bodyToComposer(text){
     if(song) return appleBlock("song", song[1], song[2]);
     const yt = t.match(/^\[youtube:([A-Za-z0-9_-]{11})(?::(\d+))?\]$/i);
     if(yt) return youtubeBlock(yt[1], yt[2] ? +yt[2] : 0);
+    const tt = t.match(/^\[tiktok:(\d{6,25})(?::@?([A-Za-z0-9._]{2,32}))?\]$/i);
+    if(tt) return tiktokBlock(tt[1], tt[2]||"");
     return "<p>"+rich(raw)+"</p>";
   }).join("");
   $("#composer").innerHTML = html || "<p><br></p>";
@@ -1617,7 +1662,7 @@ document.querySelector(".toolbar").addEventListener("mousedown", e=>{
   if(!btn) return;
   saveCaret(true);
   e.preventDefault();
-  if(btn.id==="btnPhoto" || btn.id==="btnSong" || btn.id==="btnAlbum" || btn.id==="btnYoutube") freezeCaret();
+  if(btn.id==="btnPhoto" || btn.id==="btnSong" || btn.id==="btnAlbum" || btn.id==="btnYoutube" || btn.id==="btnTiktok") freezeCaret();
 });
 document.addEventListener("selectionchange", ()=>{
   const el = $("#composer");
@@ -1874,6 +1919,7 @@ function closeYoutube(keepCaret){
 }
 function openYoutube(){
   closeApple(true);
+  closeTiktok();
   freezeCaret();
   $("#ytUrl").value = "";
   $("#ytPrev").innerHTML = "";
@@ -1886,6 +1932,42 @@ function previewYoutube(){
   if(!got) return;
   $("#ytPrev").innerHTML = `<div class="ytbox" style="position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000;margin-top:10px"><iframe src="${esc(youtubeSrc(got.id, got.start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
 }
+function openTiktok(){
+  closeApple(true);
+  closeYoutube();
+  freezeCaret();
+  $("#ttUrl").value = "";
+  $("#ttAcc").value = "";
+  $("#ttPrev").innerHTML = "";
+  $("#ttModal").classList.remove("hide");
+  $("#ttUrl").focus();
+}
+function closeTiktok(){
+  $("#ttModal").classList.add("hide");
+  $("#ttUrl").value = "";
+  $("#ttPrev").innerHTML = "";
+}
+function previewTiktok(){
+  const got = parseTikTok($("#ttUrl").value);
+  $("#ttPrev").innerHTML = "";
+  if(!got) return;
+  if(got.short){ $("#ttPrev").innerHTML = "<p class=\"muted\">Short vm.tiktok.com links do not open a video id. Open the link, copy the full address and paste it here.</p>"; return; }
+  if(got.handle && !$("#ttAcc").value.trim()) $("#ttAcc").value = got.handle;
+  $("#ttPrev").innerHTML = `<div class="yembed tk" style="margin-top:10px"><div class="ytbox" style="position:relative;aspect-ratio:9/16;border-radius:10px;overflow:hidden;background:#000"><iframe src="${esc(tiktokSrc(got.id))}" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>`;
+}
+$("#btnTiktok").onclick = openTiktok;
+$("#ttCancel").onclick = closeTiktok;
+$("#ttModal").addEventListener("click", e=>{ if(e.target === $("#ttModal")) closeTiktok(); });
+$("#ttUrl").addEventListener("change", previewTiktok);
+$("#ttUrl").addEventListener("paste", ()=> setTimeout(previewTiktok, 50));
+$("#ttGo").onclick = ()=>{
+  const got = parseTikTok($("#ttUrl").value);
+  if(!got){ toast("Paste a full tiktok.com video link"); return; }
+  if(got.short){ toast("Short link — open it and copy the full address"); return; }
+  const acc = ($("#ttAcc").value.trim() || got.handle || "").replace(/^@/,"");
+  insertHTML(tiktokBlock(got.id, acc));
+  closeTiktok();
+};
 $("#btnYoutube").onclick = openYoutube;
 $("#ytCancel").onclick = closeYoutube;
 $("#ytModal").addEventListener("click", e=>{ if(e.target === $("#ytModal")) closeYoutube(); });
@@ -1899,7 +1981,7 @@ $("#ytGo").onclick = ()=>{
   $("#ytPrev").innerHTML = "";
 };
 document.addEventListener("keydown", e=>{
-  if(e.key === "Escape"){ closeApple(); closeYoutube(); return; }
+  if(e.key === "Escape"){ closeApple(); closeYoutube(); closeTiktok(); return; }
   if(e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
   if(e.target && e.target.closest && e.target.closest("input,textarea,select,.modal")) return;
   const blk = $("#composer .blk.sel");
@@ -1919,8 +2001,10 @@ $("#brandHome").onclick = e=>{
   e.preventDefault();
   const apple = $("#appleModal");
   const yt = $("#ytModal");
+  const tt = $("#ttModal");
   if(apple) apple.classList.add("hide");
   if(yt) yt.classList.add("hide");
+  if(tt) tt.classList.add("hide");
   if($("#desk") && !$("#desk").classList.contains("hide")) fillForm(null);
   window.scrollTo(0, 0);
 };
@@ -1984,7 +2068,9 @@ async function writePost(status){
   if(!rec.publishAt) delete rec.publishAt;
   if(ix>=0) posts[ix] = rec; else posts.unshift(rec);
   try{
-    await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts})});
+    /* touched: this tab only owns the post it just edited. Without it a tab opened an hour
+       ago would restore its whole snapshot and silently undo other writers' work. */
+    await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts, touched:[rec.id]})});
     if(status==="live") toast("Published on the public site");
     else if(status==="scheduled") toast("Scheduled — it goes live at that time");
     else toast("Saved as draft — not on the public site");
@@ -2021,7 +2107,7 @@ $("#delGo").onclick = async ()=>{
   if(!id) return;
   posts = posts.filter(p=>p.id!==id);
   try{
-    await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts})});
+    await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts, touched:[id]})});
     renderList();
     toast("Removed from the site");
   }catch(err){ toast("Could not delete"); }
