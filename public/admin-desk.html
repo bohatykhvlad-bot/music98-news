@@ -1934,7 +1934,9 @@ function instagramBlock(kind, code, handle){
 function detectEmbed(raw){
   const yt = parseYouTube(raw); if(yt) return Object.assign({kind:"youtube"}, yt);
   const tt = parseTikTok(raw); if(tt) return Object.assign({kind:"tiktok"}, tt);
-  const ig = parseInstagram(raw); if(ig) return Object.assign({kind:"instagram"}, ig);
+  /* У Instagram свой вид ссылки (p / reel / tv), и если положить его в общий kind, платформа
+     потеряется: результат проверяем как «instagram», а вид уезжает в отдельное поле. */
+  const ig = parseInstagram(raw); if(ig) return {kind:"instagram", igKind:ig.kind, code:ig.code, handle:ig.handle};
   return null;
 }
 function closeEmbed(keepCaret){
@@ -1986,7 +1988,7 @@ function previewEmbed(){
     return got;
   }
   $("#emAccLabel").textContent = "Account for our credit line (the card itself already names the author)";
-  $("#emPrev").innerHTML = embedBox("instagram", instagramSrc(got.kind, got.code));
+  $("#emPrev").innerHTML = embedBox("instagram", instagramSrc(got.igKind, got.code));
   return got;
 }
 $("#btnYoutube").onclick = openEmbed;
@@ -2003,7 +2005,7 @@ $("#emGo").onclick = ()=>{
   const acc = $("#emAcc").value.trim().replace(/^@/,"");
   if(got.kind === "youtube") insertHTML(youtubeBlock(got.id, got.start));
   else if(got.kind === "tiktok") insertHTML(tiktokBlock(got.id, acc || got.handle || ""));
-  else insertHTML(instagramBlock(got.kind, got.code, acc));
+  else insertHTML(instagramBlock(got.igKind, got.code, acc));
   closeEmbed();
 };
 document.addEventListener("keydown", e=>{
