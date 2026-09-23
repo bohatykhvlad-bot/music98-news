@@ -2095,7 +2095,10 @@ function equalizeCards(gridSel){
 window.addEventListener("load", ()=>{ equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
 function renderNews(){
   const posts = data.posts.filter(p=>p.type==="news" && matches(p)).sort(byFresh);
-  const hero = posts[0], rest = posts.slice(1);
+  /* hero = the PINNED post (owner: newest must not auto-become main news while
+     a pin exists); feed order stays strictly chronological (2026-09-22 fix:
+     non-hero pinned posts keep their date slot, never jump to the edge) */
+  const hero = posts.find(p=>p.pinned) || posts[0], rest = posts.filter(p=>p!==hero);
   $("#heroSlot").innerHTML = hero ? `
     <a class="hero" href="${postPath(hero)}">
       <div class="cover">${coverImg(hero,false)}</div>
