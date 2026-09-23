@@ -2466,8 +2466,16 @@ function wireRail(gridSel, prevSel, nextSel){
     rail.classList.remove("dragging");
     /* lift survives release by design: the card stays raised until the cursor
        physically leaves it (mouseout handler above) - release no longer
-       snaps it down (owner: release-drop bug 2026-09-23) */
-    drag.grabCard = null;
+       snaps it down (owner: release-drop bug 2026-09-23). But if the rail
+       slid the card OUT from under the cursor during the drag, the mouseout
+       already happened while drag.on was true (ignored) - so check the
+       cursor position here and drop when the card is not under it. */
+    if(drag.grabCard){
+      const over = document.elementFromPoint(e.clientX, e.clientY);
+      const overCard = over && over.closest(".card, .rcard");
+      if(overCard !== drag.grabCard){ grabDrop(drag.grabCard); drag.grabCard.classList.remove("grab"); }
+      drag.grabCard = null;
+    }
     if(drag.moved){
       rail.style.scrollBehavior = "";
       /* kill any native smooth scrollBy that was still flying when the grab
