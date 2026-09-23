@@ -184,13 +184,14 @@ main{position:relative;z-index:1}
 .rail{will-change:scroll-position}
 .rail::-webkit-scrollbar{display:none}
 .rail>*{scroll-snap-align:none}
-/* hand-drag in progress: cards freeze at their pre-press position - cards
-   must not bob up/down from hover as they sweep under the cursor (owner:
-   releases scroll jumps). The grabbed card KEEPS its raised position for
-   the whole drag (owner request) - .grab re-applies the lift on top of the
-   freeze, for news cards and release cards alike. */
+/* hand-drag in progress: non-grabbed cards freeze at their pre-press position
+   - they must not bob up/down from hover as they sweep under the cursor.
+   THE GRABBED CARD IS EXEMPT: it keeps its lift for the entire gesture
+   (owner spec 2026-09-23: press -> drag -> inertia -> release = lifted the
+   whole way; drops ONLY when the cursor physically leaves the card). */
 .rail.dragging .card,.rail.dragging .rcard{transition:none}
 .rail.dragging .card,.rail.dragging .rcard{transform:none!important}
+.rail.dragging .card.grab,.rail.dragging .rcard.grab{transform:translateY(-4px)!important}
 /* glide optimization v2: while the rail moves on its own (momentum, hold-scroll,
    band spring) hover must not lift/shadow cards sweeping under the cursor -
    that recalc+paint every frame was the jank source. But pointer-events:none
@@ -199,11 +200,16 @@ main{position:relative;z-index:1}
    the hover visuals; hit-testing stays alive the whole time. */
 .rail.gliding .card,.rail.gliding .rcard{transition:none}
 .rail.gliding .card:hover,.rail.gliding .rcard:hover{transform:none;box-shadow:none}
+/* gliding must not strip the GRABBED card either (inertia phase = still lifted) */
+.rail.gliding .card.grab,.rail.gliding .rcard.grab{transform:translateY(-4px)!important;box-shadow:var(--shadow)!important}
 /* grabbed card: the CSS lift lives OUTSIDE .dragging/.gliding scoping and is
    !important - it must survive release + inertia (owner rule 2026-09-23):
    drop happens ONLY in JS when the cursor physically moves off the card */
 @media (hover:hover) and (pointer:fine){
   .card.grab,.rcard.grab{transform:translateY(-4px)!important}
+  /* smooth transition back on drop - but never during the gesture itself */
+  .card.grab,.rcard.grab{transition:transform .18s ease,box-shadow .18s ease}
+  .rail.dragging .card.grab,.rail.gliding .card.grab,.rail.dragging .rcard.grab,.rail.gliding .rcard.grab{transition:none}
 }
 @media (hover:none){
   .rail.dragging .card{transform:none!important}
