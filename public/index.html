@@ -42,7 +42,7 @@
    constant (pills, rails, hero) scales together, nothing reflows. Mobile
    widths are excluded: the 640/900px breakpoints below must keep CSS px. */
 @media (min-width:1100px){
-  html{zoom:.9}
+  html{zoom:.96}
 }
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
@@ -2418,7 +2418,7 @@ function wireRail(gridSel, prevSel, nextSel){
        pointer-events at press time retargets the release click away from the
        card (hit-test misses the anchor) and the post never opens. The freeze
        starts with the first real movement, see pointermove below. */
-    if(drag.grabCard) drag.grabCard.classList.add("grab");
+    if(drag.grabCard){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-4px)"; }
     dragStop();
     if(drag.over){ drag.over = 0; setOver(0); syncRail(gridSel); }   /* a new grab cancels the spring */
   });
@@ -2452,7 +2452,7 @@ function wireRail(gridSel, prevSel, nextSel){
        own momentum from the live position) */
     if(!drag.moved || (Math.abs(drag.vx) < 0.3 && !drag.over)) dragLandedX = rail.scrollLeft;
     rail.classList.remove("dragging");
-    if(drag.grabCard){ drag.grabCard.classList.remove("grab"); drag.grabCard = null; }
+    if(drag.grabCard){ drag.grabCard.classList.remove("grab"); drag.grabCard.style.transform = ""; drag.grabCard = null; }
     if(drag.moved){
       rail.style.scrollBehavior = "";
       /* kill any native smooth scrollBy that was still flying when the grab
