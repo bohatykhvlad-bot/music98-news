@@ -573,13 +573,6 @@ textarea{resize:vertical;min-height:64px}
 
 /* ---------- privacy overlay ---------- */
 .overlay .article{position:relative;max-width:720px}
-#privacyOverlay .article{max-width:640px}
-#privacyOverlay .abody{padding:28px}
-#privacyOverlay .aback{margin:0 0 20px}
-#privacyOverlay .article h1{margin:0 0 16px;font-size:clamp(26px,6vw,32px)}
-#privacyOverlay .ptext{margin:0}
-#privacyOverlay .ptext h2{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text);margin:22px 0 8px}
-#privacyOverlay .ptext h2:first-child{margin-top:0}
 .ptext p,.ptext li{font-size:15px;color:var(--body-text);margin:0 0 12px;line-height:1.65}
 .ptext p:last-child{margin-bottom:0}
 .ptext ul{padding-left:18px;margin:0 0 12px}
@@ -705,7 +698,6 @@ textarea{resize:vertical;min-height:64px}
   .ctext .ctrack{font-size:13px}
   .crow{grid-template-columns:24px 1fr 1fr 70px;grid-auto-rows:auto}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
-  #privacyOverlay .abody{padding:24px 20px}
 }
 </style>
 </head>
@@ -813,26 +805,9 @@ textarea{resize:vertical;min-height:64px}
 
 
 
-<div class="overlay" id="privacyOverlay" hidden>
-  <div class="article">
-    <div class="abody">
-      <a class="aback" href="#" id="privacyBack">Back</a>
-      <span class="legal-kicker">Last updated 18 September 2026</span>
-      <h1>Privacy</h1>
-      <div class="ptext">
-        <p>music98.news is an independent music publication. This page covers what we collect and how Apple Music is used on the site.</p>
-        <h2>What we collect</h2>
-        <p>If you subscribe, we store only the email address you submit, and only to send the newsletter. We do not use advertising trackers, we do not profile readers, and we do not sell data.</p>
-        <p>The charts player may remember playback in this browser. That stays on your device. Clearing this site’s data removes it.</p>
-        <h2>Apple Music</h2>
-        <p>Previews, artwork and Listen on Apple Music buttons are provided by Apple. If you play a clip or open a link, Apple may receive technical data such as your IP address, under the <a href="https://www.apple.com/legal/privacy/">Apple Privacy Policy</a>.</p>
-        <p>Links to Apple Music are affiliate links. If you start an Apple Music subscription we may earn a commission, at no extra cost to you.</p>
-        <h2>Your choices</h2>
-        <p>To correct or delete a newsletter address, use the unsubscribe link in any email we send. This site is not directed at children under 13.</p>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Privacy and Terms are real pages (/privacy, /terms) served by the worker.
+     The old in-page overlay kept a second copy of the policy that drifted out of
+     date, so it was removed on 23 Sep 2026 - one canonical text only. -->
 
 <div class="scrim" id="edScrim" hidden></div>
 <aside class="drawer" id="edDrawer" role="dialog" aria-modal="true" aria-label="Site editor">
@@ -2645,7 +2620,6 @@ $("#search").addEventListener("input", e=>{
 })();
 document.addEventListener("keydown", e=>{
   if(e.key==="/" && document.activeElement.tagName!=="INPUT" && document.activeElement.tagName!=="TEXTAREA"){ e.preventDefault(); $("#search").focus(); }
-  if(e.key==="Escape"){ closePrivacy(); }
 });
 
 /* ============ related stories ("you might also like") ============ */
@@ -3152,23 +3126,7 @@ function unlockScroll(){
   document.body.style.paddingRight = "";
   topbar.style.setProperty("--sbw", "0px");
 }
-function openPrivacy(){
-  const po = $("#privacyOverlay");
-  if(!po.hidden) return;
-  po.hidden = false;
-  lockScroll();
-  requestAnimationFrame(()=>requestAnimationFrame(()=>po.classList.add("open")));
-}
-function closePrivacy(){
-  const po = $("#privacyOverlay");
-  if(po.hidden) return;
-  po.classList.remove("open");
-  unlockScroll();
-  setTimeout(()=>{ po.hidden = true; }, 240);
-}
-/* footer Privacy is now a real link to /privacy; overlay stays for hash deep-links */
-$("#privacyBack").addEventListener("click", e=>{ e.preventDefault(); closePrivacy(); });
-$("#privacyOverlay").addEventListener("click", e=>{ if(e.target.id === "privacyOverlay") closePrivacy(); });
+/* legal pages: plain links to /privacy and /terms, nothing to toggle */
 
 /* ============ logo ============ */
 function setLogos(){
