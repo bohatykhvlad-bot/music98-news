@@ -166,11 +166,11 @@ main{position:relative;z-index:1}
 #tab-releases .rail{padding-right:44px;padding-top:24px;padding-bottom:26px;margin-top:0}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
-/* releases: the -22px wrap margin pushed the pill ~26px right of news's pill.
-   Measured on prod: news pillRight 1254, releases 1280 (delta +26 = 22px wrap
-   shift + 6px scale). Simplest robust fix: drop the releases-specific anchor
-   entirely - the pill then sits at the same right:0 as news (owner: match) */
-#tab-releases .rail-wrap .rail-btn.next{right:0;margin-right:-22px}
+/* releases pill anchor: the wrap carries margin-right:-22px (lets the last
+   card bleed to the viewport edge), which pushed the pill 48px right of
+   news's pill (measured 1254 vs 1302). Compensate inside the button: sit at
+   right:48px relative to the widened wrap => same screen position as news. */
+#tab-releases .rail-wrap .rail-btn.next{right:48px}
 /* end clearance follows the slimmer pill (44px wide): next arrow sits 6px in
    from the edge, the 44px tail inside the rail lets the last card park clear
    of it at full scroll - same geometry on both rails */
