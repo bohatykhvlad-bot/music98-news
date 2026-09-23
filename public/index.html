@@ -603,6 +603,10 @@ textarea{resize:vertical;min-height:64px}
   .hero:hover{border-color:var(--accent-dim)}
   .rcard:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
   .btn:hover{border-color:var(--accent-dim);color:var(--acc2)}
+  /* grabbed card: the lift is owned by JS (inline transform survives release
+     until the cursor physically leaves - owner rule 2026-09-23). Hover must
+     not fight it during .dragging (freeze) nor strip it after release. */
+  .card.grab,.rcard.grab{transform:translateY(-4px)!important}
 }
 @media (hover:none){
   .nav-btn:hover{color:var(--muted)}
@@ -2393,22 +2397,28 @@ function wireRail(gridSel, prevSel, nextSel){
        pointer-events at press time retargets the release click away from the
        card (hit-test misses the anchor) and the post never opens. The freeze
        starts with the first real movement, see pointermove below. */
-    if(drag.grabCard){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-4px)"; }
+    if(drag.grabCard){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-4px)"; liftEl = drag.grabCard; }
     dragStop();
     if(drag.over){ drag.over = 0; setOver(0); syncRail(gridSel); }   /* a new grab cancels the spring */
   });
-  /* owner rule (2026-09-23): the grabbed card stays lifted while the cursor
-     remains physically over it - NOT just while the button is held. So the
-     lift is tracked by mouseover/mouseout on the card itself: press adds it,
-     release keeps it, only the cursor actually leaving the card drops it.
-     Inline transform (not a class) so no CSS rule can reset it mid-gesture. */
+  /* owner rule (2026-09-23, final): the grabbed card stays lifted until the
+     CURSOR physically moves off it. Key distinction: a mouseout fired because
+     the CARD slid under a stationary cursor (rail drag/inertia) must NOT drop
+     the lift; only a real pointer position change over another element does.
+     So the arbiter is pointermove hit-testing, not mouseout. Inline transform
+     (not a class) so no CSS rule can reset it mid-gesture. */
   const grabLift = c => { c.style.transform = "translateY(-4px)"; };
-  const grabDrop = c => { c.style.transform = ""; };
-  const cardOut = e => {
+  const grabDrop = c => { c.style.transform = ""; c.classList.remove("grab"); };
+  let liftEl = null;
+  /* after release the ONLY drop path is a real cursor move onto something
+     else (another card, the gaps, the rail padding). Hover-lift parity: the
+     card under the moving cursor lifts as usual once the grabbed one is dropped. */
+  rail.addEventListener("pointermove", e => {
+    if(!liftEl || drag.on) return;             /* drag manages its own lift */
     const c = e.target.closest(".card, .rcard");
-    if(c && c.classList.contains("grab") && !drag.on){ grabDrop(c); c.classList.remove("grab"); }
-  };
-  rail.addEventListener("mouseout", cardOut);
+    if(c === liftEl) return;                   /* still over the grabbed card */
+    grabDrop(liftEl); liftEl = null;
+  }, {passive:true});
   /* native link/image drag used to hijack the pointer mid-drag: after ~5px
      Chrome started its own drag (URL ghost + cyan outline) and our pointermove
      stream died. Killing dragstart keeps the gesture ours. */
@@ -2439,18 +2449,11 @@ function wireRail(gridSel, prevSel, nextSel){
        own momentum from the live position) */
     if(!drag.moved || (Math.abs(drag.vx) < 0.3 && !drag.over)) dragLandedX = rail.scrollLeft;
     rail.classList.remove("dragging");
-    /* lift survives release by design: the card stays raised until the cursor
-       physically leaves it (mouseout handler above) - release no longer
-       snaps it down (owner: release-drop bug 2026-09-23). But if the rail
-       slid the card OUT from under the cursor during the drag, the mouseout
-       already happened while drag.on was true (ignored) - so check the
-       cursor position here and drop when the card is not under it. */
-    if(drag.grabCard){
-      const over = document.elementFromPoint(e.clientX, e.clientY);
-      const overCard = over && over.closest(".card, .rcard");
-      if(overCard !== drag.grabCard){ grabDrop(drag.grabCard); drag.grabCard.classList.remove("grab"); }
-      drag.grabCard = null;
-    }
+    /* lift survives release BY DESIGN: whatever happens to the rail (inertia,
+       card sliding out from under a stationary cursor) the lift is dropped
+       only by a real pointer move off the card (pointermove arbiter above).
+       No release-time hit test: a stationary cursor "holds" the card. */
+    drag.grabCard = null;
     if(drag.moved){
       rail.style.scrollBehavior = "";
       /* kill any native smooth scrollBy that was still flying when the grab
