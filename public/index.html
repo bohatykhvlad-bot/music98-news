@@ -532,6 +532,11 @@ textarea{resize:vertical;min-height:64px}
 .pitem .pt b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pitem .pt span{color:var(--muted2);font-size:11.5px}
 .pitem .tool{position:static;flex:none}
+/* pager under the admin post list: 10 per page, numbered pills */
+.pager{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.pager button{min-width:30px;height:30px;padding:0 8px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s}
+.pager button:hover{border-color:var(--muted2);color:var(--text)}
+.pager button.cur{background:var(--acc2);border-color:var(--acc2);color:#fff}
 .crow{display:grid;grid-template-columns:30px 1fr 1fr 62px 66px 84px;gap:7px;align-items:center}
 .crow input{padding:7px 9px;font-size:13px}
 .crow .pos{font-size:15px}
@@ -3203,14 +3208,26 @@ $("#ef_save").addEventListener("click", ()=>{
   toast(ix >= 0 ? "Post updated ✏️" : "Post published ✅");
 });
 $("#ef_cancel").addEventListener("click", resetPostForm);
+let plPage = 0;
+const PL_PAGE = 10;
 function renderPostList(){
-  $("#ef_list").innerHTML = data.posts.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(p=>
+  const items = data.posts.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  const pages = Math.max(1, Math.ceil(items.length / PL_PAGE));
+  if(plPage >= pages) plPage = pages - 1;
+  const page = items.slice(plPage * PL_PAGE, plPage * PL_PAGE + PL_PAGE);
+  const pager = pages > 1
+    ? '<div class="pager">' + Array.from({length:pages},(_,i)=>
+        '<button data-pg="'+i+'" class="'+(i===plPage?'cur':'')+'">'+(i+1)+'</button>').join("") + '</div>'
+    : "";
+  $("#ef_list").innerHTML = page.map(p=>
     '<div class="pitem"><img src="'+coverOf(p,true)+'" alt="">'+
     '<div class="pt"><b>'+esc(p.title)+'</b><span>'+esc(p.type==="release"?(p.rtype||"Release"):(p.tag||"News"))+' · '+esc(p.date||"")+'</span></div>'+
     '<button class="tool" data-act="edit" data-id="'+p.id+'" title="Edit">✎</button>'+
-    '<button class="tool del" data-act="del" data-id="'+p.id+'" title="Delete">✕</button></div>').join("");
+    '<button class="tool del" data-act="del" data-id="'+p.id+'" title="Delete">✕</button></div>').join("") + pager;
 }
 $("#ef_list").addEventListener("click", e=>{
+  const pg = e.target.closest("[data-pg]");
+  if(pg){ plPage = +pg.dataset.pg; renderPostList(); return; }
   const b = e.target.closest(".tool"); if(!b) return;
   const p = data.posts.find(x=>x.id===b.dataset.id); if(!p) return;
   if(b.dataset.act === "del"){
