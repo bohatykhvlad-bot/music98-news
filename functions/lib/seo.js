@@ -168,19 +168,24 @@ export async function serveArticle(request, env) {
 export async function serveSitemap(request, env) {
   const posts = env ? publicPosts(await readDesk(env, request)) : [];
   const slugs = buildSlugMap(posts);
-  const today = new Date().toISOString().slice(0, 10);
+  const dates = posts.map((p) => isoDate(p).slice(0, 10)).sort();
+  const newest = dates[dates.length - 1];
+  /* Static pages carry real dates instead of "today" on every request. A lastmod that
+     moves daily is a lie, and a crawler that catches it stops trusting the whole file.
+     Bump the entry by hand when the page itself changes; the homepage tracks the newest
+     post, because that is literally what changes on it. */
   const urls = [
-    { loc: `${SITE}/`, priority: "1.0" },
-    { loc: `${SITE}/about`, priority: "0.5" },
-    { loc: `${SITE}/contacts`, priority: "0.5" },
-    { loc: `${SITE}/privacy`, priority: "0.3" },
-    { loc: `${SITE}/terms`, priority: "0.3" },
+    { loc: `${SITE}/`, priority: "1.0", lastmod: newest },
+    { loc: `${SITE}/about`, priority: "0.5", lastmod: "2026-09-21" },
+    { loc: `${SITE}/contacts`, priority: "0.5", lastmod: "2026-09-21" },
+    { loc: `${SITE}/privacy`, priority: "0.3", lastmod: "2026-09-23" },
+    { loc: `${SITE}/terms`, priority: "0.3", lastmod: "2026-09-23" },
     ...posts.map((p) => ({ loc: SITE + articlePath(p, slugs[p.id]), lastmod: isoDate(p).slice(0, 10), priority: "0.8" })),
   ];
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     urls.map((u) =>
-      `  <url><loc>${u.loc}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : `<lastmod>${today}</lastmod>`}<priority>${u.priority}</priority></url>`
+      `  <url><loc>${u.loc}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}<priority>${u.priority}</priority></url>`
     ).join("\n") +
     "\n</urlset>";
   return new Response(xml, { headers: { "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "public, max-age=1800" } });
