@@ -43,10 +43,13 @@
    widths are excluded: the 640/900px breakpoints below must keep CSS px. */
 @media (min-width:1100px){
   html{zoom:.96}
-  /* ink-parity fix (owner 2026-09-24): heading->cards must equal cards->plate.
-     Measured ink gaps: news top 34.9 / bottom 17.3 -> bottom pad 12->30 evens
-     it to ~35 both sides. Releases gets its own 8/30 in its rule above. */
-  #tab-news .rail{padding-bottom:24px}
+  /* ink-parity v2 (owner 2026-09-24, pixel-truth audit): device-pixel scan shows
+   TOP gap (heading ink -> card edge) is ~2x BOT gap (card edge -> plate line).
+   Rebalance: cards up (headline margin 30->26), rail floor down (24->20),
+   plate pushed away (margin 18->24) => ~14/13 css px both sides, both tabs. */
+  .tab .hd{margin:0 0 26px}
+  #tab-news .rail{padding-bottom:20px}
+  .subscribe{margin-top:24px}
 }
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
@@ -174,7 +177,7 @@ main{position:relative;z-index:1}
 /* releases keeps 10px top padding inside the rail (headroom for the -8px hover
    lift + shadow, the rail clips overflow) - so its heading margin is shortened
    to land the SAME 30px ink gap as news: 20+10 = 30 */
-#tab-releases .hd{margin:0 0 20px}
+#tab-releases .hd{margin:0 0 16px}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 /* releases pill anchor: the wrap carries margin-right:-22px (lets the last
