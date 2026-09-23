@@ -2458,7 +2458,7 @@ function wireRail(gridSel, prevSel, nextSel){
        pointer-events at press time retargets the release click away from the
        card (hit-test misses the anchor) and the post never opens. The freeze
        starts with the first real movement, see pointermove below. */
-    if(drag.grabCard){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-8px)"; liftEl = drag.grabCard; }
+    if(drag.grabCard){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-4px)"; liftEl = drag.grabCard; }
     dragStop();
     if(drag.over){ drag.over = 0; setOver(0); syncRail(gridSel); }   /* a new grab cancels the spring */
   });
@@ -2468,7 +2468,7 @@ function wireRail(gridSel, prevSel, nextSel){
      the lift; only a real pointer position change over another element does.
      So the arbiter is pointermove hit-testing, not mouseout. Inline transform
      (not a class) so no CSS rule can reset it mid-gesture. */
-  const grabLift = c => { c.style.transform = "translateY(-8px)"; };
+  const grabLift = c => { c.style.transform = "translateY(-4px)"; };
   /* the drop must animate on the same curve as the lift even when the rail is
      still gliding (its scope sets transition:none): an INLINE transition beats
      every scoped rule, so the card eases down instead of snapping. The inline
