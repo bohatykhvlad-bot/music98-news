@@ -2098,14 +2098,31 @@ function toast(msg){
 }
 
 /* ============ search ============ */
+/* search criterion (owner 2026-09-24): TITLE + TEASER + ARTIST only -
+   the old haystack also matched hidden fields (tag/type), and plain
+   substring matching produced ghosts like "Rose" -> "p**rose**cutors".
+   Now: case/diacritic-folded (rose finds ROSÉ), every query word must
+   match the START of some word in the text - prefix matching, no
+   mid-word ghosts. */
+function normText(s){
+  return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+function wordStartsMatch(hay, q){
+  const words = normText(q).split(/\s+/).filter(Boolean);
+  if(!words.length) return true;
+  return words.every(w => {
+    const esc = w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return new RegExp("\\b" + esc).test(hay);
+  });
+}
 function matches(p){
   if(!query) return true;
-  const hay = [p.title,p.excerpt,p.tag,p.artist,p.rtype,p.type].join(" ").toLowerCase();
-  return hay.includes(query);
+  const hay = normText([p.title, p.excerpt, p.artist].join(" | "));
+  return wordStartsMatch(hay, query);
 }
 function chartMatches(r){
   if(!query) return true;
-  return (r.title+" "+r.artist).toLowerCase().includes(query);
+  return wordStartsMatch(normText((r.title||"") + " | " + (r.artist||"")), query);
 }
 
 /* ============ render ============ */
