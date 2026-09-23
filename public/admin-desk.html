@@ -247,7 +247,9 @@ a{color:var(--text)}
 .composer .yembed{max-width:520px;width:100%}
 .composer .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
 .composer .yembed.tk{max-width:340px}
-.composer .yembed.tk .ytbox{aspect-ratio:9/16}
+.composer .yembed.tk .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(160% + 150px)}
+.composer .yembed.ig{max-width:340px}
+.composer .yembed.ig .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(122% + 210px)}
 .composer .yembed .tkcred{margin:8px 0 0;font-size:12px;color:var(--muted2);text-align:center}
 .composer .yembed iframe{position:absolute;inset:0;width:100%;height:100%;border-radius:0}
 .composer iframe{width:100%;border:0;border-radius:10px;display:block;background:transparent}
@@ -373,8 +375,9 @@ a{color:var(--text)}
         </button>
         <button class="ico wide" type="button" id="btnSong" title="Apple song">♪ Song</button>
         <button class="ico wide" type="button" id="btnAlbum" title="Apple album">Album</button>
-        <button class="ico wide" type="button" id="btnYoutube" title="YouTube">YouTube</button>
-        <button class="ico wide" type="button" id="btnTiktok" title="TikTok — оригинал съёмки события">TikTok</button>
+        <button class="ico" type="button" id="btnYoutube" title="YouTube — или вставьте любую ссылку"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4L15.8 12z"/></svg></button>
+        <button class="ico" type="button" id="btnTiktok" title="TikTok — оригинал съёмки события, или вставьте любую ссылку"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M19.7 7.4a5.7 5.7 0 0 1-3.5-1.2 5.7 5.7 0 0 1-2-3.2h-3.4v13.4a2.9 2.9 0 1 1-2-2.7v-3.5a6.3 6.3 0 1 0 5.4 6.2V9.8a9 9 0 0 0 5.5 1.9V8.3c-.4 0-.7-.4-.7-.9z"/></svg></button>
+        <button class="ico" type="button" id="btnInstagram" title="Instagram — публикация автора, или вставьте любую ссылку"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4A5.8 5.8 0 0 1 16.2 22H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2zm0 1.8A4 4 0 0 0 3.8 7.8v8.4a4 4 0 0 0 4 4h8.4a4 4 0 0 0 4-4V7.8a4 4 0 0 0-4-4H7.8zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zM17.6 5.6a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg></button>
       </div>
       <input id="bodyPhoto" class="hide" type="file" accept="image/*">
       <div class="composer" id="composer" contenteditable="true" data-placeholder="Write here"></div>
@@ -451,31 +454,19 @@ a{color:var(--text)}
     </div>
   </div>
 </div>
-<div class="modal hide" id="ytModal">
+<div class="modal hide" id="emModal">
   <div class="card">
-    <h2>YouTube</h2>
-    <p class="muted">Paste a youtube.com or youtu.be link.</p>
-    <label for="ytUrl">Link</label>
-    <input id="ytUrl" placeholder="https://www.youtube.com/watch?v=…">
-    <div id="ytPrev"></div>
+    <h2>Embed a link</h2>
+    <p class="muted">One field for any link: YouTube, TikTok or Instagram — the card is chosen from the link, so it does not matter which icon you clicked. Put the clip filmed at the event itself, not a broadcaster's report. Apple Music keeps its own dialogs, because that flow carries the affiliate token.</p>
+    <label for="emUrl">Link</label>
+    <input id="emUrl" placeholder="https://www.youtube.com/watch?v=… / tiktok.com/@account/video/… / instagram.com/reel/…">
+    <label for="emAcc" id="emAccLabel" class="hide">Account shown in the credit</label>
+    <input id="emAcc" class="hide" placeholder="account">
+    <p class="muted hide" id="emHint"></p>
+    <div id="emPrev"></div>
     <div class="actions">
-      <button class="btn primary" type="button" id="ytGo">Insert</button>
-      <button class="btn ghost" type="button" id="ytCancel">Cancel</button>
-    </div>
-  </div>
-</div>
-<div class="modal hide" id="ttModal">
-  <div class="card">
-    <h2>TikTok</h2>
-    <p class="muted">Paste a tiktok.com link like <b>/@account/video/7688…</b> — a full link, not the short vm.tiktok.com one. This card is for footage filmed at the event itself; a broadcaster's report is not inserted.</p>
-    <label for="ttUrl">Link</label>
-    <input id="ttUrl" placeholder="https://www.tiktok.com/@account/video/…">
-    <label for="ttAcc">Account shown in the credit</label>
-    <input id="ttAcc" placeholder="account">
-    <div id="ttPrev"></div>
-    <div class="actions">
-      <button class="btn primary" type="button" id="ttGo">Insert</button>
-      <button class="btn ghost" type="button" id="ttCancel">Cancel</button>
+      <button class="btn primary" type="button" id="emGo">Insert</button>
+      <button class="btn ghost" type="button" id="emCancel">Cancel</button>
     </div>
   </div>
 </div>
@@ -1121,6 +1112,7 @@ function serialize(){
       }
       if(node.dataset.youtube) parts.push("[youtube:"+node.dataset.youtube+"]");
       if(node.dataset.tiktok) parts.push("[tiktok:"+node.dataset.tiktok+"]");
+      if(node.dataset.instagram) parts.push("[ig:"+node.dataset.instagram+"]");
       return;
     }
     if(node.querySelector && node.querySelector("figure")){
@@ -1150,6 +1142,8 @@ function bodyToComposer(text){
     if(yt) return youtubeBlock(yt[1], yt[2] ? +yt[2] : 0);
     const tt = t.match(/^\[tiktok:(\d{6,25})(?::@?([A-Za-z0-9._]{2,32}))?\]$/i);
     if(tt) return tiktokBlock(tt[1], tt[2]||"");
+    const ig = t.match(/^\[ig:(p|reel|tv):([A-Za-z0-9_-]{5,20})(?::@?([A-Za-z0-9._]{2,32}))?\]$/i);
+    if(ig) return instagramBlock(ig[1].toLowerCase(), ig[2], ig[3]||"");
     return "<p>"+rich(raw)+"</p>";
   }).join("");
   $("#composer").innerHTML = html || "<p><br></p>";
@@ -1662,7 +1656,7 @@ document.querySelector(".toolbar").addEventListener("mousedown", e=>{
   if(!btn) return;
   saveCaret(true);
   e.preventDefault();
-  if(btn.id==="btnPhoto" || btn.id==="btnSong" || btn.id==="btnAlbum" || btn.id==="btnYoutube" || btn.id==="btnTiktok") freezeCaret();
+  if(btn.id==="btnPhoto" || btn.id==="btnSong" || btn.id==="btnAlbum" || btn.id==="btnYoutube" || btn.id==="btnTiktok" || btn.id==="btnInstagram") freezeCaret();
 });
 document.addEventListener("selectionchange", ()=>{
   const el = $("#composer");
@@ -1871,7 +1865,7 @@ function closeApple(keepCaret){
   if(!keepCaret) thawCaret();
 }
 function openApple(kind){
-  closeYoutube(true);
+  closeEmbed(true);
   freezeCaret();
   appleKind = kind;
   pendingApple = null;
@@ -1912,76 +1906,108 @@ $("#appleGo").onclick = async ()=>{
   pendingApple = null;
 };
 
-function closeYoutube(keepCaret){
-  $("#ytModal").classList.add("hide");
-  $("#ytPrev").innerHTML = "";
+/* ОДНО ПОЛЕ ДЛЯ ЛЮБОЙ ССЫЛКИ (владелец, 24.09): иконки YouTube, TikTok и Instagram открывают
+   один и тот же диалог, а карточка выбирается по самой ссылке - «вставил с любой соц сети и
+   она будет». Apple Music сюда намеренно не входит: у него свой диалог и свой партнёрский
+   токен (владелец: «эпл надо оставить, оно же там токен аффилейт подставляет»). */
+function parseInstagram(raw){
+  const s = String(raw||"").trim();
+  if(/^[A-Za-z0-9_-]{5,20}$/.test(s)) return {kind:"p", code:s, handle:""};
+  let u;
+  try{ u = new URL(s); }catch(e){ return null; }
+  const host = (u.hostname||"").replace(/^www\./,"").toLowerCase();
+  if(host !== "instagram.com" && host !== "m.instagram.com") return null;
+  const m = u.pathname.match(/^\/(p|reel|reels|tv)\/([A-Za-z0-9_-]{5,20})/);
+  if(!m) return null;
+  return {kind: m[1]==="reels" ? "reel" : m[1], code:m[2], handle:""};
+}
+function instagramSrc(kind, code){
+  const k = (kind==="reel" || kind==="tv") ? kind : "p";
+  return "https://www.instagram.com/"+k+"/"+code+"/embed/";
+}
+function instagramBlock(kind, code, handle){
+  const h = String(handle||"").replace(/^@/,"").trim();
+  const token = [kind, code].concat(h ? [h] : []).join(":");
+  const cred = h ? `<p class="tkcred">${kind==="p" ? "Post" : "Video"}: <a href="https://www.instagram.com/${esc(kind)}/${esc(code)}/" target="_blank" rel="noopener noreferrer">@${esc(h)}</a> via Instagram</p>` : "";
+  return `<figure class="blk yembed ig" contenteditable="false" data-instagram="${esc(token)}">${blkChrome()}<div class="ytbox"><iframe src="${esc(instagramSrc(kind, code))}" title="Instagram" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="eager"></iframe></div>${cred}</figure>`;
+}
+function detectEmbed(raw){
+  const yt = parseYouTube(raw); if(yt) return Object.assign({kind:"youtube"}, yt);
+  const tt = parseTikTok(raw); if(tt) return Object.assign({kind:"tiktok"}, tt);
+  const ig = parseInstagram(raw); if(ig) return Object.assign({kind:"instagram"}, ig);
+  return null;
+}
+function closeEmbed(keepCaret){
+  $("#emModal").classList.add("hide");
+  $("#emPrev").innerHTML = "";
+  $("#emHint").textContent = "";
+  $("#emHint").classList.add("hide");
   if(!keepCaret) thawCaret();
 }
-function openYoutube(){
+function openEmbed(){
   closeApple(true);
-  closeTiktok();
   freezeCaret();
-  $("#ytUrl").value = "";
-  $("#ytPrev").innerHTML = "";
-  $("#ytModal").classList.remove("hide");
-  $("#ytUrl").focus();
+  $("#emUrl").value = "";
+  $("#emAcc").value = "";
+  $("#emPrev").innerHTML = "";
+  $("#emHint").textContent = "";
+  $("#emHint").classList.add("hide");
+  $("#emAcc").classList.add("hide");
+  $("#emAccLabel").classList.add("hide");
+  $("#emModal").classList.remove("hide");
+  $("#emUrl").focus();
 }
-function previewYoutube(){
-  const got = parseYouTube($("#ytUrl").value);
-  $("#ytPrev").innerHTML = "";
-  if(!got) return;
-  $("#ytPrev").innerHTML = `<div class="ytbox" style="position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000;margin-top:10px"><iframe src="${esc(youtubeSrc(got.id, got.start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+function embedBox(kind, src){
+  const pad = kind==="tiktok" ? "calc(160% + 150px)" : "calc(122% + 210px)";
+  return `<div class="yembed ${kind==="tiktok" ? "tk" : "ig"}" style="margin-top:10px"><div class="ytbox" style="position:relative;aspect-ratio:auto;height:0;padding-bottom:${pad};border-radius:10px;overflow:hidden;background:#000"><iframe src="${esc(src)}" title="${kind==="tiktok" ? "TikTok" : "Instagram"}" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>`;
 }
-function openTiktok(){
-  closeApple(true);
-  closeYoutube();
-  freezeCaret();
-  $("#ttUrl").value = "";
-  $("#ttAcc").value = "";
-  $("#ttPrev").innerHTML = "";
-  $("#ttModal").classList.remove("hide");
-  $("#ttUrl").focus();
+function previewEmbed(){
+  const got = detectEmbed($("#emUrl").value);
+  $("#emPrev").innerHTML = "";
+  $("#emHint").classList.add("hide");
+  if(!got) return null;
+  if(got.short){
+    $("#emHint").textContent = "Short vm.tiktok.com links do not open a video id. Open the link, copy the full address and paste it here.";
+    $("#emHint").classList.remove("hide");
+    return null;
+  }
+  if(got.kind === "youtube"){
+    $("#emAcc").classList.add("hide");
+    $("#emAccLabel").classList.add("hide");
+    $("#emPrev").innerHTML = `<div class="ytbox" style="position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000;margin-top:10px"><iframe src="${esc(youtubeSrc(got.id, got.start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+    return got;
+  }
+  $("#emAcc").classList.remove("hide");
+  $("#emAccLabel").classList.remove("hide");
+  if(got.kind === "tiktok"){
+    $("#emAccLabel").textContent = "Account shown in the credit";
+    if(got.handle && !$("#emAcc").value.trim()) $("#emAcc").value = got.handle;
+    $("#emPrev").innerHTML = embedBox("tiktok", tiktokSrc(got.id));
+    return got;
+  }
+  $("#emAccLabel").textContent = "Account for our credit line (the card itself already names the author)";
+  $("#emPrev").innerHTML = embedBox("instagram", instagramSrc(got.kind, got.code));
+  return got;
 }
-function closeTiktok(){
-  $("#ttModal").classList.add("hide");
-  $("#ttUrl").value = "";
-  $("#ttPrev").innerHTML = "";
-}
-function previewTiktok(){
-  const got = parseTikTok($("#ttUrl").value);
-  $("#ttPrev").innerHTML = "";
-  if(!got) return;
-  if(got.short){ $("#ttPrev").innerHTML = "<p class=\"muted\">Short vm.tiktok.com links do not open a video id. Open the link, copy the full address and paste it here.</p>"; return; }
-  if(got.handle && !$("#ttAcc").value.trim()) $("#ttAcc").value = got.handle;
-  $("#ttPrev").innerHTML = `<div class="yembed tk" style="margin-top:10px"><div class="ytbox" style="position:relative;aspect-ratio:9/16;border-radius:10px;overflow:hidden;background:#000"><iframe src="${esc(tiktokSrc(got.id))}" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe></div></div>`;
-}
-$("#btnTiktok").onclick = openTiktok;
-$("#ttCancel").onclick = closeTiktok;
-$("#ttModal").addEventListener("click", e=>{ if(e.target === $("#ttModal")) closeTiktok(); });
-$("#ttUrl").addEventListener("change", previewTiktok);
-$("#ttUrl").addEventListener("paste", ()=> setTimeout(previewTiktok, 50));
-$("#ttGo").onclick = ()=>{
-  const got = parseTikTok($("#ttUrl").value);
-  if(!got){ toast("Paste a full tiktok.com video link"); return; }
+$("#btnYoutube").onclick = openEmbed;
+$("#btnTiktok").onclick = openEmbed;
+$("#btnInstagram").onclick = openEmbed;
+$("#emCancel").onclick = closeEmbed;
+$("#emModal").addEventListener("click", e=>{ if(e.target === $("#emModal")) closeEmbed(); });
+$("#emUrl").addEventListener("change", previewEmbed);
+$("#emUrl").addEventListener("paste", ()=> setTimeout(previewEmbed, 50));
+$("#emGo").onclick = ()=>{
+  const got = detectEmbed($("#emUrl").value);
+  if(!got){ toast("Paste a YouTube, TikTok or Instagram link"); return; }
   if(got.short){ toast("Short link — open it and copy the full address"); return; }
-  const acc = ($("#ttAcc").value.trim() || got.handle || "").replace(/^@/,"");
-  insertHTML(tiktokBlock(got.id, acc));
-  closeTiktok();
-};
-$("#btnYoutube").onclick = openYoutube;
-$("#ytCancel").onclick = closeYoutube;
-$("#ytModal").addEventListener("click", e=>{ if(e.target === $("#ytModal")) closeYoutube(); });
-$("#ytUrl").addEventListener("change", previewYoutube);
-$("#ytUrl").addEventListener("paste", ()=> setTimeout(previewYoutube, 50));
-$("#ytGo").onclick = ()=>{
-  const got = parseYouTube($("#ytUrl").value);
-  if(!got){ toast("Paste a YouTube link"); return; }
-  insertHTML(youtubeBlock(got.id, got.start));
-  $("#ytModal").classList.add("hide");
-  $("#ytPrev").innerHTML = "";
+  const acc = $("#emAcc").value.trim().replace(/^@/,"");
+  if(got.kind === "youtube") insertHTML(youtubeBlock(got.id, got.start));
+  else if(got.kind === "tiktok") insertHTML(tiktokBlock(got.id, acc || got.handle || ""));
+  else insertHTML(instagramBlock(got.kind, got.code, acc));
+  closeEmbed();
 };
 document.addEventListener("keydown", e=>{
-  if(e.key === "Escape"){ closeApple(); closeYoutube(); closeTiktok(); return; }
+  if(e.key === "Escape"){ closeApple(); closeEmbed(); return; }
   if(e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
   if(e.target && e.target.closest && e.target.closest("input,textarea,select,.modal")) return;
   const blk = $("#composer .blk.sel");
@@ -2000,11 +2026,9 @@ $("#reset").onclick = ()=> fillForm(null);
 $("#brandHome").onclick = e=>{
   e.preventDefault();
   const apple = $("#appleModal");
-  const yt = $("#ytModal");
-  const tt = $("#ttModal");
+  const em = $("#emModal");
   if(apple) apple.classList.add("hide");
-  if(yt) yt.classList.add("hide");
-  if(tt) tt.classList.add("hide");
+  if(em) em.classList.add("hide");
   if($("#desk") && !$("#desk").classList.contains("hide")) fillForm(null);
   window.scrollTo(0, 0);
 };
