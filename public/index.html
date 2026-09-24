@@ -225,6 +225,12 @@ main{position:relative;z-index:1}
 }
 @media (hover:none){
   .rail.dragging .card{transform:none!important}
+  /* owner (2026-09-24): on phones cards must always come to rest flush with
+     the content edge - free fling rest positions read as "cards shifted
+     left". Proximity snap parks every gesture on the nearest card slot.
+     Desktop keeps the exact current free-rest behavior (untouched). */
+  .rail{scroll-snap-type:x proximity}
+  .rail .card,.rail .rcard{scroll-snap-align:start}
 }
 @media (max-width:900px){ .rail{--cardw:255px} }
 /* news rail: 4 whole cards + a peek of the 5th inside the rail box
@@ -237,7 +243,11 @@ main{position:relative;z-index:1}
    sliders must be 1-in-1 across sections) */
 #relGrid{--cardw:243px}
 @media (max-width:640px){ 
-  .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
+  /* owner (2026-09-24): the stack inherited the horizontal rail's 44px
+     right tail (pill clearance) - cards came out 44px short on the right
+     (330 vs 374) and read as "shifted left". Stack needs no tails: zero
+     horizontal padding. Vertical pair (padding 12 / margin -12) stays. */
+  .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px;padding:12px 0}
   /* full titles (owner: no ellipsis) - heights are equalized in JS after
      render: every card's title/teaser block gets the tallest sibling's
      height as min-height, so cards align without cutting any text */
@@ -695,11 +705,12 @@ textarea{resize:vertical;min-height:64px}
   .rel-grid{grid-template-columns:1fr 1fr;gap:10px}
   .toasts{left:12px;right:12px;bottom:12px}
   .toast{max-width:none}
-  .sub-in form{flex-direction:column;max-width:none;width:100%}
-  .sub-in input,.sub-in .btn{width:100%;box-sizing:border-box;min-width:0}
-  /* owner: the Subscribe pill must not run edge-to-edge on the phone -
-     size it to its text and center it; the email input stays full width */
-  .sub-in .btn{width:auto;align-self:center;padding:0 42px}
+  /* owner (2026-09-24): phone form must match the desktop shape - one row,
+     email field takes the remaining width, Subscribe pill stays compact.
+     The stacked full-width input made the pill look lost and tiny under it. */
+  .sub-in form{flex-direction:row;max-width:none;width:100%}
+  .sub-in input{flex:1 1 auto;min-width:0;width:auto;box-sizing:border-box}
+  .sub-in .btn{width:auto;align-self:auto;padding:0 24px;white-space:nowrap;box-sizing:border-box}
   .chart-row{
     --pw:auto;
     display:grid;
@@ -2462,7 +2473,11 @@ function wireRail(gridSel, prevSel, nextSel){
        pointer-events at press time retargets the release click away from the
        card (hit-test misses the anchor) and the post never opens. The freeze
        starts with the first real movement, see pointermove below. */
-    if(drag.grabCard){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-4px)"; liftEl = drag.grabCard; }
+    /* touch (owner 2026-09-24): on phones cards must NOT lift or highlight
+       on press - no .grab, no cyan border, no -4px jump; a press starts a
+       scroll or opens the post, nothing else. Mouse/pen keep the desktop
+       grab-lift rule exactly as before. */
+    if(drag.grabCard && drag.pt !== "touch"){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-4px)"; liftEl = drag.grabCard; }
     dragStop();
     /* a new grab interrupts the spring: dragStop() kills its rAF, so the band
        must be finished HERE - left to itself the transform freezes mid-flight
