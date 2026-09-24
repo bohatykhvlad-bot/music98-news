@@ -256,7 +256,7 @@ a{color:var(--text)}
 .composer .yembed.tk .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(160% + 75px);background:#fff}
 .composer .yembed.ig{max-width:340px}
 .composer .yembed.ig .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(122% + 210px);background:#fff}
-.composer .yembed .tkcred{margin:8px 0 0;font-size:12px;color:var(--muted2);text-align:center}
+.composer .yembed .pcred{margin:8px 2px 0;font-size:11px}
 .composer .yembed iframe{position:absolute;inset:0;width:100%;height:100%;border-radius:0}
 .composer iframe{width:100%;border:0;border-radius:10px;display:block;background:transparent}
 .composer .abody-pic{max-width:520px;width:100%;margin:12px auto}
@@ -469,8 +469,10 @@ a{color:var(--text)}
     <p class="muted">One field for any link: YouTube, TikTok or Instagram — the card is chosen from the link, so it does not matter which icon you clicked. Put the clip filmed at the event itself, not a broadcaster's report. Apple Music keeps its own dialogs, because that flow carries the affiliate token.</p>
     <label for="emUrl">Link</label>
     <input id="emUrl" placeholder="https://www.youtube.com/watch?v=… / tiktok.com/@account/video/… / instagram.com/reel/…">
-    <label for="emAcc" id="emAccLabel" class="hide">Account shown in the credit</label>
-    <input id="emAcc" class="hide" placeholder="account">
+    <label for="emAcc" id="emAccLabel" class="hide">Credit</label>
+    <input id="emAcc" class="hide" placeholder="Credit: @handle">
+    <label for="emCreditUrl" id="emCreditUrlLabel" class="hide">Credit link</label>
+    <input id="emCreditUrl" class="hide" placeholder="https://www.instagram.com/madonna/">
     <p class="muted hide" id="emHint"></p>
     <div id="emPrev"></div>
     <div class="actions">
@@ -768,9 +770,33 @@ function appleBlock(kind, album, track){
   return `<figure class="blk aembed${song?" song":" album"}" contenteditable="false" data-apple="${esc(token)}">${blkChrome()}${song?`<span class="songclip">${frame}</span>`:frame}</figure>`;
 }
 function pcredFor(author, link){
-  if(!author) return "";
+  if(!String(author||"").trim()) return "";
   const inner = link ? `<a href="${esc(link)}" target="_blank" rel="noopener noreferrer">${esc(author)}</a>` : esc(author);
   return `<p class="pcred">Photo: ${inner}</p>`;
+}
+function videoCredFor(word, platform, author, link){
+  if(!String(author||"").trim()) return "";
+  const inner = String(link||"").trim()
+    ? `<a href="${esc(String(link).trim())}" target="_blank" rel="noopener noreferrer">${esc(String(author).trim())}</a>`
+    : esc(String(author).trim());
+  return `<p class="pcred">${word}: ${inner} via ${platform}</p>`;
+}
+function vcredPanel(credit, url){
+  return `<span class="ppanel vcred" contenteditable="false"><input type="text" class="pp-author" placeholder="Credit: @handle" value="${esc(credit||"")}" aria-label="Credit"><input type="text" class="pp-link" placeholder="Credit link" value="${esc(url||"")}" aria-label="Credit link"></span>`;
+}
+function socialMarker(prefix, id, credit, url){
+  const pa = String(credit||"").trim(), pl = String(url||"").trim();
+  let tag = id;
+  if(pa || pl) tag += "|"+pa+"|"+pl;
+  return "["+prefix+":"+tag+"]";
+}
+function refreshFigCredit(fig){
+  const old = fig.querySelector(".pcred"); if(old) old.remove();
+  let html = "";
+  if(fig.dataset.photo != null) html = pcredFor(fig.dataset.pauthor||"", fig.dataset.plink||"");
+  else if(fig.dataset.tiktok != null) html = videoCredFor("Video", "TikTok", fig.dataset.pauthor||"", fig.dataset.plink||"");
+  else html = videoCredFor(fig.dataset.igkind==="p" ? "Post" : "Video", "Instagram", fig.dataset.pauthor||"", fig.dataset.plink||"");
+  if(html) fig.insertAdjacentHTML("beforeend", html);
 }
 function photoBlock(src, author, link, pos, zoom){
   author = author||""; link = link||"";
@@ -843,11 +869,23 @@ function parseTikTok(raw){
   return {id, handle: m ? m[1] : ""};
 }
 function tiktokSrc(id){ return "https://www.tiktok.com/embed/v2/"+id+"?lang=en"; }
-function tiktokBlock(id, handle){
-  const h = String(handle||"").replace(/^@/,"").trim();
-  const token = h ? id+":"+h : id;
-  const cred = h ? `<p class="tkcred">Video: <a href="https://www.tiktok.com/@${esc(h)}/video/${esc(id)}" target="_blank" rel="noopener noreferrer">@${esc(h)}</a> via TikTok</p>` : "";
-  return `<figure class="blk yembed tk" contenteditable="false" data-tiktok="${esc(token)}">${blkChrome()}<div class="ytbox"><iframe src="${esc(tiktokSrc(id))}" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="eager"></iframe></div>${cred}</figure>`;
+function tiktokBlock(id, credit, creditUrl){
+  credit = credit||""; creditUrl = creditUrl||"";
+  return `<figure class="blk yembed tk" contenteditable="false" data-tiktok="${esc(id)}" data-pauthor="${esc(credit)}" data-plink="${esc(creditUrl)}">${blkChrome()}<div class="ytbox"><iframe src="${esc(tiktokSrc(id))}" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="eager"></iframe></div>${vcredPanel(credit, creditUrl)}${videoCredFor("Video","TikTok",credit,creditUrl)}</figure>`;
+}
+function parseSocialMarker(t){
+  let m = String(t||"").match(/^\[tiktok:(\d{6,25})(?:\|([^|]*)(?:\|([^|]*))?)?\]$/i);
+  if(m) return {kind:"tiktok", id:m[1], credit:(m[2]||"").trim(), url:(m[3]||"").trim()};
+  m = String(t||"").match(/^\[tiktok:(\d{6,25}):@?([A-Za-z0-9._]{2,32})\]$/i);
+  if(m) return {kind:"tiktok", id:m[1], credit:"@"+m[2], url:"https://www.tiktok.com/@"+m[2]+"/video/"+m[1]};
+  m = String(t||"").match(/^\[ig:(p|reel|tv):([A-Za-z0-9_-]{5,20})(?:\|([^|]*)(?:\|([^|]*))?)?\]$/i);
+  if(m) return {kind:"instagram", igKind:m[1].toLowerCase(), code:m[2], credit:(m[3]||"").trim(), url:(m[4]||"").trim()};
+  m = String(t||"").match(/^\[ig:(p|reel|tv):([A-Za-z0-9_-]{5,20}):@?([A-Za-z0-9._]{2,32})\]$/i);
+  if(m){
+    const k = m[1].toLowerCase();
+    return {kind:"instagram", igKind:k, code:m[2], credit:"@"+m[3], url:"https://www.instagram.com/"+k+"/"+m[2]+"/"};
+  }
+  return null;
 }
 function youtubeSrc(id, start){
   let src = "https://www.youtube-nocookie.com/embed/"+id+"?rel=0&modestbranding=1&enablejsapi=1&hl=en&cc_lang_pref=en";
@@ -1120,8 +1158,8 @@ function serialize(){
         parts.push("[photo:"+tag+"]");
       }
       if(node.dataset.youtube) parts.push("[youtube:"+node.dataset.youtube+"]");
-      if(node.dataset.tiktok) parts.push("[tiktok:"+node.dataset.tiktok+"]");
-      if(node.dataset.instagram) parts.push("[ig:"+node.dataset.instagram+"]");
+      if(node.dataset.tiktok) parts.push(socialMarker("tiktok", node.dataset.tiktok, node.dataset.pauthor, node.dataset.plink));
+      if(node.dataset.instagram) parts.push(socialMarker("ig", node.dataset.instagram, node.dataset.pauthor, node.dataset.plink));
       return;
     }
     if(node.querySelector && node.querySelector("figure")){
@@ -1149,10 +1187,9 @@ function bodyToComposer(text){
     if(song) return appleBlock("song", song[1], song[2]);
     const yt = t.match(/^\[youtube:([A-Za-z0-9_-]{11})(?::(\d+))?\]$/i);
     if(yt) return youtubeBlock(yt[1], yt[2] ? +yt[2] : 0);
-    const tt = t.match(/^\[tiktok:(\d{6,25})(?::@?([A-Za-z0-9._]{2,32}))?\]$/i);
-    if(tt) return tiktokBlock(tt[1], tt[2]||"");
-    const ig = t.match(/^\[ig:(p|reel|tv):([A-Za-z0-9_-]{5,20})(?::@?([A-Za-z0-9._]{2,32}))?\]$/i);
-    if(ig) return instagramBlock(ig[1].toLowerCase(), ig[2], ig[3]||"");
+    const social = parseSocialMarker(t);
+    if(social && social.kind==="tiktok") return tiktokBlock(social.id, social.credit, social.url);
+    if(social && social.kind==="instagram") return instagramBlock(social.igKind, social.code, social.credit, social.url);
     return "<p>"+rich(raw)+"</p>";
   }).join("");
   $("#composer").innerHTML = html || "<p><br></p>";
@@ -1735,12 +1772,12 @@ document.querySelector(".toolbar").addEventListener("click", e=>{
 });
 
 $("#composer").addEventListener("input", e=>{
-  const fig = e.target.closest ? e.target.closest("figure[data-photo]") : null;
+  const fig = e.target.closest ? e.target.closest("figure[data-photo], figure[data-tiktok], figure[data-instagram]") : null;
   if(!fig) return;
   if(e.target.classList.contains("pp-author")) fig.dataset.pauthor = e.target.value;
   if(e.target.classList.contains("pp-link")) fig.dataset.plink = e.target.value;
-  const old = fig.querySelector(".pcred"); if(old) old.remove();
-  fig.insertAdjacentHTML("beforeend", pcredFor(fig.dataset.pauthor||"", fig.dataset.plink||""));
+  if(!e.target.classList.contains("pp-author") && !e.target.classList.contains("pp-link")) return;
+  refreshFigCredit(fig);
 });
 $("#composer").addEventListener("input", e=>{
   const fig = e.target.closest ? e.target.closest("figure[data-photo]") : null;
@@ -1975,11 +2012,11 @@ function instagramSrc(kind, code){
   const k = (kind==="reel" || kind==="tv") ? kind : "p";
   return "https://www.instagram.com/"+k+"/"+code+"/embed/";
 }
-function instagramBlock(kind, code, handle){
-  const h = String(handle||"").replace(/^@/,"").trim();
-  const token = [kind, code].concat(h ? [h] : []).join(":");
-  const cred = h ? `<p class="tkcred">${kind==="p" ? "Post" : "Video"}: <a href="https://www.instagram.com/${esc(kind)}/${esc(code)}/" target="_blank" rel="noopener noreferrer">@${esc(h)}</a> via Instagram</p>` : "";
-  return `<figure class="blk yembed ig" contenteditable="false" data-instagram="${esc(token)}">${blkChrome()}<div class="ytbox"><iframe src="${esc(instagramSrc(kind, code))}" title="Instagram" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="eager"></iframe></div>${cred}</figure>`;
+function instagramBlock(kind, code, credit, creditUrl){
+  const k = (kind==="reel" || kind==="tv") ? kind : "p";
+  credit = credit||""; creditUrl = creditUrl||"";
+  const word = k==="p" ? "Post" : "Video";
+  return `<figure class="blk yembed ig" contenteditable="false" data-instagram="${esc(k+":"+code)}" data-igkind="${esc(k)}" data-pauthor="${esc(credit)}" data-plink="${esc(creditUrl)}">${blkChrome()}<div class="ytbox"><iframe src="${esc(instagramSrc(k, code))}" title="Instagram" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="eager"></iframe></div>${vcredPanel(credit, creditUrl)}${videoCredFor(word,"Instagram",credit,creditUrl)}</figure>`;
 }
 function detectEmbed(raw){
   const yt = parseYouTube(raw); if(yt) return Object.assign({kind:"youtube"}, yt);
@@ -2001,11 +2038,14 @@ function openEmbed(){
   freezeCaret();
   $("#emUrl").value = "";
   $("#emAcc").value = "";
+  $("#emCreditUrl").value = "";
   $("#emPrev").innerHTML = "";
   $("#emHint").textContent = "";
   $("#emHint").classList.add("hide");
   $("#emAcc").classList.add("hide");
   $("#emAccLabel").classList.add("hide");
+  $("#emCreditUrl").classList.add("hide");
+  $("#emCreditUrlLabel").classList.add("hide");
   $("#emModal").classList.remove("hide");
   $("#emUrl").focus();
 }
@@ -2026,18 +2066,21 @@ function previewEmbed(){
   if(got.kind === "youtube"){
     $("#emAcc").classList.add("hide");
     $("#emAccLabel").classList.add("hide");
+    $("#emCreditUrl").classList.add("hide");
+    $("#emCreditUrlLabel").classList.add("hide");
     $("#emPrev").innerHTML = `<div class="ytbox" style="position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000;margin-top:10px"><iframe src="${esc(youtubeSrc(got.id, got.start))}" title="YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
     return got;
   }
   $("#emAcc").classList.remove("hide");
   $("#emAccLabel").classList.remove("hide");
+  $("#emCreditUrl").classList.remove("hide");
+  $("#emCreditUrlLabel").classList.remove("hide");
   if(got.kind === "tiktok"){
-    $("#emAccLabel").textContent = "Account shown in the credit";
-    if(got.handle && !$("#emAcc").value.trim()) $("#emAcc").value = got.handle;
+    if(got.handle && !$("#emAcc").value.trim()) $("#emAcc").value = "@"+got.handle;
+    if(got.handle && !$("#emCreditUrl").value.trim()) $("#emCreditUrl").value = "https://www.tiktok.com/@"+got.handle;
     $("#emPrev").innerHTML = embedBox("tiktok", tiktokSrc(got.id));
     return got;
   }
-  $("#emAccLabel").textContent = "Account for our credit line (the card itself already names the author)";
   $("#emPrev").innerHTML = embedBox("instagram", instagramSrc(got.igKind, got.code));
   return got;
 }
@@ -2052,10 +2095,11 @@ $("#emGo").onclick = ()=>{
   const got = detectEmbed($("#emUrl").value);
   if(!got){ toast("Paste a YouTube, TikTok or Instagram link"); return; }
   if(got.short){ toast("Short link — open it and copy the full address"); return; }
-  const acc = $("#emAcc").value.trim().replace(/^@/,"");
+  const credit = $("#emAcc").value.trim();
+  const creditUrl = $("#emCreditUrl").value.trim();
   if(got.kind === "youtube") insertHTML(youtubeBlock(got.id, got.start));
-  else if(got.kind === "tiktok") insertHTML(tiktokBlock(got.id, acc || got.handle || ""));
-  else insertHTML(instagramBlock(got.igKind, got.code, acc));
+  else if(got.kind === "tiktok") insertHTML(tiktokBlock(got.id, credit, creditUrl));
+  else insertHTML(instagramBlock(got.igKind, got.code, credit, creditUrl));
   closeEmbed();
 };
 document.addEventListener("keydown", e=>{

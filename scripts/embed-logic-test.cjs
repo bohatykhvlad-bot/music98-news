@@ -71,18 +71,28 @@ const src = instagramSrc("reel", "DdnKbPCiRcM");
 t("адрес эмбеда instagram", src, "https://www.instagram.com/reel/DdnKbPCiRcM/embed/");
 t("адрес эмбеда instagram для фото", instagramSrc("p", "DPNv0lEDHJM"), "https://www.instagram.com/p/DPNv0lEDHJM/embed/");
 
-const blk = instagramBlock("reel", "DdnKbPCiRcM", "californiapost");
-t("блок: маркер с аккаунтом", /data-instagram="reel:DdnKbPCiRcM:californiapost"/.test(blk), true);
-t("блок: наш кредит назван", /Video: <a href="https:\/\/www\.instagram\.com\/reel\/DdnKbPCiRcM\/"[^>]*>@californiapost<\/a> via Instagram/.test(blk), true);
+const blk = instagramBlock("reel", "DdnKbPCiRcM", "@californiapost", "https://www.instagram.com/californiapost/");
+t("блок: id без хвоста", /data-instagram="reel:DdnKbPCiRcM"/.test(blk), true);
+t("блок: кредит в поле", /data-pauthor="@californiapost"/.test(blk), true);
+t("блок: наш кредит назван", /class="pcred">Video: <a href="https:\/\/www\.instagram\.com\/californiapost\/"[^>]*>@californiapost<\/a> via Instagram/.test(blk), true);
+t("блок: поля кредита как у фото", /placeholder="Credit: @handle"/.test(blk) && /placeholder="Credit link"/.test(blk), true);
 t("блок: класс карточки", /class="blk yembed ig"/.test(blk), true);
 const blkNoAcc = instagramBlock("p", "DPNv0lEDHJM", "");
 t("блок без аккаунта: маркер без хвоста", /data-instagram="p:DPNv0lEDHJM"/.test(blkNoAcc), true);
-t("блок без аккаунта: подписи нет", /tkcred/.test(blkNoAcc), false);
+t("блок без аккаунта: подписи нет", /pcred/.test(blkNoAcc), false);
+t("маркер с кредитом", socialMarker("ig", "reel:DdcjIyhCp-J", "@madonna", "https://www.instagram.com/madonna/"), "[ig:reel:DdcjIyhCp-J|@madonna|https://www.instagram.com/madonna/]");
+t("маркер без кредита", socialMarker("tiktok", "7688484162818444558", "", ""), "[tiktok:7688484162818444558]");
+t("разбор pipe", parseSocialMarker("[ig:reel:DdcjIyhCp-J|@madonna|https://www.instagram.com/madonna/]"),
+  {kind:"instagram", igKind:"reel", code:"DdcjIyhCp-J", credit:"@madonna", url:"https://www.instagram.com/madonna/"});
+t("разбор старого tiktok", parseSocialMarker("[tiktok:7688484162818444558:@marina.alvarez134]"),
+  {kind:"tiktok", id:"7688484162818444558", credit:"@marina.alvarez134", url:"https://www.tiktok.com/@marina.alvarez134/video/7688484162818444558"});
+t("разбор без кредита", parseSocialMarker("[ig:reel:DdcjIyhCp-J]").credit, "");
 
 const ytBlk = youtubeBlock("iLF0ZNdhNM0", 0);
 t("youtube-блок не тронут", /data-youtube="iLF0ZNdhNM0"/.test(ytBlk), true);
-const ttBlk = tiktokBlock("7688484162818444558", "marina.alvarez134");
-t("tiktok-блок с кредитом цел", /data-tiktok="7688484162818444558:marina.alvarez134"/.test(ttBlk), true);
+const ttBlk = tiktokBlock("7688484162818444558", "@marina.alvarez134", "https://www.tiktok.com/@marina.alvarez134");
+t("tiktok-блок хранит id", /data-tiktok="7688484162818444558"/.test(ttBlk), true);
+t("tiktok-блок кредит как у фото", /class="pcred">Video: <a href="https:\/\/www\.tiktok\.com\/@marina\.alvarez134"[^>]*>@marina\.alvarez134<\/a> via TikTok/.test(ttBlk), true);
 t("apple с партнёрским токеном объявлен", typeof appleSrc === "function", true);
 
 console.log("\n" + pass + " ok, " + fail + " fail");
