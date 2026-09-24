@@ -229,6 +229,9 @@ main{position:relative;z-index:1}
    exactly and the 5th card never peeked (owner bug report). Releases keep
    their own width (square covers). */
 #newsGrid{--cardw:243px}
+/* unified rails: releases cards share the news column width too (owner:
+   sliders must be 1-in-1 across sections) */
+#relGrid{--cardw:243px}
 @media (max-width:640px){ 
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px}
   /* full titles (owner: no ellipsis) - heights are equalized in JS after
