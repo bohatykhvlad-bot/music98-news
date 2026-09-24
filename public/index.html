@@ -57,6 +57,11 @@
      tabs at ~26px top / 25.5px bottom - visually equal, measured. */
   #tab-news .hd{margin:0 0 16px}
   #tab-releases .hd{margin:0 0 24px}
+  /* owner (pixel audit 2026-09-24): the whole block sits too low -
+     header->cards is 69/77px. Lift the section: tab top padding 14->2
+     (header already breathes via body padding), heading margins keep the
+     measured ink gaps intact. Cards move ~12px closer to the header. */
+  .tab{padding-top:2px}
 }
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
