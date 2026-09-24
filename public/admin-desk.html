@@ -779,7 +779,7 @@ function videoCredFor(word, platform, author, link){
   const inner = String(link||"").trim()
     ? `<a href="${esc(String(link).trim())}" target="_blank" rel="noopener noreferrer">${esc(String(author).trim())}</a>`
     : esc(String(author).trim());
-  return `<p class="pcred">${word}: ${inner} via ${platform}</p>`;
+  return `<p class="pcred">${inner} via ${platform}</p>`;
 }
 function vcredPanel(credit, url){
   return `<span class="ppanel vcred" contenteditable="false"><input type="text" class="pp-author" placeholder="Credit: @handle" value="${esc(credit||"")}" aria-label="Credit"><input type="text" class="pp-link" placeholder="Credit link" value="${esc(url||"")}" aria-label="Credit link"></span>`;
