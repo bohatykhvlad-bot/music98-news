@@ -1399,7 +1399,7 @@ function setCover(src, pos, zoom, cardY){
 $("#miniFrame").addEventListener("click", ()=> setCropMode("card"));
 $("#modeMain").addEventListener("click", ()=> setCropMode("main"));
 $("#modeCard").addEventListener("click", ()=> setCropMode("card"));
-$(document).addEventListener("click", e=>{
+document.addEventListener("click", e=>{
   const b = e.target.closest("[data-pg]");
   if(!b) return;
   const [key, i] = b.dataset.pg.split(":");
