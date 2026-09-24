@@ -461,8 +461,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
    and over its rounded corners. Align content inside the panel. */
 @media (max-width:640px){
   /* ink-balanced: heading ink starts ~10px below its box, so top padding is
-     reduced to make ink-to-panel match button-to-panel (32-20-10.6 ≈ 21) */
-  .sub-in{padding:21px 22px 32px}
+     reduced to make ink-to-panel match button-to-panel (32-20-10.6 ≈ 21).
+     owner (2026-09-24): wider side insets - text lines and the input/button
+     pills sit on a shared measure, panel no longer hugs the screen edges. */
+  .sub-in{padding:21px 34px 36px}
   .sub-in form{gap:10px}
 }
 .sub-in h2{margin:0 0 8px;font-size:26px;letter-spacing:-.02em}
@@ -2148,18 +2150,46 @@ const RAIL_PAGE = 4;   /* cards per batch on mobile Load More (owner: 4, matches
 function equalizeCards(gridSel){
   const grid = $(gridSel);
   if(!grid) return;
-  const cards = [...grid.querySelectorAll(".card")];
+  /* owner (2026-09-24): equalize across BOTH tabs on the phone - news and
+     releases cards must share one silhouette; per-tab maxima left releases
+     ~41px shorter and the tabs read as different card heights. The desktop
+     branch below stays a no-op (media query). */
+  const cards = [...document.querySelectorAll("#newsGrid .card, #relGrid .card")];
   if(!window.matchMedia("(max-width: 640px)").matches || !cards.length){
     cards.forEach(c=>{ const h=c.querySelector("h3"), p=c.querySelector("p"); if(h) h.style.minHeight=""; if(p) p.style.minHeight=""; });
     return;
   }
   cards.forEach(c=>{ const h=c.querySelector("h3"), p=c.querySelector("p"); if(h) h.style.minHeight=""; if(p) p.style.minHeight=""; });
+  /* hidden-tab cards read 0 via offsetHeight (display:none), so the visible
+     tab would always win the max and heights would ping-pong between tabs.
+     Measure hidden text in an offscreen scribe with the shared phone column
+     width instead - both tabs then land on one silhouette. */
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;";
+  document.body.appendChild(probe);
+  const refCard = cards.find(c=>c.offsetParent) || cards[0];
+  const refH = refCard && refCard.querySelector("h3");
+  const colW = refH ? refH.clientWidth : 0;
+  const natH = el => {
+    if(!el) return 0;
+    if(el.offsetParent) return el.offsetHeight;
+    if(!colW) return 0;
+    const m = document.createElement(el.tagName);
+    const cs = getComputedStyle(el);
+    m.style.font = cs.font; m.style.letterSpacing = cs.letterSpacing;
+    m.style.lineHeight = cs.lineHeight; m.style.width = colW+"px"; m.style.margin = "0";
+    m.textContent = el.textContent;
+    probe.appendChild(m);
+    const h = m.offsetHeight;
+    m.remove();
+    return h;
+  };
   let maxH = 0, maxP = 0;
   cards.forEach(c=>{
-    const h = c.querySelector("h3"), p = c.querySelector("p");
-    if(h) maxH = Math.max(maxH, h.offsetHeight);
-    if(p) maxP = Math.max(maxP, p.offsetHeight);
+    maxH = Math.max(maxH, natH(c.querySelector("h3")));
+    maxP = Math.max(maxP, natH(c.querySelector("p")));
   });
+  probe.remove();
   cards.forEach(c=>{
     const h = c.querySelector("h3"), p = c.querySelector("p");
     if(h && maxH) h.style.minHeight = maxH+"px";
