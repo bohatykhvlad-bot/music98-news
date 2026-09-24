@@ -2331,7 +2331,7 @@ function wireRail(gridSel, prevSel, nextSel){
   /* drag the cards themselves: press + move = the rail follows the pointer,
      release = momentum. A real click (no meaningful drag) still opens the
      post - the click is suppressed only when the pointer actually moved. */
-  const drag = {on:false, id:0, x:0, sl:0, moved:false, vx:0, lx:0, lt:0, raf:0, pendX:0, raf2:0, over:0};
+  const drag = {on:false, id:0, x:0, sl:0, moved:false, vx:0, lx:0, lt:0, raf:0, pendX:0, raf2:0, over:0, pt:"mouse"};
   /* a release must land ON the grabbed position, not rewind: Chromium fires
      pointerup BEFORE the click, but certain builds deliver pointercancel via
      the native drag fallback path even when dragstart never fired, and the
@@ -2355,7 +2355,10 @@ function wireRail(gridSel, prevSel, nextSel){
     return 22 * Math.tanh(Math.abs(over) / 220);
   };
   const setOver = tx => {
-    if(tx){ rail.style.willChange = "transform"; rail.style.transform = "translate3d(" + tx.toFixed(2) + "px,0,0)"; }
+    /* snap-to-zero: a sub-pixel residue (e.g. translate3d(-0.11px,0,0)) must
+       NOT survive release - each new gesture re-applied it and the drift
+       accumulated into a visible left shift on touch (owner bug 2026-09-24) */
+    if(tx && Math.abs(tx) > 0.5){ rail.style.willChange = "transform"; rail.style.transform = "translate3d(" + tx.toFixed(2) + "px,0,0)"; }
     else { rail.style.transform = ""; rail.style.willChange = ""; }
   };
   const springBack = tx0 =>{
@@ -2447,7 +2450,7 @@ function wireRail(gridSel, prevSel, nextSel){
     if(e.target.closest(".rail-btn")) return;
     if(!e.target.closest(".card, .rcard, .hero")) return;
     if(e.button !== undefined && e.button !== 0) return;  /* left button / touch / pen only */
-    drag.on = true; drag.id = e.pointerId; drag.moved = false;
+    drag.on = true; drag.id = e.pointerId; drag.moved = false; drag.pt = e.pointerType || "mouse";
     drag.x = e.clientX; drag.sl = rail.scrollLeft;
     drag.vx = 0; drag.lx = e.clientX; drag.lt = performance.now();
     /* freeze cards at their pre-press position for the whole gesture: the
@@ -2531,6 +2534,14 @@ function wireRail(gridSel, prevSel, nextSel){
        own momentum from the live position) */
     if(!drag.moved || (Math.abs(drag.vx) < 0.3 && !drag.over)) dragLandedX = rail.scrollLeft;
     rail.classList.remove("dragging");
+    /* TOUCH rule (owner bug 2026-09-24): a touch drag shorter than the 6px
+       threshold never becomes a real drag, and the pointermove arbiter never
+       fires after lift-off - the cyan grab border hung on the card ("cards
+       get highlighted on the phone"). Touch has no persistent cursor, so the
+       desktop "lift follows the cursor" rule does not apply: drop the lift
+       at every touch release. Mouse keeps the hold-until-cursor-leaves rule. */
+    const isTouch = drag.pt === "touch";
+    if(isTouch && liftEl){ grabDrop(liftEl); liftEl = null; }
     /* lift survives release: whatever happens to the rail (inertia, the card
        sliding out from under a stationary pointer) the lift is dropped only
        by a real pointer move off the card (pointermove arbiter above). */
