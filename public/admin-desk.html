@@ -107,6 +107,12 @@ input[type=checkbox]{width:17px;height:17px;min-height:0;accent-color:#00fdfb;cu
 .tdrop-opt.sel{background:#e6ebec;font-weight:700}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 12px}
 .list{display:flex;flex-direction:column;gap:6px}
+/* paged lists (owner: 5 per page + 1 2 3... pager below) */
+.pager{display:flex;gap:6px;justify-content:center;margin:12px 0 0;flex-wrap:wrap}
+.pager button{min-width:34px;height:34px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:var(--card2);font-size:13px;font-weight:600;cursor:pointer;transition:filter .15s ease,box-shadow .15s ease;-webkit-tap-highlight-color:transparent}
+.pager button:hover{filter:brightness(.95)}
+.pager button:active{filter:brightness(.9)}
+.pager button.cur{background:#15181a;color:#fff;border-color:#15181a}
 .item{display:grid;grid-template-columns:40px 1fr auto auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px}
 /* list action buttons: same system, fixed height so rows never wobble */
 .item .btn{height:36px;padding:0 16px;font-size:12.5px;display:inline-flex;align-items:center;justify-content:center}
@@ -1393,6 +1399,13 @@ function setCover(src, pos, zoom, cardY){
 $("#miniFrame").addEventListener("click", ()=> setCropMode("card"));
 $("#modeMain").addEventListener("click", ()=> setCropMode("main"));
 $("#modeCard").addEventListener("click", ()=> setCropMode("card"));
+$(document).addEventListener("click", e=>{
+  const b = e.target.closest("[data-pg]");
+  if(!b) return;
+  const [key, i] = b.dataset.pg.split(":");
+  data["_pg_"+key] = Number(i);
+  renderList();
+});
 function renderList(){
   const item = p=>{
     const src = (p.cover && p.cover.src) || "";
@@ -1429,8 +1442,21 @@ function renderList(){
   };
   const news = posts.filter(p=>p.type==="news");
   const rel = posts.filter(p=>p.type!=="news");
-  $("#listNews").innerHTML = news.length ? news.map(item).join("") : '<p class="muted">No news posts.</p>';
-  $("#listReleases").innerHTML = rel.length ? rel.map(item).join("") : '<p class="muted">No releases.</p>';
+  /* 5 per page + numbered pager below (owner request). Page state survives
+     re-renders; clamp keeps it valid after deletes. Newest first. */
+  const PER = 5;
+  const byDate = arr => arr.slice().sort((a,b)=> new Date(b.date||b.ts||0) - new Date(a.date||a.ts||0));
+  const page = (arr, key, el, emptyMsg)=>{
+    const total = Math.max(1, Math.ceil(arr.length/PER));
+    if(data["_pg_"+key] == null) data["_pg_"+key] = 0;
+    data["_pg_"+key] = Math.min(data["_pg_"+key], total-1);
+    const pg = data["_pg_"+key];
+    const slice = byDate(arr).slice(pg*PER, pg*PER+PER);
+    $(el).innerHTML = (slice.length ? slice.map(item).join("") : `<p class="muted">${emptyMsg}</p>`)
+      + (total>1 ? `<div class="pager">${Array.from({length:total},(_,i)=>`<button type="button" data-pg="${key}:${i}" class="${i===pg?"cur":""}">${i+1}</button>`).join("")}</div>` : "");
+  };
+  page(news, "news", "#listNews", "No news posts.");
+  page(rel, "rel", "#listReleases", "No releases.");
   /* fitThumb = the site's fitCover math applied to a 40px thumb: base
      cover scale * zoom, focus point mapped to the box CENTER, translate
      clamped to the edges. Pixel-for-pixel the same crop as the live card. */
