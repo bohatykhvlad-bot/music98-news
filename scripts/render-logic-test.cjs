@@ -56,12 +56,13 @@ const t = (name, got, want) => {
 };
 const has = (name, hay, needle) => t(name, hay.indexOf(needle) > -1, true);
 
-const igBlk = instagramEmbed("reel", "DdnKbPCiRcM", "californiapost");
+const igBlk = instagramEmbed("reel", "DdnKbPCiRcM", "@californiapost", "https://www.instagram.com/reel/DdnKbPCiRcM/");
 has("instagram: эмбед reel", igBlk, "https://www.instagram.com/reel/DdnKbPCiRcM/embed/");
 has("instagram: класс карточки", igBlk, 'class="yembed ig"');
 has("instagram: наш кредит", igBlk, "Video: ");
 has("instagram: аккаунт со ссылкой", igBlk, ">@californiapost</a> via Instagram");
-t("instagram: битый код не рендерится", instagramEmbed("reel", "no", "x"), "");
+has("instagram: класс кредита как у фото", igBlk, 'class="pcred"');
+t("instagram: битый код не рендерится", instagramEmbed("reel", "no", "@x", "https://example.com"), "");
 // неизвестный вид ссылки не ломает рендер, а падает в обычный пост — так и задумано
 has("instagram: неизвестный вид → обычный пост",
     instagramEmbed("weird", "DdnKbPCiRcM", ""), "https://www.instagram.com/p/DdnKbPCiRcM/embed/");
@@ -77,8 +78,20 @@ t("renderBody: маркер не остаётся текстом",
   renderBody("[ig:reel:DdnKbPCiRcM]").indexOf("[ig:"), -1);
 
 has("регресс: youtube", renderBody("[youtube:iLF0ZNdhNM0]"), "youtube-nocookie.com/embed/iLF0ZNdhNM0");
+t("регресс: youtube без кредита", renderBody("[youtube:iLF0ZNdhNM0]").indexOf("pcred") === -1, true);
 has("регресс: tiktok", renderBody("[tiktok:7688484162818444558:marina.alvarez134]"), "tiktok.com/embed/v2/7688484162818444558");
 has("регресс: tiktok-кредит", renderBody("[tiktok:7688484162818444558:marina.alvarez134]"), "@marina.alvarez134</a> via TikTok");
+const mad = renderBody("[ig:reel:DdcjIyhCp-J|@madonna|https://www.instagram.com/madonna/]");
+has("pipe: эмбед", mad, "instagram.com/reel/DdcjIyhCp-J/embed/");
+has("pipe: кредит под эмбедом", mad, 'class="pcred"');
+has("pipe: ссылка на аккаунт", mad, 'href="https://www.instagram.com/madonna/"');
+has("pipe: текст", mad, ">@madonna</a> via Instagram");
+t("pipe: маркер не остаётся текстом", mad.indexOf("[ig:") === -1, true);
+t("без кредита: строки нет", renderBody("[ig:reel:DdcjIyhCp-J]").indexOf("pcred") === -1, true);
+t("без кредита: эмбед есть", renderBody("[tiktok:7688484162818444558]").indexOf("tiktok.com/embed/v2/7688484162818444558") > -1 && renderBody("[tiktok:7688484162818444558]").indexOf("pcred") === -1, true);
+const named = renderBody("[tiktok:7688484162818444558|@marina.alvarez134]");
+has("кредит без ссылки", named, "Video: @marina.alvarez134 via TikTok");
+t("кредит без ссылки не ссылка", named.indexOf("<a ") === -1, true);
 // Apple-карточка поднимает счётчик бутстрапа, которого в заглушке нет: здесь проверяем
 // только то, что маркер распознан как карточка, а сам путь Apple мы не трогали вообще.
 try {
