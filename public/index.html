@@ -229,7 +229,11 @@ main{position:relative;z-index:1}
      the content edge - free fling rest positions read as "cards shifted
      left". Proximity snap parks every gesture on the nearest card slot.
      Desktop keeps the exact current free-rest behavior (untouched). */
-  .rail{scroll-snap-type:x proximity}
+  /* touch panning hint (owner 2026-09-24): touch never enters the JS drag
+     (it bails at pointerdown), so the browser's native pan owns the rail -
+     pan-x enables it with proper fling physics; vertical page scroll still
+     wins when the finger moves mostly vertically. */
+  .rail{scroll-snap-type:x proximity;touch-action:pan-x}
   .rail .card,.rail .rcard{scroll-snap-align:start}
 }
 @media (max-width:900px){ .rail{--cardw:255px} }
@@ -2462,6 +2466,14 @@ function wireRail(gridSel, prevSel, nextSel){
     if(e.target.closest(".rail-btn")) return;
     if(!e.target.closest(".card, .rcard, .hero")) return;
     if(e.button !== undefined && e.button !== 0) return;  /* left button / touch / pen only */
+    /* TOUCH (owner 2026-09-24): "desktop mode" on phones and touch tablets
+       reached this drag path, where our JS scrollLeft drive raced the
+       browser's native touch pan - the rail was painted from two positions
+       per frame and cards visibly doubled/teared while swiping. Touch now
+       bails entirely: the browser pans the rail with its own physics (plus
+       our CSS snap), links stay plain anchors, and the custom grab/lift/
+       velocity/momentum code remains a mouse/pen-only feature. */
+    if((e.pointerType || "mouse") === "touch"){ dragStop(); if(drag.over){ drag.over = 0; drag.springing = false; setOver(0); } return; }
     drag.on = true; drag.id = e.pointerId; drag.moved = false; drag.pt = e.pointerType || "mouse";
     drag.x = e.clientX; drag.sl = rail.scrollLeft;
     drag.vx = 0; drag.lx = e.clientX; drag.lt = performance.now();
