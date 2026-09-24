@@ -420,6 +420,9 @@ a{color:var(--text)}
           <div class="list" id="listReleases"></div>
         </div>
       </div>
+      <!-- owner (2026-09-24): ONE numbered strip below both columns; it pages
+           both lists together (shared page index), never one per column -->
+      <div class="pager" id="listPager" style="display:none"></div>
     </div>
 
     <div class="card">
@@ -1448,17 +1451,36 @@ function renderList(){
   const PER = 5;
   window._pg = window._pg || {};
   const byDate = arr => arr.slice().sort((a,b)=> new Date(b.date||b.ts||0) - new Date(a.date||a.ts||0));
-  const page = (arr, key, el, emptyMsg)=>{
-    const total = Math.max(1, Math.ceil(arr.length/PER));
-    if(window._pg[key] == null) window._pg[key] = 0;
-    window._pg[key] = Math.min(window._pg[key], total-1);
-    const pg = window._pg[key];
+  /* owner (2026-09-24): one shared page index for BOTH columns - the single
+     strip below pages them together; per-column pagers are gone (they sat at
+     different heights because the columns end unevenly). */
+  const page = (arr, el, emptyMsg)=>{
+    if(window._pg.list == null) window._pg.list = 0;
+    const pg = Math.min(window._pg.list, Math.max(0, Math.ceil(arr.length/PER)-1));
     const slice = byDate(arr).slice(pg*PER, pg*PER+PER);
-    $(el).innerHTML = (slice.length ? slice.map(item).join("") : `<p class="muted">${emptyMsg}</p>`)
-      + (total>1 ? `<div class="pager">${Array.from({length:total},(_,i)=>`<button type="button" data-pg="${key}:${i}" class="${i===pg?"cur":""}">${i+1}</button>`).join("")}</div>` : "");
+    $(el).innerHTML = slice.length ? slice.map(item).join("") : `<p class="muted">${emptyMsg}</p>`;
+    return slice;
   };
-  page(news, "news", "#listNews", "No news posts.");
-  page(rel, "rel", "#listReleases", "No releases.");
+  const newsSlice = page(news, "#listNews", "No news posts.");
+  const relSlice = page(rel, "#listReleases", "No releases.");
+  /* equal columns: row N of News takes the taller height of the two same-index
+     rows, so both columns end on one line under the shared strip */
+  const newsEl = $("#listNews"), relEl = $("#listReleases");
+  for(let i = 0; i < Math.max(newsSlice.length, relSlice.length); i++){
+    const a = newsEl.children[i], b = relEl.children[i];
+    if(!a || !b) break;
+    const h = Math.max(a.offsetHeight, b.offsetHeight);
+    if(h){ a.style.minHeight = h+"px"; b.style.minHeight = h+"px"; }
+  }
+  const total = Math.max(Math.ceil(news.length/PER), Math.ceil(rel.length/PER));
+  window._pg.list = Math.min(window._pg.list||0, Math.max(0, total-1));
+  const lp = $("#listPager");
+  if(lp){
+    lp.style.display = total > 1 ? "flex" : "none";
+    lp.innerHTML = total > 1
+      ? Array.from({length:total},(_,i)=>`<button type="button" data-pg="list:${i}" class="${window._pg.list===i?"cur":""}">${i+1}</button>`).join("")
+      : "";
+  }
   /* fitThumb = the site's fitCover math applied to a 40px thumb: base
      cover scale * zoom, focus point mapped to the box CENTER, translate
      clamped to the edges. Pixel-for-pixel the same crop as the live card. */
