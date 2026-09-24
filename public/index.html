@@ -2331,7 +2331,7 @@ function wireRail(gridSel, prevSel, nextSel){
   /* drag the cards themselves: press + move = the rail follows the pointer,
      release = momentum. A real click (no meaningful drag) still opens the
      post - the click is suppressed only when the pointer actually moved. */
-  const drag = {on:false, id:0, x:0, sl:0, moved:false, vx:0, lx:0, lt:0, raf:0, pendX:0, raf2:0, over:0, pt:"mouse"};
+  const drag = {on:false, id:0, x:0, sl:0, moved:false, vx:0, lx:0, lt:0, raf:0, pendX:0, raf2:0, over:0, pt:"mouse", springing:false};
   /* a release must land ON the grabbed position, not rewind: Chromium fires
      pointerup BEFORE the click, but certain builds deliver pointercancel via
      the native drag fallback path even when dragstart never fired, and the
@@ -2365,6 +2365,7 @@ function wireRail(gridSel, prevSel, nextSel){
     /* long, fully smooth ease-out return (owner: jerky before): no velocity
        kick, no bounce - 560ms cubic so the band melts home */
     const o0 = Math.max(-22, Math.min(22, tx0));
+    drag.springing = true;
     const t0 = performance.now(), dur = 560;
     if(drag.raf){ cancelAnimationFrame(drag.raf); drag.raf = 0; }
     rail.style.scrollBehavior = "auto";
@@ -2373,7 +2374,7 @@ function wireRail(gridSel, prevSel, nextSel){
       const e = 1 - Math.pow(1 - u, 3);
       setOver(o0 * (1 - e));
       if(u < 1){ drag.raf = requestAnimationFrame(tick); }
-      else { setOver(0); drag.raf = 0; rail.style.scrollBehavior = ""; rail.classList.remove("gliding"); syncRail(gridSel); }
+      else { drag.springing = false; setOver(0); drag.raf = 0; rail.style.scrollBehavior = ""; rail.classList.remove("gliding"); syncRail(gridSel); }
     };
     drag.raf = requestAnimationFrame(tick);
   };
@@ -2463,7 +2464,11 @@ function wireRail(gridSel, prevSel, nextSel){
        starts with the first real movement, see pointermove below. */
     if(drag.grabCard){ drag.grabCard.classList.add("grab"); drag.grabCard.style.transform = "translateY(-4px)"; liftEl = drag.grabCard; }
     dragStop();
-    if(drag.over){ drag.over = 0; setOver(0); syncRail(gridSel); }   /* a new grab cancels the spring */
+    /* a new grab interrupts the spring: dragStop() kills its rAF, so the band
+       must be finished HERE - left to itself the transform freezes mid-flight
+       (e.g. -1.58px) and the residue survives until the next overdraw, reading
+       as "cards drifted left" on touch (owner bug 2026-09-24, probe test C) */
+    if(drag.over || drag.springing){ drag.over = 0; drag.springing = false; setOver(0); syncRail(gridSel); }
   });
   /* owner rule (2026-09-23, final): the grabbed card stays lifted until the
      CURSOR physically moves off it. Key distinction: a mouseout fired because
