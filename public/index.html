@@ -530,11 +530,11 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .aembed.song iframe{height:166px;max-width:100%}
 .yembed{margin:6px auto 22px;max-width:660px;width:100%}
 .yembed.tk,.yembed.ig{margin-bottom:4px}
-.yembed.tk+.pcred,.yembed.ig+.pcred{margin:12px 2px 12px}
+.yembed.tk+.pcred,.yembed.ig+.pcred{margin:2px 2px 12px}
 /* владелец, 24.09: зазор над подписью и под ней - одинаковый; эти правила должны
    бить #articlePage .atext p (1,1,1), поэтому у них два класса при том же ID */
-#articlePage .yembed.tk+.pcred,#articlePage .yembed.ig+.pcred{margin:12px 2px 12px}
-.article .yembed.tk+.pcred,.article .yembed.ig+.pcred{margin:12px 2px 12px}
+#articlePage .yembed.tk+.pcred,#articlePage .yembed.ig+.pcred{margin:2px 2px 12px}
+.article .yembed.tk+.pcred,.article .yembed.ig+.pcred{margin:2px 2px 12px}
 .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
 /* TikTok-карточка: кадр вертикальный, поэтому окно 9:16 и узкая колонка */
 /* Вертикальные карточки чужих платформ (TikTok, Instagram) считаются не по 9:16:
@@ -3039,7 +3039,7 @@ function videoCreditHTML(word, platform, credit, url){
   const inner = href
     ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(name)}</a>`
     : esc(name);
-  return `<p class="pcred">${word}: ${inner} via ${platform}</p>`;
+  return `<p class="pcred">${inner} via ${platform}</p>`;
 }
 function tiktokEmbed(id, credit, creditUrl){
   if(!/^\d{6,25}$/.test(id||"")) return "";
