@@ -1403,7 +1403,8 @@ document.addEventListener("click", e=>{
   const b = e.target.closest("[data-pg]");
   if(!b) return;
   const [key, i] = b.dataset.pg.split(":");
-  data["_pg_"+key] = Number(i);
+  window._pg = window._pg || {};
+  window._pg[key] = Number(i);
   renderList();
 });
 function renderList(){
@@ -1445,12 +1446,13 @@ function renderList(){
   /* 5 per page + numbered pager below (owner request). Page state survives
      re-renders; clamp keeps it valid after deletes. Newest first. */
   const PER = 5;
+  window._pg = window._pg || {};
   const byDate = arr => arr.slice().sort((a,b)=> new Date(b.date||b.ts||0) - new Date(a.date||a.ts||0));
   const page = (arr, key, el, emptyMsg)=>{
     const total = Math.max(1, Math.ceil(arr.length/PER));
-    if(data["_pg_"+key] == null) data["_pg_"+key] = 0;
-    data["_pg_"+key] = Math.min(data["_pg_"+key], total-1);
-    const pg = data["_pg_"+key];
+    if(window._pg[key] == null) window._pg[key] = 0;
+    window._pg[key] = Math.min(window._pg[key], total-1);
+    const pg = window._pg[key];
     const slice = byDate(arr).slice(pg*PER, pg*PER+PER);
     $(el).innerHTML = (slice.length ? slice.map(item).join("") : `<p class="muted">${emptyMsg}</p>`)
       + (total>1 ? `<div class="pager">${Array.from({length:total},(_,i)=>`<button type="button" data-pg="${key}:${i}" class="${i===pg?"cur":""}">${i+1}</button>`).join("")}</div>` : "");
