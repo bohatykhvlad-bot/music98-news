@@ -229,11 +229,12 @@ main{position:relative;z-index:1}
      the content edge - free fling rest positions read as "cards shifted
      left". Proximity snap parks every gesture on the nearest card slot.
      Desktop keeps the exact current free-rest behavior (untouched). */
-  /* touch panning hint (owner 2026-09-24): touch never enters the JS drag
-     (it bails at pointerdown), so the browser's native pan owns the rail -
-     pan-x enables it with proper fling physics; vertical page scroll still
-     wins when the finger moves mostly vertically. */
-  .rail{scroll-snap-type:x proximity;touch-action:pan-x}
+  /* touch (owner 2026-09-24): touch never enters the JS drag (it bails at
+     pointerdown), so the browser's native pan owns the rail with real fling
+     physics. NO touch-action here: pan-x would forbid the vertical page
+     scroll started on a card - fatal on phones where the stack covers the
+     whole width. Default auto lets the browser axis-lock by gesture. */
+  .rail{scroll-snap-type:x proximity}
   .rail .card,.rail .rcard{scroll-snap-align:start}
 }
 @media (max-width:900px){ .rail{--cardw:255px} }
