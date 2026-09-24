@@ -3044,7 +3044,7 @@ function videoCreditHTML(word, platform, credit, url){
 function tiktokEmbed(id, credit, creditUrl){
   if(!/^\d{6,25}$/.test(id||"")) return "";
   const cred = videoCreditHTML("Video", "TikTok", credit, creditUrl);
-  return `<div class="yembed tk"><div class="ytbox"><iframe src="https://www.tiktok.com/embed/v2/${id}?lang=en" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>` + cred;
+  return `<div class="yembed tk"><div class="ytbox"><iframe src="https://www.tiktok.com/embed/v2/${id}?lang=en" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>${cred}</div></div>`;
 }
 function instagramEmbed(kind, code, credit, creditUrl){
   const k = (kind === "reel" || kind === "tv") ? kind : "p";
