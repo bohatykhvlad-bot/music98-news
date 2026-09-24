@@ -43,25 +43,17 @@
    widths are excluded: the 640/900px breakpoints below must keep CSS px. */
 @media (min-width:1100px){
   html{zoom:.96}
-  /* ink-parity v2 (owner 2026-09-24, pixel-truth audit): device-pixel scan shows
-   TOP gap (heading ink -> card edge) is ~2x BOT gap (card edge -> plate line).
-   Rebalance: cards up (headline margin 30->26), rail floor down (24->20),
-   plate pushed away (margin 18->24) => ~14/13 css px both sides, both tabs. */
+  /* owner clarity (2026-09-24): "ты поднимаешь весь блок, а не карточки".
+     WRONG read — fixed: the SECTION stays where it was (tab padding back to
+     14px, heading starts at the familiar 18px below the header). What moves
+     is the SPACE between heading ink and the CARDS inside the section:
+     news margin 16->6, releases 24->14 (releases keeps +10 for descenders
+     p,g which eat ink gap). Rail keeps 20px floor so bottom gap stays 25.5. */
   .tab .hd{margin:0 0 26px}
   .tab .rail{padding-bottom:20px}
   .subscribe{margin-top:24px}
-  /* ink-parity v3 (owner: "глазу понятно что равные"): device-pixel scan says
-     ink->card is 38px on news and 31px on releases while card->plate is 25.5
-     on both. The 12px rail air sits between heading and cards, and releases'
-     descenders (p,g) eat 6px of ink gap. Per-tab heading margins land BOTH
-     tabs at ~26px top / 25.5px bottom - visually equal, measured. */
-  #tab-news .hd{margin:0 0 16px}
-  #tab-releases .hd{margin:0 0 24px}
-  /* owner (pixel audit 2026-09-24): the whole block sits too low -
-     header->cards is 69/77px. Lift the section: tab top padding 14->2
-     (header already breathes via body padding), heading margins keep the
-     measured ink gaps intact. Cards move ~12px closer to the header. */
-  .tab{padding-top:2px}
+  #tab-news .hd{margin:0 0 6px}
+  #tab-releases .hd{margin:0 0 14px}
 }
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
@@ -153,7 +145,7 @@ body.searching .rail-btn{display:none}
 
 /* ---------- tabs / layout ---------- */
 main{position:relative;z-index:1}
-.tab{display:none;padding:2px 0 0}
+.tab{display:none;padding:14px 0 0}
 /* equal breathing around section headings (owner: blocks higher + equal gaps
    to the header above and the content below) */
 .tab .hd{margin:0 0 30px}
