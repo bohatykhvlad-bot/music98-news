@@ -181,10 +181,13 @@ VERIFIED_DATES = {
     "june": "DEAD TOKEN - was 'Taylor Swift wedding, June 2026', factually wrong. The wedding was 03.07.2026",
     "july 3": "Taylor Swift married Travis Kelce, 03.07.2026, Madison Square Garden, ~1,000 guests "
               "(People/AP/Bleacher Report); 'Patient Zero' is her first release since",
-    "july": "Taylor Swift wedding 03.07.2026 (July 3, not June)",
+    "july": "Taylor Swift wedding 03.07.2026 (July 3, not June); Madonna 'Confessions II' released in July 2026 "
+            "and became her tenth No. 1 on the Billboard 200 (NME 25.09.2026; Billboard chart)",
     "2024": "the Eras Tour closed at the end of December 2024 (text: 'the end of 2024'); "
             "Taylor Swift ft. Post Malone won the VMA Song of the Summer in 2024 with 'Fortnight'",
     "2026": "Yeat's album *ADL* is 2026; COCOON recorded on the tour behind it",
+    "1982": "DJ Mark Kamins played Madonna's 'Everybody' demo at Danceteria and then produced it; the record "
+            "became her debut single in 1982 (NME 25.09.2026; Wikipedia 'Danceteria (song)')",
     # added 24.09 for the four queued posts: each one is the date the sentence leans on
     "march 19": "Feid 'EL GREEN PRINT: La Saga (Disc 1) - FEID VS FERXXO', 19.03.2026, his first "
                 "release on his own label Grabaciones Los Poderosos (Billboard/Genius/Discogs)",
@@ -195,7 +198,9 @@ VERIFIED_DATES = {
     "july 17": "Yeat LOVE/LYFE Tour opened 17.07.2026 in Minneapolis (yeatofficial.com/pages/tour, "
                "themusicuniverse)",
     "september 24": "Yeat LOVE/LYFE Tour Chicago stop, 24.09.2026, Huntington Bank Pavilion "
-                    "(yeatofficial.com/pages/tour)",
+                    "(yeatofficial.com/pages/tour); Madonna and Charli xcx 'Danceteria Afterhours' remix "
+                    "released 24.09.2026 on Warner (Wikipedia 'Danceteria (song)'; NME 25.09.2026; "
+                    "Stereogum 24.09.2026)",
     "september 13": "Judeline interview with Rolling Stone published 13.09.2026",
     "september 16": "Yeat announced COCOON as a surprise EP 16.09.2026 (InMusic)",
     "september 17": "COCOON first advertised as five tracks for 17.09.2026 (InMusic)",
