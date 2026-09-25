@@ -17,10 +17,6 @@ Password is `ADMIN_PASSWORD` in `.env` (default `music98`). Change it before you
 
 In the desk: drop a cover and drag/zoom it like Instagram, type the story, click **Italic album** / **“Song title”** / **Photo in story** / **Apple song** / **Apple album**. Paste a `music.apple.com` link — the affiliate token is attached for you. **Publish to the site** goes live now. **Save draft** stays private. Set **Go live at** and press **Schedule** to wait until that time.
 
-## Netlify
-
-The public site is static HTML. On Netlify, keep **Build command empty** and **Publish directory** `public`. Do not set Functions directory to `functions/` — that folder is Cloudflare Workers. Use `netlify/functions` (empty). The homepage still loads `data/top50.json` if `/api/top50` is missing.
-
 ## Cloudflare
 
 Do not upload a zip. Connect **Workers & Pages** to GitHub and deploy with `npx wrangler deploy` (this repo already has `worker.js` + `wrangler.toml`).
@@ -52,7 +48,3 @@ Letters go out through [Resend](https://resend.com). The live site stores the se
 Open the desk → Mail → write subject and text → **Send to the list**.
 
 The server sends the letters. They do not go “from Gmail”.
-
-## Vercel
-
-`/api/top50.py` is the Python rebuild. Add the same env vars. For the desk on Vercel you still need a store (KV). Cloudflare KV is the path already wired; we can add Vercel KV later if you publish there instead.
