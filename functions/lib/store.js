@@ -115,16 +115,28 @@ export function postIsPublic(p, now = Date.now()) {
 }
 
 export function promoteScheduled(desk, now = Date.now()) {
-  let changed = false;
+  /* Late promotion must stamp the real go-live moment, not leave the queued slot.
+     Owner bug 2026-09-26: a batch queued for 24.09 was promoted to live on the first
+     request after that instant, publishAt stayed at 24.09, and the site card read
+     "2 days ago" for a post that had just gone live. The slot is one unit -
+     publishAt (what the card and the article header read) plus date - so both move.
+     Already-live posts are skipped, which keeps this idempotent. */
+  const due = [];
   for (const p of desk.posts || []) {
     if (postStatus(p) !== "scheduled") continue;
     const at = Date.parse(p.publishAt);
-    if (Number.isFinite(at) && at <= now) {
-      p.status = "live";
-      changed = true;
-    }
+    if (Number.isFinite(at) && at <= now) due.push({ p, at });
   }
-  return changed;
+  /* a batch promoted in one pass keeps its intended order instead of collapsing
+     onto a single identical timestamp */
+  due.sort((a, b) => a.at - b.at);
+  due.forEach(({ p }, i) => {
+    p.status = "live";
+    const stamp = new Date(now - (due.length - 1 - i) * 1000).toISOString();
+    p.publishAt = stamp;
+    p.date = stamp.slice(0, 10);
+  });
+  return due.length > 0;
 }
 
 export function publicPosts(desk, now = Date.now()) {

@@ -10,7 +10,7 @@ import runpy
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -152,8 +152,11 @@ def parse_when(value):
 
 
 def promote_scheduled(data: dict) -> bool:
+    """Mirror of the Worker's promoteScheduled: a late promotion stamps the real
+    go-live moment into publishAt + date instead of leaving the queued slot, which
+    made a fresh post read "2 days ago" on the card (owner bug 2026-09-26)."""
     now = datetime.now(timezone.utc)
-    changed = False
+    due = []
     for p in data.get("posts") or []:
         if post_status(p) != "scheduled":
             continue
@@ -161,9 +164,14 @@ def promote_scheduled(data: dict) -> bool:
         if at is None:
             continue
         if at <= now:
-            p["status"] = "live"
-            changed = True
-    return changed
+            due.append((at, p))
+    due.sort(key=lambda x: x[0])
+    for i, (_at, p) in enumerate(due):
+        p["status"] = "live"
+        stamp = now - timedelta(seconds=len(due) - 1 - i)
+        p["publishAt"] = stamp.isoformat(timespec="milliseconds").replace("+00:00", "Z")
+        p["date"] = p["publishAt"][:10]
+    return bool(due)
 
 
 def public_posts(data: dict) -> list:

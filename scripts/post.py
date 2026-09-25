@@ -15,6 +15,8 @@ COMMANDS
   about "<words>" <url>...    same, but ranked against the words you care about
   register <token> "<fact>"   add a date to gate.py VERIFIED_DATES
   set <id> --body-file F      guarded desk write, status untouched
+  slot <id> [--at ISO] [--date YYYY-MM-DD]
+                              move the publication slot (publishAt + date together)
   gate <id>                   run gate.py, print only verdict lines
   publish <id>                flip to live - refuses unless the gate passes
   verify <id>                 live checks: public API, cover, youtube
@@ -33,6 +35,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -101,6 +104,22 @@ def find_post(posts, pid):
 
 def words(text: str) -> int:
     return len(MEDIA_RE.sub(" ", text or "").split())
+
+
+def slot_stamp(p, when=None):
+    """Write the publication slot as one unit: publishAt (the real go-live moment the
+    site card and the article header read) plus date.
+
+    Owner bug 2026-09-26: a post queued for an earlier day was published as live and
+    kept the queued publishAt, so the site card read "2 days ago" for a fresh post.
+    """
+    dt = when or datetime.now(timezone.utc)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    p["publishAt"] = (dt.astimezone(timezone.utc)
+                      .isoformat(timespec="milliseconds").replace("+00:00", "Z"))
+    p["date"] = dt.astimezone().strftime("%Y-%m-%d")
+    return p
 
 
 def auto_excerpt(body: str) -> str:
@@ -351,11 +370,43 @@ def cmd_publish(pid):
 
     def mutate(posts):
         p = find_post(posts, pid)
+        was_live = (p.get("status") or "live") == "live"
         p["status"] = "live"
+        if not was_live:
+            slot_stamp(p)
         return p
 
     now = guarded_write(mutate)
-    print("publish   ok: status=%s date=%s" % (now.get("status"), now.get("date")))
+    print("publish   ok: status=%s publishAt=%s date=%s"
+          % (now.get("status"), now.get("publishAt"), now.get("date")))
+    return now
+
+
+def cmd_slot(pid, at=None, day=None):
+    """Move the publication slot on an existing post: publishAt and date together,
+    because the site reads the day from publishAt and the desk lists read date."""
+    when = None
+    if at:
+        try:
+            when = datetime.fromisoformat(at.strip().replace("Z", "+00:00"))
+        except ValueError:
+            die("--at must be ISO like 2026-09-26T00:10:00Z")
+        if when.tzinfo is None:
+            when = when.replace(tzinfo=timezone.utc)
+
+    def mutate(posts):
+        p = find_post(posts, pid)
+        if when is None:
+            slot_stamp(p)
+        else:
+            slot_stamp(p, when)
+        if day:
+            p["date"] = day.strip()
+        return p
+
+    now = guarded_write(mutate)
+    print("slot      %s: status=%s publishAt=%s date=%s"
+          % (pid, now.get("status"), now.get("publishAt"), now.get("date")))
     return now
 
 
@@ -471,6 +522,11 @@ def main():
     sp.add_argument("--title")
     sp.add_argument("--excerpt")
 
+    sp = sub.add_parser("slot")
+    sp.add_argument("id")
+    sp.add_argument("--at", help="ISO moment, default: now")
+    sp.add_argument("--date", help="YYYY-MM-DD, default: the day of --at")
+
     a = ap.parse_args()
     load_env()
 
@@ -496,6 +552,8 @@ def main():
         cmd_verify(a.id)
     elif a.cmd == "finish":
         cmd_finish(a.id, a.body_file, a.title, a.excerpt)
+    elif a.cmd == "slot":
+        cmd_slot(a.id, a.at, a.date)
 
 
 if __name__ == "__main__":
