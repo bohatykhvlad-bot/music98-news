@@ -48,3 +48,19 @@ Letters go out through [Resend](https://resend.com). The live site stores the se
 Open the desk → Mail → write subject and text → **Send to the list**.
 
 The server sends the letters. They do not go “from Gmail”.
+
+## Post runner
+
+`scripts/post.py` runs the whole editorial cycle from the terminal and prints
+only a compact report, so working through a chat does not re-read the desk and
+the sources on every step.
+
+```bash
+python scripts/post.py list
+python scripts/post.py show <id>
+python scripts/post.py about "keywords" <url>...        # facts, not whole pages
+python scripts/post.py finish <id> --body-file body.txt # set -> gate -> publish -> verify
+```
+
+`finish` refuses to publish unless `scripts/gate.py` reports PASS. It needs
+`ADMIN_PASSWORD` in `.env`. `python scripts/post.py --help` lists everything.
