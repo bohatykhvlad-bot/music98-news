@@ -385,6 +385,21 @@ def pick_name(seed_rec, cached_rec, cur, name_src) -> tuple[str, str, str]:
     return cur[0], cur[1], name_src or ""
 
 
+def rekey_first_days(old: dict) -> dict:
+    """Журнал первого дня тоже переиндексируем: записи до перехода на нормализованные
+    ключи лежат под старыми "Название|Артист" и иначе не находятся."""
+    out: dict = {}
+    for k, v in (old or {}).items():
+        cut = str(k).find("|")
+        nk = tenure_key(k[:cut], k[cut + 1 :]) if cut >= 0 else k
+        try:
+            day = int(v)
+        except (TypeError, ValueError):
+            continue
+        out[nk] = day if nk not in out else min(out[nk], day)
+    return out
+
+
 def apply_names(tracks: list[dict]) -> None:
     """Apple spelling from the seed wins; otherwise the first variant we accepted stays.
     If Apple ever answers with its full credits, that spelling replaces a shortened one, once."""
@@ -653,6 +668,7 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
         first_day = json.loads(FIRST_PATH.read_text(encoding="utf-8"))
     except Exception:
         first_day = {}
+    first_day = rekey_first_days(first_day)
     # эталон стрелок - порядок ПРОШЛОГО дня: в тот же день это ten.keys,
     # на новом дне - последний порядок прошлого дня (ten.today)
     same_day = ten.get("week") == week
@@ -698,6 +714,9 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
             # порядок могла поменять, а скопированная стрелка с ним не сходится
             track["delta"] = str(prev_pos - i)
         track["weeks"] = max(1, week - first_day[key] + 1)
+        # страховка: песня была во вчерашнем порядке -> сегодня минимум второй день
+        if not first and prev_pos >= 0:
+            track["weeks"] = max(2, track["weeks"])
         seen[key] = {
             "weeks": track["weeks"],
             "lastPos": i,

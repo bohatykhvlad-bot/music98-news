@@ -4,7 +4,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v20";
+const TOP50_KV = "top50v21";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -237,6 +237,21 @@ const TENURE_KV = "tenure_v3";
    пересобрать, переименовать или потерять - счётчик "N days on chart" от этого
    больше не обнуляется (19.09 это уже случилось: весь чарт показал "1 день"). */
 const FIRST_KV = "tenure_first_v1";
+/* Журнал первого дня тоже переиндексируем: записи, сделанные до перехода на
+   нормализованные ключи, лежат под старыми "Название|Артист" и иначе не находятся -
+   песня, которая вчера была в чарте, показывала "1 day on chart". Трансформация
+   идемпотентна; при склейке двух ключей берём самый ранний день. */
+function rekeyFirstDays(old) {
+  const out = {};
+  for (const [k, v] of Object.entries(old || {})) {
+    const cut = String(k).indexOf("|");
+    const nk = cut < 0 ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1));
+    const day = Number(v);
+    if (!Number.isFinite(day)) continue;
+    out[nk] = out[nk] == null ? day : Math.min(out[nk], day);
+  }
+  return out;
+}
 async function applyTenure(env, tracks) {
   const week = chartWeek();
   /* week starts at -1 so the very first daily run opens the registry fresh. */
@@ -245,7 +260,7 @@ async function applyTenure(env, tracks) {
   if (env && env.DESK) {
     const v = await env.DESK.get(TENURE_KV, { type: "json" });
     if (v && v.epoch === "daily") ten = v;
-    firstDay = (await env.DESK.get(FIRST_KV, { type: "json" })) || {};
+    firstDay = rekeyFirstDays(await env.DESK.get(FIRST_KV, { type: "json" }));
   }
   /* Эталон стрелок - порядок ПРОШЛОГО дня. В тот же день это уже зафиксированный
      ten.keys, а на новом дне - последний порядок прошлого дня (ten.today). */
@@ -293,6 +308,9 @@ async function applyTenure(env, tracks) {
       track.delta = String(prevPos - i);
     }
     track.weeks = Math.max(1, week - firstDay[key] + 1);
+    /* страховка: если песня была во вчерашнем порядке, она была в чарте вчера -
+       значит сегодня минимум второй день */
+    if (!first && prevPos >= 0) track.weeks = Math.max(2, track.weeks);
     seen[key] = { weeks: track.weeks, lastPos: i, lastWeek: week, delta: track.delta };
   });
   /* Эталон стрелок - порядок ПРОШЛОГО дня (ten.keys). Порядок сегодняшней сборки
