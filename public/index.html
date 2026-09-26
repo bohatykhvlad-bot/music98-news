@@ -947,13 +947,16 @@ function fitCover(img){
   if(!box || !img.naturalWidth) return;
   const fx = Math.min(1, Math.max(0, Number(img.dataset.fx)));
   const fy = Math.min(1, Math.max(0, Number(img.dataset.fy)));
-  /* owner lag fix: over-zoomed covers render as giant layers (measured 665x893
-     in a 253px box = 9x the pixels) and the compositor resamples them every
-     scroll frame. 1.6 still shows real crop intent; the decoder also downscales
-     the source, keeping memory flat. THIS IS THE ONE CAP: the desk mirrors it
-     (admin-desk.html, SITE_ZOOM_CAP) so a preview can never show a crop the
-     visitor does not get - raise it here and there together. */
-  const z = Math.min(1.6, Math.max(1, Number(img.dataset.zoom) || 1));
+  /* The desk stores the crop the owner framed and this renders it AS STORED.
+     The old 1.6 clamp here silently widened every card he had tightened - his
+     rule is "голова занимает 55-65% высоты окна, минимум воздуха сверху" and
+     cardZoom is derived from it (2.2-3.2 on these portrait frames) - so the
+     live card showed a different picture than the pane he framed it in, and
+     the desk mini, which copied the clamp, agreed with the page instead of
+     with him. The giant-layer cost that clamp worked around came from the
+     covers being promoted to their own composited layer by a 3D transform;
+     positioned with a 2D translate a tight crop is painted clipped to its box. */
+  const z = Math.min(8, Math.max(1, Number(img.dataset.zoom) || 1));
   const sw = box.clientWidth, sh = box.clientHeight;
   if(!sw || !sh) return;
   const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -965,7 +968,7 @@ function fitCover(img){
   top = Math.min(0, Math.max(sh - dh, top));
   img.style.width = dw+"px";
   img.style.height = dh+"px";
-  img.style.transform = "translate3d("+left+"px,"+top+"px,0)";
+  img.style.transform = "translate("+left+"px,"+top+"px)";
 }
 function bindCovers(root){
   (root||document).querySelectorAll("img.js-cover").forEach(img=>{
@@ -978,25 +981,23 @@ function bindCovers(root){
     }
   });
 }
-function lockFocus(p, yVal){
-  const f = coverFocus(p);
-  const lxRaw = p && p.cover && p.cover.lockX;
-  const lx = (lxRaw == null || lxRaw === "") ? NaN : Number(lxRaw);
-  const x = (lx >= 0 && lx <= 1) ? lx : f.x;
-  const cy = Number(yVal);
-  const y = (cy >= 0 && cy <= 1) ? cy : f.y;
-  return {x, y};
-}
 function cardZoom(p){
   const cz = Number(p && p.cover && p.cover.cardZoom);
   return (cz >= 1 && cz <= 8) ? cz : coverZoom(p);
 }
 function cardFocus(p){
-  /* a card with an unlocked horizontal keeps its own x (cardX, set in the
-     admin via the cross pill); otherwise it follows the main crop x */
-  const f = lockFocus(p, p && p.cover && p.cover.cardY);
-  const cx = Number(p && p.cover && p.cover.cardX);
-  return Number.isFinite(cx) ? {x: Math.min(1, Math.max(0, cx)), y: f.y} : f;
+  /* the card's horizontal IS the main crop's x; only the desk's axis pill gives
+     a card its own x (cardX). A stored lockX is a copy of the main x from an
+     old save and is not read any more: while it was, a card kept an older x
+     than the main crop the desk previews showed it bound to
+     (_style-memory: "горизонт наследует стадию или cardX"). */
+  const f = coverFocus(p);
+  const cyRaw = p && p.cover && p.cover.cardY;
+  const cy = (cyRaw == null || cyRaw === "") ? NaN : Number(cyRaw);
+  const y = (cy >= 0 && cy <= 1) ? cy : f.y;
+  const cxRaw = p && p.cover && p.cover.cardX;
+  const cx = (cxRaw == null || cxRaw === "") ? NaN : Number(cxRaw);
+  return {x: Number.isFinite(cx) ? Math.min(1, Math.max(0, cx)) : f.x, y};
 }
 function coverImg(p, square, lazy, mode){
   const extra = lazy ? ' loading="lazy"' : '';

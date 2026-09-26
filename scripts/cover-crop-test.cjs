@@ -131,11 +131,11 @@ function deskGeom(iw, ih, bw, bh, fx, fy, zoom) {
   return geometry(img.style);
 }
 
-/* ---------- 1. the two copies of the math must agree, cap included ---------- */
+/* ---------- 1. the two copies of the math must agree, guard included ---------- */
 const boxes = [[543, 543, "card 1:1"], [960, 540, "main 16:9"], [40, 40, "40px thumb"]];
 const sources = [[2933, 4400, "portrait 2:3"], [4000, 2250, "landscape 16:9"], [1200, 1200, "square"]];
 const focuses = [[0.5, 0.5], [0.46, 0.59], [0.5, 0.06], [0, 1], [1, 0], [0.1, 0.9]];
-const zooms = [1, 1.2, 1.6, 1.61, 1.73, 1.89, 2.63, 6];
+const zooms = [1, 1.2, 1.6, 1.61, 1.73, 1.86, 1.89, 2.63, 6, 9];
 let checked = 0, bad = 0;
 for (const [iw, ih, sname] of sources) {
   for (const [bw, bh, bname] of boxes) {
@@ -151,24 +151,53 @@ for (const [iw, ih, sname] of sources) {
     }
   }
 }
-t("cover math: site fitCover == desk fitCover (" + checked + " combinations)", bad, 0);
+t("cover math: site fitCover == desk fitCover (" + checked + " combinations, zoom to 9)", bad, 0);
 
-/* the desk's cap helper must equal the cap the live page actually applies */
-t("zoom cap: desk siteZoom(99) is the live cap", near(desk.__probe.siteZoom(99), 1.6), true);
-t("zoom cap: cap constant matches the helper", desk.__probe.cap, desk.__probe.siteZoom(99));
-t("zoom cap: live fitCover stops growing there",
+/* a tight card must survive the trip: the owner's rule is "the head fills
+   55-65% of the window", so zoom 2.63 has to arrive as 2.63 */
+t("tight card: zoom 2.63 is drawn at 2.63",
+  siteGeom(2933, 4400, 543, 543, 0.5, 0.34, 2.63),
+  deskGeom(2933, 4400, 543, 543, 0.5, 0.34, 2.63));
+t("tight card: not silently widened",
+  siteGeom(2933, 4400, 543, 543, 0.5, 0.34, 2.63) !== siteGeom(2933, 4400, 543, 543, 0.5, 0.34, 1.6), true);
+
+/* the desk's guard must equal the guard the live page applies */
+t("zoom guard: desk siteZoom(99) is the live guard", near(desk.__probe.siteZoom(99), 8), true);
+t("zoom guard: cap constant matches the helper", desk.__probe.cap, desk.__probe.siteZoom(99));
+t("zoom guard: live fitCover stops growing there",
   siteGeom(2933, 4400, 960, 540, 0.5, 0.5, 99),
   siteGeom(2933, 4400, 960, 540, 0.5, 0.5, desk.__probe.siteZoom(99)));
+
+/* the card's x is the main crop's x unless the pill unlocked it: a stored
+   lockX is an old copy and must not move either surface any more */
+const locked = { cover: { kind: "img", pos: "40% 30%", zoom: 1, cardY: 0.5, cardZoom: 1, lockX: 0.9 } };
+t("card x: a stale lockX is ignored (live)", site.cardFocus(locked).x, 0.4);
+t("card x: a stale lockX is ignored (desk)", (() => {
+  desk.setCover("/photos/u-r1.jpg", locked.cover.pos, 1, 0.5, 1, undefined);
+  return desk.cardFx();
+})(), 0.4);
+t("card x: cardX still wins over the main x", site.cardFocus(Object.assign({}, locked, { cover: Object.assign({}, locked.cover, { cardX: 0.74 }) })).x, 0.74);
+/* missing / null card fields fall back the same way on both sides */
+const bare = { cover: { kind: "img", pos: "30% 70%", zoom: 1.4, cardY: null, cardZoom: null, cardX: "" } };
+t("fallbacks: the page takes the main crop", [
+  site.cardFocus(bare).x, site.cardFocus(bare).y, site.cardZoom(bare)
+].join(","), "0.3,0.7,1.4");
+t("fallbacks: the desk takes the same", (() => {
+  desk.setCover("/photos/u-r1.jpg", bare.cover.pos, bare.cover.zoom, bare.cover.cardY, bare.cover.cardZoom, bare.cover.cardX);
+  const c = desk.__probe.crop;
+  return [c.x, c.cardY, c.cardZoom, desk.cardFx()].join(",");
+})(), "0.3,0.7,1.4,0.3");
+/* lockX stays in the payload as a mirror of pos.x for browsers on the old page */
+t("save: lockX is written as the main x",
+  /lockX:\s*Math\.round\(crop\.x\*100\)\/100/.test(fs.readFileSync(path.join(__dirname, "..", "public", "admin-desk.html"), "utf8")), true);
 
 /* ---------- 2. every saved post: what the desk draws == what the visitor gets ---------- */
 const data = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "public", "data", "desk.json"), "utf8"));
 const posts = (data.posts || data).filter(p => p.cover && p.cover.kind === "img");
-const stale = [];
 posts.forEach((p, i) => {
   const c = p.cover;
-  const pm = String(c.pos || "50% 50%").match(/([\d.]+)%\s+([\d.]+)%/);
   // load the post into the desk exactly like fillForm() does
-  desk.setCover("/" + c.src, c.pos, c.zoom, c.cardY, c.cardZoom, c.lockX, c.cardX);
+  desk.setCover("/" + c.src, c.pos, c.zoom, c.cardY, c.cardZoom, c.cardX);
   const crop = desk.__probe.crop;
   const [iw, ih] = i % 2 ? [4000, 2250] : [2933, 4400];
 
@@ -181,7 +210,7 @@ posts.forEach((p, i) => {
     deskGeom(iw, ih, 543, 543, desk.cardFx(), crop.cardY, crop.cardZoom),
     siteGeom(iw, ih, 543, 543, cf.x, cf.y, cz));
 
-  /* the mini next to the stage mirrors that pane: same pixels, cap included */
+  /* the mini next to the stage mirrors that pane: same pixels */
   t("post " + p.id + ": mini card == card pane",
     deskGeom(iw, ih, 543, 543, desk.cardFx(), crop.cardY, desk.__probe.siteZoom(crop.cardZoom)),
     deskGeom(iw, ih, 543, 543, desk.cardFx(), crop.cardY, crop.cardZoom));
@@ -191,15 +220,8 @@ posts.forEach((p, i) => {
   t("post " + p.id + ": main crop pixels",
     deskGeom(iw, ih, 960, 540, crop.x, crop.y, crop.zoom),
     siteGeom(iw, ih, 960, 540, mf.x, mf.y, mz));
-
-  /* a free card (cardX) ignores lockX on both sides, so only the bound ones matter */
-  if (c.lockX != null && c.cardX == null && pm && Math.abs(Number(c.lockX) - Number(pm[1]) / 100) > 0.005) stale.push(p.id);
 });
 
 console.log("posts checked:", posts.length);
-if (stale.length) {
-  console.log("note: stale lockX on", stale.join(", "),
-    "- the live card keeps an older x while the desk's main-mode card mini follows the main crop");
-}
 console.log(fail ? "\n" + fail + " FAILED, " + pass + " ok" : "\nall " + pass + " checks ok");
 process.exit(fail ? 1 : 0);

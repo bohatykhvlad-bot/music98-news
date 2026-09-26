@@ -489,15 +489,14 @@ const KEY = "music98_admin_key";
 const APPLE_AT = "1001l3aZW";
 let posts = [];
 let coverSrc = "";
-let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, lockX:null, cardFree:false, cardX:null};
+let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, cardFree:false, cardX:null};
 let cropMode = "main";   /* main | card | hero */
-/* The public page clamps EVERY cover to this zoom (index.html, fitCover) -
-   anything above it simply is not drawn there. Every preview in here (card
-   stage, main stage, mini, story-list thumb, in-article photo) must draw the
-   same pixels the visitor gets, or the desk lies: the card pane used to render
-   the raw cardZoom (1.89 for Tinashe) while the live card showed 1.6, and the
-   owner could not tell which of the two panes to trust. */
-const SITE_ZOOM_CAP = 1.6;
+/* The live page draws a cover exactly as stored - fitCover in index.html, with
+   8 as the biggest zoom cardZoom() accepts. Draw the same here or the desk
+   lies: the mini used to clamp itself to 1.6 while the card pane drew 1.89, so
+   one editor showed two different cards (head cut in one, air above it in the
+   other) and the owner could not tell which of them the visitor gets. */
+const SITE_ZOOM_CAP = 8;
 const siteZoom = z => Math.min(SITE_ZOOM_CAP, Math.max(1, Number(z) || 1));
 let editing = null;
 let appleKind = "song";
@@ -809,10 +808,12 @@ function refreshFigCredit(fig){
 function photoBlock(src, author, link, pos, zoom){
   author = author||""; link = link||"";
   if(!/^[\d.]+%\s+[\d.]+%$/.test(pos||"")) pos = "50% 50%";
-  zoom = siteZoom(zoom);
+  /* the page's renderBody() keeps a [photo:…] zoom only inside 1..3 and falls
+     back to 1, so mirror that here - the preview has to match the article */
+  zoom = (Number(zoom) >= 1 && Number(zoom) <= 3) ? Number(zoom) : 1;
   const m = pos.match(/([\d.]+)%\s+([\d.]+)%/);
   const fx = +m[1]/100, fy = +m[2]/100;
-  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}" data-pauthor="${esc(author)}" data-plink="${esc(link)}" data-ppos="${esc(pos)}" data-pzoom="${zoom}">${blkChrome()}<span class="abody-box"><img src="${esc(src)}" alt="" draggable="false" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"><span class="grid"></span></span><span class="ppanel" contenteditable="false"><input type="text" class="pp-author" placeholder="Credit: author / source" value="${esc(author)}"><input type="text" class="pp-link" placeholder="Link to the photo" value="${esc(link)}"><span class="pp-zoomrow"><button class="btn ghost" type="button" data-pz="-1" aria-label="Zoom out">−</button><input type="range" class="pp-zoom" min="1" max="${SITE_ZOOM_CAP}" step="0.01" value="${zoom}"><button class="btn ghost" type="button" data-pz="1" aria-label="Zoom in">+</button><button class="btn ghost pp-center" type="button">Center</button></span></span>${pcredFor(author,link)}</figure>`;
+  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}" data-pauthor="${esc(author)}" data-plink="${esc(link)}" data-ppos="${esc(pos)}" data-pzoom="${zoom}">${blkChrome()}<span class="abody-box"><img src="${esc(src)}" alt="" draggable="false" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"><span class="grid"></span></span><span class="ppanel" contenteditable="false"><input type="text" class="pp-author" placeholder="Credit: author / source" value="${esc(author)}"><input type="text" class="pp-link" placeholder="Link to the photo" value="${esc(link)}"><span class="pp-zoomrow"><button class="btn ghost" type="button" data-pz="-1" aria-label="Zoom out">−</button><input type="range" class="pp-zoom" min="1" max="3" step="0.01" value="${zoom}"><button class="btn ghost" type="button" data-pz="1" aria-label="Zoom in">+</button><button class="btn ghost pp-center" type="button">Center</button></span></span>${pcredFor(author,link)}</figure>`;
 }
 function fitPhotoFig(fig){
   const img = fig.querySelector(".abody-box img");
@@ -1210,16 +1211,16 @@ function parsePos(p){
   return {x:0.5, y:0.5};
 }
 function cardFx(){
-  /* before the pill is clicked the card follows the main crop horizontally;
-     after unlocking, it keeps its own x (cardX). Mode-independent: the public
-     site renders cardX regardless of which admin pane is open, so the mini
-     preview must show cardX in MAIN mode too (GTA/Pylon preview bug). */
+  /* the card's horizontal IS the main crop's x; only the pill gives it its own
+     (cardX). Mode-independent, like the live page: it draws cardX or pos.x
+     whichever pane is open, so the mini in MAIN mode shows the same x as the
+     card pane and as the visitor's card (GTA/Pylon preview bug). */
   if(crop.cardFree && Number.isFinite(crop.cardX)) return crop.cardX;
-  return lockFx();
+  return crop.x;
 }
 function fitCover(img, fx, fy, zoom){
-  /* same box maths as the public fitCover, INCLUDING the site's zoom cap:
-     a preview that renders a zoom the site refuses to draw is a lie */
+  /* the same box maths (and the same zoom guard) as the public fitCover:
+     a preview that draws a different crop than the page is a lie */
   const box = img && img.parentElement;
   if(!box || !img.naturalWidth) return;
   const x = Math.min(1, Math.max(0, Number(fx)));
@@ -1252,8 +1253,8 @@ function zoomCap(){
   const need = (px, f) => 2 * Math.max(f, 1 - f) * px;
   const zw = sw ? need(iw, fx) / sw : 1;
   const zh = sh ? need(ih, fy) / sh : 1;
-  /* never above the site cap: the slider's right end used to allow 1.89/2.63
-     on cards, the live card drew 1.6 - the owner framed a crop nobody saw */
+  /* the slider's right end is the zoom that keeps the focus point visible; the
+     page accepts up to SITE_ZOOM_CAP, so never offer more than that */
   return Math.min(SITE_ZOOM_CAP, Math.max(1.2, Math.max(zw, zh) * 1.02));
 }
 function setZoom(z){
@@ -1294,13 +1295,6 @@ function setAspect(a){
   $("#stage").style.aspectRatio = crop.aspect === "1/1" ? "1 / 1" : "16 / 9";
   layoutCrop();
 }
-function lockFx(){
-  /* editorial-111: the checkbox is gone - the card is ALWAYS horizontally
-     bound to the main crop (main edits move the card's x with them, its own
-     y/zoom stay independent). Old posts with a stored lockX simply render
-     the same: lockX equalled crop.x at save time. */
-  return (cropMode !== "main" && crop.lockX != null) ? crop.lockX : crop.x;
-}
 function syncAxisPill(){
   const pill = $("#axisPill");
   if(!pill) return;
@@ -1312,7 +1306,7 @@ $("#axisPill").addEventListener("click", e=>{
   e.stopPropagation();
   if(cropMode !== "card") setCropMode("card");
   crop.cardFree = !crop.cardFree;
-  if(crop.cardFree && !Number.isFinite(crop.cardX)) crop.cardX = lockFx();
+  if(crop.cardFree && !Number.isFinite(crop.cardX)) crop.cardX = crop.x;
   crop.dirty = true;
   syncAxisPill();
   layoutCrop();
@@ -1427,19 +1421,19 @@ function setCover(src, pos, zoom, cardY){
   coverSrc = src;
   const parsed = parsePos(pos);
   crop.x = parsed.x; crop.y = parsed.y; crop.zoom = siteZoom(Number(zoom)||1);
-  const cy = Number(cardY);
+  /* empty / null card fields fall back exactly like the page does: cardY to the
+     main y, cardZoom to the main zoom, a missing cardX to the main x */
+  const num = v => (v == null || v === "") ? NaN : Number(v);
+  const cy = num(cardY);
   crop.cardY = (cy >= 0 && cy <= 1) ? cy : parsed.y;
-  const cz = Number(arguments[4]);
-  /* an over-cap cardZoom is stale: the visitor never saw it, so normalise it
-     the moment the post opens (the slider then matches what is on screen) */
-  crop.cardZoom = (cz >= 1 && cz <= 6) ? siteZoom(cz) : (crop.zoom||1);
-  const lxRaw = arguments[5];
-  const lx = (lxRaw == null || lxRaw === "") ? NaN : Number(lxRaw);
-  crop.lockX = (lx >= 0 && lx <= 1) ? lx : null;
-  const cxRaw = arguments[6];
-  const cx = (cxRaw == null || cxRaw === "") ? NaN : Number(cxRaw);
+  const cz = num(arguments[4]);
+  crop.cardZoom = (cz >= 1 && cz <= SITE_ZOOM_CAP) ? cz : (crop.zoom||1);
+  /* arguments[5] used to be the stored lockX: it is a copy of the main x from
+     an old save and is ignored now - the card's x is the main crop's x unless
+     cardX (the pill) says otherwise */
+  const cx = num(arguments[5]);
   crop.cardFree = Number.isFinite(cx);
-  crop.cardX = Number.isFinite(cx) ? cx : null;
+  crop.cardX = Number.isFinite(cx) ? Math.min(1, Math.max(0, cx)) : null;
   setCropMode("main");
   $("#zoom").value = crop.zoom;
   const img = $("#stageImg");
@@ -1479,8 +1473,8 @@ function renderList(){
     const pxy = String(c.pos || "50% 50%").split(/\s+/);
     const mx = Number(pxy[0]); const my = Number(pxy[1]);
     const cyPct = (c.cardY == null) ? (my || 50) : Math.round(Number(c.cardY)*100);
-    const cxPct = c.cardX != null ? Math.round(Number(c.cardX)*100)
-      : (c.lockX != null ? Math.round(Number(c.lockX)*100) : (mx || 50));
+    /* same rule as the live cardFocus(): cardX, else the main crop's x */
+    const cxPct = c.cardX != null ? Math.round(Number(c.cardX)*100) : (mx || 50);
     const czoom = siteZoom(c.cardZoom ?? c.zoom);
     const tattr = `class="thimg" data-fx="${(cxPct/100).toFixed(4)}" data-fy="${(cyPct/100).toFixed(4)}" data-zoom="${czoom}"`;
     /* thbox clips the fitted image to the 40px cell (zoom paints outside) */
@@ -1587,13 +1581,13 @@ function fillForm(p){
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
   const src = (p?.cover && p.cover.src) || "";
-  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.cardZoom, p.cover.lockX, p.cover.cardX);
+  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.cardZoom, p.cover.cardX);
   else {
     coverSrc = "";
     $("#stageImg").classList.add("hide");
     $("#stageImg").removeAttribute("src");
     $("#coverHint").classList.remove("hide");
-    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, cardZoom:1, lockX:null, cardFree:false, cardX:null};
+    crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, cardZoom:1, cardFree:false, cardX:null};
     $("#zoom").value = zoomNow();
     $("#miniImg").classList.add("hide");
     paintMini();
@@ -1732,8 +1726,6 @@ stage.addEventListener("pointermove", e=>{
   }else{
     crop.x = drag.cx - (e.clientX - drag.x) / dw;
     crop.y = drag.cy - (e.clientY - drag.y) / dh;
-    /* keep the card's horizontal lock glued to the main crop (default now) */
-    if(cropMode !== "card") crop.lockX = crop.x;
   }
   crop.dirty = true;
   layoutCrop();
@@ -1802,8 +1794,8 @@ $("#composer").addEventListener("input", e=>{
      not around the stored anchor fx/fy: recompute the anchor so the point
      under the box center stays under the box center across the zoom change.
      Mirrors the card-zoom logic in setZoom. */
-  const zOld = siteZoom(img.dataset.zoom);
-  const zNew = siteZoom(e.target.value);
+  const zOld = Math.min(3, Math.max(1, Number(img.dataset.zoom)||1));
+  const zNew = Math.min(3, Math.max(1, Number(e.target.value)||1));
   if(zNew !== zOld && img.naturalWidth && box.clientWidth){
     const sw = box.clientWidth, sh = box.clientHeight;
     const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -1830,8 +1822,8 @@ $("#composer").addEventListener("click", e=>{
   if(!fig) return;
   const img = fig.querySelector(".abody-box img");
   if(e.target.dataset.pz){
-    const zOld = siteZoom(img.dataset.zoom);
-    const z = siteZoom(zOld + Number(e.target.dataset.pz)*0.1);
+    const zOld = Math.min(3, Math.max(1, Number(img.dataset.zoom)||1));
+    const z = Math.min(3, Math.max(1, zOld + Number(e.target.dataset.pz)*0.1));
     const box = img.parentElement;
     /* same view-center pivot as the slider (owner: "зумит в центр") */
     if(z !== zOld && img.naturalWidth && box.clientWidth){
@@ -2179,7 +2171,10 @@ function collectPost(status){
       zoom: Math.round((crop.zoom||1)*100)/100,
       cardY: Math.round((crop.cardY!=null?crop.cardY:0.5)*100)/100,
       cardZoom: Math.round((crop.cardZoom!=null?crop.cardZoom:1)*100)/100,
-      lockX: Math.round((crop.lockX!=null?crop.lockX:crop.x)*100)/100,
+      /* lockX is no longer read by the page (the card takes the main x); it is
+         still written as a mirror of pos.x so a browser holding the previous
+         index.html keeps rendering the same card */
+      lockX: Math.round(crop.x*100)/100,
       cardX: crop.cardFree && Number.isFinite(crop.cardX) ? Math.round(crop.cardX*100)/100 : undefined
     } : {kind:"preset", i:0}
   };
