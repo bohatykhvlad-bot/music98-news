@@ -653,8 +653,14 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
         first_day = json.loads(FIRST_PATH.read_text(encoding="utf-8"))
     except Exception:
         first_day = {}
+    # эталон стрелок - порядок ПРОШЛОГО дня: в тот же день это ten.keys,
+    # на новом дне - последний порядок прошлого дня (ten.today)
+    same_day = ten.get("week") == week
+    ref_raw = (ten.get("keys") or []) if same_day else (
+        ten.get("today") if isinstance(ten.get("today"), list) and ten.get("today") else (ten.get("keys") or [])
+    )
     prev_keys = []
-    for k in ten.get("keys") or []:
+    for k in ref_raw:
         cut = str(k).find("|")
         prev_keys.append(tenure_key(k[:cut], k[cut + 1 :]) if cut >= 0 else k)
     seen = rekey_seen(ten.get("seen") or {})
@@ -677,24 +683,18 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
             prev_pos = prev_keys.index(key)
         except ValueError:
             prev_pos = -1
-        rec = seen.get(key) or {"weeks": 0}
         if first:
             first_day.setdefault(key, week)
             track["delta"] = "0"
-        elif not rolled:
-            first_day.setdefault(key, week)
-            # same-day rebuild: show movement only if it was computed today
-            track["delta"] = (
-                str(rec["delta"])
-                if rec.get("lastWeek") == week and rec.get("delta") not in (None, "")
-                else "0"
-            )
         elif prev_pos < 0:
-            # the song was not on the chart yesterday: a new streak starts -> NEW
-            first_day[key] = week
+            # во вчерашнем порядке песни нет: серия начинается заново -> NEW
+            if rolled or key not in first_day:
+                first_day[key] = week
             track["delta"] = "new"
         else:
             first_day.setdefault(key, week)
+            # стрелку ВСЕГДА считаем от вчерашнего порядка: внутридневная пересборка
+            # порядок могла поменять, а скопированная стрелка с ним не сходится
             track["delta"] = str(prev_pos - i)
         track["weeks"] = max(1, week - first_day[key] + 1)
         seen[key] = {
@@ -703,8 +703,16 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
             "lastWeek": week,
             "delta": track["delta"],
         }
-    if first or rolled:
+    # эталон стрелок - порядок прошлого дня; порядок сегодняшней сборки отдельно
+    if first:
+        # первый прогон: эталоном для следующего дня становится сегодняшний порядок
         ten["keys"] = new_keys
+        ten["today"] = new_keys
+    elif rolled:
+        ten["keys"] = ten.get("today") or prev_keys
+        ten["today"] = new_keys
+    else:
+        ten["today"] = new_keys
     ten["week"] = week
     ten["seen"] = seen
     TENURE_PATH.parent.mkdir(exist_ok=True)

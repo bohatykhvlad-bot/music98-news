@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v18 on 26.09: forces the rebuild that pins the plain title over a variant one.
+/* Bumped to v19 on 26.09: forces the rebuild with the arrow fix.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v18";
+const TOP50_KV = "top50v19";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -247,7 +247,13 @@ async function applyTenure(env, tracks) {
     if (v && v.epoch === "daily") ten = v;
     firstDay = (await env.DESK.get(FIRST_KV, { type: "json" })) || {};
   }
-  const prevKeys = (ten.keys || []).map((k) => {
+  /* Эталон стрелок - порядок ПРОШЛОГО дня. В тот же день это уже зафиксированный
+     ten.keys, а на новом дне - последний порядок прошлого дня (ten.today). */
+  const sameDay = ten.week === week;
+  const refRaw = sameDay
+    ? (ten.keys || [])
+    : (Array.isArray(ten.today) && ten.today.length ? ten.today : (ten.keys || []));
+  const prevKeys = refRaw.map((k) => {
     const cut = String(k).indexOf("|");
     return cut < 0 ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1));
   });
@@ -267,26 +273,37 @@ async function applyTenure(env, tracks) {
     const key = tenureKey(track.title, track.artist);
     newKeys.push(key);
     const prevPos = prevKeys.indexOf(key);
-    const rec = seen[key] || { weeks: 0 };
     if (first) {
       if (firstDay[key] == null) firstDay[key] = week;
       track.delta = "0";
-    } else if (!rolled) {
-      if (firstDay[key] == null) firstDay[key] = week;
-      /* та же сборка за день: движение показываем только если оно посчитано сегодня */
-      track.delta = rec.lastWeek === week && rec.delta != null && rec.delta !== "" ? String(rec.delta) : "0";
     } else if (prevPos < 0) {
-      /* песни вчера не было: серия начинается заново -> NEW (правило владельца) */
-      firstDay[key] = week;
+      /* во вчерашнем порядке песни нет: серия начинается заново -> NEW.
+         На новом дне это возврат в чарт, внутри дня - просто новая строка. */
+      if (rolled || firstDay[key] == null) firstDay[key] = week;
       track.delta = "new";
     } else {
       if (firstDay[key] == null) firstDay[key] = week;
+      /* стрелку ВСЕГДА считаем от вчерашнего порядка. Раньше при внутридневной
+         пересборке она просто копировалась из реестра, а порядок за день мог
+         поменяться (источник то отвечает, то нет) - и стрелка переставала
+         сходиться с показанным местом (владелец: "Дрейк ▼3, а #1 не менялся"). */
       track.delta = String(prevPos - i);
     }
     track.weeks = Math.max(1, week - firstDay[key] + 1);
     seen[key] = { weeks: track.weeks, lastPos: i, lastWeek: week, delta: track.delta };
   });
-  if (first || rolled) ten.keys = newKeys;
+  /* Эталон стрелок - порядок ПРОШЛОГО дня (ten.keys). Порядок сегодняшней сборки
+     живёт отдельно (ten.today), поэтому внутридневная пересборка эталон не сдвигает. */
+  if (first) {
+    /* первый прогон: эталоном для следующего дня становится сегодняшний порядок */
+    ten.keys = newKeys;
+    ten.today = newKeys;
+  } else if (rolled) {
+    ten.keys = Array.isArray(ten.today) && ten.today.length ? ten.today : prevKeys;
+    ten.today = newKeys;
+  } else {
+    ten.today = newKeys;
+  }
   ten.week = week;
   ten.seen = seen;
   if (env && env.DESK) {
@@ -294,6 +311,24 @@ async function applyTenure(env, tracks) {
     await env.DESK.put(FIRST_KV, JSON.stringify(firstDay));
   }
   return tracks;
+}
+/* Самопроверка стрелок: место + стрелка обязаны складываться в непротиворечивый
+   вчерашний порядок. Никаких двух песен на одном вчерашнем месте и никаких
+   выходов за пределы списка. Поле arrows уходит в ответ - поломку видно сразу. */
+function arrowCheck(tracks) {
+  const taken = new Set();
+  let bad = 0;
+  let fresh = 0;
+  tracks.forEach((t, i) => {
+    const d = String(t.delta == null ? "" : t.delta).toLowerCase();
+    if (d === "new") { fresh += 1; return; }
+    const n = Number(d);
+    if (!Number.isFinite(n)) { bad += 1; return; }
+    const p = i + n;
+    if (p < 0 || p >= tracks.length || taken.has(p)) bad += 1;
+    else taken.add(p);
+  });
+  return { ok: bad === 0, bad, new: fresh };
 }
 const UA = "Mozilla/5.0 (compatible; music98/1.0)";
 
@@ -667,6 +702,7 @@ export async function onRequestGet({ env, request }) {
   try {
     const payload = await withTimeout(buildTop50(new URL(request.url).origin, env), 14000);
     payload.tracks = await applyTenure(env, payload.tracks);
+    payload.arrows = arrowCheck(payload.tracks);
     if (env && env.DESK && payload.tracks && payload.tracks.length) {
       try { await env.DESK.put(TOP50_KV, JSON.stringify(payload)); } catch {}
     }
