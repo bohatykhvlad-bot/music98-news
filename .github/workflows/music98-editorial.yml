@@ -35,33 +35,6 @@ jobs:
           test -f scripts/gate.py
       - name: Desk list
         run: python scripts/post.py list
-      - name: Update Taylor Swift draft
-        run: |
-          python - <<'PY'
-          import sys, json
-          from pathlib import Path
-          sys.path.insert(0, str(Path("scripts").resolve()))
-          import post
-          body = '''Taylor Swift has given *The Life of a Showgirl* a second act. Nearly a year after the album arrived, she has returned to the project with *The Life of a Showgirl: The Encore*, adding four new songs that were written after the original album was released.\n\nThe story behind the expansion is almost as striking as the release itself. Swift traveled to Sweden with Max Martin and Shellback to celebrate the success of *The Life of a Showgirl*. The trip was supposed to be about taking in the moment and reflecting on what they had made. Instead, with a studio nearby, the three started writing again. Swift later described the new songs as coming from that feeling of gratitude and celebration.\n\nWhat began as a reunion with two of the collaborators who shaped the original album became a new recording session, and eventually a second chapter for *The Life of a Showgirl*. The Encore arrives with "Patient Zero," "Cleveland!," "Pink Clouding" and "Babylon" as four songs created after the original album had already been released.\n\n[apple:album:6814997249]\n\n"Patient Zero" introduces the new material with a story about recognizing the warning signs of a relationship from the outside. Swift takes the perspective of someone who has already been through the same kind of situation, offering another woman a way out before she makes the same mistakes.\n\nThe song also leads into one of the biggest visual moments of the release. Swift directed its music video herself, with Colin Farrell and Dakota Johnson appearing alongside her. Emmanuel Lubezki, the Oscar-winning cinematographer behind *Gravity*, *Birdman* and *The Revenant*, shot the video. It will premiere during the MTV Video Music Awards on September 27.\n\nThe Encore comes at an interesting point in the *Showgirl* era. The original album arrived in October 2025 and became one of the defining releases of Swift's year, while songs such as "The Fate of Ophelia" and "Opalite" extended its run well beyond release week. Since then, Swift has also been inducted into the Songwriters Hall of Fame and the National Recording Registry.\n\nRather than bringing an entirely new project into the picture, Swift has reopened one that was already out in the world. The additional songs were born from a celebration of the original album's success, turning a return to the studio in Sweden into another release and giving *The Life of a Showgirl* a new final chapter.'''
-          before = post.desk_read()
-          posts = before["posts"]
-          matches = [p for p in posts if "The Life of a Showgirl" in str(p.get("title",""))]
-          if not matches:
-              raise SystemExit("Taylor draft not found")
-          p = matches[0]
-          pid = p["id"]
-          excerpt = post.auto_excerpt(body)
-          def mutate(items):
-              q = post.find_post(items, pid)
-              q["body"] = body
-              q["excerpt"] = excerpt
-              q["cover"] = {"kind":"img","src":"https://storage.googleapis.com/pr-newsroom-wp/1/2025/10/5_RedFront-scaled.jpg","credit":"Spotify Newsroom","creditUrl":"https://newsroom.spotify.com/"}
-              return q
-          now = post.guarded_write(mutate)
-          print("Taylor draft updated:", now["id"], now.get("title"))
-          print("words:", post.words(now["body"]))
-          print("cover:", now.get("cover"))
-          PY
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
