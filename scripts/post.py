@@ -479,6 +479,66 @@ def cmd_register(token, fact):
     print("register  added %r -> %s" % (key, fact[:90]))
 
 
+
+
+# --- one-off editorial repair -------------------------------------------------
+
+CANONICAL_FIKE_COVER = (
+    "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/81/24/65/"
+    "812465c4-b20f-af62-4303-59a120c4199f/196874725467.jpg/3000x3000bb.jpg"
+)
+FIKE_ALBUM_URL = "https://music.apple.com/us/album/how-to-quit-smoking/6805707169"
+FIKE_TITLE = 'Dominic Fike — "Small Town"'
+FIKE_EXCERPT = (
+    'Dominic Fike has released "Small Town," the second lead single from his '
+    "upcoming third album, How To Quit Smoking, due October 9."
+)
+FIKE_BODY = [
+    'Dominic Fike has released "Small Town," the second lead single from his upcoming third album, How To Quit Smoking, due October 9.',
+    'Fike is making the album on the road, writing and recording between tour stops across North America. "Small Town" was shot in Detroit and Seattle and released from Dallas, with Emma Ogier and Gabriel Jacoby joining him on vocals.',
+    'How To Quit Smoking currently lists 15 tracks on Apple Music and is set for release on October 9.',
+]
+
+def sync_small_town_repair():
+    """Repair the live Dominic Fike post from the GitHub Action.
+    Keeps existing Apple/YouTube embed markers, removes broken body images,
+    and switches the lead art to the exact Apple Music album cover.
+    """
+    posts = desk_read()["posts"]
+    targets = [
+        p for p in posts
+        if "dominic fike" in str(p.get("artist") or "").lower()
+        and "small town" in str(p.get("title") or "").lower()
+    ]
+    if len(targets) != 1:
+        print("sync      skipped: expected 1 Dominic Fike / Small Town post, found %d" % len(targets))
+        return
+    target = targets[0]
+    media = []
+    for block in re.split(r"\n\s*\n", str(target.get("body") or "")):
+        block = block.strip()
+        if block and re.search(r"\[(?:youtube|apple|tiktok|instagram)[^\]]*\]", block, re.I):
+            if not re.search(r"!\[[^\]]*\]\([^)]*\)", block):
+                media.append(block)
+    body = "\n\n".join(FIKE_BODY + media)
+
+    def mutate(current):
+        p = find_post(current, target["id"])
+        p["title"] = FIKE_TITLE
+        p["excerpt"] = FIKE_EXCERPT
+        p["body"] = body
+        p["cover"] = {
+            "kind": "img",
+            "src": CANONICAL_FIKE_COVER,
+            "credit": "Apple Music",
+            "creditUrl": FIKE_ALBUM_URL,
+        }
+        return p
+
+    now = guarded_write(mutate)
+    print("sync      Dominic Fike / Small Town repaired: cover=Apple 3000x3000, media markers preserved=%d" % len(media))
+    print("          id=%s status=%s" % (now.get("id"), now.get("status")))
+
 # --- cli -----------------------------------------------------------------------
 
 def main():
