@@ -2,7 +2,10 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-const TOP50_KV = "top50v6";
+/* Bumped to v7 on 26.09 to force one rebuild: the registry stored today's payload
+   under v6 with the false NEW, and the daily cache would have served it until the
+   next day. Any future "refresh the chart now" is the same one-line bump. */
+const TOP50_KV = "top50v7";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
