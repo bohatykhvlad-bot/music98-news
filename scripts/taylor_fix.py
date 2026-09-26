@@ -32,6 +32,10 @@ print("PHOTO URL:",IMG_URL)
 raw=urllib.request.urlopen(urllib.request.Request(IMG_URL,headers={"User-Agent":"Mozilla/5.0"}),timeout=90).read()
 im=Image.open(io.BytesIO(raw)).convert("RGB")
 orig=im.size
+if im.height >= im.width:
+    raise SystemExit(f"bad cover geometry: {im.width}x{im.height}")
+if im.width < 1920:
+    im=im.resize((1920, round(im.height*1920/im.width)), Image.Resampling.LANCZOS)
 if im.width > 2200:
     im.thumbnail((2200,2200), Image.Resampling.LANCZOS)
 buf=io.BytesIO()
