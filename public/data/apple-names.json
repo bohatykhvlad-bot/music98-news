@@ -15,6 +15,10 @@
     "title": "Babydoll",
     "artist": "Dominic Fike"
   },
+  "babylon|taylorswift": {
+    "title": "Babylon",
+    "artist": "Taylor Swift"
+  },
   "backtofriends|sombr": {
     "title": "back to friends",
     "artist": "sombr"
@@ -22,10 +26,6 @@
   "bbywow|karolg": {
     "title": "BbY WOW",
     "artist": "KAROL G, Judeline & rusowsky"
-  },
-  "beatit|michaeljackson": {
-    "title": "Beat It",
-    "artist": "Michael Jackson"
   },
   "beautyandabeat|justinbieber": {
     "title": "Beauty and a Beat (feat. Nicki Minaj)",
@@ -54,6 +54,10 @@
   "cinderella|macmiller": {
     "title": "Cinderella (feat. Ty Dolla $ign)",
     "artist": "Mac Miller"
+  },
+  "cleveland|taylorswift": {
+    "title": "Cleveland!",
+    "artist": "Taylor Swift"
   },
   "daidai|shakira": {
     "title": "Dai Dai",
@@ -115,13 +119,13 @@
     "title": "Janice STFU",
     "artist": "Drake"
   },
+  "lastthingyouneed|morganwallen": {
+    "title": "Last Thing You Need (from GTAVI: The Album)",
+    "artist": "Morgan Wallen"
+  },
   "loser|tameimpala": {
     "title": "Loser",
     "artist": "Tame Impala"
-  },
-  "lovemenot|ravynlenae": {
-    "title": "Love Me Not",
-    "artist": "Ravyn Lenae"
   },
   "manineed|oliviadean": {
     "title": "Man I Need",
@@ -139,21 +143,17 @@
     "title": "Nicole Kidman",
     "artist": "ADÉLA"
   },
-  "ohyeah|stevelacy": {
-    "title": "Oh Yeah!",
-    "artist": "Green Day"
+  "patientzero|taylorswift": {
+    "title": "Patient Zero",
+    "artist": "Taylor Swift"
   },
-  "pinkblush|dollybabe": {
-    "title": "Pink Blush",
-    "artist": "SubKillers"
+  "pinkclouding|taylorswift": {
+    "title": "Pink Clouding",
+    "artist": "Taylor Swift"
   },
   "riskitall|brunomars": {
     "title": "Risk It All",
     "artist": "Bruno Mars"
-  },
-  "sawadika|lisa": {
-    "title": "SaWaDiKa",
-    "artist": "LISA"
   },
   "selfaware|tempercity": {
     "title": "Self Aware",
@@ -163,9 +163,9 @@
     "title": "So Easy (To Fall In Love)",
     "artist": "Olivia Dean"
   },
-  "stargazing|mylessmith": {
-    "title": "Stargazing",
-    "artist": "Myles Smith"
+  "sogood|jhenaiko": {
+    "title": "So Good (feat. Kendrick Lamar)",
+    "artist": "Jhené Aiko"
   },
   "stupidsong|oliviarodrigo": {
     "title": "stupid song",
@@ -180,7 +180,7 @@
     "artist": "Olivia Rodrigo"
   },
   "thefateofophelia|taylorswift": {
-    "title": "The Fate of Ophelia",
+    "title": "The Fate of Ophelia (Track by Track)",
     "artist": "Taylor Swift"
   },
   "theonethatgotaway|katyperry": {
