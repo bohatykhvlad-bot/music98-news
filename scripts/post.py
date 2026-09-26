@@ -1,3 +1,4 @@
+# editorial sync inspection trigger 2026-09-26
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """post.py - one compact runner for the music98 post workflow.
