@@ -1,0 +1,37 @@
+name: music98 editorial runner
+
+on:
+  workflow_dispatch:
+    inputs:
+      post_id:
+        description: "Post ID to gate (optional)"
+        required: false
+        type: string
+  push:
+    paths:
+      - "scripts/**"
+      - ".github/workflows/music98-editorial.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  editorial:
+    runs-on: ubuntu-latest
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check runner
+        run: |
+          python --version
+          test -f scripts/post.py
+          test -f scripts/gate.py
+      - name: Desk list
+        run: python scripts/post.py list
+      - name: Gate requested post
+        if: ${{ inputs.post_id != '' }}
+        run: python scripts/post.py gate "${{ inputs.post_id }}"
