@@ -59,10 +59,16 @@ function isDeezerArt(url) {
     return false;
   }
 }
+/* Файлы засева берём с меткой дня: иначе edge-кэш CDN может отдать вчерашнюю копию. */
+function seedUrl(origin, file) {
+  const base = String(origin || "");
+  const day = new Date().toISOString().slice(0, 10);
+  return `${base}/data/${file}?d=${day}`;
+}
 let COVER_SEED = null;
 async function coverSeed(origin) {
   if (COVER_SEED) return COVER_SEED;
-  try { COVER_SEED = await getJson(String(origin || "") + "/data/covers.json"); } catch { COVER_SEED = {}; }
+  try { COVER_SEED = await getJson(seedUrl(origin, "covers.json")); } catch { COVER_SEED = {}; }
   return COVER_SEED;
 }
 async function applyCovers(env, tracks, origin) {
@@ -154,7 +160,7 @@ const NAMES_KV = "names_v1";
 let NAME_SEED = null;
 async function nameSeed(origin) {
   if (NAME_SEED) return NAME_SEED;
-  try { NAME_SEED = await getJson(String(origin || "") + "/data/apple-names.json"); } catch { NAME_SEED = {}; }
+  try { NAME_SEED = await getJson(seedUrl(origin, "apple-names.json")); } catch { NAME_SEED = {}; }
   return NAME_SEED;
 }
 /* какое написание показываем: засев Apple -> запомненное ранее -> текущее (с апгрейдом от Apple).
@@ -562,7 +568,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "apple-v17",
+    rev: "apple-names-v18",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     covers: { ...coverStats, missing: tracks.filter((t) => !isAppleArt(t.art)).length },
     tracks,
