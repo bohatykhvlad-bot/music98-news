@@ -38,6 +38,8 @@ TENURE_PATH = PUBLIC / "data" / "chart-tenure.json"
 FIRST_PATH = PUBLIC / "data" / "chart-first.json"
 # Apple-only artwork per song, so covers do not flip between sources day to day
 COVERS_PATH = PUBLIC / "data" / "chart-covers.json"
+# offline-built Apple covers (m98/build-covers.mjs): used when Apple does not answer
+SEED_COVERS_PATH = PUBLIC / "data" / "covers.json"
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
@@ -347,11 +349,22 @@ def apply_covers(tracks: list[dict]) -> None:
             covers = {}
     except Exception:
         covers = {}
+    try:
+        seed = json.loads(SEED_COVERS_PATH.read_text(encoding="utf-8"))
+        if not isinstance(seed, dict):
+            seed = {}
+    except Exception:
+        seed = {}
     changed = False
     for t in tracks:
         key = merge_key(t["title"], t["artist"])
         if covers.get(key):
             t["art"] = covers[key]
+            continue
+        if is_apple_art(seed.get(key) or ""):
+            covers[key] = seed[key]
+            t["art"] = seed[key]
+            changed = True
             continue
         if is_apple_art(t.get("art") or ""):
             covers[key] = t["art"]

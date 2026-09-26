@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v11 on 26.09: forces the rebuild that fills the remaining covers.
+/* Bumped to v12 on 26.09: forces the rebuild that pulls covers from the offline seed.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v11";
+const TOP50_KV = "top50v12";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -48,7 +48,18 @@ function isAppleArt(url) {
     return false;
   }
 }
-async function applyCovers(env, tracks) {
+/* Apple endpoints are unreliable from Cloudflare egress (26.09: source A returned 0
+   rows and both cover lookups failed), so the covers are also seeded from a static
+   file that is built offline - see m98/build-covers.mjs. KV always wins, the seed
+   fills what KV does not know yet. */
+let COVER_SEED = null;
+async function coverSeed(origin) {
+  if (COVER_SEED) return COVER_SEED;
+  try { COVER_SEED = await getJson(String(origin || "") + "/data/covers.json"); } catch { COVER_SEED = {}; }
+  return COVER_SEED;
+}
+async function applyCovers(env, tracks, origin) {
+  const seed = await coverSeed(origin);
   let covers = {};
   if (env && env.DESK) {
     try { covers = (await env.DESK.get(COVERS_KV, { type: "json" })) || {}; } catch {}
@@ -57,6 +68,7 @@ async function applyCovers(env, tracks) {
   for (const t of tracks) {
     const key = mergeKey(t.title, t.artist);
     if (covers[key]) { t.art = covers[key]; continue; }   /* уже знаем обложку этой песни */
+    if (isAppleArt(seed[key])) { covers[key] = seed[key]; t.art = seed[key]; changed = true; continue; }
     if (isAppleArt(t.art)) { covers[key] = t.art; changed = true; continue; }
     t.art = "";                                            /* не-Apple обложка в чарт не идёт */
   }
@@ -410,11 +422,11 @@ export async function buildTop50(origin, env) {
   }));
   const coverStats = { want: 0, filled: 0, failed: 0 };
   await seedBaked(origin || "", tracks);
-  await applyCovers(env, tracks);   /* Apple-only + память обложек */
+  await applyCovers(env, tracks, origin);   /* Apple-only + память обложек + засев из файла */
   await enrichArtByIds(tracks, coverStats);  /* добираем обложки одним запросом по Apple-ID */
   await enrichApple(tracks);
   await enrichArtByIds(tracks, coverStats);  /* ссылки могли появиться только что - добираем остаток */
-  await applyCovers(env, tracks);   /* запомнить обложки, найденные в Apple */
+  await applyCovers(env, tracks, origin);   /* запомнить обложки, найденные в Apple */
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
     if (!isApplePreview(t.prev)) t.prev = "";
@@ -533,9 +545,9 @@ function withTimeout(promise, ms) {
 /* The baked fallback file was written when covers still came from any source; run it
    through the same Apple-only cover pass before serving, so a failed rebuild cannot
    put Deezer sleeves (or a different picture) on the page. */
-async function bakedWithCovers(env, baked) {
+async function bakedWithCovers(env, baked, origin) {
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) {
-    try { await applyCovers(env, baked.tracks); } catch {}
+    try { await applyCovers(env, baked.tracks, origin); } catch {}
   }
   return baked;
 }
@@ -558,14 +570,14 @@ export async function onRequestGet({ env, request }) {
     }
     if (payload.tracks && payload.tracks.length) return top50Response(payload);
   } catch (err) {
-    const baked = await bakedWithCovers(env, await bakedTop50(request));
+    const baked = await bakedWithCovers(env, await bakedTop50(request), new URL(request.url).origin);
     if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
     return new Response(JSON.stringify({ error: "rebuild_failed", detail: String(err) }), {
       status: 502,
       headers: { "Content-Type": "application/json" },
     });
   }
-  const baked = await bakedWithCovers(env, await bakedTop50(request));
+  const baked = await bakedWithCovers(env, await bakedTop50(request), new URL(request.url).origin);
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
   return new Response(JSON.stringify({ error: "rebuild_failed" }), {
     status: 502,
