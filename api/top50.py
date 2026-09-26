@@ -34,6 +34,8 @@ YT_CHARTS = (
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
 TENURE_PATH = PUBLIC / "data" / "chart-tenure.json"
+# day a song first appeared, kept separately so a rebuilt registry cannot zero the counter
+FIRST_PATH = PUBLIC / "data" / "chart-first.json"
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
@@ -442,7 +444,27 @@ def chart_week(day=None) -> int:
 
 
 def tenure_key(title: str, artist: str) -> str:
-    return f"{(title or '').strip().lower()}|{(artist or '').strip().lower()}"
+    """A song's identity is merge_key (normalized title + primary artist) - the same
+    key ingest() uses to fold the five sources into one chart row. Building it from the
+    raw display string made Apple's "BbY WOW / KAROL G, Judeline & rusowsky" and
+    Spotify's "BbY WOW (w/ Judeline, rusowsky) / KAROL G" two different songs, so a
+    source that answered differently re-flagged a song already on the chart as NEW."""
+    return merge_key(title, artist)
+
+
+def rekey_seen(seen: dict) -> dict:
+    """Re-key a registry written before the fix (old "title|artist" keys). Idempotent,
+    so it is safe on every load; a missing day still counts as NEW."""
+    out: dict = {}
+    for k, v in (seen or {}).items():
+        cut = str(k).find("|")
+        if cut < 0:
+            continue
+        nk = tenure_key(k[:cut], k[cut + 1 :])
+        prev = out.get(nk)
+        if prev is None or int((v or {}).get("weeks") or 0) > int((prev or {}).get("weeks") or 0):
+            out[nk] = v
+    return out
 
 
 def apply_tenure(tracks: list[dict]) -> list[dict]:
@@ -454,8 +476,24 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
         ten = {}
     if ten.get("launch") != LAUNCH.isoformat():
         ten = {"launch": LAUNCH.isoformat(), "week": week, "keys": [], "seen": {}}
-    prev_keys = ten.get("keys") or []
-    seen = ten.get("seen") or {}
+    try:
+        first_day = json.loads(FIRST_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        first_day = {}
+    prev_keys = []
+    for k in ten.get("keys") or []:
+        cut = str(k).find("|")
+        prev_keys.append(tenure_key(k[:cut], k[cut + 1 :]) if cut >= 0 else k)
+    seen = rekey_seen(ten.get("seen") or {})
+    # first fill of the ledger: the day a song appeared comes from the registry it has
+    # (counted from the record's lastWeek, not from today - otherwise the count is off by one)
+    for k, rec in seen.items():
+        if k in first_day:
+            continue
+        w = int((rec or {}).get("weeks") or 1)
+        at = (rec or {}).get("lastWeek")
+        at = int(at) if isinstance(at, (int, float)) else week
+        first_day[k] = max(0, at - (w - 1))
     first = not prev_keys
     rolled = (not first) and ten.get("week") != week
     new_keys = []
@@ -468,14 +506,24 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
             prev_pos = -1
         rec = seen.get(key) or {"weeks": 0}
         if first:
-            track["weeks"] = 1
+            first_day.setdefault(key, week)
             track["delta"] = "0"
         elif not rolled:
-            track["weeks"] = rec.get("weeks") or 1
-            track["delta"] = str(rec["delta"]) if rec.get("delta") not in (None, "") else "0"
+            first_day.setdefault(key, week)
+            # same-day rebuild: show movement only if it was computed today
+            track["delta"] = (
+                str(rec["delta"])
+                if rec.get("lastWeek") == week and rec.get("delta") not in (None, "")
+                else "0"
+            )
+        elif prev_pos < 0:
+            # the song was not on the chart yesterday: a new streak starts -> NEW
+            first_day[key] = week
+            track["delta"] = "new"
         else:
-            track["weeks"] = (rec.get("weeks") or 0) + 1 if prev_pos >= 0 else 1
-            track["delta"] = "new" if prev_pos < 0 else str(prev_pos - i)
+            first_day.setdefault(key, week)
+            track["delta"] = str(prev_pos - i)
+        track["weeks"] = max(1, week - first_day[key] + 1)
         seen[key] = {
             "weeks": track["weeks"],
             "lastPos": i,
@@ -490,6 +538,9 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
     try:
         TENURE_PATH.write_text(
             json.dumps(ten, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        FIRST_PATH.write_text(
+            json.dumps(first_day, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
     except OSError:
         pass

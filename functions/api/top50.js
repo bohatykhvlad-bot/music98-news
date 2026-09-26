@@ -31,20 +31,59 @@ function chartWeek() {
      counter is really a day index since launch. Field name kept for KV compat. */
   return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
 }
+/* A song's identity is mergeKey (normalized title + primary artist): the same key
+   ingest() already uses to fold Apple, Spotify, Deezer, Billboard and YouTube rows
+   of one track into a single chart entry. Building the tenure key from the raw
+   display string instead made Apple's "BbY WOW / KAROL G, Judeline & rusowsky" and
+   Spotify's "BbY WOW (w/ Judeline, rusowsky) / KAROL G" two different songs, so any
+   day a source answered differently re-flagged a song that was already on the chart
+   as NEW and reset its day counter. */
 function tenureKey(title, artist) {
-  return `${String(title || "").trim().toLowerCase()}|${String(artist || "").trim().toLowerCase()}`;
+  return mergeKey(title, artist);
+}
+/* Registries written before the fix hold old "title|artist" keys. This re-keys them
+   on load; the transform is idempotent, so the chart keeps its history and the next
+   write stores the normalized keys. A missing day still counts as NEW - only the
+   naming can no longer fake a new entry. */
+function rekeySeen(old) {
+  const out = {};
+  for (const [k, v] of Object.entries((old && old.seen) || {})) {
+    const cut = String(k).indexOf("|");
+    if (cut < 0) continue;
+    const nk = tenureKey(k.slice(0, cut), k.slice(cut + 1));
+    const prev = out[nk];
+    if (!prev || (Number(v && v.weeks) || 0) > (Number(prev.weeks) || 0)) out[nk] = v;
+  }
+  return out;
 }
 const TENURE_KV = "tenure_v3";
+/* День первого появления каждой песни живёт ОТДЕЛЬНЫМ ключом. Реестр можно
+   пересобрать, переименовать или потерять - счётчик "N days on chart" от этого
+   больше не обнуляется (19.09 это уже случилось: весь чарт показал "1 день"). */
+const FIRST_KV = "tenure_first_v1";
 async function applyTenure(env, tracks) {
   const week = chartWeek();
   /* week starts at -1 so the very first daily run opens the registry fresh. */
   let ten = { launch: "2026-09-17", epoch: "daily", week: -1, keys: [], seen: {} };
+  let firstDay = {};
   if (env && env.DESK) {
     const v = await env.DESK.get(TENURE_KV, { type: "json" });
     if (v && v.epoch === "daily") ten = v;
+    firstDay = (await env.DESK.get(FIRST_KV, { type: "json" })) || {};
   }
-  const prevKeys = ten.keys || [];
-  const seen = ten.seen || {};
+  const prevKeys = (ten.keys || []).map((k) => {
+    const cut = String(k).indexOf("|");
+    return cut < 0 ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1));
+  });
+  const seen = rekeySeen(ten);
+  /* первое заполнение памятки: день появления берём из того, что помнит реестр
+     (считаем от lastWeek записи, а не от сегодня - иначе счёт съезжает на день) */
+  for (const [k, rec] of Object.entries(seen)) {
+    if (firstDay[k] != null) continue;
+    const w = Number(rec && rec.weeks) || 1;
+    const at = Number(rec && rec.lastWeek);
+    firstDay[k] = Math.max(0, (Number.isFinite(at) ? at : week) - (w - 1));
+  }
   const first = !prevKeys.length;
   const rolled = !first && ten.week !== week;
   const newKeys = [];
@@ -54,21 +93,30 @@ async function applyTenure(env, tracks) {
     const prevPos = prevKeys.indexOf(key);
     const rec = seen[key] || { weeks: 0 };
     if (first) {
-      track.weeks = 1;
+      if (firstDay[key] == null) firstDay[key] = week;
       track.delta = "0";
     } else if (!rolled) {
-      track.weeks = rec.weeks || 1;
-      track.delta = rec.delta != null && rec.delta !== "" ? String(rec.delta) : "0";
+      if (firstDay[key] == null) firstDay[key] = week;
+      /* та же сборка за день: движение показываем только если оно посчитано сегодня */
+      track.delta = rec.lastWeek === week && rec.delta != null && rec.delta !== "" ? String(rec.delta) : "0";
+    } else if (prevPos < 0) {
+      /* песни вчера не было: серия начинается заново -> NEW (правило владельца) */
+      firstDay[key] = week;
+      track.delta = "new";
     } else {
-      track.weeks = prevPos >= 0 ? (rec.weeks || 0) + 1 : 1;
-      track.delta = prevPos < 0 ? "new" : String(prevPos - i);
+      if (firstDay[key] == null) firstDay[key] = week;
+      track.delta = String(prevPos - i);
     }
+    track.weeks = Math.max(1, week - firstDay[key] + 1);
     seen[key] = { weeks: track.weeks, lastPos: i, lastWeek: week, delta: track.delta };
   });
   if (first || rolled) ten.keys = newKeys;
   ten.week = week;
   ten.seen = seen;
-  if (env && env.DESK) await env.DESK.put(TENURE_KV, JSON.stringify(ten));
+  if (env && env.DESK) {
+    await env.DESK.put(TENURE_KV, JSON.stringify(ten));
+    await env.DESK.put(FIRST_KV, JSON.stringify(firstDay));
+  }
   return tracks;
 }
 const UA = "Mozilla/5.0 (compatible; music98/1.0)";
