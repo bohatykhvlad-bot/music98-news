@@ -38,6 +38,8 @@ TENURE_PATH = PUBLIC / "data" / "chart-tenure.json"
 FIRST_PATH = PUBLIC / "data" / "chart-first.json"
 # Apple-only artwork per song, so covers do not flip between sources day to day
 COVERS_PATH = PUBLIC / "data" / "chart-covers.json"
+# offline-built Apple covers (scripts/build-covers.mjs, обновляет GitHub Actions)
+SEED_COVERS_PATH = PUBLIC / "data" / "covers.json"
 # one accepted spelling per song (same idea as the covers: what we took once stays)
 NAMES_PATH = PUBLIC / "data" / "chart-names.json"
 UA = (
@@ -336,9 +338,13 @@ def is_apple_preview(url: str) -> bool:
 
 
 def is_deezer_art(url: str) -> bool:
-    """Cover art comes from one source only - Deezer (it always answers; Apple does not)."""
     host = (urllib.parse.urlparse(url or "").hostname or "").lower()
     return host == "dzcdn.net" or host.endswith(".dzcdn.net")
+
+
+def is_apple_art(url: str) -> bool:
+    host = (urllib.parse.urlparse(url or "").hostname or "").lower()
+    return host == "mzstatic.com" or host.endswith(".mzstatic.com")
 
 
 def apply_names(tracks: list[dict]) -> None:
@@ -371,42 +377,71 @@ def apply_names(tracks: list[dict]) -> None:
             pass
 
 
-def fill_covers_deezer(tracks: list[dict]) -> None:
-    """Covers for songs outside Deezer's top-50: Deezer search, 8 requests at a time."""
-    want = [t for t in tracks if not t.get("art")]
-
-    def one(t):
+def fill_covers_apple(tracks: list[dict]) -> None:
+    """Apple covers for the rest: exact release by the track id in the link (?i=...)."""
+    want: list[tuple[dict, str]] = []
+    for t in tracks:
+        if is_apple_art(t.get("art") or ""):
+            continue
+        m = re.search(r"[?&]i=(\d+)", t.get("url") or "")
+        if m:
+            want.append((t, m.group(1)))
+    if not want:
+        return
+    ids = sorted({i for _, i in want})
+    found: dict[str, str] = {}
+    for n in range(0, len(ids), 50):
         try:
-            term = urllib.parse.quote(f"{t['artist']} {strip_paren(t['title'])}".strip())
-            data = fetch_json(f"https://api.deezer.com/search?q={term}&limit=5", timeout=10)
+            data = fetch_json(
+                "https://itunes.apple.com/lookup?id="
+                + ",".join(ids[n : n + 50])
+                + "&entity=song&country=US",
+                timeout=10,
+            )
         except Exception:
-            return
-        want_t = norm_title(t["title"])
-        rows = data.get("data") or []
-        hit = next((r for r in rows if norm_title(r.get("title") or "") == want_t), None)
-        album = (hit or {}).get("album") or {}
-        art = album.get("cover_xl") or album.get("cover_big") or album.get("cover_medium")
-        if art:
-            t["art"] = art
-
-    if want:
-        with ThreadPoolExecutor(max_workers=8) as pool:
-            list(pool.map(one, want))
+            continue
+        for item in data.get("results") or []:
+            tid = str(item.get("trackId") or "")
+            art = (item.get("artworkUrl100") or "").replace("100x100bb", "600x600bb")
+            if tid and art:
+                found[tid] = art
+    for t, tid in want:
+        if found.get(tid):
+            t["art"] = found[tid]
 
 
 def apply_covers(tracks: list[dict]) -> None:
-    """One Deezer cover per song, remembered so the sleeve never changes day to day."""
+    """Apple cover per song, remembered so the sleeve never changes day to day.
+    Deezer art is only a last resort so a card is never empty."""
     try:
         covers = json.loads(COVERS_PATH.read_text(encoding="utf-8"))
         if not isinstance(covers, dict):
             covers = {}
     except Exception:
         covers = {}
+    try:
+        seed = json.loads(SEED_COVERS_PATH.read_text(encoding="utf-8"))
+        if not isinstance(seed, dict):
+            seed = {}
+    except Exception:
+        seed = {}
     changed = False
     for t in tracks:
         key = merge_key(t["title"], t["artist"])
-        if covers.get(key):
-            t["art"] = covers[key]
+        cached = covers.get(key) or ""
+        apple = (t.get("art") or "") if is_apple_art(t.get("art") or "") else seed.get(key) or ""
+        if is_apple_art(apple) and not is_apple_art(cached):
+            covers[key] = apple
+            t["art"] = apple
+            changed = True
+            continue
+        if cached:
+            t["art"] = cached
+            continue
+        if is_apple_art(apple):
+            covers[key] = apple
+            t["art"] = apple
+            changed = True
             continue
         if is_deezer_art(t.get("art") or ""):
             covers[key] = t["art"]
@@ -482,6 +517,8 @@ def enrich_tracks(tracks: list[dict]) -> None:
             t["prev"] = extra["prev"]
         if extra.get("url") and not t.get("url"):
             t["url"] = extra["url"]
+        if extra.get("art") and not is_apple_art(t.get("art") or ""):
+            t["art"] = extra["art"]
         if extra.get("year") and not t.get("year"):
             t["year"] = extra["year"]
         if t.get("url"):
@@ -513,8 +550,10 @@ def ingest(bucket: dict, src: str, rows: list[dict]) -> None:
             rec["nameSrc"] = "A"
         if row.get("url") and not rec["url"]:
             rec["url"] = row["url"]
-        if src == "D" and row.get("art"):
-            rec["art"] = row["art"]   # обложки берём только из Deezer
+        if row.get("art") and (
+            not rec["art"] or (is_apple_art(row["art"]) and not is_apple_art(rec["art"]))
+        ):
+            rec["art"] = row["art"]
         prev = row.get("prev") or ""
         if is_apple_preview(prev) and not is_apple_preview(rec.get("prev") or ""):
             rec["prev"] = prev
@@ -705,10 +744,10 @@ def build_payload(enrich: bool = False) -> dict:
     )[:SIZE]
 
     if enrich:
-        apply_covers(ranked)       # память обложек + то, что дал Deezer в сборке
-        fill_covers_deezer(ranked)  # остальных добираем поиском Deezer
-        enrich_tracks(ranked)      # ссылка/превью/год из iTunes, если Apple ответил
-        apply_covers(ranked)       # запомнить найденное
+        apply_covers(ranked)        # KV -> Apple из сборки -> засев -> Deezer -> пусто
+        fill_covers_apple(ranked)   # точный релиз по Apple-ID из ссылки
+        enrich_tracks(ranked)       # ссылка/превью/год из iTunes, если Apple ответил
+        apply_covers(ranked)        # запомнить найденное
 
     tracks = []
     for i, rec in enumerate(ranked, 1):

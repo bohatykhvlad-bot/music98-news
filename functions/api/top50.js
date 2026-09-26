@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v14 on 26.09: forces the rebuild with the remembered artist names.
+/* Bumped to v15 on 26.09: forces the rebuild that swaps Deezer covers for Apple ones.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v14";
+const TOP50_KV = "top50v15";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -35,12 +35,22 @@ function chartWeek() {
 }
 
 /* Обложка была привязана к тому, кто первым создал строку, и прыгала между Apple
-   (mzstatic) и Deezer (dzcdn). Теперь источник один и он всегда отвечает из воркера:
-   Deezer. Apple из Cloudflare блокируется (26.09: source A = 0 строк, iTunes-lookup
-   падал), Spotify требует ключей приложения, а Deezer - это уже один из пяти
-   источников чарта: одна картинка на песню, помним её вечно, ничего вручную. */
-const COVERS_KV = "covers_v2";
+   (mzstatic) и Deezer (dzcdn). Правило теперь такое: обложку берём из Apple и ровно
+   того релиза, на который ведёт ссылка "Listen on Apple Music". iTunes API из
+   Cloudflare отвечает через раз, поэтому есть засев из public/data/covers.json -
+   его каждый день обновляет .github/workflows/covers.yml (там Apple отвечает).
+   Deezer остаётся последним вариантом, чтобы карточка не осталась пустой.
+   Найденная обложка запоминается по песне, поэтому день ото дня не меняется. */
+const COVERS_KV = "covers_v3";
 const DZ_HOST = "dzcdn.net";
+function isAppleArt(url) {
+  try {
+    const h = new URL(String(url || "")).hostname.toLowerCase();
+    return h === "mzstatic.com" || h.endsWith(".mzstatic.com");
+  } catch {
+    return false;
+  }
+}
 function isDeezerArt(url) {
   try {
     const h = new URL(String(url || "")).hostname.toLowerCase();
@@ -49,7 +59,14 @@ function isDeezerArt(url) {
     return false;
   }
 }
-async function applyCovers(env, tracks) {
+let COVER_SEED = null;
+async function coverSeed(origin) {
+  if (COVER_SEED) return COVER_SEED;
+  try { COVER_SEED = await getJson(String(origin || "") + "/data/covers.json"); } catch { COVER_SEED = {}; }
+  return COVER_SEED;
+}
+async function applyCovers(env, tracks, origin) {
+  const seed = await coverSeed(origin);
   let covers = {};
   if (env && env.DESK) {
     try { covers = (await env.DESK.get(COVERS_KV, { type: "json" })) || {}; } catch {}
@@ -57,7 +74,17 @@ async function applyCovers(env, tracks) {
   let changed = false;
   for (const t of tracks) {
     const key = mergeKey(t.title, t.artist);
-    if (covers[key]) { t.art = covers[key]; continue; }   /* уже знаем обложку этой песни */
+    const cached = covers[key];
+    const apple = isAppleArt(t.art) ? t.art : (isAppleArt(seed[key]) ? seed[key] : "");
+    /* Apple важнее уже запомненного Deezer - это разовая замена, дальше картинка заморожена */
+    if (apple && !isAppleArt(cached)) {
+      covers[key] = apple;
+      t.art = apple;
+      changed = true;
+      continue;
+    }
+    if (cached) { t.art = cached; continue; }
+    if (apple) { covers[key] = apple; t.art = apple; changed = true; continue; }
     if (isDeezerArt(t.art)) { covers[key] = t.art; changed = true; continue; }
     t.art = "";
   }
@@ -66,35 +93,38 @@ async function applyCovers(env, tracks) {
   }
   return tracks;
 }
-/* Обложки для тех, кого нет в топ-50 Deezer: обычный поиск Deezer по "артист название",
-   по 8 запросов за раз. Совпадение проверяем по нормализованному названию - лучше пусто,
-   чем чужая картинка. */
-async function fillCovers(tracks, stats) {
-  const want = tracks.filter((t) => !t.art);
+/* Остальные обложки добираем одним batch-запросом Apple по track id из ссылки:
+   это ровно тот релиз, который мы показываем и на который ведёт кнопка. */
+async function enrichArtByIds(tracks, stats) {
+  const want = [];
+  for (const t of tracks) {
+    if (isAppleArt(t.art)) continue;
+    const m = String(t.url || "").match(/[?&]i=(\d+)/);
+    if (m) want.push([t, m[1]]);
+  }
   if (stats) stats.asked += want.length;
   if (!want.length) return;
-  let next = 0;
-  const worker = async () => {
-    while (next < want.length) {
-      const t = want[next++];
-      try {
-        const q = encodeURIComponent(`${t.artist} ${stripParen(t.title)}`.trim());
-        const data = await getJson(`https://api.deezer.com/search?q=${q}&limit=5`);
-        const wantT = normTitle(t.title);
-        const hit = (data.data || []).find((r) => normTitle(r.title) === wantT)
-          || (data.data || []).find((r) => normTitle(r.title) === wantT
-            && primaryArtist((r.artist && r.artist.name) || "") === primaryArtist(t.artist));
-        const art = hit && hit.album && (hit.album.cover_xl || hit.album.cover_big || hit.album.cover_medium);
-        if (art) {
-          t.art = art;
-          if (stats) stats.filled += 1;
-        }
-      } catch (e) {
-        if (stats) stats.failed += 1;
+  const ids = [...new Set(want.map(([, id]) => id))];
+  const found = new Map();
+  for (let i = 0; i < ids.length; i += 50) {
+    try {
+      const data = await getJson(`https://itunes.apple.com/lookup?id=${ids.slice(i, i + 50).join(",")}&entity=song&country=US`);
+      for (const item of data.results || []) {
+        const id = String(item.trackId || "");
+        const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
+        if (id && art) found.set(id, art);
       }
+    } catch {
+      if (stats) stats.failed += 1;
     }
-  };
-  await Promise.all([0, 1, 2, 3, 4, 5, 6, 7].map(worker));
+  }
+  for (const [t, id] of want) {
+    const art = found.get(id);
+    if (art) {
+      t.art = art;
+      if (stats) stats.filled += 1;
+    }
+  }
 }
 
 /* Написание имени тоже зависело от того, кто ответил сегодня: при молчащем Apple
@@ -384,7 +414,8 @@ function ingest(bucket, src, rows) {
       rec.nameSrc = "A";
     }
     if (row.url && !rec.url) rec.url = row.url;
-    if (src === "D" && row.art) rec.art = row.art;   /* обложки берём только из Deezer */
+    /* обложку предпочитаем Apple, Deezer оставляем только как запасной вариант */
+    if (row.art && (!rec.art || (isAppleArt(row.art) && !isAppleArt(rec.art)))) rec.art = row.art;
     if (isApplePreview(row.prev) && !isApplePreview(rec.prev)) rec.prev = row.prev;
     if (row.year && !rec.year) rec.year = row.year;
     bucket.set(key, rec);
@@ -414,6 +445,7 @@ async function seedBaked(origin, tracks) {
       if (!b) return;
       if (!isApplePreview(t.prev) && isApplePreview(b.prev)) t.prev = b.prev;
       if (!t.url && b.url) t.url = b.url;
+      if (b.art && isAppleArt(b.art) && !isAppleArt(t.art)) t.art = b.art;
       if (!t.year && b.year) t.year = b.year;
     });
   } catch {}
@@ -473,10 +505,10 @@ export async function buildTop50(origin, env) {
   await applyNames(env, tracks);           /* одно написание имени на песню */
   tracks.forEach((t) => { delete t.nameSrc; });
   await seedBaked(origin || "", tracks);
-  await applyCovers(env, tracks);          /* память обложек + то, что дал Deezer в сборке */
-  await fillCovers(tracks, coverStats);    /* остальных добираем поиском Deezer */
+  await applyCovers(env, tracks, origin);  /* KV -> Apple из сборки -> засев -> Deezer -> пусто */
+  await enrichArtByIds(tracks, coverStats); /* точный релиз по Apple-ID из ссылки */
   await enrichApple(tracks);               /* ссылка/превью/год из iTunes, если Apple ответил */
-  await applyCovers(env, tracks);          /* запомнить найденное */
+  await applyCovers(env, tracks, origin);  /* запомнить найденное */
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
     if (!isApplePreview(t.prev)) t.prev = "";
@@ -485,9 +517,9 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "name-v14",
+    rev: "cover-v15",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
-    covers: { ...coverStats, missing: tracks.filter((t) => !isDeezerArt(t.art)).length },
+    covers: { ...coverStats, missing: tracks.filter((t) => !isAppleArt(t.art)).length },
     tracks,
   };
 }
@@ -561,11 +593,11 @@ function withTimeout(promise, ms) {
 /* The baked fallback file was written when covers still came from any source; run it
    through the same Apple-only cover pass before serving, so a failed rebuild cannot
    put Deezer sleeves (or a different picture) on the page. */
-async function bakedWithCovers(env, baked) {
+async function bakedWithCovers(env, baked, origin) {
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) {
     try {
       await applyNames(env, baked.tracks);
-      await applyCovers(env, baked.tracks);
+      await applyCovers(env, baked.tracks, origin);
     } catch {}
   }
   return baked;
@@ -589,14 +621,14 @@ export async function onRequestGet({ env, request }) {
     }
     if (payload.tracks && payload.tracks.length) return top50Response(payload);
   } catch (err) {
-    const baked = await bakedWithCovers(env, await bakedTop50(request));
+    const baked = await bakedWithCovers(env, await bakedTop50(request), new URL(request.url).origin);
     if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
     return new Response(JSON.stringify({ error: "rebuild_failed", detail: String(err) }), {
       status: 502,
       headers: { "Content-Type": "application/json" },
     });
   }
-  const baked = await bakedWithCovers(env, await bakedTop50(request));
+  const baked = await bakedWithCovers(env, await bakedTop50(request), new URL(request.url).origin);
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
   return new Response(JSON.stringify({ error: "rebuild_failed" }), {
     status: 502,

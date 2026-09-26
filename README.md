@@ -4,6 +4,22 @@ Independent music desk: news, releases, and a Top 50 that can rebuild itself onc
 
 The chart scores a title across five public lists: Apple Music most-played (US), Spotify global daily, Deezer global, Billboard Hot 100, and YouTube Weekly Top Songs. A miss on a list is zero points. Trending videos are not used.
 
+## Обложки чарта (Apple)
+
+Обложка берётся **из Apple** и ровно того релиза, на который ведёт кнопка «Listen on Apple
+Music»: точный трек по `?i=` в ссылке, а не «похожий» из поиска. Deezer используется только
+как последний вариант, чтобы карточка не осталась пустой.
+
+iTunes API из Cloudflare отвечает через раз (Apple режет egress воркера), поэтому обложки
+собираются в `public/data/covers.json` на GitHub-раннере, где Apple отвечает всегда:
+`.github/workflows/covers.yml` запускается раз в сутки (05:20 по Киеву) и коммитит файл,
+если состав чарта изменился. Руками делать ничего не нужно.
+
+Воркер читает этот файл, а найденную обложку запоминает по песне (KV `covers_v3`), так что
+день ото дня картинка не меняется. Если Apple когда-нибудь отдаст обложку для песни, где
+сейчас стоит Deezer, она разово заменит её. Проверка: `node ../.gallery/m98/art-check.mjs`
+(или запрос `/api/top50` — поля `rev`, `sources`, `covers`).
+
 ## Run locally
 
 ```bash
