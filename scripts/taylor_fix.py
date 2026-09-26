@@ -7,7 +7,7 @@ DESK="https://music98.news/api/desk"
 PHOTO="https://music98.news/api/photo"
 KEY=os.environ["ADMIN_PASSWORD"]
 POST_ID="autay25r1"
-IMG_URL="https://images.squarespace-cdn.com/content/v1/6616cae0172b170a8dd0818d/91551088-581d-4dd7-b328-6556d0a7dc5a/0923%2BTaylor%2BSwift%2BThe%2BLife%2Bof%2Ba%2BShowgirl%2BThe%2BEncore%2BSeptember%2B23%2B2026%2BFeature.png"
+IMG_PAGE="https://www.aol.com/articles/taylor-swifts-life-showgirl-deluxe-144402000.html"
 BODY="Taylor Swift has released *The Life of a Showgirl: The Encore*, adding four songs to the 12-track album she released in 2025. The expanded edition arrived on September 25, 2026, with \"Patient Zero,\" \"Cleveland!,\" \"Pink Clouding\" and \"Babylon\" placed after the original sequence. Apple Music lists the project at 16 songs and 41 minutes, with the added material grouped on Disc 2. Swift announced the edition on September 23, one day after revealing \"Patient Zero\" and its September 25 release date. Rather than revising the first album's tracklist, the new edition keeps those 12 songs intact and adds a separate four-song section.\n\n[apple:album:6814997249]\n\nThe extra recordings came out of a trip Swift took to Sweden with Max Martin, a producer and songwriter, and Shellback, a producer and songwriter who worked with her on the original album. Swift said the trip was planned to celebrate the response to *The Life of a Showgirl*, but a studio was nearby and the three returned to making music. In her announcement, she wrote that they \"wrote more songs\" and described the new material as coming from gratitude for the way listeners had embraced the album. The original *The Life of a Showgirl* was released on October 3, 2025. The four additions were therefore made after the original album had already been completed and released.\n\nThe new artwork uses a photograph from the original *The Life of a Showgirl* shoot by Mert Alas and Marcus Piggott. Taylor Swift Style identified the image as a previously unseen photograph from the album shoot that had appeared only in booklet material before being used as the Encore cover. Swift is pictured in a textured orange-and-silver mini dress with crystal sock heels, against a magenta backdrop. The image gives the expanded edition its own cover while keeping the photographers who created the original visual campaign attached to the project. The cover image is separate from the music itself, but it also makes clear that the new edition is being presented as an extension of the same album era.\n\n\"Patient Zero\" is the first of the four new songs to receive a full music video, with its world premiere scheduled for the 2026 MTV Video Music Awards on September 27. Swift directed the video and appears in it with Dakota Johnson, an actor, and Colin Farrell, an actor. Emmanuel Lubezki, a cinematographer, handled the cinematography. A 13-second preview was shown on \"CBS Mornings\" on September 24 before Swift shared the teaser on social media. Paramount and CBS confirmed that the complete video will premiere during the VMAs, two days after the expanded album became available to stream.\n\nThe release also gives the 2025 album a new closing section without changing what came before it. The four songs are grouped together rather than inserted into the original 12-track sequence, making the project easy to read as an extension of the first album. \"Patient Zero\" leads that addition, followed by \"Cleveland!,\" \"Pink Clouding\" and \"Babylon,\" while the upcoming video gives one of the new tracks a visual chapter of its own. With the full 16-song edition now available, the next public step for the project is the September 27 premiere of the \"Patient Zero\" video at the VMAs."
 
 def req(url, method="GET", payload=None):
@@ -21,7 +21,15 @@ def req(url, method="GET", payload=None):
     with urllib.request.urlopen(r,timeout=90) as x:
         return x.status, x.headers, x.read()
 
-raw=urllib.request.urlopen(urllib.request.Request(IMG_URL,headers={"User-Agent":"music98-editorial-runner"}),timeout=90).read()
+page=urllib.request.urlopen(urllib.request.Request(IMG_PAGE,headers={"User-Agent":"Mozilla/5.0"}),timeout=90).read().decode("utf-8","replace")
+m=re.search(r'<meta[^>]+property=["\\\']og:image["\\\'][^>]+content=["\\\']([^"\\\']+)',page,re.I)
+if not m:
+    m=re.search(r'<meta[^>]+content=["\\\']([^"\\\']+)["\\\'][^>]+property=["\\\']og:image["\\\']',page,re.I)
+if not m:
+    raise SystemExit("og:image not found")
+IMG_URL=m.group(1).replace("&amp;","&")
+print("PHOTO URL:",IMG_URL)
+raw=urllib.request.urlopen(urllib.request.Request(IMG_URL,headers={"User-Agent":"Mozilla/5.0"}),timeout=90).read()
 im=Image.open(io.BytesIO(raw)).convert("RGB")
 orig=im.size
 if im.width > 2200:
