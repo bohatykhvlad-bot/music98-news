@@ -1,0 +1,17 @@
+name: Taylor editorial fix
+
+on:
+  push:
+    paths:
+      - "scripts/taylor_body.txt"
+      - ".github/workflows/taylor-fix.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "Taylor editorial fix"
