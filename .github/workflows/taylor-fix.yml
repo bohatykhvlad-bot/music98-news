@@ -12,15 +12,6 @@ permissions:
 jobs:
   fix:
     runs-on: ubuntu-latest
-    env:
-      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
-      - run: python scripts/post.py register "september 23" "Taylor Swift announced The Life of a Showgirl: The Encore on 23.09.2026 (Variety/NME)"
-      - run: python scripts/post.py register "september 27" "Patient Zero video scheduled to premiere at the 2026 MTV VMAs on 27.09.2026 (Variety)"
-      - run: python scripts/post.py set "autay25r1" --body-file scripts/taylor_body.txt --title "Taylor Swift — *The Life of a Showgirl: The Encore*"
-      - run: python scripts/post.py gate "autay25r1"
+      - run: echo "Temporary workflow disabled"
