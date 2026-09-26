@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v10 on 26.09: the v9 rebuild ran before this code landed, so its payload
-   still had the empty covers. Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v10";
+/* Bumped to v11 on 26.09: forces the rebuild that fills the remaining covers.
+   Any future "refresh the chart now" is the same bump. */
+const TOP50_KV = "top50v11";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -408,11 +408,12 @@ export async function buildTop50(origin, env) {
     prev: isApplePreview(rec.prev) ? rec.prev : "",
     year: rec.year || "",
   }));
+  const coverStats = { want: 0, filled: 0, failed: 0 };
   await seedBaked(origin || "", tracks);
   await applyCovers(env, tracks);   /* Apple-only + память обложек */
-  await enrichArtByIds(tracks);     /* добираем обложки одним запросом по Apple-ID */
+  await enrichArtByIds(tracks, coverStats);  /* добираем обложки одним запросом по Apple-ID */
   await enrichApple(tracks);
-  await enrichArtByIds(tracks);     /* ссылки могли появиться только что - добираем остаток */
+  await enrichArtByIds(tracks, coverStats);  /* ссылки могли появиться только что - добираем остаток */
   await applyCovers(env, tracks);   /* запомнить обложки, найденные в Apple */
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
@@ -422,6 +423,9 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
+    rev: "cover-v11",
+    sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
+    covers: { ...coverStats, missing: tracks.filter((t) => !isAppleArt(t.art)).length },
     tracks,
   };
 }
@@ -449,13 +453,14 @@ async function itunesLookup(title, artist) {
 /* One batch lookup by Apple track id (the ?i= in the link) instead of 50 searches:
    it restores the covers of rows that another source created first, and it does not
    run into the search rate limit. Runs before enrichApple, so fewer searches are left. */
-async function enrichArtByIds(tracks) {
+async function enrichArtByIds(tracks, stats) {
   const want = [];
   for (const t of tracks) {
     if (isAppleArt(t.art)) continue;
     const m = String(t.url || "").match(/[?&]i=(\d+)/);
     if (m) want.push([t, m[1]]);
   }
+  if (stats) stats.want += want.length;
   if (!want.length) return;
   const ids = [...new Set(want.map(([, id]) => id))];
   const found = new Map();
@@ -467,12 +472,16 @@ async function enrichArtByIds(tracks) {
         const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
         if (id && art) found.set(id, art);
       }
-    } catch {}
+    } catch (e) {
+      if (stats) stats.failed += 1;
+    }
   }
+  let filled = 0;
   for (const [t, id] of want) {
     const art = found.get(id);
-    if (art) t.art = art;
+    if (art) { t.art = art; filled += 1; }
   }
+  if (stats) stats.filled += filled;
 }
 
 async function enrichApple(tracks) {
