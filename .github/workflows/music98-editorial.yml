@@ -1,16 +1,16 @@
 name: music98 editorial runner
 
 on:
+  push:
+    paths:
+      - "scripts/**"
+      - ".github/workflows/music98-editorial.yml"
   workflow_dispatch:
     inputs:
       post_id:
         description: "Post ID to gate (optional)"
         required: false
         type: string
-  push:
-    paths:
-      - "scripts/**"
-      - ".github/workflows/music98-editorial.yml"
 
 permissions:
   contents: read
