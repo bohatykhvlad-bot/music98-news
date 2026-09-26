@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v19 on 26.09: forces the rebuild with the arrow fix.
+/* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v19";
+const TOP50_KV = "top50v20";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -277,9 +277,12 @@ async function applyTenure(env, tracks) {
       if (firstDay[key] == null) firstDay[key] = week;
       track.delta = "0";
     } else if (prevPos < 0) {
-      /* во вчерашнем порядке песни нет: серия начинается заново -> NEW.
-         На новом дне это возврат в чарт, внутри дня - просто новая строка. */
-      if (rolled || firstDay[key] == null) firstDay[key] = week;
+      /* Во вчерашнем порядке песни нет: это новая или вернувшаяся песня.
+         Владелец: пропустила день -> NEW, серия начинается заново. Поэтому
+         firstDay сбрасываем ВСЕГДА, а не только на новом дне: иначе при
+         внутридневном появлении получалось "NEW" рядом с прежним счётчиком
+         ("5 days on chart", владелец 26.09). */
+      firstDay[key] = week;
       track.delta = "new";
     } else {
       if (firstDay[key] == null) firstDay[key] = week;
@@ -312,23 +315,31 @@ async function applyTenure(env, tracks) {
   }
   return tracks;
 }
-/* Самопроверка стрелок: место + стрелка обязаны складываться в непротиворечивый
-   вчерашний порядок. Никаких двух песен на одном вчерашнем месте и никаких
-   выходов за пределы списка. Поле arrows уходит в ответ - поломку видно сразу. */
+/* Самопроверка стрелок и счётчика дней:
+   - место + стрелка обязаны складываться в непротиворечивый вчерашний порядок;
+   - NEW обязан идти с "1 day on chart", а числовая стрелка - минимум с двумя днями
+     (песня была в чарте вчера). Рассинхронизация видна в поле arrows сразу. */
 function arrowCheck(tracks) {
   const taken = new Set();
   let bad = 0;
+  let mixed = 0;
   let fresh = 0;
   tracks.forEach((t, i) => {
     const d = String(t.delta == null ? "" : t.delta).toLowerCase();
-    if (d === "new") { fresh += 1; return; }
+    const w = Number(t.weeks) || 0;
+    if (d === "new") {
+      fresh += 1;
+      if (w !== 1) mixed += 1;
+      return;
+    }
     const n = Number(d);
     if (!Number.isFinite(n)) { bad += 1; return; }
+    if (w < 2) mixed += 1;
     const p = i + n;
     if (p < 0 || p >= tracks.length || taken.has(p)) bad += 1;
     else taken.add(p);
   });
-  return { ok: bad === 0, bad, new: fresh };
+  return { ok: bad === 0 && mixed === 0, bad, mixed, new: fresh };
 }
 const UA = "Mozilla/5.0 (compatible; music98/1.0)";
 

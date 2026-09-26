@@ -687,9 +687,10 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
             first_day.setdefault(key, week)
             track["delta"] = "0"
         elif prev_pos < 0:
-            # во вчерашнем порядке песни нет: серия начинается заново -> NEW
-            if rolled or key not in first_day:
-                first_day[key] = week
+            # во вчерашнем порядке песни нет: новая или вернувшаяся.
+            # Пропустила день -> NEW и серия заново, поэтому first_day сбрасываем
+            # ВСЕГДА (иначе NEW стоял бы рядом со старым счётчиком дней)
+            first_day[key] = week
             track["delta"] = "new"
         else:
             first_day.setdefault(key, week)
@@ -726,6 +727,34 @@ def apply_tenure(tracks: list[dict]) -> list[dict]:
     except OSError:
         pass
     return tracks
+
+
+def arrow_check(tracks: list[dict]) -> dict:
+    """Самопроверка: место+стрелка = непротиворечивый вчерашний порядок, и
+    NEW всегда с одним днём, а числовая стрелка - минимум с двумя."""
+    taken: set[int] = set()
+    bad = mixed = fresh = 0
+    for i, t in enumerate(tracks):
+        d = str(t.get("delta") if t.get("delta") is not None else "").lower()
+        w = int(t.get("weeks") or 0)
+        if d == "new":
+            fresh += 1
+            if w != 1:
+                mixed += 1
+            continue
+        try:
+            n = int(d)
+        except ValueError:
+            bad += 1
+            continue
+        if w < 2:
+            mixed += 1
+        p = i + n
+        if p < 0 or p >= len(tracks) or p in taken:
+            bad += 1
+        else:
+            taken.add(p)
+    return {"ok": bad == 0 and mixed == 0, "bad": bad, "mixed": mixed, "new": fresh}
 
 
 def build_payload(enrich: bool = False) -> dict:
