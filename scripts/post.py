@@ -28,6 +28,7 @@ Only `show` and `read` print prose. Everything else is a handful of lines.
 from __future__ import annotations
 
 import argparse
+import os
 import html as htmllib
 import json
 import re
@@ -263,6 +264,8 @@ def guarded_write(mutate):
 
 
 def cmd_list():
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        sync_small_town_repair()
     posts = desk_read()["posts"]
     order = {"live": 0, "scheduled": 1, "draft": 2}
     posts.sort(key=lambda p: str(p.get("publishAt") or ""), reverse=True)
