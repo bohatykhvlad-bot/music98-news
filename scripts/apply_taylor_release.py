@@ -92,6 +92,7 @@ def set_cover_guarded():
     print("cover update: ok")
 
 def gate():
+    subprocess.run([sys.executable,str(REPO/"scripts/post.py"),"register","october 3","Taylor Swift The Life of a Showgirl released 03.10.2025 (Universal Music Japan: https://www.universal-music.co.jp/taylor-swift/ ; Apple Music: https://music.apple.com/us/album/the-life-of-a-showgirl-the-encore/6814997249 )"],check=True)
     subprocess.run([sys.executable,str(REPO/"scripts/post.py"),"gate",PID],check=True)
 
 if __name__=="__main__":
