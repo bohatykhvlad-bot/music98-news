@@ -33,8 +33,29 @@ jobs:
           python --version
           test -f scripts/post.py
           test -f scripts/gate.py
+      - name: Register Taylor dates
+        run: |
+          python scripts/post.py register "september 23" "Taylor Swift announced The Life of a Showgirl: The Encore on 23.09.2026 (Variety/NME)"
+          python scripts/post.py register "september 27" "Patient Zero video scheduled to premiere at the 2026 MTV VMAs on 27.09.2026; Swift to receive Artist Director Honors (Variety)"
+      - name: Upload current Encore cover
+        run: |
+          python - <<'PY'
+          import base64,json,re,urllib.request,os
+          page=urllib.request.urlopen(urllib.request.Request("https://taylorswiftstyle.squarespace.com/post-grid/tloas-te",headers={"User-Agent":"Mozilla/5.0"}),timeout=90).read().decode("utf-8","ignore")
+          m=re.search(r'<meta[^>]+property=["\\']og:image["\\'][^>]+content=["\\']([^"\\']+)',page,re.I)
+          if not m: m=re.search(r'<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+property=["\\']og:image',page,re.I)
+          if not m: raise SystemExit("Encore cover og:image not found")
+          img=m.group(1).replace("&amp;","&")
+          raw=urllib.request.urlopen(urllib.request.Request(img,headers={"User-Agent":"Mozilla/5.0"}),timeout=90).read()
+          payload={"name":"taylor-swift-encore-sept-2026.jpg","data":"data:image/jpeg;base64,"+base64.b64encode(raw).decode()}
+          req=urllib.request.Request("https://music98.news/api/photo",data=json.dumps(payload).encode(),headers={"Content-Type":"application/json","X-Admin-Key":os.environ["ADMIN_PASSWORD"]},method="POST")
+          print(urllib.request.urlopen(req,timeout=90).read().decode())
+          PY
+      - name: Set Taylor draft
+        run: python scripts/post.py set "autay25r1" --body-file scripts/taylor_body.txt --title "Taylor Swift — *The Life of a Showgirl: The Encore*"
       - name: Desk list
         run: python scripts/post.py list
-      - name: Gate requested post
+      - name: Gate Taylor draft
+        run: python scripts/post.py gate "autay25r1"
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
