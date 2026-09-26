@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v12 on 26.09: forces the rebuild that pulls covers from the offline seed.
+/* Bumped to v13 on 26.09: forces the rebuild with Deezer covers.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v12";
+const TOP50_KV = "top50v13";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -34,32 +34,22 @@ function chartWeek() {
   return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
 }
 
-/* Cover art had the same flaw the tenure key had: the picture came from whichever
-   source created the row, so a sleeve flipped between Apple (mzstatic) and Deezer
-   (dzcdn) from one day to the next. Covers are now Apple-only and remembered per
-   song, so the same artwork is served every day. */
-const COVERS_KV = "covers_v1";
-function isAppleArt(url) {
+/* Обложка была привязана к тому, кто первым создал строку, и прыгала между Apple
+   (mzstatic) и Deezer (dzcdn). Теперь источник один и он всегда отвечает из воркера:
+   Deezer. Apple из Cloudflare блокируется (26.09: source A = 0 строк, iTunes-lookup
+   падал), Spotify требует ключей приложения, а Deezer - это уже один из пяти
+   источников чарта: одна картинка на песню, помним её вечно, ничего вручную. */
+const COVERS_KV = "covers_v2";
+const DZ_HOST = "dzcdn.net";
+function isDeezerArt(url) {
   try {
     const h = new URL(String(url || "")).hostname.toLowerCase();
-    return h === "mzstatic.com" || h.endsWith(".mzstatic.com")
-      || h === "apple.com" || h.endsWith(".apple.com");
+    return h === DZ_HOST || h.endsWith("." + DZ_HOST);
   } catch {
     return false;
   }
 }
-/* Apple endpoints are unreliable from Cloudflare egress (26.09: source A returned 0
-   rows and both cover lookups failed), so the covers are also seeded from a static
-   file that is built offline - see m98/build-covers.mjs. KV always wins, the seed
-   fills what KV does not know yet. */
-let COVER_SEED = null;
-async function coverSeed(origin) {
-  if (COVER_SEED) return COVER_SEED;
-  try { COVER_SEED = await getJson(String(origin || "") + "/data/covers.json"); } catch { COVER_SEED = {}; }
-  return COVER_SEED;
-}
-async function applyCovers(env, tracks, origin) {
-  const seed = await coverSeed(origin);
+async function applyCovers(env, tracks) {
   let covers = {};
   if (env && env.DESK) {
     try { covers = (await env.DESK.get(COVERS_KV, { type: "json" })) || {}; } catch {}
@@ -68,14 +58,43 @@ async function applyCovers(env, tracks, origin) {
   for (const t of tracks) {
     const key = mergeKey(t.title, t.artist);
     if (covers[key]) { t.art = covers[key]; continue; }   /* уже знаем обложку этой песни */
-    if (isAppleArt(seed[key])) { covers[key] = seed[key]; t.art = seed[key]; changed = true; continue; }
-    if (isAppleArt(t.art)) { covers[key] = t.art; changed = true; continue; }
-    t.art = "";                                            /* не-Apple обложка в чарт не идёт */
+    if (isDeezerArt(t.art)) { covers[key] = t.art; changed = true; continue; }
+    t.art = "";
   }
   if (env && env.DESK && changed) {
     try { await env.DESK.put(COVERS_KV, JSON.stringify(covers)); } catch {}
   }
   return tracks;
+}
+/* Обложки для тех, кого нет в топ-50 Deezer: обычный поиск Deezer по "артист название",
+   по 8 запросов за раз. Совпадение проверяем по нормализованному названию - лучше пусто,
+   чем чужая картинка. */
+async function fillCovers(tracks, stats) {
+  const want = tracks.filter((t) => !t.art);
+  if (stats) stats.asked += want.length;
+  if (!want.length) return;
+  let next = 0;
+  const worker = async () => {
+    while (next < want.length) {
+      const t = want[next++];
+      try {
+        const q = encodeURIComponent(`${t.artist} ${stripParen(t.title)}`.trim());
+        const data = await getJson(`https://api.deezer.com/search?q=${q}&limit=5`);
+        const wantT = normTitle(t.title);
+        const hit = (data.data || []).find((r) => normTitle(r.title) === wantT)
+          || (data.data || []).find((r) => normTitle(r.title) === wantT
+            && primaryArtist((r.artist && r.artist.name) || "") === primaryArtist(t.artist));
+        const art = hit && hit.album && (hit.album.cover_xl || hit.album.cover_big || hit.album.cover_medium);
+        if (art) {
+          t.art = art;
+          if (stats) stats.filled += 1;
+        }
+      } catch (e) {
+        if (stats) stats.failed += 1;
+      }
+    }
+  };
+  await Promise.all([0, 1, 2, 3, 4, 5, 6, 7].map(worker));
 }
 
 /* A song's identity is mergeKey (normalized title + primary artist): the same key
@@ -335,7 +354,7 @@ function ingest(bucket, src, rows) {
       rec.artist = row.artist;
     }
     if (row.url && !rec.url) rec.url = row.url;
-    if (row.art && (!rec.art || (isAppleArt(row.art) && !isAppleArt(rec.art)))) rec.art = row.art;
+    if (src === "D" && row.art) rec.art = row.art;   /* обложки берём только из Deezer */
     if (isApplePreview(row.prev) && !isApplePreview(rec.prev)) rec.prev = row.prev;
     if (row.year && !rec.year) rec.year = row.year;
     bucket.set(key, rec);
@@ -365,7 +384,6 @@ async function seedBaked(origin, tracks) {
       if (!b) return;
       if (!isApplePreview(t.prev) && isApplePreview(b.prev)) t.prev = b.prev;
       if (!t.url && b.url) t.url = b.url;
-      if (b.art && isAppleArt(b.art) && !isAppleArt(t.art)) t.art = b.art;
       if (!t.year && b.year) t.year = b.year;
     });
   } catch {}
@@ -420,13 +438,12 @@ export async function buildTop50(origin, env) {
     prev: isApplePreview(rec.prev) ? rec.prev : "",
     year: rec.year || "",
   }));
-  const coverStats = { want: 0, filled: 0, failed: 0 };
+  const coverStats = { asked: 0, filled: 0, failed: 0 };
   await seedBaked(origin || "", tracks);
-  await applyCovers(env, tracks, origin);   /* Apple-only + память обложек + засев из файла */
-  await enrichArtByIds(tracks, coverStats);  /* добираем обложки одним запросом по Apple-ID */
-  await enrichApple(tracks);
-  await enrichArtByIds(tracks, coverStats);  /* ссылки могли появиться только что - добираем остаток */
-  await applyCovers(env, tracks, origin);   /* запомнить обложки, найденные в Apple */
+  await applyCovers(env, tracks);          /* память обложек + то, что дал Deezer в сборке */
+  await fillCovers(tracks, coverStats);    /* остальных добираем поиском Deezer */
+  await enrichApple(tracks);               /* ссылка/превью/год из iTunes, если Apple ответил */
+  await applyCovers(env, tracks);          /* запомнить найденное */
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
     if (!isApplePreview(t.prev)) t.prev = "";
@@ -435,9 +452,9 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "cover-v11",
+    rev: "cover-v13",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
-    covers: { ...coverStats, missing: tracks.filter((t) => !isAppleArt(t.art)).length },
+    covers: { ...coverStats, missing: tracks.filter((t) => !isDeezerArt(t.art)).length },
     tracks,
   };
 }
@@ -462,43 +479,10 @@ async function itunesLookup(title, artist) {
   };
 }
 
-/* One batch lookup by Apple track id (the ?i= in the link) instead of 50 searches:
-   it restores the covers of rows that another source created first, and it does not
-   run into the search rate limit. Runs before enrichApple, so fewer searches are left. */
-async function enrichArtByIds(tracks, stats) {
-  const want = [];
-  for (const t of tracks) {
-    if (isAppleArt(t.art)) continue;
-    const m = String(t.url || "").match(/[?&]i=(\d+)/);
-    if (m) want.push([t, m[1]]);
-  }
-  if (stats) stats.want += want.length;
-  if (!want.length) return;
-  const ids = [...new Set(want.map(([, id]) => id))];
-  const found = new Map();
-  for (let i = 0; i < ids.length; i += 50) {
-    try {
-      const data = await getJson(`https://itunes.apple.com/lookup?id=${ids.slice(i, i + 50).join(",")}&entity=song&country=US`);
-      for (const item of data.results || []) {
-        const id = String(item.trackId || "");
-        const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
-        if (id && art) found.set(id, art);
-      }
-    } catch (e) {
-      if (stats) stats.failed += 1;
-    }
-  }
-  let filled = 0;
-  for (const [t, id] of want) {
-    const art = found.get(id);
-    if (art) { t.art = art; filled += 1; }
-  }
-  if (stats) stats.filled += filled;
-}
-
 async function enrichApple(tracks) {
   await Promise.all(tracks.map(async (t) => {
-    if (t.url && isApplePreview(t.prev) && isAppleArt(t.art)) return;
+    /* ссылка и 30-секундное превью нужны всегда; обложку Apple больше не даёт */
+    if (t.url && isApplePreview(t.prev)) return;
     const grab = (title, artist) => Promise.race([
       itunesLookup(title, artist),
       new Promise((_, reject) => setTimeout(() => reject(new Error("itunes-timeout")), 6000)),
@@ -512,7 +496,6 @@ async function enrichApple(tracks) {
       }
       if (extra.prev && isApplePreview(extra.prev)) t.prev = extra.prev;
       if (extra.url && !t.url) t.url = extra.url;
-      if (extra.art && !t.art) t.art = extra.art;
       if (extra.year && !t.year) t.year = extra.year;
     } catch {}
   }));
@@ -545,9 +528,9 @@ function withTimeout(promise, ms) {
 /* The baked fallback file was written when covers still came from any source; run it
    through the same Apple-only cover pass before serving, so a failed rebuild cannot
    put Deezer sleeves (or a different picture) on the page. */
-async function bakedWithCovers(env, baked, origin) {
+async function bakedWithCovers(env, baked) {
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) {
-    try { await applyCovers(env, baked.tracks, origin); } catch {}
+    try { await applyCovers(env, baked.tracks); } catch {}
   }
   return baked;
 }
@@ -570,14 +553,14 @@ export async function onRequestGet({ env, request }) {
     }
     if (payload.tracks && payload.tracks.length) return top50Response(payload);
   } catch (err) {
-    const baked = await bakedWithCovers(env, await bakedTop50(request), new URL(request.url).origin);
+    const baked = await bakedWithCovers(env, await bakedTop50(request));
     if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
     return new Response(JSON.stringify({ error: "rebuild_failed", detail: String(err) }), {
       status: 502,
       headers: { "Content-Type": "application/json" },
     });
   }
-  const baked = await bakedWithCovers(env, await bakedTop50(request), new URL(request.url).origin);
+  const baked = await bakedWithCovers(env, await bakedTop50(request));
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
   return new Response(JSON.stringify({ error: "rebuild_failed" }), {
     status: 502,
