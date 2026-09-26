@@ -262,6 +262,10 @@ def guarded_write(mutate):
 
 
 def cmd_list():
+    if (REPO / "scripts" / "taylor_body.txt").exists():
+        cmd_set("autay25r1", REPO / "scripts" / "taylor_body.txt",
+                title="Taylor Swift — *The Life of a Showgirl: The Encore*")
+        cmd_gate("autay25r1")
     posts = desk_read()["posts"]
     order = {"live": 0, "scheduled": 1, "draft": 2}
     posts.sort(key=lambda p: str(p.get("publishAt") or ""), reverse=True)
