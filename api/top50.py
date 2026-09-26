@@ -38,6 +38,8 @@ TENURE_PATH = PUBLIC / "data" / "chart-tenure.json"
 FIRST_PATH = PUBLIC / "data" / "chart-first.json"
 # Apple-only artwork per song, so covers do not flip between sources day to day
 COVERS_PATH = PUBLIC / "data" / "chart-covers.json"
+# one accepted spelling per song (same idea as the covers: what we took once stays)
+NAMES_PATH = PUBLIC / "data" / "chart-names.json"
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
@@ -339,6 +341,36 @@ def is_deezer_art(url: str) -> bool:
     return host == "dzcdn.net" or host.endswith(".dzcdn.net")
 
 
+def apply_names(tracks: list[dict]) -> None:
+    """One spelling per song: whichever variant we accepted first stays. If Apple ever
+    answers with its full credits, that spelling replaces a shortened one, once."""
+    try:
+        names = json.loads(NAMES_PATH.read_text(encoding="utf-8"))
+        if not isinstance(names, dict):
+            names = {}
+    except Exception:
+        names = {}
+    changed = False
+    for t in tracks:
+        key = merge_key(t["title"], t["artist"])
+        rec = names.get(key) or {}
+        upgrade = t.get("nameSrc") == "A" and rec.get("src") != "A"
+        if rec.get("title") and rec.get("artist") and not upgrade:
+            t["title"] = rec["title"]
+            t["artist"] = rec["artist"]
+            continue
+        names[key] = {"title": t["title"], "artist": t["artist"], "src": t.get("nameSrc") or ""}
+        changed = True
+    if changed:
+        NAMES_PATH.parent.mkdir(exist_ok=True)
+        try:
+            NAMES_PATH.write_text(
+                json.dumps(names, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+        except OSError:
+            pass
+
+
 def fill_covers_deezer(tracks: list[dict]) -> None:
     """Covers for songs outside Deezer's top-50: Deezer search, 8 requests at a time."""
     want = [t for t in tracks if not t.get("art")]
@@ -478,6 +510,7 @@ def ingest(bucket: dict, src: str, rows: list[dict]) -> None:
         if src == "A":
             rec["title"] = row["title"]
             rec["artist"] = row["artist"]
+            rec["nameSrc"] = "A"
         if row.get("url") and not rec["url"]:
             rec["url"] = row["url"]
         if src == "D" and row.get("art"):
@@ -691,8 +724,12 @@ def build_payload(enrich: bool = False) -> dict:
                 "art": rec.get("art") or "",
                 "prev": prev,
                 "year": rec.get("year") or "",
+                "nameSrc": rec.get("nameSrc") or "",
             }
         )
+    apply_names(tracks)               # одно написание имени на песню
+    for t in tracks:
+        t.pop("nameSrc", None)
     return {
         "updated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "launch": LAUNCH.isoformat(),

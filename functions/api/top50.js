@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v13 on 26.09: forces the rebuild with Deezer covers.
+/* Bumped to v14 on 26.09: forces the rebuild with the remembered artist names.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v13";
+const TOP50_KV = "top50v14";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -95,6 +95,35 @@ async function fillCovers(tracks, stats) {
     }
   };
   await Promise.all([0, 1, 2, 3, 4, 5, 6, 7].map(worker));
+}
+
+/* Написание имени тоже зависело от того, кто ответил сегодня: при молчащем Apple
+   приезжал спотифай-вариант ("KAROL G" вместо "KAROL G, Judeline & rusowsky").
+   Теперь имя запоминается по песне, как обложка: что приняли один раз, то и висит.
+   Если Apple ответит и принесёт полное написание, оно один раз заменит урезанное. */
+const NAMES_KV = "names_v1";
+async function applyNames(env, tracks) {
+  let names = {};
+  if (env && env.DESK) {
+    try { names = (await env.DESK.get(NAMES_KV, { type: "json" })) || {}; } catch {}
+  }
+  let changed = false;
+  for (const t of tracks) {
+    const key = mergeKey(t.title, t.artist);
+    const rec = names[key];
+    const upgrade = t.nameSrc === "A" && rec && rec.src !== "A";
+    if (rec && rec.title && rec.artist && !upgrade) {
+      t.title = rec.title;
+      t.artist = rec.artist;
+      continue;
+    }
+    names[key] = { title: t.title, artist: t.artist, src: t.nameSrc || "" };
+    changed = true;
+  }
+  if (env && env.DESK && changed) {
+    try { await env.DESK.put(NAMES_KV, JSON.stringify(names)); } catch {}
+  }
+  return tracks;
 }
 
 /* A song's identity is mergeKey (normalized title + primary artist): the same key
@@ -352,6 +381,7 @@ function ingest(bucket, src, rows) {
     if (src === "A") {
       rec.title = row.title;
       rec.artist = row.artist;
+      rec.nameSrc = "A";
     }
     if (row.url && !rec.url) rec.url = row.url;
     if (src === "D" && row.art) rec.art = row.art;   /* обложки берём только из Deezer */
@@ -437,8 +467,11 @@ export async function buildTop50(origin, env) {
     art: rec.art || "",
     prev: isApplePreview(rec.prev) ? rec.prev : "",
     year: rec.year || "",
+    nameSrc: rec.nameSrc || "",
   }));
   const coverStats = { asked: 0, filled: 0, failed: 0 };
+  await applyNames(env, tracks);           /* одно написание имени на песню */
+  tracks.forEach((t) => { delete t.nameSrc; });
   await seedBaked(origin || "", tracks);
   await applyCovers(env, tracks);          /* память обложек + то, что дал Deezer в сборке */
   await fillCovers(tracks, coverStats);    /* остальных добираем поиском Deezer */
@@ -452,7 +485,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "cover-v13",
+    rev: "name-v14",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     covers: { ...coverStats, missing: tracks.filter((t) => !isDeezerArt(t.art)).length },
     tracks,
@@ -530,7 +563,10 @@ function withTimeout(promise, ms) {
    put Deezer sleeves (or a different picture) on the page. */
 async function bakedWithCovers(env, baked) {
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) {
-    try { await applyCovers(env, baked.tracks); } catch {}
+    try {
+      await applyNames(env, baked.tracks);
+      await applyCovers(env, baked.tracks);
+    } catch {}
   }
   return baked;
 }
