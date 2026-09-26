@@ -9,8 +9,8 @@ PHOTO = "https://music98.news/api/photo"
 IMAGE_URL = "https://www.taylorswift.com/wp-content/uploads/sites/2529/2025/08/c6aKvzeQm_png.png"
 PID = "autay25r1"
 TITLE = 'Taylor Swift Releases *The Life of a Showgirl: The Encore* With Four New Songs'
-EXCERPT = ('Taylor Swift has released *The Life of a Showgirl: The Encore*, an expanded edition of her 2025 album '
-           'that adds four new songs to the original 12-track record.')
+EXCERPT = ('Taylor Swift, the singer and songwriter, has released *The Life of a Showgirl: The Encore*, an expanded edition '
+           'of her 2025 album that adds four new songs to the original 12-track record.')
 BODY = r'''Taylor Swift, the singer and songwriter, has released *The Life of a Showgirl: The Encore*, an expanded edition of her 2025 album that adds four new songs to the original 12-track record. The new edition arrived on September 25, 2026, with "Patient Zero," "Cleveland!," "Pink Clouding," and "Babylon" forming a second disc on the digital release. Swift announced the project before its release, after first introducing "Patient Zero" as a new song, and described the extra material as coming from a return to the studio with Max Martin and Shellback, the producers and songwriters who worked with her on the original album. The release gives *Showgirl* four additional recordings without replacing the album's original tracklist.
 
 The four songs came out of a trip Swift made to Sweden with Martin and Shellback after the original album's release. According to Swift's announcement, the trip was meant to celebrate the album's response, but the three collaborators ended up working in a nearby studio and wrote more music. The result is an expanded 16-song edition that keeps the original sequence intact before moving into the four new tracks. "Patient Zero" leads the new material, followed by "Cleveland!," "Pink Clouding," and "Babylon." Apple Music lists the release as a 16-song, two-disc edition, with the four new songs grouped on Disc 2.
