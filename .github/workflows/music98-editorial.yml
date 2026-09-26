@@ -43,3 +43,5 @@ jobs:
         run: python scripts/post.py gate "${{ inputs.post_id }}"
 
 # Taylor Swift draft runner is intentionally retained for the current editorial task.
+
+# Taylor excerpt fix retry trigger.
