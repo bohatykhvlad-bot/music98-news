@@ -192,7 +192,8 @@ posts.forEach((p, i) => {
     deskGeom(iw, ih, 960, 540, crop.x, crop.y, crop.zoom),
     siteGeom(iw, ih, 960, 540, mf.x, mf.y, mz));
 
-  if (c.lockX != null && pm && Math.abs(Number(c.lockX) - Number(pm[1]) / 100) > 0.005) stale.push(p.id);
+  /* a free card (cardX) ignores lockX on both sides, so only the bound ones matter */
+  if (c.lockX != null && c.cardX == null && pm && Math.abs(Number(c.lockX) - Number(pm[1]) / 100) > 0.005) stale.push(p.id);
 });
 
 console.log("posts checked:", posts.length);
