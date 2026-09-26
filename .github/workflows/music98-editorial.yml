@@ -25,6 +25,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Prepare environment
+        run: |
+          printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
       - name: Check runner
         run: |
           python --version
