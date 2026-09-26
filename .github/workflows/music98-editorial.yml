@@ -33,8 +33,9 @@ jobs:
           python --version
           test -f scripts/post.py
           test -f scripts/gate.py
+      - name: Repair Taylor post
+        run: python scripts/repair_taylor.py
       - name: Desk list
         run: python scripts/post.py list
-      - name: Gate requested post
-        if: ${{ inputs.post_id != '' }}
-        run: python scripts/post.py gate "${{ inputs.post_id }}"
+      - name: Gate repaired post
+        run: python scripts/post.py gate "autay25r1"
