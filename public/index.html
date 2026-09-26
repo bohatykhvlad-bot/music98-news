@@ -950,7 +950,9 @@ function fitCover(img){
   /* owner lag fix: over-zoomed covers render as giant layers (measured 665x893
      in a 253px box = 9x the pixels) and the compositor resamples them every
      scroll frame. 1.6 still shows real crop intent; the decoder also downscales
-     the source, keeping memory flat. */
+     the source, keeping memory flat. THIS IS THE ONE CAP: the desk mirrors it
+     (admin-desk.html, SITE_ZOOM_CAP) so a preview can never show a crop the
+     visitor does not get - raise it here and there together. */
   const z = Math.min(1.6, Math.max(1, Number(img.dataset.zoom) || 1));
   const sw = box.clientWidth, sh = box.clientHeight;
   if(!sw || !sh) return;

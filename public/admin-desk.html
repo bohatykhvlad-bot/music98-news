@@ -491,6 +491,14 @@ let posts = [];
 let coverSrc = "";
 let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, lockX:null, cardFree:false, cardX:null};
 let cropMode = "main";   /* main | card | hero */
+/* The public page clamps EVERY cover to this zoom (index.html, fitCover) -
+   anything above it simply is not drawn there. Every preview in here (card
+   stage, main stage, mini, story-list thumb, in-article photo) must draw the
+   same pixels the visitor gets, or the desk lies: the card pane used to render
+   the raw cardZoom (1.89 for Tinashe) while the live card showed 1.6, and the
+   owner could not tell which of the two panes to trust. */
+const SITE_ZOOM_CAP = 1.6;
+const siteZoom = z => Math.min(SITE_ZOOM_CAP, Math.max(1, Number(z) || 1));
 let editing = null;
 let appleKind = "song";
 let pendingApple = null;
@@ -801,10 +809,10 @@ function refreshFigCredit(fig){
 function photoBlock(src, author, link, pos, zoom){
   author = author||""; link = link||"";
   if(!/^[\d.]+%\s+[\d.]+%$/.test(pos||"")) pos = "50% 50%";
-  zoom = Math.min(3, Math.max(1, Number(zoom)||1));
+  zoom = siteZoom(zoom);
   const m = pos.match(/([\d.]+)%\s+([\d.]+)%/);
   const fx = +m[1]/100, fy = +m[2]/100;
-  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}" data-pauthor="${esc(author)}" data-plink="${esc(link)}" data-ppos="${esc(pos)}" data-pzoom="${zoom}">${blkChrome()}<span class="abody-box"><img src="${esc(src)}" alt="" draggable="false" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"><span class="grid"></span></span><span class="ppanel" contenteditable="false"><input type="text" class="pp-author" placeholder="Credit: author / source" value="${esc(author)}"><input type="text" class="pp-link" placeholder="Link to the photo" value="${esc(link)}"><span class="pp-zoomrow"><button class="btn ghost" type="button" data-pz="-1" aria-label="Zoom out">−</button><input type="range" class="pp-zoom" min="1" max="3" step="0.01" value="${zoom}"><button class="btn ghost" type="button" data-pz="1" aria-label="Zoom in">+</button><button class="btn ghost pp-center" type="button">Center</button></span></span>${pcredFor(author,link)}</figure>`;
+  return `<figure class="blk abody-pic" contenteditable="false" data-photo="${esc(src)}" data-pauthor="${esc(author)}" data-plink="${esc(link)}" data-ppos="${esc(pos)}" data-pzoom="${zoom}">${blkChrome()}<span class="abody-box"><img src="${esc(src)}" alt="" draggable="false" data-fx="${fx}" data-fy="${fy}" data-zoom="${zoom}"><span class="grid"></span></span><span class="ppanel" contenteditable="false"><input type="text" class="pp-author" placeholder="Credit: author / source" value="${esc(author)}"><input type="text" class="pp-link" placeholder="Link to the photo" value="${esc(link)}"><span class="pp-zoomrow"><button class="btn ghost" type="button" data-pz="-1" aria-label="Zoom out">−</button><input type="range" class="pp-zoom" min="1" max="${SITE_ZOOM_CAP}" step="0.01" value="${zoom}"><button class="btn ghost" type="button" data-pz="1" aria-label="Zoom in">+</button><button class="btn ghost pp-center" type="button">Center</button></span></span>${pcredFor(author,link)}</figure>`;
 }
 function fitPhotoFig(fig){
   const img = fig.querySelector(".abody-box img");
@@ -1210,11 +1218,13 @@ function cardFx(){
   return lockFx();
 }
 function fitCover(img, fx, fy, zoom){
+  /* same box maths as the public fitCover, INCLUDING the site's zoom cap:
+     a preview that renders a zoom the site refuses to draw is a lie */
   const box = img && img.parentElement;
   if(!box || !img.naturalWidth) return;
   const x = Math.min(1, Math.max(0, Number(fx)));
   const y = Math.min(1, Math.max(0, Number(fy)));
-  const z = Math.min(8, Math.max(1, Number(zoom)||1));
+  const z = siteZoom(zoom);
   const sw = box.clientWidth, sh = box.clientHeight;
   if(!sw || !sh) return;
   const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -1234,7 +1244,7 @@ function zoomNow(){
 function zoomCap(){
   const img = $("#stageImg");
   const box = img && img.parentElement;
-  if(!coverSrc || !img || !img.naturalWidth || !box || !box.clientWidth) return 3;
+  if(!coverSrc || !img || !img.naturalWidth || !box || !box.clientWidth) return SITE_ZOOM_CAP;
   const sw = box.clientWidth, sh = box.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
   const fx = (cropMode === "card") ? cardFx() : (Number.isFinite(crop.x) ? crop.x : 0.5);
@@ -1242,7 +1252,9 @@ function zoomCap(){
   const need = (px, f) => 2 * Math.max(f, 1 - f) * px;
   const zw = sw ? need(iw, fx) / sw : 1;
   const zh = sh ? need(ih, fy) / sh : 1;
-  return Math.max(1.2, Math.max(zw, zh) * 1.02);
+  /* never above the site cap: the slider's right end used to allow 1.89/2.63
+     on cards, the live card drew 1.6 - the owner framed a crop nobody saw */
+  return Math.min(SITE_ZOOM_CAP, Math.max(1.2, Math.max(zw, zh) * 1.02));
 }
 function setZoom(z){
   const cap = zoomCap();
@@ -1355,8 +1367,8 @@ function paintMini(){
      so caption it by what is actually on screen, not by the active mode */
   const cap = document.querySelector(".mini .muted");
   if(cap) cap.textContent = (cropMode === "card") ? "Main" : "Card";
-  if(cropMode === "card") paint("miniImg", Number.isFinite(crop.x)?crop.x:0.5, Number.isFinite(crop.y)?crop.y:0.5, Math.min(1.6, crop.zoom||1));
-  else paint("miniImg", cardFx(), crop.cardY, Math.min(1.6, crop.cardZoom||1));
+  if(cropMode === "card") paint("miniImg", Number.isFinite(crop.x)?crop.x:0.5, Number.isFinite(crop.y)?crop.y:0.5, siteZoom(crop.zoom||1));
+  else paint("miniImg", cardFx(), crop.cardY, siteZoom(crop.cardZoom||1));
 }
 /* The slider's right end IS the zoom cap (owner request): the track maps
    [1..cap] of the CURRENT focus, so dragging to the end always lands exactly
@@ -1396,7 +1408,7 @@ function layoutCrop(){
   if(cropMode === "card"){ fitCover(img, cardFx(), crop.cardY, crop.cardZoom||1); paintMini(); if(syncZoomUI()) layoutCrop(); return; }
   const sw = stage.clientWidth, sh = stage.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
-  const z = crop.zoom || 1;
+  const z = siteZoom(crop.zoom);
   const base = Math.max(sw/iw, sh/ih) * z;
   const dw = iw * base, dh = ih * base;
   let left = sw/2 - crop.x * dw;
@@ -1414,11 +1426,13 @@ function layoutCrop(){
 function setCover(src, pos, zoom, cardY){
   coverSrc = src;
   const parsed = parsePos(pos);
-  crop.x = parsed.x; crop.y = parsed.y; crop.zoom = Number(zoom)||1;
+  crop.x = parsed.x; crop.y = parsed.y; crop.zoom = siteZoom(Number(zoom)||1);
   const cy = Number(cardY);
   crop.cardY = (cy >= 0 && cy <= 1) ? cy : parsed.y;
   const cz = Number(arguments[4]);
-  crop.cardZoom = (cz >= 1 && cz <= 6) ? cz : (crop.zoom||1);
+  /* an over-cap cardZoom is stale: the visitor never saw it, so normalise it
+     the moment the post opens (the slider then matches what is on screen) */
+  crop.cardZoom = (cz >= 1 && cz <= 6) ? siteZoom(cz) : (crop.zoom||1);
   const lxRaw = arguments[5];
   const lx = (lxRaw == null || lxRaw === "") ? NaN : Number(lxRaw);
   crop.lockX = (lx >= 0 && lx <= 1) ? lx : null;
@@ -1467,7 +1481,7 @@ function renderList(){
     const cyPct = (c.cardY == null) ? (my || 50) : Math.round(Number(c.cardY)*100);
     const cxPct = c.cardX != null ? Math.round(Number(c.cardX)*100)
       : (c.lockX != null ? Math.round(Number(c.lockX)*100) : (mx || 50));
-    const czoom = Math.min(8, Math.max(1, Number(c.cardZoom ?? c.zoom) || 1));
+    const czoom = siteZoom(c.cardZoom ?? c.zoom);
     const tattr = `class="thimg" data-fx="${(cxPct/100).toFixed(4)}" data-fy="${(cyPct/100).toFixed(4)}" data-zoom="${czoom}"`;
     /* thbox clips the fitted image to the 40px cell (zoom paints outside) */
     const thumb = tiny
@@ -1526,7 +1540,7 @@ function renderList(){
     if(!box || !img.naturalWidth) return;
     const fx = Math.min(1, Math.max(0, Number(img.dataset.fx)));
     const fy = Math.min(1, Math.max(0, Number(img.dataset.fy)));
-    const z = Math.min(8, Math.max(1, Number(img.dataset.zoom) || 1));
+    const z = siteZoom(img.dataset.zoom);
     const sw = box.clientWidth, sh = box.clientHeight;
     if(!sw || !sh) return;
     const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -1788,8 +1802,8 @@ $("#composer").addEventListener("input", e=>{
      not around the stored anchor fx/fy: recompute the anchor so the point
      under the box center stays under the box center across the zoom change.
      Mirrors the card-zoom logic in setZoom. */
-  const zOld = Math.min(3, Math.max(1, Number(img.dataset.zoom)||1));
-  const zNew = Math.min(3, Math.max(1, Number(e.target.value)||1));
+  const zOld = siteZoom(img.dataset.zoom);
+  const zNew = siteZoom(e.target.value);
   if(zNew !== zOld && img.naturalWidth && box.clientWidth){
     const sw = box.clientWidth, sh = box.clientHeight;
     const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -1807,8 +1821,8 @@ $("#composer").addEventListener("input", e=>{
       fig.dataset.ppos = (img.dataset.fx*100).toFixed(1).replace(/\.0$/,"")+"% "+(img.dataset.fy*100).toFixed(1).replace(/\.0$/,"")+"%";
     }
   }
-  img.dataset.zoom = e.target.value;
-  fig.dataset.pzoom = e.target.value;
+  img.dataset.zoom = zNew;
+  fig.dataset.pzoom = zNew;
   fitPhotoFig(fig);
 });
 $("#composer").addEventListener("click", e=>{
@@ -1816,8 +1830,8 @@ $("#composer").addEventListener("click", e=>{
   if(!fig) return;
   const img = fig.querySelector(".abody-box img");
   if(e.target.dataset.pz){
-    const zOld = Math.min(3, Math.max(1, Number(img.dataset.zoom)||1));
-    const z = Math.min(3, Math.max(1, zOld + Number(e.target.dataset.pz)*0.1));
+    const zOld = siteZoom(img.dataset.zoom);
+    const z = siteZoom(zOld + Number(e.target.dataset.pz)*0.1);
     const box = img.parentElement;
     /* same view-center pivot as the slider (owner: "зумит в центр") */
     if(z !== zOld && img.naturalWidth && box.clientWidth){
