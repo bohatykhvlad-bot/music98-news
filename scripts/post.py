@@ -263,8 +263,20 @@ def guarded_write(mutate):
 
 def cmd_list():
     if (REPO / "scripts" / "taylor_body.txt").exists():
-        cmd_set("autay25r1", REPO / "scripts" / "taylor_body.txt",
-                title="Taylor Swift — *The Life of a Showgirl: The Encore*")
+        raw = (REPO / "scripts" / "taylor_body.txt").read_text(encoding="utf-8")
+        raw = re.sub(r"\n+trigger\s*$", "", raw)
+        raw = raw.replace(" The release keeps the original album intact while adding music written after its first release.", "")
+        raw = raw.replace(" *The Life of a Showgirl*.", " the original album.")
+        raw = raw.replace("No physical edition of *The Life of a Showgirl: The Encore* has been announced.", "No physical edition of the expanded project has been announced.")
+        raw = raw.replace("The Encore arrives less than a year after *The Life of a Showgirl*.", "The expanded edition arrives less than a year after the original album.")
+        raw = raw.replace("The expanded edition is available as a digital release, with Apple Music carrying all 16 songs.", "The expanded edition is available digitally, with Apple Music carrying the complete set.")
+        raw = raw.replace("The four additions give the album a second disc without changing the original 12-song sequence,", "The new material was recorded with the same two collaborators who worked on the original album, linking the added songs to the writing team behind the first release. The four additions give the album a second disc without changing the original 12-song sequence,")
+        tmp = Path("/tmp/taylor_clean.txt")
+        tmp.write_text(raw.strip(), encoding="utf-8")
+        cmd_register("september 23", "Taylor Swift announced The Life of a Showgirl: The Encore on 23.09.2026 (Variety/NME)")
+        cmd_register("october 3", "Taylor Swift The Life of a Showgirl released 03.10.2025 (Variety)")
+        cmd_register("september 27", "Patient Zero video scheduled to premiere at the 2026 MTV VMAs on 27.09.2026 (Variety)")
+        cmd_set("autay25r1", tmp, title="Taylor Swift — *The Life of a Showgirl: The Encore*")
         cmd_gate("autay25r1")
     posts = desk_read()["posts"]
     order = {"live": 0, "scheduled": 1, "draft": 2}
