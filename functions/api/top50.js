@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v17 on 26.09: forces the rebuild with Apple spellings from the seed.
+/* Bumped to v18 on 26.09: forces the rebuild that pins the plain title over a variant one.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v17";
+const TOP50_KV = "top50v18";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -157,10 +157,16 @@ async function nameSeed(origin) {
   try { NAME_SEED = await getJson(String(origin || "") + "/data/apple-names.json"); } catch { NAME_SEED = {}; }
   return NAME_SEED;
 }
-/* какое написание показываем: засев Apple -> запомненное ранее -> текущее (с апгрейдом от Apple) */
+/* какое написание показываем: засев Apple -> запомненное ранее -> текущее (с апгрейдом от Apple).
+   Если Apple назвал ту же песню версией-вариантом ("The Fate of Ophelia (Track by Track)"),
+   а в чарте название плоское - оставляем плоское: версия не должна попадать в строку чарта. */
 function pickName(seedRec, cachedRec, cur, nameSrc) {
   if (seedRec && seedRec.title && seedRec.artist) {
-    return { title: seedRec.title, artist: seedRec.artist, src: "seed" };
+    const sameSong = normTitle(seedRec.title) === normTitle(cur.title);
+    const seedVariant = stripParen(seedRec.title).trim() !== String(seedRec.title).trim();
+    const curPlain = stripParen(cur.title).trim() === String(cur.title).trim();
+    const title = sameSong && seedVariant && curPlain ? cur.title : seedRec.title;
+    return { title, artist: seedRec.artist, src: "seed" };
   }
   const upgrade = nameSrc === "A" && cachedRec && cachedRec.src !== "A";
   if (cachedRec && cachedRec.title && cachedRec.artist && !upgrade) {

@@ -40,7 +40,7 @@ const art600 = (u) => String(u || "").replace("100x100bb", "600x600bb").replace(
 
 /* слово-вариант, которого нет в названии чарта, - признак чужого релиза (ремикс, live и т.п.).
    Границы слов обязательны: иначе "KPop Demon Hunters" ловится как "demo". */
-const VARIANTS = /\b(remix|rmx|sped up|slowed|instrumental|karaoke|cover|live|acoustic|demo|edit|re-?recorded|version|acapella)\b/i;
+const VARIANTS = /\b(remix|rmx|sped up|slowed|instrumental|karaoke|cover|live|acoustic|demo|edit|re-?recorded|version|acapella|track by track|commentary)\b/i;
 function variantTrap(wantedTitle, candidate) {
   const want = `${candidate.trackName || ""} ${candidate.collectionName || ""}`.toLowerCase();
   return VARIANTS.test(want) && !VARIANTS.test(String(wantedTitle).toLowerCase());
@@ -74,6 +74,12 @@ if (idWanted.length) {
   for (const [t, id] of idWanted) {
     const hit = byId.get(id);
     if (!hit) continue;
+    /* ссылка может вести на версию-вариант ("Track by Track", ремикс) - тогда имя и
+       обложку ищем поиском, чтобы в чарте стоял обычный релиз */
+    if (variantTrap(t.title, hit)) {
+      console.log(`  ссылка ведёт на вариант: ${t.artist} - ${t.title} -> ${hit.trackName}`);
+      continue;
+    }
     const key = mergeKey(t.title, t.artist);
     covers[key] = art600(hit.artworkUrl100);
     if (hit.trackName && hit.artistName) names[key] = { title: hit.trackName, artist: hit.artistName };

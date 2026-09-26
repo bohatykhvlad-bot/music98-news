@@ -367,9 +367,17 @@ def clean_display(title: str, artist: str) -> tuple[str, str]:
 
 
 def pick_name(seed_rec, cached_rec, cur, name_src) -> tuple[str, str, str]:
-    """Какое написание показываем: засев Apple -> запомненное ранее -> текущее."""
+    """Какое написание показываем: засев Apple -> запомненное ранее -> текущее.
+    Если Apple назвал ту же песню версией-вариантом ("... (Track by Track)"), а в чарте
+    название плоское - оставляем плоское."""
     if isinstance(seed_rec, dict) and seed_rec.get("title") and seed_rec.get("artist"):
-        return seed_rec["title"], seed_rec["artist"], "seed"
+        title = seed_rec["title"]
+        same_song = norm_title(title) == norm_title(cur[0])
+        seed_variant = strip_paren(title).strip() != str(title).strip()
+        cur_plain = strip_paren(cur[0]).strip() == str(cur[0]).strip()
+        if same_song and seed_variant and cur_plain:
+            title = cur[0]
+        return title, seed_rec["artist"], "seed"
     cached = cached_rec if isinstance(cached_rec, dict) else {}
     upgrade = name_src == "A" and cached and cached.get("src") != "A"
     if cached.get("title") and cached.get("artist") and not upgrade:
