@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v15 on 26.09: forces the rebuild that swaps Deezer covers for Apple ones.
+/* Bumped to v16 on 26.09: forces the rebuild that cleans the artist lines.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v15";
+const TOP50_KV = "top50v16";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -131,6 +131,22 @@ async function enrichArtByIds(tracks, stats) {
    приезжал спотифай-вариант ("KAROL G" вместо "KAROL G, Judeline & rusowsky").
    Теперь имя запоминается по песне, как обложка: что приняли один раз, то и висит.
    Если Apple ответит и принесёт полное написание, оно один раз заменит урезанное. */
+/* Spotify пишет фитов в названии: "Die With A Smile (w/ Bruno Mars)", "WTF GOIN (feat. 21
+   Savage)". Apple - в артистах: "Lady Gaga, Bruno Mars". Переносим фит в строку артистов,
+   чтобы на сайте не было ни "w/", ни разнобоя от источника. Смысл не меняется, а
+   идентичность песни та же (normTitle скобки всё равно отбрасывает). */
+function cleanDisplay(title, artist) {
+  const t0 = String(title || "").trim();
+  const m = t0.match(/\s*[(\[](?:w\/|w\.|with|feat\.?|ft\.?|featuring)\s+([^)\]]+)[)\]]\s*$/i);
+  if (!m) return { title: t0, artist: String(artist || "").trim() };
+  const title2 = t0.slice(0, m.index).trim() || t0;
+  let artist2 = String(artist || "").trim();
+  const feats = m[1].split(/\s*(?:,|&|\+|\/| x | × | and )\s*/i).map((s) => s.trim()).filter(Boolean);
+  const have = artist2.toLowerCase();
+  for (const f of feats) if (f && !have.includes(f.toLowerCase())) artist2 = artist2 ? `${artist2}, ${f}` : f;
+  return { title: title2, artist: artist2 };
+}
+
 const NAMES_KV = "names_v1";
 async function applyNames(env, tracks) {
   let names = {};
@@ -139,8 +155,20 @@ async function applyNames(env, tracks) {
   }
   let changed = false;
   for (const t of tracks) {
+    const mine = cleanDisplay(t.title, t.artist);
+    t.title = mine.title;
+    t.artist = mine.artist;
     const key = mergeKey(t.title, t.artist);
-    const rec = names[key];
+    let rec = names[key];
+    if (rec && rec.title && rec.artist) {
+      /* запись могла быть сделана до чистки - прогоняем её через те же правила */
+      const clean = cleanDisplay(rec.title, rec.artist);
+      if (clean.title !== rec.title || clean.artist !== rec.artist) {
+        rec = { ...rec, title: clean.title, artist: clean.artist };
+        names[key] = rec;
+        changed = true;
+      }
+    }
     const upgrade = t.nameSrc === "A" && rec && rec.src !== "A";
     if (rec && rec.title && rec.artist && !upgrade) {
       t.title = rec.title;

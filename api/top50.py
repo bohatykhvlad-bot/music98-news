@@ -347,6 +347,23 @@ def is_apple_art(url: str) -> bool:
     return host == "mzstatic.com" or host.endswith(".mzstatic.com")
 
 
+def clean_display(title: str, artist: str) -> tuple[str, str]:
+    """Spotify puts features in the title ("Die With A Smile (w/ Bruno Mars)"),
+    Apple puts them in the artist line. Move them over so "w/" never shows up."""
+    t0 = (title or "").strip()
+    m = re.search(r"\s*[(\[](?:w/|w\.|with|feat\.?|ft\.?|featuring)\s+([^)\]]+)[)\]]\s*$", t0, re.I)
+    if not m:
+        return t0, (artist or "").strip()
+    head = t0[: m.start()].strip() or t0
+    artist2 = (artist or "").strip()
+    feats = [s.strip() for s in re.split(r"\s*(?:,|&|\+|/| x | × | and )\s*", m.group(1), flags=re.I) if s.strip()]
+    have = artist2.lower()
+    for f in feats:
+        if f.lower() not in have:
+            artist2 = f"{artist2}, {f}" if artist2 else f
+    return head, artist2
+
+
 def apply_names(tracks: list[dict]) -> None:
     """One spelling per song: whichever variant we accepted first stays. If Apple ever
     answers with its full credits, that spelling replaces a shortened one, once."""
@@ -358,10 +375,17 @@ def apply_names(tracks: list[dict]) -> None:
         names = {}
     changed = False
     for t in tracks:
+        t["title"], t["artist"] = clean_display(t["title"], t["artist"])
         key = merge_key(t["title"], t["artist"])
-        rec = names.get(key) or {}
-        upgrade = t.get("nameSrc") == "A" and rec.get("src") != "A"
-        if rec.get("title") and rec.get("artist") and not upgrade:
+        rec = names.get(key)
+        if isinstance(rec, dict) and rec.get("title") and rec.get("artist"):
+            clean = clean_display(rec["title"], rec["artist"])
+            if clean != (rec["title"], rec["artist"]):
+                rec = {**rec, "title": clean[0], "artist": clean[1]}
+                names[key] = rec
+                changed = True
+        upgrade = t.get("nameSrc") == "A" and rec and rec.get("src") != "A"
+        if rec and rec.get("title") and rec.get("artist") and not upgrade:
             t["title"] = rec["title"]
             t["artist"] = rec["artist"]
             continue
