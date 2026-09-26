@@ -520,6 +520,16 @@ function withTimeout(promise, ms) {
   ]);
 }
 
+/* The baked fallback file was written when covers still came from any source; run it
+   through the same Apple-only cover pass before serving, so a failed rebuild cannot
+   put Deezer sleeves (or a different picture) on the page. */
+async function bakedWithCovers(env, baked) {
+  if (baked && Array.isArray(baked.tracks) && baked.tracks.length) {
+    try { await applyCovers(env, baked.tracks); } catch {}
+  }
+  return baked;
+}
+
 export async function onRequestGet({ env, request }) {
   const today = new Date().toISOString().slice(0, 10);
   if (env && env.DESK) {
@@ -538,14 +548,14 @@ export async function onRequestGet({ env, request }) {
     }
     if (payload.tracks && payload.tracks.length) return top50Response(payload);
   } catch (err) {
-    const baked = await bakedTop50(request);
+    const baked = await bakedWithCovers(env, await bakedTop50(request));
     if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
     return new Response(JSON.stringify({ error: "rebuild_failed", detail: String(err) }), {
       status: 502,
       headers: { "Content-Type": "application/json" },
     });
   }
-  const baked = await bakedTop50(request);
+  const baked = await bakedWithCovers(env, await bakedTop50(request));
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
   return new Response(JSON.stringify({ error: "rebuild_failed" }), {
     status: 502,
