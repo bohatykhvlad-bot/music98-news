@@ -42,6 +42,8 @@ COVERS_PATH = PUBLIC / "data" / "chart-covers.json"
 SEED_COVERS_PATH = PUBLIC / "data" / "covers.json"
 # one accepted spelling per song (same idea as the covers: what we took once stays)
 NAMES_PATH = PUBLIC / "data" / "chart-names.json"
+# Apple spellings collected by scripts/build-covers.mjs on the GitHub runner
+SEED_NAMES_PATH = PUBLIC / "data" / "apple-names.json"
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
@@ -364,33 +366,43 @@ def clean_display(title: str, artist: str) -> tuple[str, str]:
     return head, artist2
 
 
+def pick_name(seed_rec, cached_rec, cur, name_src) -> tuple[str, str, str]:
+    """Какое написание показываем: засев Apple -> запомненное ранее -> текущее."""
+    if isinstance(seed_rec, dict) and seed_rec.get("title") and seed_rec.get("artist"):
+        return seed_rec["title"], seed_rec["artist"], "seed"
+    cached = cached_rec if isinstance(cached_rec, dict) else {}
+    upgrade = name_src == "A" and cached and cached.get("src") != "A"
+    if cached.get("title") and cached.get("artist") and not upgrade:
+        return cached["title"], cached["artist"], cached.get("src") or ""
+    return cur[0], cur[1], name_src or ""
+
+
 def apply_names(tracks: list[dict]) -> None:
-    """One spelling per song: whichever variant we accepted first stays. If Apple ever
-    answers with its full credits, that spelling replaces a shortened one, once."""
+    """Apple spelling from the seed wins; otherwise the first variant we accepted stays.
+    If Apple ever answers with its full credits, that spelling replaces a shortened one, once."""
     try:
         names = json.loads(NAMES_PATH.read_text(encoding="utf-8"))
         if not isinstance(names, dict):
             names = {}
     except Exception:
         names = {}
+    try:
+        seed = json.loads(SEED_NAMES_PATH.read_text(encoding="utf-8"))
+        if not isinstance(seed, dict):
+            seed = {}
+    except Exception:
+        seed = {}
     changed = False
     for t in tracks:
-        t["title"], t["artist"] = clean_display(t["title"], t["artist"])
-        key = merge_key(t["title"], t["artist"])
-        rec = names.get(key)
-        if isinstance(rec, dict) and rec.get("title") and rec.get("artist"):
-            clean = clean_display(rec["title"], rec["artist"])
-            if clean != (rec["title"], rec["artist"]):
-                rec = {**rec, "title": clean[0], "artist": clean[1]}
-                names[key] = rec
-                changed = True
-        upgrade = t.get("nameSrc") == "A" and rec and rec.get("src") != "A"
-        if rec and rec.get("title") and rec.get("artist") and not upgrade:
-            t["title"] = rec["title"]
-            t["artist"] = rec["artist"]
-            continue
-        names[key] = {"title": t["title"], "artist": t["artist"], "src": t.get("nameSrc") or ""}
-        changed = True
+        cur = clean_display(t["title"], t["artist"])
+        key = merge_key(cur[0], cur[1])
+        title, artist, src = pick_name(seed.get(key), names.get(key), cur, t.get("nameSrc"))
+        title, artist = clean_display(title, artist)
+        t["title"], t["artist"] = title, artist
+        rec = {"title": title, "artist": artist, "src": src}
+        if names.get(key) != rec:
+            names[key] = rec
+            changed = True
     if changed:
         NAMES_PATH.parent.mkdir(exist_ok=True)
         try:

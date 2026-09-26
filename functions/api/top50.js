@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v16 on 26.09: forces the rebuild that cleans the artist lines.
+/* Bumped to v17 on 26.09: forces the rebuild with Apple spellings from the seed.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v16";
+const TOP50_KV = "top50v17";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -148,35 +148,46 @@ function cleanDisplay(title, artist) {
 }
 
 const NAMES_KV = "names_v1";
-async function applyNames(env, tracks) {
+/* Засев Apple-написаний: public/data/apple-names.json собирает тот же ночной
+   GitHub-экшен, что и обложки (scripts/build-covers.mjs). Так написание всегда
+   эпловское, даже когда Apple из Cloudflare не отвечает. */
+let NAME_SEED = null;
+async function nameSeed(origin) {
+  if (NAME_SEED) return NAME_SEED;
+  try { NAME_SEED = await getJson(String(origin || "") + "/data/apple-names.json"); } catch { NAME_SEED = {}; }
+  return NAME_SEED;
+}
+/* какое написание показываем: засев Apple -> запомненное ранее -> текущее (с апгрейдом от Apple) */
+function pickName(seedRec, cachedRec, cur, nameSrc) {
+  if (seedRec && seedRec.title && seedRec.artist) {
+    return { title: seedRec.title, artist: seedRec.artist, src: "seed" };
+  }
+  const upgrade = nameSrc === "A" && cachedRec && cachedRec.src !== "A";
+  if (cachedRec && cachedRec.title && cachedRec.artist && !upgrade) {
+    return { title: cachedRec.title, artist: cachedRec.artist, src: cachedRec.src || "" };
+  }
+  return { title: cur.title, artist: cur.artist, src: nameSrc || "" };
+}
+async function applyNames(env, tracks, origin) {
+  const seed = await nameSeed(origin);
   let names = {};
   if (env && env.DESK) {
     try { names = (await env.DESK.get(NAMES_KV, { type: "json" })) || {}; } catch {}
   }
   let changed = false;
   for (const t of tracks) {
-    const mine = cleanDisplay(t.title, t.artist);
-    t.title = mine.title;
-    t.artist = mine.artist;
-    const key = mergeKey(t.title, t.artist);
-    let rec = names[key];
-    if (rec && rec.title && rec.artist) {
-      /* запись могла быть сделана до чистки - прогоняем её через те же правила */
-      const clean = cleanDisplay(rec.title, rec.artist);
-      if (clean.title !== rec.title || clean.artist !== rec.artist) {
-        rec = { ...rec, title: clean.title, artist: clean.artist };
-        names[key] = rec;
-        changed = true;
-      }
+    const clean = cleanDisplay(t.title, t.artist);
+    const key = mergeKey(clean.title, clean.artist);
+    const chosen = pickName(seed[key], names[key], clean, t.nameSrc);
+    const shown = cleanDisplay(chosen.title, chosen.artist);
+    t.title = shown.title;
+    t.artist = shown.artist;
+    const rec = { title: shown.title, artist: shown.artist, src: chosen.src };
+    const old = names[key];
+    if (!old || old.title !== rec.title || old.artist !== rec.artist || old.src !== rec.src) {
+      names[key] = rec;
+      changed = true;
     }
-    const upgrade = t.nameSrc === "A" && rec && rec.src !== "A";
-    if (rec && rec.title && rec.artist && !upgrade) {
-      t.title = rec.title;
-      t.artist = rec.artist;
-      continue;
-    }
-    names[key] = { title: t.title, artist: t.artist, src: t.nameSrc || "" };
-    changed = true;
   }
   if (env && env.DESK && changed) {
     try { await env.DESK.put(NAMES_KV, JSON.stringify(names)); } catch {}
@@ -530,7 +541,7 @@ export async function buildTop50(origin, env) {
     nameSrc: rec.nameSrc || "",
   }));
   const coverStats = { asked: 0, filled: 0, failed: 0 };
-  await applyNames(env, tracks);           /* одно написание имени на песню */
+  await applyNames(env, tracks, origin);   /* написание: засев Apple -> запомненное -> текущее */
   tracks.forEach((t) => { delete t.nameSrc; });
   await seedBaked(origin || "", tracks);
   await applyCovers(env, tracks, origin);  /* KV -> Apple из сборки -> засев -> Deezer -> пусто */
@@ -545,7 +556,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "cover-v15",
+    rev: "apple-v17",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     covers: { ...coverStats, missing: tracks.filter((t) => !isAppleArt(t.art)).length },
     tracks,
@@ -624,7 +635,7 @@ function withTimeout(promise, ms) {
 async function bakedWithCovers(env, baked, origin) {
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) {
     try {
-      await applyNames(env, baked.tracks);
+      await applyNames(env, baked.tracks, origin);
       await applyCovers(env, baked.tracks, origin);
     } catch {}
   }

@@ -4,21 +4,28 @@ Independent music desk: news, releases, and a Top 50 that can rebuild itself onc
 
 The chart scores a title across five public lists: Apple Music most-played (US), Spotify global daily, Deezer global, Billboard Hot 100, and YouTube Weekly Top Songs. A miss on a list is zero points. Trending videos are not used.
 
-## Обложки чарта (Apple)
+## Обложки и написание (Apple)
 
-Обложка берётся **из Apple** и ровно того релиза, на который ведёт кнопка «Listen on Apple
-Music»: точный трек по `?i=` в ссылке, а не «похожий» из поиска. Deezer используется только
-как последний вариант, чтобы карточка не осталась пустой.
+И обложка, и написание названия/артистов берутся **из Apple** и ровно того релиза, на
+который ведёт кнопка «Listen on Apple Music»: точный трек по `?i=` в ссылке, а не «похожий»
+из поиска. Поэтому на сайте нет ни спотифай-стиля `(w/ Bruno Mars)`, ни чужой обложки
+ремикса — фиты переезжают в строку артистов (`Lady Gaga, Bruno Mars`). Deezer остаётся
+только последним вариантом для обложки, чтобы карточка не осталась пустой.
 
-iTunes API из Cloudflare отвечает через раз (Apple режет egress воркера), поэтому обложки
-собираются в `public/data/covers.json` на GitHub-раннере, где Apple отвечает всегда:
-`.github/workflows/covers.yml` запускается раз в сутки (05:20 по Киеву) и коммитит файл,
-если состав чарта изменился. Руками делать ничего не нужно.
+iTunes API из Cloudflare отвечает через раз (Apple режет egress воркера), поэтому оба файла
+собираются на GitHub-раннере, где Apple отвечает всегда:
 
-Воркер читает этот файл, а найденную обложку запоминает по песне (KV `covers_v3`), так что
-день ото дня картинка не меняется. Если Apple когда-нибудь отдаст обложку для песни, где
-сейчас стоит Deezer, она разово заменит её. Проверка: `node ../.gallery/m98/art-check.mjs`
-(или запрос `/api/top50` — поля `rev`, `sources`, `covers`).
+- `public/data/covers.json` — обложки;
+- `public/data/apple-names.json` — написания;
+
+`scripts/build-covers.mjs` собирает их, а `.github/workflows/apple-data.yml` запускается раз
+в сутки (05:20 по Киеву, плюс кнопка «Run workflow» вручную) и коммитит, если состав чарта
+изменился. **Руками делать ничего не нужно.**
+
+Воркер читает файлы и запоминает найденное по песне (KV `covers_v3` и `names_v1`), так что
+день ото дня картинка и написание не меняются; Apple разово заменяет уже запомненный Deezer.
+Проверка: `node ../.gallery/m98/art-check.mjs`, либо запрос `/api/top50` — поля `rev`,
+`sources`, `covers`.
 
 ## Run locally
 

@@ -1,8 +1,9 @@
-/* Собирает public/data/covers.json — обложки Apple для текущего чарта.
+/* Собирает public/data/covers.json (обложки) и public/data/apple-names.json
+ * (написание названия и артистов) для текущего чарта - всё из Apple.
  *
  * Зачем: iTunes API из Cloudflare отвечает через раз (Apple блокирует egress воркера),
- * а обложка нужна всегда и ровно того релиза, на который ведёт ссылка "Listen on
- * Apple Music". Поэтому файл собирается здесь и обновляется сам:
+ * а на сайте нужны и обложка, и написание ровно того релиза, на который ведёт ссылка
+ * "Listen on Apple Music". Поэтому файлы собираются здесь и обновляются сами:
  * .github/workflows/covers.yml гоняет этот скрипт по расписанию и коммитит результат.
  *
  * Правило подбора: сначала точный релиз по Apple-ID из ссылки (?i=...), и только если
@@ -18,6 +19,7 @@ import dns from "node:dns";
 dns.setDefaultResultOrder("ipv4first");
 
 const OUT = path.resolve("public/data/covers.json");
+const OUT_NAMES = path.resolve("public/data/apple-names.json");
 const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
 
 /* те же правила идентичности, что в воркере (functions/api/top50.js) */
@@ -49,6 +51,7 @@ const tracks = chart.tracks || [];
 console.log(`в чарте ${tracks.length} треков (rev ${chart.rev || "-"})`);
 
 const covers = {};
+const names = {};
 
 /* 1) точный релиз по Apple-ID из ссылки, одним batch-запросом */
 const idWanted = tracks.map((t) => [t, idOf(t.url)]).filter(([, id]) => id);
@@ -62,22 +65,26 @@ if (idWanted.length) {
       )).json();
       for (const r of d.results || []) {
         const artwork = art600(r.artworkUrl100);
-        if (r.trackId && artwork) byId.set(String(r.trackId), artwork);
+        if (r.trackId && artwork) byId.set(String(r.trackId), r);
       }
     } catch (e) {
       console.log(`  lookup ошибка: ${e.message}`);
     }
   }
   for (const [t, id] of idWanted) {
-    const art = byId.get(id);
-    if (art) covers[mergeKey(t.title, t.artist)] = art;
+    const hit = byId.get(id);
+    if (!hit) continue;
+    const key = mergeKey(t.title, t.artist);
+    covers[key] = art600(hit.artworkUrl100);
+    if (hit.trackName && hit.artistName) names[key] = { title: hit.trackName, artist: hit.artistName };
   }
   console.log(`по Apple-ID (точный релиз): ${idWanted.filter(([t]) => covers[mergeKey(t.title, t.artist)]).length}/${idWanted.length}`);
 }
 
 /* 2) поиском - только для строк без ссылки на Apple, с защитой от ремиксов */
 for (const t of tracks) {
-  if (covers[mergeKey(t.title, t.artist)]) continue;
+  const key = mergeKey(t.title, t.artist);
+  if (covers[key]) continue;
   try {
     const term = encodeURIComponent(`${t.artist} ${stripParen(t.title)}`.trim());
     const d = await (await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&limit=15&country=US`)).json();
@@ -86,9 +93,11 @@ for (const t of tracks) {
     const cand = (d.results || []).filter((r) => normTitle(r.trackName) === wantT && !variantTrap(t.title, r));
     const hit = cand.find((r) => primaryArtist(r.artistName) === wantA)
       || cand.sort((a, b) => String(a.trackName).length - String(b.trackName).length)[0];
-    const art = hit && art600(hit.artworkUrl100);
-    if (art) covers[mergeKey(t.title, t.artist)] = art;
-    console.log(`  поиск: ${art ? "OK " : "НЕТ"} ${t.artist} - ${t.title}${hit ? ` -> ${hit.trackName} / ${String(hit.collectionName || "").slice(0, 40)}` : ""}`);
+    if (hit) {
+      covers[key] = art600(hit.artworkUrl100);
+      if (hit.trackName && hit.artistName) names[key] = { title: hit.trackName, artist: hit.artistName };
+    }
+    console.log(`  поиск: ${hit ? "OK " : "НЕТ"} ${t.artist} - ${t.title}${hit ? ` -> ${hit.trackName} / ${String(hit.collectionName || "").slice(0, 40)}` : ""}`);
   } catch (e) {
     console.log(`  поиск: ошибка ${t.artist} - ${t.title}: ${e.message}`);
   }
@@ -106,3 +115,9 @@ fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(sorted, null, 2) + "\n");
 console.log(`\nзаписано ${Object.keys(sorted).length} обложек в ${path.relative(process.cwd(), OUT)}`);
 console.log(`без Apple-обложки: ${missing.length}${missing.length ? " -> " + missing.map((t) => `${t.artist} - ${t.title}`).join("; ") : ""}`);
+
+const sortedNames = Object.fromEntries(Object.entries(names).sort(([a], [b]) => a.localeCompare(b)));
+fs.writeFileSync(OUT_NAMES, JSON.stringify(sortedNames, null, 2) + "\n");
+const noName = tracks.filter((t) => !names[mergeKey(t.title, t.artist)]);
+console.log(`записано ${Object.keys(sortedNames).length} Apple-написаний в ${path.relative(process.cwd(), OUT_NAMES)}`);
+console.log(`без Apple-написания: ${noName.length}${noName.length ? " -> " + noName.map((t) => `${t.artist} - ${t.title}`).join("; ") : ""}`);

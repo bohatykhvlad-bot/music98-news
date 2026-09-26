@@ -1,0 +1,202 @@
+{
+  "ahha|cardib": {
+    "title": "AH HA",
+    "artist": "Cardi B"
+  },
+  "aintinla|adla": {
+    "title": "Ain't In LA",
+    "artist": "ADÉLA"
+  },
+  "animal|katseye": {
+    "title": "Animal",
+    "artist": "KATSEYE"
+  },
+  "babydoll|dominicfike": {
+    "title": "Babydoll",
+    "artist": "Dominic Fike"
+  },
+  "backtofriends|sombr": {
+    "title": "back to friends",
+    "artist": "sombr"
+  },
+  "bbywow|karolg": {
+    "title": "BbY WOW",
+    "artist": "KAROL G, Judeline & rusowsky"
+  },
+  "beatit|michaeljackson": {
+    "title": "Beat It",
+    "artist": "Michael Jackson"
+  },
+  "beautyandabeat|justinbieber": {
+    "title": "Beauty and a Beat (feat. Nicki Minaj)",
+    "artist": "Justin Bieber"
+  },
+  "beenbynow|morganwallen": {
+    "title": "Been By Now",
+    "artist": "Morgan Wallen"
+  },
+  "beher|ellalangley": {
+    "title": "Be Her",
+    "artist": "Ella Langley"
+  },
+  "billiejean|michaeljackson": {
+    "title": "Billie Jean",
+    "artist": "Michael Jackson"
+  },
+  "boston|stellalefty": {
+    "title": "Boston",
+    "artist": "STELLA LEFTY"
+  },
+  "choosintexas|ellalangley": {
+    "title": "Choosin' Texas",
+    "artist": "Ella Langley"
+  },
+  "cinderella|macmiller": {
+    "title": "Cinderella (feat. Ty Dolla $ign)",
+    "artist": "Mac Miller"
+  },
+  "daidai|shakira": {
+    "title": "Dai Dai",
+    "artist": "Shakira & Burna Boy"
+  },
+  "deadfresh|lilbaby": {
+    "title": "Dead Fresh",
+    "artist": "Lil Baby"
+  },
+  "diewithasmile|ladygaga": {
+    "title": "Die With A Smile",
+    "artist": "Lady Gaga & Bruno Mars"
+  },
+  "dracula|tameimpala": {
+    "title": "Dracula",
+    "artist": "Tame Impala"
+  },
+  "dropdead|oliviarodrigo": {
+    "title": "drop dead",
+    "artist": "Olivia Rodrigo"
+  },
+  "earrings|malcolmtodd": {
+    "title": "Earrings",
+    "artist": "Malcolm Todd"
+  },
+  "endofbeginning|djo": {
+    "title": "End of Beginning",
+    "artist": "Djo"
+  },
+  "golden|huntr": {
+    "title": "Golden",
+    "artist": "HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast"
+  },
+  "hatethatimadeyouloveme|arianagrande": {
+    "title": "hate that i made you love me",
+    "artist": "Ariana Grande"
+  },
+  "hootiefrutti|katseye": {
+    "title": "Hootie Frutti",
+    "artist": "KATSEYE"
+  },
+  "icantloveyouanymore|ellalangley": {
+    "title": "I Can't Love You Anymore",
+    "artist": "Ella Langley & Morgan Wallen"
+  },
+  "ijustmight|brunomars": {
+    "title": "I Just Might",
+    "artist": "Bruno Mars"
+  },
+  "iknewitiknewyou|taylorswift": {
+    "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
+    "artist": "Taylor Swift"
+  },
+  "iris|thegoogoodolls": {
+    "title": "Iris",
+    "artist": "The Goo Goo Dolls"
+  },
+  "janicestfu|drake": {
+    "title": "Janice STFU",
+    "artist": "Drake"
+  },
+  "loser|tameimpala": {
+    "title": "Loser",
+    "artist": "Tame Impala"
+  },
+  "lovemenot|ravynlenae": {
+    "title": "Love Me Not",
+    "artist": "Ravyn Lenae"
+  },
+  "manineed|oliviadean": {
+    "title": "Man I Need",
+    "artist": "Olivia Dean"
+  },
+  "midnightsun|zaralarsson": {
+    "title": "Midnight Sun",
+    "artist": "Zara Larsson"
+  },
+  "misery|pupsies": {
+    "title": "Misery.",
+    "artist": "pupsies"
+  },
+  "nicolekidman|adla": {
+    "title": "Nicole Kidman",
+    "artist": "ADÉLA"
+  },
+  "ohyeah|stevelacy": {
+    "title": "Oh Yeah!",
+    "artist": "Green Day"
+  },
+  "pinkblush|dollybabe": {
+    "title": "Pink Blush",
+    "artist": "SubKillers"
+  },
+  "riskitall|brunomars": {
+    "title": "Risk It All",
+    "artist": "Bruno Mars"
+  },
+  "sawadika|lisa": {
+    "title": "SaWaDiKa",
+    "artist": "LISA"
+  },
+  "selfaware|tempercity": {
+    "title": "Self Aware",
+    "artist": "Temper City"
+  },
+  "soeasy|oliviadean": {
+    "title": "So Easy (To Fall In Love)",
+    "artist": "Olivia Dean"
+  },
+  "stargazing|mylessmith": {
+    "title": "Stargazing",
+    "artist": "Myles Smith"
+  },
+  "stupidsong|oliviarodrigo": {
+    "title": "stupid song",
+    "artist": "Olivia Rodrigo"
+  },
+  "sunflower|postmalone": {
+    "title": "Sunflower (Spider-Man: Into the Spider-Verse)",
+    "artist": "Post Malone & Swae Lee"
+  },
+  "thecure|oliviarodrigo": {
+    "title": "the cure",
+    "artist": "Olivia Rodrigo"
+  },
+  "thefateofophelia|taylorswift": {
+    "title": "The Fate of Ophelia",
+    "artist": "Taylor Swift"
+  },
+  "theonethatgotaway|katyperry": {
+    "title": "The One That Got Away",
+    "artist": "Katy Perry"
+  },
+  "trainingseason|dualipa": {
+    "title": "Training Season",
+    "artist": "Dua Lipa"
+  },
+  "whatyouneed|tems": {
+    "title": "What You Need",
+    "artist": "Tems"
+  },
+  "wtfgoin|bellygangkushington": {
+    "title": "WTF GOIN",
+    "artist": "Belly Gang Kushington & 21 Savage"
+  }
+}
