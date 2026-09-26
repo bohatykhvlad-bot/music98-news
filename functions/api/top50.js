@@ -1,10 +1,10 @@
-const SIZE = 50;
+﻿const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v24";
+const TOP50_KV = "top50v25";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -34,13 +34,13 @@ function chartWeek() {
   return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
 }
 
-/* Обложка была привязана к тому, кто первым создал строку, и прыгала между Apple
-   (mzstatic) и Deezer (dzcdn). Правило теперь такое: обложку берём из Apple и ровно
-   того релиза, на который ведёт ссылка "Listen on Apple Music". iTunes API из
-   Cloudflare отвечает через раз, поэтому есть засев из public/data/covers.json -
-   его каждый день обновляет .github/workflows/covers.yml (там Apple отвечает).
-   Deezer остаётся последним вариантом, чтобы карточка не осталась пустой.
-   Найденная обложка запоминается по песне, поэтому день ото дня не меняется. */
+/* РћР±Р»РѕР¶РєР° Р±С‹Р»Р° РїСЂРёРІСЏР·Р°РЅР° Рє С‚РѕРјСѓ, РєС‚Рѕ РїРµСЂРІС‹Рј СЃРѕР·РґР°Р» СЃС‚СЂРѕРєСѓ, Рё РїСЂС‹РіР°Р»Р° РјРµР¶РґСѓ Apple
+   (mzstatic) Рё Deezer (dzcdn). РџСЂР°РІРёР»Рѕ С‚РµРїРµСЂСЊ С‚Р°РєРѕРµ: РѕР±Р»РѕР¶РєСѓ Р±РµСЂС‘Рј РёР· Apple Рё СЂРѕРІРЅРѕ
+   С‚РѕРіРѕ СЂРµР»РёР·Р°, РЅР° РєРѕС‚РѕСЂС‹Р№ РІРµРґС‘С‚ СЃСЃС‹Р»РєР° "Listen on Apple Music". iTunes API РёР·
+   Cloudflare РѕС‚РІРµС‡Р°РµС‚ С‡РµСЂРµР· СЂР°Р·, РїРѕСЌС‚РѕРјСѓ РµСЃС‚СЊ Р·Р°СЃРµРІ РёР· public/data/covers.json -
+   РµРіРѕ РєР°Р¶РґС‹Р№ РґРµРЅСЊ РѕР±РЅРѕРІР»СЏРµС‚ .github/workflows/covers.yml (С‚Р°Рј Apple РѕС‚РІРµС‡Р°РµС‚).
+   Deezer РѕСЃС‚Р°С‘С‚СЃСЏ РїРѕСЃР»РµРґРЅРёРј РІР°СЂРёР°РЅС‚РѕРј, С‡С‚РѕР±С‹ РєР°СЂС‚РѕС‡РєР° РЅРµ РѕСЃС‚Р°Р»Р°СЃСЊ РїСѓСЃС‚РѕР№.
+   РќР°Р№РґРµРЅРЅР°СЏ РѕР±Р»РѕР¶РєР° Р·Р°РїРѕРјРёРЅР°РµС‚СЃСЏ РїРѕ РїРµСЃРЅРµ, РїРѕСЌС‚РѕРјСѓ РґРµРЅСЊ РѕС‚Рѕ РґРЅСЏ РЅРµ РјРµРЅСЏРµС‚СЃСЏ. */
 const COVERS_KV = "covers_v3";
 const DZ_HOST = "dzcdn.net";
 function isAppleArt(url) {
@@ -59,15 +59,15 @@ function isDeezerArt(url) {
     return false;
   }
 }
-/* Данные Apple для текущего чарта лежат в репозитории: public/data/covers.json
-   (обложки) и public/data/apple-names.json (имя + ссылка + превью + год). Их
-   пересобирает scripts/build-covers.mjs по расписанию
-   (.github/workflows/apple-data.yml). Читаем их через биндинг ASSETS - это
-   локальное хранилище ассетов, без выхода в интернет; сетевой фетч оставлен
-   только как запас. Раньше засев брался сетевым запросом, и когда он не
-   отвечал, воркер запоминал пустой засев на всю жизнь изолята: часть строк
-   показывала устаревшие имена, чужие обложки и пустые ссылки. Пустой ответ
-   теперь НЕ кэшируется. */
+/* Р”Р°РЅРЅС‹Рµ Apple РґР»СЏ С‚РµРєСѓС‰РµРіРѕ С‡Р°СЂС‚Р° Р»РµР¶Р°С‚ РІ СЂРµРїРѕР·РёС‚РѕСЂРёРё: public/data/covers.json
+   (РѕР±Р»РѕР¶РєРё) Рё public/data/apple-names.json (РёРјСЏ + СЃСЃС‹Р»РєР° + РїСЂРµРІСЊСЋ + РіРѕРґ). РС…
+   РїРµСЂРµСЃРѕР±РёСЂР°РµС‚ scripts/build-covers.mjs РїРѕ СЂР°СЃРїРёСЃР°РЅРёСЋ
+   (.github/workflows/apple-data.yml). Р§РёС‚Р°РµРј РёС… С‡РµСЂРµР· Р±РёРЅРґРёРЅРі ASSETS - СЌС‚Рѕ
+   Р»РѕРєР°Р»СЊРЅРѕРµ С…СЂР°РЅРёР»РёС‰Рµ Р°СЃСЃРµС‚РѕРІ, Р±РµР· РІС‹С…РѕРґР° РІ РёРЅС‚РµСЂРЅРµС‚; СЃРµС‚РµРІРѕР№ С„РµС‚С‡ РѕСЃС‚Р°РІР»РµРЅ
+   С‚РѕР»СЊРєРѕ РєР°Рє Р·Р°РїР°СЃ. Р Р°РЅСЊС€Рµ Р·Р°СЃРµРІ Р±СЂР°Р»СЃСЏ СЃРµС‚РµРІС‹Рј Р·Р°РїСЂРѕСЃРѕРј, Рё РєРѕРіРґР° РѕРЅ РЅРµ
+   РѕС‚РІРµС‡Р°Р», РІРѕСЂРєРµСЂ Р·Р°РїРѕРјРёРЅР°Р» РїСѓСЃС‚РѕР№ Р·Р°СЃРµРІ РЅР° РІСЃСЋ Р¶РёР·РЅСЊ РёР·РѕР»СЏС‚Р°: С‡Р°СЃС‚СЊ СЃС‚СЂРѕРє
+   РїРѕРєР°Р·С‹РІР°Р»Р° СѓСЃС‚Р°СЂРµРІС€РёРµ РёРјРµРЅР°, С‡СѓР¶РёРµ РѕР±Р»РѕР¶РєРё Рё РїСѓСЃС‚С‹Рµ СЃСЃС‹Р»РєРё. РџСѓСЃС‚РѕР№ РѕС‚РІРµС‚
+   С‚РµРїРµСЂСЊ РќР• РєСЌС€РёСЂСѓРµС‚СЃСЏ. */
 async function readSeed(env, origin, file) {
   const path = "/data/" + file;
   if (env && env.ASSETS && typeof env.ASSETS.fetch === "function") {
@@ -102,9 +102,9 @@ async function applyCovers(env, tracks, origin) {
   for (const t of tracks) {
     const key = mergeKey(t.title, t.artist);
     const cached = covers[key];
-    /* Приоритет: засев Apple (пересобирается ежедневно и совпадает с релизом
-       ссылки) -> запомненная Apple -> Apple из текущей сборки (разово заменяет
-       закэшированный Deezer) -> запомненный Deezer -> Deezer из сборки -> пусто. */
+    /* РџСЂРёРѕСЂРёС‚РµС‚: Р·Р°СЃРµРІ Apple (РїРµСЂРµСЃРѕР±РёСЂР°РµС‚СЃСЏ РµР¶РµРґРЅРµРІРЅРѕ Рё СЃРѕРІРїР°РґР°РµС‚ СЃ СЂРµР»РёР·РѕРј
+       СЃСЃС‹Р»РєРё) -> Р·Р°РїРѕРјРЅРµРЅРЅР°СЏ Apple -> Apple РёР· С‚РµРєСѓС‰РµР№ СЃР±РѕСЂРєРё (СЂР°Р·РѕРІРѕ Р·Р°РјРµРЅСЏРµС‚
+       Р·Р°РєСЌС€РёСЂРѕРІР°РЅРЅС‹Р№ Deezer) -> Р·Р°РїРѕРјРЅРµРЅРЅС‹Р№ Deezer -> Deezer РёР· СЃР±РѕСЂРєРё -> РїСѓСЃС‚Рѕ. */
     const chosen = (isAppleArt(seed[key]) && seed[key])
       || (isAppleArt(cached) && cached)
       || (isAppleArt(t.art) && t.art)
@@ -122,8 +122,8 @@ async function applyCovers(env, tracks, origin) {
   }
   return tracks;
 }
-/* Остальные обложки добираем одним batch-запросом Apple по track id из ссылки:
-   это ровно тот релиз, который мы показываем и на который ведёт кнопка. */
+/* РћСЃС‚Р°Р»СЊРЅС‹Рµ РѕР±Р»РѕР¶РєРё РґРѕР±РёСЂР°РµРј РѕРґРЅРёРј batch-Р·Р°РїСЂРѕСЃРѕРј Apple РїРѕ track id РёР· СЃСЃС‹Р»РєРё:
+   СЌС‚Рѕ СЂРѕРІРЅРѕ С‚РѕС‚ СЂРµР»РёР·, РєРѕС‚РѕСЂС‹Р№ РјС‹ РїРѕРєР°Р·С‹РІР°РµРј Рё РЅР° РєРѕС‚РѕСЂС‹Р№ РІРµРґС‘С‚ РєРЅРѕРїРєР°. */
 async function enrichArtByIds(tracks, stats) {
   const want = [];
   for (const t of tracks) {
@@ -156,32 +156,32 @@ async function enrichArtByIds(tracks, stats) {
   }
 }
 
-/* Написание имени тоже зависело от того, кто ответил сегодня: при молчащем Apple
-   приезжал спотифай-вариант ("KAROL G" вместо "KAROL G, Judeline & rusowsky").
-   Теперь имя запоминается по песне, как обложка: что приняли один раз, то и висит.
-   Если Apple ответит и принесёт полное написание, оно один раз заменит урезанное. */
-/* Spotify пишет фитов в названии: "Die With A Smile (w/ Bruno Mars)", "WTF GOIN (feat. 21
-   Savage)". Apple - в артистах: "Lady Gaga, Bruno Mars". Переносим фит в строку артистов,
-   чтобы на сайте не было ни "w/", ни разнобоя от источника. Смысл не меняется, а
-   идентичность песни та же (normTitle скобки всё равно отбрасывает). */
+/* РќР°РїРёСЃР°РЅРёРµ РёРјРµРЅРё С‚РѕР¶Рµ Р·Р°РІРёСЃРµР»Рѕ РѕС‚ С‚РѕРіРѕ, РєС‚Рѕ РѕС‚РІРµС‚РёР» СЃРµРіРѕРґРЅСЏ: РїСЂРё РјРѕР»С‡Р°С‰РµРј Apple
+   РїСЂРёРµР·Р¶Р°Р» СЃРїРѕС‚РёС„Р°Р№-РІР°СЂРёР°РЅС‚ ("KAROL G" РІРјРµСЃС‚Рѕ "KAROL G, Judeline & rusowsky").
+   РўРµРїРµСЂСЊ РёРјСЏ Р·Р°РїРѕРјРёРЅР°РµС‚СЃСЏ РїРѕ РїРµСЃРЅРµ, РєР°Рє РѕР±Р»РѕР¶РєР°: С‡С‚Рѕ РїСЂРёРЅСЏР»Рё РѕРґРёРЅ СЂР°Р·, С‚Рѕ Рё РІРёСЃРёС‚.
+   Р•СЃР»Рё Apple РѕС‚РІРµС‚РёС‚ Рё РїСЂРёРЅРµСЃС‘С‚ РїРѕР»РЅРѕРµ РЅР°РїРёСЃР°РЅРёРµ, РѕРЅРѕ РѕРґРёРЅ СЂР°Р· Р·Р°РјРµРЅРёС‚ СѓСЂРµР·Р°РЅРЅРѕРµ. */
+/* Spotify РїРёС€РµС‚ С„РёС‚РѕРІ РІ РЅР°Р·РІР°РЅРёРё: "Die With A Smile (w/ Bruno Mars)", "WTF GOIN (feat. 21
+   Savage)". Apple - РІ Р°СЂС‚РёСЃС‚Р°С…: "Lady Gaga, Bruno Mars". РџРµСЂРµРЅРѕСЃРёРј С„РёС‚ РІ СЃС‚СЂРѕРєСѓ Р°СЂС‚РёСЃС‚РѕРІ,
+   С‡С‚РѕР±С‹ РЅР° СЃР°Р№С‚Рµ РЅРµ Р±С‹Р»Рѕ РЅРё "w/", РЅРё СЂР°Р·РЅРѕР±РѕСЏ РѕС‚ РёСЃС‚РѕС‡РЅРёРєР°. РЎРјС‹СЃР» РЅРµ РјРµРЅСЏРµС‚СЃСЏ, Р°
+   РёРґРµРЅС‚РёС‡РЅРѕСЃС‚СЊ РїРµСЃРЅРё С‚Р° Р¶Рµ (normTitle СЃРєРѕР±РєРё РІСЃС‘ СЂР°РІРЅРѕ РѕС‚Р±СЂР°СЃС‹РІР°РµС‚). */
 function cleanDisplay(title, artist) {
   const t0 = String(title || "").trim();
   const m = t0.match(/\s*[(\[](?:w\/|w\.|with|feat\.?|ft\.?|featuring)\s+([^)\]]+)[)\]]\s*$/i);
   if (!m) return { title: t0, artist: String(artist || "").trim() };
   const title2 = t0.slice(0, m.index).trim() || t0;
   let artist2 = String(artist || "").trim();
-  const feats = m[1].split(/\s*(?:,|&|\+|\/| x | × | and )\s*/i).map((s) => s.trim()).filter(Boolean);
+  const feats = m[1].split(/\s*(?:,|&|\+|\/| x | Г— | and )\s*/i).map((s) => s.trim()).filter(Boolean);
   const have = artist2.toLowerCase();
   for (const f of feats) if (f && !have.includes(f.toLowerCase())) artist2 = artist2 ? `${artist2}, ${f}` : f;
   return { title: title2, artist: artist2 };
 }
 
 const NAMES_KV = "names_v1";
-/* какое написание показываем: засев Apple -> запомненное ранее -> текущее (с апгрейдом от Apple).
-   Фит разбираем ДО сравнения (cleanDisplay переносит его в артистов), и "версией" считаем
-   только ту скобку, которая после этого осталась: "(Track by Track)", "(Live)" и т.п.
-   Раньше фит в скобках тоже считался версией - и у "Cinderella (feat. Ty Dolla $ign)"
-   название бралось из чарта, а фит терялся совсем. */
+/* РєР°РєРѕРµ РЅР°РїРёСЃР°РЅРёРµ РїРѕРєР°Р·С‹РІР°РµРј: Р·Р°СЃРµРІ Apple -> Р·Р°РїРѕРјРЅРµРЅРЅРѕРµ СЂР°РЅРµРµ -> С‚РµРєСѓС‰РµРµ (СЃ Р°РїРіСЂРµР№РґРѕРј РѕС‚ Apple).
+   Р¤РёС‚ СЂР°Р·Р±РёСЂР°РµРј Р”Рћ СЃСЂР°РІРЅРµРЅРёСЏ (cleanDisplay РїРµСЂРµРЅРѕСЃРёС‚ РµРіРѕ РІ Р°СЂС‚РёСЃС‚РѕРІ), Рё "РІРµСЂСЃРёРµР№" СЃС‡РёС‚Р°РµРј
+   С‚РѕР»СЊРєРѕ С‚Сѓ СЃРєРѕР±РєСѓ, РєРѕС‚РѕСЂР°СЏ РїРѕСЃР»Рµ СЌС‚РѕРіРѕ РѕСЃС‚Р°Р»Р°СЃСЊ: "(Track by Track)", "(Live)" Рё С‚.Рї.
+   Р Р°РЅСЊС€Рµ С„РёС‚ РІ СЃРєРѕР±РєР°С… С‚РѕР¶Рµ СЃС‡РёС‚Р°Р»СЃСЏ РІРµСЂСЃРёРµР№ - Рё Сѓ "Cinderella (feat. Ty Dolla $ign)"
+   РЅР°Р·РІР°РЅРёРµ Р±СЂР°Р»РѕСЃСЊ РёР· С‡Р°СЂС‚Р°, Р° С„РёС‚ С‚РµСЂСЏР»СЃСЏ СЃРѕРІСЃРµРј. */
 function pickName(seedRec, cachedRec, cur, nameSrc) {
   if (seedRec && seedRec.title && seedRec.artist) {
     const cleaned = cleanDisplay(seedRec.title, seedRec.artist);
@@ -212,9 +212,9 @@ async function applyNames(env, tracks, origin) {
     const shown = cleanDisplay(chosen.title, chosen.artist);
     t.title = shown.title;
     t.artist = shown.artist;
-    /* Ссылка, превью и год тоже берутся из засева: он сверен с конкретным релизом
-       Apple, а запечённый файл чарта может вести на версию-вариант или быть пустым
-       (живой пример: строка без ссылки, потому что iTunes из воркера не ответил). */
+    /* РЎСЃС‹Р»РєР°, РїСЂРµРІСЊСЋ Рё РіРѕРґ С‚РѕР¶Рµ Р±РµСЂСѓС‚СЃСЏ РёР· Р·Р°СЃРµРІР°: РѕРЅ СЃРІРµСЂРµРЅ СЃ РєРѕРЅРєСЂРµС‚РЅС‹Рј СЂРµР»РёР·РѕРј
+       Apple, Р° Р·Р°РїРµС‡С‘РЅРЅС‹Р№ С„Р°Р№Р» С‡Р°СЂС‚Р° РјРѕР¶РµС‚ РІРµСЃС‚Рё РЅР° РІРµСЂСЃРёСЋ-РІР°СЂРёР°РЅС‚ РёР»Рё Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј
+       (Р¶РёРІРѕР№ РїСЂРёРјРµСЂ: СЃС‚СЂРѕРєР° Р±РµР· СЃСЃС‹Р»РєРё, РїРѕС‚РѕРјСѓ С‡С‚Рѕ iTunes РёР· РІРѕСЂРєРµСЂР° РЅРµ РѕС‚РІРµС‚РёР»). */
     if (sd) {
       if (sd.url) t.url = sd.url;
       if (sd.prev) t.prev = sd.prev;
@@ -259,14 +259,14 @@ function rekeySeen(old) {
   return out;
 }
 const TENURE_KV = "tenure_v3";
-/* День первого появления каждой песни живёт ОТДЕЛЬНЫМ ключом. Реестр можно
-   пересобрать, переименовать или потерять - счётчик "N days on chart" от этого
-   больше не обнуляется (19.09 это уже случилось: весь чарт показал "1 день"). */
+/* Р”РµРЅСЊ РїРµСЂРІРѕРіРѕ РїРѕСЏРІР»РµРЅРёСЏ РєР°Р¶РґРѕР№ РїРµСЃРЅРё Р¶РёРІС‘С‚ РћРўР”Р•Р›Р¬РќР«Рњ РєР»СЋС‡РѕРј. Р РµРµСЃС‚СЂ РјРѕР¶РЅРѕ
+   РїРµСЂРµСЃРѕР±СЂР°С‚СЊ, РїРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ РёР»Рё РїРѕС‚РµСЂСЏС‚СЊ - СЃС‡С‘С‚С‡РёРє "N days on chart" РѕС‚ СЌС‚РѕРіРѕ
+   Р±РѕР»СЊС€Рµ РЅРµ РѕР±РЅСѓР»СЏРµС‚СЃСЏ (19.09 СЌС‚Рѕ СѓР¶Рµ СЃР»СѓС‡РёР»РѕСЃСЊ: РІРµСЃСЊ С‡Р°СЂС‚ РїРѕРєР°Р·Р°Р» "1 РґРµРЅСЊ"). */
 const FIRST_KV = "tenure_first_v1";
-/* Журнал первого дня тоже переиндексируем: записи, сделанные до перехода на
-   нормализованные ключи, лежат под старыми "Название|Артист" и иначе не находятся -
-   песня, которая вчера была в чарте, показывала "1 day on chart". Трансформация
-   идемпотентна; при склейке двух ключей берём самый ранний день. */
+/* Р–СѓСЂРЅР°Р» РїРµСЂРІРѕРіРѕ РґРЅСЏ С‚РѕР¶Рµ РїРµСЂРµРёРЅРґРµРєСЃРёСЂСѓРµРј: Р·Р°РїРёСЃРё, СЃРґРµР»Р°РЅРЅС‹Рµ РґРѕ РїРµСЂРµС…РѕРґР° РЅР°
+   РЅРѕСЂРјР°Р»РёР·РѕРІР°РЅРЅС‹Рµ РєР»СЋС‡Рё, Р»РµР¶Р°С‚ РїРѕРґ СЃС‚Р°СЂС‹РјРё "РќР°Р·РІР°РЅРёРµ|РђСЂС‚РёСЃС‚" Рё РёРЅР°С‡Рµ РЅРµ РЅР°С…РѕРґСЏС‚СЃСЏ -
+   РїРµСЃРЅСЏ, РєРѕС‚РѕСЂР°СЏ РІС‡РµСЂР° Р±С‹Р»Р° РІ С‡Р°СЂС‚Рµ, РїРѕРєР°Р·С‹РІР°Р»Р° "1 day on chart". РўСЂР°РЅСЃС„РѕСЂРјР°С†РёСЏ
+   РёРґРµРјРїРѕС‚РµРЅС‚РЅР°; РїСЂРё СЃРєР»РµР№РєРµ РґРІСѓС… РєР»СЋС‡РµР№ Р±РµСЂС‘Рј СЃР°РјС‹Р№ СЂР°РЅРЅРёР№ РґРµРЅСЊ. */
 function rekeyFirstDays(old) {
   const out = {};
   for (const [k, v] of Object.entries(old || {})) {
@@ -278,7 +278,7 @@ function rekeyFirstDays(old) {
   }
   return out;
 }
-async function applyTenure(env, tracks) {
+async function applyTenure(env, tracks, diag) {
   const week = chartWeek();
   /* week starts at -1 so the very first daily run opens the registry fresh. */
   let ten = { launch: "2026-09-17", epoch: "daily", week: -1, keys: [], seen: {} };
@@ -288,19 +288,20 @@ async function applyTenure(env, tracks) {
     if (v && v.epoch === "daily") ten = v;
     firstDay = rekeyFirstDays(await env.DESK.get(FIRST_KV, { type: "json" }));
   }
-  /* Эталон стрелок - порядок ПРОШЛОГО дня. В тот же день это уже зафиксированный
-     ten.keys, а на новом дне - последний порядок прошлого дня (ten.today). */
+  /* Р­С‚Р°Р»РѕРЅ СЃС‚СЂРµР»РѕРє - РїРѕСЂСЏРґРѕРє РџР РћРЁР›РћР“Рћ РґРЅСЏ. Р’ С‚РѕС‚ Р¶Рµ РґРµРЅСЊ СЌС‚Рѕ СѓР¶Рµ Р·Р°С„РёРєСЃРёСЂРѕРІР°РЅРЅС‹Р№
+     ten.keys, Р° РЅР° РЅРѕРІРѕРј РґРЅРµ - РїРѕСЃР»РµРґРЅРёР№ РїРѕСЂСЏРґРѕРє РїСЂРѕС€Р»РѕРіРѕ РґРЅСЏ (ten.today). */
   const sameDay = ten.week === week;
+  const hasToday = Array.isArray(ten.today) && ten.today.length > 0;
   const refRaw = sameDay
     ? (ten.keys || [])
-    : (Array.isArray(ten.today) && ten.today.length ? ten.today : (ten.keys || []));
+    : (hasToday ? ten.today : (ten.keys || []));
   const prevKeys = refRaw.map((k) => {
     const cut = String(k).indexOf("|");
     return cut < 0 ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1));
   });
   const seen = rekeySeen(ten);
-  /* первое заполнение памятки: день появления берём из того, что помнит реестр
-     (считаем от lastWeek записи, а не от сегодня - иначе счёт съезжает на день) */
+  /* РїРµСЂРІРѕРµ Р·Р°РїРѕР»РЅРµРЅРёРµ РїР°РјСЏС‚РєРё: РґРµРЅСЊ РїРѕСЏРІР»РµРЅРёСЏ Р±РµСЂС‘Рј РёР· С‚РѕРіРѕ, С‡С‚Рѕ РїРѕРјРЅРёС‚ СЂРµРµСЃС‚СЂ
+     (СЃС‡РёС‚Р°РµРј РѕС‚ lastWeek Р·Р°РїРёСЃРё, Р° РЅРµ РѕС‚ СЃРµРіРѕРґРЅСЏ - РёРЅР°С‡Рµ СЃС‡С‘С‚ СЃСЉРµР·Р¶Р°РµС‚ РЅР° РґРµРЅСЊ) */
   for (const [k, rec] of Object.entries(seen)) {
     if (firstDay[k] != null) continue;
     const w = Number(rec && rec.weeks) || 1;
@@ -318,31 +319,53 @@ async function applyTenure(env, tracks) {
       if (firstDay[key] == null) firstDay[key] = week;
       track.delta = "0";
     } else if (prevPos < 0) {
-      /* Во вчерашнем порядке песни нет: это новая или вернувшаяся песня.
-         Владелец: пропустила день -> NEW, серия начинается заново. Поэтому
-         firstDay сбрасываем ВСЕГДА, а не только на новом дне: иначе при
-         внутридневном появлении получалось "NEW" рядом с прежним счётчиком
-         ("5 days on chart", владелец 26.09). */
+      /* Р’Рѕ РІС‡РµСЂР°С€РЅРµРј РїРѕСЂСЏРґРєРµ РїРµСЃРЅРё РЅРµС‚: СЌС‚Рѕ РЅРѕРІР°СЏ РёР»Рё РІРµСЂРЅСѓРІС€Р°СЏСЃСЏ РїРµСЃРЅСЏ.
+         Р’Р»Р°РґРµР»РµС†: РїСЂРѕРїСѓСЃС‚РёР»Р° РґРµРЅСЊ -> NEW, СЃРµСЂРёСЏ РЅР°С‡РёРЅР°РµС‚СЃСЏ Р·Р°РЅРѕРІРѕ. РџРѕСЌС‚РѕРјСѓ
+         firstDay СЃР±СЂР°СЃС‹РІР°РµРј Р’РЎР•Р“Р”Рђ, Р° РЅРµ С‚РѕР»СЊРєРѕ РЅР° РЅРѕРІРѕРј РґРЅРµ: РёРЅР°С‡Рµ РїСЂРё
+         РІРЅСѓС‚СЂРёРґРЅРµРІРЅРѕРј РїРѕСЏРІР»РµРЅРёРё РїРѕР»СѓС‡Р°Р»РѕСЃСЊ "NEW" СЂСЏРґРѕРј СЃ РїСЂРµР¶РЅРёРј СЃС‡С‘С‚С‡РёРєРѕРј
+         ("5 days on chart", РІР»Р°РґРµР»РµС† 26.09). */
       firstDay[key] = week;
       track.delta = "new";
     } else {
       if (firstDay[key] == null) firstDay[key] = week;
-      /* стрелку ВСЕГДА считаем от вчерашнего порядка. Раньше при внутридневной
-         пересборке она просто копировалась из реестра, а порядок за день мог
-         поменяться (источник то отвечает, то нет) - и стрелка переставала
-         сходиться с показанным местом (владелец: "Дрейк ▼3, а #1 не менялся"). */
+      /* СЃС‚СЂРµР»РєСѓ Р’РЎР•Р“Р”Рђ СЃС‡РёС‚Р°РµРј РѕС‚ РІС‡РµСЂР°С€РЅРµРіРѕ РїРѕСЂСЏРґРєР°. Р Р°РЅСЊС€Рµ РїСЂРё РІРЅСѓС‚СЂРёРґРЅРµРІРЅРѕР№
+         РїРµСЂРµСЃР±РѕСЂРєРµ РѕРЅР° РїСЂРѕСЃС‚Рѕ РєРѕРїРёСЂРѕРІР°Р»Р°СЃСЊ РёР· СЂРµРµСЃС‚СЂР°, Р° РїРѕСЂСЏРґРѕРє Р·Р° РґРµРЅСЊ РјРѕРі
+         РїРѕРјРµРЅСЏС‚СЊСЃСЏ (РёСЃС‚РѕС‡РЅРёРє С‚Рѕ РѕС‚РІРµС‡Р°РµС‚, С‚Рѕ РЅРµС‚) - Рё СЃС‚СЂРµР»РєР° РїРµСЂРµСЃС‚Р°РІР°Р»Р°
+         СЃС…РѕРґРёС‚СЊСЃСЏ СЃ РїРѕРєР°Р·Р°РЅРЅС‹Рј РјРµСЃС‚РѕРј (РІР»Р°РґРµР»РµС†: "Р”СЂРµР№Рє в–ј3, Р° #1 РЅРµ РјРµРЅСЏР»СЃСЏ"). */
       track.delta = String(prevPos - i);
     }
     track.weeks = Math.max(1, week - firstDay[key] + 1);
-    /* страховка: если песня была во вчерашнем порядке, она была в чарте вчера -
-       значит сегодня минимум второй день */
+    /* СЃС‚СЂР°С…РѕРІРєР°: РµСЃР»Рё РїРµСЃРЅСЏ Р±С‹Р»Р° РІРѕ РІС‡РµСЂР°С€РЅРµРј РїРѕСЂСЏРґРєРµ, РѕРЅР° Р±С‹Р»Р° РІ С‡Р°СЂС‚Рµ РІС‡РµСЂР° -
+       Р·РЅР°С‡РёС‚ СЃРµРіРѕРґРЅСЏ РјРёРЅРёРјСѓРј РІС‚РѕСЂРѕР№ РґРµРЅСЊ */
     if (!first && prevPos >= 0) track.weeks = Math.max(2, track.weeks);
     seen[key] = { weeks: track.weeks, lastPos: i, lastWeek: week, delta: track.delta };
   });
-  /* Эталон стрелок - порядок ПРОШЛОГО дня (ten.keys). Порядок сегодняшней сборки
-     живёт отдельно (ten.today), поэтому внутридневная пересборка эталон не сдвигает. */
+  /* Р”РёР°РіРЅРѕСЃС‚РёРєР° РїР°РјСЏС‚Рё С‡Р°СЂС‚Р°: Сѓ РєР°Р¶РґРѕР№ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРё РёС‰РµРј РІ СЌС‚Р°Р»РѕРЅРЅРѕРј РїРѕСЂСЏРґРєРµ СЃС‚СЂРѕРєСѓ СЃ
+     С‚РµРј Р¶Рµ РЅРѕСЂРјР°Р»РёР·РѕРІР°РЅРЅС‹Рј РЅР°Р·РІР°РЅРёРµРј. РќР°С€Р»Р°СЃСЊ - Р·РЅР°С‡РёС‚ РїРµСЃРЅСЏ РІС‡РµСЂР° Р±С‹Р»Р°, Р° Р»РёС‡РЅРѕСЃС‚СЊ
+     СЂР°Р·РѕС€Р»Р°СЃСЊ РїРѕ РЅР°РїРёСЃР°РЅРёСЋ Р°СЂС‚РёСЃС‚РѕРІ; РЅРµ РЅР°С€Р»Р°СЃСЊ - РїРµСЃРЅРё РІС‡РµСЂР° РІ С‡Р°СЂС‚Рµ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ
+     РЅРµ Р±С‹Р»Рѕ, Рё NEW С‡РµСЃС‚РЅС‹Р№. */
+  if (diag) {
+    const near = [];
+    tracks.forEach((t, i) => {
+      if (String(t.delta).toLowerCase() !== "new") return;
+      const k = tenureKey(t.title, t.artist);
+      const head = k.split("|")[0];
+      for (let j = 0; j < prevKeys.length; j += 1) {
+        if (prevKeys[j].split("|")[0] !== head) continue;
+        near.push({ rank: i + 1, key: k, refPos: j + 1, refKey: prevKeys[j], refRaw: String(refRaw[j]) });
+        break;
+      }
+    });
+    diag.week = week;
+    diag.sameDay = sameDay;
+    diag.refSource = sameDay ? "keys" : (hasToday ? "today" : "keys-fallback");
+    diag.refLen = prevKeys.length;
+    diag.nearMiss = near;
+  }
+  /* Р­С‚Р°Р»РѕРЅ СЃС‚СЂРµР»РѕРє - РїРѕСЂСЏРґРѕРє РџР РћРЁР›РћР“Рћ РґРЅСЏ (ten.keys). РџРѕСЂСЏРґРѕРє СЃРµРіРѕРґРЅСЏС€РЅРµР№ СЃР±РѕСЂРєРё
+     Р¶РёРІС‘С‚ РѕС‚РґРµР»СЊРЅРѕ (ten.today), РїРѕСЌС‚РѕРјСѓ РІРЅСѓС‚СЂРёРґРЅРµРІРЅР°СЏ РїРµСЂРµСЃР±РѕСЂРєР° СЌС‚Р°Р»РѕРЅ РЅРµ СЃРґРІРёРіР°РµС‚. */
   if (first) {
-    /* первый прогон: эталоном для следующего дня становится сегодняшний порядок */
+    /* РїРµСЂРІС‹Р№ РїСЂРѕРіРѕРЅ: СЌС‚Р°Р»РѕРЅРѕРј РґР»СЏ СЃР»РµРґСѓСЋС‰РµРіРѕ РґРЅСЏ СЃС‚Р°РЅРѕРІРёС‚СЃСЏ СЃРµРіРѕРґРЅСЏС€РЅРёР№ РїРѕСЂСЏРґРѕРє */
     ten.keys = newKeys;
     ten.today = newKeys;
   } else if (rolled) {
@@ -359,10 +382,10 @@ async function applyTenure(env, tracks) {
   }
   return tracks;
 }
-/* Самопроверка стрелок и счётчика дней:
-   - место + стрелка обязаны складываться в непротиворечивый вчерашний порядок;
-   - NEW обязан идти с "1 day on chart", а числовая стрелка - минимум с двумя днями
-     (песня была в чарте вчера). Рассинхронизация видна в поле arrows сразу. */
+/* РЎР°РјРѕРїСЂРѕРІРµСЂРєР° СЃС‚СЂРµР»РѕРє Рё СЃС‡С‘С‚С‡РёРєР° РґРЅРµР№:
+   - РјРµСЃС‚Рѕ + СЃС‚СЂРµР»РєР° РѕР±СЏР·Р°РЅС‹ СЃРєР»Р°РґС‹РІР°С‚СЊСЃСЏ РІ РЅРµРїСЂРѕС‚РёРІРѕСЂРµС‡РёРІС‹Р№ РІС‡РµСЂР°С€РЅРёР№ РїРѕСЂСЏРґРѕРє;
+   - NEW РѕР±СЏР·Р°РЅ РёРґС‚Рё СЃ "1 day on chart", Р° С‡РёСЃР»РѕРІР°СЏ СЃС‚СЂРµР»РєР° - РјРёРЅРёРјСѓРј СЃ РґРІСѓРјСЏ РґРЅСЏРјРё
+     (РїРµСЃРЅСЏ Р±С‹Р»Р° РІ С‡Р°СЂС‚Рµ РІС‡РµСЂР°). Р Р°СЃСЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РІРёРґРЅР° РІ РїРѕР»Рµ arrows СЃСЂР°Р·Сѓ. */
 function arrowCheck(tracks) {
   const taken = new Set();
   let bad = 0;
@@ -393,14 +416,14 @@ function stripParen(s) {
 function normTitle(s) {
   const t = stripParen(s)
     .toLowerCase()
-    .replace(/[’‘]/g, "'")
+    .replace(/[вЂ™вЂ]/g, "'")
     .replace(/\b(remastered|remix|single|deluxe|from)\b/g, "")
     .replace(/[^a-z0-9]+/g, "");
   return t;
 }
 function primaryArtist(s) {
   return String(s || "")
-    .split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)[0]
+    .split(/\s*(?:,|&|\/|\+| x | Г— | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)[0]
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "");
 }
@@ -555,7 +578,7 @@ function ingest(bucket, src, rows) {
       rec.nameSrc = "A";
     }
     if (row.url && !rec.url) rec.url = row.url;
-    /* обложку предпочитаем Apple, Deezer оставляем только как запасной вариант */
+    /* РѕР±Р»РѕР¶РєСѓ РїСЂРµРґРїРѕС‡РёС‚Р°РµРј Apple, Deezer РѕСЃС‚Р°РІР»СЏРµРј С‚РѕР»СЊРєРѕ РєР°Рє Р·Р°РїР°СЃРЅРѕР№ РІР°СЂРёР°РЅС‚ */
     if (row.art && (!rec.art || (isAppleArt(row.art) && !isAppleArt(rec.art)))) rec.art = row.art;
     if (isApplePreview(row.prev) && !isApplePreview(rec.prev)) rec.prev = row.prev;
     if (row.year && !rec.year) rec.year = row.year;
@@ -643,15 +666,15 @@ export async function buildTop50(origin, env) {
     nameSrc: rec.nameSrc || "",
   }));
   const coverStats = { asked: 0, filled: 0, failed: 0 };
-  /* порядок важен: сначала данные Apple из засева (имя, ссылка, превью, год),
-     потом добор из запечённого файла, потом обложки и живые запросы к Apple */
+  /* РїРѕСЂСЏРґРѕРє РІР°Р¶РµРЅ: СЃРЅР°С‡Р°Р»Р° РґР°РЅРЅС‹Рµ Apple РёР· Р·Р°СЃРµРІР° (РёРјСЏ, СЃСЃС‹Р»РєР°, РїСЂРµРІСЊСЋ, РіРѕРґ),
+     РїРѕС‚РѕРј РґРѕР±РѕСЂ РёР· Р·Р°РїРµС‡С‘РЅРЅРѕРіРѕ С„Р°Р№Р»Р°, РїРѕС‚РѕРј РѕР±Р»РѕР¶РєРё Рё Р¶РёРІС‹Рµ Р·Р°РїСЂРѕСЃС‹ Рє Apple */
   await applyNames(env, tracks, origin);
   tracks.forEach((t) => { delete t.nameSrc; });
   await seedBaked(origin || "", tracks);
-  await applyCovers(env, tracks, origin);  /* засев -> память -> сборка -> Deezer -> пусто */
-  await enrichArtByIds(tracks, coverStats); /* точный релиз по Apple-ID из ссылки */
-  await enrichApple(tracks);               /* добор ссылки/превью/года, если Apple ответил */
-  await applyCovers(env, tracks, origin);  /* запомнить найденное */
+  await applyCovers(env, tracks, origin);  /* Р·Р°СЃРµРІ -> РїР°РјСЏС‚СЊ -> СЃР±РѕСЂРєР° -> Deezer -> РїСѓСЃС‚Рѕ */
+  await enrichArtByIds(tracks, coverStats); /* С‚РѕС‡РЅС‹Р№ СЂРµР»РёР· РїРѕ Apple-ID РёР· СЃСЃС‹Р»РєРё */
+  await enrichApple(tracks);               /* РґРѕР±РѕСЂ СЃСЃС‹Р»РєРё/РїСЂРµРІСЊСЋ/РіРѕРґР°, РµСЃР»Рё Apple РѕС‚РІРµС‚РёР» */
+  await applyCovers(env, tracks, origin);  /* Р·Р°РїРѕРјРЅРёС‚СЊ РЅР°Р№РґРµРЅРЅРѕРµ */
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
     if (!isApplePreview(t.prev)) t.prev = "";
@@ -660,7 +683,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v24",
+    rev: "feat-v25",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
@@ -694,7 +717,7 @@ async function itunesLookup(title, artist) {
 
 async function enrichApple(tracks) {
   await Promise.all(tracks.map(async (t) => {
-    /* ссылка и 30-секундное превью нужны всегда; обложку Apple больше не даёт */
+    /* СЃСЃС‹Р»РєР° Рё 30-СЃРµРєСѓРЅРґРЅРѕРµ РїСЂРµРІСЊСЋ РЅСѓР¶РЅС‹ РІСЃРµРіРґР°; РѕР±Р»РѕР¶РєСѓ Apple Р±РѕР»СЊС€Рµ РЅРµ РґР°С‘С‚ */
     if (t.url && isApplePreview(t.prev)) return;
     const grab = (title, artist) => Promise.race([
       itunesLookup(title, artist),
@@ -763,7 +786,9 @@ export async function onRequestGet({ env, request }) {
   }
   try {
     const payload = await withTimeout(buildTop50(new URL(request.url).origin, env), 14000);
-    payload.tracks = await applyTenure(env, payload.tracks);
+    const memory = {};
+    payload.tracks = await applyTenure(env, payload.tracks, memory);
+    payload.memory = memory;
     payload.arrows = arrowCheck(payload.tracks);
     if (env && env.DESK && payload.tracks && payload.tracks.length) {
       try { await env.DESK.put(TOP50_KV, JSON.stringify(payload)); } catch {}
