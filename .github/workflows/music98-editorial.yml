@@ -34,7 +34,7 @@ jobs:
           test -f scripts/post.py
           test -f scripts/gate.py
       - name: Apply Taylor Swift release draft
-        if: ${{ github.event_name == 'push' && github.sha == '76a96d25256f149e1186235b8f52afc19726851f' }}
+        if: ${{ github.event_name == 'push' && github.sha == '663631b4d4e9f2cdeb5465f87a0f3575dc1ef255' }}
         run: python scripts/apply_taylor_release.py
       - name: Desk list
         run: python scripts/post.py list
