@@ -39,6 +39,7 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check pillow
           python scripts/taylor_fix.py
+          python scripts/post.py set autay25r1 --body-file /tmp/taylor_body.txt --title "Taylor Swift — *The Life of a Showgirl: The Encore*" --excerpt "Taylor Swift has released *The Life of a Showgirl: The Encore*, adding four songs to the 12-track album she released in 2025."
           sleep 5
       - name: Taylor snapshot after fix
         run: python scripts/post.py show autay25r1
