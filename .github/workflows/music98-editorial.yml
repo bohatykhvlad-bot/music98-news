@@ -34,7 +34,7 @@ jobs:
           test -f scripts/post.py
           test -f scripts/gate.py
       - name: Apply Taylor Swift release draft
-        if: ${{ github.event_name == 'push' && github.event.head_commit.message == 'ci: run Taylor release draft preparation on this commit' }}
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, 'Taylor') }}
         run: python scripts/apply_taylor_release.py
       - name: Desk list
         run: python scripts/post.py list
