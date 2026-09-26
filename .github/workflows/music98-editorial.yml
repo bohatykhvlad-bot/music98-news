@@ -41,3 +41,5 @@ jobs:
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
+
+# Taylor Swift draft runner is intentionally retained for the current editorial task.
