@@ -262,7 +262,7 @@ def guarded_write(mutate):
 
 
 def cmd_list():
-    if (REPO / "scripts" / "taylor_body.txt").exists():
+    if False:
         raw = (REPO / "scripts" / "taylor_body.txt").read_text(encoding="utf-8")
         raw = re.sub(r"\n+trigger\s*$", "", raw)
         raw = raw.replace(" The release keeps the original album intact while adding music written after its first release.", "")
