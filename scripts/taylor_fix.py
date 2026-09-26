@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# final editorial fix
 import base64, io, json, os, re, urllib.request
 from pathlib import Path
 from PIL import Image
