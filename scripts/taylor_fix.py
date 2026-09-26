@@ -83,4 +83,4 @@ after=json.loads(resp)["posts"]
 p=next(p for p in after if str(p.get("id"))==POST_ID)
 print("POST CHECK:", p.get("status"), len(re.sub(r"\\[(youtube|apple|tiktok|instagram)[^\\]]*\\]"," ",p.get("body","")).split()), p.get("cover"))
 print("APPLE:", "[apple:album:6814997249]" in p.get("body",""))
-print("BODY PHOTO:", bool(re.search(r"\\[photo:",p.get("body",""))))
+print("BODY PHOTO:", "[photo:" in p.get("body",""))
