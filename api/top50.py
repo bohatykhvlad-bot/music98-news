@@ -690,6 +690,7 @@ def build_payload(enrich: bool = False) -> dict:
         apply_covers(ranked)      # Apple-only + память обложек
         enrich_art_by_ids(ranked)  # добираем обложки одним запросом по Apple-ID
         enrich_tracks(ranked)
+        enrich_art_by_ids(ranked)  # ссылки могли появиться только что
         apply_covers(ranked)      # запомнить то, что нашлось в Apple
 
     tracks = []

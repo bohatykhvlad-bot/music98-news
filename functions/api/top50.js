@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v9 on 26.09 to force the rebuild that restores the missing covers.
-   Any future "refresh the chart now" is the same one-line bump. */
-const TOP50_KV = "top50v9";
+/* Bumped to v10 on 26.09: the v9 rebuild ran before this code landed, so its payload
+   still had the empty covers. Any future "refresh the chart now" is the same bump. */
+const TOP50_KV = "top50v10";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -412,6 +412,7 @@ export async function buildTop50(origin, env) {
   await applyCovers(env, tracks);   /* Apple-only + память обложек */
   await enrichArtByIds(tracks);     /* добираем обложки одним запросом по Apple-ID */
   await enrichApple(tracks);
+  await enrichArtByIds(tracks);     /* ссылки могли появиться только что - добираем остаток */
   await applyCovers(env, tracks);   /* запомнить обложки, найденные в Apple */
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
