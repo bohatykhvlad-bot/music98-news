@@ -35,11 +35,12 @@ jobs:
           test -f scripts/gate.py
       - name: Desk list
         run: python scripts/post.py list
-      - name: Probe site routes
+      - name: Probe likely upload routes
         run: |
-          curl -sS https://music98.news/ -o /tmp/site.html
-          grep -oE '(/api/[A-Za-z0-9_./-]+|/photos/[A-Za-z0-9_./-]+)' /tmp/site.html | sort -u | head -100 || true
-          grep -oE '<script[^>]+src="[^"]+"' /tmp/site.html | head -30 || true
+          for p in upload uploads photos photo image images media asset assets; do
+            code=$(curl -sS -o /tmp/x -w '%{http_code}' "https://music98.news/api/$p" || true)
+            echo "/api/$p => $code $(cat /tmp/x)"
+          done
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
