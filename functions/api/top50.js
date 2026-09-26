@@ -4,7 +4,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v23";
+const TOP50_KV = "top50v24";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -178,15 +178,18 @@ function cleanDisplay(title, artist) {
 
 const NAMES_KV = "names_v1";
 /* какое написание показываем: засев Apple -> запомненное ранее -> текущее (с апгрейдом от Apple).
-   Если Apple назвал ту же песню версией-вариантом ("The Fate of Ophelia (Track by Track)"),
-   а в чарте название плоское - оставляем плоское: версия не должна попадать в строку чарта. */
+   Фит разбираем ДО сравнения (cleanDisplay переносит его в артистов), и "версией" считаем
+   только ту скобку, которая после этого осталась: "(Track by Track)", "(Live)" и т.п.
+   Раньше фит в скобках тоже считался версией - и у "Cinderella (feat. Ty Dolla $ign)"
+   название бралось из чарта, а фит терялся совсем. */
 function pickName(seedRec, cachedRec, cur, nameSrc) {
   if (seedRec && seedRec.title && seedRec.artist) {
-    const sameSong = normTitle(seedRec.title) === normTitle(cur.title);
-    const seedVariant = stripParen(seedRec.title).trim() !== String(seedRec.title).trim();
+    const cleaned = cleanDisplay(seedRec.title, seedRec.artist);
+    const sameSong = normTitle(cleaned.title) === normTitle(cur.title);
+    const seedVariant = stripParen(cleaned.title).trim() !== String(cleaned.title).trim();
     const curPlain = stripParen(cur.title).trim() === String(cur.title).trim();
-    const title = sameSong && seedVariant && curPlain ? cur.title : seedRec.title;
-    return { title, artist: seedRec.artist, src: "seed" };
+    const title = sameSong && seedVariant && curPlain ? cur.title : cleaned.title;
+    return { title, artist: cleaned.artist, src: "seed" };
   }
   const upgrade = nameSrc === "A" && cachedRec && cachedRec.src !== "A";
   if (cachedRec && cachedRec.title && cachedRec.artist && !upgrade) {
@@ -657,7 +660,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "seed-v23",
+    rev: "feat-v24",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
