@@ -2,10 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v7 on 26.09 to force one rebuild: the registry stored today's payload
-   under v6 with the false NEW, and the daily cache would have served it until the
-   next day. Any future "refresh the chart now" is the same one-line bump. */
-const TOP50_KV = "top50v7";
+/* Bumped to v8 on 26.09 to force the cover rebuild (v7 held the mixed Apple/Deezer
+   artwork). Any future "refresh the chart now" is the same one-line bump. */
+const TOP50_KV = "top50v8";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -34,6 +33,39 @@ function chartWeek() {
      counter is really a day index since launch. Field name kept for KV compat. */
   return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
 }
+
+/* Cover art had the same flaw the tenure key had: the picture came from whichever
+   source created the row, so a sleeve flipped between Apple (mzstatic) and Deezer
+   (dzcdn) from one day to the next. Covers are now Apple-only and remembered per
+   song, so the same artwork is served every day. */
+const COVERS_KV = "covers_v1";
+function isAppleArt(url) {
+  try {
+    const h = new URL(String(url || "")).hostname.toLowerCase();
+    return h === "mzstatic.com" || h.endsWith(".mzstatic.com")
+      || h === "apple.com" || h.endsWith(".apple.com");
+  } catch {
+    return false;
+  }
+}
+async function applyCovers(env, tracks) {
+  let covers = {};
+  if (env && env.DESK) {
+    try { covers = (await env.DESK.get(COVERS_KV, { type: "json" })) || {}; } catch {}
+  }
+  let changed = false;
+  for (const t of tracks) {
+    const key = mergeKey(t.title, t.artist);
+    if (covers[key]) { t.art = covers[key]; continue; }   /* уже знаем обложку этой песни */
+    if (isAppleArt(t.art)) { covers[key] = t.art; changed = true; continue; }
+    t.art = "";                                            /* не-Apple обложка в чарт не идёт */
+  }
+  if (env && env.DESK && changed) {
+    try { await env.DESK.put(COVERS_KV, JSON.stringify(covers)); } catch {}
+  }
+  return tracks;
+}
+
 /* A song's identity is mergeKey (normalized title + primary artist): the same key
    ingest() already uses to fold Apple, Spotify, Deezer, Billboard and YouTube rows
    of one track into a single chart entry. Building the tenure key from the raw
@@ -291,7 +323,7 @@ function ingest(bucket, src, rows) {
       rec.artist = row.artist;
     }
     if (row.url && !rec.url) rec.url = row.url;
-    if (row.art && !rec.art) rec.art = row.art;
+    if (row.art && (!rec.art || (isAppleArt(row.art) && !isAppleArt(rec.art)))) rec.art = row.art;
     if (isApplePreview(row.prev) && !isApplePreview(rec.prev)) rec.prev = row.prev;
     if (row.year && !rec.year) rec.year = row.year;
     bucket.set(key, rec);
@@ -321,13 +353,13 @@ async function seedBaked(origin, tracks) {
       if (!b) return;
       if (!isApplePreview(t.prev) && isApplePreview(b.prev)) t.prev = b.prev;
       if (!t.url && b.url) t.url = b.url;
-      if (!t.art && b.art) t.art = b.art;
+      if (b.art && isAppleArt(b.art) && !isAppleArt(t.art)) t.art = b.art;
       if (!t.year && b.year) t.year = b.year;
     });
   } catch {}
 }
 
-export async function buildTop50(origin) {
+export async function buildTop50(origin, env) {
   const [apple, spotify, deezer, billboard, youtube] = await Promise.all([
     safe("A", async () => parseApple(await getJson("https://rss.applemarketingtools.com/api/v2/us/music/most-played/50/songs.json"))),
     safe("S", async () => parseSpotify(await getText("https://kworb.net/spotify/country/global_daily.html"))),
@@ -377,7 +409,9 @@ export async function buildTop50(origin) {
     year: rec.year || "",
   }));
   await seedBaked(origin || "", tracks);
+  await applyCovers(env, tracks);   /* Apple-only + память обложек */
   await enrichApple(tracks);
+  await applyCovers(env, tracks);   /* запомнить обложки, найденные в Apple */
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
     if (!isApplePreview(t.prev)) t.prev = "";
@@ -412,7 +446,7 @@ async function itunesLookup(title, artist) {
 
 async function enrichApple(tracks) {
   await Promise.all(tracks.map(async (t) => {
-    if (t.url && isApplePreview(t.prev) && t.art) return;
+    if (t.url && isApplePreview(t.prev) && isAppleArt(t.art)) return;
     const grab = (title, artist) => Promise.race([
       itunesLookup(title, artist),
       new Promise((_, reject) => setTimeout(() => reject(new Error("itunes-timeout")), 6000)),
@@ -467,7 +501,7 @@ export async function onRequestGet({ env, request }) {
     } catch {}
   }
   try {
-    const payload = await withTimeout(buildTop50(new URL(request.url).origin), 14000);
+    const payload = await withTimeout(buildTop50(new URL(request.url).origin, env), 14000);
     payload.tracks = await applyTenure(env, payload.tracks);
     if (env && env.DESK && payload.tracks && payload.tracks.length) {
       try { await env.DESK.put(TOP50_KV, JSON.stringify(payload)); } catch {}

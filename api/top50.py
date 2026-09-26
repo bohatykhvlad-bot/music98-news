@@ -36,6 +36,8 @@ PUBLIC = ROOT / "public"
 TENURE_PATH = PUBLIC / "data" / "chart-tenure.json"
 # day a song first appeared, kept separately so a rebuilt registry cannot zero the counter
 FIRST_PATH = PUBLIC / "data" / "chart-first.json"
+# Apple-only artwork per song, so covers do not flip between sources day to day
+COVERS_PATH = PUBLIC / "data" / "chart-covers.json"
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
@@ -331,6 +333,41 @@ def is_apple_preview(url: str) -> bool:
     return "apple.com" in u or "mzstatic.com" in u
 
 
+def is_apple_art(url: str) -> bool:
+    """Cover art must come from Apple only (mzstatic/apple hosts)."""
+    host = (urllib.parse.urlparse(url or "").hostname or "").lower()
+    return host in ("mzstatic.com", "apple.com") or host.endswith(".mzstatic.com") or host.endswith(".apple.com")
+
+
+def apply_covers(tracks: list[dict]) -> None:
+    """Apple-only artwork, remembered per song so the sleeve never changes day to day."""
+    try:
+        covers = json.loads(COVERS_PATH.read_text(encoding="utf-8"))
+        if not isinstance(covers, dict):
+            covers = {}
+    except Exception:
+        covers = {}
+    changed = False
+    for t in tracks:
+        key = merge_key(t["title"], t["artist"])
+        if covers.get(key):
+            t["art"] = covers[key]
+            continue
+        if is_apple_art(t.get("art") or ""):
+            covers[key] = t["art"]
+            changed = True
+            continue
+        t["art"] = ""
+    if changed:
+        COVERS_PATH.parent.mkdir(exist_ok=True)
+        try:
+            COVERS_PATH.write_text(
+                json.dumps(covers, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+        except OSError:
+            pass
+
+
 def apple_aff(url: str) -> str:
     if not url or "apple.com" not in url.lower():
         return url or ""
@@ -381,7 +418,7 @@ def enrich_tracks(tracks: list[dict]) -> None:
         if (
             t.get("url")
             and is_apple_preview(t.get("prev") or "")
-            and t.get("art")
+            and is_apple_art(t.get("art") or "")
         ):
             return t
         extra = itunes_lookup(t["title"], t["artist"])
@@ -391,7 +428,7 @@ def enrich_tracks(tracks: list[dict]) -> None:
             t["prev"] = extra["prev"]
         if extra.get("url") and not t.get("url"):
             t["url"] = extra["url"]
-        if extra.get("art") and not t.get("art"):
+        if extra.get("art") and not is_apple_art(t.get("art") or ""):
             t["art"] = extra["art"]
         if extra.get("year") and not t.get("year"):
             t["year"] = extra["year"]
@@ -423,7 +460,9 @@ def ingest(bucket: dict, src: str, rows: list[dict]) -> None:
             rec["artist"] = row["artist"]
         if row.get("url") and not rec["url"]:
             rec["url"] = row["url"]
-        if row.get("art") and not rec["art"]:
+        if row.get("art") and (
+            not rec["art"] or (is_apple_art(row["art"]) and not is_apple_art(rec["art"]))
+        ):
             rec["art"] = row["art"]
         prev = row.get("prev") or ""
         if is_apple_preview(prev) and not is_apple_preview(rec.get("prev") or ""):
@@ -615,7 +654,9 @@ def build_payload(enrich: bool = False) -> dict:
     )[:SIZE]
 
     if enrich:
+        apply_covers(ranked)      # Apple-only + память обложек
         enrich_tracks(ranked)
+        apply_covers(ranked)      # запомнить то, что нашлось в Apple
 
     tracks = []
     for i, rec in enumerate(ranked, 1):
