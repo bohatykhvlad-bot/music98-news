@@ -19,7 +19,7 @@ jobs:
   editorial:
     runs-on: ubuntu-latest
     env:
-      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      ADMIN_PASSWORD: ${{ secrets['ADMIN_PASSWORD'] }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -57,5 +57,3 @@ jobs:
         run: python scripts/post.py list
       - name: Gate Taylor draft
         run: python scripts/post.py gate "autay25r1"
-        if: ${{ inputs.post_id != '' }}
-        run: python scripts/post.py gate "${{ inputs.post_id }}"
