@@ -35,6 +35,8 @@ jobs:
           test -f scripts/gate.py
       - name: Desk list
         run: python scripts/post.py list
+      - name: Taylor snapshot
+        run: python scripts/post.py show autay25r1
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
