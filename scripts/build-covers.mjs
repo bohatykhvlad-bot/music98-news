@@ -46,6 +46,21 @@ function variantTrap(wantedTitle, candidate) {
   return VARIANTS.test(want) && !VARIANTS.test(String(wantedTitle).toLowerCase());
 }
 
+/* одна запись Apple на песню: имя, ссылка, превью, год. Воркер носит этот файл
+   в бандле и берёт данные отсюда, когда Apple из Cloudflare не отвечает. */
+function appleRecord(hit) {
+  const album = String(hit.collectionId || "");
+  const track = String(hit.trackId || "");
+  const url = album && track ? `https://music.apple.com/us/album/${album}?i=${track}` : (hit.trackViewUrl || "");
+  return {
+    title: hit.trackName || "",
+    artist: hit.artistName || "",
+    url,
+    prev: hit.previewUrl || "",
+    year: String(hit.releaseDate || "").slice(0, 4),
+  };
+}
+
 const chart = await (await fetch(CHART + (CHART.includes("?") ? "&" : "?") + "cb=" + Date.now())).json();
 const tracks = chart.tracks || [];
 console.log(`в чарте ${tracks.length} треков (rev ${chart.rev || "-"})`);
@@ -54,7 +69,7 @@ const covers = {};
 const names = {};
 
 /* 1) точный релиз по Apple-ID из ссылки, одним batch-запросом */
-const idWanted = tracks.map((t) => [t, idOf(t.url)]).filter(([, id]) => id);
+  const idWanted = tracks.map((t) => [t, idOf(t.url)]).filter(([, id]) => id);
 if (idWanted.length) {
   const ids = [...new Set(idWanted.map(([, id]) => id))];
   const byId = new Map();
@@ -74,15 +89,15 @@ if (idWanted.length) {
   for (const [t, id] of idWanted) {
     const hit = byId.get(id);
     if (!hit) continue;
-    /* ссылка может вести на версию-вариант ("Track by Track", ремикс) - тогда имя и
-       обложку ищем поиском, чтобы в чарте стоял обычный релиз */
+    /* ссылка может вести на версию-вариант ("Track by Track", ремикс) - тогда имя,
+       ссылку и обложку берём поиском, чтобы в чарте стоял обычный релиз */
     if (variantTrap(t.title, hit)) {
       console.log(`  ссылка ведёт на вариант: ${t.artist} - ${t.title} -> ${hit.trackName}`);
       continue;
     }
     const key = mergeKey(t.title, t.artist);
     covers[key] = art600(hit.artworkUrl100);
-    if (hit.trackName && hit.artistName) names[key] = { title: hit.trackName, artist: hit.artistName };
+    names[key] = appleRecord(hit);
   }
   console.log(`по Apple-ID (точный релиз): ${idWanted.filter(([t]) => covers[mergeKey(t.title, t.artist)]).length}/${idWanted.length}`);
 }
@@ -101,7 +116,7 @@ for (const t of tracks) {
       || cand.sort((a, b) => String(a.trackName).length - String(b.trackName).length)[0];
     if (hit) {
       covers[key] = art600(hit.artworkUrl100);
-      if (hit.trackName && hit.artistName) names[key] = { title: hit.trackName, artist: hit.artistName };
+      names[key] = appleRecord(hit);
     }
     console.log(`  поиск: ${hit ? "OK " : "НЕТ"} ${t.artist} - ${t.title}${hit ? ` -> ${hit.trackName} / ${String(hit.collectionName || "").slice(0, 40)}` : ""}`);
   } catch (e) {

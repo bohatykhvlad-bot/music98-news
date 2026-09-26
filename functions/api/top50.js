@@ -4,7 +4,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v21";
+const TOP50_KV = "top50v22";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -59,20 +59,41 @@ function isDeezerArt(url) {
     return false;
   }
 }
-/* Файлы засева берём с меткой дня: иначе edge-кэш CDN может отдать вчерашнюю копию. */
-function seedUrl(origin, file) {
-  const base = String(origin || "");
-  const day = new Date().toISOString().slice(0, 10);
-  return `${base}/data/${file}?d=${day}`;
+/* Данные Apple для текущего чарта лежат в репозитории: public/data/covers.json
+   (обложки) и public/data/apple-names.json (имя + ссылка + превью + год). Их
+   пересобирает scripts/build-covers.mjs по расписанию
+   (.github/workflows/apple-data.yml). Читаем их через биндинг ASSETS - это
+   локальное хранилище ассетов, без выхода в интернет; сетевой фетч оставлен
+   только как запас. Раньше засев брался сетевым запросом, и когда он не
+   отвечал, воркер запоминал пустой засев на всю жизнь изолята: часть строк
+   показывала устаревшие имена, чужие обложки и пустые ссылки. Пустой ответ
+   теперь НЕ кэшируется. */
+async function readSeed(env, origin, file) {
+  const path = "/data/" + file;
+  if (env && env.ASSETS && typeof env.ASSETS.fetch === "function") {
+    try {
+      const r = await env.ASSETS.fetch(new URL(path, String(origin || "https://music98.news")));
+      if (r.ok) return await r.json();
+    } catch {}
+  }
+  try { return await getJson(String(origin || "") + path); } catch { return null; }
 }
 let COVER_SEED = null;
-async function coverSeed(origin) {
+let NAME_SEED = null;
+async function coverSeed(env, origin) {
   if (COVER_SEED) return COVER_SEED;
-  try { COVER_SEED = await getJson(seedUrl(origin, "covers.json")); } catch { COVER_SEED = {}; }
-  return COVER_SEED;
+  const v = await readSeed(env, origin, "covers.json");
+  if (v && typeof v === "object" && Object.keys(v).length) COVER_SEED = v;
+  return v && typeof v === "object" ? v : {};
+}
+async function nameSeed(env, origin) {
+  if (NAME_SEED) return NAME_SEED;
+  const v = await readSeed(env, origin, "apple-names.json");
+  if (v && typeof v === "object" && Object.keys(v).length) NAME_SEED = v;
+  return v && typeof v === "object" ? v : {};
 }
 async function applyCovers(env, tracks, origin) {
-  const seed = await coverSeed(origin);
+  const seed = await coverSeed(env, origin);
   let covers = {};
   if (env && env.DESK) {
     try { covers = (await env.DESK.get(COVERS_KV, { type: "json" })) || {}; } catch {}
@@ -81,18 +102,20 @@ async function applyCovers(env, tracks, origin) {
   for (const t of tracks) {
     const key = mergeKey(t.title, t.artist);
     const cached = covers[key];
-    const apple = isAppleArt(t.art) ? t.art : (isAppleArt(seed[key]) ? seed[key] : "");
-    /* Apple важнее уже запомненного Deezer - это разовая замена, дальше картинка заморожена */
-    if (apple && !isAppleArt(cached)) {
-      covers[key] = apple;
-      t.art = apple;
-      changed = true;
-      continue;
+    /* Приоритет: засев Apple (пересобирается ежедневно и совпадает с релизом
+       ссылки) -> запомненная Apple -> Apple из текущей сборки (разово заменяет
+       закэшированный Deezer) -> запомненный Deezer -> Deezer из сборки -> пусто. */
+    const chosen = (isAppleArt(seed[key]) && seed[key])
+      || (isAppleArt(cached) && cached)
+      || (isAppleArt(t.art) && t.art)
+      || cached
+      || (isDeezerArt(t.art) ? t.art : "");
+    if (chosen) {
+      if (covers[key] !== chosen) { covers[key] = chosen; changed = true; }
+      t.art = chosen;
+    } else {
+      t.art = "";
     }
-    if (cached) { t.art = cached; continue; }
-    if (apple) { covers[key] = apple; t.art = apple; changed = true; continue; }
-    if (isDeezerArt(t.art)) { covers[key] = t.art; changed = true; continue; }
-    t.art = "";
   }
   if (env && env.DESK && changed) {
     try { await env.DESK.put(COVERS_KV, JSON.stringify(covers)); } catch {}
@@ -154,15 +177,6 @@ function cleanDisplay(title, artist) {
 }
 
 const NAMES_KV = "names_v1";
-/* Засев Apple-написаний: public/data/apple-names.json собирает тот же ночной
-   GitHub-экшен, что и обложки (scripts/build-covers.mjs). Так написание всегда
-   эпловское, даже когда Apple из Cloudflare не отвечает. */
-let NAME_SEED = null;
-async function nameSeed(origin) {
-  if (NAME_SEED) return NAME_SEED;
-  try { NAME_SEED = await getJson(seedUrl(origin, "apple-names.json")); } catch { NAME_SEED = {}; }
-  return NAME_SEED;
-}
 /* какое написание показываем: засев Apple -> запомненное ранее -> текущее (с апгрейдом от Apple).
    Если Apple назвал ту же песню версией-вариантом ("The Fate of Ophelia (Track by Track)"),
    а в чарте название плоское - оставляем плоское: версия не должна попадать в строку чарта. */
@@ -181,7 +195,7 @@ function pickName(seedRec, cachedRec, cur, nameSrc) {
   return { title: cur.title, artist: cur.artist, src: nameSrc || "" };
 }
 async function applyNames(env, tracks, origin) {
-  const seed = await nameSeed(origin);
+  const seed = await nameSeed(env, origin);
   let names = {};
   if (env && env.DESK) {
     try { names = (await env.DESK.get(NAMES_KV, { type: "json" })) || {}; } catch {}
@@ -190,10 +204,19 @@ async function applyNames(env, tracks, origin) {
   for (const t of tracks) {
     const clean = cleanDisplay(t.title, t.artist);
     const key = mergeKey(clean.title, clean.artist);
-    const chosen = pickName(seed[key], names[key], clean, t.nameSrc);
+    const sd = seed[key];
+    const chosen = pickName(sd, names[key], clean, t.nameSrc);
     const shown = cleanDisplay(chosen.title, chosen.artist);
     t.title = shown.title;
     t.artist = shown.artist;
+    /* Ссылка, превью и год тоже берутся из засева: он сверен с конкретным релизом
+       Apple, а запечённый файл чарта может вести на версию-вариант или быть пустым
+       (живой пример: строка без ссылки, потому что iTunes из воркера не ответил). */
+    if (sd) {
+      if (sd.url) t.url = sd.url;
+      if (sd.prev) t.prev = sd.prev;
+      if (sd.year && !t.year) t.year = sd.year;
+    }
     const rec = { title: shown.title, artist: shown.artist, src: chosen.src };
     const old = names[key];
     if (!old || old.title !== rec.title || old.artist !== rec.artist || old.src !== rec.src) {
@@ -617,12 +640,14 @@ export async function buildTop50(origin, env) {
     nameSrc: rec.nameSrc || "",
   }));
   const coverStats = { asked: 0, filled: 0, failed: 0 };
-  await applyNames(env, tracks, origin);   /* написание: засев Apple -> запомненное -> текущее */
+  /* порядок важен: сначала данные Apple из засева (имя, ссылка, превью, год),
+     потом добор из запечённого файла, потом обложки и живые запросы к Apple */
+  await applyNames(env, tracks, origin);
   tracks.forEach((t) => { delete t.nameSrc; });
   await seedBaked(origin || "", tracks);
-  await applyCovers(env, tracks, origin);  /* KV -> Apple из сборки -> засев -> Deezer -> пусто */
+  await applyCovers(env, tracks, origin);  /* засев -> память -> сборка -> Deezer -> пусто */
   await enrichArtByIds(tracks, coverStats); /* точный релиз по Apple-ID из ссылки */
-  await enrichApple(tracks);               /* ссылка/превью/год из iTunes, если Apple ответил */
+  await enrichApple(tracks);               /* добор ссылки/превью/года, если Apple ответил */
   await applyCovers(env, tracks, origin);  /* запомнить найденное */
   tracks.forEach((t) => {
     t.url = appleAff(t.url);

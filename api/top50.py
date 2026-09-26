@@ -419,9 +419,18 @@ def apply_names(tracks: list[dict]) -> None:
     for t in tracks:
         cur = clean_display(t["title"], t["artist"])
         key = merge_key(cur[0], cur[1])
-        title, artist, src = pick_name(seed.get(key), names.get(key), cur, t.get("nameSrc"))
+        sd = seed.get(key) if isinstance(seed.get(key), dict) else None
+        title, artist, src = pick_name(sd, names.get(key), cur, t.get("nameSrc"))
         title, artist = clean_display(title, artist)
         t["title"], t["artist"] = title, artist
+        # ссылка, превью и год тоже из засева Apple: он сверен с конкретным релизом
+        if sd:
+            if sd.get("url"):
+                t["url"] = sd["url"]
+            if sd.get("prev"):
+                t["prev"] = sd["prev"]
+            if sd.get("year") and not t.get("year"):
+                t["year"] = sd["year"]
         rec = {"title": title, "artist": artist, "src": src}
         if names.get(key) != rec:
             names[key] = rec
@@ -488,25 +497,23 @@ def apply_covers(tracks: list[dict]) -> None:
     for t in tracks:
         key = merge_key(t["title"], t["artist"])
         cached = covers.get(key) or ""
-        apple = (t.get("art") or "") if is_apple_art(t.get("art") or "") else seed.get(key) or ""
-        if is_apple_art(apple) and not is_apple_art(cached):
-            covers[key] = apple
-            t["art"] = apple
-            changed = True
-            continue
-        if cached:
-            t["art"] = cached
-            continue
-        if is_apple_art(apple):
-            covers[key] = apple
-            t["art"] = apple
-            changed = True
-            continue
-        if is_deezer_art(t.get("art") or ""):
-            covers[key] = t["art"]
-            changed = True
-            continue
-        t["art"] = ""
+        # приоритет как в воркере: засев Apple -> запомненная Apple -> Apple из сборки
+        # (разово заменяет закэшированный Deezer) -> запомненный Deezer -> Deezer из сборки
+        art = t.get("art") or ""
+        chosen = ""
+        for cand in (seed.get(key) or "", cached, art):
+            if is_apple_art(cand):
+                chosen = cand
+                break
+        if not chosen:
+            chosen = cached if cached else (art if is_deezer_art(art) else "")
+        if chosen:
+            if covers.get(key) != chosen:
+                covers[key] = chosen
+                changed = True
+            t["art"] = chosen
+        else:
+            t["art"] = ""
     if changed:
         COVERS_PATH.parent.mkdir(exist_ok=True)
         try:
