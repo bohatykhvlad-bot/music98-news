@@ -2,9 +2,9 @@ const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v8 on 26.09 to force the cover rebuild (v7 held the mixed Apple/Deezer
-   artwork). Any future "refresh the chart now" is the same one-line bump. */
-const TOP50_KV = "top50v8";
+/* Bumped to v9 on 26.09 to force the rebuild that restores the missing covers.
+   Any future "refresh the chart now" is the same one-line bump. */
+const TOP50_KV = "top50v9";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -410,6 +410,7 @@ export async function buildTop50(origin, env) {
   }));
   await seedBaked(origin || "", tracks);
   await applyCovers(env, tracks);   /* Apple-only + память обложек */
+  await enrichArtByIds(tracks);     /* добираем обложки одним запросом по Apple-ID */
   await enrichApple(tracks);
   await applyCovers(env, tracks);   /* запомнить обложки, найденные в Apple */
   tracks.forEach((t) => {
@@ -442,6 +443,35 @@ async function itunesLookup(title, artist) {
     prev: hit.previewUrl || "",
     year: String(hit.releaseDate || "").slice(0, 4),
   };
+}
+
+/* One batch lookup by Apple track id (the ?i= in the link) instead of 50 searches:
+   it restores the covers of rows that another source created first, and it does not
+   run into the search rate limit. Runs before enrichApple, so fewer searches are left. */
+async function enrichArtByIds(tracks) {
+  const want = [];
+  for (const t of tracks) {
+    if (isAppleArt(t.art)) continue;
+    const m = String(t.url || "").match(/[?&]i=(\d+)/);
+    if (m) want.push([t, m[1]]);
+  }
+  if (!want.length) return;
+  const ids = [...new Set(want.map(([, id]) => id))];
+  const found = new Map();
+  for (let i = 0; i < ids.length; i += 50) {
+    try {
+      const data = await getJson(`https://itunes.apple.com/lookup?id=${ids.slice(i, i + 50).join(",")}&entity=song&country=US`);
+      for (const item of data.results || []) {
+        const id = String(item.trackId || "");
+        const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
+        if (id && art) found.set(id, art);
+      }
+    } catch {}
+  }
+  for (const [t, id] of want) {
+    const art = found.get(id);
+    if (art) t.art = art;
+  }
 }
 
 async function enrichApple(tracks) {

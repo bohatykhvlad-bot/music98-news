@@ -411,6 +411,39 @@ def itunes_lookup(title: str, artist: str) -> dict:
     }
 
 
+def enrich_art_by_ids(tracks: list[dict]) -> None:
+    """Restore covers with one batch Apple lookup by track id (?i= in the link)."""
+    want: list[tuple[dict, str]] = []
+    for t in tracks:
+        if is_apple_art(t.get("art") or ""):
+            continue
+        m = re.search(r"[?&]i=(\d+)", t.get("url") or "")
+        if m:
+            want.append((t, m.group(1)))
+    if not want:
+        return
+    ids = sorted({i for _, i in want})
+    found: dict[str, str] = {}
+    for n in range(0, len(ids), 50):
+        try:
+            data = fetch_json(
+                "https://itunes.apple.com/lookup?id="
+                + ",".join(ids[n : n + 50])
+                + "&entity=song&country=US",
+                timeout=10,
+            )
+        except Exception:
+            continue
+        for item in data.get("results") or []:
+            tid = str(item.get("trackId") or "")
+            art = (item.get("artworkUrl100") or "").replace("100x100bb", "600x600bb")
+            if tid and art:
+                found[tid] = art
+    for t, tid in want:
+        if found.get(tid):
+            t["art"] = found[tid]
+
+
 def enrich_tracks(tracks: list[dict]) -> None:
     def one(t):
         if t.get("url"):
@@ -655,6 +688,7 @@ def build_payload(enrich: bool = False) -> dict:
 
     if enrich:
         apply_covers(ranked)      # Apple-only + память обложек
+        enrich_art_by_ids(ranked)  # добираем обложки одним запросом по Apple-ID
         enrich_tracks(ranked)
         apply_covers(ranked)      # запомнить то, что нашлось в Apple
 
