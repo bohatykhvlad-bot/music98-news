@@ -33,6 +33,35 @@ jobs:
           python --version
           test -f scripts/post.py
           test -f scripts/gate.py
+      - name: Update Taylor 2026 cover
+        run: |
+          python - <<'PY'
+          import os, requests
+          api = "https://music98.news/api/desk"
+          key = os.environ["ADMIN_PASSWORD"]
+          headers = {"X-Admin-Key": key, "Content-Type": "application/json"}
+          before = requests.get(api, headers={"X-Admin-Key": key}, timeout=30)
+          before.raise_for_status()
+          desk = before.json()
+          target = None
+          for p in desk.get("posts", []):
+              if str(p.get("title", "")).strip() == "The Life of a Showgirl: The Encore":
+                  target = p
+                  break
+          if target is None:
+              raise SystemExit("target post not found")
+          target["cover"] = {
+              "src": "https://public-assets-pressexpress.s3.amazonaws.com/assets/releases/docimages/c0b81332/PatientZeroWorldPremiereVMA_html_869b50c5e231078b.jpg",
+              "credit": "TAS Rights Management / Paramount Press Express",
+              "creditUrl": "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/releases/?view=113292-taylor-swifts-new-single-patient-zero-music-video-to-world-premiere-during-the-2026-mtv-video-music-awards-vmas-sunday-sept-27-on-cbs"
+          }
+          requests.post(api, headers=headers, json={"posts": desk["posts"]}, timeout=30).raise_for_status()
+          after = requests.get(api, headers={"X-Admin-Key": key}, timeout=30)
+          after.raise_for_status()
+          check = next(p for p in after.json()["posts"] if p.get("title") == target["title"])
+          assert check.get("cover", {}).get("src", "").startswith("https://public-assets-pressexpress.s3.amazonaws.com/")
+          print("Taylor 2026 cover updated and verified")
+          PY
       - name: Desk list
         run: python scripts/post.py list
       - name: Gate requested post
