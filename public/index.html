@@ -46,7 +46,6 @@
    widths are excluded: the 640/900px breakpoints below must keep CSS px. */
 @media (min-width:1100px){
   html{zoom:.96}
-  html.concerts-native-scale{zoom:1}
   /* owner clarity (2026-09-24): "ты поднимаешь весь блок, а не карточки".
      WRONG read — fixed: the SECTION stays where it was (tab padding back to
      14px, heading starts at the familiar 18px below the header). What moves
@@ -2822,7 +2821,6 @@ function setTab(t){
     try{ history.replaceState(null, "", "/"); }catch(e){}
   }
   activeTab = t;
-  document.documentElement.classList.toggle("concerts-native-scale",t==="concerts");
   $$("#nav .nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===t));
   $$(".tab").forEach(s=>{
     const on = s.id==="tab-"+t;
@@ -3662,6 +3660,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260929-08" defer></script>
+<script src="/concerts-app.js?v=20260929-09" defer></script>
 </body>
 </html>
