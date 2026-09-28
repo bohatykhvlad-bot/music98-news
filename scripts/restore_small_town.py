@@ -16,21 +16,21 @@ EXCERPT = (
     'due October 9 through Columbia Records.'
 )
 
-BODY_TEMPLATE = """Dominic Fike has released "Small Town," the second lead single from his forthcoming album, due October 9 through Columbia Records. The track follows "Wallflower" in the rollout and arrives while Fike is still moving through North America on his Comedy Tragedy Parody tour.
+BODY_TEMPLATE = """Dominic Fike has released "Small Town," the second lead single from his forthcoming album, due October 9 through Columbia Records. The track follows "Wallflower" in the album campaign and arrives while Fike is still moving through North America on his Comedy Tragedy Parody tour.
 
-The album, *How To Quit Smoking*, is being made in unusually public fashion. Fike's press materials say he has been writing, recording and filming between tour stops, working in hotel rooms, on the tour bus and backstage before shows instead of separating the record-making process from the road. That same setup carries directly into "Small Town," which was released on September 18.
+The album, *How To Quit Smoking*, is being made in unusually public fashion. Fike's press materials say he has been writing, recording and filming between dates, working in hotel rooms, on the bus and backstage before shows instead of separating the record-making process from the road. That same setup carries directly into "Small Town," which was released on September 18.
 
-The song and its video were developed across several cities. The visual was shot in Detroit and Seattle, while the release was completed from Dallas. Emma Ogier and Gabriel Jacoby contribute vocals, with Jacoby traveling in to help finish the track between shows. Fike's official tour page also pairs "Small Town" with Detroit and Seattle, making those locations part of the release campaign rather than just stops on the itinerary.
+The song and its video were developed across several cities. The visual was shot in Detroit and Seattle, while the release was completed from Dallas. Emma Ogier and Gabriel Jacoby contribute vocals, with Jacoby traveling in to help finish the track between shows. Fike's official tour page also pairs "Small Town" with Detroit and Seattle, making those locations part of the release campaign rather than routine stops on the itinerary.
 
 Press materials describe *How To Quit Smoking* as Fike's third studio album. That framing follows *What Could Possibly Go Wrong* and *Sunburn*, while Ticketmaster describes his 2025 project *Rocket* as a mixtape. The distinction explains why the new campaign calls this the third studio record even though Apple Music groups *Rocket* with Fike's albums.
 
 {youtube}
 
-The label-supplied YouTube credits add more detail to the recording. Dominic Fike and Kevin Abstract are listed among the songwriters. Capi is credited as a producer as well as on keyboards and drums, while Devin Workman is credited as a producer and on acoustic guitar and brass. Nick Leonardo contributes acoustic guitar and bass, and Ogier and Jacoby appear in the vocal credits.
+The label-supplied YouTube credits add more detail to the recording. Dominic Fike and Kevin Abstract are listed among the songwriters. Capi produced the track and is also credited on keyboards and drums. Devin Workman is another producer and contributes acoustic guitar and brass, while Nick Leonardo plays acoustic guitar and bass. Ogier and Jacoby appear in the vocal credits.
 
-Apple Music currently lists *How To Quit Smoking* as a 15-song pre-release scheduled for October 9 and credits the project to Columbia Records, a division of Sony Music Entertainment, under exclusive license. "Small Town" is already listed on Fike's Apple Music artist page as part of the upcoming album alongside "Wallflower."
+Apple Music currently lists *How To Quit Smoking* as a 15-song pre-release scheduled for October 9 and credits the project to Columbia Records, a division of Sony Music Entertainment, under exclusive license. "Small Town" also appears on Fike's Apple Music artist page alongside "Wallflower" as part of the upcoming record.
 
-The road schedule is still running alongside the album campaign. Fike's official site lists two Los Angeles shows at The Wiltern on September 29 and September 30, after a North American run that has taken him through cities including Detroit, Seattle, Dallas, Austin and Albuquerque. The album is due October 9, keeping the tour and release cycle closely linked through the final stretch before release."""
+The road schedule is still running alongside the album campaign. Fike's official site lists two Los Angeles shows at The Wiltern on September 29 and September 30, after a North American run that has taken him through cities including Detroit, Seattle, Dallas, Austin and Albuquerque. The album is due October 9, keeping the live run active into the final stretch before the record arrives."""
 
 def main():
     runner.load_env()
