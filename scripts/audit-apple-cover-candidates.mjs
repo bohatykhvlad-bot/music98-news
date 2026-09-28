@@ -40,3 +40,21 @@ for (const [title,artist] of cases) {
   })).sort((a,b)=>(Date.parse(a.releaseDate)||9e15)-(Date.parse(b.releaseDate)||9e15));
   console.log("CASE", JSON.stringify({title,artist,count:rows.length,rows}));
 }
+
+
+for (const [title,artist] of cases) {
+  const term=`${artist} ${title}`;
+  const u="https://itunes.apple.com/search?term="+encodeURIComponent(term)+"&entity=album&limit=200&country=US";
+  const r=await fetch(u,{headers:{"user-agent":"Mozilla/5.0"}});
+  const j=await r.json();
+  const rows=(j.results||[]).filter(x=>primaryArtist(x.artistName||x.collectionArtistName)===primaryArtist(artist)).map(x=>({
+    collectionId:x.collectionId,
+    collectionName:x.collectionName,
+    artistName:x.artistName,
+    collectionArtistName:x.collectionArtistName,
+    releaseDate:x.releaseDate,
+    primaryGenreName:x.primaryGenreName,
+    art:x.artworkUrl100,
+  })).slice(0,60);
+  console.log("ALBUM_CASE", JSON.stringify({title,artist,count:rows.length,rows}));
+}
