@@ -557,8 +557,10 @@ iframe.apple-park{
   border:0!important;
 }
 .award-results{margin-top:26px}
-.award-results p{margin:0 0 18px}
-.award-results p strong:first-child{display:inline}
+.award-results .award-cat{margin:30px 0 11px;font-size:18px;line-height:1.2;font-weight:800;letter-spacing:-.01em}
+.award-results .award-line{margin:0 0 7px;line-height:1.45}
+.award-results .award-line.winner{font-weight:800}
+.award-results .abody-pic{margin:30px auto 32px}
 .abody-pic{margin:8px auto 22px;max-width:660px;width:100%}
 .abody-box{position:relative;display:block;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--card2)}
 .abody-box img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;border:0;display:block}
@@ -3102,6 +3104,12 @@ function renderBody(text){
     const t = raw.trim();
     if(t.toLowerCase()==="[awards]") return '<section class="award-results">';
     if(t.toLowerCase()==="[/awards]") return '</section>';
+    const awardCat = t.match(/^\[award:([^\]]+)\]$/i);
+    if(awardCat) return '<div class="award-cat">'+rich(awardCat[1].trim())+'</div>';
+    const awardWinner = t.match(/^\[winner:([\s\S]+)\]$/i);
+    if(awardWinner) return '<div class="award-line winner">'+rich(awardWinner[1].trim())+'</div>';
+    const awardNominee = t.match(/^\[nominee:([\s\S]+)\]$/i);
+    if(awardNominee) return '<div class="award-line nominee">'+rich(awardNominee[1].trim())+'</div>';
     const pic = t.match(/^\[photo:([^|]+)(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?\]$/i);
     if(pic){
       const author = (pic[2]||"").trim(), link = (pic[3]||"").trim();
