@@ -580,6 +580,7 @@ def manual_checklist(p, limit=12):
     """What the machine cannot judge: quotes with their attribution, and every
     number, so the human pass is a short targeted read instead of a re-read."""
     body = p.get("body") or ""
+    prose = prose_of(body)
     out = ["quotes: verify each against its source"]
     for para in paragraphs(prose):
         for q in quoted_spans(para):
