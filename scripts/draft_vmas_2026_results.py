@@ -16,7 +16,7 @@ import post as runner
 
 PID = "vmas26results"
 TITLE = "Taylor Swift Takes Video of the Year as Madonna Leads the 2026 MTV VMAs With Seven Wins"
-EXCERPT = 'Taylor Swift won Video of the Year and Madonna led the 2026 MTV Video Music Awards with seven awards at the September 27 ceremony in Los Angeles.'
+EXCERPT = 'Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV Video Music Awards on September 27 in Los Angeles.'
 
 HERO_KEY = "a6d485acfd"
 HERO_NAME = "vmas-2026-taylor-swift-madonna.jpg"
@@ -36,7 +36,7 @@ Swift's two competitive wins landed in the categories most closely tied to her v
 
 [photo:{sienna_src}|Christopher Polk|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=16d405d43a|50% 42%|1]
 
-Away from Madonna and Swift, the major awards spread quickly. BTS won Song of the Year with "Swim," took Best K-Pop for the same track and was named Best Group. Sienna Spiro won Best New Artist. LISA took Best Pop, Cardi B and Kehlani won in hip-hop, Bruno Mars won R&B, Olivia Rodrigo took alternative, Bad Bunny won Latin and Ella Langley took country. Ariana Grande finished with Song of Summer and the visual-effects award.
+Away from Madonna and Swift, the major awards spread quickly. BTS won Song of the Year with "Swim," took Best K-Pop for the same track and was named Best Group. Sienna Spiro won Best New Artist. LISA won the pop category. Cardi B and Kehlani took hip-hop, Bruno Mars R&B, Olivia Rodrigo alternative, Bad Bunny Latin and Ella Langley country. Ariana Grande finished with Song of Summer and the visual-effects award.
 
 The craft categories gave the board another layer. Sabrina Carpenter's "House Tour" won editing, PinkPantheress took art direction for "Stateside + Zara Larsson," and Madonna added cinematography and choreography to her total. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor. Those special awards sat outside the main competitive tally.
 
