@@ -6,7 +6,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v28";
+const TOP50_KV = "top50v29";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -42,20 +42,12 @@ function chartWeek() {
    allowed to replace an existing registry entry, even if Apple changes artwork
    behind the same track ID later. KV is a runtime mirror/fallback, not the source
    of truth. */
-const COVERS_KV = "covers_v5";
+const COVERS_KV = "covers_v6";
 const DZ_HOST = "dzcdn.net";
 function isAppleArt(url) {
   try {
     const h = new URL(String(url || "")).hostname.toLowerCase();
     return h === "mzstatic.com" || h.endsWith(".mzstatic.com");
-  } catch {
-    return false;
-  }
-}
-function isDeezerArt(url) {
-  try {
-    const h = new URL(String(url || "")).hostname.toLowerCase();
-    return h === DZ_HOST || h.endsWith("." + DZ_HOST);
   } catch {
     return false;
   }
@@ -109,8 +101,7 @@ async function applyCovers(env, tracks, origin) {
        source artwork. */
     const chosen = seed[key]
       || cached
-      || (isAppleArt(t.art) ? t.art : "")
-      || (isDeezerArt(t.art) ? t.art : "");
+      || (isAppleArt(t.art) ? t.art : "");
     if (chosen) {
       if (covers[key] !== chosen) { covers[key] = chosen; changed = true; }
       t.art = chosen;
