@@ -28,3 +28,8 @@ html=urllib.request.urlopen(req,timeout=90).read().decode("utf-8","replace")
 print("SITE_RENDERER_SHORT_HYPHEN", 'esc(p.artist)+" - "+t' in html)
 print("SITE_RENDERER_EM_DASH", 'esc(p.artist)+" — "+t' in html)
 print("SITE_RENDERER_EN_DASH", 'esc(p.artist)+" – "+t' in html)
+
+
+target=next((p for p in posts if p.get("id")=="aufike18r1"),None)
+print("FIKE_FULL_JSON")
+print(json.dumps(target,ensure_ascii=False,indent=2))
