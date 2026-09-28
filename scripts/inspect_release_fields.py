@@ -20,3 +20,11 @@ for p in posts:
         })
 print("RELEASE_FIELDS_JSON")
 print(json.dumps(rows,ensure_ascii=False,indent=2))
+
+
+import urllib.request
+req=urllib.request.Request("https://music98.news/",headers={"User-Agent":runner.UA})
+html=urllib.request.urlopen(req,timeout=90).read().decode("utf-8","replace")
+print("SITE_RENDERER_SHORT_HYPHEN", 'esc(p.artist)+" - "+t' in html)
+print("SITE_RENDERER_EM_DASH", 'esc(p.artist)+" — "+t' in html)
+print("SITE_RENDERER_EN_DASH", 'esc(p.artist)+" – "+t' in html)
