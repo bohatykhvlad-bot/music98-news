@@ -13,17 +13,15 @@ COVER_NAME="john-legend-muse-official.webp"
 
 EXCERPT="""John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records."""
 
-BODY='''John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. The song starts with Legend at the piano and gradually opens into strings, horns, choir and a full rhythm section. Pharrell wrote the track and appears on the recording, but the arrangement keeps Legend's voice at the center. "Fireflies" grows by adding players around the piano instead of building toward a conventional back-and-forth duet.
+BODY='''John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. The song starts with Legend at the piano, then opens into strings, horns, choir and a full rhythm section. Pharrell's vocal sits inside the arrangement as another layer, while Legend carries the melody from the piano.
 
-Paul Hunter directed the video, which pairs Legend's performance with the Hollywood Cinematic Orchestra and portraits of people living in a housing project. The film moves between the orchestra and quieter scenes of everyday life without turning them into a separate storyline. Its themes of inequality, loss and resilience are already present in the song, so the video gives those ideas a setting instead of explaining them again. Hunter also directed the earlier "Daylight" video, giving the first two singles from *Muse* a shared visual hand.
+Paul Hunter directs the video, cutting between Legend with the Hollywood Cinematic Orchestra and portraits of residents in a housing project. The film keeps the performance in view while moving through rooms, streets and faces around it. The orchestra gives the clip scale, while the quieter scenes keep it tied to everyday life. Hunter also directed the earlier "Daylight" video, so the two singles share a simple, performance-led visual approach.
 
 [youtube:fEw6VZq9xg8]
 
-The recording itself is built as an ensemble piece. Voices of Fire joins the choir, while Larry Gold and Matt Jones conduct the orchestral players and Terrace Martin is among the arrangers. Those details matter more here than a long list of features. The piano stays exposed enough to keep the song recognizably Legend, while the choir and orchestra give the chorus a broader scale.
+*Muse* started after Legend's guest appearance on Clipse's *Let God Sort 'Em Out*. That vocal led to a full album, much of it written and recorded in Paris. Pharrell produced all 16 songs and co-wrote the project. On "Fireflies," the familiar piano-led core is still there, but the arrangement around it is broader and more orchestral.
 
-*Muse* took shape after Legend appeared on Clipse's *Let God Sort 'Em Out*. His vocal on "The Birds Don't Sing" led Pharrell to suggest a full album built around Legend's voice. Much of the record was written and recorded at Pharrell's studio inside Louis Vuitton headquarters in Paris. Pharrell produced all 16 songs and co-wrote the album. Legend has said he also recorded material Pharrell wrote entirely on his own, something he rarely does on his records.
-
-The album pulls from gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, with Nina Simone, Nat King Cole and Marvin Gaye among the references Legend and Pharrell have cited. "Fireflies" sits at No. 14 on the tracklist, between "Doing Me" and "Everything," and follows the earlier single "Daylight." Clipse also appears on the album with "Bodies On The Floor." The full record is due October 23.'''
+For all the styles attached to *Muse*, "Fireflies" itself is fairly direct. Piano and voice lead, the choir and orchestra widen the chorus, and the production leaves enough space for Legend to remain the focus. It is a fuller version of the piano-led sound he is best known for.'''
 
 def ensure_cover():
     req=urllib.request.Request(COVER_URL, headers={"User-Agent": runner.UA})
@@ -59,6 +57,7 @@ def main():
             "cardY":0.55,
             "cardZoom":1,
             "lockX":0.50,
+            "cardX":0.42,
         }
         return p
     now=runner.guarded_write(mutate)
