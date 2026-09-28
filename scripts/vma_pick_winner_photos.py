@@ -6,7 +6,7 @@ pages=[
   "https://www.paramountpressexpress.com/cbs-entertainment/photos/download-webres?id=142100&limit=100&page=1",
   "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos?limit=500&page=1",
 ]
-targets=["3228388_VMAS_2026_2881b.jpg","3244981_VMAS_2026_4001b.jpg","3244981_VMAS_2026_3835b.jpg","3244981_VMAS_2026_4278b.jpg"]
+targets=["3228388_VMAS_2026_2881b.jpg","3244981_VMAS_2026_4001b.jpg","3244981_VMAS_2026_3835b.jpg","3244981_VMAS_2026_4278b.jpg","3244981_VMAS_2026_3905b.jpg"]
 docs=[]
 for u in pages:
     raw=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":UA}),timeout=90).read().decode("utf-8","replace")
