@@ -290,11 +290,10 @@ function renderEventList(box,events){
     const n=document.createElement("div"); n.className="tour-none"; n.textContent="No upcoming dates found.";
     box.appendChild(n); return;
   }
+
   let shown=0;
-  const more=document.createElement("button");
-  more.type="button";
-  more.className="tour-more";
-  more.textContent="More";
+  let more=null;
+
   const draw=()=>{
     const next=Math.min(sorted.length,shown+10);
     for(let i=shown;i<next;i++){
@@ -306,13 +305,27 @@ function renderEventList(box,events){
       const venue=document.createElement("span"); venue.className="event-venue"; venue.textContent=e.venue||e.name||"";
       p.append(city,venue); b.append(d,p);
       b.addEventListener("click",()=>focusEventOnMap(e));
-      box.insertBefore(b,more);
+      if(more) box.insertBefore(b,more); else box.appendChild(b);
     }
     shown=next;
-    more.hidden=shown>=sorted.length;
+    if(more && shown>=sorted.length){
+      more.remove();
+      more=null;
+    }
   };
-  more.addEventListener("click",()=>{ draw(); setTimeout(()=>more.scrollIntoView({block:"nearest",behavior:"smooth"}),20); });
-  box.appendChild(more);
+
+  if(sorted.length>10){
+    more=document.createElement("button");
+    more.type="button";
+    more.className="tour-more";
+    more.textContent="More";
+    more.addEventListener("click",()=>{
+      draw();
+      if(more) setTimeout(()=>more.scrollIntoView({block:"nearest",behavior:"smooth"}),20);
+    });
+    box.appendChild(more);
+  }
+
   draw();
 }
 
