@@ -1172,7 +1172,7 @@ def check_post(p, strict):
              if len(x) > 3 and x not in ("that", "this", "with", "they", "their", "hers", "were", "been",
                                          "have", "into", "from", "than", "then", "over", "when", "what")]
         return set(w)
-    sents = [(i, s) for i, q in enumerate(paragraphs(body)) if not is_media(q)
+    sents = [(i, s) for i, q in enumerate(paragraphs(prose))
              for s in sentences(q) if len(s.split()) >= 8]
     for a in range(len(sents)):
         for b in range(a + 1, len(sents)):
