@@ -11,19 +11,27 @@ export const HOTSPOT_MAX_DEPTH = 6;
  * rectangle without geographic gaps.
  */
 export const HOTSPOT_ROOTS = [
-  { id:"eu_west",      minLat:34, maxLat:61, minLng:-12, maxLng:12, depth:0 },
-  { id:"eu_central",   minLat:34, maxLat:61, minLng:12,  maxLng:32, depth:0 },
-  { id:"eu_east",      minLat:38, maxLat:62, minLng:32,  maxLng:60, depth:0 },
-  { id:"na_west",      minLat:24, maxLat:61, minLng:-130,maxLng:-100,depth:0 },
-  { id:"na_east",      minLat:24, maxLat:61, minLng:-100,maxLng:-52, depth:0 },
-  { id:"latam_north",  minLat:5,  maxLat:32, minLng:-118,maxLng:-60, depth:0 },
-  { id:"latam_south",  minLat:-56,maxLat:8,  minLng:-82, maxLng:-34, depth:0 },
-  { id:"mena",         minLat:12, maxLat:43, minLng:24,  maxLng:64, depth:0 },
-  { id:"africa",       minLat:-36,maxLat:16, minLng:-18, maxLng:52, depth:0 },
-  { id:"south_asia",   minLat:5,  maxLat:36, minLng:60,  maxLng:98, depth:0 },
-  { id:"east_asia",    minLat:18, maxLat:55, minLng:98,  maxLng:146,depth:0 },
-  { id:"se_asia",      minLat:-12,maxLat:23, minLng:94,  maxLng:142,depth:0 },
-  { id:"oceania",      minLat:-48,maxLat:-8, minLng:108, maxLng:180,depth:0 },
+  // Europe first so a cold rebuild fills the area that was visibly missing
+  // before moving on to the rest of the world.
+  { id:"eu_west",        minLat:34, maxLat:72, minLng:-12, maxLng:12, depth:0 },
+  { id:"eu_central",     minLat:34, maxLat:72, minLng:12,  maxLng:32, depth:0 },
+  { id:"eu_east",        minLat:38, maxLat:72, minLng:32,  maxLng:60, depth:0 },
+  { id:"north_atlantic", minLat:50, maxLat:72, minLng:-30, maxLng:-12,depth:0 },
+
+  { id:"na_pacific",     minLat:18, maxLat:72, minLng:-180,maxLng:-130,depth:0 },
+  { id:"na_west",        minLat:24, maxLat:72, minLng:-130,maxLng:-100,depth:0 },
+  { id:"na_east",        minLat:24, maxLat:72, minLng:-100,maxLng:-52, depth:0 },
+  { id:"latam_north",    minLat:5,  maxLat:32, minLng:-120,maxLng:-60, depth:0 },
+  { id:"latam_south",    minLat:-56,maxLat:8,  minLng:-82, maxLng:-34, depth:0 },
+
+  { id:"mena",           minLat:12, maxLat:43, minLng:24,  maxLng:64, depth:0 },
+  { id:"africa",         minLat:-36,maxLat:16, minLng:-18, maxLng:52, depth:0 },
+  { id:"south_asia",     minLat:5,  maxLat:36, minLng:60,  maxLng:100,depth:0 },
+  { id:"central_asia",   minLat:36, maxLat:60, minLng:60,  maxLng:100,depth:0 },
+  { id:"north_asia",     minLat:55, maxLat:72, minLng:60,  maxLng:180,depth:0 },
+  { id:"east_asia",      minLat:18, maxLat:55, minLng:98,  maxLng:146,depth:0 },
+  { id:"se_asia",        minLat:-12,maxLat:23, minLng:94,  maxLng:142,depth:0 },
+  { id:"oceania",        minLat:-48,maxLat:-8, minLng:108, maxLng:180,depth:0 },
 ];
 
 export function finiteCoord(v) {
