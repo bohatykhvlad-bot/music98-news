@@ -171,7 +171,7 @@ export default {
     }
     if (path === "/concerts" && (request.method === "GET" || request.method === "HEAD")) {
       const u = new URL(request.url);
-      return env.ASSETS.fetch(new Request(u.origin + "/concerts.html", request));
+      return env.ASSETS.fetch(new Request(u.origin + "/index.html", request));
     }
     /* legal/info pages: clean URLs -> /about, /contacts, /privacy, /terms */
     const legal = path.match(/^(\/about|\/contacts|\/privacy|\/terms)\/?$/);
