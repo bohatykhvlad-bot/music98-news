@@ -49,4 +49,8 @@ jobs:
             exit 0
           fi
           git commit -m "apple: ежедневное обновление обложек и написаний"
-          git push
+          git push || {
+            echo "main успел измениться — ребейзим сгенерированные данные и повторяем push"
+            git pull --rebase origin main
+            git push
+          }
