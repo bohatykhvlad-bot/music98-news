@@ -94,3 +94,23 @@ python scripts/post.py finish <id> --body-file body.txt # set -> gate -> publish
 
 `finish` refuses to publish unless `scripts/gate.py` reports PASS. It needs
 `ADMIN_PASSWORD` in `.env`. `python scripts/post.py --help` lists everything.
+
+
+## Concerts map
+
+The public page is `/concerts`. It uses Mapbox in the browser and a same-origin
+`/api/concerts` Worker endpoint that proxies Ticketmaster Discovery API v2.
+
+Production requires one Cloudflare Worker secret:
+
+```
+TICKETMASTER_API_KEY
+```
+
+Do not put the Ticketmaster key in `wrangler.toml`, HTML, JavaScript or GitHub.
+The Mapbox `pk...` token is intentionally public/client-side and should be
+restricted in Mapbox to the music98.news domains.
+
+The concerts endpoint uses Ticketmaster's `geoPoint` geohash search,
+`classificationName=music`, upcoming dates only, and a short Cloudflare cache
+to protect the Ticketmaster request quota.
