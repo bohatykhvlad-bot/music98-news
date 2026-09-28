@@ -219,6 +219,14 @@ def main():
     print("NO_DUPLICATE_VMA_POSTS", True)
     ok = runner.cmd_gate(PID)
     print("VMA_GATE", "PASS" if ok else "FAIL")
+    if not ok:
+        import subprocess
+        dbg = subprocess.run(
+            [sys.executable, str(runner.GATE), "--post", PID, "--json"],
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            cwd=str(runner.REPO),
+        )
+        print("GATE_JSON_DEBUG", dbg.stdout)
     runner.cmd_show(PID)
 
 if __name__ == "__main__":
