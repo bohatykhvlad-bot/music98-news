@@ -19,9 +19,15 @@ Paul Hunter directs the video, cutting between Legend with the Hollywood Cinemat
 
 [youtube:fEw6VZq9xg8]
 
-*Muse* started after Legend's guest appearance on Clipse's *Let God Sort 'Em Out*. His vocal there prompted Pharrell to suggest a full album, much of it later written and recorded in Paris. He produced all 16 songs and co-wrote the project. Legend has said he gave Pharrell more creative control than usual, including recording material written entirely by him. The album moves through gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop.
+*Muse* started after Legend's guest appearance on Clipse's *Let God Sort 'Em Out*. His vocal there prompted Pharrell to suggest a full album, much of it later written and recorded in Paris. Pharrell produced all 16 songs and co-wrote the project, while Legend gave him more room than usual to shape the material. That origin explains the album without turning "Fireflies" into a story about the producer.
 
-"Fireflies" keeps its focus tighter. Once the choir and orchestra arrive, the idea is clear. It still sounds recognizably like Legend, only with a wider frame around him. The extra scale gives that familiar sound more room.'''
+The song itself stays compact. Piano and voice lead the verses, then the choir and orchestra widen the chorus without pushing the arrangement into a showpiece. That balance is where "Fireflies" works best. The production adds scale, but the melody remains easy to follow and the track never loses the quiet pull of Legend's delivery.
+
+The album moves through gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, but "Fireflies" does not try to carry all of that at once. It sits closer to the piano-led side of Legend's catalog and uses the larger ensemble to change the texture rather than the basic shape of the song. Coming after "Daylight," it also gives a clearer sense of how broad *Muse* can be without making the singles feel disconnected.
+
+There is enough detail in the arrangement to make the song feel bigger than a standard ballad, but the writing stays direct. "Fireflies" is not built around a dramatic switch or a guest verse taking over the track. The choir, orchestra and Pharrell's vocal all serve the same center, which keeps the single focused even as the sound opens up.
+
+"Fireflies" does not reinvent John Legend, and it does not need to. It takes the voice-and-piano foundation that has defined much of his work and gives it a broader setting ahead of *Muse*.'''
 
 def ensure_cover():
     req=urllib.request.Request(COVER_URL, headers={"User-Agent": runner.UA})
