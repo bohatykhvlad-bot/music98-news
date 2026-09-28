@@ -46,6 +46,7 @@
    widths are excluded: the 640/900px breakpoints below must keep CSS px. */
 @media (min-width:1100px){
   html{zoom:.96}
+  html.concerts-native-scale{zoom:1}
   /* owner clarity (2026-09-24): "ты поднимаешь весь блок, а не карточки".
      WRONG read — fixed: the SECTION stays where it was (tab padding back to
      14px, heading starts at the familiar 18px below the header). What moves
@@ -499,14 +500,14 @@ body.editmode .card .tag{top:auto;bottom:10px}
 footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .foot-in{max-width:1180px;margin:0 auto;padding:40px 20px 44px;display:grid;grid-template-columns:minmax(330px,1fr) 150px 200px 170px;column-gap:54px;row-gap:30px;align-items:start}
 .foot-col h3{margin:0 0 14px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
-.foot-col p{margin:0;color:var(--muted);font-size:13.5px;max-width:340px}
-.flink{display:block;width:max-content;max-width:100%;color:var(--muted);text-decoration:none;font-size:14px;padding:5px 0;transition:.15s;white-space:nowrap}
+.foot-col p{margin:0;color:var(--muted);font-size:14px;line-height:1.55;max-width:340px}
+.flink{display:block;width:max-content;max-width:100%;color:var(--muted);text-decoration:none;font-size:14px;line-height:1.55;padding:5px 0;transition:.15s;white-space:nowrap}
 .flink:hover{color:var(--acc2)}
 .social .icons{display:flex;gap:10px;flex-wrap:wrap}
 .social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--acc2);text-decoration:none}
 .social a:active{border-color:var(--accent)}
 .social svg{width:18px;height:18px}
-.foot-col .copy{margin:16px 0 0;color:var(--muted2);font-size:12.5px}
+.foot-col .copy{margin:16px 0 0;color:var(--muted2);font-size:14px;line-height:1.55}
 
 /* ---------- article modal ---------- */
 .overlay{position:fixed;inset:0;z-index:90;background:rgba(10,16,18,.5);display:flex;align-items:flex-start;justify-content:center;padding:5vh 16px;overflow:auto;overscroll-behavior:contain;opacity:0;transition:opacity .24s ease}
@@ -2821,6 +2822,7 @@ function setTab(t){
     try{ history.replaceState(null, "", "/"); }catch(e){}
   }
   activeTab = t;
+  document.documentElement.classList.toggle("concerts-native-scale",t==="concerts");
   $$("#nav .nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===t));
   $$(".tab").forEach(s=>{
     const on = s.id==="tab-"+t;
@@ -3633,6 +3635,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260929-07" defer></script>
+<script src="/concerts-app.js?v=20260929-08" defer></script>
 </body>
 </html>
