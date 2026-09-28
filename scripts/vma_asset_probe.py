@@ -75,3 +75,27 @@ else:
         data=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":UA}),timeout=90).read()
         im=Image.open(io.BytesIO(data))
         print("EMBED",u,im.size,len(data),im.format)
+
+
+print("\nHIGHRES_PROBE")
+for u in [
+  "https://www.paramountpressexpress.com/cbs-entertainment/photos/download-highres?id=91603&limit=100&page=1",
+  "https://www.paramountpressexpress.com/cbs-entertainment/photos/download-webres?id=142100&limit=250&page=1",
+]:
+    try:
+        rq=urllib.request.Request(u,headers={"User-Agent":UA})
+        with urllib.request.urlopen(rq,timeout=90) as rr:
+            data=rr.read()
+            print("DL",u,"STATUS",getattr(rr,"status",None),"TYPE",rr.headers.get("Content-Type"),"DISP",rr.headers.get("Content-Disposition"),"LEN",len(data),"HEAD",data[:20])
+    except Exception as e:
+        print("DL_ERROR",u,repr(e))
+
+for key in ["dded7f7e94","a6d485acfd","16d405d43a"]:
+    u="https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view="+key
+    rr=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":UA}),timeout=90).read().decode("utf-8","replace")
+    print("DETAIL_SCAN",key)
+    for pat in ["download-highres","download-webres","photo-action_download","data-mediakey","download"]:
+        spots=[m.start() for m in re.finditer(pat,rr,re.I)]
+        print("PAT",pat,spots[:10])
+        for pos in spots[:2]:
+            print(re.sub(r"\s+"," ",rr[max(0,pos-900):pos+1600])[:2600])
