@@ -1,24 +1,31 @@
 const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
 const KWORB_ARTISTS_URL = "https://kworb.net/spotify/listeners.html";
 
-const HOTSPOT_SCAN_CELLS = {
-  americas: [
-    [40,-74,620],[34,-118,720],[42,-91,780],[30,-97,820],[27,-81,620],
-    [49,-123,720],[45,-74,700],[20,-99,850],[-23,-46,900],[-34,-58,900]
-  ],
-  europe: [
-    [54,-3,620],[50,3,560],[52,10,560],[59,17,720],[41,-4,650],
-    [44,10,520],[48,20,650],[42,24,560],[50,31,620],[39,33,700]
-  ],
-  mena: [
-    [41,29,460],[38,27,480],[39,35,620],[25,55,760],[31,35,520],
-    [30,31,720],[-26,28,850],[-1,36,900],[6,3,900]
-  ],
-  apac: [
-    [36,139,650],[37,127,600],[23,114,760],[1,104,850],[14,121,650],
-    [-34,151,900],[-32,116,900],[-37,175,720],[19,73,900],[13,100,700]
-  ]
+const HOTSPOT_SCAN_REGIONS = {
+  na_west:      { lats:[31,38,45,52],       lngs:[-124,-116,-108,-100], radius:430 },
+  na_east:      { lats:[27,34,41,48],       lngs:[-96,-88,-80,-72],     radius:390 },
+  latam_north:  { lats:[8,19,30],           lngs:[-104,-92,-80],        radius:500 },
+  latam_south:  { lats:[-38,-27,-16,-5],    lngs:[-76,-63,-50],         radius:500 },
+  eu_west:      { lats:[38,44,50,56],       lngs:[-8,0,8],              radius:250 },
+  eu_central:   { lats:[40,46,52,58],       lngs:[12,20,28],            radius:260 },
+  eu_east:      { lats:[42,49,56],          lngs:[32,40,48],            radius:320 },
+  mena:         { lats:[24,31,38,43],       lngs:[28,38,48,58],         radius:350 },
+  africa:       { lats:[-32,-20,-8,4,16,28],lngs:[-12,8,28],            radius:500 },
+  south_asia:   { lats:[7,17,27],           lngs:[73,82,91],            radius:500 },
+  east_asia:    { lats:[22,30,38,46],       lngs:[105,115,125,135],     radius:420 },
+  se_asia:      { lats:[-6,4,14],           lngs:[98,108,118,128],      radius:500 },
+  oceania:      { lats:[-42,-34,-26,-18],   lngs:[115,130,145,160,175], radius:500 }
 };
+
+function hotspotCells(region) {
+  const r = HOTSPOT_SCAN_REGIONS[region];
+  if (!r) return [];
+  const cells = [];
+  for (const lat of r.lats) {
+    for (const lng of r.lngs) cells.push([lat, lng, r.radius]);
+  }
+  return cells;
+}
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
   "Bad Bunny","Ariana Grande","Shakira","Katy Perry","Michael Jackson","David Guetta","Maroon 5","Ed Sheeran",
@@ -297,7 +304,7 @@ async function scanHotspotCell(apiKey, cell) {
   tm.searchParams.set("radius", String(radius));
   tm.searchParams.set("unit", "km");
   tm.searchParams.set("size", "200");
-  tm.searchParams.set("sort", "date,asc");
+  tm.searchParams.set("sort", "distance,asc");
   const raw = await tmJson(tm);
   return raw?._embedded?.events || [];
 }
@@ -317,7 +324,7 @@ async function verifyMetroHotspot(apiKey, candidate) {
 }
 
 async function hotspotsPayload(apiKey, region) {
-  const cells = HOTSPOT_SCAN_CELLS[region] || [];
+  const cells = hotspotCells(region);
   const groups = new Map();
   const seenEvents = new Set();
 
@@ -348,7 +355,7 @@ async function hotspotsPayload(apiKey, region) {
     }
   }
 
-  const probeBudget = Math.max(0, 44 - cells.length);
+  const probeBudget = Math.max(0, 46 - cells.length);
   const candidates = [...groups.values()]
     .map(g => ({
       city:g.city,
@@ -373,7 +380,7 @@ async function hotspotsPayload(apiKey, region) {
   for (const item of verified) {
     const duplicate = hotspots.some(existing =>
       existing.countryCode === item.countryCode &&
-      kmBetween(existing.lat, existing.lng, item.lat, item.lng) < 28
+      kmBetween(existing.lat, existing.lng, item.lat, item.lng) < 24
     );
     if (!duplicate) hotspots.push(item);
   }
@@ -412,7 +419,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v12");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v13");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
