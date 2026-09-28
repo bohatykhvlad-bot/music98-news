@@ -184,6 +184,7 @@ export async function serveSitemap(request, env) {
     { loc: `${SITE}/contacts`, priority: "0.5", lastmod: "2026-09-23" },
     { loc: `${SITE}/privacy`, priority: "0.3", lastmod: "2026-09-23" },
     { loc: `${SITE}/terms`, priority: "0.3", lastmod: "2026-09-23" },
+    { loc: `${SITE}/concerts`, priority: "0.7", lastmod: "2026-09-28" },
     ...posts.map((p) => ({ loc: SITE + articlePath(p, slugs[p.id]), lastmod: day(p), priority: "0.8" })),
   ];
   const xml =
