@@ -865,10 +865,10 @@ textarea{resize:vertical;min-height:64px}
       <h3>Sections</h3>
       <div class="fcols">
         <div>
-          <a class="flink" href="#" data-goto="news">News</a>
-          <a class="flink" href="#" data-goto="releases">Releases</a>
-          <a class="flink" href="#" data-goto="charts">Chart</a>
-          <a class="flink" href="#" data-goto="concerts">Concerts</a>
+          <a class="flink" href="/news" data-goto="news">News</a>
+          <a class="flink" href="/releases" data-goto="releases">Releases</a>
+          <a class="flink" href="/chart" data-goto="charts">Chart</a>
+          <a class="flink" href="/concerts" data-goto="concerts">Concerts</a>
           <a class="flink" href="/about">About us</a>
         </div>
         <div>
@@ -2796,6 +2796,24 @@ function renderHints(){
 function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHints(); updateStorageInfo(); }
 
 /* ============ tabs & search events ============ */
+const TAB_PATHS={news:"/news",releases:"/releases",charts:"/chart",concerts:"/concerts"};
+function tabPath(t){ return TAB_PATHS[t]||"/news"; }
+function goTab(t,replace=false){
+  setTab(t);
+  const to=tabPath(t);
+  if(location.pathname!==to || location.search || location.hash){
+    try{ history[replace?"replaceState":"pushState"]({tab:t},"",to); }catch(e){}
+  }
+}
+function resizeConcertsTab(){
+  const el=document.querySelector("music98-concerts");
+  if(!el) return;
+  try{
+    if(el.resizeConcertMap) el.resizeConcertMap();
+    requestAnimationFrame(()=>{ if(el.resizeConcertMap) el.resizeConcertMap(); });
+    setTimeout(()=>{ if(el.resizeConcertMap) el.resizeConcertMap(); },90);
+  }catch(e){}
+}
 function setTab(t){
   if(t !== activeTab || ($("#articlePage") && !$("#articlePage").hidden)){
     pauseAllMedia();
@@ -2816,16 +2834,17 @@ function setTab(t){
   /* the newly shown rail had zero size while hidden - its .ok state is stale;
      a frame later it has real geometry, so re-evaluate the arrows */
   requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
+  if(t==="concerts") resizeConcertsTab();
 }
-$("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab) setTab(b.dataset.tab); });
+$("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab) goTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
   e.preventDefault();
-  if(!$("#articlePage").hidden){ hideArticle(); try{ history.replaceState(null,"","/"); }catch(err){} }
-  setTab("news");
+  if(!$("#articlePage").hidden) hideArticle();
+  goTab("news");
 });
 document.addEventListener("click", e=>{
   const g = e.target.closest("[data-goto]");
-  if(g){ e.preventDefault(); setTab(g.dataset.goto); }
+  if(g){ e.preventDefault(); goTab(g.dataset.goto); }
 });
 $("#search").addEventListener("input", e=>{
   query = e.target.value.trim().toLowerCase();
@@ -2842,7 +2861,7 @@ $("#search").addEventListener("input", e=>{
     };
     if(!counts[activeTab]){
       const alt = ["news","releases","charts"].find(t=>counts[t] > 0);
-      if(alt) setTab(alt);
+      if(alt) goTab(alt,true);
     }
   }
 });
@@ -3266,15 +3285,30 @@ function postPath(p){ buildSlugs(); return "/" + (p.type==="release" ? "releases
 document.addEventListener("mouseover", intentBootEvent, {passive:true});
 document.addEventListener("focusin", intentBootEvent);
 function route(){
-  if(location.pathname.replace(/\/+$/,"")==="/concerts"){
+  const cleanPath=location.pathname.replace(/\/+$/,"")||"/";
+  const sectionByPath={
+    "/news":"news",
+    "/releases":"releases",
+    "/chart":"charts",
+    "/charts":"charts",
+    "/concerts":"concerts"
+  };
+  if(sectionByPath[cleanPath]){
     hideArticle();
-    setTab("concerts");
+    setTab(sectionByPath[cleanPath]);
+    return;
+  }
+  if(cleanPath==="/"){
+    hideArticle();
+    setTab("news");
     return;
   }
   const tabHash = location.hash.match(/^#(news|releases|charts|concerts)$/);
   if(tabHash){
     hideArticle();
-    setTab(tabHash[1]);
+    const t=tabHash[1];
+    setTab(t);
+    try{ history.replaceState({tab:t},"",tabPath(t)); }catch(e){}
     return;
   }
   const pm = location.pathname.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/);
@@ -3598,6 +3632,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260928-18" defer></script>
+<script src="/concerts-app.js?v=20260928-20" defer></script>
 </body>
 </html>
