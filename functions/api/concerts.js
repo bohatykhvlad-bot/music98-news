@@ -1,59 +1,24 @@
 const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
 const KWORB_ARTISTS_URL = "https://kworb.net/spotify/listeners.html";
 
-const HOTSPOT_CITY_PROBES = {
+const HOTSPOT_SCAN_CELLS = {
   americas: [
-    ["New York","US",-74.0060,40.7128],["Los Angeles","US",-118.2437,34.0522],
-    ["Chicago","US",-87.6298,41.8781],["Miami","US",-80.1918,25.7617],
-    ["San Francisco","US",-122.4194,37.7749],["Boston","US",-71.0589,42.3601],
-    ["Washington","US",-77.0369,38.9072],["Philadelphia","US",-75.1652,39.9526],
-    ["Atlanta","US",-84.3880,33.7490],["Dallas","US",-96.7970,32.7767],
-    ["Houston","US",-95.3698,29.7604],["Seattle","US",-122.3321,47.6062],
-    ["Las Vegas","US",-115.1398,36.1699],["Nashville","US",-86.7816,36.1627],
-    ["Austin","US",-97.7431,30.2672],["Denver","US",-104.9903,39.7392],
-    ["Phoenix","US",-112.0740,33.4484],["Minneapolis","US",-93.2650,44.9778],
-    ["Toronto","CA",-79.3832,43.6532],["Vancouver","CA",-123.1207,49.2827],
-    ["Montreal","CA",-73.5673,45.5017],["Calgary","CA",-114.0719,51.0447],
-    ["Edmonton","CA",-113.4909,53.5461],["Mexico City","MX",-99.1332,19.4326],
-    ["Monterrey","MX",-100.3161,25.6866],["Guadalajara","MX",-103.3496,20.6597],
-    ["São Paulo","BR",-46.6333,-23.5505],["Rio de Janeiro","BR",-43.1729,-22.9068],
-    ["Buenos Aires","AR",-58.3816,-34.6037],["Bogotá","CO",-74.0721,4.7110],
-    ["Santiago","CL",-70.6693,-33.4489],["Lima","PE",-77.0428,-12.0464]
+    [40,-74,620],[34,-118,720],[42,-91,780],[30,-97,820],[27,-81,620],
+    [49,-123,720],[45,-74,700],[20,-99,850],[-23,-46,900],[-34,-58,900]
   ],
   europe: [
-    ["London","GB",-0.1276,51.5072],["Manchester","GB",-2.2426,53.4808],
-    ["Birmingham","GB",-1.8904,52.4862],["Glasgow","GB",-4.2518,55.8642],
-    ["Dublin","IE",-6.2603,53.3498],["Paris","FR",2.3522,48.8566],
-    ["Lyon","FR",4.8357,45.7640],["Marseille","FR",5.3698,43.2965],
-    ["Amsterdam","NL",4.9041,52.3676],["Rotterdam","NL",4.4777,51.9244],
-    ["Brussels","BE",4.3517,50.8503],["Berlin","DE",13.4050,52.5200],
-    ["Hamburg","DE",9.9937,53.5511],["Munich","DE",11.5820,48.1351],
-    ["Cologne","DE",6.9603,50.9375],["Frankfurt","DE",8.6821,50.1109],
-    ["Madrid","ES",-3.7038,40.4168],["Barcelona","ES",2.1734,41.3851],
-    ["Valencia","ES",-0.3763,39.4699],["Lisbon","PT",-9.1393,38.7223],
-    ["Porto","PT",-8.6291,41.1579],["Milan","IT",9.1900,45.4642],
-    ["Rome","IT",12.4964,41.9028],["Bologna","IT",11.3426,44.4949],
-    ["Vienna","AT",16.3738,48.2082],["Zurich","CH",8.5417,47.3769],
-    ["Prague","CZ",14.4378,50.0755],["Warsaw","PL",21.0122,52.2297],
-    ["Krakow","PL",19.9445,50.0647],["Stockholm","SE",18.0686,59.3293],
-    ["Copenhagen","DK",12.5683,55.6761],["Oslo","NO",10.7522,59.9139],
-    ["Helsinki","FI",24.9384,60.1699],["Budapest","HU",19.0402,47.4979],
-    ["Athens","GR",23.7275,37.9838],["Istanbul","TR",28.9784,41.0082],
-    ["Dubai","AE",55.2708,25.2048],["Johannesburg","ZA",28.0473,-26.2041]
+    [54,-3,620],[50,3,560],[52,10,560],[59,17,720],[41,-4,650],
+    [44,10,520],[48,20,650],[42,24,560],[50,31,620],[39,33,700]
+  ],
+  mena: [
+    [41,29,460],[38,27,480],[39,35,620],[25,55,760],[31,35,520],
+    [30,31,720],[-26,28,850],[-1,36,900],[6,3,900]
   ],
   apac: [
-    ["Tokyo","JP",139.6917,35.6895],["Osaka","JP",135.5023,34.6937],
-    ["Yokohama","JP",139.6380,35.4437],["Seoul","KR",126.9780,37.5665],
-    ["Busan","KR",129.0756,35.1796],["Singapore","SG",103.8198,1.3521],
-    ["Hong Kong","HK",114.1694,22.3193],["Taipei","TW",121.5654,25.0330],
-    ["Bangkok","TH",100.5018,13.7563],["Manila","PH",120.9842,14.5995],
-    ["Kuala Lumpur","MY",101.6869,3.1390],["Jakarta","ID",106.8456,-6.2088],
-    ["Sydney","AU",151.2093,-33.8688],["Melbourne","AU",144.9631,-37.8136],
-    ["Brisbane","AU",153.0251,-27.4698],["Perth","AU",115.8605,-31.9505],
-    ["Adelaide","AU",138.6007,-34.9285],["Auckland","NZ",174.7633,-36.8485]
+    [36,139,650],[37,127,600],[23,114,760],[1,104,850],[14,121,650],
+    [-34,151,900],[-32,116,900],[-37,175,720],[19,73,900],[13,100,700]
   ]
 };
-
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
   "Bad Bunny","Ariana Grande","Shakira","Katy Perry","Michael Jackson","David Guetta","Maroon 5","Ed Sheeran",
@@ -316,52 +281,111 @@ async function popularPayload(apiKey) {
   };
 }
 
-async function hotspotProbe(apiKey, row) {
-  const [city, countryCode, lng, lat] = row;
+function kmBetween(lat1, lng1, lat2, lng2) {
+  const r = 6371;
+  const toRad = d => d * Math.PI / 180;
+  const p1 = toRad(lat1), p2 = toRad(lat2);
+  const dp = toRad(lat2 - lat1), dl = toRad(lng2 - lng1);
+  const h = Math.sin(dp/2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) ** 2;
+  return 2 * r * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+}
 
-  async function countMetro() {
-    const tm = baseEventUrl(apiKey);
-    tm.searchParams.set("geoPoint", geohash(lat, lng, 8));
-    tm.searchParams.set("radius", "45");
-    tm.searchParams.set("unit", "km");
-    tm.searchParams.set("countryCode", countryCode);
-    tm.searchParams.set("size", "1");
-    tm.searchParams.set("sort", "date,asc");
-    const raw = await tmJson(tm);
-    return Number(raw?.page?.totalElements || 0);
-  }
+async function scanHotspotCell(apiKey, cell) {
+  const [lat, lng, radius] = cell;
+  const tm = baseEventUrl(apiKey);
+  tm.searchParams.set("geoPoint", geohash(lat, lng, 8));
+  tm.searchParams.set("radius", String(radius));
+  tm.searchParams.set("unit", "km");
+  tm.searchParams.set("size", "200");
+  tm.searchParams.set("sort", "date,asc");
+  const raw = await tmJson(tm);
+  return raw?._embedded?.events || [];
+}
 
-  let count = 0;
-  try {
-    count = await countMetro();
-  } catch {
-    await new Promise(resolve => setTimeout(resolve, 120));
-    count = await countMetro();
-  }
-
+async function verifyMetroHotspot(apiKey, candidate) {
+  const tm = baseEventUrl(apiKey);
+  tm.searchParams.set("geoPoint", geohash(candidate.lat, candidate.lng, 8));
+  tm.searchParams.set("radius", "45");
+  tm.searchParams.set("unit", "km");
+  if (candidate.countryCode) tm.searchParams.set("countryCode", candidate.countryCode);
+  tm.searchParams.set("size", "1");
+  tm.searchParams.set("sort", "date,asc");
+  const raw = await tmJson(tm);
+  const count = Number(raw?.page?.totalElements || 0);
   if (count < 10) return null;
-  return { city, countryCode, lng, lat, count };
+  return { city:candidate.city, countryCode:candidate.countryCode, lng:candidate.lng, lat:candidate.lat, count };
 }
 
 async function hotspotsPayload(apiKey, region) {
-  const probes = HOTSPOT_CITY_PROBES[region] || [];
-  const hotspots = [];
+  const cells = HOTSPOT_SCAN_CELLS[region] || [];
+  const groups = new Map();
+  const seenEvents = new Set();
 
-  for (let i = 0; i < probes.length; i += 6) {
-    const chunk = probes.slice(i, i + 6);
-    const rows = await Promise.all(
-      chunk.map(row => hotspotProbe(apiKey, row).catch(() => null))
-    );
-    rows.filter(Boolean).forEach(x => hotspots.push(x));
+  for (let i = 0; i < cells.length; i += 4) {
+    const chunk = cells.slice(i, i + 4);
+    const batches = await Promise.all(chunk.map(cell => scanHotspotCell(apiKey, cell).catch(() => [])));
+
+    for (const events of batches) {
+      for (const e of events) {
+        const eventId = String(e?.id || "");
+        if (eventId && seenEvents.has(eventId)) continue;
+        if (eventId) seenEvents.add(eventId);
+
+        const venue = e?._embedded?.venues?.[0] || {};
+        const city = String(venue?.city?.name || "").trim();
+        const countryCode = String(venue?.country?.countryCode || "").trim();
+        const lat = finite(venue?.location?.latitude);
+        const lng = finite(venue?.location?.longitude);
+        if (!city || lat == null || lng == null) continue;
+
+        const key = (city + "|" + countryCode).toLowerCase();
+        const g = groups.get(key) || { city, countryCode, latSum:0, lngSum:0, samples:0 };
+        g.latSum += lat;
+        g.lngSum += lng;
+        g.samples++;
+        groups.set(key, g);
+      }
+    }
   }
 
-  hotspots.sort((a, b) => b.count - a.count || a.city.localeCompare(b.city));
+  const probeBudget = Math.max(0, 44 - cells.length);
+  const candidates = [...groups.values()]
+    .map(g => ({
+      city:g.city,
+      countryCode:g.countryCode,
+      lat:g.latSum/g.samples,
+      lng:g.lngSum/g.samples,
+      samples:g.samples,
+    }))
+    .sort((a,b)=>b.samples-a.samples || a.city.localeCompare(b.city))
+    .slice(0, probeBudget);
+
+  const verified = [];
+  for (let i = 0; i < candidates.length; i += 6) {
+    const chunk = candidates.slice(i, i + 6);
+    const rows = await Promise.all(chunk.map(c => verifyMetroHotspot(apiKey, c).catch(() => null)));
+    rows.filter(Boolean).forEach(x => verified.push(x));
+  }
+
+  verified.sort((a,b)=>b.count-a.count || a.city.localeCompare(b.city));
+
+  const hotspots = [];
+  for (const item of verified) {
+    const duplicate = hotspots.some(existing =>
+      existing.countryCode === item.countryCode &&
+      kmBetween(existing.lat, existing.lng, item.lat, item.lng) < 28
+    );
+    if (!duplicate) hotspots.push(item);
+  }
+
   return {
-    ok: true,
-    mode: "hotspots",
+    ok:true,
+    mode:"hotspots",
     region,
-    threshold: 10,
-    checkedCities: probes.length,
+    threshold:10,
+    discovery:"automatic",
+    scannedCells:cells.length,
+    candidateCities:candidates.length,
     hotspots,
   };
 }
@@ -388,7 +412,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v10");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v12");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
@@ -409,7 +433,7 @@ export async function onRequestGet({ request, env }) {
     }
 
     const tm = baseEventUrl(env.TICKETMASTER_API_KEY);
-    tm.searchParams.set("size", (artist || attractionId) ? "200" : "100");
+    tm.searchParams.set("size", "200");
     tm.searchParams.set("sort", (artist || attractionId) ? "date,asc" : "distance,date,asc");
 
     if (attractionId) {
