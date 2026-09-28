@@ -363,7 +363,9 @@ body.editmode .card .tag{top:auto;bottom:10px}
 /* NEW badge = same pill construction as the top nav pills (owner: unified
    style): inline-flex capsule, fixed height, equal side padding, ink-centered
    via text-box. Ratio matches .nav-btn (32px height / 14px font -> 24px / 10.5px). */
-.delta.new{color:#fff;background:var(--text);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 calc(13px - .08em) 0 13px;font-size:10.5px;letter-spacing:.08em;line-height:1;text-box:trim-both cap alphabetic;width:fit-content;justify-self:center}
+.delta.new,.delta.reentry{color:#fff;background:var(--text);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;height:24px;line-height:1;text-box:trim-both cap alphabetic;width:fit-content;justify-self:center}
+.delta.new{padding:0 calc(13px - .08em) 0 13px;font-size:10.5px;letter-spacing:.08em}
+.delta.reentry{padding:0 4px;font-size:7.4px;letter-spacing:0}
 /* vertical: ink-true centering via text-box (caps top .. baseline) - the
    padding hack was tuned to one rasterizer; the mechanism works everywhere */
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
@@ -729,8 +731,9 @@ textarea{resize:vertical;min-height:64px}
   }
   .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0;max-width:100%;overflow:hidden}
   .delta.new{height:20px;padding:0 calc(9px - .03em) 0 9px;font-size:8.5px;letter-spacing:.03em;line-height:1;box-sizing:border-box}
+  .delta.reentry{height:20px;padding:0 2px;font-size:6.2px;letter-spacing:-.01em;line-height:1;box-sizing:border-box;overflow:visible;white-space:nowrap}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
-  .delta.new{background:var(--text);color:#fff}
+  .delta.new,.delta.reentry{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
   .artwrap img{border-radius:8px}
   .ctext{grid-area:names;align-self:center;min-width:0}
@@ -1155,7 +1158,7 @@ const lsSet = v => lsSetRaw(KEY, v);
 
 /* ============ settings & Apple integrations ============ */
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v27";
+const DAILYKEY = "music98news_daily_v28";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -1200,7 +1203,7 @@ function previewPlayUrl(url, page){
   return s;
 }
 /* ---- iTunes Search API via JSONP (preview, artwork, track urls) ---- */
-const PREVCACHE = "music98news_prevcache_v5";
+const PREVCACHE = "music98news_prevcache_v6";
 function prevCache(){ try{ const r = lsGetRaw(PREVCACHE); return r ? JSON.parse(r) : {}; }catch(e){ return {}; } }
 let jsonpN = 0;
 function itunesNorm(s){
@@ -2021,7 +2024,7 @@ function computeMoves(feedId, rows){
       return;
     }
     const p = pk.keys.indexOf(key);
-    r.delta = p<0 ? "new" : String(p-i);
+    r.delta = p<0 ? (hk[key] ? "re-entry" : "new") : String(p-i);
     const prevW = hk[key] ? hk[key].weeks : (baked || 0);
     r.weeks = p>=0 ? prevW+1 : 1;
     hk[key] = {weeks: r.weeks, delta: r.delta};
@@ -2724,7 +2727,9 @@ function renderCharts(){
   $("#chartList").innerHTML = rows.map((o)=>{
     const r = o.r, i = o.i;
     let dcls="same", dtxt="—";
-    if(String(r.delta).toLowerCase()==="new"){ dcls="new"; dtxt="NEW"; }
+    const deltaKind=String(r.delta).toLowerCase();
+    if(deltaKind==="new"){ dcls="new"; dtxt="NEW"; }
+    else if(deltaKind==="re-entry"){ dcls="reentry"; dtxt="RE-ENTRY"; }
     else { const n = parseInt(r.delta,10)||0;
       if(n>0){ dcls="up"; dtxt="<span class=\"darr\">▲</span><span class=\"dnum\">"+n+"</span>"; } else if(n<0){ dcls="down"; dtxt="<span class=\"darr\">▼</span><span class=\"dnum\">"+Math.abs(n)+"</span>"; } }
     const w = parseInt(r.weeks,10)||0;
