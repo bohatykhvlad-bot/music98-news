@@ -25,10 +25,10 @@ HERO_CREDIT = "Christopher Polk"
 HERO_CREDIT_URL = "https://www.instagram.com/polkimaging/"
 HERO_SOURCE_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=a6d485acfd"
 
-TAYLOR_WIN_KEY = "dded7f7e94"
-TAYLOR_WIN_NAME = "vmas-2026-taylor-video-of-year.jpg"
-TAYLOR_WIN_CREDIT = "Stewart Cook"
-TAYLOR_WIN_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=dded7f7e94"
+NIRVANA_KEY = "b3e87895ab"
+NIRVANA_NAME = "vmas-2026-nirvana-vanguard.jpg"
+NIRVANA_CREDIT = "Christopher Polk"
+NIRVANA_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=b3e87895ab"
 
 LISA_KEY = "932c1f928d"
 LISA_NAME = "vmas-2026-lisa.jpg"
@@ -41,7 +41,6 @@ Madonna entered the final ballot with 13 nominations after MTV added its social 
 
 Swift's two competitive wins landed in the categories most closely tied to her video work. "The Fate of Ophelia" took Video of the Year, while "Opalite" won Best Direction. Those awards moved her career tally from 30 to 32 and ahead of Beyoncé's previous total. MTV also gave Swift the inaugural Artist Director Honors, a separate recognition for her directing work rather than another competitive category.
 
-[photo:{sienna_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 42%|1]
 
 Away from Madonna and Swift, the major awards spread quickly. BTS won Song of the Year with "Swim," took Best K-Pop for the same track and was named Best Group. Sienna Spiro won Best New Artist. LISA won the pop category. Cardi B and Kehlani took hip-hop, Bruno Mars R&B, Olivia Rodrigo alternative, Bad Bunny Latin and Ella Langley country. Ariana Grande finished with Song of Summer and the visual-effects award.
 
@@ -124,8 +123,6 @@ The performance side of the VMAs deserves its own recap because the show packed 
 [nominee:Shakira and Burna Boy — "Dai Dai"]
 
 [nominee:Teyana Taylor and Lucky Daye — "Hard Part"]
-
-[photo:{taylor_src}|Stewart Cook|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=dded7f7e94|50% 46%|1]
 
 [award:Best Pop]
 
@@ -321,6 +318,8 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Taylor Swift — "The Fate of Ophelia"]
 
+[photo:{nirvana_src}|Christopher Polk|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=b3e87895ab|50% 44%|1]
+
 [award:Best Visual Effects]
 
 [winner:Ariana Grande — "hate that i made you love me"]
@@ -500,9 +499,9 @@ def main():
         raise RuntimeError("refusing to modify non-draft VMA post: " + repr(existing.get("status")))
 
     hero_src, hero_size = upload_photo(HERO_KEY, HERO_NAME)
-    taylor_src, taylor_size = upload_photo(TAYLOR_WIN_KEY, TAYLOR_WIN_NAME)
+    nirvana_src, nirvana_size = upload_photo(NIRVANA_KEY, NIRVANA_NAME)
     lisa_src, lisa_size = upload_photo(LISA_KEY, LISA_NAME)
-    body = BODY_TEMPLATE.format(taylor_src=taylor_src, lisa_src=lisa_src)
+    body = BODY_TEMPLATE.format(nirvana_src=nirvana_src, lisa_src=lisa_src)
 
     def mutate(posts):
         p = find_existing(posts)
@@ -539,7 +538,7 @@ def main():
     now = runner.guarded_write(mutate)
     print("VMA_DRAFT", now["id"], now["status"], runner.words(now["body"]), "words")
     print("HERO", hero_size, now["cover"]["src"], now["cover"]["credit"])
-    print("BODY_PHOTO", taylor_size, taylor_src, TAYLOR_WIN_CREDIT)
+    print("BODY_PHOTO", nirvana_size, nirvana_src, NIRVANA_CREDIT)
     print("BODY_PHOTO", lisa_size, lisa_src, LISA_CREDIT)
     print("NO_DUPLICATE_VMA_POSTS", True)
     import time
