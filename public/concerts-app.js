@@ -49,7 +49,10 @@ let popularArtists=[];
 let lastArea=null;
 let activeMode="popular";
 let suggestTimer=0;
+let suggestSeq=0;
 let moveTimer=0;
+let areaRequestSeq=0;
+let popularRequestSeq=0;
 let popup=null;
 let userMoving=false;
 let expandedKey="";
@@ -508,6 +511,8 @@ function restoreArtistSide(){
 }
 function showArtistContext(){
   if(!artistContext) return;
+  areaRequestSeq++;
+  popularRequestSeq++;
   setMode("artist");
   setEventData([],0);
   setArtistMapData(artistContext.events||[]);
@@ -521,7 +526,7 @@ async function showAllConcertsInMapArea(){
   setMode("artist-area");
   setArtistMapData([]);
   sideSub.textContent="All concerts in this map area.";
-  await loadArea(c.lat,c.lng,"Map area",{fit:false,radius:visibleRadiusKm(),context:"artist-area"});
+  await loadArea(c.lat,c.lng,"Map area",{fit:false,radius:Number(radiusEl.value)||100,context:"artist-area"});
 }
 
 async function toggleArtist(item,card,mode){
@@ -548,6 +553,8 @@ async function toggleArtist(item,card,mode){
     return;
   }
 
+  areaRequestSeq++;
+  popularRequestSeq++;
   artistContext={item:{...item},events:[],sourceMode:mode,sourceItems:sourceItemsForArtist(item,mode)};
   setMode("artist");
   setEventData([],0);
@@ -672,6 +679,9 @@ async function loadHotspots(){
 }
 
 async function loadPopular(force=false){
+  areaRequestSeq++;
+  const requestId=++popularRequestSeq;
+  clearArtistContext();
   setMode("popular");
   sideSub.textContent="Popular artists with upcoming Ticketmaster shows.";
   sideEmpty.hidden=false;
@@ -686,11 +696,13 @@ async function loadPopular(force=false){
     const data=await getPayload({mode:"popular",v:"popular-v15"});
     popularArtists=data.artists||[];
     popularEvents=[];
+    if(requestId!==popularRequestSeq || activeMode!=="popular" || artistContext) return;
     renderArtists(popularArtists,"popular");
     prefetchPopular(popularArtists);
     setEventData([]);
     setStatus(popularArtists.length ? "Popular artists" : "Popular concerts are unavailable right now.");
   }catch(err){
+    if(requestId!==popularRequestSeq) return;
     console.error(err);
     toursEl.textContent="";
     sideEmpty.hidden=false;
@@ -700,6 +712,7 @@ async function loadPopular(force=false){
 }
 
 async function loadArea(lat,lng,label,opts={}){
+  const requestId=++areaRequestSeq;
   const inArtistArea=opts.context==="artist-area" && !!artistContext;
   if(!inArtistArea) clearArtistContext();
   setMode(inArtistArea?"artist-area":"nearby");
@@ -708,6 +721,7 @@ async function loadArea(lat,lng,label,opts={}){
   try{
     const searchRadius=Math.max(5,Math.min(500,Number(opts.radius ?? radiusEl.value)||100));
     const data=await getPayload({lat,lng,radius:searchRadius});
+    if(requestId!==areaRequestSeq) return;
     const events=data.events||[];
     const total=Number(data.page?.totalElements ?? events.length) || events.length;
 
@@ -721,6 +735,7 @@ async function loadArea(lat,lng,label,opts={}){
     if(opts.fit) fitEvents(events);
     setStatus(total ? total+" concerts · "+label : "No Ticketmaster concerts found · "+label);
   }catch(err){
+    if(requestId!==areaRequestSeq) return;
     console.error(err);
     toursEl.textContent="";
     sideEmpty.hidden=false;
@@ -730,6 +745,8 @@ async function loadArea(lat,lng,label,opts={}){
 }
 
 function requestLocation(){
+  areaRequestSeq++;
+  popularRequestSeq++;
   clearArtistContext();
   setMode("nearby");
   if(!navigator.geolocation){
@@ -764,6 +781,8 @@ async function searchArtists(q){
   return data.artists||[];
 }
 async function selectFeature(f){
+  areaRequestSeq++;
+  popularRequestSeq++;
   clearArtistContext();
   const coords=f?.geometry?.coordinates;
   if(!coords||coords.length<2) return;
@@ -832,10 +851,12 @@ popularTab.addEventListener("click",()=>{
 
 search.addEventListener("input",()=>{
   clearTimeout(suggestTimer);
+  const seq=++suggestSeq;
   const q=search.value.trim();
   if(q.length<2){ suggestions.hidden=true; return; }
   suggestTimer=setTimeout(async()=>{
     const [placesResult,artistsResult]=await Promise.allSettled([geocode(q,true),searchArtists(q)]);
+    if(seq!==suggestSeq || search.value.trim()!==q) return;
     const places=placesResult.status==="fulfilled"?placesResult.value:[];
     const artists=artistsResult.status==="fulfilled"?artistsResult.value:[];
     renderSuggestions(places,artists);
@@ -844,6 +865,7 @@ search.addEventListener("input",()=>{
 search.addEventListener("keydown",async e=>{
   if(e.key!=="Enter") return;
   e.preventDefault();
+  ++suggestSeq;
   const q=search.value.trim(); if(!q) return;
   const [placesResult,artistsResult]=await Promise.allSettled([geocode(q,false),searchArtists(q)]);
   const places=placesResult.status==="fulfilled"?placesResult.value:[];
@@ -933,9 +955,9 @@ map.on("moveend",()=>{
   moveTimer=setTimeout(()=>{
     const c=map.getCenter();
     if(activeMode==="artist-area" && artistContext){
-      loadArea(c.lat,c.lng,"Map area",{fit:false,radius:visibleRadiusKm(),context:"artist-area"});
+      loadArea(c.lat,c.lng,"Map area",{fit:false,radius:Number(radiusEl.value)||100,context:"artist-area"});
     }else{
-      loadArea(c.lat,c.lng,"Map area",{fit:false,radius:visibleRadiusKm()});
+      loadArea(c.lat,c.lng,"Map area",{fit:false,radius:Number(radiusEl.value)||100});
     }
   },360);
 });
