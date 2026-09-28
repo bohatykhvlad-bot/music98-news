@@ -19,7 +19,7 @@ Paul Hunter's video understands that balance. Legend performs with the Hollywood
 
 The album draws from gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, with Nina Simone, Nat King Cole and Marvin Gaye among the reference points the pair cited. "Fireflies" comes late in the sequence, after "Doing Me" and before "Everything," and follows the earlier single "Daylight." Despite the wide list of influences, the song itself is easy to follow. Piano and voice lead; the orchestra fills the edges; the choir gives the chorus its lift.
 
-What I like most is that the production never tries to turn John Legend into someone else. His usual strengths are still obvious, especially the piano-led writing and controlled vocal, but the frame around them is richer. Pharrell brings movement without stamping his own sound over the track. The result is polished soul-pop with enough scale to feel fresh, but not so much that the song disappears underneath it.'''
+The strongest part of "Fireflies" is how little it tries to remake John Legend. His familiar strengths are intact, especially the piano-led writing and controlled vocal, but the frame around them is richer. Pharrell adds movement without stamping his own sound over the track. The result is polished soul-pop with enough scale to feel fresh, without burying the song underneath the production.'''
 
 def main():
     runner.load_env()
