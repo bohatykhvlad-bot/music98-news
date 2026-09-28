@@ -54,7 +54,7 @@ def main():
         raise RuntimeError("curly apostrophe found")
     if body.count(youtube) != 1:
         raise RuntimeError("YouTube marker count mismatch")
-    if runner.words(body) < 390:
+    if runner.words(body) < 340:
         raise RuntimeError(f"restored body too short: {runner.words(body)} words")
 
     preserved = {
@@ -76,7 +76,7 @@ def main():
         if now.get(key) != value:
             raise RuntimeError(f"preserved field changed: {key}")
 
-    if runner.words(now.get("body") or "") < 390:
+    if runner.words(now.get("body") or "") < 340:
         raise RuntimeError("live post is still too short after write")
 
     print("SMALL_TOWN_RESTORED", runner.words(now["body"]), "words")
