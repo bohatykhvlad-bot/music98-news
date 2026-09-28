@@ -420,7 +420,8 @@ def cmd_verify(pid):
 
     src = (p.get("cover") or {}).get("src")
     if src:
-        url = "https://music98.news/" + str(src).lstrip("/")
+        src = str(src)
+        url = src if re.match(r"^https?://", src, re.I) else "https://music98.news/" + src.lstrip("/")
         try:
             req = urllib.request.Request(url, headers={"User-Agent": UA})
             with urllib.request.urlopen(req, timeout=45) as r:
