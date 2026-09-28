@@ -616,7 +616,7 @@ async function loadPopular(force=false){
   if(popularArtists.length && !force){
     renderArtists(popularArtists,"popular");
     setEventData(popularEvents);
-    setStatus("Popular artists · Kworb × Ticketmaster");
+    setStatus("Popular artists");
     return;
   }
   try{
@@ -625,7 +625,7 @@ async function loadPopular(force=false){
     popularEvents=[];
     renderArtists(popularArtists,"popular");
     setEventData([]);
-    setStatus(popularArtists.length ? "Popular artists · Kworb × Ticketmaster" : "Popular concerts are unavailable right now.");
+    setStatus(popularArtists.length ? "Popular artists" : "Popular concerts are unavailable right now.");
   }catch(err){
     console.error(err);
     toursEl.textContent="";
