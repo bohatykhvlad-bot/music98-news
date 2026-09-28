@@ -6,7 +6,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v29";
+const TOP50_KV = "top50v30";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -42,7 +42,7 @@ function chartWeek() {
    allowed to replace an existing registry entry, even if Apple changes artwork
    behind the same track ID later. KV is a runtime mirror/fallback, not the source
    of truth. */
-const COVERS_KV = "covers_v6";
+const COVERS_KV = "covers_v7";
 const DZ_HOST = "dzcdn.net";
 function isAppleArt(url) {
   try {
@@ -99,12 +99,18 @@ async function applyCovers(env, tracks, origin) {
        If the song is not in the checked-in registry yet, keep the first runtime
        cover already cached for it. Only a truly unseen key may take today's
        source artwork. */
-    const chosen = seed[key]
-      || cached
-      || (isAppleArt(t.art) ? t.art : "");
+    const chosen = seed[key] || cached;
+    const temporary = !chosen && isAppleArt(t.art) ? t.art : "";
     if (chosen) {
-      if (covers[key] !== chosen) { covers[key] = chosen; changed = true; }
+      if (seed[key] && covers[key] !== seed[key]) {
+        covers[key] = seed[key];
+        changed = true;
+      }
       t.art = chosen;
+    } else if (temporary) {
+      /* Temporary Apple display only. Never persist an unreviewed runtime image
+         as the canonical lock. The GitHub Apple resolver will pin it later. */
+      t.art = temporary;
     } else {
       t.art = "";
     }
@@ -657,7 +663,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v28",
+    rev: "feat-v30",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
