@@ -12,11 +12,11 @@ import post as runner
 PID = "vmas26results"
 
 EXCERPT = (
-    "Madonna won seven awards at the 2026 MTV VMAs, the most of any artist, while Taylor Swift took "
-    "Video of the Year for \"The Fate of Ophelia\" at the September 27 ceremony in Los Angeles."
+    "Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift took Video of the Year "
+    "for \"The Fate of Ophelia\" at the September 27 ceremony in Los Angeles."
 )
 
-INTRO_BEFORE_PHOTO = """Madonna won seven awards at the 2026 MTV VMAs, the most of any artist, while Taylor Swift took Video of the Year for "The Fate of Ophelia" at the September 27 ceremony in Los Angeles. Snoop Dogg hosted the show at the Peacock Theater.
+INTRO_BEFORE_PHOTO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift took Video of the Year for "The Fate of Ophelia" at the September 27 ceremony in Los Angeles. Snoop Dogg hosted the show at the Peacock Theater.
 
 Madonna entered the final ballot with 13 nominations after MTV added the social categories, raising her total from 11. Her seven wins included Artist of the Year, Best Album for *CONFESSIONS II* and Best Collaboration with Sabrina Carpenter. "Confessions II - The Film" accounted for four additional awards in dance, cinematography, choreography and long-form video."""
 
