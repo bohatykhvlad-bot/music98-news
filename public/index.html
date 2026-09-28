@@ -152,10 +152,18 @@ main{position:relative;z-index:1}
    to the header above and the content below) */
 .tab .hd{margin:0 0 30px}
 .tab.active{display:block}
-.tab.rise{animation:rise .28s ease both}
-@keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .hd{margin:0 0 24px}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
+.concerts-frame{display:block;width:100%;height:640px;border:0;background:transparent}
+@media(max-width:900px){.concerts-frame{height:1050px}}
+@media(max-width:640px){.concerts-frame{height:980px}}
+
+/* Pre-crop only the visible editorial covers. Raw intrinsic-size images stay
+   hidden until fitCover has applied the stored crop, eliminating the load zoom. */
+#heroSlot img.js-cover,#newsGrid img.js-cover,#relGrid img.js-cover{visibility:hidden}
+#heroSlot img.js-cover[data-crop-ready="1"],
+#newsGrid img.js-cover[data-crop-ready="1"],
+#relGrid img.js-cover[data-crop-ready="1"]{visibility:visible}
 
 /* hero — left cell matches the text column; photo fills and crops to the face */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
@@ -788,7 +796,7 @@ textarea{resize:vertical;min-height:64px}
       <button class="nav-btn active" data-tab="news">News</button>
       <button class="nav-btn" data-tab="releases">Releases</button>
       <button class="nav-btn" data-tab="charts">Chart</button>
-      <a class="nav-btn" href="/concerts">Concerts</a>
+      <button class="nav-btn" data-tab="concerts">Concerts</button>
     </nav>
     <div class="top-actions">
       <div class="search">
@@ -831,6 +839,10 @@ textarea{resize:vertical;min-height:64px}
     <div class="chart" id="chartList" role="list"></div>
     <p class="chart-note" id="chartStatus" hidden></p>
     <div class="empty" id="chartEmpty" hidden>Nothing found for your query.</div>
+  </section>
+
+  <section class="tab" id="tab-concerts">
+    <iframe class="concerts-frame" id="concertsFrame" src="/concerts?embed=1" title="Concerts" loading="eager"></iframe>
   </section>
 </main>
 
@@ -980,6 +992,7 @@ function fitCover(img){
   img.style.width = dw+"px";
   img.style.height = dh+"px";
   img.style.transform = "translate("+left+"px,"+top+"px)";
+  img.dataset.cropReady = "1";
 }
 function bindCovers(root){
   (root||document).querySelectorAll("img.js-cover").forEach(img=>{
@@ -2795,12 +2808,11 @@ function setTab(t){
   $$(".tab").forEach(s=>{
     const on = s.id==="tab-"+t;
     s.classList.toggle("active", on);
-    s.classList.toggle("rise", on);
   });
   window.scrollTo(0, 0);
   /* the newly shown rail had zero size while hidden - its .ok state is stale;
      a frame later it has real geometry, so re-evaluate the arrows */
-  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
+  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); document.querySelectorAll("#tab-"+t+" img.js-cover").forEach(fitCover); });
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
