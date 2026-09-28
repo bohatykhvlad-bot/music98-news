@@ -251,4 +251,5 @@ $("#concertLocateBtn").addEventListener("click",()=>{
   );
 });
 window.addEventListener("resize",()=>{ if(map) requestAnimationFrame(()=>map.resize()); });
+if(document.querySelector("#tab-concerts.active")) ensureMap();
 })();
