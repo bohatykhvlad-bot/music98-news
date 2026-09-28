@@ -32,6 +32,8 @@ INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift w
 
 Madonna entered the final ballot with 13 nominations after MTV added the social categories. Her seven wins included Artist of the Year, the album award for *Confessions II*, Best Collaboration with Sabrina Carpenter for "Bring Your Love," and four awards connected to "Confessions II - The Film."
 
+[photo:{madonna_src}|Francis Specker|https://francisspecker.com/|47.3% 37.1%|1]
+
 Taylor Swift also won Best Direction for "Opalite." BTS collected three awards, including Song of the Year and Best Group, while Sienna Spiro was named Best New Artist.
 
 The complete list below includes every competitive category from the final 2026 ballot, followed by the Video Vanguard Award and the MTV VMA Artist Director Honors. Winners are shown in bold on the published page, with the remaining nominees listed underneath each category."""
