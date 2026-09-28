@@ -40,6 +40,8 @@ const nearTab=$("#nearTab"), popularTab=$("#popularTab");
 
 let currentEvents=[];
 let nearbyEvents=[];
+let nearbyTotal=0;
+let currentTotal=0;
 let popularEvents=[];
 let popularArtists=[];
 let lastArea=null;
@@ -96,10 +98,16 @@ function hubsGeoJSON(){
   };
 }
 
-function setEventData(events){
+function setEventData(events,total=null){
   currentEvents=events||[];
+  currentTotal=Number(total==null ? currentEvents.length : total) || 0;
   const src=map.getSource("events");
   if(src) src.setData(toGeoJSON(currentEvents));
+
+  if(map.getLayer("cluster-count")){
+    const complete=currentTotal<=currentEvents.length;
+    map.setLayoutProperty("cluster-count","visibility",complete?"visible":"none");
+  }
 }
 
 function addLayers(){
@@ -181,7 +189,7 @@ function handleHubClick(e){
   const count=Number(f.properties?.count||0);
   userMoving=false;
   map.flyTo({center:[lng,lat],zoom:8.5,duration:650});
-  loadArea(lat,lng,count ? name+" · "+count+"+ shows" : name,{fit:false});
+  loadArea(lat,lng,name,{fit:false,radius:45});
 }
 
 function popupContent(e){
@@ -321,7 +329,6 @@ function renderEventList(box,events){
     more.textContent="More";
     more.addEventListener("click",()=>{
       draw();
-      if(more) setTimeout(()=>more.scrollIntoView({block:"nearest",behavior:"smooth"}),20);
     });
     box.appendChild(more);
   }
@@ -437,9 +444,9 @@ function restoreModeMap(){
     setEventData(popularEvents);
     setStatus(popularEvents.length ? "Popular Ticketmaster artists · worldwide" : "");
   }else{
-    setEventData(nearbyEvents);
+    setEventData(nearbyEvents,nearbyTotal);
     const label=lastArea?.label||"Selected area";
-    setStatus(nearbyEvents.length ? nearbyEvents.length+" concerts · "+label : "No Ticketmaster concerts found · "+label);
+    setStatus(nearbyTotal ? nearbyTotal+" concerts · "+label : "No Ticketmaster concerts found · "+label);
   }
 }
 
@@ -455,10 +462,10 @@ async function getEvents(params){ return (await getPayload(params)).events||[]; 
 
 async function loadHotspots(){
   hotspots=[];
-  const regions=["americas","europe","apac"];
+  const regions=["americas","europe","mena","apac"];
   for(const region of regions){
     try{
-      const data=await getPayload({mode:"hotspots",region,v:"hotspots-v9"});
+      const data=await getPayload({mode:"hotspots",region,v:"hotspots-v12"});
       hotspots.push(...(data.hotspots||[]));
       hotspots.sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
       const src=map.getSource("hubs");
@@ -481,7 +488,7 @@ async function loadPopular(force=false){
     return;
   }
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v10"});
+    const data=await getPayload({mode:"popular",v:"popular-v12"});
     popularArtists=data.artists||[];
     popularEvents=[];
     renderArtists(popularArtists,"popular");
@@ -502,13 +509,19 @@ async function loadArea(lat,lng,label,opts={}){
   sideSub.textContent="Artists with the most upcoming events in this area.";
   setStatus("Loading concerts...");
   try{
-    const events=await getEvents({lat,lng,radius:radiusEl.value});
+    const searchRadius=Math.max(5,Math.min(500,Number(opts.radius ?? radiusEl.value)||100));
+    const data=await getPayload({lat,lng,radius:searchRadius});
+    const events=data.events||[];
+    const total=Number(data.page?.totalElements ?? events.length) || events.length;
+
     nearbyEvents=events;
-    lastArea={lat,lng,label};
+    nearbyTotal=total;
+    lastArea={lat,lng,label,radius:searchRadius};
+
     renderArtists(groupedNearby(events),"nearby");
-    setEventData(events);
+    setEventData(events,total);
     if(opts.fit) fitEvents(events);
-    setStatus(events.length ? events.length+" concerts · "+label : "No Ticketmaster concerts found · "+label);
+    setStatus(total ? total+" concerts · "+label : "No Ticketmaster concerts found · "+label);
   }catch(err){
     console.error(err);
     toursEl.textContent="";
@@ -570,7 +583,7 @@ nearTab.addEventListener("click",()=>{
     setMode("nearby");
     sideSub.textContent="Artists with the most upcoming events in this area.";
     renderArtists(groupedNearby(nearbyEvents),"nearby");
-    setEventData(nearbyEvents);
+    setEventData(nearbyEvents,nearbyTotal);
     restoreModeMap();
   }else{
     requestLocation();
@@ -603,6 +616,19 @@ radiusEl.addEventListener("change",()=>{
   }
 });
 
+function distanceKm(lat1,lng1,lat2,lng2){
+  const r=6371,toRad=d=>d*Math.PI/180;
+  const p1=toRad(lat1),p2=toRad(lat2),dp=toRad(lat2-lat1),dl=toRad(lng2-lng1);
+  const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
+  return 2*r*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));
+}
+function visibleRadiusKm(){
+  const c=map.getCenter(),b=map.getBounds();
+  const horizontal=distanceKm(c.lat,c.lng,c.lat,b.getEast());
+  const vertical=distanceKm(c.lat,c.lng,b.getNorth(),c.lng);
+  return Math.round(Math.max(5,Math.min(500,Math.max(horizontal,vertical))));
+}
+
 map.on("movestart",e=>{ if(e.originalEvent) userMoving=true; });
 map.on("zoomend",()=>{
   if(!popup || !map.getLayer("clusters")) return;
@@ -619,7 +645,7 @@ map.on("moveend",()=>{
   clearTimeout(moveTimer);
   moveTimer=setTimeout(()=>{
     const c=map.getCenter();
-    loadArea(c.lat,c.lng,"Map area",{fit:false});
+    loadArea(c.lat,c.lng,"Map area",{fit:false,radius:visibleRadiusKm()});
   },360);
 });
 
