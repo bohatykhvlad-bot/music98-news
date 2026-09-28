@@ -496,12 +496,11 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- footer ---------- */
 footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
-.foot-in{max-width:1180px;margin:0 auto;padding:40px 20px 44px;display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:34px}
+.foot-in{max-width:1180px;margin:0 auto;padding:40px 20px 44px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:30px}
 .foot-col h3{margin:0 0 14px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
 .foot-col p{margin:0;color:var(--muted);font-size:13.5px;max-width:340px}
-.flink{display:block;color:var(--muted);text-decoration:none;font-size:14px;padding:5px 0;transition:.15s}
+.flink{display:block;color:var(--muted);text-decoration:none;font-size:14px;padding:5px 0;transition:.15s;white-space:nowrap}
 .flink:hover{color:var(--acc2)}
-.fcols{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
 .social .icons{display:flex;gap:10px;flex-wrap:wrap}
 .social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--acc2);text-decoration:none}
 .social a:active{border-color:var(--accent)}
@@ -863,20 +862,17 @@ textarea{resize:vertical;min-height:64px}
     </div>
     <div class="foot-col">
       <h3>Sections</h3>
-      <div class="fcols">
-        <div>
-          <a class="flink" href="/news" data-goto="news">News</a>
-          <a class="flink" href="/releases" data-goto="releases">Releases</a>
-          <a class="flink" href="/chart" data-goto="charts">Chart</a>
-          <a class="flink" href="/concerts" data-goto="concerts">Concerts</a>
-          <a class="flink" href="/about">About us</a>
-        </div>
-        <div>
-          <a class="flink" href="/contacts">Contacts</a>
-          <a class="flink" href="/privacy" id="footPrivacy">Privacy & Cookies</a>
-          <a class="flink" href="/terms">Terms of Use</a>
-          </div>
-      </div>
+      <a class="flink" href="/news" data-goto="news">News</a>
+      <a class="flink" href="/releases" data-goto="releases">Releases</a>
+      <a class="flink" href="/chart" data-goto="charts">Chart</a>
+      <a class="flink" href="/concerts" data-goto="concerts">Concerts</a>
+    </div>
+    <div class="foot-col">
+      <h3>Information</h3>
+      <a class="flink" href="/about">About us</a>
+      <a class="flink" href="/contacts">Contacts</a>
+      <a class="flink" href="/privacy" id="footPrivacy">Privacy & Cookies</a>
+      <a class="flink" href="/terms">Terms of Use</a>
     </div>
     <div class="foot-col social">
       <h3>Follow us</h3>
