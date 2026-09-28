@@ -2807,7 +2807,7 @@ function setTab(t){
   }
   activeTab = t;
   $$("#nav .nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===t));
-  $(".tab").forEach(s=>{
+  $$(".tab").forEach(s=>{
     const on = s.id==="tab-"+t;
     s.classList.toggle("active", on);
     s.classList.toggle("rise", on);
