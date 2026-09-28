@@ -121,7 +121,7 @@
   "dropdead|oliviarodrigo": {
     "title": "drop dead",
     "artist": "Olivia Rodrigo",
-    "url": "https://music.apple.com/us/album/1889992111?i=1889992113",
+    "url": "https://music.apple.com/us/album/1893996068?i=6762380193",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/89/57/ad/8957adf6-1862-4e4e-bcb5-810d6cf79cc4/mzaf_7752581374620577831.plus.aac.p.m4a",
     "year": "2026"
   },
@@ -163,7 +163,7 @@
   "ijustmight|brunomars": {
     "title": "I Just Might",
     "artist": "Bruno Mars",
-    "url": "https://music.apple.com/us/album/1866732792?i=1866732800",
+    "url": "https://music.apple.com/us/album/1869157136?i=1869157139",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/ef/58/86ef584b-cb46-43df-12e3-fce4b436688c/mzaf_10081886156675578892.plus.aac.p.m4a",
     "year": "2026"
   },
@@ -184,7 +184,7 @@
   "loser|tameimpala": {
     "title": "Loser",
     "artist": "Tame Impala",
-    "url": "https://music.apple.com/us/album/1842957385?i=1842957386",
+    "url": "https://music.apple.com/us/album/1835526733?i=1835526735",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4c/fd/bc/4cfdbc05-8385-dcca-13d7-c15b0b81d644/mzaf_343675252092765252.plus.aac.p.m4a",
     "year": "2025"
   },
@@ -230,6 +230,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0b/be/8c/0bbe8c0a-dc77-af41-97a5-c745cc43d38c/mzaf_11790447166833591507.plus.aac.p.m4a",
     "year": "2026"
   },
+  "pinkblush|dollybabe": {
+    "title": "Pink Blush",
+    "artist": "Dolly Babe",
+    "url": "https://music.apple.com/us/album/6783917228?i=6783917229",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d6/89/52/d689522d-416e-0fcf-e4fd-db989c677437/mzaf_1043987127463886777.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "pinkclouding|taylorswift": {
     "title": "Pink Clouding",
     "artist": "Taylor Swift",
@@ -250,6 +257,13 @@
     "url": "https://music.apple.com/us/album/1877803357?i=1877803360",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/48/89/4d/48894def-36b6-0085-9184-b28a200cf47a/mzaf_6109765307626823795.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "september|earth": {
+    "title": "September",
+    "artist": "Earth, Wind & Fire",
+    "url": "https://music.apple.com/us/album/1456623332?i=1456623340",
+    "prev": "",
+    "year": "1978"
   },
   "soeasy|oliviadean": {
     "title": "So Easy (To Fall In Love)",
