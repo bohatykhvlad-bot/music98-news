@@ -264,7 +264,7 @@ function venuePopupContent(events){
   events.forEach(ev=>{
     const b=document.createElement("button"); b.type="button"; b.className="venue-event";
     const d=document.createElement("span"); d.className="venue-event-date"; d.textContent=shortDate(ev);
-    const img=document.createElement("img"); img.className="venue-event-art"; img.src=ev.image||ev.artistImage||"/logo.png"; img.alt=""; img.loading="lazy";
+    const img=document.createElement("img"); img.className="venue-event-art"; img.src=ev.artistImage||ev.image||"/logo.png"; img.alt=""; img.loading="lazy";
     img.addEventListener("error",()=>{img.src="/logo.png";},{once:true});
     const cp=document.createElement("span"); cp.className="venue-event-copy";
     const n=document.createElement("span"); n.className="venue-event-name"; n.textContent=ev.artist||ev.name;
@@ -387,7 +387,7 @@ function renderEventList(box,events){
       const e=sorted[i];
       const b=document.createElement("button"); b.type="button"; b.className="event-link";
       const d=document.createElement("span"); d.className="event-date"; d.textContent=shortDate(e);
-      const img=document.createElement("img"); img.className="event-art"; img.src=e.image||e.artistImage||"/logo.png"; img.alt=""; img.loading="lazy";
+      const img=document.createElement("img"); img.className="event-art"; img.src=e.artistImage||e.image||"/logo.png"; img.alt=""; img.loading="lazy";
       img.addEventListener("error",()=>{img.src="/logo.png";},{once:true});
       const p=document.createElement("span"); p.className="event-place";
       const city=document.createElement("span"); city.className="event-city"; city.textContent=[e.city,e.countryCode].filter(Boolean).join(", ")||"Venue TBA";
