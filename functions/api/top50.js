@@ -6,7 +6,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v30";
+const TOP50_KV = "top50v31";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -361,6 +361,14 @@ async function applyTenure(env, tracks, diag) {
     diag.refSource = sameDay ? "keys" : (hasToday ? "today" : "keys-fallback");
     diag.refLen = prevKeys.length;
     diag.nearMiss = near;
+    const seenOrder = Object.keys(seen);
+    diag.newHistoryOrder = tracks
+      .filter((t) => String(t.delta).toLowerCase() === "new")
+      .map((t) => {
+        const key = tenureKey(t.title, t.artist);
+        return { key, seenIndex: seenOrder.indexOf(key), seenTotal: seenOrder.length };
+      });
+    diag.seenTail = seenOrder.slice(-40);
   }
   /* Эталон стрелок - порядок ПРОШЛОГО дня (ten.keys). Порядок сегодняшней сборки
      живёт отдельно (ten.today), поэтому внутридневная пересборка эталон не сдвигает. */
@@ -663,7 +671,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v30",
+    rev: "feat-v31",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
