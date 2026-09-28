@@ -166,6 +166,12 @@ main{position:relative;z-index:1}
   position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;border:0;display:block;
   -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none
 }
+/* A JS-cropped cover must never paint at its intrinsic size first. The old
+   first paint showed the raw image, then fitCover() resized/translated it,
+   which read as a brief zoom on page/tab load. Keep it invisible until the
+   final crop has been applied; reveal is instantaneous, no fade/transition. */
+img.js-cover{visibility:hidden!important}
+img.js-cover.cover-ready{visibility:visible!important}
 #articlePage .acover img,#articlePage .abody-pic img{
   pointer-events:auto;-webkit-user-select:auto;user-select:auto;-webkit-touch-callout:default;cursor:default
 }
@@ -1020,6 +1026,7 @@ function fitCover(img){
   img.style.width = dw+"px";
   img.style.height = dh+"px";
   img.style.transform = "translate("+left+"px,"+top+"px)";
+  img.classList.add("cover-ready");
 }
 function bindCovers(root){
   (root||document).querySelectorAll("img.js-cover").forEach(img=>{
