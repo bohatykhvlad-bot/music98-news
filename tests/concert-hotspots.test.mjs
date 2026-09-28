@@ -103,6 +103,18 @@ test("venue candidates distinguish same-named cities in different states", () =>
   assert.notEqual(cityKey("Springfield","IL","US"),cityKey("Springfield","MO","US"));
 });
 
+test("state names are not sent as stateCode filters", () => {
+  const paris=venueCandidate({
+    city:{name:"Paris"},
+    state:{name:"Île-de-France"},
+    country:{countryCode:"FR"},
+    location:{latitude:"48.8566",longitude:"2.3522"},
+    upcomingEvents:{_total:5},
+  });
+  assert.ok(paris);
+  assert.equal(paris.stateCode,"");
+});
+
 test("zero-upcoming venues and invalid coordinates are rejected", () => {
   assert.equal(venueCandidate({
     city:{name:"Paris"}, country:{countryCode:"FR"},
