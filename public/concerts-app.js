@@ -424,16 +424,18 @@ async function getPayload(params){
 async function getEvents(params){ return (await getPayload(params)).events||[]; }
 
 async function loadHotspots(){
-  try{
-    const data=await getPayload({mode:"hotspots",v:"hotspots-v6"});
-    hotspots=data.hotspots||[];
-    const src=map.getSource("hubs");
-    if(src) src.setData(hubsGeoJSON());
-  }catch(err){
-    console.error(err);
-    hotspots=[];
-    const src=map.getSource("hubs");
-    if(src) src.setData(hubsGeoJSON());
+  hotspots=[];
+  const regions=["americas","europe","apac"];
+  for(const region of regions){
+    try{
+      const data=await getPayload({mode:"hotspots",region,v:"hotspots-v7"});
+      hotspots.push(...(data.hotspots||[]));
+      hotspots.sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
+      const src=map.getSource("hubs");
+      if(src) src.setData(hubsGeoJSON());
+    }catch(err){
+      console.error(err);
+    }
   }
 }
 
@@ -449,7 +451,7 @@ async function loadPopular(force=false){
     return;
   }
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v6"});
+    const data=await getPayload({mode:"popular",v:"popular-v7"});
     popularArtists=data.artists||[];
     popularEvents=[];
     renderArtists(popularArtists,"popular");
