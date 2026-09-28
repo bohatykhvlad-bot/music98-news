@@ -64,16 +64,26 @@ a{color:inherit}
 .map-status{position:absolute;z-index:5;left:14px;top:14px;max-width:min(560px,calc(100% - 28px));padding:8px 12px;border:1px solid rgba(255,255,255,.84);background:rgba(255,255,255,.92);border-radius:999px;box-shadow:0 5px 18px rgba(15,45,55,.10);font-size:12.5px;color:#425158;backdrop-filter:blur(8px)}
 .map-status:empty{display:none}
 .side{border:1px solid var(--line);border-radius:var(--r);background:#fff;padding:13px;height:420px;min-height:0;display:flex;flex-direction:column;box-shadow:var(--shadow);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-gutter:stable}
-.side-tabs{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:4px;background:var(--bg2);border:1px solid var(--line);border-radius:999px;margin-bottom:10px;position:sticky;top:-13px;z-index:5}
+.side-tabs{width:100%;display:grid;grid-template-columns:repeat(2,minmax(140px,1fr));gap:4px;padding:4px;background:var(--bg2);border:1px solid var(--line);border-radius:999px;margin-bottom:10px;position:sticky;top:-13px;z-index:5}
 .side-tab{width:100%;min-width:0;height:34px;padding:0 14px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;line-height:1;white-space:nowrap;cursor:pointer;transition:background .16s ease,color .16s ease,transform .12s ease}
 .side-tab:hover{color:var(--text)}
 .side-tab.active{background:var(--accent);color:#03282b}
 .side-sub{font-size:12.5px;color:var(--muted);margin:0 4px 10px;line-height:1.4}
-.tours{display:flex;flex-direction:column;gap:4px}
-.tour-card{border-radius:12px;overflow:hidden;border:1px solid transparent}
-.tour-card.open{border-color:var(--line);background:#fff}
-.tour-row{width:100%;display:grid;grid-template-columns:24px 48px minmax(0,1fr) 18px;gap:8px;align-items:center;border:0;background:transparent;border-radius:11px;padding:7px 6px;text-align:left;cursor:pointer;color:var(--text)}
+.tours{display:flex;flex-direction:column;gap:6px}
+.tour-card{
+  border:1px solid transparent;border-radius:24px;overflow:hidden;background:transparent;
+  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease
+}
+.tour-card.open{
+  background:var(--bg2);border-color:var(--line);box-shadow:0 6px 18px rgba(15,45,55,.06)
+}
+.tour-row{
+  width:100%;display:grid;grid-template-columns:24px 48px minmax(0,1fr) 18px;gap:8px;align-items:center;
+  border:0;background:transparent;border-radius:999px;padding:7px 8px;text-align:left;cursor:pointer;color:var(--text);
+  transition:background .16s ease,transform .12s cubic-bezier(.3,.7,.4,1)
+}
 .tour-row:hover{background:var(--bg2)}
+.tour-card.open .tour-row{background:#fff}
 .tour-rank{font-weight:800;font-size:11.5px;color:#879398;text-align:center;font-variant-numeric:tabular-nums}
 .tour-art{width:48px;height:48px;padding:2px;border-radius:12px;border:1px solid var(--line);background:#fff;overflow:hidden;transition:.16s}
 .tour-art img{width:100%;height:100%;display:block;object-fit:cover;border-radius:9px;background:var(--card2)}
@@ -84,11 +94,21 @@ a{color:inherit}
 .tour-chevron{width:18px;height:18px;display:grid;place-items:center;color:var(--muted);transition:transform .18s ease}
 .tour-chevron svg{width:14px;height:14px}
 .tour-card.open .tour-chevron{transform:rotate(90deg)}
-.tour-events{padding:2px 7px 8px 79px}
-.tour-events[hidden]{display:none}
-.tour-loading,.tour-none{font-size:11px;color:var(--muted);padding:5px 0 7px}
-.event-link{width:100%;display:grid;grid-template-columns:54px minmax(0,1fr);gap:8px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer;text-decoration:none;padding:8px 6px;border-radius:9px}
-.event-link:hover{background:var(--bg2)}
+.tour-events{
+  max-height:0;opacity:0;overflow:hidden;pointer-events:none;
+  padding:0 9px 0 80px;
+  transition:max-height .28s cubic-bezier(.3,.7,.4,1),opacity .18s ease,padding .28s cubic-bezier(.3,.7,.4,1)
+}
+.tour-card.open .tour-events{
+  max-height:340px;opacity:1;pointer-events:auto;padding:2px 9px 10px 80px
+}
+.tour-loading,.tour-none{font-size:11.5px;color:var(--muted);padding:7px 2px 9px}
+.event-link{
+  width:100%;display:grid;grid-template-columns:54px minmax(0,1fr);gap:8px;border:0;
+  background:rgba(255,255,255,.72);color:inherit;text-align:left;cursor:pointer;text-decoration:none;
+  padding:9px 10px;border-radius:14px;margin:4px 0
+}
+.event-link:hover{background:#fff}
 .event-date{font-size:11.5px;font-weight:800;color:var(--text);text-transform:uppercase;line-height:1.25;text-rendering:geometricPrecision}
 .event-place{min-width:0}
 .event-city{display:block;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-rendering:geometricPrecision}
@@ -196,7 +216,7 @@ html.embedded .hero p{font-size:15px}
         <button class="side-tab" id="nearTab" type="button" role="tab" aria-selected="false">Near me</button>
         <button class="side-tab active" id="popularTab" type="button" role="tab" aria-selected="true">Popular</button>
       </div>
-      <p class="side-sub" id="sideSub">Global digital ranking · artists with upcoming Ticketmaster shows.</p>
+      <p class="side-sub" id="sideSub">Popular artists with upcoming Ticketmaster shows.</p>
       <div class="tours" id="tours"></div>
       <div class="side-empty" id="sideEmpty">Loading popular artists...</div>
       <p class="disclosure">Ticket links may earn music98.news a commission. Event availability and ticketing are provided by Ticketmaster.</p>
@@ -494,13 +514,24 @@ async function eventsForArtist(item,mode){
   return events;
 }
 
+function prefetchArtist(item){
+  const key=item.id ? "id:"+item.id : "name:"+String(item.name||"").toLowerCase();
+  if(!key || artistEventCache.has(key)) return;
+  eventsForArtist(item,"popular").catch(()=>{});
+}
+
+function prefetchPopular(items){
+  const work=()=>items.slice(0,4).forEach(prefetchArtist);
+  if("requestIdleCallback" in window) requestIdleCallback(work,{timeout:1200});
+  else setTimeout(work,220);
+}
+
 async function toggleArtist(item,card,mode){
   const key=artistKey(item);
   const box=card.querySelector(".tour-events");
   const opening=expandedKey!==key;
   document.querySelectorAll(".tour-card.open").forEach(el=>{
     el.classList.remove("open");
-    const b=el.querySelector(".tour-events"); if(b) b.hidden=true;
   });
 
   if(!opening){
@@ -511,7 +542,6 @@ async function toggleArtist(item,card,mode){
 
   expandedKey=key;
   card.classList.add("open");
-  box.hidden=false;
   box.textContent="";
   const loading=document.createElement("div"); loading.className="tour-loading"; loading.textContent="Loading dates...";
   box.appendChild(loading);
@@ -559,7 +589,7 @@ function renderArtists(items,mode){
     const meta=document.createElement("span"); meta.className="tour-meta";
     const shows=Number(item.shows||item.count||0);
     meta.textContent=mode==="popular"
-      ? ("Kworb #"+String(item.kworbRank||item.rank||index+1)+" · upcoming shows")
+      ? "Upcoming shows"
       : (shows+" nearby "+(shows===1?"show":"shows"));
     copy.append(name,meta);
 
@@ -567,8 +597,12 @@ function renderArtists(items,mode){
     chev.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>';
 
     row.append(rank,art,copy,chev);
-    const box=document.createElement("div"); box.className="tour-events"; box.hidden=true;
+    const box=document.createElement("div"); box.className="tour-events";
     row.addEventListener("click",()=>toggleArtist(item,card,mode));
+    if(mode==="popular"){
+      row.addEventListener("pointerenter",()=>prefetchArtist(item),{once:true});
+      row.addEventListener("focus",()=>prefetchArtist(item),{once:true});
+    }
     card.append(row,box); toursEl.appendChild(card);
   });
 }
@@ -610,7 +644,7 @@ async function loadHotspots(){
 
 async function loadPopular(force=false){
   setMode("popular");
-  sideSub.textContent="Global digital ranking · artists with upcoming Ticketmaster shows.";
+  sideSub.textContent="Popular artists with upcoming Ticketmaster shows.";
   sideEmpty.hidden=false;
   sideEmpty.textContent="Loading popular artists...";
   if(popularArtists.length && !force){
@@ -620,10 +654,11 @@ async function loadPopular(force=false){
     return;
   }
   try{
-    const data=await getPayload({mode:"popular"});
+    const data=await getPayload({mode:"popular",v:"popular-v4"});
     popularArtists=data.artists||[];
     popularEvents=[];
     renderArtists(popularArtists,"popular");
+    prefetchPopular(popularArtists);
     setEventData([]);
     setStatus(popularArtists.length ? "Popular artists" : "Popular concerts are unavailable right now.");
   }catch(err){
