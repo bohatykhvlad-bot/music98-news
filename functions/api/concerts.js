@@ -376,11 +376,11 @@ function queueCandidate(state, candidate) {
 }
 
 async function processVenueJob(apiKey, state, job) {
-  if (!validJob(job)) return;
+  if (!validJob(job)) return { queried:false };
 
   if (needsGeographicSplit(job)) {
     state.queue.unshift(...splitHotspotJob(job));
-    return;
+    return { queried:false };
   }
 
   const first = await venuePage(apiKey, job, 0);
@@ -389,12 +389,12 @@ async function processVenueJob(apiKey, state, job) {
 
   if ((shouldSplitVenueResult(total, job) || totalPages > 5) && Number(job.depth || 0) < HOTSPOT_MAX_DEPTH) {
     state.queue.unshift(...splitHotspotJob(job));
-    return;
+    return { queried:true };
   }
 
   if (total > 1000 || totalPages > 5) {
     state.partial = true;
-    return;
+    return { queried:true };
   }
 
   const pages = [first];
@@ -410,6 +410,7 @@ async function processVenueJob(apiKey, state, job) {
     }
   }
   state.scannedJobs = Number(state.scannedJobs || 0) + 1;
+  return { queried:true };
 }
 
 async function processCityVerification(apiKey, state, key) {
@@ -441,11 +442,13 @@ export async function refreshHotspotSnapshot(env, options = {}) {
   if (state.complete) return { ok:true, complete:true, hotspots:Object.keys(state.verified || {}).length };
 
   let jobsDone = 0;
-  while (state.queue.length && jobsDone < jobBudget) {
+  let dequeued = 0;
+  while (state.queue.length && jobsDone < jobBudget && dequeued < 160) {
     const job = state.queue.shift();
+    dequeued++;
     try {
-      await processVenueJob(env.TICKETMASTER_API_KEY, state, job);
-      jobsDone++;
+      const result = await processVenueJob(env.TICKETMASTER_API_KEY, state, job);
+      if (result?.queried) jobsDone++;
     } catch (err) {
       state.errors = Number(state.errors || 0) + 1;
       state.queue.unshift({ ...job, attempts:Number(job?.attempts || 0) + 1 });
@@ -522,7 +525,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   if (mode === "hotspots") {
     const payload = await hotspotSnapshotPayload(env);
     if (payload.partial && env?.TICKETMASTER_API_KEY && env?.DESK && typeof waitUntil === "function") {
-      waitUntil(refreshHotspotSnapshot(env).catch(() => {}));
+      waitUntil(refreshHotspotSnapshot(env, { jobBudget:4, verifyBudget:16 }).catch(() => {}));
     }
     if (!payload.hotspots.length && !env?.TICKETMASTER_API_KEY) {
       return json({ error:"ticketmaster_key_missing", ...payload }, 503);
