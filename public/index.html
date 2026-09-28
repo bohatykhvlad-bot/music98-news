@@ -789,15 +789,15 @@ textarea{resize:vertical;min-height:64px}
   <div class="topbar-glass topbar-glass-full" aria-hidden="true"></div>
   <div class="topbar-glass topbar-glass-isle" aria-hidden="true"></div>
   <div class="topbar-in">
-    <a class="brand" href="#" id="brandHome" title="music98.news — home">
+    <a class="brand" href="/" id="brandHome" title="music98.news — home">
       <img class="brand-logo" id="brandLogo" src="/logo.png" alt="music98.news" width="44" height="44">
       <span class="brand-name">music98.news</span>
     </a>
     <nav class="nav" id="nav">
-      <a class="nav-btn active" data-tab="news" href="/#news">News</a>
-      <a class="nav-btn" data-tab="releases" href="/#releases">Releases</a>
-      <a class="nav-btn" data-tab="charts" href="/#charts">Chart</a>
-      <a class="nav-btn" data-tab="concerts" href="/#concerts">Concerts</a>
+      <a class="nav-btn active" data-tab="news" href="/">News</a>
+      <a class="nav-btn" data-tab="releases" href="/releases">Releases</a>
+      <a class="nav-btn" data-tab="charts" href="/chart">Chart</a>
+      <a class="nav-btn" data-tab="concerts" href="/concerts">Concerts</a>
     </nav>
     <div class="top-actions">
       <div class="search">
@@ -863,10 +863,10 @@ textarea{resize:vertical;min-height:64px}
     </div>
     <div class="foot-col">
       <h3>Sections</h3>
-      <a class="flink" href="/#news" data-goto="news">News</a>
-      <a class="flink" href="/#releases" data-goto="releases">Releases</a>
-      <a class="flink" href="/#charts" data-goto="charts">Chart</a>
-      <a class="flink" href="/#concerts" data-goto="concerts">Concerts</a>
+      <a class="flink" href="/" data-goto="news">News</a>
+      <a class="flink" href="/releases" data-goto="releases">Releases</a>
+      <a class="flink" href="/chart" data-goto="charts">Chart</a>
+      <a class="flink" href="/concerts" data-goto="concerts">Concerts</a>
     </div>
     <div class="foot-col">
       <h3>Information</h3>
@@ -2793,12 +2793,12 @@ function renderHints(){
 function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHints(); updateStorageInfo(); }
 
 /* ============ tabs & search events ============ */
-const TAB_PATHS={news:"/#news",releases:"/#releases",charts:"/#charts",concerts:"/#concerts"};
-function tabPath(t){ return TAB_PATHS[t]||"/#news"; }
+const TAB_PATHS={news:"/",releases:"/releases",charts:"/chart",concerts:"/concerts"};
+function tabPath(t){ return TAB_PATHS[t]||"/"; }
 function goTab(t,replace=false){
   setTab(t);
   const to=tabPath(t);
-  if((location.pathname+location.hash)!==to || location.search){
+  if(location.pathname!==to || location.search || location.hash){
     try{ history[replace?"replaceState":"pushState"]({tab:t},"",to); }catch(e){}
   }
 }
@@ -3286,7 +3286,9 @@ function route(){
   const tabHash = location.hash.match(/^#(news|releases|charts|concerts)$/);
   if(tabHash){
     hideArticle();
-    setTab(tabHash[1]);
+    const t=tabHash[1];
+    setTab(t);
+    try{ history.replaceState({tab:t},"",tabPath(t)); }catch(e){}
     return;
   }
   const sectionByPath={
@@ -3298,7 +3300,11 @@ function route(){
   };
   if(sectionByPath[cleanPath]){
     hideArticle();
-    setTab(sectionByPath[cleanPath]);
+    const t=sectionByPath[cleanPath];
+    setTab(t);
+    if(cleanPath==="/news"){
+      try{ history.replaceState({tab:"news"},"","/"); }catch(e){}
+    }
     return;
   }
   if(cleanPath==="/"){
