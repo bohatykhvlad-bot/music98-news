@@ -140,6 +140,9 @@ REFERENT = re.compile(
 # The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
+    "october 9": "Dominic Fike 'How To Quit Smoking' album release date, 09.10.2026 (Apple Music / Columbia Records)",
+    "september 29": "Dominic Fike Comedy Tragedy Parody show at The Wiltern, Los Angeles, 29.09.2026 (dominicfike.com / Ticketmaster)",
+    "september 30": "Dominic Fike Comedy Tragedy Parody show at The Wiltern, Los Angeles, 30.09.2026 (dominicfike.com / Ticketmaster)",
     "september 23": "Taylor Swift announced The Life of a Showgirl: The Encore on 23.09.2026 (Pitchfork/NME)",
     "october 3": "The Life of a Showgirl released on 03.10.2025 (Variety)",
     "2016": "debut, SQUARE ONE, 08.08.2016 (YG); first music show win 21.08.2016 (Inkigayo)",
