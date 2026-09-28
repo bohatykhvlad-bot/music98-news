@@ -149,3 +149,23 @@ for key in ["dded7f7e94","0cb642bd2d","16d405d43a","a6d485acfd"]:
         print("ACTION",key,data[:8000])
     except Exception as e:
         print("ACTION_ERR",key,repr(e))
+
+
+print("\nHIGHRES_DIMENSIONS")
+try:
+    from PIL import Image
+    import io, json as _json
+    for key in ["dded7f7e94","0cb642bd2d","16d405d43a","a6d485acfd"]:
+        au="https://www.paramountpressexpress.com/mtv/actions/?action=asset-download&brand=mtv&type=photo&key="+key+"&rnd=7654321"
+        aq=urllib.request.Request(au,headers={"User-Agent":UA,"Referer":"https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/"})
+        aj=_json.loads(urllib.request.urlopen(aq,timeout=90).read().decode("utf-8"))
+        du=urljoin("https://www.paramountpressexpress.com",aj["redirect"])
+        dq=urllib.request.Request(du,headers={"User-Agent":UA,"Referer":"https://www.paramountpressexpress.com/"})
+        with urllib.request.urlopen(dq,timeout=90) as dr:
+            data=dr.read()
+            final=dr.geturl()
+            ct=dr.headers.get("Content-Type")
+        im=Image.open(io.BytesIO(data))
+        print("HIRES",key,im.size,len(data),im.format,ct,final[:1000])
+except Exception as e:
+    print("HIGHRES_DIM_ERROR",repr(e))
