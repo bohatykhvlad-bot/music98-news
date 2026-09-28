@@ -25,7 +25,7 @@ MADONNA_CREDIT_URL = "https://francisspecker.com/"
 
 EXCERPT = (
     "Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won "
-    "Video of the Year at the September 27 ceremony in Los Angeles."
+    "Video of the Year for \"The Fate of Ophelia\" at the September 27 ceremony in Los Angeles."
 )
 
 INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year for "The Fate of Ophelia" at the September 27 ceremony in Los Angeles. Hosted by Snoop Dogg at the Peacock Theater, the show gave Madonna the largest award total of the night and recognized Taylor Swift with the inaugural MTV VMA Artist Director Honors.
