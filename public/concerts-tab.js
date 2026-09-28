@@ -3,19 +3,28 @@
 const MAPBOX_TOKEN = "pk.eyJ1IjoibXVzaWM5OCIsImEiOiJjbXVsaWM1M2kxbm4xMnpxeW83bWR5aHg5In0.8Y56YcxjJ3kpa5g51Yl3aw";
 let map = null;
 function ensureMap(){
-  if(map){ requestAnimationFrame(()=>map.resize()); return map; }
+  if(map){
+    requestAnimationFrame(()=>map.resize());
+    setTimeout(()=>map.resize(),80);
+    return map;
+  }
   if(typeof mapboxgl === "undefined") return null;
   mapboxgl.accessToken = MAPBOX_TOKEN;
   map = new mapboxgl.Map({
     container:"concertMap",
-    style:"mapbox://styles/mapbox/light-v11",
+    style:"mapbox://styles/mapbox/streets-v12",
     projection:"mercator",
     center:[0,22],
     zoom:1.55,
     attributionControl:true
   });
   map.addControl(new mapboxgl.NavigationControl({showCompass:false}),"bottom-right");
-  
+  map.on("load",()=>{
+    addLayers();
+    requestAnimationFrame(()=>map.resize());
+    setTimeout(()=>map.resize(),120);
+  });
+  map.on("moveend",()=>scheduleViewportLoad());
   return map;
 }
 window.ensureConcertsMap = ensureMap;
@@ -26,6 +35,9 @@ let currentEvents=[];
 let lastArea=null;
 let suggestTimer=0;
 let popup=null;
+let viewportTimer=0;
+let suppressViewportLoad=0;
+let viewportRequestSeq=0;
 
 function escText(v){ return String(v==null?"":v); }
 function setStatus(s){ statusEl.textContent=s||""; }
@@ -40,6 +52,30 @@ function shortDate(e){
   return new Intl.DateTimeFormat("en",{month:"short",day:"numeric"}).format(d).toUpperCase();
 }
 function placeLine(e){ return [e.venue,e.city,e.state,e.country].filter(Boolean).join(" · "); }
+
+function scheduleViewportLoad(){
+  if(!map || suppressViewportLoad) return;
+  clearTimeout(viewportTimer);
+  viewportTimer=setTimeout(async()=>{
+    if(!map || suppressViewportLoad || !document.querySelector("#tab-concerts.active")) return;
+    const center=map.getCenter();
+    const seq=++viewportRequestSeq;
+    setStatus("Loading concerts in this area...");
+    try{
+      const events=await getEvents({lat:center.lat,lng:center.lng,radius:radiusEl.value});
+      if(seq!==viewportRequestSeq) return;
+      lastArea={lat:center.lat,lng:center.lng,label:"Map area"};
+      sideTitle.textContent="Popular nearby";
+      sideSub.textContent="Artists with the most upcoming events in this map area.";
+      resetArtist.hidden=true;
+      renderTours(events);
+      applyEvents(events,"Map area",false);
+    }catch(err){
+      console.error(err);
+      if(seq===viewportRequestSeq) setStatus("Could not load concerts in this area.");
+    }
+  },420);
+}
 
 function toGeoJSON(events){
   return {
@@ -89,8 +125,6 @@ function addLayers(){
   map.on("mouseenter","event-points",()=>map.getCanvas().style.cursor="pointer");
   map.on("mouseleave","event-points",()=>map.getCanvas().style.cursor="");
 }
-map.on("load",addLayers);
-
 function popupContent(e){
   const root=document.createElement("div");
   if(e.image){
@@ -147,12 +181,16 @@ function renderTours(events){
     toursEl.appendChild(b);
   });
 }
-function applyEvents(events,modeLabel){
+function applyEvents(events,modeLabel,fit=true){
   currentEvents=events;
   ensureMap();
   if(map.getSource("events")) map.getSource("events").setData(toGeoJSON(events));
-  else map.once("load",()=>map.getSource("events").setData(toGeoJSON(events)));
-  fitEvents(events);
+  else map.once("load",()=>map.getSource("events")?.setData(toGeoJSON(events)));
+  if(fit){
+    suppressViewportLoad++;
+    fitEvents(events);
+    setTimeout(()=>{ suppressViewportLoad=Math.max(0,suppressViewportLoad-1); },1000);
+  }
   setStatus(events.length ? (events.length+" concerts · "+modeLabel) : ("No Ticketmaster concerts found · "+modeLabel));
 }
 async function getEvents(params){
@@ -195,7 +233,12 @@ async function loadArtist(name){
   }
 }
 resetArtist.addEventListener("click",()=>{ if(lastArea) loadArea(lastArea.lat,lastArea.lng,lastArea.label); });
-radiusEl.addEventListener("change",()=>{ if(lastArea) loadArea(lastArea.lat,lastArea.lng,lastArea.label); });
+radiusEl.addEventListener("change",()=>{
+  if(map){
+    const c=map.getCenter();
+    loadArea(c.lat,c.lng,lastArea?.label||"Map area");
+  }else if(lastArea) loadArea(lastArea.lat,lastArea.lng,lastArea.label);
+});
 
 function featureLabel(f){
   return f?.properties?.full_address || f?.properties?.name_preferred || f?.properties?.name || "";
@@ -213,6 +256,12 @@ async function selectFeature(f){
   if(!coords||coords.length<2) return;
   const label=featureLabel(f)||search.value.trim()||"Selected area";
   search.value=label; suggestions.hidden=true;
+  const m=ensureMap();
+  if(m){
+    suppressViewportLoad++;
+    m.flyTo({center:[coords[0],coords[1]],zoom:9,duration:700});
+    setTimeout(()=>{ suppressViewportLoad=Math.max(0,suppressViewportLoad-1); },900);
+  }
   await loadArea(coords[1],coords[0],label);
 }
 function renderSuggestions(features){
