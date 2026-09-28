@@ -759,17 +759,17 @@ function mergeHotspots(rows){
   return [...byKey.values()].sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
 }
 
-const HOTSPOT_CACHE_KEY="music98:concert-hotspots:v17";
+const HOTSPOT_CACHE_KEY="music98:concert-hotspots:v18";
 function readHotspotCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(HOTSPOT_CACHE_KEY)||"null");
     const age=Date.now()-(Date.parse(cached?.builtAt||0)||0);
-    if(cached?.version==="hotspots-v17" && Array.isArray(cached.hotspots) && age<24*60*60*1000) return cached;
+    if(cached?.version==="hotspots-v18" && Array.isArray(cached.hotspots) && age<24*60*60*1000) return cached;
   }catch(e){}
   return null;
 }
 function writeHotspotCache(data){
-  if(data?.partial || data?.version!=="hotspots-v17" || !Array.isArray(data.hotspots)) return;
+  if(data?.partial || data?.version!=="hotspots-v18" || !Array.isArray(data.hotspots)) return;
   try{ localStorage.setItem(HOTSPOT_CACHE_KEY,JSON.stringify(data)); }catch(e){}
 }
 async function loadHotspots(){
@@ -779,7 +779,7 @@ async function loadHotspots(){
   if(src) src.setData(hubsGeoJSON());
 
   try{
-    const data=await getPayload({mode:"hotspots",v:"hotspots-v17"});
+    const data=await getPayload({mode:"hotspots",v:"hotspots-v18"});
     const incoming=mergeHotspots(data.hotspots||[]);
     if(incoming.length || !hotspots.length) hotspots=incoming;
     src=map.getSource("hubs");
@@ -791,7 +791,7 @@ async function loadHotspots(){
     if(data.partial && !cached){
       setTimeout(async()=>{
         try{
-          const next=await getPayload({mode:"hotspots",v:"hotspots-v17",_:Date.now()});
+          const next=await getPayload({mode:"hotspots",v:"hotspots-v18",_:Date.now()});
           if((next.hotspots||[]).length>hotspots.length){
             hotspots=mergeHotspots(next.hotspots||[]);
             const hubSrc=map.getSource("hubs");
