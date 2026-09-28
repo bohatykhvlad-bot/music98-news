@@ -28,21 +28,15 @@ EXCERPT = (
     "Video of the Year at the September 27 ceremony in Los Angeles."
 )
 
-INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year at the September 27 ceremony in Los Angeles. Hosted by Snoop Dogg at the Peacock Theater, the show also recognized BTS in three categories and named Sienna Spiro Best New Artist. Madonna's haul included Artist of the Year, the album award for *Confessions II* and the collaboration prize with Sabrina Carpenter, while Taylor Swift added the directing award and received the inaugural MTV VMA Artist Director Honors.
+INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year for "The Fate of Ophelia" at the September 27 ceremony in Los Angeles. Hosted by Snoop Dogg at the Peacock Theater, the show gave Madonna the largest award total of the night and recognized Taylor Swift with the inaugural MTV VMA Artist Director Honors.
 
-Madonna entered the final ballot with 13 nominations after MTV added the social categories. She won Artist of the Year and the album prize for *Confessions II*, shared the collaboration award with Sabrina Carpenter for "Bring Your Love," and collected four additional wins for "Confessions II - The Film." Those came in the dance, cinematography, choreography and long-form video categories.
+Madonna entered the final ballot with 13 nominations after MTV added the social categories. Her seven wins included Artist of the Year, the album award for *Confessions II*, Best Collaboration with Sabrina Carpenter for "Bring Your Love," and four awards connected to "Confessions II - The Film."
 
-[photo:{madonna_src}|Francis Specker|https://francisspecker.com/|50% 46%|1]
-
-Taylor Swift won Video of the Year for "The Fate of Ophelia" and the directing category for "Opalite." MTV also presented Taylor Swift with the inaugural Artist Director Honors, a separate recognition for her work as a director.
-
-Elsewhere, LISA took pop, Cardi B featuring Kehlani hip-hop, Bruno Mars R&B, Olivia Rodrigo alternative, Bad Bunny Latin and Ella Langley country. Ariana Grande won Song of Summer and the visual-effects category.
-
-In the craft categories, Sabrina Carpenter won editing for "House Tour," PinkPantheress took art direction for "Stateside + Zara Larsson," and Madonna added cinematography and choreography to her total. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor.
+Taylor Swift also won Best Direction for "Opalite." BTS collected three awards, including Song of the Year and Best Group, while Sienna Spiro was named Best New Artist.
 
 The complete list below includes every competitive category from the final 2026 ballot, followed by the Video Vanguard Award and the MTV VMA Artist Director Honors. Winners are shown in bold on the published page, with the remaining nominees listed underneath each category."""
 
-ENDING = """The final results reflected a broad distribution of awards across the 2026 ceremony. Madonna led the night with seven wins across major, genre, social and craft categories. Taylor Swift won Video of the Year and Best Direction in addition to receiving the Artist Director Honors, while BTS, Ariana Grande, Sienna Spiro and the genre-category winners accounted for many of the night's other major results."""
+ENDING = """The 2026 VMAs combined a clear awards leader in Madonna with a Video of the Year win for Taylor Swift and a broad spread of winners across the remaining categories."""
 
 REPLACEMENTS = [
     ('[nominee:Madonna and Sabrina Carpenter — "Bring Your Love"]',
@@ -163,10 +157,14 @@ def main():
     if current.get("status") != "live":
         raise RuntimeError(f"expected live post, got {current.get('status')!r}")
 
-    hero_src, hero_size = assets.upload_photo(HERO_KEY, HERO_NAME)
-    madonna_src, madonna_size = assets.upload_photo(MADONNA_KEY, MADONNA_NAME)
-
     body = current.get("body") or ""
+    madonna_match = re.search(
+        r'\[photo:(photos/vmas-2026-madonna-sabrina-best-collaboration-stage\.jpg)\|',
+        body,
+    )
+    if not madonna_match:
+        raise RuntimeError("current centered Madonna photo not found")
+    madonna_src = madonna_match.group(1)
     if "[awards]" not in body or "[/awards]" not in body:
         raise RuntimeError("structured awards block missing")
 
@@ -182,6 +180,7 @@ def main():
         "publishAt": current.get("publishAt"),
         "date": current.get("date"),
         "title": current.get("title"),
+        "cover": current.get("cover"),
     }
 
     def mutate(posts):
@@ -190,18 +189,6 @@ def main():
             raise RuntimeError("post vanished before write")
         p["body"] = new_body
         p["excerpt"] = EXCERPT
-        p["cover"] = {
-            "kind": "img",
-            "src": hero_src,
-            "credit": HERO_CREDIT,
-            "creditUrl": HERO_CREDIT_URL,
-            "pos": "50% 42%",
-            "zoom": 1,
-            "lockX": 0.50,
-            "cardX": 0.50,
-            "cardY": 0.42,
-            "cardZoom": 1,
-        }
         return p
 
     now = runner.guarded_write(mutate)
@@ -214,8 +201,8 @@ def main():
 
     audit(now["body"])
     print("VMA_LIVE_UPDATED", now["id"], now["status"], runner.words(now["body"]), "words")
-    print("HERO", hero_size, hero_src, HERO_CREDIT)
-    print("MADONNA_PHOTO", madonna_size, madonna_src, MADONNA_CREDIT)
+    print("TEXT_ONLY_UPDATE", "all existing image positions preserved")
+    print("MADONNA_PHOTO", madonna_src, "current centered placement preserved")
 
     ok = runner.cmd_gate(PID)
     if not ok:
