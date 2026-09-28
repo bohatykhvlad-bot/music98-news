@@ -1,10 +1,12 @@
+import { appleCandidateCompatible, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
+
 const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v26";
+const TOP50_KV = "top50v27";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -41,7 +43,7 @@ function chartWeek() {
    его каждый день обновляет .github/workflows/covers.yml (там Apple отвечает).
    Deezer остаётся последним вариантом, чтобы карточка не осталась пустой.
    Найденная обложка запоминается по песне, поэтому день ото дня не меняется. */
-const COVERS_KV = "covers_v3";
+const COVERS_KV = "covers_v4";
 const DZ_HOST = "dzcdn.net";
 function isAppleArt(url) {
   try {
@@ -140,18 +142,20 @@ async function enrichArtByIds(tracks, stats) {
       const data = await getJson(`https://itunes.apple.com/lookup?id=${ids.slice(i, i + 50).join(",")}&entity=song&country=US`);
       for (const item of data.results || []) {
         const id = String(item.trackId || "");
-        const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
-        if (id && art) found.set(id, art);
+        if (id) found.set(id, item);
       }
     } catch {
       if (stats) stats.failed += 1;
     }
   }
   for (const [t, id] of want) {
-    const art = found.get(id);
-    if (art) {
-      t.art = art;
-      if (stats) stats.filled += 1;
+    const item = found.get(id);
+    if (item && appleCandidateCompatible(t.title, t.artist, item)) {
+      const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
+      if (art) {
+        t.art = art;
+        if (stats) stats.filled += 1;
+      }
     }
   }
 }
@@ -252,7 +256,7 @@ function rekeySeen(old) {
   for (const [k, v] of Object.entries((old && old.seen) || {})) {
     const cut = String(k).indexOf("|");
     if (cut < 0) continue;
-    const nk = tenureKey(k.slice(0, cut), k.slice(cut + 1));
+    const nk = isVersionedMergeKey(k) ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1));
     const prev = out[nk];
     if (!prev || (Number(v && v.weeks) || 0) > (Number(prev.weeks) || 0)) out[nk] = v;
   }
@@ -271,7 +275,7 @@ function rekeyFirstDays(old) {
   const out = {};
   for (const [k, v] of Object.entries(old || {})) {
     const cut = String(k).indexOf("|");
-    const nk = cut < 0 ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1));
+    const nk = cut < 0 ? k : (isVersionedMergeKey(k) ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1)));
     const day = Number(v);
     if (!Number.isFinite(day)) continue;
     out[nk] = out[nk] == null ? day : Math.min(out[nk], day);
@@ -297,7 +301,7 @@ async function applyTenure(env, tracks, diag) {
     : (hasToday ? ten.today : (ten.keys || []));
   const prevKeys = refRaw.map((k) => {
     const cut = String(k).indexOf("|");
-    return cut < 0 ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1));
+    return cut < 0 ? k : (isVersionedMergeKey(k) ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1)));
   });
   const seen = rekeySeen(ten);
   /* первое заполнение памятки: день появления берём из того, что помнит реестр
@@ -410,26 +414,6 @@ function arrowCheck(tracks) {
 }
 const UA = "Mozilla/5.0 (compatible; music98/1.0)";
 
-function stripParen(s) {
-  return String(s || "").replace(/\([^)]*\)|\[[^\]]*\]/g, " ");
-}
-function normTitle(s) {
-  const t = stripParen(s)
-    .toLowerCase()
-    .replace(/[’‘]/g, "'")
-    .replace(/\b(remastered|remix|single|deluxe|from)\b/g, "")
-    .replace(/[^a-z0-9]+/g, "");
-  return t;
-}
-function primaryArtist(s) {
-  return String(s || "")
-    .split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)[0]
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "");
-}
-function mergeKey(title, artist) {
-  return `${normTitle(title)}|${primaryArtist(artist)}`;
-}
 function points(pos) {
   const n = Number(pos);
   if (!n || n < 1 || n > SIZE) return 0;
@@ -602,10 +586,10 @@ async function seedBaked(origin, tracks) {
     const baked = await getJson(origin + "/data/top50.json");
     const map = new Map();
     (baked.tracks || []).forEach((t) => {
-      map.set(normTitle(t.title) + "|" + primaryArtist(t.artist), t);
+      map.set(mergeKey(t.title, t.artist), t);
     });
     tracks.forEach((t) => {
-      const b = map.get(normTitle(t.title) + "|" + primaryArtist(t.artist));
+      const b = map.get(mergeKey(t.title, t.artist));
       if (!b) return;
       if (!isApplePreview(t.prev) && isApplePreview(b.prev)) t.prev = b.prev;
       if (!t.url && b.url) t.url = b.url;
@@ -683,7 +667,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v26",
+    rev: "feat-v27",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
@@ -697,12 +681,8 @@ export async function buildTop50(origin, env) {
 
 async function itunesLookup(title, artist) {
   const term = encodeURIComponent(`${artist} ${stripParen(title)}`.trim());
-  const data = await getJson(`https://itunes.apple.com/search?term=${term}&entity=song&limit=5&country=US`);
-  const wantT = normTitle(title);
-  const wantA = primaryArtist(artist);
-  let hit = (data.results || []).find((item) => normTitle(item.trackName) === wantT && primaryArtist(item.artistName) === wantA)
-    || (data.results || []).find((item) => normTitle(item.trackName) === wantT)
-    || (data.results || [])[0];
+  const data = await getJson(`https://itunes.apple.com/search?term=${term}&entity=song&limit=25&country=US`);
+  const hit = pickAppleCandidate(title, artist, data.results || []);
   if (!hit) return {};
   const album = String(hit.collectionId || "");
   const track = String(hit.trackId || "");
