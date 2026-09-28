@@ -169,7 +169,8 @@ export default {
       const u = new URL("/admin-desk", request.url);
       return Response.redirect(u, 301);
     }
-    if (path === "/concerts" && (request.method === "GET" || request.method === "HEAD")) {
+    if (/^\/(?:news|releases|chart|charts|concerts)\/?$/.test(path) &&
+        (request.method === "GET" || request.method === "HEAD")) {
       const u = new URL(request.url);
       return env.ASSETS.fetch(new Request(u.origin + "/index.html", request));
     }
