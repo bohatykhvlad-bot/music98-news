@@ -95,9 +95,6 @@ jobs:
       - name: Revise Fireflies live
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[revise-fireflies]') }}
         run: python scripts/revise_fireflies_live.py
-      - name: Probe official VMA press assets
-        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[vma-assets]') }}
-        run: python scripts/vma_asset_probe.py
       - name: Draft 2026 VMA results
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[vma-draft]') }}
         run: python scripts/draft_vmas_2026_results.py
