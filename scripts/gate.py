@@ -527,10 +527,29 @@ def is_media(t):
     return bool(re.match(r"^\[(?:photo|youtube|apple|tiktok|ig):[^\]]*\]$", t, re.I))
 
 
+def is_awards_marker(t):
+    return (t or "").strip().lower() in ("[awards]", "[/awards]")
+
+
 def prose_of(body):
+    """Journalistic prose only.
+
+    [awards]...[/awards] is a structured results appendix. Repeated nominee
+    names and song titles are factual list data, not prose style, so they do
+    not participate in echo/colon/dash/quote-density checks. Media and credit
+    validation still run against the full body.
+    """
     out = []
+    in_awards = False
     for p in paragraphs(body):
-        if not is_media(p):
+        t = p.strip()
+        if t.lower() == "[awards]":
+            in_awards = True
+            continue
+        if t.lower() == "[/awards]":
+            in_awards = False
+            continue
+        if not in_awards and not is_media(t):
             out.append(p)
     return "\n\n".join(out)
 
@@ -562,9 +581,7 @@ def manual_checklist(p, limit=12):
     number, so the human pass is a short targeted read instead of a re-read."""
     body = p.get("body") or ""
     out = ["quotes: verify each against its source"]
-    for para in paragraphs(body):
-        if is_media(para):
-            continue
+    for para in paragraphs(prose):
         for q in quoted_spans(para):
             if len(q) < 18:
                 continue
@@ -895,8 +912,15 @@ def check_post(p, strict):
     # релизы чуть длиннее"), so on them the floor is the fragment line, not the longread band.
     long_form = len(prose_of(body).split()) > 900
     floor = 80 if long_form else 40
+    awards_depth = False
     for i, q in enumerate(paras):
-        if is_media(q):
+        if q.strip().lower() == "[awards]":
+            awards_depth = True
+            continue
+        if q.strip().lower() == "[/awards]":
+            awards_depth = False
+            continue
+        if is_media(q) or awards_depth:
             continue
         w = len(q.split())
         sents = len(sentences(q))
@@ -913,7 +937,20 @@ def check_post(p, strict):
     # committed. A single 190-word paragraph that ends by handing off to its own photo or
     # clip is working, not bloated.
     run, run_start = 0, 0
+    awards_depth = False
     for i, q in enumerate(paras):
+        if q.strip().lower() == "[awards]":
+            awards_depth = True
+            if run > WALL_RUN_WORDS and long_form:
+                warns.append(("text-wall", "paragraphs %d-%d total %d words with no carrier between them"
+                              % (run_start, i - 1, run)))
+            run = 0
+            continue
+        if q.strip().lower() == "[/awards]":
+            awards_depth = False
+            continue
+        if awards_depth:
+            continue
         if is_media(q):
             if run > WALL_RUN_WORDS and long_form:
                 warns.append(("text-wall", "paragraphs %d-%d total %d words with no carrier between them"
