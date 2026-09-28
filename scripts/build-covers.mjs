@@ -94,12 +94,12 @@ if (idWanted.length) {
   console.log(`по Apple-ID (точный релиз): ${idWanted.filter(([t]) => covers[mergeKey(t.title, t.artist)]).length}/${idWanted.length}`);
 }
 
-/* 2) Search every row, even when an Apple ID already exists. A valid old URL
-   can still point at a later reissue. The matcher chooses the exact title +
-   primary artist + exact version signature, then prefers the cleanest and
-   earliest matching Apple release. Search wins; exact-ID remains a fallback. */
+/* 2) Search only rows whose exact Apple ID is missing or failed strict identity.
+   This keeps the blast radius small and avoids iTunes rate limits. The search
+   matcher still enforces title + primary artist + exact version signature. */
 for (const t of tracks) {
   const key = mergeKey(t.title, t.artist);
+  if (covers[key]) continue;
   try {
     const term = encodeURIComponent(`${t.artist} ${stripParen(t.title)}`.trim());
     const d = await (await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&limit=25&country=US`)).json();
