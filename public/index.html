@@ -794,10 +794,10 @@ textarea{resize:vertical;min-height:64px}
       <span class="brand-name">music98.news</span>
     </a>
     <nav class="nav" id="nav">
-      <button class="nav-btn active" data-tab="news">News</button>
-      <button class="nav-btn" data-tab="releases">Releases</button>
-      <button class="nav-btn" data-tab="charts">Chart</button>
-      <button class="nav-btn" data-tab="concerts">Concerts</button>
+      <a class="nav-btn active" data-tab="news" href="/news">News</a>
+      <a class="nav-btn" data-tab="releases" href="/releases">Releases</a>
+      <a class="nav-btn" data-tab="charts" href="/chart">Chart</a>
+      <a class="nav-btn" data-tab="concerts" href="/concerts">Concerts</a>
     </nav>
     <div class="top-actions">
       <div class="search">
@@ -2836,7 +2836,7 @@ function setTab(t){
   requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
   if(t==="concerts") resizeConcertsTab();
 }
-$("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab) goTab(b.dataset.tab); });
+$("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab){ e.preventDefault(); goTab(b.dataset.tab); } });
 $("#brandHome").addEventListener("click", e=>{
   e.preventDefault();
   if(!$("#articlePage").hidden) hideArticle();
