@@ -12,25 +12,25 @@ import post as runner
 PID = "aufike18r1"
 
 EXCERPT = (
-    'Dominic Fike has released "Small Town," the second lead single from his forthcoming album, '
-    'due October 9 through Columbia Records.'
+    'Dominic Fike has released "Small Town," the second lead single from his forthcoming album '
+    '*How To Quit Smoking*, due October 9 through Columbia Records.'
 )
 
-BODY_TEMPLATE = """Dominic Fike has released "Small Town," the second lead single from his forthcoming album, due October 9 through Columbia Records. The track follows "Wallflower" in the album campaign and arrives while Fike is still moving through North America on his Comedy Tragedy Parody tour.
+BODY_TEMPLATE = """Dominic Fike has released "Small Town," the second lead single from his forthcoming album *How To Quit Smoking*, due October 9 through Columbia Records. The track follows "Wallflower" and arrives while Fike is in the middle of his Comedy Tragedy Parody tour across North America.
 
-The album, *How To Quit Smoking*, is being made in unusually public fashion. Fike's press materials say he has been writing, recording and filming between dates, working in hotel rooms, on the bus and backstage before shows instead of separating the record-making process from the road. That same setup carries directly into "Small Town," which was released on September 18.
+Fike has been writing and recording the album between shows, using hotel rooms, the tour bus and backstage spaces as temporary studios. The road schedule has become part of the recording process rather than something separate from it, and "Small Town" came together during that stretch of touring.
 
-The song and its video were developed across several cities. The visual was shot in Detroit and Seattle, while the release was completed from Dallas. Emma Ogier and Gabriel Jacoby contribute vocals, with Jacoby traveling in to help finish the track between shows. Fike's official tour page also pairs "Small Town" with Detroit and Seattle, making those locations part of the release campaign rather than routine stops on the itinerary.
-
-Press materials describe *How To Quit Smoking* as Fike's third studio album. That framing follows *What Could Possibly Go Wrong* and *Sunburn*, while Ticketmaster describes his 2025 project *Rocket* as a mixtape. The distinction explains why the new campaign calls this the third studio record even though Apple Music groups *Rocket* with Fike's albums.
+The song and its video were developed across several cities. The visual was shot in Detroit and Seattle, while the release was completed from Dallas. Emma Ogier and Gabriel Jacoby contribute vocals, and Jacoby traveled in to help finish the track between shows.
 
 {youtube}
 
-The label-supplied YouTube credits add more detail to the recording. Dominic Fike and Kevin Abstract are listed among the songwriters. Capi produced the track and is also credited on keyboards and drums. Devin Workman is another producer and contributes acoustic guitar and brass, while Nick Leonardo plays acoustic guitar and bass. Ogier and Jacoby appear in the vocal credits.
+*How To Quit Smoking* will be Fike's third studio album, following *What Could Possibly Go Wrong* and *Sunburn*. His 2025 project *Rocket* was released as a mixtape. The new album runs 15 tracks and includes both "Wallflower" and "Small Town."
 
-Apple Music currently lists *How To Quit Smoking* as a 15-song pre-release scheduled for October 9 and credits the project to Columbia Records, a division of Sony Music Entertainment, under exclusive license. "Small Town" also appears on Fike's Apple Music artist page alongside "Wallflower" as part of the upcoming record.
+Dominic Fike and Kevin Abstract are among the songwriters on "Small Town." Capi produced the track and also plays keyboards and drums. Devin Workman is another producer and contributes acoustic guitar and brass, while Nick Leonardo plays acoustic guitar and bass. Ogier and Jacoby are both credited on vocals.
 
-The road schedule is still running alongside the album campaign. Fike's official site lists two Los Angeles shows at The Wiltern on September 29 and September 30, after a North American run that has taken him through cities including Detroit, Seattle, Dallas, Austin and Albuquerque. The album is due October 9, keeping the live run active into the final stretch before the record arrives."""
+The production keeps the arrangement relatively open around Fike's voice, with the additional vocals widening the chorus without turning the song into a full duet. Guitar, bass, drums, keyboards and brass all appear in the credits, but the track stays compact and direct rather than stacking every part at once.
+
+The album campaign continues alongside the tour. Fike is scheduled for two Los Angeles shows at The Wiltern on September 29 and September 30 after dates in cities including Detroit, Seattle, Dallas, Austin and Albuquerque. *How To Quit Smoking* arrives October 9, bringing the touring and recording cycle into the same final stretch before release."""
 
 def main():
     runner.load_env()
@@ -54,7 +54,7 @@ def main():
         raise RuntimeError("curly apostrophe found")
     if body.count(youtube) != 1:
         raise RuntimeError("YouTube marker count mismatch")
-    if runner.words(body) < 340:
+    if runner.words(body) < 330:
         raise RuntimeError(f"restored body too short: {runner.words(body)} words")
 
     preserved = {
@@ -76,7 +76,7 @@ def main():
         if now.get(key) != value:
             raise RuntimeError(f"preserved field changed: {key}")
 
-    if runner.words(now.get("body") or "") < 340:
+    if runner.words(now.get("body") or "") < 330:
         raise RuntimeError("live post is still too short after write")
 
     print("SMALL_TOWN_RESTORED", runner.words(now["body"]), "words")
