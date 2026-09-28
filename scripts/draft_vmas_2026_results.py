@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Final gate rerun after structured-awards checklist fix.
 from __future__ import annotations
 
 import base64
