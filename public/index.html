@@ -1200,22 +1200,55 @@ function previewPlayUrl(url, page){
   return s;
 }
 /* ---- iTunes Search API via JSONP (preview, artwork, track urls) ---- */
-const PREVCACHE = "music98news_prevcache_v2";
+const PREVCACHE = "music98news_prevcache_v3";
 function prevCache(){ try{ const r = lsGetRaw(PREVCACHE); return r ? JSON.parse(r) : {}; }catch(e){ return {}; } }
 let jsonpN = 0;
 function itunesNorm(s){
-  return String(s||"").toLowerCase().replace(/[’‘]/g,"'").replace(/\([^)]*\)|\[[^\]]*\]/g," ").replace(/[^a-z0-9]+/g,"");
+  return String(s||"").toLowerCase().replace(/[’‘]/g,"'").replace(/\([^)]*\)|\[[^\]]*\]/g," ").replace(/\b(remastered|remaster|remix|rmx|single|deluxe|from)\b/g,"").replace(/[^a-z0-9]+/g,"");
+}
+function itunesVersion(s){
+  const x=String(s||"").toLowerCase().replace(/[–—]/g,"-"), tags=[];
+  const add=(n,re)=>{ if(re.test(x)) tags.push(n); };
+  add("remix",/\b(?:remix|rmx)\b/);
+  add("live",/\blive\b/);
+  add("acoustic",/\bacoustic\b/);
+  add("instrumental",/\binstrumental\b/);
+  add("karaoke",/\bkaraoke\b/);
+  add("demo",/\bdemo\b/);
+  add("spedup",/\bsped\s*up\b/);
+  add("slowed",/\bslowed\b/);
+  add("acapella",/\b(?:acapella|a\s*cappella)\b/);
+  add("extended",/\bextended\b/);
+  add("edit",/\b(?:radio\s+)?edit\b/);
+  add("remaster",/\bremaster(?:ed)?\b/);
+  add("rerecorded",/\b(?:re-?recorded|taylor['’]s\s+version)\b/);
+  add("mix",/\b(?:dj\s+mix|mixed|mix)\b/);
+  if(!tags.length && /\bversion\b/.test(x)) tags.push("version");
+  return [...new Set(tags)].sort().join("+");
+}
+function itunesPrimary(s){
+  return itunesNorm(String(s||"").split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)[0]);
 }
 function itunesPick(results, title, artist){
-  const list = results || [];
+  const list=results||[];
   if(!list.length) return null;
-  const wantT = itunesNorm(title);
-  const wantA = itunesNorm(String(artist||"").split(/\s*(?:,|&|\/|\+| x | feat\.? | ft\.? | featuring | with )\s*/i)[0]);
-  const hit = list.find(item => itunesNorm(item.trackName) === wantT && itunesNorm(item.artistName) === wantA)
-    || list.find(item => itunesNorm(item.trackName) === wantT)
-    || list.find(item => wantT && itunesNorm(item.trackName).indexOf(wantT) === 0)
-    || null;
-  return hit;
+  const wantT=itunesNorm(title), wantV=itunesVersion(title), wantA=itunesPrimary(artist);
+  const exact=list.filter(item=>{
+    if(itunesNorm(item.trackName)!==wantT) return false;
+    if(itunesVersion(item.trackName)!==wantV) return false;
+    if(wantA && itunesPrimary(item.artistName)!==wantA) return false;
+    return true;
+  });
+  if(!exact.length) return null;
+  exact.sort((a,b)=>{
+    const av=itunesVersion(a.collectionName), bv=itunesVersion(b.collectionName);
+    const ap=av && av!==wantV ? 1 : 0, bp=bv && bv!==wantV ? 1 : 0;
+    if(ap!==bp) return ap-bp;
+    const ad=Date.parse(a.releaseDate||"")||Number.MAX_SAFE_INTEGER;
+    const bd=Date.parse(b.releaseDate||"")||Number.MAX_SAFE_INTEGER;
+    return ad-bd;
+  });
+  return exact[0];
 }
 function itunesLookup(title, artist, cb){
   const term = (title+" "+artist).trim();
@@ -1239,7 +1272,7 @@ function itunesLookup(title, artist, cb){
     cb(out);
   };
   s.onerror = ()=>{ cleanup(); cb(null); };
-  s.src = "https://itunes.apple.com/search?media=music&entity=song&limit=5&country=US&callback="+cbn+"&term="+encodeURIComponent(term);
+  s.src = "https://itunes.apple.com/search?media=music&entity=song&limit=15&country=US&callback="+cbn+"&term="+encodeURIComponent(term);
   document.head.appendChild(s);
 }
 /* ---- one shared <audio>; the whole player UI lives inside each chart row ---- */
