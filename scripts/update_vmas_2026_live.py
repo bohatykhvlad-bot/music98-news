@@ -26,18 +26,18 @@ ENDING = ""
 
 def normalize_awards(awards: str) -> str:
     # Billboard-style list separator: en dash, not em dash.
-    awards = awards.replace(" — ", " – ")
+    awards = awards.replace(" — ", " - ").replace(" – ", " - ")
 
     # Keep collaborators outside the work title where the title itself is simply "Stateside".
     awards = awards.replace(
-        'PinkPantheress – "Stateside + Zara Larsson"',
-        'PinkPantheress + Zara Larsson – "Stateside"',
+        'PinkPantheress - "Stateside + Zara Larsson"',
+        'PinkPantheress + Zara Larsson - "Stateside"',
     )
 
     # "Dream" is the work title; Kentaro Sakaguchi is the credited video collaborator.
     awards = awards.replace(
-        'LISA – "Dream feat. Kentaro Sakaguchi"',
-        'LISA – "Dream" feat. Kentaro Sakaguchi',
+        'LISA - "Dream feat. Kentaro Sakaguchi"',
+        'LISA - "Dream" feat. Kentaro Sakaguchi',
     )
 
     # Album casing follows Apple Music.
@@ -68,8 +68,8 @@ def audit(body: str, original_photo_tags: list[str]) -> None:
 
     if "Swift's" in body or "Taylor Swift's" in body:
         raise RuntimeError("surname shorthand or possessive Taylor Swift wording remains")
-    if "—" in body:
-        raise RuntimeError("em dash remains; awards list should use en dash")
+    if "—" in awards or "–" in awards:
+        raise RuntimeError("long dash remains in award-list artist/title separator")
     if any(ch in body for ch in ("’", "‘")):
         raise RuntimeError("curly apostrophe remains")
 
@@ -84,13 +84,13 @@ def audit(body: str, original_photo_tags: list[str]) -> None:
     awards = body[a:b]
     if awards.count("[award:") != 25 or awards.count("[winner:") != 25:
         raise RuntimeError("award/winner count mismatch")
-    if " — " in awards:
-        raise RuntimeError("em-dash separator remains in awards")
-    if 'PinkPantheress – "Stateside + Zara Larsson"' in awards:
+    if " — " in awards or " – " in awards:
+        raise RuntimeError("long-dash separator remains in awards")
+    if 'PinkPantheress - "Stateside + Zara Larsson"' in awards:
         raise RuntimeError("Stateside collaborator remains inside title")
-    if awards.count('PinkPantheress + Zara Larsson – "Stateside"') != 5:
+    if awards.count('PinkPantheress + Zara Larsson - "Stateside"') != 5:
         raise RuntimeError("Stateside credit count mismatch")
-    if awards.count('LISA – "Dream" feat. Kentaro Sakaguchi') != 4:
+    if awards.count('LISA - "Dream" feat. Kentaro Sakaguchi') != 4:
         raise RuntimeError("LISA Dream credit count mismatch")
     if "*CONFESSIONS II*" not in awards or "*ICEMAN*" not in awards:
         raise RuntimeError("Apple Music album casing missing")
@@ -107,10 +107,10 @@ def audit(body: str, original_photo_tags: list[str]) -> None:
     if '"' in album_section:
         raise RuntimeError("album titles should not be in quotation marks")
 
-    # Songs/videos are quoted and separated from artist credit with an en dash.
+    # Songs/videos are quoted and separated from artist credit with a spaced ASCII hyphen.
     for line in re.findall(r"\[(?:winner|nominee):[^\]]+\]", awards):
-        if '"' in line and " – " not in line:
-            raise RuntimeError("quoted work missing en-dash separator: " + line)
+        if '"' in line and " - " not in line:
+            raise RuntimeError("quoted work missing short-hyphen separator: " + line)
 
 def main():
     runner.load_env()
