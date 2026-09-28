@@ -56,10 +56,27 @@ const chart = await (await fetch(CHART + (CHART.includes("?") ? "&" : "?") + "cb
 const tracks = chart.tracks || [];
 console.log(`в чарте ${tracks.length} треков (rev ${chart.rev || "-"})`);
 
-const covers = {};
+/* Canonical artwork registry.
+ * Existing keys are immutable: an external catalog may change artwork later,
+ * but music98 keeps the first approved cover for that song identity.
+ * The daily job may only append covers for previously unseen keys.
+ */
+let covers = {};
+try {
+  const saved = JSON.parse(fs.readFileSync(OUT, "utf8"));
+  if (saved && typeof saved === "object" && !Array.isArray(saved)) covers = { ...saved };
+} catch {}
+const lockedAtStart = new Set(Object.keys(covers));
+const pinCover = (key, url) => {
+  if (!key || !url || covers[key]) return false;
+  covers[key] = url;
+  return true;
+};
 const names = {};
+console.log(`закреплённых обложек до сборки: ${lockedAtStart.size}`);
 
-/* 1) точный релиз по Apple-ID из ссылки, одним batch-запросом */
+/* 1) Для НОВЫХ ключей пробуем точный релиз по Apple-ID одним batch-запросом.
+   Уже закреплённые covers[key] не меняются ни при каких ответах каталога. */
   const idWanted = tracks.map((t) => [t, idOf(t.url)]).filter(([, id]) => id);
 if (idWanted.length) {
   const ids = [...new Set(idWanted.map(([, id]) => id))];
@@ -78,6 +95,12 @@ if (idWanted.length) {
     }
   }
   for (const [t, id] of idWanted) {
+    const key = mergeKey(t.title, t.artist);
+    if (covers[key]) {
+      const hit = byId.get(id);
+      if (hit) names[key] = appleRecord(hit);
+      continue;
+    }
     const hit = byId.get(id);
     if (!hit) continue;
     /* Existing Apple URLs are hints, not truth. If a row now points to a remix,
@@ -87,14 +110,13 @@ if (idWanted.length) {
       console.log(`  ссылка не совпадает с оригиналом: ${t.artist} - ${t.title} -> ${hit.trackName} / ${hit.collectionName || ""}`);
       continue;
     }
-    const key = mergeKey(t.title, t.artist);
-    covers[key] = art600(hit.artworkUrl100);
+    pinCover(key, art600(hit.artworkUrl100));
     names[key] = appleRecord(hit);
   }
-  console.log(`по Apple-ID (точный релиз): ${idWanted.filter(([t]) => covers[mergeKey(t.title, t.artist)]).length}/${idWanted.length}`);
+  console.log(`по Apple-ID: ${idWanted.filter(([t]) => covers[mergeKey(t.title, t.artist)]).length}/${idWanted.length} имеют закреплённую обложку`);
 }
 
-/* 2) Search only rows whose exact Apple ID is missing or failed strict identity.
+/* 2) Search only NEW rows whose exact Apple ID is missing or failed strict identity.
    This keeps the blast radius small and avoids iTunes rate limits. The search
    matcher still enforces title + primary artist + exact version signature. */
 for (const t of tracks) {
@@ -105,7 +127,7 @@ for (const t of tracks) {
     const d = await (await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&limit=25&country=US`)).json();
     const hit = pickAppleCandidate(t.title, t.artist, d.results || []);
     if (hit) {
-      covers[key] = art600(hit.artworkUrl100);
+      pinCover(key, art600(hit.artworkUrl100));
       names[key] = appleRecord(hit);
     }
     console.log(`  поиск: ${hit ? "OK " : "НЕТ"} ${t.artist} - ${t.title}${hit ? ` -> ${hit.trackName} / ${String(hit.collectionName || "").slice(0, 48)}` : ""}`);
@@ -117,15 +139,15 @@ for (const t of tracks) {
 /* 3) что уже знает живой ответ и это Apple - оставляем как есть */
 for (const t of tracks) {
   const key = mergeKey(t.title, t.artist);
-  if (!covers[key] && isAppleArt(t.art)) covers[key] = t.art;
+  if (!covers[key] && isAppleArt(t.art)) pinCover(key, t.art);
 }
 
 const missing = tracks.filter((t) => !covers[mergeKey(t.title, t.artist)]);
 const sorted = Object.fromEntries(Object.entries(covers).sort(([a], [b]) => a.localeCompare(b)));
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(sorted, null, 2) + "\n");
-console.log(`\nзаписано ${Object.keys(sorted).length} обложек в ${path.relative(process.cwd(), OUT)}`);
-console.log(`без Apple-обложки: ${missing.length}${missing.length ? " -> " + missing.map((t) => `${t.artist} - ${t.title}`).join("; ") : ""}`);
+console.log(`\nв registry ${Object.keys(sorted).length} закреплённых обложек (+${Object.keys(sorted).length - lockedAtStart.size} новых) в ${path.relative(process.cwd(), OUT)}`);
+console.log(`без закреплённой обложки: ${missing.length}${missing.length ? " -> " + missing.map((t) => `${t.artist} - ${t.title}`).join("; ") : ""}`);
 
 const sortedNames = Object.fromEntries(Object.entries(names).sort(([a], [b]) => a.localeCompare(b)));
 fs.writeFileSync(OUT_NAMES, JSON.stringify(sortedNames, null, 2) + "\n");
