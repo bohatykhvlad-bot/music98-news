@@ -22,11 +22,13 @@ HERO_KEY = "a6d485acfd"
 HERO_NAME = "vmas-2026-taylor-swift-madonna.jpg"
 HERO_CREDIT = "Christopher Polk"
 HERO_CREDIT_URL = "https://www.instagram.com/polkimaging/"
+HERO_SOURCE_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=a6d485acfd"
 
 SIENNA_KEY = "16d405d43a"
 SIENNA_NAME = "vmas-2026-sienna-spiro.jpg"
 SIENNA_CREDIT = "Christopher Polk"
 SIENNA_CREDIT_URL = "https://www.instagram.com/polkimaging/"
+SIENNA_SOURCE_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=16d405d43a"
 
 BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host. By the end of the night, Madonna had the largest trophy count, while Swift had taken the top video prize and added another directing win to a career total that now stands at 32 VMAs.
 
