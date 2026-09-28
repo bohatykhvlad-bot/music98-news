@@ -19,16 +19,16 @@ PID = "vmas26results"
 TITLE = "2026 MTV VMAs: All the Winners"
 EXCERPT = 'Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles.'
 
-HERO_KEY = "a6d485acfd"
-HERO_NAME = "vmas-2026-taylor-swift-madonna.jpg"
-HERO_CREDIT = "Christopher Polk"
-HERO_CREDIT_URL = "https://www.instagram.com/polkimaging/"
-HERO_SOURCE_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=a6d485acfd"
+HERO_KEY = "69c1ac19ff"
+HERO_NAME = "vmas-2026-taylor-swift-artist-director-honors-stage.jpg"
+HERO_CREDIT = "Stewart Cook"
+HERO_CREDIT_URL = "https://stewartcook.com/"
+HERO_SOURCE_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=69c1ac19ff"
 
-NIRVANA_KEY = "b3e87895ab"
-NIRVANA_NAME = "vmas-2026-nirvana-vanguard.jpg"
-NIRVANA_CREDIT = "Christopher Polk"
-NIRVANA_CREDIT_URL = "https://www.instagram.com/polkimaging/"
+NIRVANA_KEY = "2f1e0f8fc4"
+NIRVANA_NAME = "vmas-2026-nirvana-video-vanguard-stage.jpg"
+NIRVANA_CREDIT = "Francis Specker"
+NIRVANA_CREDIT_URL = "https://francisspecker.com/"
 
 LISA_KEY = "932c1f928d"
 LISA_NAME = "vmas-2026-lisa.jpg"
@@ -40,10 +40,10 @@ TAYLOR_NAME = "vmas-2026-taylor-video-of-the-year.jpg"
 TAYLOR_CREDIT = "Stewart Cook"
 TAYLOR_CREDIT_URL = "https://stewartcook.com/"
 
-SIENNA_KEY = "16d405d43a"
-SIENNA_NAME = "vmas-2026-sienna-spiro.jpg"
-SIENNA_CREDIT = "Christopher Polk"
-SIENNA_CREDIT_URL = "https://www.instagram.com/polkimaging/"
+SIENNA_KEY = "3f54be88ed"
+SIENNA_NAME = "vmas-2026-sienna-spiro-best-new-artist-stage.jpg"
+SIENNA_CREDIT = "Francis Specker"
+SIENNA_CREDIT_URL = "https://francisspecker.com/"
 
 BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host, while Swift also won Best Direction.
 
@@ -134,7 +134,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Teyana Taylor and Lucky Daye — "Hard Part"]
 
-[photo:{taylor_src}|Stewart Cook|https://stewartcook.com/|50% 42%|1]
+[photo:{taylor_src}|Stewart Cook|https://stewartcook.com/|50% 25%|1]
 
 [award:Best Pop]
 
@@ -196,7 +196,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Twenty One Pilots — "Drag Path"]
 
-[photo:{sienna_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 42%|1]
+[photo:{sienna_src}|Francis Specker|https://francisspecker.com/|50% 45%|1]
 
 [award:Best Dance]
 
@@ -244,7 +244,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
 
-[photo:{lisa_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 42%|1]
+[photo:{lisa_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 54%|1]
 
 [award:Best Country]
 
@@ -332,7 +332,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Taylor Swift — "The Fate of Ophelia"]
 
-[photo:{nirvana_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 44%|1]
+[photo:{nirvana_src}|Francis Specker|https://francisspecker.com/|50% 50%|1]
 
 [award:Best Visual Effects]
 
@@ -545,7 +545,7 @@ def main():
                 "zoom": 1,
                 "lockX": 0.50,
                 "cardX": 0.50,
-                "cardY": 0.48,
+                "cardY": 0.45,
                 "cardZoom": 1,
             },
         }
