@@ -28,7 +28,7 @@ EXCERPT = (
     "Video of the Year at the September 27 ceremony in Los Angeles."
 )
 
-INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year at the September 27 ceremony in Los Angeles. The show took place at the Peacock Theater with Snoop Dogg as host. Madonna's seven-win total included Artist of the Year, Best Album and Best Collaboration, while Taylor Swift also won Best Direction and received the inaugural MTV VMA Artist Director Honors. BTS won Song of the Year, Best K-Pop and Best Group, and Sienna Spiro was named Best New Artist.
+INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year at the September 27 ceremony in Los Angeles. Hosted by Snoop Dogg at the Peacock Theater, the ceremony also saw BTS win Song of the Year, Best K-Pop and Best Group, while Sienna Spiro was named Best New Artist. Madonna's seven-win total included Artist of the Year, Best Album and Best Collaboration. Taylor Swift also won Best Direction and received the inaugural MTV VMA Artist Director Honors.
 
 Madonna entered the final ballot with 13 nominations after MTV added the social categories. She won Artist of the Year and Best Album for *Confessions II*, shared Best Collaboration with Sabrina Carpenter for "Bring Your Love," and collected four awards for "Confessions II - The Film": Best Dance, Best Cinematography, Best Choreography and Best Long Form Video.
 
@@ -93,6 +93,8 @@ REPLACEMENTS = [
     # Album titles remain italicized.
     ('[nominee:Drake — *ICEMAN*]',
      '[nominee:Drake — *Iceman*]'),
+    ('[nominee:Slayyyter — "DANCE..."]',
+     '[nominee:Slayyyter — "DANCE…"]'),
 
     # Follow the official MTV/Paramount capitalization in this category.
     ('[winner:BTS — "Swim"]\n\n[nominee:BLACKPINK — "JUMP"]',
@@ -108,8 +110,8 @@ def fix_award_text(awards: str) -> str:
     return awards
 
 def audit(body: str) -> None:
-    if not body.startswith(EXCERPT):
-        raise RuntimeError("excerpt is not the literal beginning of body")
+    if not body.lstrip().startswith(EXCERPT):
+        raise RuntimeError("excerpt is not the opening sentence of body")
 
     # Formal naming in narrative copy.
     if "Swift's" in body or "Taylor Swift's" in body:
@@ -147,6 +149,8 @@ def audit(body: str) -> None:
         raise RuntimeError("Madonna in-body photo missing")
     if any(ch in body for ch in ("’", "‘")):
         raise RuntimeError("curly apostrophe found")
+    if "DANCE..." in body:
+        raise RuntimeError("Slayyyter title needs official ellipsis styling")
     if body.count("[award:") != 25 or body.count("[winner:") != 25:
         raise RuntimeError("award/winner count mismatch")
 
