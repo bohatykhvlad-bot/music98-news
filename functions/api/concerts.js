@@ -54,22 +54,15 @@ const HOTSPOT_CITY_PROBES = {
   ]
 };
 
-const GLOBAL_SUPERSTARS = new Set([
-  "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Bad Bunny","Drake",
-  "Ariana Grande","Coldplay","Shakira","Katy Perry","Michael Jackson","David Guetta","Maroon 5","Ed Sheeran",
-  "Pitbull","Billie Eilish","Dua Lipa","Calvin Harris","Eminem","J Balvin","Kanye West","Kendrick Lamar",
-  "Post Malone","Sia","KAROL G","Beyoncé","Adele","BTS","Harry Styles","Lana Del Rey","SZA","Miley Cyrus",
-  "Travis Scott","Doja Cat","Sabrina Carpenter","Justin Timberlake","Shawn Mendes","LINKIN PARK",
-  "Arctic Monkeys","Chris Brown","Rauw Alejandro","Imagine Dragons","Madonna","Queen","Britney Spears",
-  "USHER","Nicki Minaj","OneRepublic","Red Hot Chili Peppers","Metallica","Guns N' Roses"
-]);
-
 const KWORB_FALLBACK = [
-  "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Bad Bunny","Drake",
-  "Ariana Grande","Coldplay","Shakira","Katy Perry","Michael Jackson","David Guetta","Maroon 5","Ed Sheeran",
+  "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
+  "Bad Bunny","Ariana Grande","Shakira","Katy Perry","Michael Jackson","David Guetta","Maroon 5","Ed Sheeran",
   "Pitbull","Billie Eilish","Dua Lipa","Calvin Harris","Eminem","J Balvin","Kanye West","Kendrick Lamar",
-  "Post Malone","Sia","KAROL G","Beyoncé","Adele","Harry Styles","Lana Del Rey","SZA","Miley Cyrus",
-  "Travis Scott","Doja Cat","Sabrina Carpenter","Rauw Alejandro","Imagine Dragons","Madonna","BTS"
+  "Post Malone","Sia","KAROL G","Olivia Rodrigo","SZA","Black Eyed Peas","Beyoncé","Lana Del Rey",
+  "Daddy Yankee","Harry Styles","Miley Cyrus","Tame Impala","Travis Scott","Sean Paul","Adele","Justin Timberlake",
+  "Shawn Mendes","Linkin Park","Chris Brown","Marshmello","Ellie Goulding","Arctic Monkeys","Zara Larsson",
+  "Shreya Ghoshal","Doja Cat","Halsey","Sabrina Carpenter","Alicia Keys","Rauw Alejandro","Madonna","Sam Smith",
+  "Elton John","sombr","Arijit Singh","Ozuna","JAŸ-Z"
 ]
 
 function json(data, status = 200, extra = {}) {
@@ -235,7 +228,7 @@ async function kworbArtists() {
       const rank = Number(String(cells[0]).replace(/[^0-9]/g, ""));
       const name = String(cells[1] || "").trim();
       const listeners = Number(String(cells[2]).replace(/[^0-9]/g, ""));
-      if (!rank || !name || !listeners || !GLOBAL_SUPERSTARS.has(name)) continue;
+      if (!rank || !name || !listeners) continue;
       const key = normName(name);
       if (!key || seen.has(key)) continue;
       seen.add(key);
@@ -291,7 +284,7 @@ async function validatePopularArtist(apiKey, name, popularityRank, listeners) {
 
 async function popularPayload(apiKey) {
   const ranking = await kworbArtists();
-  const candidates = ranking.artists.slice(0, 60);
+  const candidates = ranking.artists.slice(0, 42);
   const found = [];
 
   for (let i = 0; i < candidates.length && found.length < 10; i += 6) {
@@ -395,7 +388,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v9");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v10");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
