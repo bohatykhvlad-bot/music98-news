@@ -49,7 +49,7 @@ print("HOME", status, "concerts_nav", 'href="/concerts"' in home)
 if status != 200 or 'href="/concerts"' not in home:
     raise SystemExit("homepage Concerts nav missing")
 
-status, headers, raw = get("/sitemap.xml")
+status, headers, raw = get("/sitemap.xml?concerts-check=1")
 sitemap = raw.decode("utf-8","replace")
 print("SITEMAP", status, "concerts", "https://music98.news/concerts" in sitemap)
 if status != 200 or "https://music98.news/concerts" not in sitemap:
