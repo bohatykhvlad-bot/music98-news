@@ -35,6 +35,6 @@ print("FIKE_FULL_JSON")
 print(json.dumps(target,ensure_ascii=False,indent=2))
 
 
-# One-shot final Small Town copy update; remove after verification.
-import restore_small_town
-restore_small_town.main()
+# One-shot final Small Town copy update; execute source directly, then remove after verification.
+import runpy
+runpy.run_path(str(Path(__file__).with_name("restore_small_town.py")), run_name="__main__")
