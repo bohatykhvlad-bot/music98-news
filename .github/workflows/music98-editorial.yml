@@ -52,6 +52,10 @@ jobs:
           git add .editorial/tsunami-cover-candidate.jpg
           git diff --cached --quiet || git commit -m "temp: stage TSUNAMI cover candidate"
           git push
+      - name: Publish Fireflies release
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/publish_fireflies.py
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
