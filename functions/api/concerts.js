@@ -1,5 +1,14 @@
 const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
-const TM_ATTRACTIONS_ROOT = "https://app.ticketmaster.com/discovery/v2/attractions.json";
+const KWORB_ARTISTS_URL = "https://kworb.net/itunes/";
+
+const KWORB_FALLBACK = [
+  "Taylor Swift","Bad Bunny","Drake","Olivia Rodrigo","Ariana Grande","KAROL G","ADÉLA","Tiakola",
+  "Omar Courtz","Shakira","HUGEL","The Weeknd","Dua Lipa","Olivia Dean","BTS","LINKIN PARK",
+  "Bruno Mars","Justin Bieber","Ella Langley","Anuel AA","Fuerza Regida","Rihanna","Tame Impala",
+  "KATSEYE","Katy Perry","Lady Gaga","Alex Warren","Noah Kahan","sombr","Billie Eilish","Oasis",
+  "Rauw Alejandro","Burna Boy","Miley Cyrus","Morgan Wallen","Ed Sheeran","Kanye West","Harry Styles",
+  "Lana Del Rey","Zara Larsson","Sabrina Carpenter","SZA","Teddy Swims","Coldplay","Arctic Monkeys"
+];
 
 function json(data, status = 200, extra = {}) {
   const headers = new Headers({
@@ -61,16 +70,6 @@ function bestArtistImage(images) {
   return pool[0]?.url || "";
 }
 
-function normalizeAttraction(a) {
-  if (!a || !a.id || !a.name) return null;
-  return {
-    id: String(a.id),
-    name: String(a.name),
-    image: bestArtistImage(a.images),
-    url: String(a.url || ""),
-  };
-}
-
 function normalizeEvent(e) {
   const venue = e?._embedded?.venues?.[0] || {};
   const attractions = Array.isArray(e?._embedded?.attractions) ? e._embedded.attractions : [];
@@ -108,6 +107,18 @@ function upcomingIso() {
   return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 }
 
+function baseEventUrl(apiKey) {
+  const tm = new URL(TM_EVENTS_ROOT);
+  tm.searchParams.set("apikey", apiKey);
+  tm.searchParams.set("classificationName", "music");
+  tm.searchParams.set("includeTest", "no");
+  tm.searchParams.set("includeTBA", "no");
+  tm.searchParams.set("includeTBD", "no");
+  tm.searchParams.set("locale", "*");
+  tm.searchParams.set("startDateTime", upcomingIso());
+  return tm;
+}
+
 async function tmJson(url) {
   let res;
   try {
@@ -127,73 +138,170 @@ async function tmJson(url) {
   return res.json();
 }
 
-function baseEventUrl(apiKey) {
-  const tm = new URL(TM_EVENTS_ROOT);
-  tm.searchParams.set("apikey", apiKey);
-  tm.searchParams.set("classificationName", "music");
-  tm.searchParams.set("includeTest", "no");
-  tm.searchParams.set("includeTBA", "no");
-  tm.searchParams.set("includeTBD", "no");
-  tm.searchParams.set("locale", "*");
-  tm.searchParams.set("startDateTime", upcomingIso());
-  return tm;
+function decodeHtml(s) {
+  return String(s || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function kworbArtists() {
+  try {
+    const r = await fetch(KWORB_ARTISTS_URL, {
+      headers: {
+        "Accept": "text/html,application/xhtml+xml",
+        "User-Agent": "music98.news concert discovery/1.0",
+      },
+    });
+    if (!r.ok) throw new Error("kworb_http_" + r.status);
+    const html = await r.text();
+    const names = [];
+    const seen = new Set();
+
+    /* Kworb's artist links live in the ranking table and use artist/... URLs. */
+    const re = /<a\b[^>]*href=["'](?:\.\/)?artist\/[^"']+["'][^>]*>([\s\S]*?)<\/a>/gi;
+    let m;
+    while ((m = re.exec(html)) && names.length < 80) {
+      const name = decodeHtml(m[1]);
+      const key = name.toLowerCase();
+      if (!name || seen.has(key)) continue;
+      seen.add(key);
+      names.push(name);
+    }
+    return names.length >= 20
+      ? { names, source: "kworb_live" }
+      : { names: KWORB_FALLBACK, source: "kworb_fallback" };
+  } catch {
+    return { names: KWORB_FALLBACK, source: "kworb_fallback" };
+  }
+}
+
+function normName(s) {
+  return String(s || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/gi, " ")
+    .trim()
+    .toLowerCase();
+}
+
+async function validatePopularArtist(apiKey, name, kworbRank) {
+  const tm = baseEventUrl(apiKey);
+  tm.searchParams.set("keyword", name);
+  tm.searchParams.set("size", "20");
+  tm.searchParams.set("sort", "relevance,desc");
+
+  const raw = await tmJson(tm);
+  const wanted = normName(name);
+  const events = raw?._embedded?.events || [];
+
+  for (const rawEvent of events) {
+    const attractions = Array.isArray(rawEvent?._embedded?.attractions) ? rawEvent._embedded.attractions : [];
+    const exact = attractions.find(a => normName(a?.name) === wanted);
+    if (!exact) continue;
+    const event = normalizeEvent(rawEvent);
+    if (!event) continue;
+    return {
+      id: String(exact.id || ""),
+      name: String(exact.name || name),
+      image: bestArtistImage(exact.images) || event.artistImage || event.image,
+      kworbRank,
+      firstDate: event.date,
+    };
+  }
+  return null;
 }
 
 async function popularPayload(apiKey) {
-  const attrsUrl = new URL(TM_ATTRACTIONS_ROOT);
-  attrsUrl.searchParams.set("apikey", apiKey);
-  attrsUrl.searchParams.set("classificationName", "music");
-  attrsUrl.searchParams.set("includeTest", "no");
-  attrsUrl.searchParams.set("locale", "*");
-  attrsUrl.searchParams.set("sort", "relevance,desc");
-  attrsUrl.searchParams.set("size", "60");
+  const ranking = await kworbArtists();
+  const candidates = ranking.names.slice(0, 42);
+  const found = [];
 
-  const attrRaw = await tmJson(attrsUrl);
-  const attractions = (attrRaw?._embedded?.attractions || [])
-    .map(normalizeAttraction)
-    .filter(Boolean);
-
-  if (!attractions.length) {
-    return { ok: true, mode: "popular", artists: [], events: [] };
-  }
-
-  const candidateIds = attractions.map(a => a.id).slice(0, 60);
-  const eventsUrl = baseEventUrl(apiKey);
-  eventsUrl.searchParams.set("attractionId", candidateIds.join(","));
-  eventsUrl.searchParams.set("size", "200");
-  eventsUrl.searchParams.set("sort", "relevance,desc");
-
-  const eventRaw = await tmJson(eventsUrl);
-  const events = (eventRaw?._embedded?.events || []).map(normalizeEvent).filter(Boolean);
-
-  const counts = new Map();
-  for (const e of events) {
-    const ids = e.attractionIds.length ? e.attractionIds : [e.attractionId];
-    for (const id of ids) {
-      if (!candidateIds.includes(id)) continue;
-      counts.set(id, (counts.get(id) || 0) + 1);
+  /* Work in small parallel batches and stop as soon as ten ranked artists
+     with real upcoming Ticketmaster events have been confirmed. */
+  for (let i = 0; i < candidates.length && found.length < 10; i += 6) {
+    const chunk = candidates.slice(i, i + 6);
+    const checked = await Promise.all(chunk.map((name, j) =>
+      validatePopularArtist(apiKey, name, i + j + 1).catch(() => null)
+    ));
+    for (const artist of checked) {
+      if (!artist || found.some(x => x.id === artist.id)) continue;
+      found.push(artist);
+      if (found.length >= 10) break;
     }
   }
-
-  const artists = attractions
-    .filter(a => (counts.get(a.id) || 0) > 0)
-    .slice(0, 10)
-    .map((a, index) => ({
-      ...a,
-      rank: index + 1,
-      shows: counts.get(a.id) || 0,
-    }));
-
-  const selected = new Set(artists.map(a => a.id));
-  const selectedEvents = events.filter(e => e.attractionIds.some(id => selected.has(id)) || selected.has(e.attractionId));
 
   return {
     ok: true,
     mode: "popular",
-    artists,
-    events: selectedEvents,
-    source: "ticketmaster_relevance",
+    artists: found.slice(0, 10).map((a, i) => ({
+      id: a.id,
+      name: a.name,
+      image: a.image,
+      rank: i + 1,
+      kworbRank: a.kworbRank,
+      firstDate: a.firstDate,
+    })),
+    source: ranking.source,
+    ranking: "Kworb Global Digital Artist Ranking",
   };
+}
+
+async function hotspotsPayload(apiKey) {
+  const raws = await Promise.all([0, 1, 2, 3, 4].map(page => {
+    const tm = baseEventUrl(apiKey);
+    tm.searchParams.set("size", "200");
+    tm.searchParams.set("page", String(page));
+    tm.searchParams.set("sort", "relevance,desc");
+    return tmJson(tm).catch(() => null);
+  }));
+
+  const groups = new Map();
+  let sampledEvents = 0;
+
+  for (const raw of raws) {
+    const events = raw?._embedded?.events || [];
+    sampledEvents += events.length;
+    for (const e of events) {
+      const venue = e?._embedded?.venues?.[0] || {};
+      const city = String(venue?.city?.name || "").trim();
+      const countryCode = String(venue?.country?.countryCode || "").trim();
+      const lat = finite(venue?.location?.latitude);
+      const lng = finite(venue?.location?.longitude);
+      if (!city || lat == null || lng == null) continue;
+
+      const key = (city + "|" + countryCode).toLowerCase();
+      const g = groups.get(key) || { city, countryCode, latSum: 0, lngSum: 0, points: 0, count: 0 };
+      g.latSum += lat;
+      g.lngSum += lng;
+      g.points++;
+      g.count++;
+      groups.set(key, g);
+    }
+  }
+
+  const hotspots = [...groups.values()]
+    .map(g => ({
+      city: g.city,
+      countryCode: g.countryCode,
+      lat: g.latSum / g.points,
+      lng: g.lngSum / g.points,
+      count: g.count,
+    }))
+    .filter(x => x.count >= 2)
+    .sort((a, b) => b.count - a.count || a.city.localeCompare(b.city))
+    .slice(0, 40);
+
+  return { ok: true, mode: "hotspots", hotspots, sampledEvents };
 }
 
 export async function onRequestGet({ request, env }) {
@@ -209,7 +317,7 @@ export async function onRequestGet({ request, env }) {
   const attractionId = String(u.searchParams.get("attractionId") || "").trim().slice(0, 160);
   const radius = Math.min(500, Math.max(5, finite(u.searchParams.get("radius")) || 100));
 
-  if (mode !== "popular" && !artist && !attractionId &&
+  if (mode !== "popular" && mode !== "hotspots" && !artist && !attractionId &&
       (lat == null || lng == null || lat < -90 || lat > 90 || lng < -180 || lng > 180)) {
     return json({ error: "location_required" }, 400);
   }
@@ -224,7 +332,14 @@ export async function onRequestGet({ request, env }) {
   try {
     if (mode === "popular") {
       const payload = await popularPayload(env.TICKETMASTER_API_KEY);
-      const res = json(payload, 200, { "Cache-Control": "public, max-age=120, s-maxage=1800" });
+      const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=21600" });
+      await cache.put(cacheKey, res.clone()).catch(() => {});
+      return res;
+    }
+
+    if (mode === "hotspots") {
+      const payload = await hotspotsPayload(env.TICKETMASTER_API_KEY);
+      const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=10800" });
       await cache.put(cacheKey, res.clone()).catch(() => {});
       return res;
     }
