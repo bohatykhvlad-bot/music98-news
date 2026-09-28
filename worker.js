@@ -225,7 +225,7 @@ export default {
 
   async scheduled(controller, env, ctx) {
     ctx.waitUntil(
-      refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 12 })
+      refreshHotspotSnapshot(env, { jobBudget: 4, verifyBudget: 16 })
         .catch(() => {})
     );
   },
