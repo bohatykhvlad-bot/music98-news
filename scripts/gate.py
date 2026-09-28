@@ -1233,11 +1233,9 @@ def check_post(p, strict):
             (fails if n > 2 else warns).append(("tautology", msg))
 
     # --- quotes need attribution -------------------------------------------
-    # pairing scan, not a regex: a regex pairs a closing title quote with the next
-    # opening one and invents quotes that are not there ("JUMP" ... "GO,")
-    for para in paragraphs(body):
-        if is_media(para):
-            continue
+    # Structured [awards] data contains song titles, not attributed speech.
+    # Only journalistic prose participates in quote-attribution checks.
+    for para in paragraphs(prose):
         for q in quoted_spans(para):
             if len(q) < 18:
                 continue
