@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 
 PID = "vmas26results"
-TITLE = "Taylor Swift Takes Video of the Year as Madonna Leads the 2026 MTV VMAs With Seven Wins"
+TITLE = "2026 MTV VMAs: All the Winners"
 EXCERPT = 'Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles.'
 
 HERO_KEY = "a6d485acfd"
@@ -25,11 +25,15 @@ HERO_CREDIT = "Christopher Polk"
 HERO_CREDIT_URL = "https://www.instagram.com/polkimaging/"
 HERO_SOURCE_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=a6d485acfd"
 
-SIENNA_KEY = "16d405d43a"
-SIENNA_NAME = "vmas-2026-sienna-spiro.jpg"
-SIENNA_CREDIT = "Christopher Polk"
-SIENNA_CREDIT_URL = "https://www.instagram.com/polkimaging/"
-SIENNA_SOURCE_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=16d405d43a"
+TAYLOR_WIN_KEY = "dded7f7e94"
+TAYLOR_WIN_NAME = "vmas-2026-taylor-video-of-year.jpg"
+TAYLOR_WIN_CREDIT = "Stewart Cook"
+TAYLOR_WIN_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=dded7f7e94"
+
+LISA_KEY = "932c1f928d"
+LISA_NAME = "vmas-2026-lisa.jpg"
+LISA_CREDIT = "Christopher Polk"
+LISA_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=932c1f928d"
 
 BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host. By the end of the night, Madonna had the largest trophy count, while Swift had taken the top video prize and added another directing win to a career total that now stands at 32 VMAs.
 
@@ -47,55 +51,371 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [awards]
 
-**Video of the Year.** **Winner** Taylor Swift with "The Fate of Ophelia." **Nominees** Ariana Grande with "Hate That I Made You Love Me," Bruno Mars with "I Just Might," GENER8ION with "Storm Starring Yung Lean," Madonna with "Confessions II - The Film," and Sabrina Carpenter with "Tears."
+[award:Video of the Year]
 
-**Artist of the Year.** **Winner** Madonna. **Nominees** Ariana Grande, Bruno Mars, Morgan Wallen, Sabrina Carpenter and Taylor Swift.
+[winner:Taylor Swift — "The Fate of Ophelia"]
 
-**Song of the Year.** **Winner** BTS with "Swim." **Nominees** Ella Langley with "Choosin' Texas," HUNTR/X with EJAE, Audrey Nuna and REI AMI with "Golden," Madonna and Sabrina Carpenter with "Bring Your Love," Olivia Dean with "Man I Need," PinkPantheress with "Stateside + Zara Larsson," and RAYE with "Where Is My Husband!"
+[nominee:Ariana Grande — "Hate That I Made You Love Me"]
 
-**Best New Artist.** **Winner** Sienna Spiro. **Nominees** Bella Kay, CORTIS, Magnus Ferrell, Malcolm Todd, Myles Smith and Stella Lefty.
+[nominee:Bruno Mars — "I Just Might"]
 
-**Best Collaboration.** **Winner** Madonna and Sabrina Carpenter with "Bring Your Love." **Nominees** Clipse, Kendrick Lamar, Pusha T and Malice with "Chains & Whips," French Montana and Max B with "Ever Since U Left Me," PinkPantheress with "Stateside + Zara Larsson," Shakira and Burna Boy with "Dai Dai," and Teyana Taylor and Lucky Daye with "Hard Part."
+[nominee:GENER8ION — "Storm Starring Yung Lean"]
 
-**Best Pop.** **Winner** LISA with "Dream feat. Kentaro Sakaguchi." **Nominees** Ariana Grande with "Hate That I Made You Love Me," Charli xcx with "SS26," Olivia Rodrigo with "Drop Dead," Sabrina Carpenter with "House Tour," Tate McRae with "Nobody's Girl," and Taylor Swift with "The Fate of Ophelia."
+[nominee:Madonna — "Confessions II - The Film"]
 
-**Best Hip-Hop.** **Winner** Cardi B ft. Kehlani with "Safe." **Nominees** Don Toliver with "E85," Drake with "Janice STFU," Megan Thee Stallion with "Lover Girl," Travis Scott with "Dumbo," and Tyler, the Creator with "Sugar on My Tongue."
+[nominee:Sabrina Carpenter — "Tears"]
 
-**Best R&B.** **Winner** Bruno Mars with "I Just Might." **Nominees** Chris Brown with "It Depends/Obvious," Dave and Tems with "Raindance," Justin Bieber with "Yukon," Kehlani with "Folded," and Mariah the Scientist and Kali Uchis with "Is It a Crime."
+[award:Artist of the Year]
 
-**Best Alternative.** **Winner** Olivia Rodrigo with "the cure." **Nominees** Geese with "Taxes," mgk and Fred Durst with "Fix Ur Face," Noah Kahan with "The Great Divide," SOMBR with "Homewrecker," Tame Impala with "Dracula," and Twenty One Pilots with "Drag Path."
+[winner:Madonna]
 
-**Best Dance.** **Winner** Madonna with "Confessions II - The Film." **Nominees** Bebe Rexha and Faithless with "New Religion," Harry Styles with "Aperture," Lady Gaga and Doechii with "RUNWAY," PinkPantheress with "Stateside + Zara Larsson," Slayyyter with "Dance...," and Tate McRae with "Nobody's Girl."
+[nominee:Ariana Grande]
 
-**Best Latin.** **Winner** Bad Bunny with "NUEVAYoL." **Nominees** Anitta with Shakira on "Choka Choka," Fuerza Regida with "Tu Sancho," KAROL G with "Papasito," Rosalía ft. Yahritza Y Su Esencia with "La Perla," Ryan Castro, Kapo and Gangsta with "La Villa," and Shakira and Burna Boy with "Dai Dai."
+[nominee:Bruno Mars]
 
-**Best K-Pop.** **Winner** BTS with "Swim." **Nominees** BLACKPINK with "Jump," CORTIS with "RedRed," KATSEYE with "Pinky Up," LE SSERAFIM feat. J-Hope of BTS with "Spaghetti," and LISA with "Dream feat. Kentaro Sakaguchi."
+[nominee:Morgan Wallen]
 
-**Best Country.** **Winner** Ella Langley with "Choosin' Texas." **Nominees** Kacey Musgraves with "Dry Spell," Lainey Wilson with "Somewhere Over Laredo," Luke Combs with "Back in the Saddle," Shaboozey with "Cowgirl," Stella Lefty with "Boston," and Tucker Wetmore with "Brunette."
+[nominee:Sabrina Carpenter]
 
-**Best Direction.** **Winner** Taylor Swift with "Opalite." **Nominees** Ariana Grande with "Hate That I Made You Love Me," Bruno Mars with "I Just Might," GENER8ION with "Storm starring Yung Lean," Madonna with "Confessions II - The Film," and Sabrina Carpenter with "House Tour."
+[nominee:Taylor Swift]
 
-**Best Art Direction.** **Winner** PinkPantheress with "Stateside + Zara Larsson." **Nominees** Charli xcx with "SS26," Lady Gaga and Doechii with "Runaway," Madonna with "Confessions II - The Film," SOMBR with "My Body Isn't Ready," and Taylor Swift with "The Fate of Ophelia."
+[award:Song of the Year]
 
-**Best Cinematography.** **Winner** Madonna with "Confessions II - The Film." **Nominees** A$AP Rocky with "Punk Rocky," Ariana Grande with "Hate That I Made You Love Me," LISA with "Dream feat. Kentaro Sakaguchi," Shaboozey with "Cowgirl," and Taylor Swift with "The Fate of Ophelia."
+[winner:BTS — "Swim"]
 
-**Best Editing.** **Winner** Sabrina Carpenter with "House Tour." **Nominees** Ariana Grande with "Hate That I Made You Love Me," Bruno Mars with "I Just Might," LISA with "Dream feat. Kentaro Sakaguchi," Madonna with "Confessions II - The Film," and Taylor Swift with "The Fate of Ophelia."
+[nominee:Ella Langley — "Choosin' Texas"]
 
-**Best Choreography.** **Winner** Madonna with "Confessions II - The Film." **Nominees** GENER8ION with "Storm starring Yung Lean," Harry Styles with "Dance No More," KATSEYE with "Pinky Up," Tate McRae with "Nobody's Girl," and Taylor Swift with "The Fate of Ophelia."
+[nominee:HUNTR/X with EJAE, Audrey Nuna and REI AMI — "Golden"]
 
-**Best Visual Effects.** **Winner** Ariana Grande with "hate that i made you love me." **Nominees** JISOO x ZAYN with "Eyes Closed," Madonna with "Confessions II - The Film," PinkPantheress with "Stateside + Zara Larsson," RAYE ft. Hans Zimmer with "Click Clack Symphony.," and Taylor Swift with "The Fate of Ophelia."
+[nominee:Madonna and Sabrina Carpenter — "Bring Your Love"]
 
-**Best Group.** **Winner** BTS. **Nominees** BLACKPINK, CORTIS, FLO, Fuerza Regida, Geese, KATSEYE and Twenty One Pilots.
+[nominee:Olivia Dean — "Man I Need"]
 
-**Best Long Form Video.** **Winner** Madonna with *Confessions II - The Film*. **Nominees** Charli xcx with *Music, Fashion, Film*, Ella Langley with *Choosin' Texas*, and GENER8ION with *STORM starring Yung Lean*.
+[nominee:PinkPantheress — "Stateside + Zara Larsson"]
 
-**Best Album.** **Winner** Madonna with *Confessions II*. **Nominees** Drake with *ICEMAN*, Olivia Dean with *The Art of Loving*, Olivia Rodrigo with *you seem pretty sad for a girl so in love*, Sabrina Carpenter with *Man's Best Friend*, and Taylor Swift with *The Life of a Showgirl*.
+[nominee:RAYE — "Where Is My Husband!"]
 
-**Song of Summer.** **Winner** Ariana Grande with "hate that i made you love me." **Nominees** Bruno Mars with "Risk It All," Charli xcx with "Camera," Ella Langley with "Choosin' Texas," KATSEYE with "Hootie Frutti," Latto ft. Doja Cat with "Okayyy," Morgan Wallen with "Been By Now," Olivia Dean with "So Easy (To Fall in Love)," Olivia Rodrigo with "Stupid Song," Sabrina Carpenter with "House Tour," Slayyyter with "brand new chanel$," SOMBR with "Homewrecker," Stella Lefty with "Boston," Tame Impala and JENNIE with "Dracula," and Taylor Swift with "I Knew It, I Knew You."
+[award:Best New Artist]
 
-**Video Vanguard Award.** Nirvana.
+[winner:Sienna Spiro]
 
-**MTV VMA Artist Director Honors.** Taylor Swift.
+[nominee:Bella Kay]
+
+[nominee:CORTIS]
+
+[nominee:Magnus Ferrell]
+
+[nominee:Malcolm Todd]
+
+[nominee:Myles Smith]
+
+[nominee:Stella Lefty]
+
+[award:Best Collaboration]
+
+[winner:Madonna and Sabrina Carpenter — "Bring Your Love"]
+
+[nominee:Clipse, Kendrick Lamar, Pusha T and Malice — "Chains & Whips"]
+
+[nominee:French Montana and Max B — "Ever Since U Left Me"]
+
+[nominee:PinkPantheress — "Stateside + Zara Larsson"]
+
+[nominee:Shakira and Burna Boy — "Dai Dai"]
+
+[nominee:Teyana Taylor and Lucky Daye — "Hard Part"]
+
+[photo:{taylor_src}|Stewart Cook|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=dded7f7e94|50% 46%|1]
+
+[award:Best Pop]
+
+[winner:LISA — "Dream feat. Kentaro Sakaguchi"]
+
+[nominee:Ariana Grande — "Hate That I Made You Love Me"]
+
+[nominee:Charli xcx — "SS26"]
+
+[nominee:Olivia Rodrigo — "Drop Dead"]
+
+[nominee:Sabrina Carpenter — "House Tour"]
+
+[nominee:Tate McRae — "Nobody's Girl"]
+
+[nominee:Taylor Swift — "The Fate of Ophelia"]
+
+[award:Best Hip-Hop]
+
+[winner:Cardi B ft. Kehlani — "Safe"]
+
+[nominee:Don Toliver — "E85"]
+
+[nominee:Drake — "Janice STFU"]
+
+[nominee:Megan Thee Stallion — "Lover Girl"]
+
+[nominee:Travis Scott — "Dumbo"]
+
+[nominee:Tyler, the Creator — "Sugar on My Tongue"]
+
+[award:Best R&B]
+
+[winner:Bruno Mars — "I Just Might"]
+
+[nominee:Chris Brown — "It Depends/Obvious"]
+
+[nominee:Dave and Tems — "Raindance"]
+
+[nominee:Justin Bieber — "Yukon"]
+
+[nominee:Kehlani — "Folded"]
+
+[nominee:Mariah the Scientist and Kali Uchis — "Is It a Crime"]
+
+[award:Best Alternative]
+
+[winner:Olivia Rodrigo — "the cure"]
+
+[nominee:Geese — "Taxes"]
+
+[nominee:mgk and Fred Durst — "Fix Ur Face"]
+
+[nominee:Noah Kahan — "The Great Divide"]
+
+[nominee:SOMBR — "Homewrecker"]
+
+[nominee:Tame Impala — "Dracula"]
+
+[nominee:Twenty One Pilots — "Drag Path"]
+
+[award:Best Dance]
+
+[winner:Madonna — "Confessions II - The Film"]
+
+[nominee:Bebe Rexha and Faithless — "New Religion"]
+
+[nominee:Harry Styles — "Aperture"]
+
+[nominee:Lady Gaga and Doechii — "RUNWAY"]
+
+[nominee:PinkPantheress — "Stateside + Zara Larsson"]
+
+[nominee:Slayyyter — "Dance..."]
+
+[nominee:Tate McRae — "Nobody's Girl"]
+
+[award:Best Latin]
+
+[winner:Bad Bunny — "NUEVAYoL"]
+
+[nominee:Anitta with Shakira — "Choka Choka"]
+
+[nominee:Fuerza Regida — "Tu Sancho"]
+
+[nominee:KAROL G — "Papasito"]
+
+[nominee:Rosalía ft. Yahritza Y Su Esencia — "La Perla"]
+
+[nominee:Ryan Castro, Kapo and Gangsta — "La Villa"]
+
+[nominee:Shakira and Burna Boy — "Dai Dai"]
+
+[award:Best K-Pop]
+
+[winner:BTS — "Swim"]
+
+[nominee:BLACKPINK — "Jump"]
+
+[nominee:CORTIS — "RedRed"]
+
+[nominee:KATSEYE — "Pinky Up"]
+
+[nominee:LE SSERAFIM feat. J-Hope of BTS — "Spaghetti"]
+
+[nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
+
+[photo:{lisa_src}|Christopher Polk|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=932c1f928d|50% 42%|1]
+
+[award:Best Country]
+
+[winner:Ella Langley — "Choosin' Texas"]
+
+[nominee:Kacey Musgraves — "Dry Spell"]
+
+[nominee:Lainey Wilson — "Somewhere Over Laredo"]
+
+[nominee:Luke Combs — "Back in the Saddle"]
+
+[nominee:Shaboozey — "Cowgirl"]
+
+[nominee:Stella Lefty — "Boston"]
+
+[nominee:Tucker Wetmore — "Brunette"]
+
+[award:Best Direction]
+
+[winner:Taylor Swift — "Opalite"]
+
+[nominee:Ariana Grande — "Hate That I Made You Love Me"]
+
+[nominee:Bruno Mars — "I Just Might"]
+
+[nominee:GENER8ION — "Storm Starring Yung Lean"]
+
+[nominee:Madonna — "Confessions II - The Film"]
+
+[nominee:Sabrina Carpenter — "House Tour"]
+
+[award:Best Art Direction]
+
+[winner:PinkPantheress — "Stateside + Zara Larsson"]
+
+[nominee:Charli xcx — "SS26"]
+
+[nominee:Lady Gaga and Doechii — "RUNWAY"]
+
+[nominee:Madonna — "Confessions II - The Film"]
+
+[nominee:SOMBR — "My Body Isn't Ready"]
+
+[nominee:Taylor Swift — "The Fate of Ophelia"]
+
+[award:Best Cinematography]
+
+[winner:Madonna — "Confessions II - The Film"]
+
+[nominee:A$AP Rocky — "Punk Rocky"]
+
+[nominee:Ariana Grande — "Hate That I Made You Love Me"]
+
+[nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
+
+[nominee:Shaboozey — "Cowgirl"]
+
+[nominee:Taylor Swift — "The Fate of Ophelia"]
+
+[award:Best Editing]
+
+[winner:Sabrina Carpenter — "House Tour"]
+
+[nominee:Ariana Grande — "Hate That I Made You Love Me"]
+
+[nominee:Bruno Mars — "I Just Might"]
+
+[nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
+
+[nominee:Madonna — "Confessions II - The Film"]
+
+[nominee:Taylor Swift — "The Fate of Ophelia"]
+
+[award:Best Choreography]
+
+[winner:Madonna — "Confessions II - The Film"]
+
+[nominee:GENER8ION — "Storm Starring Yung Lean"]
+
+[nominee:Harry Styles — "Dance No More"]
+
+[nominee:KATSEYE — "Pinky Up"]
+
+[nominee:Tate McRae — "Nobody's Girl"]
+
+[nominee:Taylor Swift — "The Fate of Ophelia"]
+
+[award:Best Visual Effects]
+
+[winner:Ariana Grande — "hate that i made you love me"]
+
+[nominee:JISOO x ZAYN — "Eyes Closed"]
+
+[nominee:Madonna — "Confessions II - The Film"]
+
+[nominee:PinkPantheress — "Stateside + Zara Larsson"]
+
+[nominee:RAYE ft. Hans Zimmer — "Click Clack Symphony."]
+
+[nominee:Taylor Swift — "The Fate of Ophelia"]
+
+[award:Best Group]
+
+[winner:BTS]
+
+[nominee:BLACKPINK]
+
+[nominee:CORTIS]
+
+[nominee:FLO]
+
+[nominee:Fuerza Regida]
+
+[nominee:Geese]
+
+[nominee:KATSEYE]
+
+[nominee:Twenty One Pilots]
+
+[award:Best Long Form Video]
+
+[winner:Madonna — *Confessions II - The Film*]
+
+[nominee:Charli xcx — *Music, Fashion, Film*]
+
+[nominee:Ella Langley — *Choosin' Texas*]
+
+[nominee:GENER8ION — *STORM starring Yung Lean*]
+
+[award:Best Album]
+
+[winner:Madonna — *Confessions II*]
+
+[nominee:Drake — *ICEMAN*]
+
+[nominee:Olivia Dean — *The Art of Loving*]
+
+[nominee:Olivia Rodrigo — *you seem pretty sad for a girl so in love*]
+
+[nominee:Sabrina Carpenter — *Man's Best Friend*]
+
+[nominee:Taylor Swift — *The Life of a Showgirl*]
+
+[award:Song of Summer]
+
+[winner:Ariana Grande — "hate that i made you love me"]
+
+[nominee:Bruno Mars — "Risk It All"]
+
+[nominee:Charli xcx — "Camera"]
+
+[nominee:Ella Langley — "Choosin' Texas"]
+
+[nominee:KATSEYE — "Hootie Frutti"]
+
+[nominee:Latto ft. Doja Cat — "Okayyy"]
+
+[nominee:Morgan Wallen — "Been By Now"]
+
+[nominee:Olivia Dean — "So Easy (To Fall in Love)"]
+
+[nominee:Olivia Rodrigo — "Stupid Song"]
+
+[nominee:Sabrina Carpenter — "House Tour"]
+
+[nominee:Slayyyter — "brand new chanel$"]
+
+[nominee:SOMBR — "Homewrecker"]
+
+[nominee:Stella Lefty — "Boston"]
+
+[nominee:Tame Impala and JENNIE — "Dracula"]
+
+[nominee:Taylor Swift — "I Knew It, I Knew You"]
+
+[award:Video Vanguard Award]
+
+[winner:Nirvana]
+
+[award:MTV VMA Artist Director Honors]
+
+[winner:Taylor Swift]
 
 [/awards]
 
@@ -180,8 +500,9 @@ def main():
         raise RuntimeError("refusing to modify non-draft VMA post: " + repr(existing.get("status")))
 
     hero_src, hero_size = upload_photo(HERO_KEY, HERO_NAME)
-    sienna_src, sienna_size = upload_photo(SIENNA_KEY, SIENNA_NAME)
-    body = BODY_TEMPLATE.format(sienna_src=sienna_src)
+    taylor_src, taylor_size = upload_photo(TAYLOR_WIN_KEY, TAYLOR_WIN_NAME)
+    lisa_src, lisa_size = upload_photo(LISA_KEY, LISA_NAME)
+    body = BODY_TEMPLATE.format(taylor_src=taylor_src, lisa_src=lisa_src)
 
     def mutate(posts):
         p = find_existing(posts)
@@ -218,7 +539,8 @@ def main():
     now = runner.guarded_write(mutate)
     print("VMA_DRAFT", now["id"], now["status"], runner.words(now["body"]), "words")
     print("HERO", hero_size, now["cover"]["src"], now["cover"]["credit"])
-    print("BODY_PHOTO", sienna_size, sienna_src, SIENNA_CREDIT)
+    print("BODY_PHOTO", taylor_size, taylor_src, TAYLOR_WIN_CREDIT)
+    print("BODY_PHOTO", lisa_size, lisa_src, LISA_CREDIT)
     print("NO_DUPLICATE_VMA_POSTS", True)
     import time
     time.sleep(3)
