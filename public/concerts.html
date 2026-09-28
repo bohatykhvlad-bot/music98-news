@@ -515,7 +515,7 @@ function renderArtists(items,mode){
     const meta=document.createElement("span"); meta.className="tour-meta";
     const shows=Number(item.shows||item.count||0);
     meta.textContent=mode==="popular"
-      ? (shows ? shows+" sampled upcoming "+(shows===1?"show":"shows") : "Upcoming shows")
+      ? (shows ? shows+" upcoming "+(shows===1?"show":"shows") : "Upcoming shows")
       : (shows+" nearby "+(shows===1?"show":"shows"));
     copy.append(name,meta);
 
