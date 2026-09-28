@@ -39,6 +39,24 @@ test("root jobs are valid and large regions subdivide into gap-free children", (
   assert.ok(Math.abs(total-area(large))<1e-9);
 });
 
+
+test("problem European cities are inside the first-pass geographic coverage", () => {
+  const cities=[
+    ["Paris",48.8566,2.3522],
+    ["Lyon",45.7640,4.8357],
+    ["Madrid",40.4168,-3.7038],
+    ["Barcelona",41.3874,2.1686],
+    ["Berlin",52.5200,13.4050],
+    ["Vienna",48.2082,16.3738],
+    ["Prague",50.0755,14.4378],
+    ["Warsaw",52.2297,21.0122],
+  ];
+  for(const [name,lat,lng] of cities){
+    const covered=HOTSPOT_ROOTS.some(j=>lat>=j.minLat&&lat<=j.maxLat&&lng>=j.minLng&&lng<=j.maxLng);
+    assert.equal(covered,true,name+" must be covered");
+  }
+});
+
 test("venue candidates distinguish same-named cities in different states", () => {
   const a=venueCandidate({
     city:{name:"Springfield"}, state:{stateCode:"IL"}, country:{countryCode:"US"},
