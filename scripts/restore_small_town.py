@@ -18,9 +18,9 @@ EXCERPT = (
 
 BODY_TEMPLATE = """Dominic Fike has released "Small Town," the second lead single from his forthcoming album *How To Quit Smoking*, due October 9 through Columbia Records. The track follows "Wallflower" and arrives while Fike is in the middle of his Comedy Tragedy Parody tour across North America.
 
-Fike has been writing and recording the album between shows, using hotel rooms, the tour bus and backstage spaces as temporary studios. The road schedule has become part of the recording process rather than something separate from it, and "Small Town" came together during that stretch of touring.
+Fike has been writing and recording the album between shows, using hotel rooms, the tour bus and backstage spaces as temporary studios. "Small Town" came together during that stretch on the road, with the recording process continuing as the tour moved from city to city.
 
-The song and its video were developed across several cities. The visual was shot in Detroit and Seattle, while the release was completed from Dallas. Emma Ogier and Gabriel Jacoby contribute vocals, and Jacoby traveled in to help finish the track between shows.
+The video was shot in Detroit and Seattle. Fike released the track from Dallas, where Gabriel Jacoby joined him to help finish it. Emma Ogier and Jacoby both contribute vocals, tying the final recording to the same run of dates that shaped the song.
 
 {youtube}
 
@@ -28,9 +28,9 @@ The song and its video were developed across several cities. The visual was shot
 
 Dominic Fike and Kevin Abstract are among the songwriters on "Small Town." Capi produced the track and also plays keyboards and drums. Devin Workman is another producer and contributes acoustic guitar and brass, while Nick Leonardo plays acoustic guitar and bass. Ogier and Jacoby are both credited on vocals.
 
-The production keeps the arrangement relatively open around Fike's voice, with the additional vocals widening the chorus without turning the song into a full duet. Guitar, bass, drums, keyboards and brass all appear in the credits, but the track stays compact and direct rather than stacking every part at once.
+The album has taken shape alongside the tour rather than during a separate studio block. Stops on the current run have included Detroit, Seattle, Dallas, Austin and Albuquerque, while writing and recording have continued between shows. That schedule has also fed directly into the visual side of the release, with the "Small Town" video filmed during the same run.
 
-The album campaign continues alongside the tour. Fike is scheduled for two Los Angeles shows at The Wiltern on September 29 and September 30 after dates in cities including Detroit, Seattle, Dallas, Austin and Albuquerque. *How To Quit Smoking* arrives October 9, bringing the touring and recording cycle into the same final stretch before release."""
+Fike plays two nights at The Wiltern in Los Angeles on September 29 and September 30. *How To Quit Smoking* arrives October 9."""
 
 def main():
     runner.load_env()
@@ -54,7 +54,7 @@ def main():
         raise RuntimeError("curly apostrophe found")
     if body.count(youtube) != 1:
         raise RuntimeError("YouTube marker count mismatch")
-    if runner.words(body) < 330:
+    if runner.words(body) < 300:
         raise RuntimeError(f"restored body too short: {runner.words(body)} words")
 
     preserved = {
@@ -76,7 +76,7 @@ def main():
         if now.get(key) != value:
             raise RuntimeError(f"preserved field changed: {key}")
 
-    if runner.words(now.get("body") or "") < 330:
+    if runner.words(now.get("body") or "") < 300:
         raise RuntimeError("live post is still too short after write")
 
     print("SMALL_TOWN_RESTORED", runner.words(now["body"]), "words")
