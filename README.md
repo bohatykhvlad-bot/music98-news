@@ -4,28 +4,28 @@ Independent music desk: news, releases, and a Top 50 that can rebuild itself onc
 
 The chart scores a title across five public lists: Apple Music most-played (US), Spotify global daily, Deezer global, Billboard Hot 100, and YouTube Weekly Top Songs. A miss on a list is zero points. Trending videos are not used.
 
-## Обложки и написание (Apple)
+## Обложки чарта и Apple metadata
 
-И обложка, и написание названия/артистов берутся **из Apple** и ровно того релиза, на
-который ведёт кнопка «Listen on Apple Music»: точный трек по `?i=` в ссылке, а не «похожий»
-из поиска. Поэтому на сайте нет ни спотифай-стиля `(w/ Bruno Mars)`, ни чужой обложки
-ремикса — фиты переезжают в строку артистов (`Lady Gaga, Bruno Mars`). Deezer остаётся
-только последним вариантом для обложки, чтобы карточка не осталась пустой.
+`public/data/covers.json` — **канонический immutable registry обложек**. Ключ песни
+(`title + primary artist + version`) получает одну проверенную картинку и после этого
+автоматически больше не меняется. Remix, live, acoustic, sped-up, remaster и другие версии
+имеют отдельную identity и не могут занять cover-lock оригинала.
 
-iTunes API из Cloudflare отвечает через раз (Apple режет egress воркера), поэтому оба файла
-собираются на GitHub-раннере, где Apple отвечает всегда:
+Для новой песни `scripts/build-covers.mjs` сначала ищет точный релиз в Deezer, затем
+использует Apple как fallback. Совпадение строго проверяется по title, primary artist и
+version. После первого успешного выбора URL записывается в `covers.json` навсегда.
+Изменить существующий lock можно только явной редакторской правкой, если выяснилось, что
+изначально была закреплена неправильная обложка. CI отдельно проверяет, что ежедневная
+сборка может только добавлять новые ключи и не переписывает существующие.
 
-- `public/data/covers.json` — обложки;
-- `public/data/apple-names.json` — написания;
+Apple по-прежнему отвечает за написание артистов/треков, ссылку Listen on Apple Music,
+preview и год через `public/data/apple-names.json`. Это отделено от cover registry,
+потому что внешний каталог способен задним числом менять artwork даже у того же track ID.
 
-`scripts/build-covers.mjs` собирает их, а `.github/workflows/apple-data.yml` запускается раз
-в сутки (05:20 по Киеву, плюс кнопка «Run workflow» вручную) и коммитит, если состав чарта
-изменился. **Руками делать ничего не нужно.**
-
-Воркер читает файлы и запоминает найденное по песне (KV `covers_v3` и `names_v1`), так что
-день ото дня картинка и написание не меняются; Apple разово заменяет уже запомненный Deezer.
-Проверка: `node ../.gallery/m98/art-check.mjs`, либо запрос `/api/top50` — поля `rev`,
-`sources`, `covers`.
+`.github/workflows/apple-data.yml` запускается ежедневно в 09:20 по Киеву и вручную через
+Run workflow. Воркер считает `covers.json` источником истины, а KV — только runtime-кэшем.
+Если для новой песни точная обложка временно не найдена, лучше оставить её незакреплённой
+до следующей проверки, чем автоматически поставить картинку другого релиза.
 
 ## Run locally
 
