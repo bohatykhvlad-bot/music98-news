@@ -21,7 +21,7 @@ Paul Hunter directs the video, cutting between Legend with the Hollywood Cinemat
 
 *Muse* started after Legend's guest appearance on Clipse's *Let God Sort 'Em Out*. His vocal there prompted Pharrell to suggest a full album, much of it later written and recorded in Paris. He produced all 16 songs and co-wrote the project. Legend has said he gave Pharrell more creative control than usual, including recording material written entirely by him. The album moves through gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop.
 
-"Fireflies" keeps its focus tighter. Once the choir and orchestra arrive, the idea is clear. It still sounds recognizably like Legend, only with a wider frame around him. The extra scale feels like a natural extension of his sound on this single.'''
+"Fireflies" keeps its focus tighter. Once the choir and orchestra arrive, the idea is clear. It still sounds recognizably like Legend, only with a wider frame around him. The extra scale broadens his usual sound and still leaves it recognizable.'''
 
 def ensure_cover():
     req=urllib.request.Request(COVER_URL, headers={"User-Agent": runner.UA})
@@ -62,6 +62,7 @@ def main():
         return p
     now=runner.guarded_write(mutate)
     print("DRAFT", now["id"], now["status"], runner.words(now["body"]), "words")
+    print("COVER_CROP", "pos="+str(now.get("cover",{}).get("pos")), "cardX="+str(now.get("cover",{}).get("cardX")), "cardY="+str(now.get("cover",{}).get("cardY")), "cardZoom="+str(now.get("cover",{}).get("cardZoom")))
     ok=runner.cmd_gate(PID)
     print("GATE_AFTER_DRAFT", "PASS" if ok else "FAIL")
     runner.cmd_show(PID)
