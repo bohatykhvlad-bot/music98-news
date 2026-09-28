@@ -7,7 +7,7 @@ import post as runner
 
 PID="aujlfire28r1"
 
-EXCERPT='John Legend and Pharrell Williams have released "Fireflies," the latest preview of Legend\\'s forthcoming album *Muse*. The 16-track record arrives October 23 through Republic Records.'
+EXCERPT="""John Legend and Pharrell Williams have released "Fireflies," the latest preview of Legend's forthcoming album *Muse*. The 16-track record arrives October 23 through Republic Records."""
 
 BODY='''John Legend and Pharrell Williams have released "Fireflies," the latest preview of Legend's forthcoming album *Muse*. The 16-track record arrives October 23 through Republic Records.
 
