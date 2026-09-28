@@ -19,8 +19,6 @@ The collaboration behind *Muse* started with Legend's appearance on Clipse's *Le
 
 That history matters because Pharrell is not just dropping into a few songs. He produced all 16 tracks and co-wrote the album, while Legend gave him more creative control than he usually hands to another writer or producer. The record moves through gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, with Nina Simone, Nat King Cole and Marvin Gaye among the reference points the pair cited. "Fireflies" sits inside that mix as a piano-led song with a much larger ensemble built around it.
 
-[apple:song:6808409890:6808409913]
-
 "Fireflies" appears at No. 14 on *Muse*, after "Doing Me" and before "Everything." It follows "Daylight," the album's lead single, and is one of several songs that also feature Pharrell. He appears on the title track, "Her," "Get Back," "Are You OK?" and "Next Time," while Clipse guests on "Bodies On The Floor." That track list makes the scale of the partnership clear, but "Fireflies" is one of the places where the arrangement does more of the talking than the guest credit.
 
 For Legend, that is part of the point of *Muse*. He has spent much of his career being associated with piano-driven ballads, and he said he wanted this album to "shake up the formula." "Fireflies" still starts from the part of his sound listeners know best, his voice and piano, then opens outward through choir, orchestra and Pharrell's production. It is a familiar John Legend setup pushed into a denser, more cinematic frame, without turning the song into a showcase for anyone but Legend.'''
