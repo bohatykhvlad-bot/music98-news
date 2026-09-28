@@ -98,6 +98,9 @@ jobs:
       - name: Probe official VMA press assets
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[vma-assets]') }}
         run: python scripts/vma_asset_probe.py
+      - name: Draft 2026 VMA results
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[vma-draft]') }}
+        run: python scripts/draft_vmas_2026_results.py
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
