@@ -110,7 +110,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
 .nav{justify-self:center;display:flex;align-items:center;height:40px;gap:6px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}
-.nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+.nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 /* optical ink centering (owner: text reads high even though the pixel
    envelope is symmetric 11/11 and 19/18): cap-height words concentrate mass
    above the midline, so the eye wants a hair more air on top. Nudge the text
@@ -788,6 +788,7 @@ textarea{resize:vertical;min-height:64px}
       <button class="nav-btn active" data-tab="news">News</button>
       <button class="nav-btn" data-tab="releases">Releases</button>
       <button class="nav-btn" data-tab="charts">Chart</button>
+      <a class="nav-btn" href="/concerts">Concerts</a>
     </nav>
     <div class="top-actions">
       <div class="search">
@@ -2801,7 +2802,7 @@ function setTab(t){
      a frame later it has real geometry, so re-evaluate the arrows */
   requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
 }
-$("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b) setTab(b.dataset.tab); });
+$("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
   e.preventDefault();
   if(!$("#articlePage").hidden){ hideArticle(); try{ history.replaceState(null,"","/"); }catch(err){} }
@@ -3250,6 +3251,12 @@ function postPath(p){ buildSlugs(); return "/" + (p.type==="release" ? "releases
 document.addEventListener("mouseover", intentBootEvent, {passive:true});
 document.addEventListener("focusin", intentBootEvent);
 function route(){
+  const tabHash = location.hash.match(/^#(news|releases|charts)$/);
+  if(tabHash){
+    hideArticle();
+    setTab(tabHash[1]);
+    return;
+  }
   const pm = location.pathname.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/);
   if(pm){
     buildSlugs();
