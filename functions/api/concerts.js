@@ -48,6 +48,7 @@ function json(data, status = 200, extra = {}) {
 }
 
 function finite(v) {
+  if (v == null || (typeof v === "string" && !v.trim())) return null;
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
 }
@@ -104,7 +105,7 @@ function normalizeEvent(e) {
   const attraction = attractions[0] || {};
   const lat = finite(venue?.location?.latitude);
   const lng = finite(venue?.location?.longitude);
-  if (lat == null || lng == null) return null;
+  if (lat == null || lng == null || lat < -90 || lat > 90 || lng < -180 || lng > 180 || (Math.abs(lat) < 1e-7 && Math.abs(lng) < 1e-7)) return null;
   return {
     id: String(e.id || ""),
     name: String(e.name || attraction.name || "Concert"),
@@ -421,7 +422,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v14");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v15");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
