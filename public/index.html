@@ -160,13 +160,6 @@ main{position:relative;z-index:1}
 @media(max-width:900px){.concerts-frame{height:1050px}}
 @media(max-width:640px){.concerts-frame{height:980px}}
 
-/* Pre-crop only the visible editorial covers. Raw intrinsic-size images stay
-   hidden until fitCover has applied the stored crop, eliminating the load zoom. */
-#heroSlot img.js-cover,#newsGrid img.js-cover,#relGrid img.js-cover{visibility:hidden}
-#heroSlot img.js-cover[data-crop-ready="1"],
-#newsGrid img.js-cover[data-crop-ready="1"],
-#relGrid img.js-cover[data-crop-ready="1"]{visibility:visible}
-
 /* hero — left cell matches the text column; photo fills and crops to the face */
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .hero .cover{position:relative;aspect-ratio:16/9;min-height:0;height:auto;overflow:hidden;background:var(--card2)}
@@ -994,7 +987,6 @@ function fitCover(img){
   img.style.width = dw+"px";
   img.style.height = dh+"px";
   img.style.transform = "translate("+left+"px,"+top+"px)";
-  img.dataset.cropReady = "1";
 }
 function bindCovers(root){
   (root||document).querySelectorAll("img.js-cover").forEach(img=>{
@@ -2815,7 +2807,7 @@ function setTab(t){
   window.scrollTo(0, 0);
   /* the newly shown rail had zero size while hidden - its .ok state is stale;
      a frame later it has real geometry, so re-evaluate the arrows */
-  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); document.querySelectorAll("#tab-"+t+" img.js-cover").forEach(fitCover); if(t==="concerts"){ const f=$("#concertsFrame"); try{ if(f&&f.contentWindow) f.contentWindow.dispatchEvent(new f.contentWindow.Event("resize")); }catch(e){} } });
+  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
