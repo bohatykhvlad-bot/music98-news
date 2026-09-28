@@ -1,13 +1,14 @@
-/* Поддерживает два файла для чарта:
- * - public/data/covers.json: immutable cover registry, song identity -> fixed artwork URL
- * - public/data/apple-names.json: Apple spelling/link/preview metadata for current rows
+/* Apple-first chart cover registry.
  *
- * Cover rule: existing cover keys are NEVER rewritten automatically.
- * For a new song identity, resolve an exact Deezer release first, then Apple as fallback.
- * Matching is strict by title + primary artist + version (remix/live/sped-up etc.).
- * Once pinned, the URL is permanent until an explicit editorial correction.
+ * public/data/covers.json is immutable: once a song identity gets a verified
+ * Apple artwork URL, daily automation never replaces it. Existing locks change
+ * only by an explicit editorial correction.
  *
- * Запуск вручную: node scripts/build-covers.mjs
+ * New song resolution:
+ *   1. known exact Apple collection override (rare catalog-search miss)
+ *   2. dedicated Apple single/EP for the exact song/version
+ *   3. exact Apple song on the artist's own release closest to first release
+ * Generic compilations, soundtracks and alternate packs lose to artist releases.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -16,7 +17,6 @@ import {
   appleCandidateCompatible,
   mergeKey,
   normTitle,
-  pickAppleCandidate,
   primaryArtist,
   stripParen,
   versionSignature,
@@ -28,42 +28,33 @@ const OUT = path.resolve("public/data/covers.json");
 const OUT_NAMES = path.resolve("public/data/apple-names.json");
 const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
 
-const idOf = (u) => (String(u || "").match(/[?&]i=(\d+)/) || [])[1] || "";
-const art600 = (u) => String(u || "").replace("100x100bb", "600x600bb").replace("100x100bb.jpg", "600x600bb.jpg");
+const DIRECT_COLLECTION = {
+  "loser|tameimpala": "1835526733",
+  "pinkblush|dollybabe": "6783917228",
+};
 
-async function deezerCover(wantedTitle, wantedArtist) {
-  const q = encodeURIComponent(`${wantedArtist} ${stripParen(wantedTitle)}`.trim());
-  const r = await fetch(`https://api.deezer.com/search?q=${q}&limit=25`);
-  if (!r.ok) throw new Error(`Deezer ${r.status}`);
-  const d = await r.json();
-  const wantT = normTitle(wantedTitle);
-  const wantA = primaryArtist(wantedArtist);
-  const wantV = versionSignature(wantedTitle);
-  const candidates = (d.data || []).filter((x) => {
-    if (normTitle(x.title) !== wantT) return false;
-    if (versionSignature(x.title) !== wantV) return false;
-    if (wantA && primaryArtist(x.artist && x.artist.name) !== wantA) return false;
-    return true;
-  });
-  candidates.sort((a, b) => {
-    const av = versionSignature(a.album && a.album.title);
-    const bv = versionSignature(b.album && b.album.title);
-    const ap = av && av !== wantV ? 1 : 0;
-    const bp = bv && bv !== wantV ? 1 : 0;
-    return ap - bp;
-  });
-  const hit = candidates[0];
-  return hit && hit.album
-    ? (hit.album.cover_xl || hit.album.cover_big || hit.album.cover_medium || "")
-    : "";
+const idOf = (u) => (String(u || "").match(/[?&]i=(\d+)/) || [])[1] || "";
+const art600 = (u) => String(u || "")
+  .replace("100x100bb.jpg", "600x600bb.jpg")
+  .replace("100x100bb", "600x600bb");
+
+const releaseMs = (x) => {
+  const n = Date.parse(String((x && x.releaseDate) || ""));
+  return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+};
+
+async function json(url) {
+  const r = await fetch(url, { headers: { "user-agent": "music98-cover-resolver/1.0" } });
+  if (!r.ok) throw new Error(`HTTP ${r.status} ${url}`);
+  return r.json();
 }
 
-/* одна запись Apple на песню: имя, ссылка, превью, год. Воркер носит этот файл
-   в бандле и берёт данные отсюда, когда Apple из Cloudflare не отвечает. */
 function appleRecord(hit) {
   const album = String(hit.collectionId || "");
   const track = String(hit.trackId || "");
-  const url = album && track ? `https://music.apple.com/us/album/${album}?i=${track}` : (hit.trackViewUrl || "");
+  const url = album && track
+    ? `https://music.apple.com/us/album/${album}?i=${track}`
+    : (hit.trackViewUrl || "");
   return {
     title: hit.trackName || "",
     artist: hit.artistName || "",
@@ -73,15 +64,131 @@ function appleRecord(hit) {
   };
 }
 
-const chart = await (await fetch(CHART + (CHART.includes("?") ? "&" : "?") + "cb=" + Date.now())).json();
+function collectionBase(name) {
+  return String(name || "")
+    .replace(/\s*-\s*(?:single|ep)\s*$/i, "")
+    .trim();
+}
+
+function derivativeCollection(name) {
+  const s = String(name || "").toLowerCase();
+  return /\b(?:remix(?:es)?|rmx|live|acoustic|instrumental|karaoke|demo|sped\s*up|slowed|reverb(?:ed)?|isolated\s+vocals?|singalong|track\s+by\s+track|commentary|limited\s+cover|alternate\s+(?:cover|version)|radio\s+edit|extended\s+(?:mix|version))\b/.test(s);
+}
+
+function genericCompilation(name, genre) {
+  const s = String(name || "").toLowerCase();
+  const g = String(genre || "").toLowerCase();
+  if (g === "soundtrack") return 5;
+  if (/original motion picture soundtrack|soundtrack/.test(s)) return 5;
+  if (/\b(?:70s|80s|90s)\b.*\b(?:hits|gems|anthems)\b/.test(s)) return 5;
+  if (/\b(?:party|disco|flashback|various artists|anthology)\b/.test(s)) return 4;
+  if (/\b(?:greatest hits|essential)\b/.test(s)) return 3;
+  if (/\b(?:best of|collection)\b/.test(s)) return 1;
+  return 0;
+}
+
+async function albumSearch(title, artist) {
+  const term = encodeURIComponent(`${artist} ${stripParen(title)}`.trim());
+  const d = await json(`https://itunes.apple.com/search?term=${term}&entity=album&limit=200&country=US`);
+  const wantA = primaryArtist(artist);
+  return (d.results || []).filter((x) =>
+    !wantA || primaryArtist(x.artistName || x.collectionArtistName) === wantA
+  );
+}
+
+async function songSearch(title, artist) {
+  const terms = [
+    `${artist} ${stripParen(title)}`,
+    `${stripParen(title)} ${artist}`,
+    `${artist} ${stripParen(title)} single`,
+  ];
+  const out = new Map();
+  for (const term0 of terms) {
+    const term = encodeURIComponent(term0.trim());
+    const d = await json(`https://itunes.apple.com/search?term=${term}&entity=song&limit=200&country=US`);
+    for (const x of d.results || []) {
+      if (appleCandidateCompatible(title, artist, x) && x.trackId) {
+        out.set(String(x.trackId), x);
+      }
+    }
+  }
+  return [...out.values()];
+}
+
+async function lookupCollection(collectionId, title, artist) {
+  const d = await json(`https://itunes.apple.com/lookup?id=${collectionId}&entity=song&country=US`);
+  return (d.results || []).find((x) =>
+    x.wrapperType === "track" && appleCandidateCompatible(title, artist, x)
+  ) || null;
+}
+
+async function resolveApple(title, artist) {
+  const key = mergeKey(title, artist);
+
+  if (DIRECT_COLLECTION[key]) {
+    const hit = await lookupCollection(DIRECT_COLLECTION[key], title, artist);
+    if (hit && hit.artworkUrl100) return { hit, reason: "direct-original" };
+  }
+
+  const [albums, songs] = await Promise.all([
+    albumSearch(title, artist),
+    songSearch(title, artist),
+  ]);
+
+  const wantT = normTitle(title);
+  const wantV = versionSignature(title);
+
+  const dedicated = albums
+    .filter((a) =>
+      normTitle(collectionBase(a.collectionName)) === wantT &&
+      versionSignature(a.collectionName) === wantV &&
+      !derivativeCollection(a.collectionName)
+    )
+    .sort((a, b) => releaseMs(a) - releaseMs(b) || Number(a.collectionId) - Number(b.collectionId));
+
+  for (const a of dedicated) {
+    const hit = await lookupCollection(a.collectionId, title, artist);
+    if (hit && hit.artworkUrl100) return { hit, reason: "dedicated-single" };
+  }
+
+  if (!songs.length) return null;
+
+  const albumById = new Map(albums.map((a) => [String(a.collectionId || ""), a]));
+  const firstTrackDate = Math.min(...songs.map(releaseMs));
+
+  const ranked = songs.map((hit) => {
+    const album = albumById.get(String(hit.collectionId || ""));
+    const ownRelease = !!album;
+    const comp = genericCompilation(hit.collectionName, hit.primaryGenreName);
+    const albumDate = album ? releaseMs(album) : Number.MAX_SAFE_INTEGER;
+    const gapDays = Number.isFinite(albumDate) && Number.isFinite(firstTrackDate)
+      ? Math.abs(albumDate - firstTrackDate) / 86400000
+      : 999999;
+    let score = 0;
+    if (ownRelease) score += 1000;
+    if (!derivativeCollection(hit.collectionName)) score += 250;
+    score -= comp * 180;
+    score -= Math.min(600, gapDays / 15);
+    return { hit, score, albumDate, comp };
+  }).sort((a, b) =>
+    b.score - a.score ||
+    a.albumDate - b.albumDate ||
+    releaseMs(a.hit) - releaseMs(b.hit) ||
+    Number(a.hit.trackId) - Number(b.hit.trackId)
+  );
+
+  const best = ranked[0];
+  return best && best.hit && best.hit.artworkUrl100
+    ? { hit: best.hit, reason: "artist-release" }
+    : null;
+}
+
+const chart = await (await fetch(
+  CHART + (CHART.includes("?") ? "&" : "?") + "cb=" + Date.now()
+)).json();
 const tracks = chart.tracks || [];
 console.log(`в чарте ${tracks.length} треков (rev ${chart.rev || "-"})`);
 
-/* Canonical artwork registry.
- * Existing keys are immutable: an external catalog may change artwork later,
- * but music98 keeps the first approved cover for that song identity.
- * The daily job may only append covers for previously unseen keys.
- */
 let covers = {};
 try {
   const saved = JSON.parse(fs.readFileSync(OUT, "utf8"));
@@ -93,84 +200,60 @@ const pinCover = (key, url) => {
   covers[key] = url;
   return true;
 };
+
+let previousNames = {};
+try {
+  const saved = JSON.parse(fs.readFileSync(OUT_NAMES, "utf8"));
+  if (saved && typeof saved === "object" && !Array.isArray(saved)) previousNames = saved;
+} catch {}
 const names = {};
-console.log(`закреплённых обложек до сборки: ${lockedAtStart.size}`);
 
-/* 0) Для НОВЫХ ключей сначала Deezer: artwork у песни берём из одного
-   конкретного релиза и после этого замораживаем. Строгая проверка title + artist +
-   version не даёт ремиксу/live/sped-up занять ключ оригинала. */
-for (const t of tracks) {
-  const key = mergeKey(t.title, t.artist);
-  if (covers[key]) continue;
-  try {
-    const art = await deezerCover(t.title, t.artist);
-    if (art) {
-      pinCover(key, art);
-      console.log(`  Deezer lock: ${t.artist} - ${t.title}`);
-    }
-  } catch (e) {
-    console.log(`  Deezer ошибка: ${t.artist} - ${t.title}: ${e.message}`);
-  }
-}
+console.log(`закреплённых Apple-обложек до сборки: ${lockedAtStart.size}`);
 
-/* 1) Для НОВЫХ ключей пробуем точный релиз по Apple-ID одним batch-запросом.
-   Уже закреплённые covers[key] не меняются ни при каких ответах каталога. */
-  const idWanted = tracks.map((t) => [t, idOf(t.url)]).filter(([, id]) => id);
+/* Keep Apple metadata fresh cheaply for rows that already have a track ID. */
+const idWanted = tracks.map((t) => [t, idOf(t.url)]).filter(([, id]) => id);
 if (idWanted.length) {
   const ids = [...new Set(idWanted.map(([, id]) => id))];
   const byId = new Map();
   for (let i = 0; i < ids.length; i += 50) {
     try {
-      const d = await (await fetch(
+      const d = await json(
         `https://itunes.apple.com/lookup?id=${ids.slice(i, i + 50).join(",")}&entity=song&country=US`
-      )).json();
-      for (const r of d.results || []) {
-        const artwork = art600(r.artworkUrl100);
-        if (r.trackId && artwork) byId.set(String(r.trackId), r);
-      }
+      );
+      for (const x of d.results || []) if (x.trackId) byId.set(String(x.trackId), x);
     } catch (e) {
-      console.log(`  lookup ошибка: ${e.message}`);
+      console.log("  Apple batch lookup ошибка:", e.message);
     }
   }
   for (const [t, id] of idWanted) {
     const key = mergeKey(t.title, t.artist);
-    if (covers[key]) {
-      const hit = byId.get(id);
-      if (hit) names[key] = appleRecord(hit);
-      continue;
-    }
     const hit = byId.get(id);
-    if (!hit) continue;
-    /* Existing Apple URLs are hints, not truth. If a row now points to a remix,
-       live/sped-up version or even a different title/artist, ignore it and let
-       the canonical search below repair all fields. */
-    if (!appleCandidateCompatible(t.title, t.artist, hit)) {
-      console.log(`  ссылка не совпадает с оригиналом: ${t.artist} - ${t.title} -> ${hit.trackName} / ${hit.collectionName || ""}`);
-      continue;
-    }
-    pinCover(key, art600(hit.artworkUrl100));
-    names[key] = appleRecord(hit);
+    if (hit && appleCandidateCompatible(t.title, t.artist, hit)) names[key] = appleRecord(hit);
   }
-  console.log(`по Apple-ID: ${idWanted.filter(([t]) => covers[mergeKey(t.title, t.artist)]).length}/${idWanted.length} имеют закреплённую обложку`);
 }
 
-/* 2) Search only NEW rows whose exact Apple ID is missing or failed strict identity.
-   This keeps the blast radius small and avoids iTunes rate limits. The search
-   matcher still enforces title + primary artist + exact version signature. */
+/* Only unseen cover keys go through discovery. Existing locks are immutable. */
 for (const t of tracks) {
   const key = mergeKey(t.title, t.artist);
-  if (covers[key]) continue;
+  if (covers[key]) {
+    if (!names[key] && previousNames[key]) names[key] = previousNames[key];
+    continue;
+  }
   try {
-    const term = encodeURIComponent(`${t.artist} ${stripParen(t.title)}`.trim());
-    const d = await (await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&limit=25&country=US`)).json();
-    const hit = pickAppleCandidate(t.title, t.artist, d.results || []);
-    if (hit) {
-      pinCover(key, art600(hit.artworkUrl100));
-      names[key] = appleRecord(hit);
+    const resolved = await resolveApple(t.title, t.artist);
+    if (!resolved) {
+      console.log(`  Apple cover не найден: ${t.artist} - ${t.title}`);
+      if (previousNames[key]) names[key] = previousNames[key];
+      continue;
     }
-    console.log(`  поиск: ${hit ? "OK " : "НЕТ"} ${t.artist} - ${t.title}${hit ? ` -> ${hit.trackName} / ${String(hit.collectionName || "").slice(0, 48)}` : ""}`);
+    const url = art600(resolved.hit.artworkUrl100);
+    if (pinCover(key, url)) {
+      console.log(`  Apple lock [${resolved.reason}]: ${t.artist} - ${t.title} -> ${resolved.hit.collectionName}`);
+    }
+    names[key] = appleRecord(resolved.hit);
   } catch (e) {
-    console.log(`  поиск: ошибка ${t.artist} - ${t.title}: ${e.message}`);
+    console.log(`  Apple resolver ошибка: ${t.artist} - ${t.title}: ${e.message}`);
+    if (previousNames[key]) names[key] = previousNames[key];
   }
 }
 
@@ -178,11 +261,9 @@ const missing = tracks.filter((t) => !covers[mergeKey(t.title, t.artist)]);
 const sorted = Object.fromEntries(Object.entries(covers).sort(([a], [b]) => a.localeCompare(b)));
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(sorted, null, 2) + "\n");
-console.log(`\nв registry ${Object.keys(sorted).length} закреплённых обложек (+${Object.keys(sorted).length - lockedAtStart.size} новых) в ${path.relative(process.cwd(), OUT)}`);
-console.log(`без закреплённой обложки: ${missing.length}${missing.length ? " -> " + missing.map((t) => `${t.artist} - ${t.title}`).join("; ") : ""}`);
+console.log(`\nв registry ${Object.keys(sorted).length} Apple cover-locks (+${Object.keys(sorted).length - lockedAtStart.size} новых)`);
+console.log(`без Apple cover-lock: ${missing.length}${missing.length ? " -> " + missing.map((t) => `${t.artist} - ${t.title}`).join("; ") : ""}`);
 
 const sortedNames = Object.fromEntries(Object.entries(names).sort(([a], [b]) => a.localeCompare(b)));
 fs.writeFileSync(OUT_NAMES, JSON.stringify(sortedNames, null, 2) + "\n");
-const noName = tracks.filter((t) => !names[mergeKey(t.title, t.artist)]);
-console.log(`записано ${Object.keys(sortedNames).length} Apple-написаний в ${path.relative(process.cwd(), OUT_NAMES)}`);
-console.log(`без Apple-написания: ${noName.length}${noName.length ? " -> " + noName.map((t) => `${t.artist} - ${t.title}`).join("; ") : ""}`);
+console.log(`записано ${Object.keys(sortedNames).length} Apple metadata rows`);
