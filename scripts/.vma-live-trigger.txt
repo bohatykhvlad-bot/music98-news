@@ -1,1 +1,1 @@
-inspect current live VMA after revision attempt
+final proofread current live VMA after manual image centering
