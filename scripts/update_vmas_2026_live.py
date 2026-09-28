@@ -28,16 +28,14 @@ def normalize_awards(awards: str) -> str:
     # Billboard-style list separator: en dash, not em dash.
     awards = awards.replace(" — ", " - ").replace(" – ", " - ")
 
-    # Keep collaborators outside the work title where the title itself is simply "Stateside".
+    # Match the official MTV/Paramount nominee wording exactly for these credits.
     awards = awards.replace(
-        'PinkPantheress - "Stateside + Zara Larsson"',
         'PinkPantheress + Zara Larsson - "Stateside"',
+        'PinkPantheress - "Stateside + Zara Larsson"',
     )
-
-    # "Dream" is the work title; Kentaro Sakaguchi is the credited video collaborator.
     awards = awards.replace(
-        'LISA - "Dream feat. Kentaro Sakaguchi"',
         'LISA - "Dream" feat. Kentaro Sakaguchi',
+        'LISA - "Dream feat. Kentaro Sakaguchi"',
     )
 
     # Album casing follows Apple Music.
@@ -68,8 +66,8 @@ def audit(body: str, original_photo_tags: list[str]) -> None:
 
     if "Swift's" in body or "Taylor Swift's" in body:
         raise RuntimeError("surname shorthand or possessive Taylor Swift wording remains")
-    if "—" in awards or "–" in awards:
-        raise RuntimeError("long dash remains in award-list artist/title separator")
+    if "—" in body or "–" in body:
+        raise RuntimeError("long dash remains in post text")
     if any(ch in body for ch in ("’", "‘")):
         raise RuntimeError("curly apostrophe remains")
 
@@ -86,12 +84,10 @@ def audit(body: str, original_photo_tags: list[str]) -> None:
         raise RuntimeError("award/winner count mismatch")
     if " — " in awards or " – " in awards:
         raise RuntimeError("long-dash separator remains in awards")
-    if 'PinkPantheress - "Stateside + Zara Larsson"' in awards:
-        raise RuntimeError("Stateside collaborator remains inside title")
-    if awards.count('PinkPantheress + Zara Larsson - "Stateside"') != 5:
-        raise RuntimeError("Stateside credit count mismatch")
-    if awards.count('LISA - "Dream" feat. Kentaro Sakaguchi') != 4:
-        raise RuntimeError("LISA Dream credit count mismatch")
+    if awards.count('PinkPantheress - "Stateside + Zara Larsson"') != 5:
+        raise RuntimeError("official Stateside wording/count mismatch")
+    if awards.count('LISA - "Dream feat. Kentaro Sakaguchi"') != 4:
+        raise RuntimeError("official LISA Dream wording/count mismatch")
     if "*CONFESSIONS II*" not in awards or "*ICEMAN*" not in awards:
         raise RuntimeError("Apple Music album casing missing")
     if "*you seem pretty sad for a girl so in love*" not in awards:
