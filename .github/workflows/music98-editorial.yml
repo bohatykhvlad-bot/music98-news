@@ -64,6 +64,14 @@ jobs:
           open("/tmp/tsunami-press.png","wb").write(raw)
           PY
           file /tmp/tsunami-press.png
+      - name: Inspect Fireflies media
+        run: |
+          python - <<'PY'
+          import urllib.request
+          url = "https://www.dropbox.com/scl/fo/3b5x15fece0gdmyaxe0n8/ABBEEwylW6nVnCf3DF52rCk?rlkey=oxpvy17mb6nurbb13321itr5e&st=me4uptj5&dl=1"
+          urllib.request.urlretrieve(url, "/tmp/fireflies-media.zip")
+          PY
+          unzip -l /tmp/fireflies-media.zip | head -100
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
