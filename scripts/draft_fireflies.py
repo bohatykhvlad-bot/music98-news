@@ -7,19 +7,19 @@ import post as runner
 
 PID="aujlfire28r1"
 
-EXCERPT="""John Legend and Pharrell Williams have released "Fireflies," the latest song from Legend's forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records."""
+EXCERPT="""John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records."""
 
-BODY='''John Legend and Pharrell Williams have released "Fireflies," the latest song from Legend's forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. It is a big arrangement that rarely feels busy. Legend stays at the piano while strings, horns, choir and rhythm section gather around him, and Pharrell's vocal remains part of the texture instead of becoming the main event. The song works because nobody is fighting for space. Legend keeps the center, and everything else adds weight around him.
+BODY='''John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. The song starts with Legend at the piano and gradually opens into strings, horns, choir and a full rhythm section. Pharrell wrote the track and appears on the recording, but the arrangement keeps Legend's voice at the center. "Fireflies" grows by adding players around the piano instead of building toward a conventional back-and-forth duet.
 
-Paul Hunter's video understands that balance. Legend performs with the Hollywood Cinematic Orchestra while the camera moves through portraits of people living in a housing project. Hunter does not force a plot onto the song. The faces, rooms and streets give it a social setting, then the film returns to the performance. That simplicity helps. A more elaborate concept could have overwhelmed the track; here, the orchestra gives the clip scale and the people on screen keep it human.
+Paul Hunter directed the video, which pairs Legend's performance with the Hollywood Cinematic Orchestra and portraits of people living in a housing project. The film moves between the orchestra and quieter scenes of everyday life without turning them into a separate storyline. Its themes of inequality, loss and resilience are already present in the song, so the video gives those ideas a setting instead of explaining them again. Hunter also directed the earlier "Daylight" video, giving the first two singles from *Muse* a shared visual hand.
 
 [youtube:fEw6VZq9xg8]
 
-*Muse* grew out of Legend's appearance on Clipse's *Let God Sort 'Em Out*. Pharrell heard his vocal on "The Birds Don't Sing" and suggested a full album, much of it later written and recorded at his studio inside Louis Vuitton headquarters in Paris. He produced all 16 songs and co-wrote the record. That is enough context to explain why "Fireflies" feels cohesive rather than assembled around a feature.
+The recording itself is built as an ensemble piece. Voices of Fire joins the choir, while Larry Gold and Matt Jones conduct the orchestral players and Terrace Martin is among the arrangers. Those details matter more here than a long list of features. The piano stays exposed enough to keep the song recognizably Legend, while the choir and orchestra give the chorus a broader scale.
 
-The album draws from gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, with Nina Simone, Nat King Cole and Marvin Gaye among the reference points the pair cited. "Fireflies" comes late in the sequence, after "Doing Me" and before "Everything," and follows the earlier single "Daylight." Despite the wide list of influences, the song itself is easy to follow. Piano and voice lead. The orchestra fills the edges, and the choir gives the chorus its lift.
+*Muse* took shape after Legend appeared on Clipse's *Let God Sort 'Em Out*. His vocal on "The Birds Don't Sing" led Pharrell to suggest a full album built around Legend's voice. Much of the record was written and recorded at Pharrell's studio inside Louis Vuitton headquarters in Paris. Pharrell produced all 16 songs and co-wrote the album. Legend has said he also recorded material Pharrell wrote entirely on his own, something he rarely does on his records.
 
-The production leaves Legend's familiar strengths intact, especially the piano-led writing and controlled vocal, while giving them a richer frame. Pharrell adds movement without stamping his own sound over the track. "Fireflies" stays polished and expansive without letting the production bury the song.'''
+The album pulls from gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, with Nina Simone, Nat King Cole and Marvin Gaye among the references Legend and Pharrell have cited. "Fireflies" sits at No. 14 on the tracklist, between "Doing Me" and "Everything," and follows the earlier single "Daylight." Clipse also appears on the album with "Bodies On The Floor." The full record is due October 23.'''
 
 def main():
     runner.load_env()
