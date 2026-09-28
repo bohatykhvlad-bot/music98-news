@@ -1,6 +1,33 @@
 const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
 const KWORB_ARTISTS_URL = "https://kworb.net/itunes/";
 
+const HOTSPOT_CITY_PROBES = [
+  ["New York","US",-74.0060,40.7128],["Los Angeles","US",-118.2437,34.0522],
+  ["Chicago","US",-87.6298,41.8781],["Miami","US",-80.1918,25.7617],
+  ["San Francisco","US",-122.4194,37.7749],["Boston","US",-71.0589,42.3601],
+  ["Washington","US",-77.0369,38.9072],["Philadelphia","US",-75.1652,39.9526],
+  ["Atlanta","US",-84.3880,33.7490],["Dallas","US",-96.7970,32.7767],
+  ["Houston","US",-95.3698,29.7604],["Seattle","US",-122.3321,47.6062],
+  ["Las Vegas","US",-115.1398,36.1699],["Nashville","US",-86.7816,36.1627],
+  ["Toronto","CA",-79.3832,43.6532],["Vancouver","CA",-123.1207,49.2827],
+  ["Montreal","CA",-73.5673,45.5017],["Mexico City","MX",-99.1332,19.4326],
+  ["London","GB",-0.1276,51.5072],["Manchester","GB",-2.2426,53.4808],
+  ["Birmingham","GB",-1.8904,52.4862],["Dublin","IE",-6.2603,53.3498],
+  ["Paris","FR",2.3522,48.8566],["Lyon","FR",4.8357,45.7640],
+  ["Amsterdam","NL",4.9041,52.3676],["Brussels","BE",4.3517,50.8503],
+  ["Berlin","DE",13.4050,52.5200],["Hamburg","DE",9.9937,53.5511],
+  ["Munich","DE",11.5820,48.1351],["Madrid","ES",-3.7038,40.4168],
+  ["Barcelona","ES",2.1734,41.3851],["Lisbon","PT",-9.1393,38.7223],
+  ["Milan","IT",9.1900,45.4642],["Rome","IT",12.4964,41.9028],
+  ["Vienna","AT",16.3738,48.2082],["Zurich","CH",8.5417,47.3769],
+  ["Prague","CZ",14.4378,50.0755],["Warsaw","PL",21.0122,52.2297],
+  ["Stockholm","SE",18.0686,59.3293],["Copenhagen","DK",12.5683,55.6761],
+  ["Oslo","NO",10.7522,59.9139],["Helsinki","FI",24.9384,60.1699],
+  ["Tokyo","JP",139.6917,35.6895],["Seoul","KR",126.9780,37.5665],
+  ["Singapore","SG",103.8198,1.3521],["Sydney","AU",151.2093,-33.8688],
+  ["Melbourne","AU",144.9631,-37.8136],["São Paulo","BR",-46.6333,-23.5505]
+];
+
 const KWORB_FALLBACK = [
   "Taylor Swift","Bad Bunny","Drake","Olivia Rodrigo","Ariana Grande","KAROL G","ADÉLA","Tiakola",
   "Omar Courtz","Shakira","HUGEL","The Weeknd","Michael Jackson","Dua Lipa","Olivia Dean","Imael Angel",
@@ -257,52 +284,43 @@ async function popularPayload(apiKey) {
   };
 }
 
+async function hotspotProbe(apiKey, row) {
+  const [city, countryCode, lng, lat] = row;
+  const tm = baseEventUrl(apiKey);
+  tm.searchParams.set("city", city);
+  tm.searchParams.set("countryCode", countryCode);
+  tm.searchParams.set("size", "1");
+  tm.searchParams.set("sort", "date,asc");
+
+  const raw = await tmJson(tm);
+  const count = Number(raw?.page?.totalElements || 0);
+  if (count < 10) return null;
+
+  return { city, countryCode, lng, lat, count };
+}
+
 async function hotspotsPayload(apiKey) {
-  const raws = await Promise.all([0, 1, 2, 3, 4].map(page => {
-    const tm = baseEventUrl(apiKey);
-    tm.searchParams.set("size", "200");
-    tm.searchParams.set("page", String(page));
-    tm.searchParams.set("sort", "relevance,desc");
-    return tmJson(tm).catch(() => null);
-  }));
+  const hotspots = [];
 
-  const groups = new Map();
-  let sampledEvents = 0;
-
-  for (const raw of raws) {
-    const events = raw?._embedded?.events || [];
-    sampledEvents += events.length;
-    for (const e of events) {
-      const venue = e?._embedded?.venues?.[0] || {};
-      const city = String(venue?.city?.name || "").trim();
-      const countryCode = String(venue?.country?.countryCode || "").trim();
-      const lat = finite(venue?.location?.latitude);
-      const lng = finite(venue?.location?.longitude);
-      if (!city || lat == null || lng == null) continue;
-
-      const key = (city + "|" + countryCode).toLowerCase();
-      const g = groups.get(key) || { city, countryCode, latSum: 0, lngSum: 0, points: 0, count: 0 };
-      g.latSum += lat;
-      g.lngSum += lng;
-      g.points++;
-      g.count++;
-      groups.set(key, g);
-    }
+  /* Small batches keep Ticketmaster/Cloudflare subrequests controlled while
+     still making the global map fast enough. */
+  for (let i = 0; i < HOTSPOT_CITY_PROBES.length; i += 8) {
+    const chunk = HOTSPOT_CITY_PROBES.slice(i, i + 8);
+    const rows = await Promise.all(
+      chunk.map(row => hotspotProbe(apiKey, row).catch(() => null))
+    );
+    rows.filter(Boolean).forEach(x => hotspots.push(x));
   }
 
-  const hotspots = [...groups.values()]
-    .map(g => ({
-      city: g.city,
-      countryCode: g.countryCode,
-      lat: g.latSum / g.points,
-      lng: g.lngSum / g.points,
-      count: g.count,
-    }))
-    .filter(x => x.count >= 2)
-    .sort((a, b) => b.count - a.count || a.city.localeCompare(b.city))
-    .slice(0, 40);
+  hotspots.sort((a, b) => b.count - a.count || a.city.localeCompare(b.city));
 
-  return { ok: true, mode: "hotspots", hotspots, sampledEvents };
+  return {
+    ok: true,
+    mode: "hotspots",
+    threshold: 10,
+    checkedCities: HOTSPOT_CITY_PROBES.length,
+    hotspots,
+  };
 }
 
 export async function onRequestGet({ request, env }) {
@@ -326,7 +344,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-popular-v5");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v6");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
@@ -341,7 +359,7 @@ export async function onRequestGet({ request, env }) {
 
     if (mode === "hotspots") {
       const payload = await hotspotsPayload(env.TICKETMASTER_API_KEY);
-      const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=10800" });
+      const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=21600" });
       await cache.put(cacheKey, res.clone()).catch(() => {});
       return res;
     }
