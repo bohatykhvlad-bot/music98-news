@@ -11,18 +11,24 @@ import draft_vmas_2026_results as assets
 
 PID = "vmas26results"
 
+# A tighter, portrait-oriented official VMAs image for the live hero.
+HERO_KEY = "0cb642bd2d"
+HERO_NAME = "vmas-2026-madonna-stage-portrait.jpg"
+HERO_CREDIT = "Stewart Cook"
+HERO_CREDIT_URL = "https://stewartcook.com/"
+
+# Separate in-body Madonna image tied directly to Best Collaboration.
 MADONNA_KEY = "bb68f07087"
 MADONNA_NAME = "vmas-2026-madonna-sabrina-best-collaboration-stage.jpg"
 MADONNA_CREDIT = "Francis Specker"
 MADONNA_CREDIT_URL = "https://francisspecker.com/"
-MADONNA_CROP = "50% 46%"
 
 EXCERPT = (
     "Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won "
     "Video of the Year at the September 27 ceremony in Los Angeles."
 )
 
-INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year at the September 27 ceremony in Los Angeles. The show took place at the Peacock Theater with Snoop Dogg as host. Madonna's wins included Artist of the Year, Best Album and Best Collaboration, while Taylor Swift also won Best Direction and received the inaugural MTV VMA Artist Director Honors. BTS won Song of the Year, Best K-Pop and Best Group, and Sienna Spiro was named Best New Artist.
+INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year at the September 27 ceremony in Los Angeles. The show took place at the Peacock Theater with Snoop Dogg as host. Madonna's seven-win total included Artist of the Year, Best Album and Best Collaboration, while Taylor Swift also won Best Direction and received the inaugural MTV VMA Artist Director Honors. BTS won Song of the Year, Best K-Pop and Best Group, and Sienna Spiro was named Best New Artist.
 
 Madonna entered the final ballot with 13 nominations after MTV added the social categories. She won Artist of the Year and Best Album for *Confessions II*, shared Best Collaboration with Sabrina Carpenter for "Bring Your Love," and collected four awards for "Confessions II - The Film": Best Dance, Best Cinematography, Best Choreography and Best Long Form Video.
 
@@ -38,91 +44,107 @@ The complete list below includes every competitive category from the final 2026 
 
 ENDING = """The final results reflected a broad distribution of awards across the 2026 ceremony. Madonna led the night with seven wins across major, genre, social and craft categories. Taylor Swift won Video of the Year and Best Direction in addition to receiving the Artist Director Honors, while BTS, Ariana Grande, Sienna Spiro and the genre-category winners accounted for many of the night's other major results."""
 
+REPLACEMENTS = [
+    ('[nominee:Madonna and Sabrina Carpenter — "Bring Your Love"]',
+     '[nominee:Madonna & Sabrina Carpenter — "Bring Your Love"]'),
+    ('[winner:Madonna and Sabrina Carpenter — "Bring Your Love"]',
+     '[winner:Madonna & Sabrina Carpenter — "Bring Your Love"]'),
+    ('[nominee:Clipse, Kendrick Lamar, Pusha T and Malice — "Chains & Whips"]',
+     '[nominee:Clipse, Kendrick Lamar, Pusha T, Malice — "Chains & Whips"]'),
+    ('[nominee:French Montana and Max B — "Ever Since U Left Me"]',
+     '[nominee:French Montana x Max B — "Ever Since U Left Me"]'),
+    ('[nominee:Shakira and Burna Boy — "Dai Dai"]',
+     '[nominee:Shakira & Burna Boy — "Dai Dai"]'),
+    ('[nominee:Teyana Taylor and Lucky Daye — "Hard Part"]',
+     '[nominee:Teyana Taylor & Lucky Daye — "Hard Part"]'),
+    ('[nominee:Dave and Tems — "Raindance"]',
+     '[nominee:Dave & Tems — "Raindance"]'),
+    ('[nominee:Mariah the Scientist and Kali Uchis — "Is It a Crime"]',
+     '[nominee:Mariah the Scientist & Kali Uchis — "Is It a Crime"]'),
+    ('[nominee:mgk and Fred Durst — "FIX UR FACE"]',
+     '[nominee:mgk & Fred Durst — "FIX UR FACE"]'),
+    ('[nominee:Bebe Rexha and Faithless — "New Religion"]',
+     '[nominee:Bebe Rexha & Faithless — "New Religion"]'),
+    ('[nominee:Lady Gaga and Doechii — "RUNWAY"]',
+     '[nominee:Lady Gaga & Doechii — "RUNWAY"]'),
+    ('[nominee:Ryan Castro, Kapo and Gangsta — "LA VILLA"]',
+     '[nominee:Ryan Castro, Kapo & GANGSTA — "LA VILLA"]'),
+    ('[nominee:LE SSERAFIM feat. j-hope of BTS — "SPAGHETTI"]',
+     '[nominee:LE SSERAFIM (feat. j-hope of BTS) — "SPAGHETTI"]'),
+    ('[nominee:JISOO x ZAYN — "Eyes Closed"]',
+     '[nominee:JISOO X ZAYN — "Eyes Closed"]'),
+    ('[nominee:Tame Impala and JENNIE — "Dracula"]',
+     '[nominee:Tame Impala & JENNIE — "Dracula"]'),
+    ('[nominee:Tyler, the Creator — "SUGAR ON MY TONGUE"]',
+     '[nominee:Tyler, The Creator — "SUGAR ON MY TONGUE"]'),
+    ('[nominee:Twenty One Pilots — "Drag Path"]',
+     '[nominee:twenty one pilots — "Drag Path"]'),
+
+    # Long-form video is a video title, so use quotation marks rather than album italics.
+    ('[winner:Madonna — *Confessions II - The Film*]',
+     '[winner:Madonna — "Confessions II - The Film"]'),
+    ('[nominee:Charli xcx — *Music, Fashion, Film*]',
+     '[nominee:Charli xcx — "Music, Fashion, Film"]'),
+    ("[nominee:Ella Langley — *Choosin' Texas*]",
+     "[nominee:Ella Langley — \"Choosin' Texas\"]"),
+    ('[nominee:GENER8ION — *STORM starring Yung Lean*]',
+     '[nominee:GENER8ION — "STORM starring Yung Lean"]'),
+
+    # Album titles remain italicized.
+    ('[nominee:Drake — *ICEMAN*]',
+     '[nominee:Drake — *Iceman*]'),
+
+    # Follow the official MTV/Paramount capitalization in this category.
+    ('[winner:BTS — "Swim"]\n\n[nominee:BLACKPINK — "JUMP"]',
+     '[winner:BTS — "SWIM"]\n\n[nominee:BLACKPINK — "JUMP"]'),
+]
+
 def fix_award_text(awards: str) -> str:
-    replacements = {
-        '[nominee:Madonna and Sabrina Carpenter — "Bring Your Love"]':
-            '[nominee:Madonna & Sabrina Carpenter — "Bring Your Love"]',
-        '[winner:Madonna and Sabrina Carpenter — "Bring Your Love"]':
-            '[winner:Madonna & Sabrina Carpenter — "Bring Your Love"]',
-        '[nominee:Clipse, Kendrick Lamar, Pusha T and Malice — "Chains & Whips"]':
-            '[nominee:Clipse, Kendrick Lamar, Pusha T, Malice — "Chains & Whips"]',
-        '[nominee:French Montana and Max B — "Ever Since U Left Me"]':
-            '[nominee:French Montana x Max B — "Ever Since U Left Me"]',
-        '[nominee:Shakira and Burna Boy — "Dai Dai"]':
-            '[nominee:Shakira & Burna Boy — "Dai Dai"]',
-        '[nominee:Teyana Taylor and Lucky Daye — "Hard Part"]':
-            '[nominee:Teyana Taylor & Lucky Daye — "Hard Part"]',
-        '[nominee:Dave and Tems — "Raindance"]':
-            '[nominee:Dave & Tems — "Raindance"]',
-        '[nominee:Mariah the Scientist and Kali Uchis — "Is It a Crime"]':
-            '[nominee:Mariah the Scientist & Kali Uchis — "Is It a Crime"]',
-        '[nominee:mgk and Fred Durst — "FIX UR FACE"]':
-            '[nominee:mgk & Fred Durst — "FIX UR FACE"]',
-        '[nominee:Bebe Rexha and Faithless — "New Religion"]':
-            '[nominee:Bebe Rexha & Faithless — "New Religion"]',
-        '[nominee:Lady Gaga and Doechii — "RUNWAY"]':
-            '[nominee:Lady Gaga & Doechii — "RUNWAY"]',
-        '[nominee:Ryan Castro, Kapo and Gangsta — "LA VILLA"]':
-            '[nominee:Ryan Castro, Kapo & GANGSTA — "LA VILLA"]',
-        '[nominee:LE SSERAFIM feat. j-hope of BTS — "SPAGHETTI"]':
-            '[nominee:LE SSERAFIM (feat. j-hope of BTS) — "SPAGHETTI"]',
-        '[nominee:JISOO x ZAYN — "Eyes Closed"]':
-            '[nominee:JISOO X ZAYN — "Eyes Closed"]',
-        '[nominee:Tame Impala and JENNIE — "Dracula"]':
-            '[nominee:Tame Impala & JENNIE — "Dracula"]',
-        '[nominee:Tyler, the Creator — "SUGAR ON MY TONGUE"]':
-            '[nominee:Tyler, The Creator — "SUGAR ON MY TONGUE"]',
-        '[nominee:Twenty One Pilots — "Drag Path"]':
-            '[nominee:twenty one pilots — "Drag Path"]',
-        '[winner:BTS — "Swim"]\n\n[nominee:BLACKPINK — "JUMP"]':
-            '[winner:BTS — "SWIM"]\n\n[nominee:BLACKPINK — "JUMP"]',
-        '[winner:Madonna — *Confessions II - The Film*]':
-            '[winner:Madonna — "Confessions II - The Film"]',
-        '[nominee:Charli xcx — *Music, Fashion, Film*]':
-            '[nominee:Charli xcx — "Music, Fashion, Film"]',
-        '[nominee:Ella Langley — *Choosin\\' Texas*]':
-            '[nominee:Ella Langley — "Choosin\\' Texas"]',
-        '[nominee:GENER8ION — *STORM starring Yung Lean*]':
-            '[nominee:GENER8ION — "STORM starring Yung Lean"]',
-        '[nominee:Drake — *ICEMAN*]':
-            '[nominee:Drake — *Iceman*]',
-    }
-    for old, new in replacements.items():
+    for old, new in REPLACEMENTS:
         if old in awards:
             awards = awards.replace(old, new)
             print("FIX", old, "=>", new)
-        elif new not in awards:
-            print("WARN missing expected variant:", old)
-
-    # Song/video titles use quotation marks; album titles alone use italics.
-    long_form = re.search(
-        r'(\[award:Best Long Form Video\][\s\S]*?)(?=\n\n\[award:Best Album\])',
-        awards,
-    )
-    if not long_form:
-        raise RuntimeError("Best Long Form Video section not found")
-    if "*" in long_form.group(1):
-        raise RuntimeError("italic markup remains in Best Long Form Video")
 
     return awards
 
 def audit(body: str) -> None:
     if not body.startswith(EXCERPT):
         raise RuntimeError("excerpt is not the literal beginning of body")
-    if "Swift's" in body:
-        raise RuntimeError("shorthand 'Swift\\'s' remains")
-    if "Taylor Swift's" in body:
-        raise RuntimeError("possessive Taylor Swift wording remains; use formal sentence")
-    if "Madonna and Sabrina Carpenter" in body:
-        raise RuntimeError("non-official collaboration separator remains")
-    if re.search(r'\[award:Best Long Form Video\][\s\S]*?\*[^\\n]+\*', body):
-        raise RuntimeError("italics remain in Best Long Form Video")
-    if "[award:Best Album]" not in body or "*Confessions II*" not in body:
+
+    # Formal naming in narrative copy.
+    if "Swift's" in body or "Taylor Swift's" in body:
+        raise RuntimeError("abbreviated or possessive Taylor Swift reference remains")
+
+    # Style: songs/videos in quotes, albums in italics, em dash between artist and work.
+    awards_start = body.index("[awards]")
+    awards_end = body.index("[/awards]") + len("[/awards]")
+    awards = body[awards_start:awards_end]
+
+    lf = re.search(
+        r'\[award:Best Long Form Video\]([\s\S]*?)(?=\n\n\[award:Best Album\])',
+        awards,
+    )
+    if not lf:
+        raise RuntimeError("Best Long Form Video section not found")
+    if "*" in lf.group(1):
+        raise RuntimeError("italic markup remains in Best Long Form Video")
+
+    album = re.search(
+        r'\[award:Best Album\]([\s\S]*?)(?=\n\n\[award:Song of Summer\])',
+        awards,
+    )
+    if not album or "*" not in album.group(1):
         raise RuntimeError("album italics missing")
+
+    # All song/video entries should use an em dash separator before quoted title.
+    for line in re.findall(r'\[(?:winner|nominee):[^\]]+\]', awards):
+        if '"' in line and " — " not in line:
+            raise RuntimeError("quoted work is missing em dash separator: " + line)
+
     if body.count("[photo:") != 5:
         raise RuntimeError(f"expected 5 inline photos, found {body.count('[photo:')}")
-    if "vmas-2026-madonna-sabrina-best-collaboration-stage.jpg" not in body:
-        raise RuntimeError("Madonna photo missing")
+    if MADONNA_NAME not in body:
+        raise RuntimeError("Madonna in-body photo missing")
     if any(ch in body for ch in ("’", "‘")):
         raise RuntimeError("curly apostrophe found")
     if body.count("[award:") != 25 or body.count("[winner:") != 25:
@@ -137,24 +159,24 @@ def main():
     if current.get("status") != "live":
         raise RuntimeError(f"expected live post, got {current.get('status')!r}")
 
+    hero_src, hero_size = assets.upload_photo(HERO_KEY, HERO_NAME)
     madonna_src, madonna_size = assets.upload_photo(MADONNA_KEY, MADONNA_NAME)
 
     body = current.get("body") or ""
     if "[awards]" not in body or "[/awards]" not in body:
         raise RuntimeError("structured awards block missing")
+
     start = body.index("[awards]")
     end = body.index("[/awards]") + len("[/awards]")
     awards = fix_award_text(body[start:end])
-
     new_body = INTRO.format(madonna_src=madonna_src) + "\n\n" + awards + "\n\n" + ENDING
     audit(new_body)
 
-    preserve = {
+    preserved = {
         "status": current.get("status"),
         "pinned": current.get("pinned"),
         "publishAt": current.get("publishAt"),
         "date": current.get("date"),
-        "cover": current.get("cover"),
         "title": current.get("title"),
     }
 
@@ -164,20 +186,37 @@ def main():
             raise RuntimeError("post vanished before write")
         p["body"] = new_body
         p["excerpt"] = EXCERPT
+        p["cover"] = {
+            "kind": "img",
+            "src": hero_src,
+            "credit": HERO_CREDIT,
+            "creditUrl": HERO_CREDIT_URL,
+            "pos": "50% 42%",
+            "zoom": 1,
+            "lockX": 0.50,
+            "cardX": 0.50,
+            "cardY": 0.42,
+            "cardZoom": 1,
+        }
         return p
 
     now = runner.guarded_write(mutate)
 
-    for k, v in preserve.items():
-        if now.get(k) != v:
-            raise RuntimeError(f"preserved field changed: {k}: {v!r} -> {now.get(k)!r}")
+    for key, value in preserved.items():
+        if now.get(key) != value:
+            raise RuntimeError(
+                f"preserved field changed: {key}: {value!r} -> {now.get(key)!r}"
+            )
 
-    print("VMA_LIVE_UPDATED", now["id"], now["status"], runner.words(now["body"]), "words")
-    print("MADONNA_PHOTO", madonna_size, madonna_src, MADONNA_CREDIT, MADONNA_CROP)
     audit(now["body"])
+    print("VMA_LIVE_UPDATED", now["id"], now["status"], runner.words(now["body"]), "words")
+    print("HERO", hero_size, hero_src, HERO_CREDIT)
+    print("MADONNA_PHOTO", madonna_size, madonna_src, MADONNA_CREDIT)
+
     ok = runner.cmd_gate(PID)
     if not ok:
         raise RuntimeError("gate failed after live update")
+
     runner.cmd_verify(PID)
     runner.cmd_show(PID)
 
