@@ -342,7 +342,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
    ring) rides the same width ramp via --pwipe so the reveal reads as one
    fluid wipe, no flash, no end hitch. Mobile (<=640px) keeps its own stack
    layout and is untouched by the override block below. */
-.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:44px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
+.chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:82px 56px minmax(180px,1fr) var(--pw) minmax(110px,1fr);gap:16px;cursor:pointer;align-items:center;padding:16px 22px;border-bottom:1px solid var(--line);transition:background .15s ease,grid-template-columns .45s cubic-bezier(.3,.65,.25,1)}
 .chart-row:last-child{border-bottom:0}
 .chart-row:hover{background:var(--card2)}
 .weeks{color:var(--muted);font-size:13.5px;font-weight:600;text-align:right;white-space:nowrap;justify-self:end;align-self:center;line-height:1.2;display:flex;align-items:center;height:100%}
@@ -363,9 +363,9 @@ body.editmode .card .tag{top:auto;bottom:10px}
 /* NEW badge = same pill construction as the top nav pills (owner: unified
    style): inline-flex capsule, fixed height, equal side padding, ink-centered
    via text-box. Ratio matches .nav-btn (32px height / 14px font -> 24px / 10.5px). */
-.delta.new,.delta.reentry{color:#fff;background:var(--text);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;height:24px;line-height:1;text-box:trim-both cap alphabetic;width:fit-content;justify-self:center}
+.delta.new,.delta.reentry{color:#fff;background:var(--text);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;height:24px;line-height:1;text-box:trim-both cap alphabetic;width:fit-content;justify-self:center;white-space:nowrap;box-sizing:border-box}
 .delta.new{padding:0 calc(13px - .08em) 0 13px;font-size:10.5px;letter-spacing:.08em}
-.delta.reentry{padding:0 4px;font-size:7.4px;letter-spacing:0}
+.delta.reentry{min-width:82px;padding:0 calc(13px - .08em) 0 13px;font-size:10.5px;letter-spacing:.08em}
 /* vertical: ink-true centering via text-box (caps top .. baseline) - the
    padding hack was tuned to one rasterizer; the mechanism works everywhere */
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
@@ -719,7 +719,7 @@ textarea{resize:vertical;min-height:64px}
   .chart-row{
     --pw:auto;
     display:grid;
-    grid-template-columns:28px 44px minmax(0,1fr) 36px;
+    grid-template-columns:68px 44px minmax(0,1fr) 36px;
     grid-template-areas:
       "delta art names play"
       ". week week week"
@@ -731,7 +731,7 @@ textarea{resize:vertical;min-height:64px}
   }
   .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0;max-width:100%;overflow:hidden}
   .delta.new{height:20px;padding:0 calc(9px - .03em) 0 9px;font-size:8.5px;letter-spacing:.03em;line-height:1;box-sizing:border-box}
-  .delta.reentry{height:20px;padding:0 2px;font-size:6.2px;letter-spacing:-.01em;line-height:1;box-sizing:border-box;overflow:visible;white-space:nowrap}
+  .delta.reentry{height:20px;min-width:68px;padding:0 calc(9px - .03em) 0 9px;font-size:8.5px;letter-spacing:.03em;line-height:1;box-sizing:border-box;overflow:visible;white-space:nowrap}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
   .delta.new,.delta.reentry{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
