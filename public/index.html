@@ -934,7 +934,7 @@ function rich(s){ return esc(s).replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>
 function titleHTML(p){
   if(p && p.type==="release"){
     const t = "<em>"+esc(p.title||"")+"</em>";
-    return p.artist ? esc(p.artist)+" — "+t : t;
+    return p.artist ? esc(p.artist)+" - "+t : t;
   }
   return rich(p && p.title || "");
 }
@@ -2748,7 +2748,7 @@ function renderCharts(){
     const badge = `<a class="abadge"${r.url ? "" : ' data-lk="'+esc(key)+'"'} rel="nofollow sponsored" href="${esc(appleUrl)}" title="Listen on Apple Music" aria-label="Listen on Apple Music">${badgeImg}</a>`;
     return `<div class="chart-row${i<3?" top":""}" data-key="${esc(key)}" data-title="${esc(r.title)}" data-artist="${esc(r.artist)}" data-url="${esc(appleUrl==="#" ? "" : appleUrl)}" data-prev="${esc(applePreview(r.prev||""))}" tabindex="0" role="listitem" aria-label="Position ${i+1}: ${esc(r.title)} by ${esc(r.artist)} — press Enter to play the preview">
       <div class="delta ${dcls}">${dtxt}</div>
-      <div class="artwrap"><img data-lk="${esc(key)}"${r.art ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} — ${esc(r.artist)}" loading="lazy"></div>
+      <div class="artwrap"><img data-lk="${esc(key)}"${r.art ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} - ${esc(r.artist)}" loading="lazy"></div>
       <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span><span class="cartist">${esc(r.artist)}</span></div><div class="ctrack">${esc(r.title)}</div></div></div>
       <div class="cmid">
         <button class="rplay" title="Play preview" aria-label="Play preview of ${esc(r.title)}">${ICON_STACK}</button>
