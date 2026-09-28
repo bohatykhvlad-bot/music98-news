@@ -30,15 +30,15 @@ EXCERPT = (
 
 INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year for "The Fate of Ophelia" at the September 27 ceremony in Los Angeles. Hosted by Snoop Dogg at the Peacock Theater, the show gave Madonna the largest award total of the night and recognized Taylor Swift with the inaugural MTV VMA Artist Director Honors.
 
-Madonna entered the final ballot with 13 nominations after MTV added the social categories. Her seven wins included Artist of the Year, the album award for *Confessions II*, Best Collaboration with Sabrina Carpenter for "Bring Your Love," and four awards connected to "Confessions II - The Film."
+Madonna entered the final ballot with 13 nominations after MTV added the social categories. She converted that lead into seven wins spanning the major, genre, craft and social fields, with *Confessions II* and "Confessions II - The Film" recurring throughout the final results.
 
 [photo:{madonna_src}|Francis Specker|https://francisspecker.com/|47.3% 37.1%|1]
 
-Taylor Swift also won Best Direction for "Opalite." BTS collected three awards, including Song of the Year and Best Group, while Sienna Spiro was named Best New Artist.
+Taylor Swift also won Best Direction for "Opalite," while Nirvana received the Video Vanguard Award.
 
 The complete list below includes every competitive category from the final 2026 ballot, followed by the Video Vanguard Award and the MTV VMA Artist Director Honors. Winners are shown in bold on the published page, with the remaining nominees listed underneath each category."""
 
-ENDING = """The 2026 VMAs combined a clear awards leader in Madonna with a Video of the Year win for Taylor Swift and a broad spread of winners across the remaining categories."""
+ENDING = ""
 
 REPLACEMENTS = [
     ('[nominee:Madonna and Sabrina Carpenter — "Bring Your Love"]',
@@ -173,7 +173,7 @@ def main():
     start = body.index("[awards]")
     end = body.index("[/awards]") + len("[/awards]")
     awards = fix_award_text(body[start:end])
-    new_body = INTRO.format(madonna_src=madonna_src) + "\n\n" + awards + "\n\n" + ENDING
+    new_body = INTRO.format(madonna_src=madonna_src) + "\n\n" + awards
     audit(new_body)
 
     preserved = {
