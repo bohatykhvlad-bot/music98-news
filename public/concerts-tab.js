@@ -24,7 +24,13 @@ function ensureMap(){
     requestAnimationFrame(()=>map.resize());
     setTimeout(()=>map.resize(),120);
   });
-  map.on("moveend",()=>scheduleViewportLoad());
+  map.on("moveend",()=>{
+    if(skipNextViewportLoad){
+      skipNextViewportLoad=false;
+      return;
+    }
+    scheduleViewportLoad();
+  });
   return map;
 }
 window.ensureConcertsMap = ensureMap;
@@ -37,6 +43,7 @@ let suggestTimer=0;
 let popup=null;
 let viewportTimer=0;
 let suppressViewportLoad=0;
+let skipNextViewportLoad=false;
 let viewportRequestSeq=0;
 
 function escText(v){ return String(v==null?"":v); }
@@ -58,6 +65,10 @@ function scheduleViewportLoad(){
   clearTimeout(viewportTimer);
   viewportTimer=setTimeout(async()=>{
     if(!map || suppressViewportLoad || !document.querySelector("#tab-concerts.active")) return;
+    if(map.getZoom() < 4){
+      setStatus("Zoom in or search for a city to see concerts.");
+      return;
+    }
     const center=map.getCenter();
     const seq=++viewportRequestSeq;
     setStatus("Loading concerts in this area...");
@@ -111,11 +122,21 @@ function addLayers(){
   },paint:{"text-color":"#15181a","text-halo-color":"#ffffff","text-halo-width":1.5}});
   map.on("click","clusters",async e=>{
     const f=map.queryRenderedFeatures(e.point,{layers:["clusters"]})[0];
-    if(!f) return;
-    const z=await map.getSource("events").getClusterExpansionZoom(f.properties.cluster_id);
-    map.easeTo({center:f.geometry.coordinates,zoom:z});
+    if(!f || !map.getSource("events")) return;
+    try{
+      const z=await map.getSource("events").getClusterExpansionZoom(f.properties.cluster_id);
+      skipNextViewportLoad=true;
+      map.easeTo({
+        center:f.geometry.coordinates,
+        zoom:Math.min(Number(z)||map.getZoom()+2,14),
+        duration:500
+      });
+    }catch(err){
+      console.error("cluster_zoom_failed",err);
+    }
   });
   map.on("click","event-points",e=>{
+    if(e.originalEvent) e.originalEvent.stopPropagation();
     const id=String(e.features?.[0]?.properties?.id||"");
     const ev=currentEvents.find(x=>x.id===id);
     if(ev) showPopup(ev);
