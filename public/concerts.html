@@ -95,7 +95,7 @@ a{color:inherit}
 .event-venue{display:block;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;text-rendering:geometricPrecision}
 .side-empty{font-size:12.5px;color:var(--muted);padding:12px 5px}
 .disclosure{margin-top:auto;padding:12px 4px 2px;font-size:10.5px;color:#7a878c;line-height:1.4}
-.mapboxgl-popup{max-width:310px!important}
+.mapboxgl-popup{max-width:286px!important}
 .mapboxgl-popup-content{width:286px;max-width:calc(100vw - 34px);padding:0;border-radius:15px;overflow:hidden;box-shadow:0 14px 38px rgba(15,45,55,.2);font-family:var(--font)}
 .pop-img{display:block;width:100%;height:142px;object-fit:cover;background:#eef2f3}
 .pop-body{padding:13px}
@@ -383,10 +383,42 @@ function popupContent(e){
   return root;
 }
 
+function ensurePopupFullyVisible(){
+  if(!popup) return;
+  const el=popup.getElement ? popup.getElement() : map.getContainer().querySelector(".mapboxgl-popup");
+  if(!el) return;
+
+  const mapRect=map.getContainer().getBoundingClientRect();
+  const popRect=el.getBoundingClientRect();
+  const margin=16;
+
+  let shiftX=0, shiftY=0;
+  const leftLimit=mapRect.left+margin;
+  const rightLimit=mapRect.right-margin;
+  const topLimit=mapRect.top+margin;
+  const bottomLimit=mapRect.bottom-margin;
+
+  if(popRect.left<leftLimit) shiftX=leftLimit-popRect.left;
+  else if(popRect.right>rightLimit) shiftX=-(popRect.right-rightLimit);
+
+  if(popRect.top<topLimit) shiftY=topLimit-popRect.top;
+  else if(popRect.bottom>bottomLimit) shiftY=-(popRect.bottom-bottomLimit);
+
+  if(Math.abs(shiftX)<1 && Math.abs(shiftY)<1) return;
+
+  const centerPoint=[mapRect.width/2-shiftX,mapRect.height/2-shiftY];
+  const newCenter=map.unproject(centerPoint);
+  userMoving=false;
+  map.easeTo({center:newCenter,duration:280});
+}
+
 function showPopup(e){
   if(popup) popup.remove();
   popup=new mapboxgl.Popup({offset:16,closeButton:true,maxWidth:"286px",focusAfterOpen:false})
     .setLngLat([e.lng,e.lat]).setDOMContent(popupContent(e)).addTo(map);
+
+  requestAnimationFrame(()=>requestAnimationFrame(ensurePopupFullyVisible));
+  setTimeout(ensurePopupFullyVisible,80);
 }
 
 function focusEventOnMap(e){
