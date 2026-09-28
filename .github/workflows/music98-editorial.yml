@@ -56,7 +56,7 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python - <<'PY'
-          import io, urllib.request
+          import io, re, urllib.request
           from PIL import Image
           urls=[
             "https://johnlegend.com/img/hero-0011.webp",
@@ -69,6 +69,22 @@ jobs:
               raw=urllib.request.urlopen(req,timeout=60).read()
               im=Image.open(io.BytesIO(raw))
               print("CANDIDATE", url, im.size, len(raw), im.format)
+              if url.endswith("hero-0011.webp"):
+                  print("HERO_INFO", dict(im.info))
+                  try:
+                      exif=im.getexif()
+                      print("HERO_EXIF", {str(k):str(v) for k,v in exif.items()})
+                  except Exception as e:
+                      print("HERO_EXIF_ERROR", repr(e))
+          page=urllib.request.urlopen(
+              urllib.request.Request("https://johnlegend.com/",headers={"User-Agent":"Mozilla/5.0"}),
+              timeout=60
+          ).read().decode("utf-8","replace")
+          for pat in ("hero-0011.webp","photographer","photo credit","credit"):
+              print("PAGE_FIND", pat, [m.start() for m in re.finditer(re.escape(pat), page, re.I)][:20])
+          i=page.find("hero-0011.webp")
+          if i>=0:
+              print("HERO_HTML_CONTEXT", page[max(0,i-700):i+900].replace("\n"," "))
           PY
       - name: Draft Fireflies release
         run: python scripts/draft_fireflies.py
