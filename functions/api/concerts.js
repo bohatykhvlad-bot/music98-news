@@ -114,7 +114,7 @@ function baseEventUrl(apiKey) {
   tm.searchParams.set("includeTest", "no");
   tm.searchParams.set("includeTBA", "no");
   tm.searchParams.set("includeTBD", "no");
-  tm.searchParams.set("locale", "*");
+  tm.searchParams.set("locale", "en-us,en,*");
   tm.searchParams.set("startDateTime", upcomingIso());
   return tm;
 }
