@@ -1,1 +1,1 @@
-final text audit after manual centering
+verify live VMA after latest text-only update
