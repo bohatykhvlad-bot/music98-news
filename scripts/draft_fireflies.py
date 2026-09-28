@@ -15,19 +15,19 @@ EXCERPT="""John Legend has released "Fireflies," featuring Pharrell Williams, as
 
 BODY='''John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. The song starts with Legend at the piano, then opens into strings, horns, choir and a full rhythm section. Pharrell appears more as a supporting voice than a duet partner, while Legend carries the melody from the piano.
 
-Paul Hunter directs the video, cutting between Legend with the Hollywood Cinematic Orchestra and portraits of residents in a housing project. The film moves through rooms, streets and faces without losing sight of the performance. The orchestra gives the clip scale, while the quieter scenes keep it close to everyday life. Hunter directed "Daylight" too, and both videos put the performance ahead of spectacle.
+Paul Hunter directs the video, cutting between Legend with the Hollywood Cinematic Orchestra and portraits of residents in a housing project. The film moves through rooms, streets and faces, returning regularly to the performance. The orchestra gives the clip scale, while the quieter scenes keep it close to everyday life. Hunter directed "Daylight" too, and both videos put the performance ahead of spectacle.
 
 [youtube:fEw6VZq9xg8]
 
-*Muse* started after Legend's guest appearance on Clipse's *Let God Sort 'Em Out*. His vocal there prompted Pharrell to suggest a full album, much of it later written and recorded in Paris. Pharrell produced all 16 songs and co-wrote the project, while Legend gave him more room than usual to shape the material. That origin explains the album without turning "Fireflies" into a story about the producer.
+*Muse* started after Legend's guest appearance on Clipse's *Let God Sort 'Em Out*. His vocal there prompted Pharrell to suggest a full album, much of it later written and recorded in Paris. Pharrell produced all 16 songs and co-wrote the project, while Legend gave him more room than usual to shape the material. That origin gives the album a clear frame while "Fireflies" stays centered on Legend.
 
-The song itself stays compact. Piano and voice lead the verses, then the choir and orchestra widen the chorus without pushing the arrangement into a showpiece. That balance is where "Fireflies" works best. The production adds scale, but the melody remains easy to follow and the track never loses the quiet pull of Legend's delivery.
+The song itself stays compact. Piano and voice lead the verses, then the choir and orchestra widen the chorus while the arrangement remains controlled. That balance is where "Fireflies" works best. The production adds scale, the melody stays easy to follow, and Legend's restrained delivery keeps the track grounded as the instrumentation grows around him.
 
-The album moves through gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, but "Fireflies" does not try to carry all of that at once. It sits closer to the piano-led side of Legend's catalog and uses the larger ensemble to change the texture rather than the basic shape of the song. Coming after "Daylight," it also gives a clearer sense of how broad *Muse* can be without making the singles feel disconnected.
+The album moves through gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, and "Fireflies" draws most directly from the piano-led side of Legend's catalog. The larger ensemble changes the texture more than the basic shape of the song. Coming after "Daylight," it also gives a clearer sense of how broad *Muse* can be while keeping a recognizable center.
 
-There is enough detail in the arrangement to make the song feel bigger than a standard ballad, but the writing stays direct. "Fireflies" is not built around a dramatic switch or a guest verse taking over the track. The choir, orchestra and Pharrell's vocal all serve the same center, which keeps the single focused even as the sound opens up.
+The arrangement earns its size gradually. The choir brings lift, the orchestra thickens the backdrop, and Pharrell stays tucked into the song as a supporting voice. Each layer has a clear job, so the larger production still feels controlled. That restraint matters on a track this polished because the melody remains the part that carries it.
 
-"Fireflies" does not reinvent John Legend, and it does not need to. It takes the voice-and-piano foundation that has defined much of his work and gives it a broader setting ahead of *Muse*.'''
+As a second look at *Muse* after "Daylight," "Fireflies" makes the album feel larger while staying close to the sound most associated with Legend. The single keeps his voice and piano in front, then lets the choir and orchestra stretch the edges around them.'''
 
 def ensure_cover():
     req=urllib.request.Request(COVER_URL, headers={"User-Agent": runner.UA})
