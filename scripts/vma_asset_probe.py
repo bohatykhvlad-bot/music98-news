@@ -37,3 +37,41 @@ for key in ["dded7f7e94","73f0b0c2a3","0cb642bd2d"]:
     for x in urls:
         if "pressexpress" in x or "amazonaws" in x:
             print(x[:1200])
+
+
+print("\nNAMED_ASSETS")
+items=re.findall(r'<li id="photo-([^"]+)"[\s\S]*?</li>', raw, re.I)
+for block in items:
+    pass
+
+# Simpler block scan around matching captions.
+for who in ["Madonna", "Sienna Spiro", "LISA"]:
+    print("\nWHO", who)
+    for m in re.finditer(who, raw, re.I):
+        a=raw.rfind('<li id="photo-',0,m.start())
+        b=raw.find('</li>',m.end())
+        if a<0 or b<0: continue
+        block=raw[a:b+5]
+        fn=re.search(r"<dd class='photo-filename'>([^<]+)",block,re.I)
+        cap=re.search(r"<dd class='photo-caption'>([^<]+)",block,re.I)
+        view=re.search(r"href='([^']+\?view=[^']+)'",block,re.I)
+        if fn and cap:
+            print("ITEM", fn.group(1), "VIEW", urljoin(URL, view.group(1)) if view else "")
+            print("CAPTION", html.unescape(cap.group(1)))
+            break
+
+print("\nDIMENSIONS")
+try:
+    from PIL import Image
+    import io
+except Exception as e:
+    print("PIL_ERROR",repr(e))
+else:
+    embeds=[
+      "https://public-assets-pressexpress.s3.amazonaws.com/assets/photos/embed/2026/09/27/3228388_VMAS_2026_2881b-941dab88de1cfb8c.jpg",
+      "https://public-assets-pressexpress.s3.amazonaws.com/assets/photos/embed/2026/09/27/3228388_VMAS_2026_3037b-045509f35884e166.jpg",
+    ]
+    for u in embeds:
+        data=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":UA}),timeout=90).read()
+        im=Image.open(io.BytesIO(data))
+        print("EMBED",u,im.size,len(data),im.format)
