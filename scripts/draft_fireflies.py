@@ -13,15 +13,13 @@ COVER_NAME="john-legend-muse-official.webp"
 
 EXCERPT="""John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records."""
 
-BODY='''John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. The song starts with Legend at the piano, then opens into strings, horns, choir and a full rhythm section. Pharrell's vocal sits inside the arrangement as another layer, while Legend carries the melody from the piano.
+BODY='''John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. The song starts with Legend at the piano, then opens into strings, horns, choir and a full rhythm section. Pharrell appears more as a supporting voice than a duet partner, while Legend carries the melody from the piano.
 
-Paul Hunter directs the video, cutting between Legend with the Hollywood Cinematic Orchestra and portraits of residents in a housing project. The film keeps the performance in view while moving through rooms, streets and faces around it. The orchestra gives the clip scale, while the quieter scenes keep it tied to everyday life. Hunter also directed the earlier "Daylight" video, so the two singles share a simple, performance-led visual approach.
+Paul Hunter directs the video, cutting between Legend with the Hollywood Cinematic Orchestra and portraits of residents in a housing project. The film moves through rooms, streets and faces without losing sight of the performance. The orchestra gives the clip scale, while the quieter scenes keep it close to everyday life. Hunter directed "Daylight" too, and both videos put the performance ahead of spectacle.
 
 [youtube:fEw6VZq9xg8]
 
-*Muse* started after Legend's guest appearance on Clipse's *Let God Sort 'Em Out*. That vocal led to a full album, much of it written and recorded in Paris. Pharrell produced all 16 songs and co-wrote the project. On "Fireflies," the familiar piano-led core is still there, but the arrangement around it is broader and more orchestral.
-
-For all the styles attached to *Muse*, "Fireflies" itself is fairly direct. Piano and voice lead, the choir and orchestra widen the chorus, and the production leaves enough space for Legend to remain the focus. It is a fuller version of the piano-led sound he is best known for.'''
+*Muse* started after Legend's guest appearance on Clipse's *Let God Sort 'Em Out*. His vocal there prompted Pharrell to suggest a full album, much of it later written and recorded in Paris. He produced all 16 songs and co-wrote the project. Legend has said he gave Pharrell more creative control than usual, including recording material written entirely by him. The album moves through gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, while "Fireflies" keeps its focus much tighter. Once the choir and orchestra arrive, the idea is clear. "Fireflies" still sounds recognizably like Legend, only with a wider frame around him.'''
 
 def ensure_cover():
     req=urllib.request.Request(COVER_URL, headers={"User-Agent": runner.UA})
