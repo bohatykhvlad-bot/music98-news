@@ -28,17 +28,17 @@ EXCERPT = (
     "Video of the Year at the September 27 ceremony in Los Angeles."
 )
 
-INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year at the September 27 ceremony in Los Angeles. Hosted by Snoop Dogg at the Peacock Theater, the ceremony also saw BTS win Song of the Year, Best K-Pop and Best Group, while Sienna Spiro was named Best New Artist. Madonna's seven-win total included Artist of the Year, Best Album and Best Collaboration. Taylor Swift also won Best Direction and received the inaugural MTV VMA Artist Director Honors.
+INTRO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year at the September 27 ceremony in Los Angeles. Hosted by Snoop Dogg at the Peacock Theater, the show also recognized BTS in three categories and named Sienna Spiro Best New Artist. Madonna's haul included Artist of the Year, the album award for *Confessions II* and the collaboration prize with Sabrina Carpenter, while Taylor Swift added the directing award and received the inaugural MTV VMA Artist Director Honors.
 
-Madonna entered the final ballot with 13 nominations after MTV added the social categories. She won Artist of the Year and Best Album for *Confessions II*, shared Best Collaboration with Sabrina Carpenter for "Bring Your Love," and collected four awards for "Confessions II - The Film": Best Dance, Best Cinematography, Best Choreography and Best Long Form Video.
+Madonna entered the final ballot with 13 nominations after MTV added the social categories. She won Artist of the Year and the album prize for *Confessions II*, shared the collaboration award with Sabrina Carpenter for "Bring Your Love," and collected four additional wins for "Confessions II - The Film." Those came in the dance, cinematography, choreography and long-form video categories.
 
 [photo:{madonna_src}|Francis Specker|https://francisspecker.com/|50% 46%|1]
 
-Taylor Swift won Video of the Year for "The Fate of Ophelia" and Best Direction for "Opalite." MTV also presented Taylor Swift with the inaugural Artist Director Honors, a separate recognition for her work as a director.
+Taylor Swift won Video of the Year for "The Fate of Ophelia" and the directing category for "Opalite." MTV also presented Taylor Swift with the inaugural Artist Director Honors, a separate recognition for her work as a director.
 
-Several other artists won across the major genre and fan-voted categories. LISA won Best Pop, Cardi B featuring Kehlani won Best Hip-Hop, Bruno Mars won Best R&B, Olivia Rodrigo won Best Alternative, Bad Bunny won Best Latin and Ella Langley won Best Country. Ariana Grande won Song of Summer and Best Visual Effects.
+Elsewhere, LISA took pop, Cardi B featuring Kehlani hip-hop, Bruno Mars R&B, Olivia Rodrigo alternative, Bad Bunny Latin and Ella Langley country. Ariana Grande won Song of Summer and the visual-effects category.
 
-The craft categories produced a separate group of winners. Sabrina Carpenter won Best Editing for "House Tour," PinkPantheress won Best Art Direction for "Stateside + Zara Larsson," and Madonna added Best Cinematography and Best Choreography to her total. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor.
+In the craft categories, Sabrina Carpenter won editing for "House Tour," PinkPantheress took art direction for "Stateside + Zara Larsson," and Madonna added cinematography and choreography to her total. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor.
 
 The complete list below includes every competitive category from the final 2026 ballot, followed by the Video Vanguard Award and the MTV VMA Artist Director Honors. Winners are shown in bold on the published page, with the remaining nominees listed underneath each category."""
 
