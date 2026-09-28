@@ -18,8 +18,11 @@ import dns from "node:dns";
 import {
   appleCandidateCompatible,
   mergeKey,
+  normTitle,
   pickAppleCandidate,
+  primaryArtist,
   stripParen,
+  versionSignature,
 } from "../functions/lib/chart-identity.js";
 
 dns.setDefaultResultOrder("ipv4first");
@@ -36,6 +39,33 @@ const isAppleArt = (u) => {
   } catch { return false; }
 };
 const art600 = (u) => String(u || "").replace("100x100bb", "600x600bb").replace("100x100bb.jpg", "600x600bb.jpg");
+
+async function deezerCover(wantedTitle, wantedArtist) {
+  const q = encodeURIComponent(`${wantedArtist} ${stripParen(wantedTitle)}`.trim());
+  const r = await fetch(`https://api.deezer.com/search?q=${q}&limit=25`);
+  if (!r.ok) throw new Error(`Deezer ${r.status}`);
+  const d = await r.json();
+  const wantT = normTitle(wantedTitle);
+  const wantA = primaryArtist(wantedArtist);
+  const wantV = versionSignature(wantedTitle);
+  const candidates = (d.data || []).filter((x) => {
+    if (normTitle(x.title) !== wantT) return false;
+    if (versionSignature(x.title) !== wantV) return false;
+    if (wantA && primaryArtist(x.artist && x.artist.name) !== wantA) return false;
+    return true;
+  });
+  candidates.sort((a, b) => {
+    const av = versionSignature(a.album && a.album.title);
+    const bv = versionSignature(b.album && b.album.title);
+    const ap = av && av !== wantV ? 1 : 0;
+    const bp = bv && bv !== wantV ? 1 : 0;
+    return ap - bp;
+  });
+  const hit = candidates[0];
+  return hit && hit.album
+    ? (hit.album.cover_xl || hit.album.cover_big || hit.album.cover_medium || "")
+    : "";
+}
 
 /* одна запись Apple на песню: имя, ссылка, превью, год. Воркер носит этот файл
    в бандле и берёт данные отсюда, когда Apple из Cloudflare не отвечает. */
@@ -74,6 +104,23 @@ const pinCover = (key, url) => {
 };
 const names = {};
 console.log(`закреплённых обложек до сборки: ${lockedAtStart.size}`);
+
+/* 0) Для НОВЫХ ключей сначала Deezer: artwork у песни берём из одного
+   конкретного релиза и после этого замораживаем. Строгая проверка title + artist +
+   version не даёт ремиксу/live/sped-up занять ключ оригинала. */
+for (const t of tracks) {
+  const key = mergeKey(t.title, t.artist);
+  if (covers[key]) continue;
+  try {
+    const art = await deezerCover(t.title, t.artist);
+    if (art) {
+      pinCover(key, art);
+      console.log(`  Deezer lock: ${t.artist} - ${t.title}`);
+    }
+  } catch (e) {
+    console.log(`  Deezer ошибка: ${t.artist} - ${t.title}: ${e.message}`);
+  }
+}
 
 /* 1) Для НОВЫХ ключей пробуем точный релиз по Apple-ID одним batch-запросом.
    Уже закреплённые covers[key] не меняются ни при каких ответах каталога. */
