@@ -193,3 +193,25 @@ nirvana_all=collect_candidates(
     limit=24,
 )
 contact_sheet("NIRVANA_ALL",nirvana_all)
+
+
+final_specs=[
+    ("HERO", "69c1ac19ff", .50,.45,1.0),
+    ("TAYLOR INLINE", "dded7f7e94", .50,.25,1.0),
+    ("SIENNA INLINE", "3f54be88ed", .50,.45,1.0),
+    ("LISA INLINE", "932c1f928d", .50,.54,1.0),
+    ("NIRVANA INLINE", "2f1e0f8fc4", .50,.50,1.0),
+]
+final_previews=[]
+for lab,key,fx,fy,z in final_specs:
+    item=lookup_key(key)
+    final_previews.append((lab,render_169(item,fx,fy,z)))
+cw,ch=660,405
+sheet=Image.new("RGB",(cw, ch*len(final_previews)),"white")
+draw=ImageDraw.Draw(sheet)
+for i,(lab,im) in enumerate(final_previews):
+    x=10; y=i*ch+10
+    sheet.paste(im,(x,y))
+    draw.text((x,y+365),lab,fill="black")
+buf=io.BytesIO(); sheet.save(buf,"JPEG",quality=76,optimize=True)
+print("CONTACT_SHEET FINAL_CROP_QC",len(final_previews),base64.b64encode(buf.getvalue()).decode("ascii"))
