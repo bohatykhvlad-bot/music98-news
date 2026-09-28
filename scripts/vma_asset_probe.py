@@ -138,3 +138,14 @@ for src in scripts:
             i=js.find(pat)
             if i>=0:
                 print("JSCTX",pat,re.sub(r"\s+"," ",js[max(0,i-1800):i+4500])[:6500])
+
+
+print("\nACTION_DOWNLOAD")
+for key in ["dded7f7e94","0cb642bd2d","16d405d43a","a6d485acfd"]:
+    u="https://www.paramountpressexpress.com/mtv/actions/?action=asset-download&brand=mtv&type=photo&key="+key+"&rnd=1234567"
+    try:
+        rq=urllib.request.Request(u,headers={"User-Agent":UA,"Referer":"https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/"})
+        data=urllib.request.urlopen(rq,timeout=90).read().decode("utf-8","replace")
+        print("ACTION",key,data[:8000])
+    except Exception as e:
+        print("ACTION_ERR",key,repr(e))
