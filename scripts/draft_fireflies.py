@@ -17,9 +17,9 @@ Paul Hunter's video understands that balance. Legend performs with the Hollywood
 
 *Muse* grew out of Legend's appearance on Clipse's *Let God Sort 'Em Out*. Pharrell heard his vocal on "The Birds Don't Sing" and suggested a full album, much of it later written and recorded at his studio inside Louis Vuitton headquarters in Paris. He produced all 16 songs and co-wrote the record. That is enough context to explain why "Fireflies" feels cohesive rather than assembled around a feature.
 
-The album draws from gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, with Nina Simone, Nat King Cole and Marvin Gaye among the reference points the pair cited. "Fireflies" comes late in the sequence, after "Doing Me" and before "Everything," and follows the earlier single "Daylight." Despite the wide list of influences, the song itself is easy to follow. Piano and voice lead; the orchestra fills the edges; the choir gives the chorus its lift.
+The album draws from gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, with Nina Simone, Nat King Cole and Marvin Gaye among the reference points the pair cited. "Fireflies" comes late in the sequence, after "Doing Me" and before "Everything," and follows the earlier single "Daylight." Despite the wide list of influences, the song itself is easy to follow. Piano and voice lead. The orchestra fills the edges, and the choir gives the chorus its lift.
 
-The strongest part of "Fireflies" is how little it tries to remake John Legend. His familiar strengths are intact, especially the piano-led writing and controlled vocal, but the frame around them is richer. Pharrell adds movement without stamping his own sound over the track. The result is polished soul-pop with enough scale to feel fresh, without burying the song underneath the production.'''
+The production leaves Legend's familiar strengths intact, especially the piano-led writing and controlled vocal, while giving them a richer frame. Pharrell adds movement without stamping his own sound over the track. "Fireflies" stays polished and expansive without letting the production bury the song.'''
 
 def main():
     runner.load_env()
