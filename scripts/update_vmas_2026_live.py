@@ -16,17 +16,15 @@ EXCERPT = (
     "Video of the Year at the September 27 ceremony in Los Angeles."
 )
 
-INTRO_BEFORE_PHOTO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year at the September 27 ceremony in Los Angeles. Snoop Dogg hosted the show at the Peacock Theater. Madonna finished with the largest award total of the night, and Taylor Swift added a directing win and the inaugural MTV VMA Artist Director Honors to the top video prize. The complete winners and nominees are listed below.
+INTRO_BEFORE_PHOTO = """Madonna led the 2026 MTV VMAs with seven awards, while Taylor Swift won Video of the Year at the September 27 ceremony in Los Angeles. Snoop Dogg hosted the show at the Peacock Theater. The full results below cover the final ballot across the main, genre, technical and social categories, followed by the two special honors.
 
 Madonna entered the final ballot with 13 nominations after MTV added the social categories, raising her total from 11. She won Artist of the Year and the album category for *CONFESSIONS II*, shared the collaboration award with Sabrina Carpenter for "Bring Your Love," and added four wins for "Confessions II - The Film." Those four came in dance, cinematography, choreography and long-form video."""
 
 INTRO_AFTER_PHOTO = """Taylor Swift won Video of the Year for "The Fate of Ophelia" and the directing category for "Opalite." MTV also presented Taylor Swift with the inaugural Artist Director Honors, a separate recognition for her work as a director. The special honor sat outside the competitive tally.
 
-Beyond the two headline names, BTS won three awards, including Song of the Year, while Sienna Spiro was named Best New Artist. BTS also received the K-Pop and group awards. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor.
+Beyond the two headline names, BTS won three awards, including Song of the Year, while Sienna Spiro was named Best New Artist. BTS also received the K-Pop and group awards. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor. Every remaining genre, technical and social-category result appears in the complete list below."""
 
-The complete list below follows the final 2026 ballot and includes the genre, technical and social categories. Each category appears once, every nominee is listed, and the winner is highlighted in bold on the published page."""
-
-ENDING = """Madonna finished as the most-awarded artist of the night with seven wins, while Taylor Swift left with Video of the Year and the directing award. The final ballot included the social categories announced after the original nominations, and the list above also includes the two special honors. Nirvana received the Video Vanguard Award, while Taylor Swift received the Artist Director Honors."""
+ENDING = ""
 
 def normalize_awards(awards: str) -> str:
     # Billboard-style list separator: en dash, not em dash.
@@ -150,8 +148,6 @@ def main():
         + INTRO_AFTER_PHOTO
         + "\n\n"
         + awards
-        + "\n\n"
-        + ENDING
     )
     audit(new_body, original_photos)
 
