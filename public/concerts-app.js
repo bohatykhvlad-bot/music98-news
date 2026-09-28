@@ -511,6 +511,8 @@ function restoreArtistSide(){
 }
 function showArtistContext(){
   if(!artistContext) return;
+  clearTimeout(moveTimer);
+  moveTimer=0;
   areaRequestSeq++;
   popularRequestSeq++;
   setMode("artist");
@@ -553,6 +555,8 @@ async function toggleArtist(item,card,mode){
     return;
   }
 
+  clearTimeout(moveTimer);
+  moveTimer=0;
   areaRequestSeq++;
   popularRequestSeq++;
   artistContext={item:{...item},events:[],sourceMode:mode,sourceItems:sourceItemsForArtist(item,mode)};
@@ -679,6 +683,8 @@ async function loadHotspots(){
 }
 
 async function loadPopular(force=false){
+  clearTimeout(moveTimer);
+  moveTimer=0;
   areaRequestSeq++;
   const requestId=++popularRequestSeq;
   clearArtistContext();
@@ -745,6 +751,8 @@ async function loadArea(lat,lng,label,opts={}){
 }
 
 function requestLocation(){
+  clearTimeout(moveTimer);
+  moveTimer=0;
   areaRequestSeq++;
   popularRequestSeq++;
   clearArtistContext();
@@ -781,6 +789,8 @@ async function searchArtists(q){
   return data.artists||[];
 }
 async function selectFeature(f){
+  clearTimeout(moveTimer);
+  moveTimer=0;
   areaRequestSeq++;
   popularRequestSeq++;
   clearArtistContext();
@@ -953,6 +963,7 @@ map.on("moveend",()=>{
   if(activeMode!=="nearby" && activeMode!=="artist-area") return;
   clearTimeout(moveTimer);
   moveTimer=setTimeout(()=>{
+    if(activeMode!=="nearby" && activeMode!=="artist-area") return;
     const c=map.getCenter();
     if(activeMode==="artist-area" && artistContext){
       loadArea(c.lat,c.lng,"Map area",{fit:false,radius:Number(radiusEl.value)||100,context:"artist-area"});
