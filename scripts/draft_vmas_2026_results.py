@@ -16,29 +16,29 @@ import post as runner
 
 PID = "vmas26results"
 TITLE = "Taylor Swift Takes Video of the Year as Madonna Leads the 2026 MTV VMAs With Seven Wins"
-EXCERPT = 'Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV Video Music Awards on September 27 in Los Angeles.'
+EXCERPT = 'Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles.'
 
 HERO_KEY = "a6d485acfd"
 HERO_NAME = "vmas-2026-taylor-swift-madonna.jpg"
 HERO_CREDIT = "Christopher Polk"
-HERO_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=a6d485acfd"
+HERO_CREDIT_URL = "https://www.instagram.com/polkimaging/"
 
 SIENNA_KEY = "16d405d43a"
 SIENNA_NAME = "vmas-2026-sienna-spiro.jpg"
 SIENNA_CREDIT = "Christopher Polk"
-SIENNA_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=16d405d43a"
+SIENNA_CREDIT_URL = "https://www.instagram.com/polkimaging/"
 
-BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV Video Music Awards on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host. By the end of the night, Madonna had the largest trophy count, while Swift had taken the top video prize and added another directing win to a career total that now stands at 32 VMAs.
+BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host. By the end of the night, Madonna had the largest trophy count, while Swift had taken the top video prize and added another directing win to a career total that now stands at 32 VMAs.
 
 Madonna entered the final ballot with 13 nominations after MTV added its social categories. Her wins reached across the show rather than clustering in one lane. She took Artist of the Year and Best Album for *Confessions II*, shared Best Collaboration with Sabrina Carpenter for "Bring Your Love," and picked up four more awards tied to *Confessions II - The Film*. The seven-award haul gave the night a clear statistical leader without turning the rest of the results into a one-artist sweep.
 
 Swift's two competitive wins landed in the categories most closely tied to her video work. "The Fate of Ophelia" took Video of the Year, while "Opalite" won Best Direction. Those awards moved her career tally from 30 to 32 and ahead of Beyoncé's previous total. MTV also gave Swift the inaugural Artist Director Honors, a separate recognition for her directing work rather than another competitive category.
 
-[photo:{sienna_src}|Christopher Polk|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=16d405d43a|50% 42%|1]
+[photo:{sienna_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 42%|1]
 
 Away from Madonna and Swift, the major awards spread quickly. BTS won Song of the Year with "Swim," took Best K-Pop for the same track and was named Best Group. Sienna Spiro won Best New Artist. LISA won the pop category. Cardi B and Kehlani took hip-hop, Bruno Mars R&B, Olivia Rodrigo alternative, Bad Bunny Latin and Ella Langley country. Ariana Grande finished with Song of Summer and the visual-effects award.
 
-The craft categories gave the board another layer. Sabrina Carpenter's "House Tour" won editing, PinkPantheress took art direction for "Stateside + Zara Larsson," and Madonna added cinematography and choreography to her total. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor. Those special awards sat outside the main competitive tally.
+The craft races broke in a different direction. Sabrina Carpenter's "House Tour" won editing, PinkPantheress took art direction for "Stateside + Zara Larsson," and Madonna added cinematography and choreography to her total. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor. Those special awards sat outside the main competitive tally.
 
 The performance side of the VMAs deserves its own recap because the show packed in far more than the winners list can hold. This post stays with the results. Every competitive category, winner and nominee from the final 2026 ballot is collected below, followed by the two special honors.
 
@@ -217,16 +217,13 @@ def main():
     print("HERO", hero_size, now["cover"]["src"], now["cover"]["credit"])
     print("BODY_PHOTO", sienna_size, sienna_src, SIENNA_CREDIT)
     print("NO_DUPLICATE_VMA_POSTS", True)
+    import time
+    time.sleep(3)
     ok = runner.cmd_gate(PID)
-    print("VMA_GATE", "PASS" if ok else "FAIL")
     if not ok:
-        import subprocess
-        dbg = subprocess.run(
-            [sys.executable, str(runner.GATE), "--post", PID, "--json"],
-            capture_output=True, text=True, encoding="utf-8", errors="replace",
-            cwd=str(runner.REPO),
-        )
-        print("GATE_JSON_DEBUG", dbg.stdout)
+        time.sleep(3)
+        ok = runner.cmd_gate(PID)
+    print("VMA_GATE", "PASS" if ok else "FAIL")
     runner.cmd_show(PID)
 
 if __name__ == "__main__":
