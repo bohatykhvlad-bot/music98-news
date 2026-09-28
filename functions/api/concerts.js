@@ -450,6 +450,10 @@ async function loadHotspotState(env) {
     const finished = Date.parse(state.completedAt || state.updatedAt || 0) || 0;
     if (Date.now() - finished >= 20 * 60 * 60 * 1000) return freshState();
   }
+  if (state.partial && !state.queue.length && !state.verifyQueue.length) {
+    const failed = Date.parse(state.failedAt || state.updatedAt || 0) || 0;
+    if (Date.now() - failed >= 60 * 60 * 1000) return freshState();
+  }
   return state;
 }
 
@@ -503,6 +507,8 @@ export async function refreshHotspotSnapshot(env, options = {}) {
     if (state.complete) {
       const snapshot = snapshotFromState(state);
       await kvPutJson(env, HOTSPOT_SNAPSHOT_KEY, snapshot);
+    } else {
+      state.failedAt = new Date().toISOString();
     }
   }
 
