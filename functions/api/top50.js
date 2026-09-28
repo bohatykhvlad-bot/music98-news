@@ -6,7 +6,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v31";
+const TOP50_KV = "top50v32";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -259,14 +259,19 @@ function rekeySeen(old) {
   return out;
 }
 const TENURE_KV = "tenure_v3";
-/* День первого появления каждой песни живёт ОТДЕЛЬНЫМ ключом. Реестр можно
-   пересобрать, переименовать или потерять - счётчик "N days on chart" от этого
-   больше не обнуляется (19.09 это уже случилось: весь чарт показал "1 день"). */
 const FIRST_KV = "tenure_first_v1";
-/* Журнал первого дня тоже переиндексируем: записи, сделанные до перехода на
-   нормализованные ключи, лежат под старыми "Название|Артист" и иначе не находятся -
-   песня, которая вчера была в чарте, показывала "1 day on chart". Трансформация
-   идемпотентна; при склейке двух ключей берём самый ранний день. */
+/* Permanent "has ever entered music98 Top 50" registry.
+   Unlike the current streak counter, this is never cleared when a song drops out.
+   NEW = first appearance in this registry; RE-ENTRY = absent yesterday but seen before. */
+const EVER_KV = "tenure_ever_v1";
+
+/* One-time migration on 2026-09-28.
+   The persistent seen object had 72 identities before today's first rebuild.
+   Later keys were inserted during 28 Sep rebuilds. This boundary was verified
+   against the previous-day reference and the insertion order before EVER_KV existed. */
+const EVER_MIGRATION_WEEK = 11;
+const EVER_MIGRATION_PREVIOUS_COUNT = 72;
+
 function rekeyFirstDays(old) {
   const out = {};
   for (const [k, v] of Object.entries(old || {})) {
@@ -278,18 +283,32 @@ function rekeyFirstDays(old) {
   }
   return out;
 }
+
+function normalizeEver(old) {
+  const out = {};
+  const src = old && old.seen && typeof old.seen === "object" ? old.seen : (old || {});
+  for (const [k, v] of Object.entries(src)) {
+    if (!v) continue;
+    const cut = String(k).indexOf("|");
+    const nk = cut < 0 ? k : (isVersionedMergeKey(k) ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1)));
+    out[nk] = true;
+  }
+  return out;
+}
+
 async function applyTenure(env, tracks, diag) {
   const week = chartWeek();
-  /* week starts at -1 so the very first daily run opens the registry fresh. */
   let ten = { launch: "2026-09-17", epoch: "daily", week: -1, keys: [], seen: {} };
   let firstDay = {};
+  let everStored = null;
+
   if (env && env.DESK) {
     const v = await env.DESK.get(TENURE_KV, { type: "json" });
     if (v && v.epoch === "daily") ten = v;
     firstDay = rekeyFirstDays(await env.DESK.get(FIRST_KV, { type: "json" }));
+    everStored = await env.DESK.get(EVER_KV, { type: "json" });
   }
-  /* Эталон стрелок - порядок ПРОШЛОГО дня. В тот же день это уже зафиксированный
-     ten.keys, а на новом дне - последний порядок прошлого дня (ten.today). */
+
   const sameDay = ten.week === week;
   const hasToday = Array.isArray(ten.today) && ten.today.length > 0;
   const refRaw = sameDay
@@ -299,55 +318,64 @@ async function applyTenure(env, tracks, diag) {
     const cut = String(k).indexOf("|");
     return cut < 0 ? k : (isVersionedMergeKey(k) ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1)));
   });
+
   const seen = rekeySeen(ten);
-  /* первое заполнение памятки: день появления берём из того, что помнит реестр
-     (считаем от lastWeek записи, а не от сегодня - иначе счёт съезжает на день) */
+  let ever = normalizeEver(everStored);
+  let everMigrated = !!everStored && Object.keys(ever).length > 0;
+
+  if (!everMigrated) {
+    const order = Object.keys(seen);
+    const count = week === EVER_MIGRATION_WEEK
+      ? Math.min(EVER_MIGRATION_PREVIOUS_COUNT, order.length)
+      : order.length;
+    for (const k of order.slice(0, count)) ever[k] = true;
+    everMigrated = true;
+  }
+
   for (const [k, rec] of Object.entries(seen)) {
     if (firstDay[k] != null) continue;
     const w = Number(rec && rec.weeks) || 1;
     const at = Number(rec && rec.lastWeek);
     firstDay[k] = Math.max(0, (Number.isFinite(at) ? at : week) - (w - 1));
   }
+
   const first = !prevKeys.length;
   const rolled = !first && ten.week !== week;
+
+  /* At a day rollover, yesterday's final published chart becomes historical.
+     Same-day rebuilds never add today's entrants here, so a first-time song
+     remains NEW all day instead of becoming RE-ENTRY on the second rebuild. */
+  if (rolled) {
+    for (const k of prevKeys) ever[k] = true;
+  }
+
   const newKeys = [];
   tracks.forEach((track, i) => {
     const key = tenureKey(track.title, track.artist);
     newKeys.push(key);
     const prevPos = prevKeys.indexOf(key);
+
     if (first) {
       if (firstDay[key] == null) firstDay[key] = week;
       track.delta = "0";
     } else if (prevPos < 0) {
-      /* Во вчерашнем порядке песни нет: это новая или вернувшаяся песня.
-         Владелец: пропустила день -> NEW, серия начинается заново. Поэтому
-         firstDay сбрасываем ВСЕГДА, а не только на новом дне: иначе при
-         внутридневном появлении получалось "NEW" рядом с прежним счётчиком
-         ("5 days on chart", владелец 26.09). */
       firstDay[key] = week;
-      track.delta = "new";
+      track.delta = ever[key] ? "re-entry" : "new";
     } else {
       if (firstDay[key] == null) firstDay[key] = week;
-      /* стрелку ВСЕГДА считаем от вчерашнего порядка. Раньше при внутридневной
-         пересборке она просто копировалась из реестра, а порядок за день мог
-         поменяться (источник то отвечает, то нет) - и стрелка переставала
-         сходиться с показанным местом (владелец: "Дрейк ▼3, а #1 не менялся"). */
       track.delta = String(prevPos - i);
     }
+
     track.weeks = Math.max(1, week - firstDay[key] + 1);
-    /* страховка: если песня была во вчерашнем порядке, она была в чарте вчера -
-       значит сегодня минимум второй день */
     if (!first && prevPos >= 0) track.weeks = Math.max(2, track.weeks);
     seen[key] = { weeks: track.weeks, lastPos: i, lastWeek: week, delta: track.delta };
   });
-  /* Диагностика памяти чарта: у каждой новой строки ищем в эталонном порядке строку с
-     тем же нормализованным названием. Нашлась - значит песня вчера была, а личность
-     разошлась по написанию артистов; не нашлась - песни вчера в чарте действительно
-     не было, и NEW честный. */
+
   if (diag) {
     const near = [];
     tracks.forEach((t, i) => {
-      if (String(t.delta).toLowerCase() !== "new") return;
+      const d = String(t.delta).toLowerCase();
+      if (d !== "new" && d !== "re-entry") return;
       const k = tenureKey(t.title, t.artist);
       const head = k.split("|")[0];
       for (let j = 0; j < prevKeys.length; j += 1) {
@@ -361,19 +389,12 @@ async function applyTenure(env, tracks, diag) {
     diag.refSource = sameDay ? "keys" : (hasToday ? "today" : "keys-fallback");
     diag.refLen = prevKeys.length;
     diag.nearMiss = near;
-    const seenOrder = Object.keys(seen);
-    diag.newHistoryOrder = tracks
-      .filter((t) => String(t.delta).toLowerCase() === "new")
-      .map((t) => {
-        const key = tenureKey(t.title, t.artist);
-        return { key, seenIndex: seenOrder.indexOf(key), seenTotal: seenOrder.length };
-      });
-    diag.seenTail = seenOrder.slice(-40);
+    diag.ever = Object.keys(ever).length;
+    diag.new = tracks.filter((t) => String(t.delta).toLowerCase() === "new").length;
+    diag.reentry = tracks.filter((t) => String(t.delta).toLowerCase() === "re-entry").length;
   }
-  /* Эталон стрелок - порядок ПРОШЛОГО дня (ten.keys). Порядок сегодняшней сборки
-     живёт отдельно (ten.today), поэтому внутридневная пересборка эталон не сдвигает. */
+
   if (first) {
-    /* первый прогон: эталоном для следующего дня становится сегодняшний порядок */
     ten.keys = newKeys;
     ten.today = newKeys;
   } else if (rolled) {
@@ -382,28 +403,33 @@ async function applyTenure(env, tracks, diag) {
   } else {
     ten.today = newKeys;
   }
+
   ten.week = week;
   ten.seen = seen;
   if (env && env.DESK) {
     await env.DESK.put(TENURE_KV, JSON.stringify(ten));
     await env.DESK.put(FIRST_KV, JSON.stringify(firstDay));
+    await env.DESK.put(EVER_KV, JSON.stringify({ schema: 1, seen: ever }));
   }
   return tracks;
 }
-/* Самопроверка стрелок и счётчика дней:
-   - место + стрелка обязаны складываться в непротиворечивый вчерашний порядок;
-   - NEW обязан идти с "1 day on chart", а числовая стрелка - минимум с двумя днями
-     (песня была в чарте вчера). Рассинхронизация видна в поле arrows сразу. */
+
+/* Movement self-check:
+   NEW and RE-ENTRY both start a fresh current run at 1 day.
+   Numeric movement requires presence in yesterday's Top 50. */
 function arrowCheck(tracks) {
   const taken = new Set();
   let bad = 0;
   let mixed = 0;
   let fresh = 0;
+  let reentry = 0;
+
   tracks.forEach((t, i) => {
     const d = String(t.delta == null ? "" : t.delta).toLowerCase();
     const w = Number(t.weeks) || 0;
-    if (d === "new") {
-      fresh += 1;
+    if (d === "new" || d === "re-entry") {
+      if (d === "new") fresh += 1;
+      else reentry += 1;
       if (w !== 1) mixed += 1;
       return;
     }
@@ -414,7 +440,8 @@ function arrowCheck(tracks) {
     if (p < 0 || p >= tracks.length || taken.has(p)) bad += 1;
     else taken.add(p);
   });
-  return { ok: bad === 0 && mixed === 0, bad, mixed, new: fresh };
+
+  return { ok: bad === 0 && mixed === 0, bad, mixed, new: fresh, reentry };
 }
 const UA = "Mozilla/5.0 (compatible; music98/1.0)";
 
@@ -671,7 +698,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v31",
+    rev: "feat-v32",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
