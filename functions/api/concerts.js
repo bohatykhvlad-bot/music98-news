@@ -436,7 +436,6 @@ export async function onRequestGet({ request, env }) {
       tm.searchParams.set("includeTest", "no");
       tm.searchParams.set("locale", "en-us,en,*");
       tm.searchParams.set("size", "6");
-      tm.searchParams.set("sort", "relevance,desc");
       const raw = await tmJson(tm);
       const artists = (raw?._embedded?.attractions || []).map(x => ({
         id: String(x?.id || ""),
