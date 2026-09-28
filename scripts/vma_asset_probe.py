@@ -99,3 +99,24 @@ for key in ["dded7f7e94","a6d485acfd","16d405d43a"]:
         print("PAT",pat,spots[:10])
         for pos in spots[:2]:
             print(re.sub(r"\s+"," ",rr[max(0,pos-900):pos+1600])[:2600])
+
+
+print("\nHIGHRES_URL_SCAN")
+for u in [
+  "https://www.paramountpressexpress.com/cbs-entertainment/photos/download-highres?id=91603&limit=250&page=1",
+  "https://www.paramountpressexpress.com/cbs-entertainment/photos/download-webres?id=142100&limit=250&page=1",
+]:
+    rr=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":UA}),timeout=90).read().decode("utf-8","replace")
+    print("PAGE",u,"LEN",len(rr))
+    for filename in ["3228388_VMAS_2026_2881b","3244981_VMAS_2026_4001b","3244981_VMAS_2026_3905b","3228388_VMAS_2026_1963b"]:
+        i=rr.find(filename)
+        print("FILE",filename,"AT",i)
+        if i>=0:
+            ctx=html.unescape(rr[max(0,i-6000):i+9000])
+            urls=re.findall(r'https?://[^"\'<> ]+',ctx)
+            for x in urls:
+                if ("assets/photos/" in x or "download" in x) and filename in x:
+                    print("ASSET_URL",x[:3000])
+            for pat in ["original","webres","highres","download"]:
+                spots=[m.start() for m in re.finditer(pat,ctx,re.I)]
+                if spots: print("CTX_PAT",pat,spots[:10])
