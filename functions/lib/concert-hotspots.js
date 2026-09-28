@@ -3,7 +3,7 @@ export const HOTSPOT_THRESHOLD = 11;
 export const HOTSPOT_STATE_KEY = "concert-hotspots:v17:state";
 export const HOTSPOT_SNAPSHOT_KEY = "concert-hotspots:v17:snapshot";
 export const HOTSPOT_MAX_RADIUS_KM = 480;
-export const HOTSPOT_MAX_DEPTH = 6;
+export const HOTSPOT_MAX_DEPTH = 7;
 
 /*
  * Root rectangles deliberately cover the inhabited world with overlap only at
