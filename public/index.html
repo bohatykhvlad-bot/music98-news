@@ -3264,7 +3264,12 @@ function postPath(p){ buildSlugs(); return "/" + (p.type==="release" ? "releases
 document.addEventListener("mouseover", intentBootEvent, {passive:true});
 document.addEventListener("focusin", intentBootEvent);
 function route(){
-  const tabHash = location.hash.match(/^#(news|releases|charts)$/);
+  if(location.pathname.replace(/\/+$/,"")==="/concerts"){
+    hideArticle();
+    setTab("concerts");
+    return;
+  }
+  const tabHash = location.hash.match(/^#(news|releases|charts|concerts)$/);
   if(tabHash){
     hideArticle();
     setTab(tabHash[1]);
