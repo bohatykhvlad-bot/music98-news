@@ -13,7 +13,7 @@ COVER_NAME="john-legend-muse-official.webp"
 
 EXCERPT="""John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records."""
 
-BODY='''John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. The song starts with Legend at the piano, then opens into strings, horns, choir and a full rhythm section. Pharrell stays low in the mix, while Legend carries the melody from the piano.
+BODY='''John Legend has released "Fireflies," featuring Pharrell Williams, as the latest single from his forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. The song starts with Legend at the piano, then opens into strings, horns, choir and a full rhythm section. Pharrell remains in the background, while Legend carries the melody from the piano.
 
 Paul Hunter directs the video, cutting between Legend with the Hollywood Cinematic Orchestra and portraits of residents in a housing project. The film moves through rooms, streets and faces, returning regularly to the performance. The orchestra gives the clip scale, while the quieter scenes keep it close to everyday life. The camera lingers on faces long enough for them to register, then returns to Legend and the players around him. That pacing gives the clip a documentary texture and keeps the music as the anchor. Hunter directed "Daylight" too, and both videos put the performance ahead of spectacle.
 
