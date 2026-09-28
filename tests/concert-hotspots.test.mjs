@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import {
   HOTSPOT_THRESHOLD,
   HOTSPOT_MAX_RADIUS_KM,
+  HOTSPOT_STATE_KEY,
+  HOTSPOT_SNAPSHOT_KEY,
   HOTSPOT_ROOTS,
   freshState,
   validJob,
@@ -16,6 +18,7 @@ import {
   cityKey,
   snapshotFromState,
 } from "../functions/lib/concert-hotspots.js";
+import { refreshHotspotSnapshot } from "../functions/api/concerts.js";
 
 test("hotspot threshold is strictly more than 10", () => {
   assert.equal(HOTSPOT_THRESHOLD, 11);
@@ -99,4 +102,92 @@ test("venue result above Ticketmaster deep-pagination ceiling is subdivided", ()
   assert.equal(shouldSplitVenueResult(1001,job),true);
   const circle=jobSearchCircle(job);
   assert.ok(circle && circle.radius < HOTSPOT_MAX_RADIUS_KM);
+});
+
+
+function memoryKv() {
+  const map=new Map();
+  return {
+    async get(key,type){
+      if(!map.has(key)) return null;
+      const raw=map.get(key);
+      return type==="json" ? JSON.parse(raw) : raw;
+    },
+    async put(key,value){ map.set(key,String(value)); },
+    raw(key){ return map.get(key) || null; },
+  };
+}
+
+test("hotspot builder reads every venue page and publishes only verified 11+ cities", async () => {
+  const kv=memoryKv();
+  const state=freshState(Date.UTC(2026,8,29));
+  state.queue=[{id:"test",minLat:40,maxLat:40.1,minLng:-74,maxLng:-73.9,depth:7}];
+  await kv.put(HOTSPOT_STATE_KEY,JSON.stringify(state));
+
+  const oldFetch=globalThis.fetch;
+  const seen=[];
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    seen.push(u.pathname+"?page="+(u.searchParams.get("page")||""));
+    if(u.pathname.endsWith("/venues.json")){
+      const page=Number(u.searchParams.get("page")||0);
+      const venue={
+        id:"v"+page,
+        city:{name:"New York"},
+        state:{stateCode:"NY"},
+        country:{countryCode:"US"},
+        location:{latitude:String(40.71+page*.01),longitude:String(-74.00+page*.01)},
+        upcomingEvents:{_total:5},
+      };
+      return new Response(JSON.stringify({
+        _embedded:{venues:[venue]},
+        page:{totalElements:201,totalPages:2,size:200,number:page},
+      }),{status:200,headers:{"content-type":"application/json"}});
+    }
+    if(u.pathname.endsWith("/events.json")){
+      return new Response(JSON.stringify({page:{totalElements:11,totalPages:1,size:1,number:0}}),
+        {status:200,headers:{"content-type":"application/json"}});
+    }
+    return new Response("not found",{status:404});
+  };
+
+  try{
+    const result=await refreshHotspotSnapshot(
+      {TICKETMASTER_API_KEY:"test",DESK:kv},
+      {jobBudget:1,verifyBudget:10}
+    );
+    assert.equal(result.complete,true);
+    assert.ok(seen.filter(x=>x.includes("/venues.json")).length===2);
+    const snap=JSON.parse(kv.raw(HOTSPOT_SNAPSHOT_KEY));
+    assert.equal(snap.partial,false);
+    assert.equal(snap.hotspots.length,1);
+    assert.equal(snap.hotspots[0].city,"New York");
+    assert.equal(snap.hotspots[0].count,11);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
+test("429 does not become an empty successful hotspot cache", async () => {
+  const kv=memoryKv();
+  const state=freshState(Date.UTC(2026,8,29));
+  state.queue=[{id:"retry",minLat:40,maxLat:40.1,minLng:-74,maxLng:-73.9,depth:7}];
+  await kv.put(HOTSPOT_STATE_KEY,JSON.stringify(state));
+
+  const oldFetch=globalThis.fetch;
+  globalThis.fetch=async()=>new Response("rate limited",{status:429});
+  try{
+    const result=await refreshHotspotSnapshot(
+      {TICKETMASTER_API_KEY:"test",DESK:kv},
+      {jobBudget:1,verifyBudget:1}
+    );
+    assert.equal(result.ok,false);
+    assert.equal(result.retry,true);
+    assert.equal(result.status,429);
+    const saved=JSON.parse(kv.raw(HOTSPOT_STATE_KEY));
+    assert.equal(saved.queue.length,1);
+    assert.equal(kv.raw(HOTSPOT_SNAPSHOT_KEY),null);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
 });
