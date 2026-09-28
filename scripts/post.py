@@ -341,12 +341,11 @@ def run_gate(pid, quiet=True):
                 or re.match(r"\s*--\s+length", l)]
     else:
         keep = lines
-    verdict = ""
-    for l in reversed(lines):
-        if l.strip():
-            verdict = l.strip()
-            break
-    return verdict.startswith("PASS"), keep
+    # gate.py is the authority and returns 0 for a clean gate, 1 for defects.
+    # Do not infer success from the last merged stdout/stderr line: a harmless
+    # runtime warning written to stderr after "PASS - gate clean" used to turn
+    # a clean gate into a false failure.
+    return r.returncode == 0, keep
 
 
 def cmd_gate(pid):
