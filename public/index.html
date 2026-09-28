@@ -3234,7 +3234,8 @@ function intentBootEvent(e){
   const href = a.getAttribute("href")||"";
   const m = href.match(/^#post\/(.+)$/);
   if(m){ intentBootPost(m[1]); return; }
-  const sm = href.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/);
+  buildSlugs();
+  const sm = href.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/) || href.match(/^\/([^\/]+)\/?$/);
   if(sm){
     try{
       const slug = decodeURIComponent(sm[1]);
@@ -3245,6 +3246,10 @@ function intentBootEvent(e){
 }
 /* ---- clean article URLs: /post/<slug> (SEO) with legacy #/post/<id> support ---- */
 const POST_SLUGS = {};
+const RESERVED_ROOT_SLUGS = new Set([
+  "news","releases","chart","charts","concerts","about","contacts","privacy","terms",
+  "admin-desk","m98desk","sitemap","rss","robots","favicon"
+]);
 let _slugsBuilt = false;
 /* slug base: artist + title (artist prepended only when the title doesn't name them) */
 function slugBase(p){
@@ -3267,6 +3272,7 @@ function buildSlugs(){
   const used = {};
   data.posts.forEach(p=>{
     let s = slugify(p);
+    if(p.type!=="release" && RESERVED_ROOT_SLUGS.has(s)) s = s + "-" + p.id;
     if(used[s]) s = s + "-" + p.id;
     used[s] = p.id;
     POST_SLUGS[p.id] = s;
@@ -3280,7 +3286,11 @@ function slugCap(s){
   for(const w of words){ if(out && (out.length + 1 + w.length) > 80) break; out = out ? out + "-" + w : w; }
   return out || s.slice(0,80);
 }
-function postPath(p){ buildSlugs(); return "/" + (p.type==="release" ? "releases" : "news") + "/" + (POST_SLUGS[p.id] || p.id); }
+function postPath(p){
+  buildSlugs();
+  const slug=POST_SLUGS[p.id] || p.id;
+  return p.type==="release" ? "/releases/"+slug : "/"+slug;
+}
 document.addEventListener("mouseover", intentBootEvent, {passive:true});
 document.addEventListener("focusin", intentBootEvent);
 function route(){
@@ -3314,16 +3324,32 @@ function route(){
     setTab("news");
     return;
   }
-  const pm = location.pathname.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/);
+  const pm = location.pathname.match(/^\/(post|news|releases)\/([^\/]+)\/?$/);
   if(pm){
     buildSlugs();
     try{
-      const slug = decodeURIComponent(pm[1]);
+      const kind=pm[1];
+      const slug = decodeURIComponent(pm[2]);
       const p = data.posts.find(x=>POST_SLUGS[x.id]===slug);
-      if(p){ intentBootPost(p.id); showArticle(p); return; }
+      if(p && (kind!=="releases" || p.type==="release")){
+        intentBootPost(p.id);
+        showArticle(p);
+        const canonical=postPath(p);
+        if(location.pathname!==canonical) try{ history.replaceState({}, "", canonical); }catch(e){}
+        return;
+      }
     }catch(e){}
     hideArticle();
     return;
+  }
+  const rm = location.pathname.match(/^\/([^\/]+)\/?$/);
+  if(rm){
+    buildSlugs();
+    try{
+      const slug=decodeURIComponent(rm[1]);
+      const p=data.posts.find(x=>x.type!=="release" && POST_SLUGS[x.id]===slug);
+      if(p){ intentBootPost(p.id); showArticle(p); return; }
+    }catch(e){}
   }
   const m = location.hash.match(/^#post\/(.+)$/);
   if(m){
@@ -3343,10 +3369,11 @@ window.addEventListener("popstate", route);
 /* SPA navigation for clean URLs: intercept clicks, keep the no-reload experience */
 document.addEventListener("click", e=>{
   if(e.defaultPrevented || e.button!==0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-  const a = e.target && e.target.closest ? e.target.closest('a[href^="/post/"], a[href^="/news/"], a[href^="/releases/"]') : null;
+  const a = e.target && e.target.closest ? e.target.closest('a.hero, a.card, a.rcard, a[href^="/post/"], a[href^="/news/"], a[href^="/releases/"]') : null;
   if(!a) return;
-  e.preventDefault();
   const to = a.getAttribute("href");
+  if(!to || !to.startsWith("/") || to.startsWith("//")) return;
+  e.preventDefault();
   try{ history.pushState({}, "", to); }
   catch(err){ location.href = to; return; }
   route();
