@@ -35,11 +35,17 @@ export function slugify(post) {
   return slugCap(base);
 }
 
+const RESERVED_ROOT_SLUGS = new Set([
+  "news","releases","chart","charts","concerts","about","contacts","privacy","terms",
+  "admin-desk","m98desk","sitemap","rss","robots","favicon"
+]);
+
 export function buildSlugMap(posts) {
   const used = {};
   const slugs = {}; /* id -> slug */
   (posts || []).forEach((p) => {
     let s = slugify(p);
+    if ((p && p.type) !== "release" && RESERVED_ROOT_SLUGS.has(s)) s = s + "-" + p.id;
     if (used[s]) s = s + "-" + p.id;
     used[s] = p.id;
     slugs[p.id] = s;
@@ -80,9 +86,26 @@ function firstImage(p) {
   return m ? m[1] : "";
 }
 
-/* canonical article path: /news/<slug> or /releases/<slug> */
+/* canonical article path: /<slug> for news, /releases/<slug> for releases */
 export function articlePath(p, slug) {
-  return "/" + ((p && p.type) === "release" ? "releases" : "news") + "/" + slug;
+  return (p && p.type) === "release" ? "/releases/" + slug : "/" + slug;
+}
+
+function breadcrumbJsonLd(p, slug) {
+  const url = SITE + articlePath(p, slug);
+  const items = [
+    { "@type": "ListItem", position: 1, name: "music98.news", item: SITE + "/" },
+  ];
+  if (p && p.type === "release") {
+    items.push({ "@type": "ListItem", position: 2, name: "Releases", item: SITE + "/releases" });
+  }
+  items.push({
+    "@type": "ListItem",
+    position: items.length + 1,
+    name: String(p?.title || "Article").slice(0, 110),
+    item: url,
+  });
+  return { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: items };
 }
 
 function articleJsonLd(p, slug, origin) {
@@ -119,6 +142,7 @@ export function articleHtml(shell, p, slug, origin) {
   /* JSON-LD must stay raw JSON: entities are not decoded inside <script>.
      Only neutralize potential </script> sequences via \u003c escapes. */
   const jsonld = JSON.stringify(articleJsonLd(p, slug, origin)).replace(/</g, "\\u003c");
+  const breadcrumbs = JSON.stringify(breadcrumbJsonLd(p, slug)).replace(/</g, "\\u003c");
 
   let out = shell;
   /* strip shell-level homepage tags first: two canonicals/og:images would
@@ -143,23 +167,42 @@ export function articleHtml(shell, p, slug, origin) {
     `<meta name="twitter:title" content="${escapeHtml(String(p.title||""))}">\n` +
     `<meta name="twitter:description" content="${desc}">\n` +
     `<meta name="twitter:image" content="${image}">\n` +
-    `<script type="application/ld+json">${jsonld}</script>\n`;
+    `<script type="application/ld+json">${jsonld}</script>\n` +
+    `<script type="application/ld+json">${breadcrumbs}</script>\n`;
   out = rep(out, /<\/head>/i, extra + "</head>");
   return out;
 }
 
 /* GET /post/<slug> handler body: shell + desk lookup, 404 -> plain shell */
 export async function serveArticle(request, env) {
-  const origin = new URL(request.url).origin;
-  const slug = decodeURIComponent(new URL(request.url).pathname.replace(/^\/(?:post|news|releases)\//, "").replace(/\/+$/, ""));
+  const reqUrl = new URL(request.url);
+  const origin = reqUrl.origin;
+  const path = reqUrl.pathname.replace(/\/+$/, "") || "/";
+  const legacy = path.match(/^\/(post|news|releases)\/([^\/]+)$/);
+  const root = path.match(/^\/([^\/]+)$/);
+  let slug = "";
+  try { slug = decodeURIComponent(legacy ? legacy[2] : (root ? root[1] : "")); } catch {}
   const shellRes = await env.ASSETS.fetch(new URL("/index.html", request.url));
   const shell = await shellRes.text();
   const posts = publicPosts(await readDesk(env, request));
   const slugs = buildSlugMap(posts);
   const p = posts.find((x) => slugs[x.id] === slug);
-  const html = p ? articleHtml(shell, p, slug, origin) : shell;
+
+  if (!p || (!legacy && p.type === "release")) {
+    return new Response(shell, {
+      status: 404,
+      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store, max-age=0" },
+    });
+  }
+
+  const canonical = articlePath(p, slug);
+  if (path !== canonical) {
+    return Response.redirect(origin + canonical, 301);
+  }
+
+  const html = articleHtml(shell, p, slug, origin);
   return new Response(html, {
-    status: p ? 200 : 404,
+    status: 200,
     headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store, max-age=0" },
   });
 }
@@ -180,7 +223,6 @@ export async function serveSitemap(request, env) {
      post, because that is literally what changes on it. */
   const urls = [
     { loc: `${SITE}/`, priority: "1.0", lastmod: newest },
-    { loc: `${SITE}/news`, priority: "0.9", lastmod: newest },
     { loc: `${SITE}/releases`, priority: "0.8", lastmod: newest },
     { loc: `${SITE}/chart`, priority: "0.8", lastmod: newest },
     { loc: `${SITE}/about`, priority: "0.5", lastmod: "2026-09-28" },
