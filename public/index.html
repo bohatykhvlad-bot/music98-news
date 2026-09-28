@@ -165,6 +165,14 @@ main{position:relative;z-index:1}
   position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;border:0;display:block;
   -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none
 }
+/* Prevent the raw intrinsic-size image from painting for one frame before
+   fitCover() applies the saved crop. There is deliberately no fade: the
+   preview appears once, already at its final scale. */
+#heroSlot img.js-cover:not(.cover-fitted),
+#newsGrid img.js-cover:not(.cover-fitted),
+#relGrid img.js-cover:not(.cover-fitted){
+  visibility:hidden
+}
 #articlePage .acover img,#articlePage .abody-pic img{
   pointer-events:auto;-webkit-user-select:auto;user-select:auto;-webkit-touch-callout:default;cursor:default
 }
@@ -984,6 +992,7 @@ function fitCover(img){
   img.style.width = dw+"px";
   img.style.height = dh+"px";
   img.style.transform = "translate("+left+"px,"+top+"px)";
+  img.classList.add("cover-fitted");
 }
 function bindCovers(root){
   (root||document).querySelectorAll("img.js-cover").forEach(img=>{
