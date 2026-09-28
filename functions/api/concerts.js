@@ -3,12 +3,12 @@ import {
   HOTSPOT_THRESHOLD,
   HOTSPOT_STATE_KEY,
   HOTSPOT_SNAPSHOT_KEY,
-  HOTSPOT_MAX_DEPTH,
   freshState,
   validJob,
   jobSearchCircle,
   needsGeographicSplit,
   splitHotspotJob,
+  overflowHotspotJobs,
   shouldSplitVenueResult,
   venueCandidate,
   mergeCandidate,
@@ -287,8 +287,8 @@ async function popularPayload(apiKey) {
 const HOTSPOT_BUILD_JOB_BUDGET = 2;
 const HOTSPOT_VERIFY_BUDGET = 10;
 const HOTSPOT_CACHE_TTL = 24 * 60 * 60;
-const HOTSPOT_VENUE_CACHE_PREFIX = "concert-hotspots:v17:venue:";
-const HOTSPOT_CITY_CACHE_PREFIX = "concert-hotspots:v17:city:";
+const HOTSPOT_VENUE_CACHE_PREFIX = "concert-hotspots:v18:venue:";
+const HOTSPOT_CITY_CACHE_PREFIX = "concert-hotspots:v18:city:";
 let hotspotLastFetchAt = 0;
 
 function sleep(ms) {
@@ -331,20 +331,32 @@ function normalizeBuildState(state) {
 }
 
 async function venuePage(env, apiKey, job, page = 0) {
-  const circle = jobSearchCircle(job);
-  if (!circle) throw new Error("invalid_hotspot_job");
+  if (!validJob(job)) throw new Error("invalid_hotspot_job");
   const cacheKey = HOTSPOT_VENUE_CACHE_PREFIX + String(job.id || "job") + ":" + String(page);
   const cached = await kvGetJson(env, cacheKey);
   if (cached) return cached;
 
   const tm = new URL(TM_VENUES_ROOT);
   tm.searchParams.set("apikey", apiKey);
-  tm.searchParams.set("geoPoint", geohash(circle.lat, circle.lng, 8));
-  tm.searchParams.set("radius", String(Math.ceil(circle.radius)));
-  tm.searchParams.set("unit", "km");
+  tm.searchParams.set("countryCode", job.countryCode);
+  if (job.stateCode) tm.searchParams.set("stateCode", job.stateCode);
+
+  if (job.kind === "geo") {
+    const circle = jobSearchCircle(job);
+    if (!circle) throw new Error("invalid_hotspot_job");
+    tm.searchParams.set("geoPoint", geohash(circle.lat, circle.lng, 8));
+    tm.searchParams.set("radius", String(Math.ceil(circle.radius)));
+    tm.searchParams.set("unit", "km");
+    tm.searchParams.set("sort", "distance,asc");
+  } else {
+    tm.searchParams.set("sort", "name,asc");
+  }
+
+  tm.searchParams.set("includeTest", "no");
   tm.searchParams.set("size", "200");
   tm.searchParams.set("page", String(page));
   tm.searchParams.set("locale", "en-us,en,*");
+
   const raw = await hotspotTmJson(tm);
   await kvPutJson(env, cacheKey, raw, { expirationTtl: HOTSPOT_CACHE_TTL }).catch(() => {});
   return raw;
@@ -399,7 +411,9 @@ function queueCandidate(state, candidate) {
 async function processVenueJob(env, apiKey, state, job) {
   if (!validJob(job)) return { queried:false };
 
-  if (needsGeographicSplit(job)) {
+  // Geo fallback jobs are split before querying until one radius covers the
+  // rectangle's corners. countryCode/stateCode stay on every request.
+  if (job.kind === "geo" && needsGeographicSplit(job)) {
     state.queue.unshift(...splitHotspotJob(job));
     return { queried:false };
   }
@@ -408,13 +422,22 @@ async function processVenueJob(env, apiKey, state, job) {
   const total = Number(first?.page?.totalElements || 0);
   const totalPages = Number(first?.page?.totalPages || 0);
 
-  if ((shouldSplitVenueResult(total, job) || totalPages > 5) && Number(job.depth || 0) < HOTSPOT_MAX_DEPTH) {
-    state.queue.unshift(...splitHotspotJob(job));
-    return { queried:true };
-  }
-
-  if (total > 1000 || totalPages > 5) {
+  if (shouldSplitVenueResult(total, job) || totalPages > 5) {
+    const children = overflowHotspotJobs(job);
+    if (children.length) {
+      state.queue.unshift(...children);
+      return { queried:true };
+    }
     state.partial = true;
+    if (!Array.isArray(state.overflow)) state.overflow = [];
+    state.overflow.push({
+      id:String(job.id||""),
+      kind:String(job.kind||""),
+      countryCode:String(job.countryCode||""),
+      stateCode:String(job.stateCode||""),
+      total,
+      totalPages,
+    });
     return { queried:true };
   }
 
@@ -584,7 +607,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v17");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v18");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
