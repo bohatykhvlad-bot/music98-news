@@ -15,6 +15,12 @@
 import fs from "node:fs";
 import path from "node:path";
 import dns from "node:dns";
+import {
+  appleCandidateCompatible,
+  mergeKey,
+  pickAppleCandidate,
+  stripParen,
+} from "../functions/lib/chart-identity.js";
 
 dns.setDefaultResultOrder("ipv4first");
 
@@ -22,13 +28,6 @@ const OUT = path.resolve("public/data/covers.json");
 const OUT_NAMES = path.resolve("public/data/apple-names.json");
 const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
 
-/* те же правила идентичности, что в воркере (functions/api/top50.js) */
-const stripParen = (s) => String(s || "").replace(/\([^)]*\)|\[[^\]]*\]/g, " ");
-const normTitle = (s) => stripParen(s).toLowerCase().replace(/[’‘]/g, "'")
-  .replace(/\b(remastered|remix|single|deluxe|from)\b/g, "").replace(/[^a-z0-9]+/g, "");
-const primaryArtist = (s) => String(s || "").split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)[0]
-  .toLowerCase().replace(/[^a-z0-9]+/g, "");
-const mergeKey = (t, a) => `${normTitle(t)}|${primaryArtist(a)}`;
 const idOf = (u) => (String(u || "").match(/[?&]i=(\d+)/) || [])[1] || "";
 const isAppleArt = (u) => {
   try {
@@ -37,14 +36,6 @@ const isAppleArt = (u) => {
   } catch { return false; }
 };
 const art600 = (u) => String(u || "").replace("100x100bb", "600x600bb").replace("100x100bb.jpg", "600x600bb.jpg");
-
-/* слово-вариант, которого нет в названии чарта, - признак чужого релиза (ремикс, live и т.п.).
-   Границы слов обязательны: иначе "KPop Demon Hunters" ловится как "demo". */
-const VARIANTS = /\b(remix|rmx|sped up|slowed|instrumental|karaoke|cover|live|acoustic|demo|edit|re-?recorded|version|acapella|track by track|commentary)\b/i;
-function variantTrap(wantedTitle, candidate) {
-  const want = `${candidate.trackName || ""} ${candidate.collectionName || ""}`.toLowerCase();
-  return VARIANTS.test(want) && !VARIANTS.test(String(wantedTitle).toLowerCase());
-}
 
 /* одна запись Apple на песню: имя, ссылка, превью, год. Воркер носит этот файл
    в бандле и берёт данные отсюда, когда Apple из Cloudflare не отвечает. */
@@ -89,10 +80,11 @@ if (idWanted.length) {
   for (const [t, id] of idWanted) {
     const hit = byId.get(id);
     if (!hit) continue;
-    /* ссылка может вести на версию-вариант ("Track by Track", ремикс) - тогда имя,
-       ссылку и обложку берём поиском, чтобы в чарте стоял обычный релиз */
-    if (variantTrap(t.title, hit)) {
-      console.log(`  ссылка ведёт на вариант: ${t.artist} - ${t.title} -> ${hit.trackName}`);
+    /* Existing Apple URLs are hints, not truth. If a row now points to a remix,
+       live/sped-up version or even a different title/artist, ignore it and let
+       the canonical search below repair all fields. */
+    if (!appleCandidateCompatible(t.title, t.artist, hit)) {
+      console.log(`  ссылка не совпадает с оригиналом: ${t.artist} - ${t.title} -> ${hit.trackName} / ${hit.collectionName || ""}`);
       continue;
     }
     const key = mergeKey(t.title, t.artist);
@@ -102,23 +94,21 @@ if (idWanted.length) {
   console.log(`по Apple-ID (точный релиз): ${idWanted.filter(([t]) => covers[mergeKey(t.title, t.artist)]).length}/${idWanted.length}`);
 }
 
-/* 2) поиском - только для строк без ссылки на Apple, с защитой от ремиксов */
+/* 2) Search every row, even when an Apple ID already exists. A valid old URL
+   can still point at a later reissue. The matcher chooses the exact title +
+   primary artist + exact version signature, then prefers the cleanest and
+   earliest matching Apple release. Search wins; exact-ID remains a fallback. */
 for (const t of tracks) {
   const key = mergeKey(t.title, t.artist);
-  if (covers[key]) continue;
   try {
     const term = encodeURIComponent(`${t.artist} ${stripParen(t.title)}`.trim());
-    const d = await (await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&limit=15&country=US`)).json();
-    const wantT = normTitle(t.title);
-    const wantA = primaryArtist(t.artist);
-    const cand = (d.results || []).filter((r) => normTitle(r.trackName) === wantT && !variantTrap(t.title, r));
-    const hit = cand.find((r) => primaryArtist(r.artistName) === wantA)
-      || cand.sort((a, b) => String(a.trackName).length - String(b.trackName).length)[0];
+    const d = await (await fetch(`https://itunes.apple.com/search?term=${term}&entity=song&limit=25&country=US`)).json();
+    const hit = pickAppleCandidate(t.title, t.artist, d.results || []);
     if (hit) {
       covers[key] = art600(hit.artworkUrl100);
       names[key] = appleRecord(hit);
     }
-    console.log(`  поиск: ${hit ? "OK " : "НЕТ"} ${t.artist} - ${t.title}${hit ? ` -> ${hit.trackName} / ${String(hit.collectionName || "").slice(0, 40)}` : ""}`);
+    console.log(`  поиск: ${hit ? "OK " : "НЕТ"} ${t.artist} - ${t.title}${hit ? ` -> ${hit.trackName} / ${String(hit.collectionName || "").slice(0, 48)}` : ""}`);
   } catch (e) {
     console.log(`  поиск: ошибка ${t.artist} - ${t.title}: ${e.message}`);
   }
