@@ -42,6 +42,19 @@ def api(label, lat, lng, radius=50):
             raise SystemExit(f"{label}: missing {k}")
     return events
 
+
+status, headers, raw = get("/")
+home = raw.decode("utf-8","replace")
+print("HOME", status, "concerts_nav", 'href="/concerts"' in home)
+if status != 200 or 'href="/concerts"' not in home:
+    raise SystemExit("homepage Concerts nav missing")
+
+status, headers, raw = get("/sitemap.xml")
+sitemap = raw.decode("utf-8","replace")
+print("SITEMAP", status, "concerts", "https://music98.news/concerts" in sitemap)
+if status != 200 or "https://music98.news/concerts" not in sitemap:
+    raise SystemExit("concerts sitemap entry missing")
+
 status, headers, raw = get("/concerts")
 html = raw.decode("utf-8","replace")
 print("PAGE", status, "bytes", len(raw), "mapbox", "mapboxgl.Map" in html, "concerts_api", "/api/concerts" in html)
