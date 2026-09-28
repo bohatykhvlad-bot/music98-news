@@ -109,7 +109,8 @@ function addLayers(){
   map.addLayer({
     id:"hub-points",type:"circle",source:"hubs",maxzoom:6,
     paint:{
-      "circle-color":"#00fdfb","circle-radius":7,
+      "circle-color":"#00fdfb",
+      "circle-radius":["step",["get","count"],6,20,7.5,50,9,100,11],
       "circle-opacity":.96,"circle-stroke-width":0
     }
   });
@@ -169,9 +170,10 @@ function handleHubClick(e){
   if(!f) return;
   const [lng,lat]=f.geometry.coordinates;
   const name=String(f.properties?.name||"Selected city");
+  const count=Number(f.properties?.count||0);
   userMoving=false;
   map.flyTo({center:[lng,lat],zoom:8.5,duration:650});
-  loadArea(lat,lng,name,{fit:false});
+  loadArea(lat,lng,count ? name+" · "+count+"+ shows" : name,{fit:false});
 }
 
 function popupContent(e){
@@ -423,7 +425,7 @@ async function getEvents(params){ return (await getPayload(params)).events||[]; 
 
 async function loadHotspots(){
   try{
-    const data=await getPayload({mode:"hotspots"});
+    const data=await getPayload({mode:"hotspots",v:"hotspots-v6"});
     hotspots=data.hotspots||[];
     const src=map.getSource("hubs");
     if(src) src.setData(hubsGeoJSON());
@@ -447,7 +449,7 @@ async function loadPopular(force=false){
     return;
   }
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v5"});
+    const data=await getPayload({mode:"popular",v:"popular-v6"});
     popularArtists=data.artists||[];
     popularEvents=[];
     renderArtists(popularArtists,"popular");
