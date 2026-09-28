@@ -39,6 +39,7 @@ jobs:
         run: |
           node - <<'NODE'
           const urls = [
+            "https://itunes.apple.com/lookup?id=1835526733&entity=song&country=US",
             "https://music98.news/api/top50?diag=" + Date.now(),
             "https://itunes.apple.com/lookup?id=1842957386&entity=song&country=US",
             "https://itunes.apple.com/search?term=" + encodeURIComponent("Tame Impala Loser") + "&entity=song&limit=25&country=US",
@@ -48,7 +49,10 @@ jobs:
             try {
               const r = await fetch(u, {headers:{"user-agent":"Mozilla/5.0"}});
               const t = await r.text();
-              if (u.includes("music98.news")) {
+              if (u.includes("1835526733")) {
+                const j=JSON.parse(t);
+                console.log("ALT_LOSER", JSON.stringify((j.results||[]).map(x=>({wrapperType:x.wrapperType,collectionId:x.collectionId,trackId:x.trackId,trackName:x.trackName,collectionName:x.collectionName,artistName:x.artistName,art:x.artworkUrl100,releaseDate:x.releaseDate}))));
+              } else if (u.includes("music98.news")) {
                 const j=JSON.parse(t);
                 const row=(j.tracks||[]).find(x=>x.title==="Loser" && /Tame Impala/i.test(x.artist||""));
                 console.log("LIVE_LOSER", JSON.stringify(row));
