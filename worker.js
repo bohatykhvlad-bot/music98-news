@@ -12,6 +12,10 @@ import { serveArticle, serveSitemap, serveRss, serveNewsSitemap } from "./functi
 
 const APPLE_ALBUM = /^\/apple-embed\/([a-z]{2})\/album\/(\d+)$/;
 const PHOTO_FILE = /^\/photos\/([a-z0-9._-]+)\.(jpe?g|png|webp)$/;
+const ROOT_ARTICLE_RESERVED = new Set([
+  "news","releases","chart","charts","concerts","about","contacts","privacy","terms",
+  "admin-desk","m98desk","sitemap","rss","robots","favicon"
+]);
 const APPLE_STATIC = /^\/apple-static\/(build|assets)\/([A-Za-z0-9._/-]+)$/;
 const APPLE_GW = /^\/apple-gw\/(amp-api\.music\.apple\.com|amp-api-edge\.music\.apple\.com|api\.music\.apple\.com|play\.itunes\.apple\.com|sf-api-token-service\.itunes\.apple\.com)(\/.*)?$/;
 const APPLE_EMBED_CSP = [
@@ -169,7 +173,10 @@ export default {
       const u = new URL("/admin-desk", request.url);
       return Response.redirect(u, 301);
     }
-    if (/^\/(?:news|releases|chart|charts|concerts)\/?$/.test(path) &&
+    if (path === "/news" && (request.method === "GET" || request.method === "HEAD")) {
+      return Response.redirect(new URL("/", request.url), 301);
+    }
+    if (/^\/(?:releases|chart|charts|concerts)\/?$/.test(path) &&
         (request.method === "GET" || request.method === "HEAD")) {
       const u = new URL(request.url);
       return env.ASSETS.fetch(new Request(u.origin + "/index.html", request));
@@ -180,14 +187,21 @@ export default {
       const u = new URL(request.url);
       return env.ASSETS.fetch(new Request(u.origin + legal[1] + ".html", request));
     }
-    /* clean article URLs with server-side SEO meta + dynamic sitemap/RSS.
-       /news/<slug> and /releases/<slug> are canonical; /post/<slug> stays
-       alive so links shared before the category split keep resolving. */
-    const post = path.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/);
-    if (post && (request.method === "GET" || request.method === "HEAD")) return serveArticle(request, env);
+    /* Article URLs:
+       - news canonical: /<slug>
+       - release canonical: /releases/<slug>
+       - old /news/<slug> and /post/<slug> permanently redirect in serveArticle(). */
+    const legacyArticle = path.match(/^\/(?:post|news|releases)\/([^\/]+)\/?$/);
+    if (legacyArticle && (request.method === "GET" || request.method === "HEAD")) return serveArticle(request, env);
     if (path === "/sitemap.xml") return serveSitemap(request, env);
     if (path === "/news-sitemap.xml") return serveNewsSitemap(request, env);
     if (path === "/rss.xml") return serveRss(request, env);
+    const rootArticle = path.match(/^\/([a-z0-9][a-z0-9-]{0,100})\/?$/i);
+    if (rootArticle &&
+        !ROOT_ARTICLE_RESERVED.has(rootArticle[1].toLowerCase()) &&
+        (request.method === "GET" || request.method === "HEAD")) {
+      return serveArticle(request, env);
+    }
     const photo = path.match(PHOTO_FILE);
     if (photo) {
       const fromKV = await servePhoto(env, photo[1] + "." + photo[2]);
