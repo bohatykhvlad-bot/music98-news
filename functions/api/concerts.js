@@ -502,12 +502,14 @@ async function hotspotSnapshotPayload(env) {
     return { ...snapshot, partial:false, warming:false };
   }
 
-  const state = normalizeBuildState(await kvGetJson(env, HOTSPOT_STATE_KEY));
+  const storedState = await kvGetJson(env, HOTSPOT_STATE_KEY);
+  const state = normalizeBuildState(storedState);
   const progress = snapshotFromState(state);
   return {
     ...progress,
     partial:true,
     warming:true,
+    cold:!storedState,
     progress:{
       queue:state.queue.length,
       verifyQueue:state.verifyQueue.length,
@@ -524,8 +526,8 @@ export async function onRequestGet({ request, env, waitUntil }) {
 
   if (mode === "hotspots") {
     const payload = await hotspotSnapshotPayload(env);
-    if (payload.partial && env?.TICKETMASTER_API_KEY && env?.DESK && typeof waitUntil === "function") {
-      waitUntil(refreshHotspotSnapshot(env, { jobBudget:4, verifyBudget:16 }).catch(() => {}));
+    if (payload.cold && env?.TICKETMASTER_API_KEY && env?.DESK && typeof waitUntil === "function") {
+      waitUntil(refreshHotspotSnapshot(env, { jobBudget:3, verifyBudget:12 }).catch(() => {}));
     }
     if (!payload.hotspots.length && !env?.TICKETMASTER_API_KEY) {
       return json({ error:"ticketmaster_key_missing", ...payload }, 503);
