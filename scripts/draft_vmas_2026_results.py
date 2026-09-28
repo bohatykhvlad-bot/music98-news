@@ -157,11 +157,18 @@ def main():
 
     initial = runner.desk_read()["posts"]
     existing = find_existing(initial)
-    possible = [
-        p for p in initial
-        if p.get("id") != PID
-        and ("vma" in str(p.get("title", "")).lower() or "video music awards" in str(p.get("title", "")).lower())
-    ]
+    possible = []
+    related = []
+    for p in initial:
+        if p.get("id") == PID:
+            continue
+        title = str(p.get("title", ""))
+        low = title.lower()
+        if "vma" in low or "video music awards" in low:
+            related.append((p.get("id"), p.get("status"), title))
+            if any(term in low for term in ("winner", "winners", "result", "results", "video of the year")):
+                possible.append(p)
+    print("RELATED_VMA_POSTS", related)
     if possible:
         raise RuntimeError("possible existing VMA post(s): " + repr([(p.get("id"), p.get("status"), p.get("title")) for p in possible]))
     if existing and existing.get("status") != "draft":
