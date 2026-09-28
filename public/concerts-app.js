@@ -1080,6 +1080,7 @@ function visibleRadiusKm(){
 }
 
 map.on("movestart",e=>{ if(e.originalEvent) userMoving=true; });
+map.on("render",()=>{ if(popup) snapPopup(); });
 map.on("zoom",()=>{ if(popup) syncPopupPresentation(); });
 map.on("zoomend",()=>{
   if(!popup) return;
