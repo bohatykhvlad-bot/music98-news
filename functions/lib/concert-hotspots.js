@@ -180,7 +180,7 @@ export function cityKey(city,stateCode,countryCode) {
 
 export function venueCandidate(venue) {
   const city=String(venue?.city?.name||"").trim();
-  const stateCode=String(venue?.state?.stateCode||venue?.state?.name||"").trim();
+  const stateCode=String(venue?.state?.stateCode||"").trim();
   const countryCode=String(venue?.country?.countryCode||"").trim();
   const lat=finiteCoord(venue?.location?.latitude);
   const lng=finiteCoord(venue?.location?.longitude);
