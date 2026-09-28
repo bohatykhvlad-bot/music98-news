@@ -20,7 +20,7 @@ BODY_TEMPLATE = """Dominic Fike has released "Small Town," the second lead singl
 
 Fike has been writing and recording the album between shows, using hotel rooms, the tour bus and backstage spaces as temporary studios. "Small Town" came together during that stretch, with sessions continuing as the tour crossed North America and moved toward its late-September Los Angeles dates.
 
-The video was shot in Detroit and Seattle. Gabriel Jacoby joined Fike in Dallas to help finish the track, and both Jacoby and Emma Ogier contribute vocals.
+The video was shot in Detroit and Seattle. Gabriel Jacoby joined Fike in Dallas to help finish the track, and both Jacoby and Emma Ogier contribute vocals. The single was released September 18 while the tour was still moving through North America.
 
 {youtube}
 
