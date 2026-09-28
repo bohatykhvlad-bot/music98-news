@@ -56,3 +56,17 @@
   #tab-concerts .concert-map-shell{height:52vh;min-height:340px;max-height:440px}
   #tab-concerts .concert-tours{grid-template-columns:1fr}
 }
+
+/* canvas-gap fix: the site uses CSS zoom on desktop, so force Mapbox's
+   internal canvas to paint all the way to the map shell edges. */
+#concertMap,
+#concertMap .mapboxgl-canvas-container,
+#concertMap .mapboxgl-canvas{
+  width:100%!important;
+  height:100%!important;
+}
+#concertMap .mapboxgl-canvas-container{
+  position:absolute!important;
+  inset:0!important;
+}
+#concertMap .mapboxgl-canvas{display:block}
