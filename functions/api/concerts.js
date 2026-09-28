@@ -3,12 +3,13 @@ const KWORB_ARTISTS_URL = "https://kworb.net/itunes/";
 
 const KWORB_FALLBACK = [
   "Taylor Swift","Bad Bunny","Drake","Olivia Rodrigo","Ariana Grande","KAROL G","ADÉLA","Tiakola",
-  "Omar Courtz","Shakira","HUGEL","The Weeknd","Dua Lipa","Olivia Dean","BTS","LINKIN PARK",
-  "Bruno Mars","Justin Bieber","Ella Langley","Anuel AA","Fuerza Regida","Rihanna","Tame Impala",
-  "KATSEYE","Katy Perry","Lady Gaga","Alex Warren","Noah Kahan","sombr","Billie Eilish","Oasis",
-  "Rauw Alejandro","Burna Boy","Miley Cyrus","Morgan Wallen","Ed Sheeran","Kanye West","Harry Styles",
-  "Lana Del Rey","Zara Larsson","Sabrina Carpenter","SZA","Teddy Swims","Coldplay","Arctic Monkeys"
-];
+  "Omar Courtz","Shakira","HUGEL","The Weeknd","Michael Jackson","Dua Lipa","Olivia Dean","Imael Angel",
+  "BTS","LINKIN PARK","Bruno Mars","Justin Bieber","Ella Langley","Anuel AA","Fuerza Regida","Rihanna",
+  "Tame Impala","KATSEYE","SIENNA SPIRO","Katy Perry","BLOK3","Lady Gaga","Alex Warren","Noah Kahan",
+  "sombr","Karan Aujla","Billie Eilish","Mauvais Djo","Oasis","Rauw Alejandro","Asake","Burna Boy",
+  "Ultra Naté","Feid","Miley Cyrus","Morgan Wallen","Ed Sheeran","Kanye West","Malie Donn",
+  "Giorgos Mazonakis","Quevedo","Harry Styles"
+]
 
 function json(data, status = 200, extra = {}) {
   const headers = new Headers({
@@ -325,7 +326,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-popular-v4");
+  cacheUrl.searchParams.set("__cachev", "concerts-popular-v5");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
