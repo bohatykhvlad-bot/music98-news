@@ -140,7 +140,7 @@ function addLayers(){
     paint:{"text-color":"#15181a","text-halo-color":"#ffffff","text-halo-width":1.5}
   });
 
-  map.addSource("events",{type:"geojson",data:toGeoJSON([]),cluster:true,clusterMaxZoom:6,clusterRadius:40});
+  map.addSource("events",{type:"geojson",data:toGeoJSON([]),cluster:true,clusterMaxZoom:5,clusterRadius:40});
   map.addLayer({id:"clusters",type:"circle",source:"events",filter:["has","point_count"],paint:{
     "circle-color":"#00fdfb","circle-radius":["interpolate",["linear"],["zoom"],1.2,2.5,3,3.5,4.8,5.5,6,7],
     "circle-stroke-color":"rgba(255,255,255,.98)","circle-stroke-width":["interpolate",["linear"],["zoom"],1.2,0,4.8,1,6,2],
@@ -772,7 +772,7 @@ map.on("movestart",e=>{ if(e.originalEvent) userMoving=true; });
 map.on("zoomend",()=>{
   if(!popup || !map.getLayer("clusters")) return;
   const clusters=map.queryRenderedFeatures({layers:["clusters"]});
-  if(map.getZoom()<5.2 || clusters.length){
+  if(map.getZoom()<4.8 || clusters.length){
     popup.remove();
     popup=null;
   }
