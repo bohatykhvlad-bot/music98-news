@@ -62,17 +62,17 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [award:Video of the Year]
 
-[winner:Taylor Swift — "The Fate of Ophelia"]
+[winner:Taylor Swift - "The Fate of Ophelia"]
 
-[nominee:Ariana Grande — "hate that i made you love me"]
+[nominee:Ariana Grande - "hate that i made you love me"]
 
-[nominee:Bruno Mars — "I Just Might"]
+[nominee:Bruno Mars - "I Just Might"]
 
-[nominee:GENER8ION — "STORM starring Yung Lean"]
+[nominee:GENER8ION - "STORM starring Yung Lean"]
 
-[nominee:Madonna — "Confessions II - The Film"]
+[nominee:Madonna - "Confessions II - The Film"]
 
-[nominee:Sabrina Carpenter — "Tears"]
+[nominee:Sabrina Carpenter - "Tears"]
 
 [award:Artist of the Year]
 
@@ -90,19 +90,19 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [award:Song of the Year]
 
-[winner:BTS — "Swim"]
+[winner:BTS - "Swim"]
 
-[nominee:Ella Langley — "Choosin' Texas"]
+[nominee:Ella Langley - "Choosin' Texas"]
 
-[nominee:HUNTR/X: EJAE, Audrey Nuna, REI AMI — "Golden"]
+[nominee:HUNTR/X: EJAE, Audrey Nuna, REI AMI - "Golden"]
 
-[nominee:Madonna and Sabrina Carpenter — "Bring Your Love"]
+[nominee:Madonna and Sabrina Carpenter - "Bring Your Love"]
 
-[nominee:Olivia Dean — "Man I Need"]
+[nominee:Olivia Dean - "Man I Need"]
 
-[nominee:PinkPantheress — "Stateside + Zara Larsson"]
+[nominee:PinkPantheress - "Stateside + Zara Larsson"]
 
-[nominee:RAYE — "WHERE IS MY HUSBAND!"]
+[nominee:RAYE - "WHERE IS MY HUSBAND!"]
 
 [award:Best New Artist]
 
@@ -122,231 +122,231 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [award:Best Collaboration]
 
-[winner:Madonna and Sabrina Carpenter — "Bring Your Love"]
+[winner:Madonna and Sabrina Carpenter - "Bring Your Love"]
 
-[nominee:Clipse, Kendrick Lamar, Pusha T and Malice — "Chains & Whips"]
+[nominee:Clipse, Kendrick Lamar, Pusha T and Malice - "Chains & Whips"]
 
-[nominee:French Montana and Max B — "Ever Since U Left Me"]
+[nominee:French Montana and Max B - "Ever Since U Left Me"]
 
-[nominee:PinkPantheress — "Stateside + Zara Larsson"]
+[nominee:PinkPantheress - "Stateside + Zara Larsson"]
 
-[nominee:Shakira and Burna Boy — "Dai Dai"]
+[nominee:Shakira and Burna Boy - "Dai Dai"]
 
-[nominee:Teyana Taylor and Lucky Daye — "Hard Part"]
+[nominee:Teyana Taylor and Lucky Daye - "Hard Part"]
 
 [photo:{taylor_src}|Stewart Cook|https://stewartcook.com/|50% 25%|1]
 
 [award:Best Pop]
 
-[winner:LISA — "Dream feat. Kentaro Sakaguchi"]
+[winner:LISA - "Dream feat. Kentaro Sakaguchi"]
 
-[nominee:Ariana Grande — "hate that i made you love me"]
+[nominee:Ariana Grande - "hate that i made you love me"]
 
-[nominee:Charli xcx — "SS26"]
+[nominee:Charli xcx - "SS26"]
 
-[nominee:Olivia Rodrigo — "drop dead"]
+[nominee:Olivia Rodrigo - "drop dead"]
 
-[nominee:Sabrina Carpenter — "House Tour"]
+[nominee:Sabrina Carpenter - "House Tour"]
 
-[nominee:Tate McRae — "Nobody's Girl"]
+[nominee:Tate McRae - "Nobody's Girl"]
 
-[nominee:Taylor Swift — "The Fate of Ophelia"]
+[nominee:Taylor Swift - "The Fate of Ophelia"]
 
 [award:Best Hip-Hop]
 
-[winner:Cardi B ft. Kehlani — "Safe"]
+[winner:Cardi B ft. Kehlani - "Safe"]
 
-[nominee:Don Toliver — "E85"]
+[nominee:Don Toliver - "E85"]
 
-[nominee:Drake — "Janice STFU"]
+[nominee:Drake - "Janice STFU"]
 
-[nominee:Megan Thee Stallion — "LOVER GIRL"]
+[nominee:Megan Thee Stallion - "LOVER GIRL"]
 
-[nominee:Travis Scott — "DUMBO"]
+[nominee:Travis Scott - "DUMBO"]
 
-[nominee:Tyler, the Creator — "SUGAR ON MY TONGUE"]
+[nominee:Tyler, the Creator - "SUGAR ON MY TONGUE"]
 
 [award:Best R&B]
 
-[winner:Bruno Mars — "I Just Might"]
+[winner:Bruno Mars - "I Just Might"]
 
-[nominee:Chris Brown — "It Depends/Obvious"]
+[nominee:Chris Brown - "It Depends/Obvious"]
 
-[nominee:Dave and Tems — "Raindance"]
+[nominee:Dave and Tems - "Raindance"]
 
-[nominee:Justin Bieber — "YUKON"]
+[nominee:Justin Bieber - "YUKON"]
 
-[nominee:Kehlani — "Folded"]
+[nominee:Kehlani - "Folded"]
 
-[nominee:Mariah the Scientist and Kali Uchis — "Is It a Crime"]
+[nominee:Mariah the Scientist and Kali Uchis - "Is It a Crime"]
 
 [award:Best Alternative]
 
-[winner:Olivia Rodrigo — "the cure"]
+[winner:Olivia Rodrigo - "the cure"]
 
-[nominee:Geese — "Taxes"]
+[nominee:Geese - "Taxes"]
 
-[nominee:mgk and Fred Durst — "FIX UR FACE"]
+[nominee:mgk and Fred Durst - "FIX UR FACE"]
 
-[nominee:Noah Kahan — "The Great Divide"]
+[nominee:Noah Kahan - "The Great Divide"]
 
-[nominee:SOMBR — "Homewrecker"]
+[nominee:SOMBR - "Homewrecker"]
 
-[nominee:Tame Impala — "Dracula"]
+[nominee:Tame Impala - "Dracula"]
 
-[nominee:Twenty One Pilots — "Drag Path"]
+[nominee:Twenty One Pilots - "Drag Path"]
 
 [photo:{sienna_src}|Francis Specker|https://francisspecker.com/|50% 45%|1]
 
 [award:Best Dance]
 
-[winner:Madonna — "Confessions II - The Film"]
+[winner:Madonna - "Confessions II - The Film"]
 
-[nominee:Bebe Rexha and Faithless — "New Religion"]
+[nominee:Bebe Rexha and Faithless - "New Religion"]
 
-[nominee:Harry Styles — "Aperture"]
+[nominee:Harry Styles - "Aperture"]
 
-[nominee:Lady Gaga and Doechii — "RUNWAY"]
+[nominee:Lady Gaga and Doechii - "RUNWAY"]
 
-[nominee:PinkPantheress — "Stateside + Zara Larsson"]
+[nominee:PinkPantheress - "Stateside + Zara Larsson"]
 
-[nominee:Slayyyter — "DANCE..."]
+[nominee:Slayyyter - "DANCE..."]
 
-[nominee:Tate McRae — "Nobody's Girl"]
+[nominee:Tate McRae - "Nobody's Girl"]
 
 [award:Best Latin]
 
-[winner:Bad Bunny — "NUEVAYoL"]
+[winner:Bad Bunny - "NUEVAYoL"]
 
-[nominee:Anitta with Shakira — "Choka Choka"]
+[nominee:Anitta with Shakira - "Choka Choka"]
 
-[nominee:Fuerza Regida — "TU SANCHO"]
+[nominee:Fuerza Regida - "TU SANCHO"]
 
-[nominee:KAROL G — "Papasito"]
+[nominee:KAROL G - "Papasito"]
 
-[nominee:Rosalía ft. Yahritza Y Su Esencia — "La Perla"]
+[nominee:Rosalía ft. Yahritza Y Su Esencia - "La Perla"]
 
-[nominee:Ryan Castro, Kapo and Gangsta — "LA VILLA"]
+[nominee:Ryan Castro, Kapo and Gangsta - "LA VILLA"]
 
-[nominee:Shakira and Burna Boy — "Dai Dai"]
+[nominee:Shakira and Burna Boy - "Dai Dai"]
 
 [award:Best K-Pop]
 
-[winner:BTS — "Swim"]
+[winner:BTS - "Swim"]
 
-[nominee:BLACKPINK — "JUMP"]
+[nominee:BLACKPINK - "JUMP"]
 
-[nominee:CORTIS — "REDRED"]
+[nominee:CORTIS - "REDRED"]
 
-[nominee:KATSEYE — "PINKY UP"]
+[nominee:KATSEYE - "PINKY UP"]
 
-[nominee:LE SSERAFIM feat. j-hope of BTS — "SPAGHETTI"]
+[nominee:LE SSERAFIM feat. j-hope of BTS - "SPAGHETTI"]
 
-[nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
+[nominee:LISA - "Dream feat. Kentaro Sakaguchi"]
 
 [photo:{lisa_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 54%|1]
 
 [award:Best Country]
 
-[winner:Ella Langley — "Choosin' Texas"]
+[winner:Ella Langley - "Choosin' Texas"]
 
-[nominee:Kacey Musgraves — "Dry Spell"]
+[nominee:Kacey Musgraves - "Dry Spell"]
 
-[nominee:Lainey Wilson — "Somewhere Over Laredo"]
+[nominee:Lainey Wilson - "Somewhere Over Laredo"]
 
-[nominee:Luke Combs — "Back in the Saddle"]
+[nominee:Luke Combs - "Back in the Saddle"]
 
-[nominee:Shaboozey — "Cowgirl"]
+[nominee:Shaboozey - "Cowgirl"]
 
-[nominee:Stella Lefty — "Boston"]
+[nominee:Stella Lefty - "Boston"]
 
-[nominee:Tucker Wetmore — "Brunette"]
+[nominee:Tucker Wetmore - "Brunette"]
 
 [award:Best Direction]
 
-[winner:Taylor Swift — "Opalite"]
+[winner:Taylor Swift - "Opalite"]
 
-[nominee:Ariana Grande — "hate that i made you love me"]
+[nominee:Ariana Grande - "hate that i made you love me"]
 
-[nominee:Bruno Mars — "I Just Might"]
+[nominee:Bruno Mars - "I Just Might"]
 
-[nominee:GENER8ION — "STORM starring Yung Lean"]
+[nominee:GENER8ION - "STORM starring Yung Lean"]
 
-[nominee:Madonna — "Confessions II - The Film"]
+[nominee:Madonna - "Confessions II - The Film"]
 
-[nominee:Sabrina Carpenter — "House Tour"]
+[nominee:Sabrina Carpenter - "House Tour"]
 
 [award:Best Art Direction]
 
-[winner:PinkPantheress — "Stateside + Zara Larsson"]
+[winner:PinkPantheress - "Stateside + Zara Larsson"]
 
-[nominee:Charli xcx — "SS26"]
+[nominee:Charli xcx - "SS26"]
 
-[nominee:Lady Gaga and Doechii — "RUNWAY"]
+[nominee:Lady Gaga and Doechii - "RUNWAY"]
 
-[nominee:Madonna — "Confessions II - The Film"]
+[nominee:Madonna - "Confessions II - The Film"]
 
-[nominee:SOMBR — "My Body Isn't Ready"]
+[nominee:SOMBR - "My Body Isn't Ready"]
 
-[nominee:Taylor Swift — "The Fate of Ophelia"]
+[nominee:Taylor Swift - "The Fate of Ophelia"]
 
 [award:Best Cinematography]
 
-[winner:Madonna — "Confessions II - The Film"]
+[winner:Madonna - "Confessions II - The Film"]
 
-[nominee:A$AP Rocky — "PUNK ROCKY"]
+[nominee:A$AP Rocky - "PUNK ROCKY"]
 
-[nominee:Ariana Grande — "hate that i made you love me"]
+[nominee:Ariana Grande - "hate that i made you love me"]
 
-[nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
+[nominee:LISA - "Dream feat. Kentaro Sakaguchi"]
 
-[nominee:Shaboozey — "Cowgirl"]
+[nominee:Shaboozey - "Cowgirl"]
 
-[nominee:Taylor Swift — "The Fate of Ophelia"]
+[nominee:Taylor Swift - "The Fate of Ophelia"]
 
 [award:Best Editing]
 
-[winner:Sabrina Carpenter — "House Tour"]
+[winner:Sabrina Carpenter - "House Tour"]
 
-[nominee:Ariana Grande — "hate that i made you love me"]
+[nominee:Ariana Grande - "hate that i made you love me"]
 
-[nominee:Bruno Mars — "I Just Might"]
+[nominee:Bruno Mars - "I Just Might"]
 
-[nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
+[nominee:LISA - "Dream feat. Kentaro Sakaguchi"]
 
-[nominee:Madonna — "Confessions II - The Film"]
+[nominee:Madonna - "Confessions II - The Film"]
 
-[nominee:Taylor Swift — "The Fate of Ophelia"]
+[nominee:Taylor Swift - "The Fate of Ophelia"]
 
 [award:Best Choreography]
 
-[winner:Madonna — "Confessions II - The Film"]
+[winner:Madonna - "Confessions II - The Film"]
 
-[nominee:GENER8ION — "STORM starring Yung Lean"]
+[nominee:GENER8ION - "STORM starring Yung Lean"]
 
-[nominee:Harry Styles — "Dance No More"]
+[nominee:Harry Styles - "Dance No More"]
 
-[nominee:KATSEYE — "PINKY UP"]
+[nominee:KATSEYE - "PINKY UP"]
 
-[nominee:Tate McRae — "Nobody's Girl"]
+[nominee:Tate McRae - "Nobody's Girl"]
 
-[nominee:Taylor Swift — "The Fate of Ophelia"]
+[nominee:Taylor Swift - "The Fate of Ophelia"]
 
 [photo:{nirvana_src}|Francis Specker|https://francisspecker.com/|50% 50%|1]
 
 [award:Best Visual Effects]
 
-[winner:Ariana Grande — "hate that i made you love me"]
+[winner:Ariana Grande - "hate that i made you love me"]
 
-[nominee:JISOO x ZAYN — "Eyes Closed"]
+[nominee:JISOO x ZAYN - "Eyes Closed"]
 
-[nominee:Madonna — "Confessions II - The Film"]
+[nominee:Madonna - "Confessions II - The Film"]
 
-[nominee:PinkPantheress — "Stateside + Zara Larsson"]
+[nominee:PinkPantheress - "Stateside + Zara Larsson"]
 
-[nominee:RAYE ft. Hans Zimmer — "Click Clack Symphony."]
+[nominee:RAYE ft. Hans Zimmer - "Click Clack Symphony."]
 
-[nominee:Taylor Swift — "The Fate of Ophelia"]
+[nominee:Taylor Swift - "The Fate of Ophelia"]
 
 [award:Best Group]
 
@@ -368,59 +368,59 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [award:Best Long Form Video]
 
-[winner:Madonna — *Confessions II - The Film*]
+[winner:Madonna - *Confessions II - The Film*]
 
-[nominee:Charli xcx — *Music, Fashion, Film*]
+[nominee:Charli xcx - *Music, Fashion, Film*]
 
-[nominee:Ella Langley — *Choosin' Texas*]
+[nominee:Ella Langley - *Choosin' Texas*]
 
-[nominee:GENER8ION — *STORM starring Yung Lean*]
+[nominee:GENER8ION - *STORM starring Yung Lean*]
 
 [award:Best Album]
 
-[winner:Madonna — *Confessions II*]
+[winner:Madonna - *Confessions II*]
 
-[nominee:Drake — *ICEMAN*]
+[nominee:Drake - *ICEMAN*]
 
-[nominee:Olivia Dean — *The Art of Loving*]
+[nominee:Olivia Dean - *The Art of Loving*]
 
-[nominee:Olivia Rodrigo — *You Seem Pretty Sad for a Girl So in Love*]
+[nominee:Olivia Rodrigo - *You Seem Pretty Sad for a Girl So in Love*]
 
-[nominee:Sabrina Carpenter — *Man's Best Friend*]
+[nominee:Sabrina Carpenter - *Man's Best Friend*]
 
-[nominee:Taylor Swift — *The Life of a Showgirl*]
+[nominee:Taylor Swift - *The Life of a Showgirl*]
 
 [award:Song of Summer]
 
-[winner:Ariana Grande — "hate that i made you love me"]
+[winner:Ariana Grande - "hate that i made you love me"]
 
-[nominee:Bruno Mars — "Risk It All"]
+[nominee:Bruno Mars - "Risk It All"]
 
-[nominee:Charli xcx — "Camera"]
+[nominee:Charli xcx - "Camera"]
 
-[nominee:Ella Langley — "Choosin' Texas"]
+[nominee:Ella Langley - "Choosin' Texas"]
 
-[nominee:KATSEYE — "Hootie Frutti"]
+[nominee:KATSEYE - "Hootie Frutti"]
 
-[nominee:Latto ft. Doja Cat — "Okayyy"]
+[nominee:Latto ft. Doja Cat - "Okayyy"]
 
-[nominee:Morgan Wallen — "Been by Now"]
+[nominee:Morgan Wallen - "Been by Now"]
 
-[nominee:Olivia Dean — "So Easy (To Fall in Love)"]
+[nominee:Olivia Dean - "So Easy (To Fall in Love)"]
 
-[nominee:Olivia Rodrigo — "Stupid Song"]
+[nominee:Olivia Rodrigo - "Stupid Song"]
 
-[nominee:Sabrina Carpenter — "House Tour"]
+[nominee:Sabrina Carpenter - "House Tour"]
 
-[nominee:Slayyyter — "brand new chanel$"]
+[nominee:Slayyyter - "brand new chanel$"]
 
-[nominee:SOMBR — "Homewrecker"]
+[nominee:SOMBR - "Homewrecker"]
 
-[nominee:Stella Lefty — "Boston"]
+[nominee:Stella Lefty - "Boston"]
 
-[nominee:Tame Impala and JENNIE — "Dracula"]
+[nominee:Tame Impala and JENNIE - "Dracula"]
 
-[nominee:Taylor Swift — "I Knew It, I Knew You"]
+[nominee:Taylor Swift - "I Knew It, I Knew You"]
 
 [award:Video Vanguard Award]
 
