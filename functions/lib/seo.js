@@ -180,6 +180,9 @@ export async function serveSitemap(request, env) {
      post, because that is literally what changes on it. */
   const urls = [
     { loc: `${SITE}/`, priority: "1.0", lastmod: newest },
+    { loc: `${SITE}/news`, priority: "0.9", lastmod: newest },
+    { loc: `${SITE}/releases`, priority: "0.8", lastmod: newest },
+    { loc: `${SITE}/chart`, priority: "0.8", lastmod: newest },
     { loc: `${SITE}/about`, priority: "0.5", lastmod: "2026-09-28" },
     { loc: `${SITE}/contacts`, priority: "0.5", lastmod: "2026-09-28" },
     { loc: `${SITE}/privacy`, priority: "0.3", lastmod: "2026-09-28" },
