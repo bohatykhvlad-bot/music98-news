@@ -87,7 +87,7 @@ a{color:inherit}
 .tour-events{padding:2px 7px 8px 79px}
 .tour-events[hidden]{display:none}
 .tour-loading,.tour-none{font-size:11px;color:var(--muted);padding:5px 0 7px}
-.event-link{display:grid;grid-template-columns:47px minmax(0,1fr);gap:7px;text-decoration:none;padding:7px 5px;border-radius:9px}
+.event-link{width:100%;display:grid;grid-template-columns:54px minmax(0,1fr);gap:8px;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer;text-decoration:none;padding:8px 6px;border-radius:9px}
 .event-link:hover{background:var(--bg2)}
 .event-date{font-size:11.5px;font-weight:800;color:var(--text);text-transform:uppercase;line-height:1.25;text-rendering:geometricPrecision}
 .event-place{min-width:0}
@@ -137,6 +137,10 @@ a{color:inherit}
   .tour-events{padding-left:72px}
 }
 html.embedded{background:transparent}
+@media(min-width:1100px){
+  html.embedded{zoom:1.041666667}
+  html.embedded body{width:96%}
+}
 html.embedded body{padding-top:0;background:transparent}
 html.embedded .topbar{display:none!important}
 html.embedded .wrap{max-width:none;margin:0;padding:0 0 4px}
@@ -385,6 +389,16 @@ function showPopup(e){
     .setLngLat([e.lng,e.lat]).setDOMContent(popupContent(e)).addTo(map);
 }
 
+function focusEventOnMap(e){
+  if(!e || !Number.isFinite(Number(e.lat)) || !Number.isFinite(Number(e.lng))) return;
+  userMoving=false;
+  const targetZoom=Math.max(map.getZoom(),9.6);
+  map.easeTo({center:[Number(e.lng),Number(e.lat)],zoom:Math.min(targetZoom,12),duration:430});
+  setTimeout(()=>{
+    if(map.getZoom()>=7) showPopup(e);
+  },455);
+}
+
 function fitEvents(events){
   if(!events.length) return;
   if(events.length===1){ map.flyTo({center:[events[0].lng,events[0].lat],zoom:10.5,duration:650}); return; }
@@ -424,18 +438,17 @@ function renderEventList(box,events){
     .slice()
     .sort((a,b)=>String(a.date||"9999").localeCompare(String(b.date||"9999")))
     .forEach(e=>{
-      const a=document.createElement("a");
-      a.className="event-link";
-      a.href=e.url||"#";
-      a.target="_blank";
-      a.rel="sponsored noopener";
-      if(!e.url) a.addEventListener("click",ev=>ev.preventDefault());
+      const b=document.createElement("button");
+      b.type="button";
+      b.className="event-link";
 
       const d=document.createElement("span"); d.className="event-date"; d.textContent=shortDate(e);
       const p=document.createElement("span"); p.className="event-place";
       const city=document.createElement("span"); city.className="event-city"; city.textContent=[e.city,e.countryCode].filter(Boolean).join(", ")||"Venue TBA";
       const venue=document.createElement("span"); venue.className="event-venue"; venue.textContent=e.venue||e.name||"";
-      p.append(city,venue); a.append(d,p); box.appendChild(a);
+      p.append(city,venue); b.append(d,p);
+      b.addEventListener("click",()=>focusEventOnMap(e));
+      box.appendChild(b);
     });
 }
 
@@ -475,6 +488,7 @@ async function toggleArtist(item,card,mode){
     const events=await eventsForArtist(item,mode);
     if(expandedKey!==key) return;
     renderEventList(box,events);
+    setTimeout(()=>card.scrollIntoView({block:"nearest",behavior:"smooth"}),30);
     if(events.length){
       setEventData(events);
       fitEvents(events);
@@ -699,7 +713,7 @@ map.on("movestart",e=>{ if(e.originalEvent) userMoving=true; });
 map.on("zoomend",()=>{
   if(!popup || !map.getLayer("clusters")) return;
   const clusters=map.queryRenderedFeatures({layers:["clusters"]});
-  if(clusters.length){
+  if(map.getZoom()<7 || clusters.length){
     popup.remove();
     popup=null;
   }
