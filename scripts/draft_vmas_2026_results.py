@@ -45,7 +45,7 @@ SIENNA_NAME = "vmas-2026-sienna-spiro-best-new-artist-stage.jpg"
 SIENNA_CREDIT = "Francis Specker"
 SIENNA_CREDIT_URL = "https://francisspecker.com/"
 
-BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host, while Swift also won Best Direction.
+BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony took place at the Peacock Theater with Snoop Dogg as host, while Swift also won Best Direction.
 
 Madonna entered the final ballot with 13 nominations after MTV added its social categories. Her wins reached across the show rather than clustering in one lane. She took Artist of the Year and Best Album for *Confessions II*, shared Best Collaboration with Sabrina Carpenter for "Bring Your Love," and picked up four more awards tied to *Confessions II - The Film*. The seven-award haul gave the night a clear statistical leader without turning the rest of the results into a one-artist sweep.
 
@@ -64,11 +64,11 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [winner:Taylor Swift — "The Fate of Ophelia"]
 
-[nominee:Ariana Grande — "Hate That I Made You Love Me"]
+[nominee:Ariana Grande — "hate that i made you love me"]
 
 [nominee:Bruno Mars — "I Just Might"]
 
-[nominee:GENER8ION — "Storm Starring Yung Lean"]
+[nominee:GENER8ION — "STORM starring Yung Lean"]
 
 [nominee:Madonna — "Confessions II - The Film"]
 
@@ -94,7 +94,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Ella Langley — "Choosin' Texas"]
 
-[nominee:HUNTR/X with EJAE, Audrey Nuna and REI AMI — "Golden"]
+[nominee:HUNTR/X: EJAE, Audrey Nuna, REI AMI — "Golden"]
 
 [nominee:Madonna and Sabrina Carpenter — "Bring Your Love"]
 
@@ -102,7 +102,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:PinkPantheress — "Stateside + Zara Larsson"]
 
-[nominee:RAYE — "Where Is My Husband!"]
+[nominee:RAYE — "WHERE IS MY HUSBAND!"]
 
 [award:Best New Artist]
 
@@ -140,11 +140,11 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [winner:LISA — "Dream feat. Kentaro Sakaguchi"]
 
-[nominee:Ariana Grande — "Hate That I Made You Love Me"]
+[nominee:Ariana Grande — "hate that i made you love me"]
 
 [nominee:Charli xcx — "SS26"]
 
-[nominee:Olivia Rodrigo — "Drop Dead"]
+[nominee:Olivia Rodrigo — "drop dead"]
 
 [nominee:Sabrina Carpenter — "House Tour"]
 
@@ -160,11 +160,11 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Drake — "Janice STFU"]
 
-[nominee:Megan Thee Stallion — "Lover Girl"]
+[nominee:Megan Thee Stallion — "LOVER GIRL"]
 
-[nominee:Travis Scott — "Dumbo"]
+[nominee:Travis Scott — "DUMBO"]
 
-[nominee:Tyler, the Creator — "Sugar on My Tongue"]
+[nominee:Tyler, the Creator — "SUGAR ON MY TONGUE"]
 
 [award:Best R&B]
 
@@ -174,7 +174,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Dave and Tems — "Raindance"]
 
-[nominee:Justin Bieber — "Yukon"]
+[nominee:Justin Bieber — "YUKON"]
 
 [nominee:Kehlani — "Folded"]
 
@@ -186,7 +186,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Geese — "Taxes"]
 
-[nominee:mgk and Fred Durst — "Fix Ur Face"]
+[nominee:mgk and Fred Durst — "FIX UR FACE"]
 
 [nominee:Noah Kahan — "The Great Divide"]
 
@@ -210,7 +210,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:PinkPantheress — "Stateside + Zara Larsson"]
 
-[nominee:Slayyyter — "Dance..."]
+[nominee:Slayyyter — "DANCE..."]
 
 [nominee:Tate McRae — "Nobody's Girl"]
 
@@ -220,13 +220,13 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Anitta with Shakira — "Choka Choka"]
 
-[nominee:Fuerza Regida — "Tu Sancho"]
+[nominee:Fuerza Regida — "TU SANCHO"]
 
 [nominee:KAROL G — "Papasito"]
 
 [nominee:Rosalía ft. Yahritza Y Su Esencia — "La Perla"]
 
-[nominee:Ryan Castro, Kapo and Gangsta — "La Villa"]
+[nominee:Ryan Castro, Kapo and Gangsta — "LA VILLA"]
 
 [nominee:Shakira and Burna Boy — "Dai Dai"]
 
@@ -234,13 +234,13 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [winner:BTS — "Swim"]
 
-[nominee:BLACKPINK — "Jump"]
+[nominee:BLACKPINK — "JUMP"]
 
-[nominee:CORTIS — "RedRed"]
+[nominee:CORTIS — "REDRED"]
 
-[nominee:KATSEYE — "Pinky Up"]
+[nominee:KATSEYE — "PINKY UP"]
 
-[nominee:LE SSERAFIM feat. J-Hope of BTS — "Spaghetti"]
+[nominee:LE SSERAFIM feat. j-hope of BTS — "SPAGHETTI"]
 
 [nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
 
@@ -266,11 +266,11 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [winner:Taylor Swift — "Opalite"]
 
-[nominee:Ariana Grande — "Hate That I Made You Love Me"]
+[nominee:Ariana Grande — "hate that i made you love me"]
 
 [nominee:Bruno Mars — "I Just Might"]
 
-[nominee:GENER8ION — "Storm Starring Yung Lean"]
+[nominee:GENER8ION — "STORM starring Yung Lean"]
 
 [nominee:Madonna — "Confessions II - The Film"]
 
@@ -294,9 +294,9 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [winner:Madonna — "Confessions II - The Film"]
 
-[nominee:A$AP Rocky — "Punk Rocky"]
+[nominee:A$AP Rocky — "PUNK ROCKY"]
 
-[nominee:Ariana Grande — "Hate That I Made You Love Me"]
+[nominee:Ariana Grande — "hate that i made you love me"]
 
 [nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
 
@@ -308,7 +308,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [winner:Sabrina Carpenter — "House Tour"]
 
-[nominee:Ariana Grande — "Hate That I Made You Love Me"]
+[nominee:Ariana Grande — "hate that i made you love me"]
 
 [nominee:Bruno Mars — "I Just Might"]
 
@@ -322,11 +322,11 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [winner:Madonna — "Confessions II - The Film"]
 
-[nominee:GENER8ION — "Storm Starring Yung Lean"]
+[nominee:GENER8ION — "STORM starring Yung Lean"]
 
 [nominee:Harry Styles — "Dance No More"]
 
-[nominee:KATSEYE — "Pinky Up"]
+[nominee:KATSEYE — "PINKY UP"]
 
 [nominee:Tate McRae — "Nobody's Girl"]
 
@@ -384,7 +384,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Olivia Dean — *The Art of Loving*]
 
-[nominee:Olivia Rodrigo — *you seem pretty sad for a girl so in love*]
+[nominee:Olivia Rodrigo — *You Seem Pretty Sad for a Girl So in Love*]
 
 [nominee:Sabrina Carpenter — *Man's Best Friend*]
 
@@ -404,7 +404,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Latto ft. Doja Cat — "Okayyy"]
 
-[nominee:Morgan Wallen — "Been By Now"]
+[nominee:Morgan Wallen — "Been by Now"]
 
 [nominee:Olivia Dean — "So Easy (To Fall in Love)"]
 
