@@ -6,7 +6,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v27";
+const TOP50_KV = "top50v28";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -36,14 +36,13 @@ function chartWeek() {
   return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
 }
 
-/* Обложка была привязана к тому, кто первым создал строку, и прыгала между Apple
-   (mzstatic) и Deezer (dzcdn). Правило теперь такое: обложку берём из Apple и ровно
-   того релиза, на который ведёт ссылка "Listen on Apple Music". iTunes API из
-   Cloudflare отвечает через раз, поэтому есть засев из public/data/covers.json -
-   его каждый день обновляет .github/workflows/covers.yml (там Apple отвечает).
-   Deezer остаётся последним вариантом, чтобы карточка не осталась пустой.
-   Найденная обложка запоминается по песне, поэтому день ото дня не меняется. */
-const COVERS_KV = "covers_v4";
+/* Canonical cover rule: public/data/covers.json is the authority.
+   Each song identity gets one approved artwork URL and keeps it permanently.
+   External catalogs are only discovery sources for NEW keys. They are never
+   allowed to replace an existing registry entry, even if Apple changes artwork
+   behind the same track ID later. KV is a runtime mirror/fallback, not the source
+   of truth. */
+const COVERS_KV = "covers_v5";
 const DZ_HOST = "dzcdn.net";
 function isAppleArt(url) {
   try {
@@ -104,13 +103,13 @@ async function applyCovers(env, tracks, origin) {
   for (const t of tracks) {
     const key = mergeKey(t.title, t.artist);
     const cached = covers[key];
-    /* Приоритет: засев Apple (пересобирается ежедневно и совпадает с релизом
-       ссылки) -> запомненная Apple -> Apple из текущей сборки (разово заменяет
-       закэшированный Deezer) -> запомненный Deezer -> Deezer из сборки -> пусто. */
-    const chosen = (isAppleArt(seed[key]) && seed[key])
-      || (isAppleArt(cached) && cached)
-      || (isAppleArt(t.art) && t.art)
+    /* Registry lock wins unconditionally, regardless of provider.
+       If the song is not in the checked-in registry yet, keep the first runtime
+       cover already cached for it. Only a truly unseen key may take today's
+       source artwork. */
+    const chosen = seed[key]
       || cached
+      || (isAppleArt(t.art) ? t.art : "")
       || (isDeezerArt(t.art) ? t.art : "");
     if (chosen) {
       if (covers[key] !== chosen) { covers[key] = chosen; changed = true; }
@@ -129,7 +128,7 @@ async function applyCovers(env, tracks, origin) {
 async function enrichArtByIds(tracks, stats) {
   const want = [];
   for (const t of tracks) {
-    if (isAppleArt(t.art)) continue;
+    if (t.art) continue;
     const m = String(t.url || "").match(/[?&]i=(\d+)/);
     if (m) want.push([t, m[1]]);
   }
@@ -667,14 +666,14 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v27",
+    rev: "feat-v28",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
       names: Object.keys(NAME_SEED || {}).length,
       namesWithUrl: Object.values(NAME_SEED || {}).filter((v) => v && v.url).length,
     },
-    covers: { ...coverStats, missing: tracks.filter((t) => !isAppleArt(t.art)).length },
+    covers: { ...coverStats, missing: tracks.filter((t) => !t.art).length },
     tracks,
   };
 }
