@@ -17,6 +17,7 @@ on:
       - "functions/api/top50.js"
       - "scripts/build-covers.mjs"
       - "scripts/chart-artwork-regression.mjs"
+      - "scripts/audit-live-chart.mjs"
       - ".github/workflows/apple-data.yml"
   schedule:
     # раз в сутки, утром после смены чартового дня (09:20 по Киеву): свежий чарт
@@ -35,6 +36,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Проверить live tenure
+        run: node scripts/audit-live-chart.mjs
       - name: Проверить original/remix matcher
         run: node scripts/chart-artwork-regression.mjs
       - name: Собрать cover registry и Apple metadata
