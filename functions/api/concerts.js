@@ -167,7 +167,7 @@ async function kworbArtists() {
     const seen = new Set();
 
     /* Kworb's artist links live in the ranking table and use artist/... URLs. */
-    const re = /<a\b[^>]*href=["'](?:\.\/)?artist\/[^"']+["'][^>]*>([\s\S]*?)<\/a>/gi;
+    const re = /<a\b[^>]*href=["'][^"']*(?:\/itunes\/)?artist\/[^"']+["'][^>]*>([\s\S]*?)<\/a>/gi;
     let m;
     while ((m = re.exec(html)) && names.length < 80) {
       const name = decodeHtml(m[1]);
@@ -325,6 +325,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
+  cacheUrl.searchParams.set("__cachev", "concerts-popular-v4");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
@@ -332,7 +333,7 @@ export async function onRequestGet({ request, env }) {
   try {
     if (mode === "popular") {
       const payload = await popularPayload(env.TICKETMASTER_API_KEY);
-      const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=21600" });
+      const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=3600" });
       await cache.put(cacheKey, res.clone()).catch(() => {});
       return res;
     }
