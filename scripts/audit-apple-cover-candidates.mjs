@@ -58,3 +58,16 @@ for (const [title,artist] of cases) {
   })).slice(0,60);
   console.log("ALBUM_CASE", JSON.stringify({title,artist,count:rows.length,rows}));
 }
+
+const direct=await (await fetch("https://itunes.apple.com/lookup?id=6783917228&entity=song&country=US",{headers:{"user-agent":"Mozilla/5.0"}})).json();
+console.log("PINK_BLUSH_DIRECT", JSON.stringify((direct.results||[]).map(x=>({
+  wrapperType:x.wrapperType,
+  collectionId:x.collectionId,
+  trackId:x.trackId,
+  trackName:x.trackName,
+  artistName:x.artistName,
+  collectionName:x.collectionName,
+  releaseDate:x.releaseDate,
+  art:x.artworkUrl100,
+  previewUrl:x.previewUrl
+}))));
