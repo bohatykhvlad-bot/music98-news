@@ -1,32 +1,26 @@
+import {
+  HOTSPOT_VERSION,
+  HOTSPOT_THRESHOLD,
+  HOTSPOT_STATE_KEY,
+  HOTSPOT_SNAPSHOT_KEY,
+  HOTSPOT_MAX_DEPTH,
+  freshState,
+  validJob,
+  jobSearchCircle,
+  needsGeographicSplit,
+  splitHotspotJob,
+  shouldSplitVenueResult,
+  venueCandidate,
+  mergeCandidate,
+  candidatePoint,
+  snapshotFromState,
+} from "../lib/concert-hotspots.js";
+
 const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
 const TM_ATTRACTIONS_ROOT = "https://app.ticketmaster.com/discovery/v2/attractions.json";
+const TM_VENUES_ROOT = "https://app.ticketmaster.com/discovery/v2/venues.json";
 const KWORB_ARTISTS_URL = "https://kworb.net/spotify/listeners.html";
 
-const HOTSPOT_SCAN_REGIONS = {
-  na_west:      { lats:[31,38,45,52],       lngs:[-124,-116,-108,-100], radius:430 },
-  na_east:      { lats:[27,34,41,48],       lngs:[-96,-88,-80,-72],     radius:390 },
-  latam_north:  { lats:[8,19,30],           lngs:[-104,-92,-80],        radius:500 },
-  latam_south:  { lats:[-38,-27,-16,-5],    lngs:[-76,-63,-50],         radius:500 },
-  eu_west:      { lats:[38,44,50,56],       lngs:[-8,0,8],              radius:250 },
-  eu_central:   { lats:[40,46,52,58],       lngs:[12,20,28],            radius:260 },
-  eu_east:      { lats:[42,49,56],          lngs:[32,40,48],            radius:320 },
-  mena:         { lats:[24,31,38,43],       lngs:[28,38,48,58],         radius:350 },
-  africa:       { lats:[-32,-20,-8,4,16,28],lngs:[-12,8,28],            radius:500 },
-  south_asia:   { lats:[7,17,27],           lngs:[73,82,91],            radius:500 },
-  east_asia:    { lats:[22,30,38,46],       lngs:[105,115,125,135],     radius:420 },
-  se_asia:      { lats:[-6,4,14],           lngs:[98,108,118,128],      radius:500 },
-  oceania:      { lats:[-42,-34,-26,-18],   lngs:[115,130,145,160,175], radius:500 }
-};
-
-function hotspotCells(region) {
-  const r = HOTSPOT_SCAN_REGIONS[region];
-  if (!r) return [];
-  const cells = [];
-  for (const lat of r.lats) {
-    for (const lng of r.lngs) cells.push([lat, lng, r.radius]);
-  }
-  return cells;
-}
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
   "Bad Bunny","Ariana Grande","Shakira","Katy Perry","Michael Jackson","David Guetta","Maroon 5","Ed Sheeran",
@@ -290,123 +284,259 @@ async function popularPayload(apiKey) {
   };
 }
 
-function kmBetween(lat1, lng1, lat2, lng2) {
-  const r = 6371;
-  const toRad = d => d * Math.PI / 180;
-  const p1 = toRad(lat1), p2 = toRad(lat2);
-  const dp = toRad(lat2 - lat1), dl = toRad(lng2 - lng1);
-  const h = Math.sin(dp/2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) ** 2;
-  return 2 * r * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+const HOTSPOT_BUILD_JOB_BUDGET = 2;
+const HOTSPOT_VERIFY_BUDGET = 10;
+let hotspotLastFetchAt = 0;
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function scanHotspotCell(apiKey, cell) {
-  const [lat, lng, radius] = cell;
-  const tm = baseEventUrl(apiKey);
-  tm.searchParams.set("geoPoint", geohash(lat, lng, 8));
-  tm.searchParams.set("radius", String(radius));
+async function hotspotTmJson(url) {
+  const wait = Math.max(0, 225 - (Date.now() - hotspotLastFetchAt));
+  if (wait) await sleep(wait);
+  const out = await tmJson(url);
+  hotspotLastFetchAt = Date.now();
+  return out;
+}
+
+async function kvGetJson(env, key) {
+  if (!env?.DESK) return null;
+  try {
+    const value = await env.DESK.get(key, "json");
+    if (value && typeof value === "object") return value;
+  } catch {}
+  try {
+    const raw = await env.DESK.get(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function kvPutJson(env, key, value) {
+  if (!env?.DESK) return;
+  await env.DESK.put(key, JSON.stringify(value));
+}
+
+function normalizeBuildState(state) {
+  if (!state || state.version !== HOTSPOT_VERSION || !Array.isArray(state.queue) ||
+      !state.candidates || !state.verified || !Array.isArray(state.verifyQueue)) {
+    return freshState();
+  }
+  return state;
+}
+
+async function venuePage(apiKey, job, page = 0) {
+  const circle = jobSearchCircle(job);
+  if (!circle) throw new Error("invalid_hotspot_job");
+  const tm = new URL(TM_VENUES_ROOT);
+  tm.searchParams.set("apikey", apiKey);
+  tm.searchParams.set("geoPoint", geohash(circle.lat, circle.lng, 8));
+  tm.searchParams.set("radius", String(Math.ceil(circle.radius)));
   tm.searchParams.set("unit", "km");
   tm.searchParams.set("size", "200");
-  tm.searchParams.set("sort", "distance,asc");
-  const raw = await tmJson(tm);
-  return raw?._embedded?.events || [];
+  tm.searchParams.set("page", String(page));
+  tm.searchParams.set("locale", "en-us,en,*");
+  return hotspotTmJson(tm);
 }
 
-async function verifyMetroHotspot(apiKey, candidate) {
+async function verifyHotspotCity(apiKey, record) {
+  const point = candidatePoint(record);
+  if (!point.city || !point.countryCode) return null;
+
   const tm = baseEventUrl(apiKey);
-  tm.searchParams.set("geoPoint", geohash(candidate.lat, candidate.lng, 8));
-  tm.searchParams.set("radius", "45");
-  tm.searchParams.set("unit", "km");
-  if (candidate.countryCode) tm.searchParams.set("countryCode", candidate.countryCode);
+  tm.searchParams.set("city", point.city);
+  tm.searchParams.set("countryCode", point.countryCode);
+  if (point.stateCode) tm.searchParams.set("stateCode", point.stateCode);
   tm.searchParams.set("size", "1");
   tm.searchParams.set("sort", "date,asc");
-  const raw = await tmJson(tm);
+
+  const raw = await hotspotTmJson(tm);
   const count = Number(raw?.page?.totalElements || 0);
-  if (count < 10) return null;
-  return { city:candidate.city, countryCode:candidate.countryCode, lng:candidate.lng, lat:candidate.lat, count };
-}
-
-async function hotspotsPayload(apiKey, region) {
-  const cells = hotspotCells(region);
-  const groups = new Map();
-  const seenEvents = new Set();
-
-  for (let i = 0; i < cells.length; i += 4) {
-    const chunk = cells.slice(i, i + 4);
-    const batches = await Promise.all(chunk.map(cell => scanHotspotCell(apiKey, cell).catch(() => [])));
-
-    for (const events of batches) {
-      for (const e of events) {
-        const eventId = String(e?.id || "");
-        if (eventId && seenEvents.has(eventId)) continue;
-        if (eventId) seenEvents.add(eventId);
-
-        const venue = e?._embedded?.venues?.[0] || {};
-        const city = String(venue?.city?.name || "").trim();
-        const countryCode = String(venue?.country?.countryCode || "").trim();
-        const lat = finite(venue?.location?.latitude);
-        const lng = finite(venue?.location?.longitude);
-        if (!city || lat == null || lng == null) continue;
-
-        const key = (city + "|" + countryCode).toLowerCase();
-        const g = groups.get(key) || { city, countryCode, latSum:0, lngSum:0, samples:0 };
-        g.latSum += lat;
-        g.lngSum += lng;
-        g.samples++;
-        groups.set(key, g);
-      }
-    }
-  }
-
-  const probeBudget = Math.max(0, 46 - cells.length);
-  const candidates = [...groups.values()]
-    .map(g => ({
-      city:g.city,
-      countryCode:g.countryCode,
-      lat:g.latSum/g.samples,
-      lng:g.lngSum/g.samples,
-      samples:g.samples,
-    }))
-    .sort((a,b)=>b.samples-a.samples || a.city.localeCompare(b.city))
-    .slice(0, probeBudget);
-
-  const verified = [];
-  for (let i = 0; i < candidates.length; i += 6) {
-    const chunk = candidates.slice(i, i + 6);
-    const rows = await Promise.all(chunk.map(c => verifyMetroHotspot(apiKey, c).catch(() => null)));
-    rows.filter(Boolean).forEach(x => verified.push(x));
-  }
-
-  verified.sort((a,b)=>b.count-a.count || a.city.localeCompare(b.city));
-
-  const hotspots = [];
-  for (const item of verified) {
-    const duplicate = hotspots.some(existing =>
-      existing.countryCode === item.countryCode &&
-      kmBetween(existing.lat, existing.lng, item.lat, item.lng) < 24
-    );
-    if (!duplicate) hotspots.push(item);
-  }
-
+  if (count < HOTSPOT_THRESHOLD) return null;
   return {
-    ok:true,
-    mode:"hotspots",
-    region,
-    threshold:10,
-    discovery:"automatic",
-    scannedCells:cells.length,
-    candidateCities:candidates.length,
-    hotspots,
+    city:point.city,
+    stateCode:point.stateCode,
+    countryCode:point.countryCode,
+    lat:point.lat,
+    lng:point.lng,
+    count,
   };
 }
 
-export async function onRequestGet({ request, env }) {
-  if (!env?.TICKETMASTER_API_KEY) {
-    return json({ error: "ticketmaster_key_missing" }, 503);
+function queueCandidate(state, candidate) {
+  if (!candidate?.key) return;
+  mergeCandidate(state.candidates, candidate);
+  const rec = state.candidates[candidate.key];
+  if (!rec.queued && !rec.verified) {
+    rec.queued = true;
+    state.verifyQueue.push(candidate.key);
+  }
+}
+
+async function processVenueJob(apiKey, state, job) {
+  if (!validJob(job)) return;
+
+  if (needsGeographicSplit(job)) {
+    state.queue.unshift(...splitHotspotJob(job));
+    return;
   }
 
+  const first = await venuePage(apiKey, job, 0);
+  const total = Number(first?.page?.totalElements || 0);
+  const totalPages = Number(first?.page?.totalPages || 0);
+
+  if ((shouldSplitVenueResult(total, job) || totalPages > 5) && Number(job.depth || 0) < HOTSPOT_MAX_DEPTH) {
+    state.queue.unshift(...splitHotspotJob(job));
+    return;
+  }
+
+  if (total > 1000 || totalPages > 5) {
+    state.partial = true;
+    return;
+  }
+
+  const pages = [first];
+  for (let page = 1; page < totalPages; page++) {
+    pages.push(await venuePage(apiKey, job, page));
+  }
+
+  for (const raw of pages) {
+    const venues = raw?._embedded?.venues || [];
+    for (const venue of venues) {
+      const candidate = venueCandidate(venue);
+      if (candidate) queueCandidate(state, candidate);
+    }
+  }
+  state.scannedJobs = Number(state.scannedJobs || 0) + 1;
+}
+
+async function processCityVerification(apiKey, state, key) {
+  const rec = state.candidates[key];
+  if (!rec || rec.verified) return;
+  const verified = await verifyHotspotCity(apiKey, rec);
+  rec.verified = true;
+  if (verified) state.verified[key] = verified;
+}
+
+async function loadHotspotState(env) {
+  const stored = await kvGetJson(env, HOTSPOT_STATE_KEY);
+  const state = normalizeBuildState(stored);
+
+  if (state.complete) {
+    const finished = Date.parse(state.completedAt || state.updatedAt || 0) || 0;
+    if (Date.now() - finished >= 20 * 60 * 60 * 1000) return freshState();
+  }
+  return state;
+}
+
+export async function refreshHotspotSnapshot(env, options = {}) {
+  if (!env?.TICKETMASTER_API_KEY || !env?.DESK) return { ok:false, reason:"hotspot_storage_or_key_missing" };
+
+  const jobBudget = Math.max(1, Math.min(4, Number(options.jobBudget || HOTSPOT_BUILD_JOB_BUDGET)));
+  const verifyBudget = Math.max(1, Math.min(16, Number(options.verifyBudget || HOTSPOT_VERIFY_BUDGET)));
+  const state = await loadHotspotState(env);
+
+  if (state.complete) return { ok:true, complete:true, hotspots:Object.keys(state.verified || {}).length };
+
+  let jobsDone = 0;
+  while (state.queue.length && jobsDone < jobBudget) {
+    const job = state.queue.shift();
+    try {
+      await processVenueJob(env.TICKETMASTER_API_KEY, state, job);
+      jobsDone++;
+    } catch (err) {
+      state.errors = Number(state.errors || 0) + 1;
+      state.queue.unshift({ ...job, attempts:Number(job?.attempts || 0) + 1 });
+      state.updatedAt = new Date().toISOString();
+      await kvPutJson(env, HOTSPOT_STATE_KEY, state);
+      return { ok:false, complete:false, retry:true, status:Number(err?.status || 0), error:String(err?.message || err) };
+    }
+  }
+
+  let verifiedDone = 0;
+  while (state.verifyQueue.length && verifiedDone < verifyBudget) {
+    const key = state.verifyQueue.shift();
+    try {
+      await processCityVerification(env.TICKETMASTER_API_KEY, state, key);
+      verifiedDone++;
+    } catch (err) {
+      state.verifyQueue.unshift(key);
+      state.errors = Number(state.errors || 0) + 1;
+      state.updatedAt = new Date().toISOString();
+      await kvPutJson(env, HOTSPOT_STATE_KEY, state);
+      return { ok:false, complete:false, retry:true, status:Number(err?.status || 0), error:String(err?.message || err) };
+    }
+  }
+
+  state.updatedAt = new Date().toISOString();
+
+  if (!state.queue.length && !state.verifyQueue.length) {
+    state.complete = !state.partial;
+    state.completedAt = new Date().toISOString();
+
+    if (state.complete) {
+      const snapshot = snapshotFromState(state);
+      await kvPutJson(env, HOTSPOT_SNAPSHOT_KEY, snapshot);
+    }
+  }
+
+  await kvPutJson(env, HOTSPOT_STATE_KEY, state);
+  return {
+    ok:true,
+    complete:!!state.complete,
+    partial:!!state.partial,
+    queue:state.queue.length,
+    verifyQueue:state.verifyQueue.length,
+    verified:Object.keys(state.verified || {}).length,
+  };
+}
+
+async function hotspotSnapshotPayload(env) {
+  const snapshot = await kvGetJson(env, HOTSPOT_SNAPSHOT_KEY);
+  if (snapshot?.version === HOTSPOT_VERSION && Array.isArray(snapshot.hotspots)) {
+    return { ...snapshot, partial:false, warming:false };
+  }
+
+  const state = normalizeBuildState(await kvGetJson(env, HOTSPOT_STATE_KEY));
+  const progress = snapshotFromState(state);
+  return {
+    ...progress,
+    partial:true,
+    warming:true,
+    progress:{
+      queue:state.queue.length,
+      verifyQueue:state.verifyQueue.length,
+      scannedJobs:Number(state.scannedJobs || 0),
+    },
+  };
+}
+
+export async function onRequestGet({ request, env, waitUntil }) {
   const u = new URL(request.url);
   const mode = String(u.searchParams.get("mode") || "").toLowerCase();
   const region = String(u.searchParams.get("region") || "").toLowerCase();
+  void region;
+
+  if (mode === "hotspots") {
+    const payload = await hotspotSnapshotPayload(env);
+    if (payload.partial && env?.TICKETMASTER_API_KEY && env?.DESK && typeof waitUntil === "function") {
+      waitUntil(refreshHotspotSnapshot(env).catch(() => {}));
+    }
+    if (!payload.hotspots.length && !env?.TICKETMASTER_API_KEY) {
+      return json({ error:"ticketmaster_key_missing", ...payload }, 503);
+    }
+    return json(payload, 200, {
+      "Cache-Control": payload.partial
+        ? "public, max-age=15, s-maxage=30"
+        : "public, max-age=300, s-maxage=3600"
+    });
+  }
+
+  if (!env?.TICKETMASTER_API_KEY) {
+    return json({ error: "ticketmaster_key_missing" }, 503);
+  }
   const q = String(u.searchParams.get("q") || "").trim().slice(0, 120);
   const lat = finite(u.searchParams.get("lat"));
   const lng = finite(u.searchParams.get("lng"));
@@ -414,7 +544,7 @@ export async function onRequestGet({ request, env }) {
   const attractionId = String(u.searchParams.get("attractionId") || "").trim().slice(0, 160);
   const radius = Math.min(500, Math.max(5, finite(u.searchParams.get("radius")) || 100));
 
-  if (mode !== "popular" && mode !== "hotspots" && mode !== "artist-search" && !artist && !attractionId &&
+  if (mode !== "popular" && mode !== "artist-search" && !artist && !attractionId &&
       (lat == null || lng == null || lat < -90 || lat > 90 || lng < -180 || lng > 180)) {
     return json({ error: "location_required" }, 400);
   }
@@ -422,7 +552,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v15");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v17");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
@@ -451,13 +581,6 @@ export async function onRequestGet({ request, env }) {
     if (mode === "popular") {
       const payload = await popularPayload(env.TICKETMASTER_API_KEY);
       const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=3600" });
-      await cache.put(cacheKey, res.clone()).catch(() => {});
-      return res;
-    }
-
-    if (mode === "hotspots") {
-      const payload = await hotspotsPayload(env.TICKETMASTER_API_KEY, region);
-      const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=21600" });
       await cache.put(cacheKey, res.clone()).catch(() => {});
       return res;
     }
