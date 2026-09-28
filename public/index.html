@@ -155,8 +155,6 @@ main{position:relative;z-index:1}
    to the header above and the content below) */
 .tab .hd{margin:0 0 30px}
 .tab.active{display:block}
-.tab.rise{animation:rise .28s ease both}
-@keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .hd{margin:0 0 24px}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
 
@@ -2835,10 +2833,10 @@ function setTab(t){
   }
   activeTab = t;
   $$("#nav .nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===t));
-  $$(".tab").forEach(s=>{
+  $(".tab").forEach(s=>{
     const on = s.id==="tab-"+t;
     s.classList.toggle("active", on);
-    s.classList.toggle("rise", on);
+    s.classList.remove("rise");
   });
   window.scrollTo(0, 0);
   /* the newly shown rail had zero size while hidden - its .ok state is stale;
