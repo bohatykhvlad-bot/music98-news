@@ -27,6 +27,9 @@
 <link rel="canonical" href="https://music98.news/">
 <link rel="alternate" type="application/rss+xml" title="music98.news — RSS" href="/rss.xml">
 <link rel="apple-touch-icon" href="/logo.png">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
+<link rel="stylesheet" href="/concerts-tab.css">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="icon" href="/logo.png" type="image/png">
 <style>
@@ -788,7 +791,7 @@ textarea{resize:vertical;min-height:64px}
       <button class="nav-btn active" data-tab="news">News</button>
       <button class="nav-btn" data-tab="releases">Releases</button>
       <button class="nav-btn" data-tab="charts">Chart</button>
-      <a class="nav-btn" href="/concerts">Concerts</a>
+      <button class="nav-btn" data-tab="concerts">Concerts</button>
     </nav>
     <div class="top-actions">
       <div class="search">
@@ -832,6 +835,45 @@ textarea{resize:vertical;min-height:64px}
     <p class="chart-note" id="chartStatus" hidden></p>
     <div class="empty" id="chartEmpty" hidden>Nothing found for your query.</div>
   </section>
+
+  <section class="tab" id="tab-concerts">
+    <div class="hd concerts-hd">
+      <h1 class="hd-t">Concerts Near You</h1>
+      <p class="concerts-lede">Search any city, explore upcoming shows on the map and buy tickets.</p>
+    </div>
+
+    <div class="concert-controls">
+      <div class="concert-search-wrap">
+        <svg class="concert-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input class="concert-city-input" id="concertCitySearch" type="search" autocomplete="off" placeholder="Search any city..." aria-label="Search city">
+        <div class="concert-suggestions" id="concertSuggestions" hidden></div>
+      </div>
+      <button class="concert-action" id="concertLocateBtn" type="button">Use my location</button>
+      <select class="concert-radius" id="concertRadius" aria-label="Search radius">
+        <option value="25">25 km</option>
+        <option value="50">50 km</option>
+        <option value="100" selected>100 km</option>
+        <option value="250">250 km</option>
+      </select>
+    </div>
+
+    <div class="concert-layout">
+      <section class="concert-map-shell" aria-label="Concert map">
+        <div id="concertMap"></div>
+        <div class="concert-map-status" id="concertStatus">Search for a city or use your location to find concerts.</div>
+      </section>
+      <aside class="concert-side">
+        <div class="concert-side-head">
+          <h2 id="concertSideTitle">Popular nearby</h2>
+          <button class="concert-reset" id="concertResetArtist" type="button" hidden>Back to area</button>
+        </div>
+        <p class="concert-side-sub" id="concertSideSub">Artists with the most upcoming events in this search.</p>
+        <div class="concert-tours" id="concertTours"></div>
+        <div class="concert-side-empty" id="concertSideEmpty">Choose a location to load concerts.</div>
+        <p class="concert-disclosure">Ticket links may earn music98.news a commission. Event availability and ticketing are provided by Ticketmaster.</p>
+      </aside>
+    </div>
+  </section>
 </main>
 
 <section class="subscribe">
@@ -855,6 +897,7 @@ textarea{resize:vertical;min-height:64px}
           <a class="flink" href="#" data-goto="news">News</a>
           <a class="flink" href="#" data-goto="releases">Releases</a>
           <a class="flink" href="#" data-goto="charts">Chart</a>
+          <a class="flink" href="#" data-goto="concerts">Concerts</a>
           <a class="flink" href="/about">About us</a>
         </div>
         <div>
@@ -2800,7 +2843,7 @@ function setTab(t){
   window.scrollTo(0, 0);
   /* the newly shown rail had zero size while hidden - its .ok state is stale;
      a frame later it has real geometry, so re-evaluate the arrows */
-  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
+  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); if(t==="concerts" && window.ensureConcertsMap) window.ensureConcertsMap(); });
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
@@ -3575,8 +3618,10 @@ window.addEventListener("pageshow", e=>{ if(e.persisted) loadPublishedDesk(); })
   setTimeout(snap, 1200);
 })();
 S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refreshDailyTop50();
+if(location.pathname.replace(/\/+$/,"")==="/concerts") setTab("concerts");
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
+<script src="/concerts-tab.js"></script>
 </body>
 </html>
