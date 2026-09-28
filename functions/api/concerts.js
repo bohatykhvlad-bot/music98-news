@@ -325,14 +325,27 @@ async function popularPayload(apiKey) {
 
 async function hotspotProbe(apiKey, row) {
   const [city, countryCode, lng, lat] = row;
-  const tm = baseEventUrl(apiKey);
-  tm.searchParams.set("city", city);
-  tm.searchParams.set("countryCode", countryCode);
-  tm.searchParams.set("size", "1");
-  tm.searchParams.set("sort", "date,asc");
 
-  const raw = await tmJson(tm);
-  const count = Number(raw?.page?.totalElements || 0);
+  async function countMetro() {
+    const tm = baseEventUrl(apiKey);
+    tm.searchParams.set("geoPoint", geohash(lat, lng, 8));
+    tm.searchParams.set("radius", "45");
+    tm.searchParams.set("unit", "km");
+    tm.searchParams.set("countryCode", countryCode);
+    tm.searchParams.set("size", "1");
+    tm.searchParams.set("sort", "date,asc");
+    const raw = await tmJson(tm);
+    return Number(raw?.page?.totalElements || 0);
+  }
+
+  let count = 0;
+  try {
+    count = await countMetro();
+  } catch {
+    await new Promise(resolve => setTimeout(resolve, 120));
+    count = await countMetro();
+  }
+
   if (count < 10) return null;
   return { city, countryCode, lng, lat, count };
 }
@@ -382,7 +395,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v8");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v9");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
