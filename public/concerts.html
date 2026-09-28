@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>if(new URLSearchParams(location.search).get("embed")==="1")document.documentElement.classList.add("embedded");</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9555543001162953" crossorigin="anonymous"></script>
 <title>Concerts Near You - music98.news</title>
 <meta name="description" content="Find concerts around the world, explore tour dates on an interactive map and buy tickets.">
@@ -107,6 +108,14 @@ a{color:inherit}
   .side{border-radius:15px}
   .tours{grid-template-columns:1fr}
 }
+
+html.embedded{background:transparent}
+html.embedded body{padding-top:0;background:transparent}
+html.embedded .topbar{display:none!important}
+html.embedded .wrap{max-width:none;margin:0;padding:0 0 4px}
+html.embedded .hero{margin:0 0 18px}
+html.embedded .hero h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.03em;margin:0 0 6px}
+html.embedded .hero p{font-size:15px}
 </style>
 </head>
 <body>
@@ -170,7 +179,7 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const map = new mapboxgl.Map({
   container:"map",
-  style:"mapbox://styles/mapbox/light-v11",
+  style:"mapbox://styles/mapbox/streets-v12",
   projection:"mercator",
   center:[0,22],
   zoom:1.55,
