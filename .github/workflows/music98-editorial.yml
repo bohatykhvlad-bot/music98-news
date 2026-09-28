@@ -35,8 +35,35 @@ jobs:
           test -f scripts/gate.py
       - name: Desk list
         run: python scripts/post.py list
-      - name: TEMP show release reference
-        run: python scripts/post.py show autin25r1
+      - name: TEMP resolve TSUNAMI assets
+        run: |
+          python - <<'PY'
+          import json, re, struct, urllib.parse, urllib.request
+          UA={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+          def get(url):
+              return urllib.request.urlopen(urllib.request.Request(url,headers=UA),timeout=60).read()
+          q=urllib.parse.urlencode({"term":"SOFI TUKKER OneRepublic TSUNAMI","entity":"song","country":"US","limit":25})
+          data=json.loads(get("https://itunes.apple.com/search?"+q))
+          for x in data.get("results",[]):
+              if x.get("trackName","").upper()=="TSUNAMI":
+                  print("APPLE", json.dumps({k:x.get(k) for k in ["artistName","collectionName","collectionId","trackId","trackViewUrl","collectionViewUrl","releaseDate","primaryGenreName"]}, ensure_ascii=False))
+          page=get("https://www.sofitukker.com/").decode("utf-8","replace")
+          urls=[]
+          for u in re.findall(r'https?[^"\'<> ]+', page):
+              u=u.replace("&amp;","&")
+              if "wp-content/uploads" in u and ("Duo-DSP" in u or "press" in u.lower()):
+                  urls.append(u)
+          print("OFFICIAL_IMAGE_URLS")
+          for u in sorted(set(urls)):
+              print(u)
+          photo="https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/09/Screenshot-2026-09-25-at-2.18.12-PM.png"
+          raw=get(photo)
+          print("PRESS_BYTES",len(raw))
+          if raw[:8]==b'\x89PNG\r\n\x1a\n':
+              w,h=struct.unpack(">II",raw[16:24]); print("PRESS_DIMS",w,h)
+          open("/tmp/tsunami-press.png","wb").write(raw)
+          PY
+          file /tmp/tsunami-press.png
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
