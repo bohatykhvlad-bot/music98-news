@@ -20,81 +20,83 @@ EXCERPT = 'Taylor Swift won Video of the Year and Madonna led the 2026 MTV Video
 
 HERO_KEY = "a6d485acfd"
 HERO_NAME = "vmas-2026-taylor-swift-madonna.jpg"
-HERO_CREDIT = "Christopher Polk/CBS"
+HERO_CREDIT = "Christopher Polk"
 HERO_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=a6d485acfd"
 
 SIENNA_KEY = "16d405d43a"
 SIENNA_NAME = "vmas-2026-sienna-spiro.jpg"
-SIENNA_CREDIT = "Christopher Polk/CBS"
+SIENNA_CREDIT = "Christopher Polk"
 SIENNA_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=16d405d43a"
 
-BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna led the 2026 MTV Video Music Awards with seven awards at the September 27 ceremony in Los Angeles. The show returned to the Peacock Theater with Snoop Dogg as host, but the results settled around two clear centers. Madonna dominated the count, while Swift took the night's top video prize and moved ahead on the VMAs' all-time wins list.
+BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV Video Music Awards on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host. By the end of the night, Madonna had the largest trophy count, while Swift had taken the top video prize and added another directing win to a career total that now stands at 32 VMAs.
 
-Madonna arrived with 13 nominations after MTV added its social categories and converted more than half of them into wins. She took Artist of the Year and Best Album for *Confessions II*, while "Bring Your Love" with Sabrina Carpenter won Best Collaboration. *Confessions II - The Film* added Best Dance, Best Long Form Video, Best Cinematography and Best Choreography. Seven awards made Madonna the most awarded artist of the night by a wide margin.
+Madonna entered the final ballot with 13 nominations after MTV added its social categories. Her wins reached across the show rather than clustering in one lane. She took Artist of the Year and Best Album for *Confessions II*, shared Best Collaboration with Sabrina Carpenter for "Bring Your Love," and picked up four more awards tied to *Confessions II - The Film*. The seven-award haul gave the night a clear statistical leader without turning the rest of the results into a one-artist sweep.
 
-Swift's night was smaller by count and bigger at the top. "The Fate of Ophelia" won Video of the Year, and "Opalite" earned Best Direction. Those two competitive wins took her career VMA total to 32, moving her past Beyoncé for the most wins in the show's history. MTV also gave Swift the inaugural Artist Director Honors, a separate award recognizing artists whose directing work has pushed music-video storytelling forward.
+Swift's two competitive wins landed in the categories most closely tied to her video work. "The Fate of Ophelia" took Video of the Year, while "Opalite" won Best Direction. Those awards moved her career tally from 30 to 32 and ahead of Beyoncé's previous total. MTV also gave Swift the inaugural Artist Director Honors, a separate recognition for her directing work rather than another competitive category.
 
-The rest of the major prizes were spread across a much wider field. BTS won Song of the Year and Best K-Pop for "Swim" and also took Best Group. LISA won Best Pop with "Dream feat. Kentaro Sakaguchi," while Sienna Spiro was named Best New Artist. Cardi B and Kehlani took Best Hip-Hop for "Safe," Bruno Mars won Best R&B for "I Just Might," Olivia Rodrigo took Best Alternative with "the cure," Bad Bunny won Best Latin for "NUEVAYoL," and Ella Langley won Best Country for "Choosin' Texas."
+[photo:{sienna_src}|Christopher Polk|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=16d405d43a|50% 42%|1]
 
-[photo:{sienna_src}|Christopher Polk/CBS|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=16d405d43a|50% 42%|1]
+Away from Madonna and Swift, the major awards spread quickly. BTS won Song of the Year with "Swim," took Best K-Pop for the same track and was named Best Group. Sienna Spiro won Best New Artist. LISA took Best Pop, Cardi B and Kehlani won in hip-hop, Bruno Mars won R&B, Olivia Rodrigo took alternative, Bad Bunny won Latin and Ella Langley took country. Ariana Grande finished with Song of Summer and the visual-effects award.
 
-The craft categories did not collapse around one video either. Madonna added cinematography and choreography, Taylor Swift won direction, Sabrina Carpenter's "House Tour" took editing, PinkPantheress won art direction for "Stateside + Zara Larsson," and Ariana Grande's "hate that i made you love me" won visual effects. Grande also took Song of Summer, giving her two awards across the final results.
+The craft categories gave the board another layer. Sabrina Carpenter's "House Tour" won editing, PinkPantheress took art direction for "Stateside + Zara Larsson," and Madonna added cinematography and choreography to her total. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor. Those special awards sat outside the main competitive tally.
 
-The special honors sat outside the competitive tally. Nirvana received the Video Vanguard Award, with Dave Grohl, Krist Novoselic and Pat Smear present for the honor. Swift received the first Artist Director Honors. The live performances and tributes were a separate story from the awards themselves, so this recap keeps the focus on who actually won and who they beat in each category.
+The performance side of the VMAs deserves its own recap because the show packed in far more than the winners list can hold. This post stays with the results. Every competitive category, winner and nominee from the final 2026 ballot is collected below, followed by the two special honors.
 
-The complete 2026 MTV VMA results are below. Winners are listed first, followed by the other nominees in each category.
+[awards]
 
-**Video of the Year** — **Winner: Taylor Swift — "The Fate of Ophelia."** Other nominees: Ariana Grande — "Hate That I Made You Love Me," Bruno Mars — "I Just Might," GENER8ION — "Storm Starring Yung Lean," Madonna — "Confessions II - The Film," Sabrina Carpenter — "Tears."
+**Video of the Year.** **Winner** Taylor Swift with "The Fate of Ophelia." **Nominees** Ariana Grande with "Hate That I Made You Love Me," Bruno Mars with "I Just Might," GENER8ION with "Storm Starring Yung Lean," Madonna with "Confessions II - The Film," and Sabrina Carpenter with "Tears."
 
-**Artist of the Year** — **Winner: Madonna.** Other nominees: Ariana Grande, Bruno Mars, Morgan Wallen, Sabrina Carpenter, Taylor Swift.
+**Artist of the Year.** **Winner** Madonna. **Nominees** Ariana Grande, Bruno Mars, Morgan Wallen, Sabrina Carpenter and Taylor Swift.
 
-**Song of the Year** — **Winner: BTS — "Swim."** Other nominees: Ella Langley — "Choosin' Texas," HUNTR/X with EJAE, Audrey Nuna and REI AMI — "Golden," Madonna and Sabrina Carpenter — "Bring Your Love," Olivia Dean — "Man I Need," PinkPantheress — "Stateside + Zara Larsson," RAYE — "Where Is My Husband!"
+**Song of the Year.** **Winner** BTS with "Swim." **Nominees** Ella Langley with "Choosin' Texas," HUNTR/X with EJAE, Audrey Nuna and REI AMI with "Golden," Madonna and Sabrina Carpenter with "Bring Your Love," Olivia Dean with "Man I Need," PinkPantheress with "Stateside + Zara Larsson," and RAYE with "Where Is My Husband!"
 
-**Best New Artist** — **Winner: Sienna Spiro.** Other nominees: Bella Kay, CORTIS, Magnus Ferrell, Malcolm Todd, Myles Smith, Stella Lefty.
+**Best New Artist.** **Winner** Sienna Spiro. **Nominees** Bella Kay, CORTIS, Magnus Ferrell, Malcolm Todd, Myles Smith and Stella Lefty.
 
-**Best Collaboration** — **Winner: Madonna and Sabrina Carpenter — "Bring Your Love."** Other nominees: Clipse, Kendrick Lamar, Pusha T and Malice — "Chains & Whips," French Montana and Max B — "Ever Since U Left Me," PinkPantheress — "Stateside + Zara Larsson," Shakira and Burna Boy — "Dai Dai," Teyana Taylor and Lucky Daye — "Hard Part."
+**Best Collaboration.** **Winner** Madonna and Sabrina Carpenter with "Bring Your Love." **Nominees** Clipse, Kendrick Lamar, Pusha T and Malice with "Chains & Whips," French Montana and Max B with "Ever Since U Left Me," PinkPantheress with "Stateside + Zara Larsson," Shakira and Burna Boy with "Dai Dai," and Teyana Taylor and Lucky Daye with "Hard Part."
 
-**Best Pop** — **Winner: LISA — "Dream feat. Kentaro Sakaguchi."** Other nominees: Ariana Grande — "Hate That I Made You Love Me," Charli xcx — "SS26," Olivia Rodrigo — "Drop Dead," Sabrina Carpenter — "House Tour," Tate McRae — "Nobody's Girl," Taylor Swift — "The Fate of Ophelia."
+**Best Pop.** **Winner** LISA with "Dream feat. Kentaro Sakaguchi." **Nominees** Ariana Grande with "Hate That I Made You Love Me," Charli xcx with "SS26," Olivia Rodrigo with "Drop Dead," Sabrina Carpenter with "House Tour," Tate McRae with "Nobody's Girl," and Taylor Swift with "The Fate of Ophelia."
 
-**Best Hip-Hop** — **Winner: Cardi B ft. Kehlani — "Safe."** Other nominees: Don Toliver — "E85," Drake — "Janice STFU," Megan Thee Stallion — "Lover Girl," Travis Scott — "Dumbo," Tyler, the Creator — "Sugar on My Tongue."
+**Best Hip-Hop.** **Winner** Cardi B ft. Kehlani with "Safe." **Nominees** Don Toliver with "E85," Drake with "Janice STFU," Megan Thee Stallion with "Lover Girl," Travis Scott with "Dumbo," and Tyler, the Creator with "Sugar on My Tongue."
 
-**Best R&B** — **Winner: Bruno Mars — "I Just Might."** Other nominees: Chris Brown — "It Depends/Obvious," Dave and Tems — "Raindance," Justin Bieber — "Yukon," Kehlani — "Folded," Mariah the Scientist and Kali Uchis — "Is It a Crime."
+**Best R&B.** **Winner** Bruno Mars with "I Just Might." **Nominees** Chris Brown with "It Depends/Obvious," Dave and Tems with "Raindance," Justin Bieber with "Yukon," Kehlani with "Folded," and Mariah the Scientist and Kali Uchis with "Is It a Crime."
 
-**Best Alternative** — **Winner: Olivia Rodrigo — "the cure."** Other nominees: Geese — "Taxes," mgk and Fred Durst — "Fix Ur Face," Noah Kahan — "The Great Divide," SOMBR — "Homewrecker," Tame Impala — "Dracula," Twenty One Pilots — "Drag Path."
+**Best Alternative.** **Winner** Olivia Rodrigo with "the cure." **Nominees** Geese with "Taxes," mgk and Fred Durst with "Fix Ur Face," Noah Kahan with "The Great Divide," SOMBR with "Homewrecker," Tame Impala with "Dracula," and Twenty One Pilots with "Drag Path."
 
-**Best Dance** — **Winner: Madonna — "Confessions II - The Film."** Other nominees: Bebe Rexha and Faithless — "New Religion," Harry Styles — "Aperture," Lady Gaga and Doechii — "Runaway," PinkPantheress — "Stateside + Zara Larsson," Slayyyter — "Dance...," Tate McRae — "Nobody's Girl."
+**Best Dance.** **Winner** Madonna with "Confessions II - The Film." **Nominees** Bebe Rexha and Faithless with "New Religion," Harry Styles with "Aperture," Lady Gaga and Doechii with "Runaway," PinkPantheress with "Stateside + Zara Larsson," Slayyyter with "Dance...," and Tate McRae with "Nobody's Girl."
 
-**Best Latin** — **Winner: Bad Bunny — "NUEVAYoL."** Other nominees: Anitta with Shakira — "Choka Choka," Fuerza Regida — "Tu Sancho," KAROL G — "Papasito," Rosalía ft. Yahritza Y Su Esencia — "La Perla," Ryan Castro, Kapo and Gangsta — "La Villa," Shakira and Burna Boy — "Dai Dai."
+**Best Latin.** **Winner** Bad Bunny with "NUEVAYoL." **Nominees** Anitta with Shakira on "Choka Choka," Fuerza Regida with "Tu Sancho," KAROL G with "Papasito," Rosalía ft. Yahritza Y Su Esencia with "La Perla," Ryan Castro, Kapo and Gangsta with "La Villa," and Shakira and Burna Boy with "Dai Dai."
 
-**Best K-Pop** — **Winner: BTS — "Swim."** Other nominees: BLACKPINK — "Jump," CORTIS — "RedRed," KATSEYE — "Pinky Up," LE SSERAFIM feat. J-Hope of BTS — "Spaghetti," LISA — "Dream feat. Kentaro Sakaguchi."
+**Best K-Pop.** **Winner** BTS with "Swim." **Nominees** BLACKPINK with "Jump," CORTIS with "RedRed," KATSEYE with "Pinky Up," LE SSERAFIM feat. J-Hope of BTS with "Spaghetti," and LISA with "Dream feat. Kentaro Sakaguchi."
 
-**Best Country** — **Winner: Ella Langley — "Choosin' Texas."** Other nominees: Kacey Musgraves — "Dry Spell," Lainey Wilson — "Somewhere Over Laredo," Luke Combs — "Back in the Saddle," Shaboozey — "Cowgirl," Stella Lefty — "Boston," Tucker Wetmore — "Brunette."
+**Best Country.** **Winner** Ella Langley with "Choosin' Texas." **Nominees** Kacey Musgraves with "Dry Spell," Lainey Wilson with "Somewhere Over Laredo," Luke Combs with "Back in the Saddle," Shaboozey with "Cowgirl," Stella Lefty with "Boston," and Tucker Wetmore with "Brunette."
 
-**Best Direction** — **Winner: Taylor Swift — "Opalite."** Other nominees: Ariana Grande — "Hate That I Made You Love Me," Bruno Mars — "I Just Might," GENER8ION — "Storm starring Yung Lean," Madonna — "Confessions II - The Film," Sabrina Carpenter — "House Tour."
+**Best Direction.** **Winner** Taylor Swift with "Opalite." **Nominees** Ariana Grande with "Hate That I Made You Love Me," Bruno Mars with "I Just Might," GENER8ION with "Storm starring Yung Lean," Madonna with "Confessions II - The Film," and Sabrina Carpenter with "House Tour."
 
-**Best Art Direction** — **Winner: PinkPantheress — "Stateside + Zara Larsson."** Other nominees: Charli xcx — "SS26," Lady Gaga and Doechii — "Runaway," Madonna — "Confessions II - The Film," SOMBR — "My Body Isn't Ready," Taylor Swift — "The Fate of Ophelia."
+**Best Art Direction.** **Winner** PinkPantheress with "Stateside + Zara Larsson." **Nominees** Charli xcx with "SS26," Lady Gaga and Doechii with "Runaway," Madonna with "Confessions II - The Film," SOMBR with "My Body Isn't Ready," and Taylor Swift with "The Fate of Ophelia."
 
-**Best Cinematography** — **Winner: Madonna — "Confessions II - The Film."** Other nominees: A$AP Rocky — "Punk Rocky," Ariana Grande — "Hate That I Made You Love Me," LISA — "Dream feat. Kentaro Sakaguchi," Shaboozey — "Cowgirl," Taylor Swift — "The Fate of Ophelia."
+**Best Cinematography.** **Winner** Madonna with "Confessions II - The Film." **Nominees** A$AP Rocky with "Punk Rocky," Ariana Grande with "Hate That I Made You Love Me," LISA with "Dream feat. Kentaro Sakaguchi," Shaboozey with "Cowgirl," and Taylor Swift with "The Fate of Ophelia."
 
-**Best Editing** — **Winner: Sabrina Carpenter — "House Tour."** Other nominees: Ariana Grande — "Hate That I Made You Love Me," Bruno Mars — "I Just Might," LISA — "Dream feat. Kentaro Sakaguchi," Madonna — "Confessions II - The Film," Taylor Swift — "The Fate of Ophelia."
+**Best Editing.** **Winner** Sabrina Carpenter with "House Tour." **Nominees** Ariana Grande with "Hate That I Made You Love Me," Bruno Mars with "I Just Might," LISA with "Dream feat. Kentaro Sakaguchi," Madonna with "Confessions II - The Film," and Taylor Swift with "The Fate of Ophelia."
 
-**Best Choreography** — **Winner: Madonna — "Confessions II - The Film."** Other nominees: GENER8ION — "Storm starring Yung Lean," Harry Styles — "Dance No More," KATSEYE — "Pinky Up," Tate McRae — "Nobody's Girl," Taylor Swift — "The Fate of Ophelia."
+**Best Choreography.** **Winner** Madonna with "Confessions II - The Film." **Nominees** GENER8ION with "Storm starring Yung Lean," Harry Styles with "Dance No More," KATSEYE with "Pinky Up," Tate McRae with "Nobody's Girl," and Taylor Swift with "The Fate of Ophelia."
 
-**Best Visual Effects** — **Winner: Ariana Grande — "hate that i made you love me."** Other nominees: JISOO x ZAYN — "Eyes Closed," Madonna — "Confessions II - The Film," PinkPantheress — "Stateside + Zara Larsson," RAYE ft. Hans Zimmer — "Click Clack Symphony.," Taylor Swift — "The Fate of Ophelia."
+**Best Visual Effects.** **Winner** Ariana Grande with "hate that i made you love me." **Nominees** JISOO x ZAYN with "Eyes Closed," Madonna with "Confessions II - The Film," PinkPantheress with "Stateside + Zara Larsson," RAYE ft. Hans Zimmer with "Click Clack Symphony.," and Taylor Swift with "The Fate of Ophelia."
 
-**Best Group** — **Winner: BTS.** Other nominees: BLACKPINK, CORTIS, FLO, Fuerza Regida, Geese, KATSEYE, Twenty One Pilots.
+**Best Group.** **Winner** BTS. **Nominees** BLACKPINK, CORTIS, FLO, Fuerza Regida, Geese, KATSEYE and Twenty One Pilots.
 
-**Best Long Form Video** — **Winner: Madonna — *Confessions II - The Film*.** Other nominees: Charli xcx — *Music, Fashion, Film*, Ella Langley — *Choosin' Texas*, GENER8ION — *STORM starring Yung Lean*.
+**Best Long Form Video.** **Winner** Madonna with *Confessions II - The Film*. **Nominees** Charli xcx with *Music, Fashion, Film*, Ella Langley with *Choosin' Texas*, and GENER8ION with *STORM starring Yung Lean*.
 
-**Best Album** — **Winner: Madonna — *Confessions II*.** Other nominees: Drake — *ICEMAN*, Olivia Dean — *The Art of Loving*, Olivia Rodrigo — *you seem pretty sad for a girl so in love*, Sabrina Carpenter — *Man's Best Friend*, Taylor Swift — *The Life of a Showgirl*.
+**Best Album.** **Winner** Madonna with *Confessions II*. **Nominees** Drake with *ICEMAN*, Olivia Dean with *The Art of Loving*, Olivia Rodrigo with *you seem pretty sad for a girl so in love*, Sabrina Carpenter with *Man's Best Friend*, and Taylor Swift with *The Life of a Showgirl*.
 
-**Song of Summer** — **Winner: Ariana Grande — "hate that i made you love me."** Other nominees: Bruno Mars — "Risk It All," Charli xcx — "Camera," Ella Langley — "Choosin' Texas," KATSEYE — "Hootie Frutti," Latto ft. Doja Cat — "Okayyy," Morgan Wallen — "Been By Now," Olivia Dean — "So Easy (To Fall in Love)," Olivia Rodrigo — "Stupid Song," Sabrina Carpenter — "House Tour," Slayyyter — "brand new chanel$," SOMBR — "Homewrecker," Stella Lefty — "Boston," Tame Impala and JENNIE — "Dracula," Taylor Swift — "I Knew It, I Knew You."
+**Song of Summer.** **Winner** Ariana Grande with "hate that i made you love me." **Nominees** Bruno Mars with "Risk It All," Charli xcx with "Camera," Ella Langley with "Choosin' Texas," KATSEYE with "Hootie Frutti," Latto ft. Doja Cat with "Okayyy," Morgan Wallen with "Been By Now," Olivia Dean with "So Easy (To Fall in Love)," Olivia Rodrigo with "Stupid Song," Sabrina Carpenter with "House Tour," Slayyyter with "brand new chanel$," SOMBR with "Homewrecker," Stella Lefty with "Boston," Tame Impala and JENNIE with "Dracula," and Taylor Swift with "I Knew It, I Knew You."
 
-**Video Vanguard Award** — **Nirvana.**
+**Video Vanguard Award.** Nirvana.
 
-**MTV VMA Artist Director Honors** — **Taylor Swift.**
+**MTV VMA Artist Director Honors.** Taylor Swift.
 
-The final split says more than a single sweep would have. Madonna owned the count across major, social and craft categories, while Swift took Video of the Year, direction and the show's new directing honor. Around them, the genre awards stayed scattered enough for the 2026 results to look like a broad snapshot of the year rather than one campaign swallowing the entire board.'''
+[/awards]
+
+The final board split the night in two different ways. Madonna's seven awards showed how far *Confessions II* and its film reached across the ballot, from Artist and Album to collaboration and craft. Swift left with fewer competitive trophies, but one was Video of the Year and the other was for her direction. Around them, BTS, Ariana Grande, Sienna Spiro and the genre winners kept the results from narrowing into a two-artist story.'''
 
 def get_highres(key: str) -> bytes:
     action = (
