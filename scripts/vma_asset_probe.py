@@ -27,3 +27,13 @@ for name in targets:
     print("IDS",ids[-20:])
     clean=re.sub(r"\s+"," ",ctx)
     print("CTX",clean[:7000])
+
+print("\nDETAIL")
+for key in ["dded7f7e94","73f0b0c2a3","0cb642bd2d"]:
+    u="https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view="+key
+    rr=urllib.request.urlopen(urllib.request.Request(u,headers={"User-Agent":UA}),timeout=90).read().decode("utf-8","replace")
+    urls=re.findall(r'https?://[^"\'<> ]+', html.unescape(rr))
+    print("KEY",key,"LEN",len(rr))
+    for x in urls:
+        if "pressexpress" in x or "amazonaws" in x:
+            print(x[:1200])
