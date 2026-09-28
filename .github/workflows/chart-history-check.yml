@@ -1,0 +1,29 @@
+name: chart-history-check
+
+on:
+  push:
+    paths:
+      - ".github/workflows/chart-history-check.yml"
+  workflow_dispatch:
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for feat-v31 and print history
+        run: |
+          node - <<'NODE'
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          for(let i=1;i<=30;i++){
+            const r=await fetch("https://music98.news/api/top50?hist="+Date.now(),{headers:{"cache-control":"no-cache"}});
+            const j=await r.json();
+            console.log("attempt",i,"rev",j.rev);
+            if(j.rev==="feat-v31"){
+              console.log("MEMORY_FULL",JSON.stringify(j.memory||{}));
+              console.log("NEW_ROWS",JSON.stringify((j.tracks||[]).filter(t=>String(t.delta).toLowerCase()==="new").map(t=>({rank:t.rank,title:t.title,artist:t.artist}))));
+              process.exit(0);
+            }
+            await sleep(10000);
+          }
+          throw new Error("feat-v31 not live");
+          NODE
