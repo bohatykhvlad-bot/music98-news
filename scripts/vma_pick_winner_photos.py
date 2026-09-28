@@ -116,3 +116,9 @@ hero_items=collect_candidates(
     limit=24,
 )
 contact_sheet("HERO",hero_items)
+
+
+taylor_all=collect_candidates(lambda cap: "taylor swift" in cap, limit=24)
+contact_sheet("TAYLOR_ALL",taylor_all)
+madonna_all=collect_candidates(lambda cap: "madonna" in cap, limit=24)
+contact_sheet("MADONNA_ALL",madonna_all)
