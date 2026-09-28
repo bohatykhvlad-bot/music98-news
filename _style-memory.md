@@ -313,7 +313,7 @@
 - Verified color only: a juicy quote/fact goes in only after finding the primary source (Drake's "Nobody is coming to save you" - Complex, from his premiere note). No reason speculated for the FOMO takedown - no official statement exists.
 
 ### Post 2 (Teddy Swims) rebuild — LESSONS CHECKLIST (21.09, reported to owner)
-- RELEASE-TITLE CONVENTION (fixes card duplication): for type=release the title field = ALBUM NAME ONLY ("UGLY"), because titleHTML() renders releases as "Artist — <em>title</em>". My old title "Teddy Swims Announces UGLY..." produced "Teddy Swims — Teddy Swims Announces UGLY..." on every card.
+- RELEASE-TITLE CONVENTION (fixes card duplication): for type=release the title field = ALBUM NAME ONLY ("UGLY"), because titleHTML() renders releases as "Artist - <em>title</em>". My old title "Teddy Swims Announces UGLY..." produced "Teddy Swims - Teddy Swims Announces UGLY..." on every card.
 - Excerpt names the subject (UGLY present in excerpt text) — owner's "что за UGLY?" lesson, now enforced by the style checker.
 - MEMORY IS NOT A SOURCE (biggest catch of the day): I wrote the debut album title from memory as "I've Tried Everything But Trauma" — the real title is *I've Tried Everything but Therapy*. Pass 2 two-source check caught it. Even "obvious" facts get verified.
 - Time-reference precision: "the year also carried his first Grammy nomination" was ambiguous (nomination = Feb 2025, 67th ceremony) -> "the run also carried".
@@ -941,3 +941,5 @@ Conflict precedent (recorded): pass 4 fan wants era-accurate fresh photo, pass 1
 Итог: абзац перед плеером 54 → 102 слова, `thin-leadin` закрыт (PASS без него), перед видео 3 абзаца / 219 слов, всего 444 слова (норма релиза 450 — не хватило 6).
 **Мой FAIL в этом заходе:** первая редакция второй фразы дала `X tautology` — «them» трижды в одном предложении («the two of them… both of them… made them»). Гейт поймал; лечится заменой на «both singers». Урок общий: при склейке двух мыслей в одно предложение местоимения размножаются — писать имена/«both singers».
 Источники, которые не удалось прочитать из-за SSL (сертификат просрочен на стороне читалки, не сайта): stereogum.com, justjared.com, billboard.com напрямую, en.wikipedia.org. Обходить через поисковые сниппеты и `about` по доступным зеркалам.
+
+- OWNER STYLE RULE (28.09.2026): whenever the UI or an awards/release list presents an artist and a song/album/video as a pair, use the plain spaced ASCII hyphen: `Artist - "Song"` / `Artist - *Album*`. This is a display convention, not a global punctuation rule. In normal prose, keep the grammatically appropriate punctuation; do not replace em dashes/en dashes blindly. Before any push that changes images, visually center/crop first and verify the rendered result, then push.
