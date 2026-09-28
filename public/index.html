@@ -2812,7 +2812,7 @@ function setTab(t){
   window.scrollTo(0, 0);
   /* the newly shown rail had zero size while hidden - its .ok state is stale;
      a frame later it has real geometry, so re-evaluate the arrows */
-  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); document.querySelectorAll("#tab-"+t+" img.js-cover").forEach(fitCover); });
+  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); document.querySelectorAll("#tab-"+t+" img.js-cover").forEach(fitCover); if(t==="concerts"){ const f=$("#concertsFrame"); try{ if(f&&f.contentWindow) f.contentWindow.dispatchEvent(new f.contentWindow.Event("resize")); }catch(e){} } });
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab) setTab(b.dataset.tab); });
 $("#brandHome").addEventListener("click", e=>{
