@@ -1,5 +1,5 @@
 const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
-const KWORB_ARTISTS_URL = "https://kworb.net/itunes/";
+const KWORB_ARTISTS_URL = "https://kworb.net/spotify/listeners.html";
 
 const HOTSPOT_CITY_PROBES = {
   americas: [
@@ -54,14 +54,22 @@ const HOTSPOT_CITY_PROBES = {
   ]
 };
 
+const GLOBAL_SUPERSTARS = new Set([
+  "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Bad Bunny","Drake",
+  "Ariana Grande","Coldplay","Shakira","Katy Perry","Michael Jackson","David Guetta","Maroon 5","Ed Sheeran",
+  "Pitbull","Billie Eilish","Dua Lipa","Calvin Harris","Eminem","J Balvin","Kanye West","Kendrick Lamar",
+  "Post Malone","Sia","KAROL G","Beyoncé","Adele","BTS","Harry Styles","Lana Del Rey","SZA","Miley Cyrus",
+  "Travis Scott","Doja Cat","Sabrina Carpenter","Justin Timberlake","Shawn Mendes","LINKIN PARK",
+  "Arctic Monkeys","Chris Brown","Rauw Alejandro","Imagine Dragons","Madonna","Queen","Britney Spears",
+  "USHER","Nicki Minaj","OneRepublic","Red Hot Chili Peppers","Metallica","Guns N' Roses"
+]);
+
 const KWORB_FALLBACK = [
-  "Taylor Swift","Bad Bunny","Drake","Olivia Rodrigo","Ariana Grande","KAROL G","ADÉLA","Tiakola",
-  "Omar Courtz","Shakira","HUGEL","The Weeknd","Michael Jackson","Dua Lipa","Olivia Dean","Imael Angel",
-  "BTS","LINKIN PARK","Bruno Mars","Justin Bieber","Ella Langley","Anuel AA","Fuerza Regida","Rihanna",
-  "Tame Impala","KATSEYE","SIENNA SPIRO","Katy Perry","BLOK3","Lady Gaga","Alex Warren","Noah Kahan",
-  "sombr","Karan Aujla","Billie Eilish","Mauvais Djo","Oasis","Rauw Alejandro","Asake","Burna Boy",
-  "Ultra Naté","Feid","Miley Cyrus","Morgan Wallen","Ed Sheeran","Kanye West","Malie Donn",
-  "Giorgos Mazonakis","Quevedo","Harry Styles"
+  "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Bad Bunny","Drake",
+  "Ariana Grande","Coldplay","Shakira","Katy Perry","Michael Jackson","David Guetta","Maroon 5","Ed Sheeran",
+  "Pitbull","Billie Eilish","Dua Lipa","Calvin Harris","Eminem","J Balvin","Kanye West","Kendrick Lamar",
+  "Post Malone","Sia","KAROL G","Beyoncé","Adele","Harry Styles","Lana Del Rey","SZA","Miley Cyrus",
+  "Travis Scott","Doja Cat","Sabrina Carpenter","Rauw Alejandro","Imagine Dragons","Madonna","BTS"
 ]
 
 function json(data, status = 200, extra = {}) {
@@ -217,24 +225,29 @@ async function kworbArtists() {
     });
     if (!r.ok) throw new Error("kworb_http_" + r.status);
     const html = await r.text();
-    const names = [];
+    const artists = [];
     const seen = new Set();
 
-    /* Kworb's artist links live in the ranking table and use artist/... URLs. */
-    const re = /<a\b[^>]*href=["'][^"']*(?:\/itunes\/)?artist\/[^"']+["'][^>]*>([\s\S]*?)<\/a>/gi;
-    let m;
-    while ((m = re.exec(html)) && names.length < 80) {
-      const name = decodeHtml(m[1]);
-      const key = name.toLowerCase();
-      if (!name || seen.has(key)) continue;
+    const rows = html.match(/<tr\b[\s\S]*?<\/tr>/gi) || [];
+    for (const row of rows) {
+      const cells = [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map(m => decodeHtml(m[1]));
+      if (cells.length < 3) continue;
+      const rank = Number(String(cells[0]).replace(/[^0-9]/g, ""));
+      const name = String(cells[1] || "").trim();
+      const listeners = Number(String(cells[2]).replace(/[^0-9]/g, ""));
+      if (!rank || !name || !listeners || !GLOBAL_SUPERSTARS.has(name)) continue;
+      const key = normName(name);
+      if (!key || seen.has(key)) continue;
       seen.add(key);
-      names.push(name);
+      artists.push({ name, rank, listeners });
     }
-    return names.length >= 20
-      ? { names, source: "kworb_live" }
-      : { names: KWORB_FALLBACK, source: "kworb_fallback" };
+
+    artists.sort((a,b)=>a.rank-b.rank);
+    return artists.length >= 10
+      ? { artists, source: "spotify_monthly_listeners" }
+      : { artists: KWORB_FALLBACK.map((name,i)=>({name,rank:i+1,listeners:0})), source: "spotify_monthly_fallback" };
   } catch {
-    return { names: KWORB_FALLBACK, source: "kworb_fallback" };
+    return { artists: KWORB_FALLBACK.map((name,i)=>({name,rank:i+1,listeners:0})), source: "spotify_monthly_fallback" };
   }
 }
 
@@ -248,7 +261,7 @@ function normName(s) {
     .toLowerCase();
 }
 
-async function validatePopularArtist(apiKey, name, kworbRank) {
+async function validatePopularArtist(apiKey, name, popularityRank, listeners) {
   const tm = baseEventUrl(apiKey);
   tm.searchParams.set("keyword", name);
   tm.searchParams.set("size", "20");
@@ -268,7 +281,8 @@ async function validatePopularArtist(apiKey, name, kworbRank) {
       id: String(exact.id || ""),
       name: String(exact.name || name),
       image: bestArtistImage(exact.images) || event.artistImage || event.image,
-      kworbRank,
+      popularityRank,
+      listeners,
       firstDate: event.date,
     };
   }
@@ -277,15 +291,13 @@ async function validatePopularArtist(apiKey, name, kworbRank) {
 
 async function popularPayload(apiKey) {
   const ranking = await kworbArtists();
-  const candidates = ranking.names.slice(0, 42);
+  const candidates = ranking.artists.slice(0, 60);
   const found = [];
 
-  /* Work in small parallel batches and stop as soon as ten ranked artists
-     with real upcoming Ticketmaster events have been confirmed. */
   for (let i = 0; i < candidates.length && found.length < 10; i += 6) {
     const chunk = candidates.slice(i, i + 6);
-    const checked = await Promise.all(chunk.map((name, j) =>
-      validatePopularArtist(apiKey, name, i + j + 1).catch(() => null)
+    const checked = await Promise.all(chunk.map(a =>
+      validatePopularArtist(apiKey, a.name, a.rank, a.listeners).catch(() => null)
     ));
     for (const artist of checked) {
       if (!artist || found.some(x => x.id === artist.id)) continue;
@@ -302,11 +314,12 @@ async function popularPayload(apiKey) {
       name: a.name,
       image: a.image,
       rank: i + 1,
-      kworbRank: a.kworbRank,
+      popularityRank: a.popularityRank,
+      listeners: a.listeners,
       firstDate: a.firstDate,
     })),
     source: ranking.source,
-    ranking: "Kworb Global Digital Artist Ranking",
+    ranking: "Spotify monthly listeners",
   };
 }
 
@@ -369,7 +382,7 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v7");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v8");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
