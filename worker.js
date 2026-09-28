@@ -1,5 +1,6 @@
 import { onRequest as desk } from "./functions/api/desk.js";
 import { onRequestGet as top50 } from "./functions/api/top50.js";
+import { onRequestGet as concerts } from "./functions/api/concerts.js";
 import { onRequestGet as preview } from "./functions/api/preview.js";
 import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
 import { onRequestGet as subscribers, onRequestDelete as subscribersRemove } from "./functions/api/subscribers.js";
@@ -154,6 +155,7 @@ export default {
       return proxyAppleGw(request, rawPath);
     }
     if (path === "/api/top50" && request.method === "GET") return top50(c);
+    if (path === "/api/concerts" && request.method === "GET") return concerts(c);
     if (path === "/api/preview" && (request.method === "GET" || request.method === "HEAD")) return preview(c);
     if (path === "/api/desk") return desk(c);
     if (path === "/api/subscribe" && request.method === "POST") return subscribe(c);
@@ -166,6 +168,10 @@ export default {
     if (path === "/m98desk" || path === "/m98desk.html") {
       const u = new URL("/admin-desk", request.url);
       return Response.redirect(u, 301);
+    }
+    if (path === "/concerts" && (request.method === "GET" || request.method === "HEAD")) {
+      const u = new URL(request.url);
+      return env.ASSETS.fetch(new Request(u.origin + "/concerts.html", request));
     }
     /* legal/info pages: clean URLs -> /about, /contacts, /privacy, /terms */
     const legal = path.match(/^(\/about|\/contacts|\/privacy|\/terms)\/?$/);
