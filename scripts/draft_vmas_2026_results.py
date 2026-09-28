@@ -45,7 +45,7 @@ SIENNA_NAME = "vmas-2026-sienna-spiro.jpg"
 SIENNA_CREDIT = "Christopher Polk"
 SIENNA_CREDIT_URL = "https://www.instagram.com/polkimaging/"
 
-BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host. Madonna left with the most awards of the night, while Swift took the top video prize, won Best Direction and received the inaugural Artist Director Honors.
+BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host, while Swift also won Best Direction.
 
 Madonna entered the final ballot with 13 nominations after MTV added its social categories. Her wins reached across the show rather than clustering in one lane. She took Artist of the Year and Best Album for *Confessions II*, shared Best Collaboration with Sabrina Carpenter for "Bring Your Love," and picked up four more awards tied to *Confessions II - The Film*. The seven-award haul gave the night a clear statistical leader without turning the rest of the results into a one-artist sweep.
 
