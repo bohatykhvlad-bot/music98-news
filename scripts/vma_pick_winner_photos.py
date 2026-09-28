@@ -186,3 +186,10 @@ for i,(lab,im) in enumerate(previews):
     draw.text((x,y+365),lab,fill="black")
 buf=io.BytesIO(); sheet.save(buf,"JPEG",quality=70,optimize=True)
 print("CONTACT_SHEET CROP_QC",len(previews),base64.b64encode(buf.getvalue()).decode("ascii"))
+
+
+nirvana_all=collect_candidates(
+    lambda cap: ("dave grohl" in cap or "krist novoselic" in cap or "pat smear" in cap or "nirvana" in cap),
+    limit=24,
+)
+contact_sheet("NIRVANA_ALL",nirvana_all)
