@@ -1,4 +1,5 @@
 const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
+const TM_ATTRACTIONS_ROOT = "https://app.ticketmaster.com/discovery/v2/attractions.json";
 const KWORB_ARTISTS_URL = "https://kworb.net/spotify/listeners.html";
 
 const HOTSPOT_SCAN_REGIONS = {
@@ -405,13 +406,14 @@ export async function onRequestGet({ request, env }) {
   const u = new URL(request.url);
   const mode = String(u.searchParams.get("mode") || "").toLowerCase();
   const region = String(u.searchParams.get("region") || "").toLowerCase();
+  const q = String(u.searchParams.get("q") || "").trim().slice(0, 120);
   const lat = finite(u.searchParams.get("lat"));
   const lng = finite(u.searchParams.get("lng"));
   const artist = String(u.searchParams.get("artist") || "").trim().slice(0, 120);
   const attractionId = String(u.searchParams.get("attractionId") || "").trim().slice(0, 160);
   const radius = Math.min(500, Math.max(5, finite(u.searchParams.get("radius")) || 100));
 
-  if (mode !== "popular" && mode !== "hotspots" && !artist && !attractionId &&
+  if (mode !== "popular" && mode !== "hotspots" && mode !== "artist-search" && !artist && !attractionId &&
       (lat == null || lng == null || lat < -90 || lat > 90 || lng < -180 || lng > 180)) {
     return json({ error: "location_required" }, 400);
   }
@@ -419,12 +421,34 @@ export async function onRequestGet({ request, env }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v13");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v14");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
 
   try {
+    if (mode === "artist-search") {
+      if (q.length < 2) return json({ ok:true, mode:"artist-search", artists:[] }, 200);
+      const tm = new URL(TM_ATTRACTIONS_ROOT);
+      tm.searchParams.set("apikey", env.TICKETMASTER_API_KEY);
+      tm.searchParams.set("keyword", q);
+      tm.searchParams.set("classificationName", "music");
+      tm.searchParams.set("includeTest", "no");
+      tm.searchParams.set("locale", "en-us,en,*");
+      tm.searchParams.set("size", "6");
+      tm.searchParams.set("sort", "relevance,desc");
+      const raw = await tmJson(tm);
+      const rows = raw?._embedded?.attractions || [];
+      const artists = rows.map(x => ({
+        id: String(x?.id || ""),
+        name: String(x?.name || ""),
+        image: bestArtistImage(x?.images) || bestImage(x?.images),
+      })).filter(x => x.id && x.name);
+      const res = json({ ok:true, mode:"artist-search", artists }, 200, { "Cache-Control":"public, max-age=120, s-maxage=600" });
+      await cache.put(cacheKey, res.clone()).catch(() => {});
+      return res;
+    }
+
     if (mode === "popular") {
       const payload = await popularPayload(env.TICKETMASTER_API_KEY);
       const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=3600" });
