@@ -1,6 +1,6 @@
 import { onRequest as desk } from "./functions/api/desk.js";
 import { onRequestGet as top50 } from "./functions/api/top50.js";
-import { onRequestGet as concerts } from "./functions/api/concerts.js";
+import { onRequestGet as concerts, refreshHotspotSnapshot } from "./functions/api/concerts.js";
 import { onRequestGet as preview } from "./functions/api/preview.js";
 import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
 import { onRequestGet as subscribers, onRequestDelete as subscribersRemove } from "./functions/api/subscribers.js";
@@ -221,5 +221,12 @@ export default {
       return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
     }
     return res;
+  },
+
+  async scheduled(controller, env, ctx) {
+    ctx.waitUntil(
+      refreshHotspotSnapshot(env, { jobBudget: 2, verifyBudget: 10 })
+        .catch(() => {})
+    );
   },
 };
