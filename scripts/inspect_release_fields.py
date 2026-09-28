@@ -33,8 +33,3 @@ print("SITE_RENDERER_EN_DASH", 'esc(p.artist)+" – "+t' in html)
 target=next((p for p in posts if p.get("id")=="aufike18r1"),None)
 print("FIKE_FULL_JSON")
 print(json.dumps(target,ensure_ascii=False,indent=2))
-
-
-# One-shot Small Town editorial rewrite; removed after verification.
-import restore_small_town
-restore_small_town.main()
