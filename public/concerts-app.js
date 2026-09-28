@@ -495,6 +495,17 @@ function groupedNearby(events){
     .map((g,i)=>({...g,rank:i+1,shows:g.count}));
 }
 
+function setTourBoxHeight(box,open){
+  if(!box) return;
+  if(open){
+    requestAnimationFrame(()=>{ box.style.maxHeight=box.scrollHeight+"px"; });
+    return;
+  }
+  box.style.maxHeight=box.scrollHeight+"px";
+  box.getBoundingClientRect();
+  requestAnimationFrame(()=>{ box.style.maxHeight="0px"; });
+}
+
 function renderEventList(box,events){
   box.textContent="";
   const sorted=events.slice().sort((a,b)=>String(a.date||"9999").localeCompare(String(b.date||"9999")));
@@ -526,6 +537,7 @@ function renderEventList(box,events){
       more.remove();
       more=null;
     }
+    setTourBoxHeight(box,true);
   };
 
   if(sorted.length>10){
@@ -636,6 +648,7 @@ async function toggleArtist(item,card,mode){
   const box=card.querySelector(".tour-events");
   const opening=expandedKey!==key;
   root.querySelectorAll(".tour-card.open").forEach(el=>{
+    setTourBoxHeight(el.querySelector(".tour-events"),false);
     el.classList.remove("open");
   });
 
@@ -663,12 +676,14 @@ async function toggleArtist(item,card,mode){
   box.textContent="";
   const loading=document.createElement("div"); loading.className="tour-loading"; loading.textContent="Loading dates...";
   box.appendChild(loading);
+  setTourBoxHeight(box,true);
 
   try{
     const rawEvents=await eventsForArtist(item,mode);
     if(expandedKey!==key) return;
     const events=stabilizeArtistCoordinates(rawEvents);
     renderEventList(box,events);
+    setTourBoxHeight(box,true);
     if(artistContext && artistKey(artistContext.item)===key) artistContext.events=events;
     setMode("artist");
     setEventData([],0);
