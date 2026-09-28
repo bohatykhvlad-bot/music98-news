@@ -31,3 +31,23 @@ for fn in targets:
             break
         if found: break
     if not found: print("NOT_FOUND")
+
+
+print("=== SIENNA_CANDIDATES ===")
+seen=set()
+for pageurl,page in docs:
+    for m in re.finditer(r"<li id=['\"]photo-([^'\"]+)['\"][^>]*>([\s\S]*?)</li>",page,re.I):
+        key=m.group(1); block=m.group(2)
+        plain=html.unescape(block)
+        if "sienna spiro" not in plain.lower() or key in seen:
+            continue
+        seen.add(key)
+        fnm=re.search(r"<dd class=['\"]photo-filename['\"]>([^<]+)",block,re.I)
+        cap=re.search(r"<dd class=['\"]photo-caption['\"]>([\s\S]*?)</dd>",block,re.I)
+        deturl="https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view="+key
+        det=urllib.request.urlopen(urllib.request.Request(deturl,headers={"User-Agent":UA}),timeout=90).read().decode("utf-8","replace")
+        emb=re.search(r"https://public-assets-pressexpress\.s3\.amazonaws\.com/assets/photos/embed/[^\"'<> ]+",html.unescape(det))
+        print("SIENNA",key,fnm.group(1) if fnm else "")
+        print("DETAIL",deturl)
+        print("EMBED",emb.group(0) if emb else "")
+        print("CAPTION",re.sub("<[^>]+>","",html.unescape(cap.group(1))) if cap else "")
