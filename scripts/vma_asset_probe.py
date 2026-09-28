@@ -120,3 +120,21 @@ for u in [
             for pat in ["original","webres","highres","download"]:
                 spots=[m.start() for m in re.finditer(pat,ctx,re.I)]
                 if spots: print("CTX_PAT",pat,spots[:10])
+
+
+print("\nJS_DOWNLOAD_LOGIC")
+detail_url="https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=dded7f7e94"
+detail=urllib.request.urlopen(urllib.request.Request(detail_url,headers={"User-Agent":UA}),timeout=90).read().decode("utf-8","replace")
+scripts=re.findall(r'<script[^>]+src=["\']([^"\']+)["\']',detail,re.I)
+for src in scripts:
+    su=urljoin(detail_url,html.unescape(src))
+    try:
+        js=urllib.request.urlopen(urllib.request.Request(su,headers={"User-Agent":UA}),timeout=90).read().decode("utf-8","replace")
+    except Exception:
+        continue
+    if "photo-action_download" in js or "data-mediakey" in js or "download-highres" in js:
+        print("JS",su,"LEN",len(js))
+        for pat in ["photo-action_download","data-mediakey","download-highres","download"]:
+            i=js.find(pat)
+            if i>=0:
+                print("JSCTX",pat,re.sub(r"\s+"," ",js[max(0,i-1800):i+4500])[:6500])
