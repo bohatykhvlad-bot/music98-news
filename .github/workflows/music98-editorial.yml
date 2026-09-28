@@ -13,7 +13,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   editorial:
@@ -35,43 +35,23 @@ jobs:
           test -f scripts/gate.py
       - name: Desk list
         run: python scripts/post.py list
-      - name: TEMP resolve TSUNAMI assets
+      - name: TEMP fetch official TSUNAMI cover candidate
         run: |
-          python - <<'PY'
-          import json, re, struct, urllib.parse, urllib.request
-          UA={"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-          def get(url):
-              return urllib.request.urlopen(urllib.request.Request(url,headers=UA),timeout=60).read()
-          q=urllib.parse.urlencode({"term":"SOFI TUKKER OneRepublic TSUNAMI","entity":"song","country":"US","limit":25})
-          data=json.loads(get("https://itunes.apple.com/search?"+q))
-          for x in data.get("results",[]):
-              if x.get("trackName","").upper()=="TSUNAMI":
-                  print("APPLE", json.dumps({k:x.get(k) for k in ["artistName","collectionName","collectionId","trackId","trackViewUrl","collectionViewUrl","releaseDate","primaryGenreName"]}, ensure_ascii=False))
-          page=get("https://www.sofitukker.com/").decode("utf-8","replace")
-          urls=[]
-          for u in re.findall(r'https?[^"\'<> ]+', page):
-              u=u.replace("&amp;","&")
-              if "wp-content/uploads" in u and ("Duo-DSP" in u or "press" in u.lower()):
-                  urls.append(u)
-          print("OFFICIAL_IMAGE_URLS")
-          for u in sorted(set(urls)):
-              print(u)
-          photo="https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/09/Screenshot-2026-09-25-at-2.18.12-PM.png"
-          raw=get(photo)
-          print("PRESS_BYTES",len(raw))
-          if raw[:8]==b'\x89PNG\r\n\x1a\n':
-              w,h=struct.unpack(">II",raw[16:24]); print("PRESS_DIMS",w,h)
-          open("/tmp/tsunami-press.png","wb").write(raw)
-          PY
-          file /tmp/tsunami-press.png
-      - name: Inspect Fireflies media
-        run: |
+          mkdir -p .editorial
           python - <<'PY'
           import urllib.request
-          url = "https://www.dropbox.com/scl/fo/3b5x15fece0gdmyaxe0n8/ABBEEwylW6nVnCf3DF52rCk?rlkey=oxpvy17mb6nurbb13321itr5e&st=me4uptj5&dl=1"
-          urllib.request.urlretrieve(url, "/tmp/fireflies-media.zip")
+          u="https://www.sofitukker.com/wp-content/uploads/sites/20199/2026/03/Duo-DSP-1-main-press-image-2-1-compressed-scaled.jpg"
+          r=urllib.request.Request(u,headers={"User-Agent":"Mozilla/5.0"})
+          raw=urllib.request.urlopen(r,timeout=60).read()
+          open(".editorial/tsunami-cover-candidate.jpg","wb").write(raw)
+          print("bytes",len(raw))
           PY
-          unzip -l /tmp/fireflies-media.zip | head -100
+          file .editorial/tsunami-cover-candidate.jpg
+          git config user.name "music98 editorial"
+          git config user.email "editorial@music98.news"
+          git add .editorial/tsunami-cover-candidate.jpg
+          git diff --cached --quiet || git commit -m "temp: stage TSUNAMI cover candidate"
+          git push
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
