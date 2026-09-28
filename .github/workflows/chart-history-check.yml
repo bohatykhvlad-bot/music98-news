@@ -10,7 +10,7 @@ jobs:
   inspect:
     runs-on: ubuntu-latest
     steps:
-      - name: Wait for feat-v31 and print history
+      - name: Wait for feat-v32 and print history
         run: |
           node - <<'NODE'
           const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -18,12 +18,14 @@ jobs:
             const r=await fetch("https://music98.news/api/top50?hist="+Date.now(),{headers:{"cache-control":"no-cache"}});
             const j=await r.json();
             console.log("attempt",i,"rev",j.rev);
-            if(j.rev==="feat-v31"){
+            if(j.rev==="feat-v32"){
               console.log("MEMORY_FULL",JSON.stringify(j.memory||{}));
-              console.log("NEW_ROWS",JSON.stringify((j.tracks||[]).filter(t=>String(t.delta).toLowerCase()==="new").map(t=>({rank:t.rank,title:t.title,artist:t.artist}))));
+              console.log("NEW_ROWS",JSON.stringify((j.tracks||[]).filter(t=>String(t.delta).toLowerCase()==="new").map(t=>({rank:t.rank,title:t.title,artist:t.artist,weeks:t.weeks}))));
+              console.log("REENTRY_ROWS",JSON.stringify((j.tracks||[]).filter(t=>String(t.delta).toLowerCase()==="re-entry").map(t=>({rank:t.rank,title:t.title,artist:t.artist,weeks:t.weeks}))));
+              console.log("ARROWS",JSON.stringify(j.arrows||{}));
               process.exit(0);
             }
             await sleep(10000);
           }
-          throw new Error("feat-v31 not live");
+          throw new Error("feat-v32 not live");
           NODE
