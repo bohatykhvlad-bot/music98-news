@@ -21,7 +21,7 @@ Paul Hunter directs the video, cutting between Legend with the Hollywood Cinemat
 
 *Muse* started after Legend's guest appearance on Clipse's *Let God Sort 'Em Out*. His vocal there prompted Pharrell to suggest a full album, much of it later written and recorded in Paris. He produced all 16 songs and co-wrote the project. Legend has said he gave Pharrell more creative control than usual, including recording material written entirely by him. The album moves through gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop.
 
-"Fireflies" keeps its focus tighter. Once the choir and orchestra arrive, the idea is clear. It still sounds recognizably like Legend, only with a wider frame around him. The extra scale broadens his usual sound and still leaves it recognizable.'''
+"Fireflies" keeps its focus tighter. Once the choir and orchestra arrive, the idea is clear. It still sounds recognizably like Legend, only with a wider frame around him. The extra scale gives that familiar sound more room.'''
 
 def ensure_cover():
     req=urllib.request.Request(COVER_URL, headers={"User-Agent": runner.UA})
