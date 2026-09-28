@@ -1,0 +1,58 @@
+/* Concerts tab: uses the same spacing, type and surfaces as the main site. */
+#tab-concerts .concerts-hd{margin-bottom:22px}
+#tab-concerts .concerts-lede{margin:6px 0 0;color:var(--muted);font-size:15px}
+#tab-concerts .concert-controls{display:grid;grid-template-columns:minmax(260px,1fr) auto auto;gap:10px;margin:0 0 18px}
+#tab-concerts .concert-search-wrap{position:relative}
+#tab-concerts .concert-city-input{width:100%;height:43px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);padding:0 16px 0 41px;outline:none;color:var(--text);font-size:14px}
+#tab-concerts .concert-city-input:focus{border-color:var(--accent-dim);box-shadow:0 0 0 3px rgba(0,253,251,.15)}
+#tab-concerts .concert-search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted2);pointer-events:none}
+#tab-concerts .concert-suggestions{position:absolute;z-index:70;top:49px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+#tab-concerts .concert-suggestion{width:100%;border:0;background:#fff;text-align:left;padding:11px 14px;cursor:pointer;color:var(--text);font:inherit}
+#tab-concerts .concert-suggestion:hover,#tab-concerts .concert-suggestion:focus{background:var(--bg2);outline:none}
+#tab-concerts .concert-action,#tab-concerts .concert-radius{height:43px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);padding:0 18px;color:var(--text);font-size:14px;font-weight:600;white-space:nowrap}
+#tab-concerts .concert-action{cursor:pointer;width:auto}
+#tab-concerts .concert-action:hover{border-color:var(--accent-dim);color:var(--acc2)}
+#tab-concerts .concert-radius{width:auto;min-width:108px;outline:none}
+#tab-concerts .concert-layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;align-items:start}
+#tab-concerts .concert-map-shell{position:relative;height:420px;min-height:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card2);box-shadow:var(--shadow)}
+#concertMap{position:absolute;inset:0}
+#tab-concerts .concert-map-status{position:absolute;z-index:5;left:14px;top:14px;max-width:min(520px,calc(100% - 28px));padding:8px 12px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.9);border-radius:999px;box-shadow:0 5px 18px rgba(15,45,55,.10);font-size:13px;color:#425158;backdrop-filter:blur(8px)}
+#tab-concerts .concert-map-status:empty{display:none}
+#tab-concerts .concert-side{border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:17px;height:420px;min-height:0;display:flex;flex-direction:column;box-shadow:var(--shadow);overflow:auto}
+#tab-concerts .concert-side-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px}
+#tab-concerts .concert-side h2{font-size:19px;margin:0;letter-spacing:-.02em}
+#tab-concerts .concert-side-sub{font-size:12px;color:var(--muted);margin:0 0 12px}
+#tab-concerts .concert-tours{display:flex;flex-direction:column;gap:7px}
+#tab-concerts .concert-tour{width:100%;display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:9px;align-items:center;border:0;background:transparent;border-radius:11px;padding:9px 8px;text-align:left;cursor:pointer}
+#tab-concerts .concert-tour:hover{background:var(--bg2)}
+#tab-concerts .concert-tour-rank{font-weight:800;font-size:12px;color:#879398;text-align:center}
+#tab-concerts .concert-tour-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#tab-concerts .concert-tour-count{font-size:11px;color:var(--muted);white-space:nowrap}
+#tab-concerts .concert-side-empty{font-size:13px;color:var(--muted);padding:10px 4px}
+#tab-concerts .concert-reset{border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;padding:3px}
+#tab-concerts .concert-disclosure{margin-top:auto;padding-top:14px;font-size:11px;color:var(--muted2);line-height:1.45}
+#tab-concerts .mapboxgl-popup{max-width:310px!important}
+#tab-concerts .mapboxgl-popup-content{padding:0;border-radius:15px;overflow:hidden;box-shadow:0 14px 38px rgba(15,45,55,.2);font-family:var(--font)}
+#tab-concerts .concert-pop-img{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--card2)}
+#tab-concerts .concert-pop-body{padding:13px}
+#tab-concerts .concert-pop-title{font-size:16px;font-weight:800;line-height:1.18;margin:0 26px 6px 0}
+#tab-concerts .concert-pop-meta{font-size:12.5px;color:var(--muted);margin:3px 0}
+#tab-concerts .concert-buy{display:flex;align-items:center;justify-content:center;height:39px;margin-top:11px;border-radius:999px;background:var(--accent);color:#03282b;text-decoration:none;font-size:13px;font-weight:800}
+#tab-concerts .mapboxgl-popup-close-button{font-size:20px;padding:5px 8px;color:#344}
+#tab-concerts .mapboxgl-ctrl-group{border-radius:11px!important;overflow:hidden}
+
+@media(max-width:900px){
+  #tab-concerts .concert-layout{grid-template-columns:1fr}
+  #tab-concerts .concert-map-shell{height:420px}
+  #tab-concerts .concert-side{height:auto;overflow:visible}
+  #tab-concerts .concert-tours{display:grid;grid-template-columns:1fr 1fr}
+}
+@media(max-width:640px){
+  #tab-concerts .concerts-hd{margin-bottom:18px}
+  #tab-concerts .concerts-lede{font-size:14px}
+  #tab-concerts .concert-controls{grid-template-columns:1fr 1fr}
+  #tab-concerts .concert-search-wrap{grid-column:1/-1}
+  #tab-concerts .concert-action,#tab-concerts .concert-radius{width:100%;padding:0 12px}
+  #tab-concerts .concert-map-shell{height:52vh;min-height:340px;max-height:440px}
+  #tab-concerts .concert-tours{grid-template-columns:1fr}
+}
