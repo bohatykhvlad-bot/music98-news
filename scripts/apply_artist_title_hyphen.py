@@ -13,10 +13,24 @@ def normalize_award_tags(body: str) -> str:
     return body.replace(" — ", " - ").replace(" – ", " - ")
 
 def normalize_title(title: str) -> str:
-    # Display convention only: artist + quoted work in a post title.
-    if re.match(r'^.+\s[—–]\s["\']', title or ""):
-        return (title or "").replace(" — "," - ").replace(" – "," - ")
-    return title
+    # Display convention only: normalize artist/title separators in stored titles.
+    return (title or "").replace(" — "," - ").replace(" – "," - ")
+
+def normalize_release_title(artist: str, title: str) -> str:
+    # Release cards prepend the artist in the renderer. Stored release titles must
+    # therefore contain only the work title, never "Artist - Title".
+    a=(artist or "").strip()
+    t=(title or "").strip()
+    if not a or not t:
+        return t
+    for sep in (" - "," — "," – "):
+        prefix=a+sep
+        if t.lower().startswith(prefix.lower()):
+            t=t[len(prefix):].strip()
+            if len(t)>=2 and t[0]==t[-1] and t[0] in ('"', "'"):
+                t=t[1:-1].strip()
+            return t
+    return t
 
 def main():
     runner.load_env()
@@ -29,8 +43,14 @@ def main():
         pid=p.get("id")
         old_title=p.get("title") or ""
         new_title=normalize_title(old_title)
+        if p.get("type")=="release":
+            new_title=normalize_release_title(p.get("artist") or "", new_title)
         if new_title!=old_title:
             p["title"]=new_title
+
+        # Owner-selected display credit follows the official video title style.
+        if pid=="aujlfire28r1" and p.get("artist")!="John Legend, Pharrell Williams":
+            p["artist"]="John Legend, Pharrell Williams"
 
         if pid==VMA_ID:
             old_body=p.get("body") or ""
@@ -63,12 +83,19 @@ def main():
         raise RuntimeError("long artist/title separators remain in VMA: "+repr(bad[:5]))
 
     title_bad=[]
+    release_dupes=[]
     for p in after:
         t=p.get("title") or ""
-        if re.match(r'^.+\s[—–]\s["\']',t):
+        if " — " in t or " – " in t:
             title_bad.append((p.get("id"),t))
+        if p.get("type")=="release":
+            a=(p.get("artist") or "").strip()
+            if a and re.match(r'^'+re.escape(a)+r'\s+-\s+',t,re.I):
+                release_dupes.append((p.get("id"),a,t))
     if title_bad:
-        raise RuntimeError("long artist/title separators remain in post titles: "+repr(title_bad))
+        raise RuntimeError("long separators remain in post titles: "+repr(title_bad))
+    if release_dupes:
+        raise RuntimeError("release titles duplicate artist names: "+repr(release_dupes))
 
     print("CHANGED_POSTS",json.dumps(changed,ensure_ascii=False))
     for pid in changed:
