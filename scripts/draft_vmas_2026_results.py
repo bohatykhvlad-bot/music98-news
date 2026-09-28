@@ -28,18 +28,28 @@ HERO_SOURCE_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-vide
 NIRVANA_KEY = "b3e87895ab"
 NIRVANA_NAME = "vmas-2026-nirvana-vanguard.jpg"
 NIRVANA_CREDIT = "Christopher Polk"
-NIRVANA_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=b3e87895ab"
+NIRVANA_CREDIT_URL = "https://www.instagram.com/polkimaging/"
 
 LISA_KEY = "932c1f928d"
 LISA_NAME = "vmas-2026-lisa.jpg"
 LISA_CREDIT = "Christopher Polk"
-LISA_CREDIT_URL = "https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=932c1f928d"
+LISA_CREDIT_URL = "https://www.instagram.com/polkimaging/"
 
-BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host. By the end of the night, Madonna had the largest trophy count, while Swift had taken the top video prize and added another directing win to a career total that now stands at 32 VMAs.
+TAYLOR_KEY = "dded7f7e94"
+TAYLOR_NAME = "vmas-2026-taylor-video-of-the-year.jpg"
+TAYLOR_CREDIT = "Stewart Cook"
+TAYLOR_CREDIT_URL = "https://stewartcook.com/"
+
+SIENNA_KEY = "16d405d43a"
+SIENNA_NAME = "vmas-2026-sienna-spiro.jpg"
+SIENNA_CREDIT = "Christopher Polk"
+SIENNA_CREDIT_URL = "https://www.instagram.com/polkimaging/"
+
+BODY_TEMPLATE = r'''Taylor Swift won Video of the Year and Madonna finished with seven awards at the 2026 MTV VMAs on September 27 in Los Angeles. The ceremony returned to the Peacock Theater with Snoop Dogg as host. Madonna left with the most awards of the night, while Swift took the top video prize, won Best Direction and received the inaugural Artist Director Honors.
 
 Madonna entered the final ballot with 13 nominations after MTV added its social categories. Her wins reached across the show rather than clustering in one lane. She took Artist of the Year and Best Album for *Confessions II*, shared Best Collaboration with Sabrina Carpenter for "Bring Your Love," and picked up four more awards tied to *Confessions II - The Film*. The seven-award haul gave the night a clear statistical leader without turning the rest of the results into a one-artist sweep.
 
-Swift's two competitive wins landed in the categories most closely tied to her video work. "The Fate of Ophelia" took Video of the Year, while "Opalite" won Best Direction. Those awards moved her career tally from 30 to 32 and ahead of Beyoncé's previous total. MTV also gave Swift the inaugural Artist Director Honors, a separate recognition for her directing work rather than another competitive category.
+Swift's two competitive wins landed in the categories most closely tied to her video work. "The Fate of Ophelia" took Video of the Year, while "Opalite" won Best Direction. MTV also presented Swift with the inaugural Artist Director Honors, a separate recognition for her work behind the camera.
 
 
 Away from Madonna and Swift, the major awards spread quickly. BTS won Song of the Year with "Swim," took Best K-Pop for the same track and was named Best Group. Sienna Spiro won Best New Artist. LISA won the pop category. Cardi B and Kehlani took hip-hop, Bruno Mars R&B, Olivia Rodrigo alternative, Bad Bunny Latin and Ella Langley country. Ariana Grande finished with Song of Summer and the visual-effects award.
@@ -124,6 +134,8 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Teyana Taylor and Lucky Daye — "Hard Part"]
 
+[photo:{taylor_src}|Stewart Cook|https://stewartcook.com/|50% 42%|1]
+
 [award:Best Pop]
 
 [winner:LISA — "Dream feat. Kentaro Sakaguchi"]
@@ -184,6 +196,8 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Twenty One Pilots — "Drag Path"]
 
+[photo:{sienna_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 42%|1]
+
 [award:Best Dance]
 
 [winner:Madonna — "Confessions II - The Film"]
@@ -230,7 +244,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:LISA — "Dream feat. Kentaro Sakaguchi"]
 
-[photo:{lisa_src}|Christopher Polk|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=932c1f928d|50% 42%|1]
+[photo:{lisa_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 42%|1]
 
 [award:Best Country]
 
@@ -318,7 +332,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 [nominee:Taylor Swift — "The Fate of Ophelia"]
 
-[photo:{nirvana_src}|Christopher Polk|https://www.paramountpressexpress.com/mtv/shows/2026-mtv-video-music-awards-vmas/photos/?view=b3e87895ab|50% 44%|1]
+[photo:{nirvana_src}|Christopher Polk|https://www.instagram.com/polkimaging/|50% 44%|1]
 
 [award:Best Visual Effects]
 
@@ -499,9 +513,16 @@ def main():
         raise RuntimeError("refusing to modify non-draft VMA post: " + repr(existing.get("status")))
 
     hero_src, hero_size = upload_photo(HERO_KEY, HERO_NAME)
-    nirvana_src, nirvana_size = upload_photo(NIRVANA_KEY, NIRVANA_NAME)
+    taylor_src, taylor_size = upload_photo(TAYLOR_KEY, TAYLOR_NAME)
+    sienna_src, sienna_size = upload_photo(SIENNA_KEY, SIENNA_NAME)
     lisa_src, lisa_size = upload_photo(LISA_KEY, LISA_NAME)
-    body = BODY_TEMPLATE.format(nirvana_src=nirvana_src, lisa_src=lisa_src)
+    nirvana_src, nirvana_size = upload_photo(NIRVANA_KEY, NIRVANA_NAME)
+    body = BODY_TEMPLATE.format(
+        taylor_src=taylor_src,
+        sienna_src=sienna_src,
+        lisa_src=lisa_src,
+        nirvana_src=nirvana_src,
+    )
 
     def mutate(posts):
         p = find_existing(posts)
@@ -538,8 +559,11 @@ def main():
     now = runner.guarded_write(mutate)
     print("VMA_DRAFT", now["id"], now["status"], runner.words(now["body"]), "words")
     print("HERO", hero_size, now["cover"]["src"], now["cover"]["credit"])
-    print("BODY_PHOTO", nirvana_size, nirvana_src, NIRVANA_CREDIT)
+    print("BODY_PHOTO", taylor_size, taylor_src, TAYLOR_CREDIT)
+    print("BODY_PHOTO", sienna_size, sienna_src, SIENNA_CREDIT)
     print("BODY_PHOTO", lisa_size, lisa_src, LISA_CREDIT)
+    print("BODY_PHOTO", nirvana_size, nirvana_src, NIRVANA_CREDIT)
+    print("AWARD_MARKUP", "technical-render-tags", "award/winner/nominee")
     print("NO_DUPLICATE_VMA_POSTS", True)
     import time
     time.sleep(3)
