@@ -5,6 +5,9 @@ keep_vars = true
 workers_dev = true
 compatibility_flags = ["global_fetch_strictly_public"]
 
+[triggers]
+crons = ["*/15 * * * *"]
+
 [vars]
 FROM_EMAIL = "music98.news <onboarding@resend.dev>"
 ADMIN_PASSWORD = "RrrUuu181818@"
