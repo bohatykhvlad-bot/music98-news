@@ -125,12 +125,21 @@ function addLayers(){
 
   map.addSource("events",{type:"geojson",data:toGeoJSON([]),cluster:true,clusterMaxZoom:11,clusterRadius:48});
   map.addLayer({id:"clusters",type:"circle",source:"events",filter:["has","point_count"],paint:{
-    "circle-color":"rgba(0,253,251,.88)","circle-radius":["step",["get","point_count"],16,20,20,50,24],
-    "circle-stroke-color":"rgba(255,255,255,.95)","circle-stroke-width":3,"circle-blur":.04
+    "circle-color":"#00fdfb","circle-radius":13,
+    "circle-stroke-color":"rgba(255,255,255,.98)","circle-stroke-width":2,
+    "circle-opacity":.96,"circle-blur":0
   }});
   map.addLayer({id:"cluster-count",type:"symbol",source:"events",filter:["has","point_count"],layout:{
-    "text-field":["get","point_count_abbreviated"],"text-size":12
-  },paint:{"text-color":"#03282b","text-halo-color":"rgba(255,255,255,.35)","text-halo-width":.5}});
+    "text-field":["get","point_count_abbreviated"],
+    "text-size":10.5,
+    "text-anchor":"center",
+    "text-offset":[0,0],
+    "text-allow-overlap":true,
+    "text-ignore-placement":true
+  },paint:{
+    "text-color":"#03282b",
+    "text-halo-width":0
+  }});
   map.addLayer({id:"event-points",type:"circle",source:"events",filter:["!",["has","point_count"]],paint:{
     "circle-color":"#00fdfb","circle-radius":7.5,"circle-opacity":.98,"circle-stroke-width":0
   }});
