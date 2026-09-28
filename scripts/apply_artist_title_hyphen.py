@@ -48,9 +48,9 @@ def main():
         if new_title!=old_title:
             p["title"]=new_title
 
-        # Owner-selected display credit follows the official video title style.
-        if pid=="aujlfire28r1" and p.get("artist")!="John Legend, Pharrell Williams":
-            p["artist"]="John Legend, Pharrell Williams"
+        # Release artist spelling follows Apple Music/iTunes exactly.
+        if pid=="aujlfire28r1" and p.get("artist")!="John Legend & Pharrell Williams":
+            p["artist"]="John Legend & Pharrell Williams"
 
         if pid==VMA_ID:
             old_body=p.get("body") or ""
