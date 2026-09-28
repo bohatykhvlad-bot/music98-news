@@ -1,14 +1,11 @@
-/* Собирает public/data/covers.json (обложки) и public/data/apple-names.json
- * (написание названия и артистов) для текущего чарта - всё из Apple.
+/* Поддерживает два файла для чарта:
+ * - public/data/covers.json: immutable cover registry, song identity -> fixed artwork URL
+ * - public/data/apple-names.json: Apple spelling/link/preview metadata for current rows
  *
- * Зачем: iTunes API из Cloudflare отвечает через раз (Apple блокирует egress воркера),
- * а на сайте нужны и обложка, и написание ровно того релиза, на который ведёт ссылка
- * "Listen on Apple Music". Поэтому файлы собираются здесь и обновляются сами:
- * .github/workflows/covers.yml гоняет этот скрипт по расписанию и коммитит результат.
- *
- * Правило подбора: сначала точный релиз по Apple-ID из ссылки (?i=...), и только если
- * ссылки нет - поиск с проверками (точное название, без ремиксов/версий, которые не
- * указаны в самом названии чарта).
+ * Cover rule: existing cover keys are NEVER rewritten automatically.
+ * For a new song identity, resolve an exact Deezer release first, then Apple as fallback.
+ * Matching is strict by title + primary artist + version (remix/live/sped-up etc.).
+ * Once pinned, the URL is permanent until an explicit editorial correction.
  *
  * Запуск вручную: node scripts/build-covers.mjs
  */
@@ -32,12 +29,6 @@ const OUT_NAMES = path.resolve("public/data/apple-names.json");
 const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
 
 const idOf = (u) => (String(u || "").match(/[?&]i=(\d+)/) || [])[1] || "";
-const isAppleArt = (u) => {
-  try {
-    const h = new URL(String(u || "")).hostname.toLowerCase();
-    return h === "mzstatic.com" || h.endsWith(".mzstatic.com");
-  } catch { return false; }
-};
 const art600 = (u) => String(u || "").replace("100x100bb", "600x600bb").replace("100x100bb.jpg", "600x600bb.jpg");
 
 async function deezerCover(wantedTitle, wantedArtist) {
@@ -181,12 +172,6 @@ for (const t of tracks) {
   } catch (e) {
     console.log(`  поиск: ошибка ${t.artist} - ${t.title}: ${e.message}`);
   }
-}
-
-/* 3) что уже знает живой ответ и это Apple - оставляем как есть */
-for (const t of tracks) {
-  const key = mergeKey(t.title, t.artist);
-  if (!covers[key] && isAppleArt(t.art)) pinCover(key, t.art);
 }
 
 const missing = tracks.filter((t) => !covers[mergeKey(t.title, t.artist)]);
