@@ -104,6 +104,9 @@ jobs:
       - name: Inspect VMA live
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[vma-live-inspect]') }}
         run: python scripts/inspect_vmas_live.py
+      - name: Audit dash usage
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[dash-audit]') }}
+        run: python scripts/audit_dash_usage.py
       - name: Revise VMA live
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[vma-live]') }}
         run: python scripts/update_vmas_2026_live.py
