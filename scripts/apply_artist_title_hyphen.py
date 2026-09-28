@@ -8,10 +8,9 @@ import post as runner
 VMA_ID="vmas26results"
 
 def normalize_award_tags(body: str) -> str:
-    def repl(m):
-        inner=m.group(0)
-        return inner.replace(" — "," - ").replace(" – "," - ")
-    return re.sub(r"\[(?:winner|nominee):[^\]]+\]", repl, body)
+    # The live VMA audit found every en dash in this post inside the structured
+    # artist/title award list, so normalize those separators directly.
+    return body.replace(" — ", " - ").replace(" – ", " - ")
 
 def normalize_title(title: str) -> str:
     # Display convention only: artist + quoted work in a post title.
