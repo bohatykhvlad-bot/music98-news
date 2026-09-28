@@ -1,33 +1,29 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import json, sys
+import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 
 PID="aujlfire28r1"
 
-EXCERPT="""John Legend and Pharrell Williams have released "Fireflies," the latest preview of Legend's forthcoming album *Muse*. The 16-track record arrives October 23 through Republic Records."""
+EXCERPT="""John Legend and Pharrell Williams have released "Fireflies," the latest song from Legend's forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records."""
 
-BODY='''John Legend and Pharrell Williams have released "Fireflies," the latest preview of Legend's forthcoming album *Muse*. The 16-track record arrives October 23 through Republic Records.
+BODY='''John Legend and Pharrell Williams have released "Fireflies," the latest song from Legend's forthcoming album *Muse*. The 16-track album arrives October 23 through Republic Records. "Fireflies" puts Legend at the piano while strings, horns, choir and rhythm section widen the arrangement around him. Pharrell is there as a featured vocalist, but the song does not turn into a back-and-forth duet. His presence is folded into the production, which fits an album he produced in full and co-wrote with Legend.
 
-"Fireflies" keeps the arrangement large without losing sight of Legend at the piano. Strings, horns, choir and rhythm section build around him, while Pharrell stays mostly in the background, shaping the track rather than turning it into a conventional duet. It plays like a full-band soul performance, with Legend carrying the melody and the ensemble widening the song around him.
-
-The video, directed by Paul Hunter, follows the same idea. Legend performs at the piano with the Hollywood Cinematic Orchestra as the film moves through portraits of people living in a housing project. The images do not compete with the performance. They give the song a social frame, tying its themes of inequality, grief and resilience to faces and places rather than building a separate storyline.
+Paul Hunter's video keeps the scale of the recording in view. Legend performs at the piano with the Hollywood Cinematic Orchestra as the film moves through portraits of people living in a housing project. Instead of cutting away to a separate plot, Hunter stays close to the people and the performance. The official release ties those images to the song's themes of inequality, loss and resilience, so the video gives the music a setting without pulling attention away from Legend at the center.
 
 [youtube:fEw6VZq9xg8]
 
-The track also shows how closely Legend and Pharrell are working on *Muse*. Pharrell produced the album in full and co-wrote the project, and the sessions grew out of Legend's appearance on Clipse's *Let God Sort 'Em Out*. After hearing that collaboration, Pharrell pushed for a larger record built around Legend's voice. Much of the album was then written and recorded at Pharrell's studio inside Louis Vuitton headquarters in Paris.
+The collaboration behind *Muse* started with Legend's appearance on Clipse's *Let God Sort 'Em Out*. His vocal on "The Birds Don't Sing" caught Pharrell's attention and led him to suggest a full album built around Legend's voice. The two then wrote and recorded at Pharrell's studio inside Louis Vuitton headquarters in Paris. Legend later said the project felt "past due." For two artists who have known each other for more than twenty years, *Muse* is their first album made together from start to finish.
+
+That history matters because Pharrell is not just dropping into a few songs. He produced all 16 tracks and co-wrote the album, while Legend gave him more creative control than he usually hands to another writer or producer. The record moves through gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, with Nina Simone, Nat King Cole and Marvin Gaye among the reference points the pair cited. "Fireflies" sits inside that mix as a piano-led song with a much larger ensemble built around it.
 
 [apple:song:6808409890:6808409913]
 
-That partnership gives *Muse* a different shape from a one-off producer pairing. Legend and Pharrell have known each other for more than two decades, but this is their first full album together. The record draws from gospel, standards, doo-wop, classic soul, Afrobeat and hip-hop, with Legend's voice staying at the center while Pharrell handles the production across all 16 tracks.
+"Fireflies" appears at No. 14 on *Muse*, after "Doing Me" and before "Everything." It follows "Daylight," the album's lead single, and is one of several songs that also feature Pharrell. He appears on the title track, "Her," "Get Back," "Are You OK?" and "Next Time," while Clipse guests on "Bodies On The Floor." That track list makes the scale of the partnership clear, but "Fireflies" is one of the places where the arrangement does more of the talking than the guest credit.
 
-"Fireflies" lands late in the sequence, at track 14, after the earlier single "Daylight." Pharrell also appears as a featured artist elsewhere on the album, including the title track, "Her," "Get Back," "Are You OK?" and "Next Time," while Clipse guests on "Bodies On The Floor." His role is bigger than those features, though. He is the producer across the record, and "Fireflies" makes that collaboration feel most visible in the way the song is built around Legend rather than around Pharrell himself.
-
-[apple:album:6808409890]
-
-Hunter also directed the "Daylight" video, so "Fireflies" continues the same visual partnership into the next stage of the album rollout. This time the scale is wider, but the focus stays simple: Legend at the piano, a live ensemble around him, and a video that keeps returning to the people the song is meant to speak about.'''
+For Legend, that is part of the point of *Muse*. He has spent much of his career being associated with piano-driven ballads, and he said he wanted this album to "shake up the formula." "Fireflies" still starts from the part of his sound listeners know best, his voice and piano, then opens outward through choir, orchestra and Pharrell's production. It is a familiar John Legend setup pushed into a denser, more cinematic frame, without turning the song into a showcase for anyone but Legend.'''
 
 def main():
     runner.load_env()
