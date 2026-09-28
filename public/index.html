@@ -556,6 +556,9 @@ iframe.apple-park{
   z-index:0!important;
   border:0!important;
 }
+.award-results{margin-top:26px}
+.award-results p{margin:0 0 18px}
+.award-results p strong:first-child{display:inline}
 .abody-pic{margin:8px auto 22px;max-width:660px;width:100%}
 .abody-box{position:relative;display:block;aspect-ratio:16/9;border-radius:20px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);background:var(--card2)}
 .abody-box img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;border:0;display:block}
@@ -3097,6 +3100,8 @@ function instagramEmbed(kind, code, credit, creditUrl){
 function renderBody(text){
   return String(text||"").split(/\n{2,}/).filter(Boolean).map(raw=>{
     const t = raw.trim();
+    if(t.toLowerCase()==="[awards]") return '<section class="award-results">';
+    if(t.toLowerCase()==="[/awards]") return '</section>';
     const pic = t.match(/^\[photo:([^|]+)(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?\]$/i);
     if(pic){
       const author = (pic[2]||"").trim(), link = (pic[3]||"").trim();
