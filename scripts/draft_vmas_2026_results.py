@@ -65,7 +65,7 @@ The performance side of the VMAs deserves its own recap because the show packed 
 
 **Best Alternative.** **Winner** Olivia Rodrigo with "the cure." **Nominees** Geese with "Taxes," mgk and Fred Durst with "Fix Ur Face," Noah Kahan with "The Great Divide," SOMBR with "Homewrecker," Tame Impala with "Dracula," and Twenty One Pilots with "Drag Path."
 
-**Best Dance.** **Winner** Madonna with "Confessions II - The Film." **Nominees** Bebe Rexha and Faithless with "New Religion," Harry Styles with "Aperture," Lady Gaga and Doechii with "Runaway," PinkPantheress with "Stateside + Zara Larsson," Slayyyter with "Dance...," and Tate McRae with "Nobody's Girl."
+**Best Dance.** **Winner** Madonna with "Confessions II - The Film." **Nominees** Bebe Rexha and Faithless with "New Religion," Harry Styles with "Aperture," Lady Gaga and Doechii with "RUNWAY," PinkPantheress with "Stateside + Zara Larsson," Slayyyter with "Dance...," and Tate McRae with "Nobody's Girl."
 
 **Best Latin.** **Winner** Bad Bunny with "NUEVAYoL." **Nominees** Anitta with Shakira on "Choka Choka," Fuerza Regida with "Tu Sancho," KAROL G with "Papasito," Rosalía ft. Yahritza Y Su Esencia with "La Perla," Ryan Castro, Kapo and Gangsta with "La Villa," and Shakira and Burna Boy with "Dai Dai."
 
