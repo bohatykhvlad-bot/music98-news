@@ -107,6 +107,9 @@ jobs:
       - name: Audit dash usage
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[dash-audit]') }}
         run: python scripts/audit_dash_usage.py
+      - name: Apply artist-title hyphen style
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[artist-title-style]') }}
+        run: python scripts/apply_artist_title_hyphen.py
       - name: Revise VMA live
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[vma-live]') }}
         run: python scripts/update_vmas_2026_live.py
