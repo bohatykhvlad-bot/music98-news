@@ -208,6 +208,7 @@ VERIFIED_DATES = {
     "september 17": "COCOON first advertised as five tracks for 17.09.2026 (InMusic)",
     "september 27": "2026 MTV VMAs air 27.09.2026, CBS, Madonna opening; Song of the Summer fan voting "
                      "closes that day",
+    "october 23": "John Legend *Muse* out 23.10.2026 via Republic Records; produced in full and co-written by Pharrell Williams (Universal Music Canada 08.09.2026 and 25.09.2026)",
     "2019": "Feid EP *19*, 2019 - the record EL CLUB DE LAS 19 FLORES reaches back to",
     "july 10": "Feid 'A XON DE QUE' advance track, 10.07.2026",
     "june 5": "Taylor Swift 'I Knew It, I Knew You' (Toy Story 5) out 05.06.2026 "
