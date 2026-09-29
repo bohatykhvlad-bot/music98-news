@@ -255,8 +255,9 @@ async function popularPayload(apiKey) {
   const candidates = ranking.artists.slice(0, 42);
   const found = [];
 
-  for (let i = 0; i < candidates.length && found.length < 10; i += 6) {
-    const chunk = candidates.slice(i, i + 6);
+  // Scheduled-only work: stay comfortably under Ticketmaster's burst rate.
+  for (let i = 0; i < candidates.length && found.length < 10; i += 4) {
+    const chunk = candidates.slice(i, i + 4);
     const checked = await Promise.all(chunk.map(a =>
       validatePopularArtist(apiKey, a.name, a.rank, a.listeners).catch(() => null)
     ));
@@ -265,6 +266,7 @@ async function popularPayload(apiKey) {
       found.push(artist);
       if (found.length >= 10) break;
     }
+    if (i + 4 < candidates.length && found.length < 10) await sleep(900);
   }
 
   return {
@@ -284,6 +286,8 @@ async function popularPayload(apiKey) {
   };
 }
 
+const POPULAR_SNAPSHOT_KEY = "concert-popular:v2";
+const POPULAR_REFRESH_MS = 6 * 60 * 60 * 1000;
 const HOTSPOT_BUILD_JOB_BUDGET = 2;
 const HOTSPOT_VERIFY_BUDGET = 10;
 const HOTSPOT_CACHE_TTL = 24 * 60 * 60;
@@ -320,6 +324,28 @@ async function kvGetJson(env, key) {
 async function kvPutJson(env, key, value, options = undefined) {
   if (!env?.DESK) return;
   await env.DESK.put(key, JSON.stringify(value), options);
+}
+
+export async function refreshPopularSnapshot(env, force = false) {
+  if (!env?.TICKETMASTER_API_KEY || !env?.DESK) return { ok:false, reason:"popular_storage_or_key_missing" };
+  const existing = await kvGetJson(env, POPULAR_SNAPSHOT_KEY);
+  const age = Date.now() - (Date.parse(existing?.builtAt || 0) || 0);
+  if (!force && existing?.artists?.length && age < POPULAR_REFRESH_MS) {
+    return { ok:true, fresh:true, artists:existing.artists.length };
+  }
+  const payload = await popularPayload(env.TICKETMASTER_API_KEY);
+  const snapshot = { ...payload, builtAt:new Date().toISOString(), version:"popular-v2" };
+  await kvPutJson(env, POPULAR_SNAPSHOT_KEY, snapshot);
+  return { ok:true, fresh:false, artists:snapshot.artists.length };
+}
+
+async function popularSnapshotPayload(env) {
+  const snapshot = await kvGetJson(env, POPULAR_SNAPSHOT_KEY);
+  if (snapshot?.version === "popular-v2" && Array.isArray(snapshot.artists)) return snapshot;
+  return {
+    ok:true,mode:"popular",version:"popular-v2",builtAt:"",
+    artists:[],source:"scheduled",ranking:"Spotify monthly listeners",warming:true
+  };
 }
 
 function normalizeBuildState(state) {
@@ -640,8 +666,9 @@ export async function onRequestGet({ request, env, waitUntil }) {
     }
 
     if (mode === "popular") {
-      const payload = await popularPayload(env.TICKETMASTER_API_KEY);
-      const res = json(payload, 200, { "Cache-Control": "public, max-age=300, s-maxage=3600" });
+      // Read-only snapshot: opening the page never spends Ticketmaster quota.
+      const payload = await popularSnapshotPayload(env);
+      const res = json(payload, 200, { "Cache-Control": "public, max-age=600, s-maxage=3600" });
       await cache.put(cacheKey, res.clone()).catch(() => {});
       return res;
     }
