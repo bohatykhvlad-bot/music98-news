@@ -68,9 +68,9 @@ test("world overview is static and restores pinned markets after zooming out",()
 });
 
 test("map has one compact reset control and no Overview or Fit results controls",()=>{
-  assert.match(app,/id=\"resetMapBtn\"[^>]*>−<\/button>/);
-  assert.doesNotMatch(app,/id=\"overviewBtn\"/);
-  assert.doesNotMatch(app,/id=\"fitBtn\"/);
+  assert.match(app,/id=\\\"resetMapBtn\\\"[^>]*>−<\\\/button>/);
+  assert.doesNotMatch(app,/id=\\\"overviewBtn\\\"/);
+  assert.doesNotMatch(app,/id=\\\"fitBtn\\\"/);
   assert.match(app,/resetMapBtn\.addEventListener\("click"/);
   assert.match(app,/radiusEl\.value="100"/);
   assert.match(app,/map\.easeTo\(\{center:\[8,27\],zoom:1\.55/);
