@@ -21,7 +21,11 @@ function initConcerts(root,host){
 const MAPBOX_TOKEN = "pk.eyJ1IjoibXVzaWM5OCIsImEiOiJjbXVsaWM1M2kxbm4xMnpxeW83bWR5aHg5In0.8Y56YcxjJ3kpa5g51Yl3aw";
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-let hotspots=[];
+// Stable major-market entry points make the map useful without a global
+// Ticketmaster scan. Selecting one makes exactly one cached area request.
+let hotspots=[
+  {city:"New York",countryCode:"US",lat:40.7128,lng:-74.0060},{city:"Los Angeles",countryCode:"US",lat:34.0522,lng:-118.2437},{city:"Chicago",countryCode:"US",lat:41.8781,lng:-87.6298},{city:"Toronto",countryCode:"CA",lat:43.6532,lng:-79.3832},{city:"Mexico City",countryCode:"MX",lat:19.4326,lng:-99.1332},{city:"São Paulo",countryCode:"BR",lat:-23.5505,lng:-46.6333},{city:"Buenos Aires",countryCode:"AR",lat:-34.6037,lng:-58.3816},{city:"London",countryCode:"GB",lat:51.5072,lng:-0.1276},{city:"Paris",countryCode:"FR",lat:48.8566,lng:2.3522},{city:"Berlin",countryCode:"DE",lat:52.5200,lng:13.4050},{city:"Madrid",countryCode:"ES",lat:40.4168,lng:-3.7038},{city:"Amsterdam",countryCode:"NL",lat:52.3676,lng:4.9041},{city:"Rome",countryCode:"IT",lat:41.9028,lng:12.4964},{city:"Warsaw",countryCode:"PL",lat:52.2297,lng:21.0122},{city:"Dubai",countryCode:"AE",lat:25.2048,lng:55.2708},{city:"Johannesburg",countryCode:"ZA",lat:-26.2041,lng:28.0473},{city:"Mumbai",countryCode:"IN",lat:19.0760,lng:72.8777},{city:"Bangkok",countryCode:"TH",lat:13.7563,lng:100.5018},{city:"Singapore",countryCode:"SG",lat:1.3521,lng:103.8198},{city:"Tokyo",countryCode:"JP",lat:35.6762,lng:139.6503},{city:"Seoul",countryCode:"KR",lat:37.5665,lng:126.9780},{city:"Manila",countryCode:"PH",lat:14.5995,lng:120.9842},{city:"Sydney",countryCode:"AU",lat:-33.8688,lng:151.2093},{city:"Melbourne",countryCode:"AU",lat:-37.8136,lng:144.9631}
+];
 
 const map = new mapboxgl.Map({
   container:root.querySelector("#map"),
@@ -609,7 +613,7 @@ async function loadArtistArea(lat,lng,label,radius){
   }catch(err){
     if(requestId!==areaRequestSeq) return;
     console.error(err);
-    setStatus("Could not load concerts in this area.");
+    setStatus(concertErrorMessage(err,"Could not load concerts in this area."));
   }
 }
 async function showAllConcertsInMapArea(){
@@ -666,7 +670,7 @@ async function toggleArtist(item,card,mode){
   }catch(err){
     console.error(err);
     box.textContent="";
-    const n=document.createElement("div"); n.className="tour-none"; n.textContent="Could not load tour dates.";
+    const n=document.createElement("div"); n.className="tour-none"; n.textContent=concertErrorMessage(err,"Could not load tour dates.");
     box.appendChild(n);
   }
 }
@@ -735,6 +739,12 @@ async function getPayload(params){
   return j;
 }
 async function getEvents(params){ return (await getPayload(params)).events||[]; }
+function concertErrorMessage(err,fallback){
+  const code=String(err?.message||"");
+  if(code==="ticketmaster_temporarily_limited") return "Ticketmaster is temporarily limiting requests. Please try again shortly.";
+  if(code==="ticketmaster_key_missing") return "Concert search is being connected. Please try again shortly.";
+  return fallback;
+}
 
 function mergeHotspots(rows){
   const byKey=new Map();
@@ -788,7 +798,7 @@ async function loadPopular(force=false){
     popularEvents=[];
     if(requestId!==popularRequestSeq || activeMode!=="popular" || artistContext) return;
     renderArtists(popularArtists,"popular");
-    prefetchPopular(popularArtists);
+
     setEventData([]);
     setStatus(popularArtists.length ? "Popular artists" : "Popular concerts are unavailable right now.");
   }catch(err){
@@ -828,8 +838,8 @@ async function loadArea(lat,lng,label,opts={}){
     console.error(err);
     toursEl.textContent="";
     sideEmpty.hidden=false;
-    sideEmpty.textContent="Could not load concerts in this area.";
-    setStatus(err.message==="ticketmaster_key_missing" ? "Concert search is being connected. Please try again shortly." : "Could not load concerts right now.");
+    sideEmpty.textContent=concertErrorMessage(err,"Could not load concerts in this area.");
+    setStatus(concertErrorMessage(err,"Could not load concerts right now."));
   }
 }
 
@@ -1060,7 +1070,7 @@ function resizeMapStable(){
 map.on("load",()=>{
   resizeMapStable();
   addLayers();
-  loadHotspots();
+
   loadPopular();
   requestAnimationFrame(resizeMapStable);
   setTimeout(resizeMapStable,90);
@@ -1091,7 +1101,7 @@ class Music98Concerts extends HTMLElement{
       mapCss.rel="stylesheet";
       mapCss.href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css";
       const style=document.createElement("style");
-      style.textContent=CONCERTS_CSS;
+      style.textContent=CONCERTS_CSS+"\n.buy.press{font-size:12px}\n";
       const shell=document.createElement("div");
       shell.innerHTML=CONCERTS_HTML;
       this.shadowRoot.append(mapCss,style,...shell.childNodes);

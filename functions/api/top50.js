@@ -6,7 +6,9 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v32";
+/* v33 is a targeted artwork refresh: a corrected registry needs a fresh
+   generated payload rather than today's pre-correction cache. */
+const TOP50_KV = "top50v33";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -698,7 +700,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v32",
+    rev: "feat-v33",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,

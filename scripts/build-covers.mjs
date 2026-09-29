@@ -29,9 +29,10 @@ const OUT_NAMES = path.resolve("public/data/apple-names.json");
 const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
 
 const DIRECT_COLLECTION = {
-  "loser|tameimpala": "1835526733",
+  "loser|tameimpala": "1842957385",
   "pinkblush|dollybabe": "6783917228",
 };
+const CORRECTIONS = path.resolve("public/data/cover-corrections.json");
 
 const idOf = (u) => (String(u || "").match(/[?&]i=(\d+)/) || [])[1] || "";
 const art600 = (u) => String(u || "")
@@ -195,6 +196,16 @@ try {
   if (saved && typeof saved === "object" && !Array.isArray(saved)) covers = { ...saved };
 } catch {}
 const lockedAtStart = new Set(Object.keys(covers));
+const editorialCorrections = JSON.parse(fs.readFileSync(CORRECTIONS, "utf8"));
+const correctionsApplied = [];
+for (const [key, rec] of Object.entries(editorialCorrections)) {
+  const art = String(rec && rec.art || "");
+  if (!art) throw new Error(`cover correction has no artwork URL: ${key}`);
+  if (covers[key] !== art) {
+    covers[key] = art;
+    correctionsApplied.push(key);
+  }
+}
 const pinCover = (key, url) => {
   if (!key || !url || covers[key]) return false;
   covers[key] = url;
@@ -209,6 +220,7 @@ try {
 const names = {};
 
 console.log(`закреплённых Apple-обложек до сборки: ${lockedAtStart.size}`);
+if (correctionsApplied.length) console.log(`исправлены явные cover-lock: ${correctionsApplied.join(", ")}`);
 
 /* Keep Apple metadata fresh cheaply for rows that already have a track ID. */
 const idWanted = tracks.map((t) => [t, idOf(t.url)]).filter(([, id]) => id);

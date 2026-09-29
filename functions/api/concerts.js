@@ -159,7 +159,7 @@ async function tmJson(url) {
   }
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
-    const err = new Error("ticketmaster_error");
+    const err = new Error(res.status === 429 ? "ticketmaster_temporarily_limited" : "ticketmaster_error");
     err.status = res.status;
     err.detail = detail.slice(0, 300);
     throw err;
@@ -490,6 +490,9 @@ export async function onRequestGet({ request, env }) {
   } catch (err) {
     if (err?.message === "ticketmaster_unavailable") {
       return json({ error: "ticketmaster_unavailable" }, 502);
+    }
+    if (err?.message === "ticketmaster_temporarily_limited") {
+      return json({ error: "ticketmaster_temporarily_limited" }, 429, { "Retry-After": "60" });
     }
     return json({
       error: "ticketmaster_error",
