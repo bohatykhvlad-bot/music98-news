@@ -21,6 +21,7 @@ import {
   stripParen,
   pickAppleCandidate,
 } from "../functions/lib/chart-identity.js";
+import { appleTopSongHref, appleTrackIdFromHref } from "../functions/lib/apple-top-songs.js";
 
 dns.setDefaultResultOrder("ipv4first");
 
@@ -44,10 +45,27 @@ const art600 = (u) => String(u || "")
   .replace("100x100bb.jpg", "600x600bb.jpg")
   .replace("100x100bb", "600x600bb");
 
+async function request(url, accept="application/json") {
+  let last;
+  for(let attempt=0;attempt<3;attempt++){
+    const r = await fetch(url, {
+      headers: {
+        "user-agent": "Mozilla/5.0 (compatible; music98-cover-resolver/2.0; +https://music98.news)",
+        "accept": accept,
+      }
+    });
+    if(r.ok) return r;
+    last=new Error(`HTTP ${r.status} ${url}`);
+    if(r.status!==403 && r.status!==429 && r.status<500) throw last;
+    await new Promise(resolve=>setTimeout(resolve,700*(attempt+1)));
+  }
+  throw last;
+}
 async function json(url) {
-  const r = await fetch(url, { headers: { "user-agent": "music98-cover-resolver/1.0" } });
-  if (!r.ok) throw new Error(`HTTP ${r.status} ${url}`);
-  return r.json();
+  return (await request(url)).json();
+}
+async function html(url) {
+  return (await request(url,"text/html,application/xhtml+xml")).text();
 }
 
 function appleRecord(hit) {
@@ -63,6 +81,63 @@ function appleRecord(hit) {
     prev: hit.previewUrl || "",
     year: String(hit.releaseDate || "").slice(0, 4),
   };
+}
+
+const artistIdCache=new Map();
+const artistPageCache=new Map();
+const trackLookupCache=new Map();
+
+async function artistIdFor(artist) {
+  const key=primaryArtist(artist);
+  if(!key) return "";
+  if(artistIdCache.has(key)) return artistIdCache.get(key);
+  const term=encodeURIComponent(artist);
+  try{
+    const d=await json(`https://itunes.apple.com/search?term=${term}&entity=musicArtist&attribute=artistTerm&limit=25&country=US`);
+    const exact=(d.results||[]).find(x=>primaryArtist(x.artistName||"")===key && x.artistId);
+    const id=String(exact?.artistId||"");
+    artistIdCache.set(key,id);
+    return id;
+  }catch{
+    artistIdCache.set(key,"");
+    return "";
+  }
+}
+
+async function lookupTrack(trackId) {
+  const id=String(trackId||"");
+  if(!id) return null;
+  if(trackLookupCache.has(id)) return trackLookupCache.get(id);
+  try{
+    const d=await json(`https://itunes.apple.com/lookup?id=${encodeURIComponent(id)}&entity=song&country=US`);
+    const hit=(d.results||[]).find(x=>String(x.trackId||"")===id)||null;
+    trackLookupCache.set(id,hit);
+    return hit;
+  }catch{
+    trackLookupCache.set(id,null);
+    return null;
+  }
+}
+
+async function artistTopSong(title,artist) {
+  const artistId=await artistIdFor(artist);
+  if(!artistId) return null;
+  let page=artistPageCache.get(artistId);
+  if(page===undefined){
+    try{
+      page=await html(`https://music.apple.com/us/artist/${encodeURIComponent(artistId)}`);
+    }catch{
+      page="";
+    }
+    artistPageCache.set(artistId,page);
+  }
+  if(!page) return null;
+  const href=appleTopSongHref(page,title);
+  const trackId=appleTrackIdFromHref(href);
+  if(!trackId) return null;
+  const hit=await lookupTrack(trackId);
+  if(!hit || !appleCandidateCompatible(title,artist,hit) || !hit.artworkUrl100) return null;
+  return hit;
 }
 
 async function songSearch(title, artist) {
@@ -98,6 +173,9 @@ async function resolveApple(title, artist) {
     const hit = await lookupCollection(DIRECT_COLLECTION[key], title, artist);
     if (hit && hit.artworkUrl100) return { hit, reason: "direct-catalog-miss" };
   }
+
+  const topSong=await artistTopSong(title,artist);
+  if(topSong?.artworkUrl100) return {hit:topSong,reason:"apple-top-song"};
 
   const songs = await songSearch(title, artist);
   if (!songs.length) return null;
