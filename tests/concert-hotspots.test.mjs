@@ -400,11 +400,14 @@ test("daily market snapshot publishes only cities with real upcoming Ticketmaste
     calls++;
     assert.equal(u.searchParams.get("classificationName"),"music");
     assert.ok(u.searchParams.get("startDateTime"));
-    const city=u.searchParams.get("city")||"";
-    const hasShows=["London","Paris","Los Angeles","Dubai"].includes(city);
+    assert.ok(u.searchParams.get("geoPoint"));
+    assert.equal(u.searchParams.get("city"),null);
+    assert.equal(u.searchParams.get("unit"),"km");
+    const cc=u.searchParams.get("countryCode")||"";
+    const hasShows=["GB","FR","IT","AE"].includes(cc);
     return new Response(JSON.stringify(hasShows ? {
-      _embedded:{events:[{id:"e-"+city,dates:{start:{localDate:"2026-10-10"}}}]},
-      page:{totalElements:3,totalPages:3,size:1,number:0}
+      _embedded:{events:[{id:"e-"+cc,dates:{start:{localDate:"2026-10-10"}}}]},
+      page:{totalElements:3,totalPages:1,size:1,number:0}
     } : {
       page:{totalElements:0,totalPages:0,size:1,number:0}
     }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
@@ -426,12 +429,44 @@ test("daily market snapshot publishes only cities with real upcoming Ticketmaste
     });
     assert.equal(response.status,200);
     const data=await response.json();
-    assert.equal(data.version,"concert-markets-v1");
+    assert.equal(data.version,"concert-markets-v2");
+    assert.equal(data.complete,true);
     assert.ok(data.markets.length>=4);
     assert.ok(data.markets.every(x=>x.verified===true && Number(x.count)>0));
-    assert.ok(data.markets.some(x=>x.city==="Dubai"));
-    assert.ok(data.markets.some(x=>x.city==="Los Angeles"));
+    assert.ok(data.markets.some(x=>x.city==="Rome"));
     assert.equal(data.markets.some(x=>x.city==="Yerevan"),false);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
+test("public market read exposes verified Rome before the whole daily scan finishes", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(!u.pathname.endsWith("/events.json")) return new Response("not found",{status:404});
+    const hasShows=u.searchParams.get("countryCode")==="IT";
+    return new Response(JSON.stringify(hasShows ? {
+      _embedded:{events:[{id:"rome-event",dates:{start:{localDate:"2026-10-10"}}}]},
+      page:{totalElements:7,totalPages:1,size:1,number:0}
+    } : {page:{totalElements:0,totalPages:0,size:1,number:0}}),
+    {status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+  };
+  try{
+    const warm=await refreshMapMarketSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv},true);
+    assert.equal(warm.complete,false);
+
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?mode=markets"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    const data=await response.json();
+    assert.equal(data.version,"concert-markets-v2");
+    assert.equal(data.complete,false);
+    assert.equal(data.warming,true);
+    assert.ok(data.markets.some(x=>x.city==="Rome" && x.countryCode==="IT" && Number(x.count)===7));
   }finally{
     globalThis.fetch=oldFetch;
   }
