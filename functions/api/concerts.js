@@ -471,6 +471,74 @@ function newPopularBuildState(ranking,now=Date.now()){
   };
 }
 
+async function cachedPopularEventEvidence(env,existing){
+  const byName=new Map();
+
+  const put=(name,value)=>{
+    const key=normName(name);
+    if(!key || !value?.id) return;
+    const prev=byName.get(key);
+    const nextShows=Number(value.shows||0);
+    if(nextShows<=0) return;
+    if(!prev || Number(prev.shows||0)<nextShows) byName.set(key,value);
+  };
+
+  const existingArtists=Array.isArray(existing?.artists)?existing.artists.filter(a=>a?.id && a?.name):[];
+  const tourRows=await Promise.all(existingArtists.map(async artist=>[
+    artist,
+    await kvGetJson(env,popularTourCacheKey(artist.id))
+  ]));
+  for(const [artist,payload] of tourRows){
+    const events=Array.isArray(payload?.events)?payload.events:[];
+    if(!prewarmFresh(payload) || !events.length) continue;
+    const first=events[0]||{};
+    put(artist.name,{
+      id:String(artist.id),
+      name:String(artist.name),
+      image:String(artist.image||first.artistImage||first.image||""),
+      shows:Math.max(events.length,Number(payload?.page?.totalElements||0)),
+      firstDate:String(first.date||""),
+      eventConfirmed:true,
+      evidence:"ticketmaster_cached_tour",
+    });
+  }
+
+  const capitalPayloads=await Promise.all(EUROPE_CAPITAL_SEEDS.map(async seed=>[
+    seed,
+    await kvGetJson(env,capitalEventCacheKey(seed.city,seed.countryCode))
+  ]));
+  const capitalCounts=new Map();
+  for(const [,payload] of capitalPayloads){
+    const events=Array.isArray(payload?.events)?payload.events:[];
+    if(!prewarmFresh(payload) || !events.length) continue;
+    for(const ev of events){
+      const name=String(ev?.artist||"").trim();
+      const id=String(ev?.attractionId||"").trim();
+      if(!name || !id) continue;
+      const key=normName(name);
+      if(!key) continue;
+      const prev=capitalCounts.get(key);
+      if(!prev){
+        capitalCounts.set(key,{
+          id,name,
+          image:String(ev?.artistImage||ev?.image||""),
+          shows:1,
+          firstDate:String(ev?.date||""),
+          eventConfirmed:true,
+          evidence:"ticketmaster_cached_capital_event",
+        });
+      }else{
+        prev.shows=Number(prev.shows||0)+1;
+        if(!prev.image) prev.image=String(ev?.artistImage||ev?.image||"");
+        if(!prev.firstDate || (ev?.date && String(ev.date)<prev.firstDate)) prev.firstDate=String(ev.date);
+      }
+    }
+  }
+  for(const rec of capitalCounts.values()) put(rec.name,rec);
+
+  return byName;
+}
+
 export async function refreshPopularSnapshot(env, force = false) {
   if (!env?.TICKETMASTER_API_KEY || !env?.DESK) {
     return { ok:false, reason:"popular_storage_or_key_missing" };
@@ -524,6 +592,23 @@ export async function refreshPopularSnapshot(env, force = false) {
       const resumeAt=Math.max(rankedMax,Number.isFinite(storedCursor)?storedCursor:0);
       state.index=Math.max(0,Math.min(state.candidates.length,resumeAt));
     }
+  }
+
+  // Reuse recent real Ticketmaster event payloads before spending origin
+  // quota. This is stricter than attraction.upcomingEvents and lets a rebuild
+  // recover safely even while the Ticketmaster reserve guard is active.
+  const cachedEvidence=await cachedPopularEventEvidence(env,existing);
+  for(const candidate of state.candidates){
+    const evidence=cachedEvidence.get(normName(candidate?.name));
+    if(!evidence) continue;
+    if(state.found.some(x=>String(x?.id||"")===String(evidence.id) || normName(x?.name)===normName(candidate.name))) continue;
+    state.found.push({
+      ...evidence,
+      name:String(evidence.name||candidate.name),
+      popularityRank:Number(candidate.rank||999999),
+      listeners:Number(candidate.listeners||0),
+      eventConfirmed:true,
+    });
   }
 
   let processed=0;
