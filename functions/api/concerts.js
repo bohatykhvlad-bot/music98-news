@@ -33,8 +33,6 @@ const CAPITAL_EVENTS_STATE_KEY = "concert-capitals:v1:state";
 const CAPITAL_EVENTS_PREFIX = "concert-capitals:v1:city:";
 const CAPITAL_HUB_SNAPSHOT_KEY = "concert-capitals:v1:hubs";
 const PREWARM_MAX_AGE_MS = 26 * 60 * 60 * 1000;
-const MAP_WARM_LOCK_KEY = "concert-map:warm-lock:v1";
-const MAP_WARM_LOCK_MS = 15 * 60 * 1000;
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
@@ -1162,26 +1160,6 @@ export async function refreshHotspotSnapshot(env, options = {}) {
     verified:Object.keys(state.verified || {}).length,
     rejected:Array.isArray(state.rejected)?state.rejected.length:0,
   };
-}
-
-async function scheduleMapWarmupIfSparse(env,waitUntil,visibleCount){
-  if(!env?.DESK || !env?.TICKETMASTER_API_KEY || typeof waitUntil!=="function" || Number(visibleCount||0)>=3) return;
-  const lock=await kvGetJson(env,MAP_WARM_LOCK_KEY);
-  const lockAt=Date.parse(lock?.at||0)||0;
-  if(Date.now()-lockAt<MAP_WARM_LOCK_MS) return;
-
-  await kvPutJson(env,MAP_WARM_LOCK_KEY,{at:new Date().toISOString()},{expirationTtl:20*60});
-  waitUntil((async()=>{
-    try{
-      // Cheap first-aid path: refresh a small capital batch so the public map
-      // gets real Ticketmaster-backed points quickly. The normal cron keeps
-      // advancing the full global hotspot builder separately.
-      await refreshCapitalEventSnapshots(env,4);
-    }catch(e){}
-    try{
-      await refreshHotspotSnapshot(env,{jobBudget:2,verifyBudget:10});
-    }catch(e){}
-  })());
 }
 
 async function hotspotSnapshotPayload(env) {
