@@ -1,0 +1,65 @@
+name: force concert popular rebuild
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/force-popular-rebuild.yml"
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Force Top 30 rebuild
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://music98.news/api/__m98-popular-rebuild-4f9d72c1"
+
+          echo "Resetting Popular build..."
+          reset_body=""
+          for i in $(seq 1 12); do
+            if reset_body="$(curl -fsS --max-time 45 "$base?reset=1")"; then
+              echo "$reset_body"
+              break
+            fi
+            sleep 5
+          done
+          test -n "$reset_body"
+
+          complete="false"
+          artists="0"
+          found="0"
+          for i in $(seq 1 16); do
+            body="$(curl -fsS --max-time 45 "$base")"
+            echo "$body"
+            read -r complete artists found <<<"$(BODY="$body" python - <<'PY'
+import json, os
+d=json.loads(os.environ["BODY"])
+print(str(bool(d.get("complete"))).lower(), int(d.get("artists") or 0), int(d.get("found") or 0))
+PY
+)"
+            echo "step=$i complete=$complete artists=$artists found=$found"
+            if [ "$complete" = "true" ] && [ "$artists" -ge 30 ]; then
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$complete" != "true" ] || [ "$artists" -lt 30 ]; then
+            echo "Top 30 rebuild did not complete"
+            exit 1
+          fi
+
+          echo "Verifying public endpoint..."
+          public="$(curl -fsS --max-time 30 'https://music98.news/api/concerts?mode=popular&v=popular-v4&forcecheck=20260929')"
+          echo "$public"
+          PUBLIC="$public" python - <<'PY'
+import json, os
+d=json.loads(os.environ["PUBLIC"])
+artists=d.get("artists") or []
+assert len(artists) >= 30, f"public Popular returned {len(artists)} artists"
+assert d.get("warming") is False, f"public Popular still warming: {d}"
+print("verified_public_artists=", len(artists))
+PY
