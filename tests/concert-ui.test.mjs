@@ -106,3 +106,21 @@ test("warming verified market pins merge with the last complete map",()=>{
   assert.match(app,/data\.complete===false[\s\S]*mergeHotspots\(\[\.\.\.\(hotspots\|\|\[\]\),\.\.\.data\.markets\]\)/);
   assert.match(app,/if\(data\.complete!==false\) writeMarketCache\(data\)/);
 });
+
+
+test("artist mode hides global markets and keeps only artist markers at every zoom",()=>{
+  assert.match(app,/const showHubs=activeMode==="popular";/);
+  assert.match(app,/\["artist-points","artist-hit"\]\.forEach\(id=>setLayerVisible\(id,artist\)\)/);
+  assert.match(app,/\["clusters","cluster-hit","event-points","event-hit","event-labels"\]\.forEach\(id=>setLayerVisible\(id,area\)\)/);
+  assert.doesNotMatch(app,/showHubs=activeMode==="popular" \|\| overviewZoom/);
+  assert.doesNotMatch(app,/artist && !overviewZoom/);
+});
+
+test("verified market marker layer is zoom-stable for Rome and every other country",()=>{
+  assert.match(app,/id:"capital-points",type:"symbol",source:"hubs",minzoom:0,maxzoom:18/);
+  assert.doesNotMatch(app,/id:"capital-points"[^\n]*filter:/);
+  assert.match(app,/id:"city-major-points"[\s\S]*?layout:\{"visibility":"none"/);
+  assert.match(app,/id:"city-mid-points"[\s\S]*?layout:\{"visibility":"none"/);
+  assert.match(app,/id:"city-all-points"[\s\S]*?layout:\{"visibility":"none"/);
+  assert.match(app,/\["city-major-points","city-mid-points","city-all-points"\]\.forEach\(id=>setLayerVisible\(id,false\)\)/);
+});
