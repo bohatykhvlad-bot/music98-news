@@ -1462,6 +1462,10 @@ function distanceKm(lat1,lng1,lat2,lng2){
 }
 
 map.on("movestart",e=>{ if(e.originalEvent) userMoving=true; });
+map.on("styleimagemissing",e=>{
+  if(e?.id!=="m98-triangle") return;
+  try{ addConcertTriangle(); }catch(err){ console.error("Could not restore concert marker",err); }
+});
 map.on("render",()=>{ if(popup) snapPopup(); });
 map.on("zoom",()=>{ if(popup) syncPopupPresentation(); });
 map.on("zoomend",()=>{
