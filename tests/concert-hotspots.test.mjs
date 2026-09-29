@@ -24,7 +24,7 @@ import {
   cityKey,
   snapshotFromState,
 } from "../functions/lib/concert-hotspots.js";
-import { refreshHotspotSnapshot, onRequestGet } from "../functions/api/concerts.js";
+import { refreshHotspotSnapshot, refreshPopularSnapshot, onRequestGet } from "../functions/api/concerts.js";
 
 test("hotspot threshold is 10 or more", () => {
   assert.equal(HOTSPOT_THRESHOLD, 10);
@@ -160,6 +160,7 @@ function memoryKv() {
       return type==="json" ? JSON.parse(raw) : raw;
     },
     async put(key,value){ map.set(key,String(value)); },
+    async delete(key){ map.delete(key); },
     raw(key){ return map.get(key) || null; },
   };
 }
@@ -275,8 +276,8 @@ test("public hotspot read never triggers Ticketmaster discovery", async () => {
 
 test("public Popular read is snapshot-only and spends no Ticketmaster call", async () => {
   const kv=memoryKv();
-  await kv.put("concert-popular:v2",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v2",builtAt:new Date().toISOString(),
+  await kv.put("concert-popular:v3",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v3",builtAt:new Date().toISOString(),
     artists:[{id:"a1",name:"Artist",image:"",rank:1}]
   }));
   const oldFetch=globalThis.fetch;
@@ -344,5 +345,72 @@ test("exact-city user query paginates and stays scoped to that city", async () =
   }finally{
     globalThis.fetch=oldFetch;
     globalThis.caches=oldCaches;
+  }
+});
+
+
+test("daily Popular builder produces 30 eligible artists in source-rank order", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  const rows=Array.from({length:40},(_,i)=>
+    "<tr><td>"+(i+1)+"</td><td>Artist "+(i+1)+"</td><td>"+(100000000-i*1000)+"</td></tr>"
+  ).join("");
+
+  let kworbCalls=0;
+  let ticketmasterCalls=0;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net"){
+      kworbCalls++;
+      return new Response("<table>"+rows+"</table>",{status:200,headers:{"content-type":"text/html"}});
+    }
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      ticketmasterCalls++;
+      const name=u.searchParams.get("keyword")||"";
+      const n=Number(name.replace(/[^0-9]/g,""))||1;
+      const event={
+        id:"event-"+n,
+        name:name+" Live",
+        dates:{start:{localDate:"2026-12-01",localTime:"20:00:00"}},
+        _embedded:{
+          attractions:[{id:"artist-"+n,name,images:[]}],
+          venues:[{
+            id:"venue-"+n,name:"Venue "+n,city:{name:"City "+n},
+            country:{name:"United States",countryCode:"US"},
+            location:{latitude:"40.0",longitude:"-74.0"}
+          }]
+        },
+        images:[]
+      };
+      return new Response(JSON.stringify({_embedded:{events:[event]},page:{totalElements:1,totalPages:1,size:20,number:0}}),
+        {status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+
+  try{
+    let result;
+    for(let i=0;i<4;i++){
+      result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+      if(result.complete) break;
+    }
+    assert.equal(result.complete,true);
+    const snap=JSON.parse(kv.raw("concert-popular:v3"));
+    assert.equal(snap.version,"popular-v3");
+    assert.equal(snap.artists.length,30);
+    assert.deepEqual(snap.artists.map(x=>x.rank),Array.from({length:30},(_,i)=>i+1));
+    assert.deepEqual(snap.artists.map(x=>x.popularityRank),Array.from({length:30},(_,i)=>i+1));
+    assert.equal(snap.artists[0].name,"Artist 1");
+    assert.equal(snap.artists[29].name,"Artist 30");
+    assert.equal(kworbCalls,1);
+    assert.equal(ticketmasterCalls,30);
+
+    // A fresh daily snapshot must not hit either source again.
+    const before=ticketmasterCalls;
+    const fresh=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+    assert.equal(fresh.fresh,true);
+    assert.equal(ticketmasterCalls,before);
+  }finally{
+    globalThis.fetch=oldFetch;
   }
 });
