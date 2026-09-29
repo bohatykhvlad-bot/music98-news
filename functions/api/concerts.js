@@ -36,9 +36,9 @@ const CAPITAL_HUB_SNAPSHOT_KEY = "concert-capitals:v1:hubs";
 const PREWARM_MAX_AGE_MS = 26 * 60 * 60 * 1000;
 const MAP_WARM_LOCK_KEY = "concert-map:warm-lock:v1";
 const MAP_WARM_LOCK_MS = 15 * 60 * 1000;
-const MAP_MARKET_VERSION = "concert-markets-v1";
-const MAP_MARKET_STATE_KEY = "concert-markets:v1:state";
-const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v1:snapshot";
+const MAP_MARKET_VERSION = "concert-markets-v2";
+const MAP_MARKET_STATE_KEY = "concert-markets:v2:state";
+const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v2:snapshot";
 const MAP_MARKET_BATCH_SIZE = 20;
 
 const KWORB_FALLBACK = [
@@ -898,7 +898,13 @@ async function marketSeedResult(env,seed){
   const tm=baseEventUrl(env.TICKETMASTER_API_KEY);
   tm.searchParams.set("size","1");
   tm.searchParams.set("sort","date,asc");
-  tm.searchParams.set("city",seed.city);
+  // City names are not canonical across Ticketmaster markets (Rome/Roma,
+  // Vienna/Wien, etc.). Verify the metro area by coordinates instead, while
+  // still constraining country/state. This avoids silently dropping a real
+  // concert city because the API stores the localized venue city spelling.
+  tm.searchParams.set("geoPoint",geohash(Number(seed.lat),Number(seed.lng),8));
+  tm.searchParams.set("radius",seed.kind==="state_capital" ? "45" : "60");
+  tm.searchParams.set("unit","km");
   tm.searchParams.set("countryCode",seed.countryCode);
   if(seed.stateCode) tm.searchParams.set("stateCode",seed.stateCode);
 
@@ -997,26 +1003,50 @@ export async function refreshMapMarketSnapshot(env, force=false){
 }
 
 async function marketSnapshotPayload(env){
-  const snapshot=await kvGetJson(env,MAP_MARKET_SNAPSHOT_KEY);
+  const [snapshot,state]=await Promise.all([
+    kvGetJson(env,MAP_MARKET_SNAPSHOT_KEY),
+    kvGetJson(env,MAP_MARKET_STATE_KEY),
+  ]);
   if(snapshot?.version===MAP_MARKET_VERSION && Array.isArray(snapshot.markets) && snapshot.markets.length){
-    return snapshot;
+    return {...snapshot,complete:true};
   }
 
-  // Until the first new daily cycle completes, reuse only the already-verified
-  // old hotspot snapshot. Do not invent markers from the candidate seed list.
+  // Expose verified rows from the in-progress daily scan immediately. Waiting
+  // for every global seed to finish made early cities (including Rome) disappear
+  // from the public map for hours even after Ticketmaster had confirmed them.
+  const cycle=new Date().toISOString().slice(0,10);
+  const warming=state?.version===MAP_MARKET_VERSION && state?.cycle===cycle && Array.isArray(state.markets)
+    ? state.markets.filter(x=>Number(x?.count||0)>0)
+    : [];
+
+  // Keep the last already-verified fallback while the new scan warms, then
+  // overlay fresher same-day rows. Candidate seeds themselves are never exposed.
   const fallback=await hotspotSnapshotPayload(env);
-  const markets=(fallback?.hotspots||[])
+  const previous=(fallback?.hotspots||[])
     .filter(x=>Number(x?.count||0)>0)
     .map(x=>({...x,verified:true,pinned:1,tier:(String(x?.countryCode||"")==="US"&&x?.stateCode)?2:1}));
+
+  const merged=new Map();
+  for(const row of [...previous,...warming]){
+    const key=String(row?.city||"").toLowerCase()+"|"+String(row?.stateCode||"").toUpperCase()+"|"+String(row?.countryCode||"").toUpperCase();
+    if(!key || Number(row?.count||0)<=0) continue;
+    merged.set(key,{...row,verified:true,pinned:1});
+  }
+  const markets=[...merged.values()]
+    .sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
+
   return {
     ok:true,
     mode:"markets",
     version:MAP_MARKET_VERSION,
-    builtAt:String(fallback?.builtAt||""),
+    builtAt:String(state?.updatedAt||fallback?.builtAt||""),
     markets,
     candidateCount:MAP_MARKET_SEEDS.length,
     verifiedCount:markets.length,
-    fallback:true,
+    complete:false,
+    warming:true,
+    progress:{index:Number(state?.index||0),total:MAP_MARKET_SEEDS.length},
+    fallback:previous.length>0,
   };
 }
 
