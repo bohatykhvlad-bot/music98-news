@@ -710,6 +710,12 @@ export async function buildTop50(origin, env) {
   };
 }
 
+function leadArtistName(s) {
+  return String(s || "")
+    .split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)[0]
+    .trim();
+}
+
 async function itunesLookup(title, artist) {
   const term = encodeURIComponent(`${artist} ${stripParen(title)}`.trim());
   const data = await getJson(`https://itunes.apple.com/search?term=${term}&entity=song&limit=25&country=US`);
@@ -738,8 +744,12 @@ async function enrichApple(tracks) {
       let extra = await grab(t.title, t.artist);
       const incomplete = !(extra.prev && isApplePreview(extra.prev)) || !extra.url;
       if (incomplete) {
-        /* second chance without featured-artist noise in the term */
-        try { extra = await grab(t.title, ""); } catch {}
+        /* Second chance keeps the lead artist. Title-only fallback can match a
+           cover/live/tribute release by somebody else. */
+        const lead = leadArtistName(t.artist);
+        if (lead && lead !== String(t.artist || "").trim()) {
+          try { extra = await grab(t.title, lead); } catch {}
+        }
       }
       if (extra.prev && isApplePreview(extra.prev)) t.prev = extra.prev;
       if (extra.url && !t.url) t.url = extra.url;
