@@ -139,9 +139,11 @@ function applyMapMode(){
 }
 function setMode(mode){
   activeMode=mode;
+  if(mode!=="nearby" && mode!=="artist-area") hidePendingAreaSearch();
   syncModeTabs();
   syncMapModeSwitch();
   applyMapMode();
+  syncFitButton();
 }
 
 function toGeoJSON(events){
