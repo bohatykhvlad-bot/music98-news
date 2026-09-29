@@ -1341,6 +1341,9 @@ const RMONO = '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="2
    toggles opacity instead of replacing innerHTML. Both glyphs are
    envelope-symmetric, so the swap is pixel-stable as well. */
 const ICON_STACK = RMONO;
+// Keep Apple preview dynamics intact but leave 3 dB of headroom. This is a
+// fixed master attenuation only — no compressor/normalizer and no per-song boost.
+const CHART_MASTER_GAIN = Math.pow(10,-3/20);
 const audio = new Audio();
 audio.preload = "auto";
 audio.playsInline = true;
@@ -1349,7 +1352,7 @@ audio.setAttribute("webkit-playsinline", "");
 audio.crossOrigin = "anonymous";
 audio.muted = false;
 audio.defaultMuted = false;
-audio.volume = 1;         /* 100% of the device volume; every start fades in from here, see volArm */
+audio.volume = CHART_MASTER_GAIN; /* -3 dB master headroom; fade logic preserves source dynamics */
 const IS_ANDROID = /Android/i.test(navigator.userAgent);
 /* iOS gets the same onset guard as Android: the PC build never blasts because
    desktop browsers honour element volume instantly, mobile WebKit can hand
@@ -1393,8 +1396,13 @@ const VOL_FADE_IN_COLD = 1000, VOL_FADE_IN_WARM = 450, VOL_FADE_OUT = 300;
 const VOL_DB = 60, VOL_MAX_DT = 40, VOL_UNMUTE_LATEST = 600, VOL_FALLBACK_WAIT = 500;
 function volWrite(v){
   volLevel = v;
-  gainSet(v);
-  try{ audio.volume = v; }catch(e){}
+  if(gainOwns){
+    gainSet(v * CHART_MASTER_GAIN);
+    try{ audio.volume = v; }catch(e){}
+  }else{
+    gainSet(v);
+    try{ audio.volume = v * CHART_MASTER_GAIN; }catch(e){}
+  }
 }
 function volUnmute(acc){
   if(!volMuted) return;
@@ -1575,7 +1583,12 @@ function deviceVol(){
   }
   audio.muted = false;
   audio.defaultMuted = false;
-  audio.volume = 1;
+  if(gainOwns){
+    gainSet(CHART_MASTER_GAIN);
+    audio.volume = 1;
+  }else{
+    audio.volume = CHART_MASTER_GAIN;
+  }
 }
 function attachOut(){
   deviceVol();
