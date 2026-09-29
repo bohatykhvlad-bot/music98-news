@@ -326,32 +326,52 @@ function normName(s) {
     .toLowerCase();
 }
 
+function attractionUpcomingTotal(attraction){
+  const upcoming=attraction?.upcomingEvents;
+  if(!upcoming || typeof upcoming!=="object") return 0;
+  const direct=Number(upcoming._total);
+  if(Number.isFinite(direct)) return Math.max(0,direct);
+  let total=0;
+  for(const [key,value] of Object.entries(upcoming)){
+    if(key.startsWith("_")) continue;
+    const n=Number(value);
+    if(Number.isFinite(n) && n>0) total+=n;
+  }
+  return total;
+}
+function attractionIsMusic(attraction){
+  const classifications=Array.isArray(attraction?.classifications) ? attraction.classifications : [];
+  if(!classifications.length) return true;
+  return classifications.some(x=>normName(x?.segment?.name)==="music");
+}
 async function validatePopularArtist(env, name, popularityRank, listeners) {
-  const tm = baseEventUrl(env.TICKETMASTER_API_KEY);
+  // Attraction Search is a better identity check than keyword Event Search:
+  // one call gives us the canonical attraction id, images and upcoming count.
+  const tm = new URL(TM_ATTRACTIONS_ROOT);
+  tm.searchParams.set("apikey", env.TICKETMASTER_API_KEY);
   tm.searchParams.set("keyword", name);
   tm.searchParams.set("size", "50");
-  tm.searchParams.set("sort", "relevance,desc");
+  tm.searchParams.set("locale", "en-us,en,*");
 
   const raw = await tmJson(tm, env, "scheduled");
   const wanted = normName(name);
-  const events = raw?._embedded?.events || [];
+  const attractions = raw?._embedded?.attractions || [];
+  const exact = attractions.find(a=>
+    normName(a?.name)===wanted &&
+    attractionIsMusic(a) &&
+    attractionUpcomingTotal(a)>0
+  );
+  if(!exact) return null;
 
-  for (const rawEvent of events) {
-    const attractions = Array.isArray(rawEvent?._embedded?.attractions) ? rawEvent._embedded.attractions : [];
-    const exact = attractions.find(a => normName(a?.name) === wanted);
-    if (!exact) continue;
-    const event = normalizeEvent(rawEvent);
-    if (!event) continue;
-    return {
-      id: String(exact.id || ""),
-      name: String(exact.name || name),
-      image: bestArtistImage(exact.images) || event.artistImage || event.image,
-      popularityRank,
-      listeners,
-      firstDate: event.date,
-    };
-  }
-  return null;
+  return {
+    id:String(exact.id||""),
+    name:String(exact.name||name),
+    image:bestArtistImage(exact.images),
+    popularityRank,
+    listeners,
+    shows:attractionUpcomingTotal(exact),
+    firstDate:"",
+  };
 }
 
 const HOTSPOT_BUILD_JOB_BUDGET = 2;
