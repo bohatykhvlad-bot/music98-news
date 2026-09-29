@@ -95,7 +95,8 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tab\{\\n  width:100%;min-width:0;max-width:none/);
   assert.match(app,/\.side-tab\{[\s\S]*?transition:\.18s;/);
   assert.match(app,/\.side-tab\{[\s\S]*?display:grid;place-items:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1/);
-  assert.match(app,/function pillInkShift\(el\)/);\n  assert.match(app,/Math\\.round\\(raw\\*2\\)\\/2/);
+  assert.match(app,/function pillInkShift\(el\)/);
+  assert.match(app,/Math\.round\(raw\*2\)\/2/);
   assert.match(app,/getImageData\(/);
   assert.match(app,/\.tour-more\{[^}]*display:grid;place-items:center;text-align:center/);
   assert.match(app,/\.map-mode-btn\{[^}]*display:grid;place-items:center;text-align:center/);

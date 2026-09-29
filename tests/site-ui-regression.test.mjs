@@ -9,7 +9,8 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/\.nav\{[^}]*width:410px;[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(page,/\.nav-btn\{width:100%;text-indent:var\(--ink-x,0px\);/);
   assert.match(page,/window\.music98InkShift/);
-  assert.match(page,/getImageData\(/);\n  assert.match(page,/Math\\.round\\(\\(advance\\/2-inkCenter\\)\\*2\\)\\/2/);
+  assert.match(page,/getImageData\(/);
+  assert.match(page,/Math\.round\(\(advance\/2-inkCenter\)\*2\)\/2/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
