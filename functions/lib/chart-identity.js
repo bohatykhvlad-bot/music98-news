@@ -52,6 +52,30 @@ export function mergeKey(title, artist) {
   return `${normTitle(title)}${sig ? "~v:" + sig : ""}|${primaryArtist(artist)}`;
 }
 
+/* Artwork identity is deliberately stricter than chart/ranking identity.
+ * Ranking uses the lead artist so provider naming differences still merge into
+ * one chart row. Artwork includes the full credited artist set; otherwise a
+ * remix/feature/re-release can silently steal another row's cover. */
+export function artworkArtistSignature(s) {
+  const words = String(s || "")
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[’‘]/g, "'")
+    .replace(/\b(?:feat(?:uring)?|ft|with|and|x|w)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .sort();
+  return words.join("");
+}
+
+export function artworkKey(title, artist) {
+  const sig = versionSignature(title);
+  return `${normTitle(title)}${sig ? "~v:" + sig : ""}|${artworkArtistSignature(artist)}`;
+}
+
 export function isVersionedMergeKey(key) {
   const head = String(key || "").split("|")[0] || "";
   return head.includes("~v:");

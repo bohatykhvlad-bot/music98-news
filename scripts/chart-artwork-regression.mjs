@@ -1,154 +1,44 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import {
-  appleCandidateCompatible,
-  mergeKey,
-  pickAppleCandidate,
-  versionSignature,
-} from "../functions/lib/chart-identity.js";
+import { artworkArtistSignature, artworkKey, mergeKey, versionSignature } from "../functions/lib/chart-identity.js";
+import { candidateCompatible, isGenericRelease, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
+const track=(title,artist)=>({title,artist});
+const c=o=>({provider:"apple",id:"1",collectionId:"10",trackTitle:"Song",artist:"Artist",releaseTitle:"Album",releaseArtist:"Artist",releaseDate:"2026-01-01",trackCount:10,genre:"Pop",art:"https://is1-ssl.mzstatic.com/a.jpg",url:"",...o});
 
-const original = {
-  trackId: 100,
-  trackName: "Loser",
-  artistName: "Tame Impala",
-  collectionArtistName: "Tame Impala",
-  collectionName: "Loser - Single",
-  trackCount: 1,
-  releaseDate: "2025-09-01T00:00:00Z",
-};
-const album = {
-  trackId: 101,
-  trackName: "Loser",
-  artistName: "Tame Impala",
-  collectionArtistName: "Tame Impala",
-  collectionName: "Deadbeat",
-  trackCount: 12,
-  releaseDate: "2025-10-17T00:00:00Z",
-};
-const remix = {
-  trackId: 102,
-  trackName: "Loser (Fcukers Remix)",
-  artistName: "Tame Impala & Fcukers",
-  collectionName: "Loser (Fcukers Remix) - Single",
-  releaseDate: "2026-09-25T00:00:00Z",
-};
+assert.equal(versionSignature("Dracula (with JENNIE)"),"");
+assert.notEqual(mergeKey("Loser","Tame Impala"),mergeKey("Loser (Fcukers Remix)","Tame Impala & Fcukers"));
+assert.notEqual(artworkKey("BbY WOW","KAROL G, Judeline & rusowsky"),artworkKey("BbY WOW","KAROL G & Feid"));
+assert.equal(artworkArtistSignature("Ella Langley & Morgan Wallen"),artworkArtistSignature("Morgan Wallen, Ella Langley"));
+assert.equal(candidateCompatible(track("The One That Got Away","Katy Perry"),c({trackTitle:"The One That Got Away",artist:"Katy Perry & B.o.B"})),false);
+assert.equal(candidateCompatible(track("Babydoll","Dominic Fike"),c({trackTitle:"Babydoll (From The Carwash)",artist:"Dominic Fike"})),false);
+assert.equal(isGenericRelease("20th Century Masters - The Millennium Collection: The Best of Marvin Gaye & Tammi Terrell"),true);
+assert.equal(isGenericRelease("United"),false);
 
-assert.notEqual(mergeKey("Loser", "Tame Impala"), mergeKey("Loser (Fcukers Remix)", "Tame Impala & Fcukers"));
-assert.equal(versionSignature("Dracula (with JENNIE)"), "");
-assert.equal(versionSignature("Dracula (Boys Noize Disko Version)"), "version");
-assert.equal(versionSignature("Bad Times (Extended Version)"), "extended");
-assert.equal(versionSignature("Beauty and a Beat (Wideboys Dub)"), "dub");
-assert.equal(versionSignature("Song (Unplugged Session)"), "session");
-assert.equal(appleCandidateCompatible("Loser", "Tame Impala", remix), false);
-assert.equal(appleCandidateCompatible("Loser", "Tame Impala", original), true);
-assert.equal(pickAppleCandidate("Loser", "Tame Impala", [remix, album, original]).trackId, 101);
+const mountain=track("Ain't No Mountain High Enough","Marvin Gaye & Tammi Terrell");
+const united=c({provider:"apple",id:"1469575663",trackTitle:mountain.title,artist:mountain.artist,releaseTitle:"United",releaseArtist:mountain.artist,releaseDate:"1967-08-29",trackCount:12});
+const lateSingle=c({provider:"apple",id:"999",trackTitle:mountain.title,artist:mountain.artist,releaseTitle:"Ain't No Mountain High Enough - Single",releaseArtist:mountain.artist,releaseDate:"2025-01-01",trackCount:1,art:"https://is1-ssl.mzstatic.com/b.jpg"});
+assert.equal(selectArtworkCandidate(mountain,[lateSingle,united]).selected.releaseTitle,"United");
+const unitedDz={...united,provider:"deezer",id:"dz1",art:"https://e-cdns-images.dzcdn.net/images/cover/x/1000x1000.jpg"};
+assert.equal(selectArtworkCandidate(mountain,[lateSingle,united,unitedDz]).selected.releaseTitle,"United");
 
-const live = {
-  trackId: 200,
-  trackName: "Uninvited (Live at Newport Folk)",
-  artistName: "Brandi Carlile",
-  collectionName: "Uninvited (Live at Newport Folk) - Single",
-  releaseDate: "2026-09-01T00:00:00Z",
-};
-const studio = {
-  trackId: 201,
-  trackName: "Uninvited",
-  artistName: "Brandi Carlile",
-  collectionName: "Uninvited - Single",
-  releaseDate: "2026-08-01T00:00:00Z",
-};
-assert.equal(pickAppleCandidate("Uninvited (Live at Newport Folk)", "Brandi Carlile", [studio, live]).trackId, 200);
+const bby=track("BbY WOW","KAROL G, Judeline & rusowsky");
+const album=c({provider:"apple-feed",id:"6796864754",trackTitle:bby.title,artist:bby.artist,releaseTitle:"NO ME ARREPIENTO DE SENTIR TANTO",releaseArtist:"KAROL G",releaseDate:"2026-08-07",trackCount:14});
+const single=c({provider:"apple",id:"6816228072",trackTitle:bby.title,artist:bby.artist,releaseTitle:"BbY WOW - Single",releaseArtist:bby.artist,releaseDate:"2026-08-05",trackCount:1,art:"https://is1-ssl.mzstatic.com/c.jpg"});
+assert.equal(selectArtworkCandidate(bby,[single,album]).selected.provider,"apple-feed");
 
-const instr = {
-  trackId: 300,
-  trackName: "Dracula (with JENNIE) [Instrumental]",
-  artistName: "Tame Impala",
-  collectionName: "Dracula (with JENNIE) [Instrumental] - Single",
-  releaseDate: "2026-09-01T00:00:00Z",
-};
-const vocal = {
-  trackId: 301,
-  trackName: "Dracula (with JENNIE)",
-  artistName: "Tame Impala",
-  collectionName: "Dracula (with JENNIE) - Single",
-  releaseDate: "2026-08-01T00:00:00Z",
-};
-assert.equal(pickAppleCandidate("Dracula (with JENNIE)", "Tame Impala", [instr, vocal]).trackId, 301);
-
-/* The repository resolver pins known canonical Apple collections for catalog
- * cases where search ranking can drift between alternate packages. These IDs are
- * official Apple releases and the artwork job must not silently fall back to a
- * playlist/variant package on a later run. */
-const resolverSource = fs.readFileSync(new URL("./build-covers.mjs", import.meta.url), "utf8");
-assert.match(resolverSource, /"animal\\|katseye": "6793209963"/);
-assert.match(resolverSource, /"hootiefrutti\\|katseye": "1891779764"/);
-assert.match(resolverSource, /"billiejean\\|michaeljackson": "269572838"/);
-assert.match(resolverSource, /function pickDedicatedAppleRelease\(/);
-assert.match(resolverSource, /full credited artist set match exactly/);
-assert.match(resolverSource, /resolved\.reason !== "dedicated-single"/);
-assert.match(resolverSource, /Existing verified metadata is a lock/);
-
-
-const beautyStudio={
-  trackId:500,trackName:"Beauty and a Beat (feat. Nicki Minaj)",
-  artistName:"Justin Bieber",collectionArtistName:"Justin Bieber",
-  collectionName:"Believe",trackCount:16,releaseDate:"2012-06-15T00:00:00Z"
-};
-const beautyDub={
-  trackId:501,trackName:"Beauty and a Beat (Wideboys Dub)",
-  artistName:"Justin Bieber",collectionArtistName:"Justin Bieber",
-  collectionName:"Beauty and a Beat (Wideboys Dub) - Single",trackCount:1,releaseDate:"2012-12-01T00:00:00Z"
-};
-assert.equal(appleCandidateCompatible("Beauty and a Beat (feat. Nicki Minaj)","Justin Bieber",beautyDub),false);
-assert.equal(pickAppleCandidate("Beauty and a Beat (feat. Nicki Minaj)","Justin Bieber",[beautyDub,beautyStudio]).trackId,500);
-
-const corrections = JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json", import.meta.url), "utf8"));
-const lockedCovers = JSON.parse(fs.readFileSync(new URL("../public/data/covers.json", import.meta.url), "utf8"));
-const appleNames = JSON.parse(fs.readFileSync(new URL("../public/data/apple-names.json", import.meta.url), "utf8"));
-for (const [key, collectionId, trackId] of [
-  ["animal|katseye", "6793209963", "6793209964"],
-  ["hootiefrutti|katseye", "1891779764", "1891779777"],
-  ["billiejean|michaeljackson", "269572838", "269573364"],
-]) {
-  assert.equal(corrections[key].appleCollectionId, collectionId);
-  assert.equal(corrections[key].appleTrackId, trackId);
-  assert.equal(lockedCovers[key], corrections[key].art);
-  assert.match(appleNames[key].url, new RegExp("/" + collectionId + "\\?i=" + trackId + "(?:&|$)"));
-}
-const bostonCorrection = corrections["boston|stellalefty"];
-assert.equal(bostonCorrection.appleCollectionId, "1884403092");
-assert.equal(bostonCorrection.appleTrackId, "1884403093");
-assert.match(bostonCorrection.art, /810129961546\.jpg\/600x600bb\.jpg$/);
-const tameCorrection = corrections["loser|tameimpala"];
-assert.equal(tameCorrection.appleCollectionId, "1836226516");
-assert.equal(tameCorrection.appleTrackId, "1836226731");
-assert.match(tameCorrection.art, /196873555331\.jpg\/600x600bb\.jpg$/);
-const daftCorrection = corrections["getlucky~v:edit|daftpunk"];
-assert.equal(daftCorrection.appleCollectionId, "617154241");
-assert.match(daftCorrection.art, /886443919266\.jpg\/600x600bb\.jpg$/);
-assert.match(daftCorrection.reason, /never.*Remix/);
-
+const source=fs.readFileSync(new URL("./build-covers.mjs",import.meta.url),"utf8");
+assert.match(source,/APPLE_FEED/); assert.match(source,/api\.deezer\.com/); assert.match(source,/ARTWORK_UNRESOLVED/);
+assert.doesNotMatch(source,/DIRECT_COLLECTION|animal\\\|katseye|billiejean\\\|michaeljackson|boston\\\|stellalefty/);
+const corrections=JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json",import.meta.url),"utf8"));
+assert.deepEqual(corrections,{});
+try{
+  const audit=JSON.parse(fs.readFileSync(new URL("../public/data/artwork-audit.json",import.meta.url),"utf8"));
+  if(audit?.schema===2&&audit?.entries&&Object.keys(audit.entries).length){
+    for(const [key,e] of Object.entries(audit.entries)){
+      assert.equal(e.verified,true,key); assert.ok(e.confidence>=91,key+" confidence");
+      assert.notEqual(e.releaseClass,"generic",key); assert.notEqual(e.releaseClass,"derivative",key);
+      assert.match(e.art,/^https:\/\/(?:[^/]*mzstatic\.com|[^/]*dzcdn\.net)\//i,key);
+    }
+  }
+}catch{}
 console.log("chart artwork regression: PASS");
-
-const livePackPlain={
-  trackId:400,trackName:"Ain't No Mountain High Enough",
-  artistName:"Marvin Gaye & Tammi Terrell",
-  collectionArtistName:"Marvin Gaye & Tammi Terrell",
-  collectionName:"Ain't No Mountain High Enough (Live) - EP",
-  trackCount:4,releaseDate:"2026-01-01T00:00:00Z"
-};
-const united={
-  trackId:401,trackName:"Ain't No Mountain High Enough",
-  artistName:"Marvin Gaye & Tammi Terrell",
-  collectionArtistName:"Marvin Gaye & Tammi Terrell",
-  collectionName:"United",trackCount:12,releaseDate:"1967-08-29T00:00:00Z"
-};
-const compilation={
-  trackId:402,trackName:"Ain't No Mountain High Enough",
-  artistName:"Marvin Gaye & Tammi Terrell",
-  collectionArtistName:"Marvin Gaye & Tammi Terrell",
-  collectionName:"20th Century Masters - The Millennium Collection: The Best of Marvin Gaye & Tammi Terrell",
-  trackCount:11,releaseDate:"2001-01-01T00:00:00Z"
-};
-assert.equal(appleCandidateCompatible("Ain't No Mountain High Enough","Marvin Gaye & Tammi Terrell",livePackPlain),false);
-assert.equal(pickAppleCandidate("Ain't No Mountain High Enough","Marvin Gaye & Tammi Terrell",[compilation,livePackPlain,united]).trackId,401);

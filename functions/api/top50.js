@@ -1,4 +1,4 @@
-import { appleCandidateCompatible, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
+import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
 
 const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
@@ -36,13 +36,9 @@ function chartWeek() {
   return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
 }
 
-/* Canonical cover rule: public/data/covers.json is the authority.
-   Each song identity gets one approved artwork URL and keeps it permanently.
-   External catalogs are only discovery sources for NEW keys. They are never
-   allowed to replace an existing registry entry, even if Apple changes artwork
-   behind the same track ID later. KV is a runtime mirror/fallback, not the source
-   of truth. */
-const COVERS_KV = "covers_v7";
+/* Artwork is resolved offline by the audited multi-provider registry.
+   Artwork identity is stricter than ranking/tenure, so collaborator or version
+   changes can never steal another row's cover. */
 const DZ_HOST = "dzcdn.net";
 function isAppleArt(url) {
   try {
@@ -107,36 +103,15 @@ async function applyLoudness(env, tracks, origin) {
 }
 async function applyCovers(env, tracks, origin) {
   const seed = await coverSeed(env, origin);
-  let covers = {};
-  if (env && env.DESK) {
-    try { covers = (await env.DESK.get(COVERS_KV, { type: "json" })) || {}; } catch {}
-  }
-  let changed = false;
   for (const t of tracks) {
-    const key = mergeKey(t.title, t.artist);
-    const cached = covers[key];
-    /* Registry lock wins unconditionally, regardless of provider.
-       If the song is not in the checked-in registry yet, keep the first runtime
-       cover already cached for it. Only a truly unseen key may take today's
-       source artwork. */
-    const chosen = seed[key] || cached;
+    const strict = artworkKey(t.title, t.artist);
+    const legacy = mergeKey(t.title, t.artist); // rollout compatibility alias
+    const chosen = seed[strict] || seed[legacy] || "";
     const temporary = !chosen && isAppleArt(t.art) ? t.art : "";
-    if (chosen) {
-      if (seed[key] && covers[key] !== seed[key]) {
-        covers[key] = seed[key];
-        changed = true;
-      }
-      t.art = chosen;
-    } else if (temporary) {
-      /* Temporary Apple display only. Never persist an unreviewed runtime image
-         as the canonical lock. The GitHub Apple resolver will pin it later. */
-      t.art = temporary;
-    } else {
-      t.art = "";
-    }
-  }
-  if (env && env.DESK && changed) {
-    try { await env.DESK.put(COVERS_KV, JSON.stringify(covers)); } catch {}
+    /* Never persist artwork in KV. A bad runtime match must disappear instead of
+       becoming a permanent lock. The checked-in audited registry is the only
+       persistent artwork authority. */
+    t.art = chosen || temporary || "";
   }
   return tracks;
 }

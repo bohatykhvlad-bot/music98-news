@@ -14,6 +14,7 @@ on:
   push:
     paths:
       - "functions/lib/chart-identity.js"
+      - "functions/lib/artwork-resolver.js"
       - "scripts/build-covers.mjs"
       - "scripts/build-loudness.mjs"
       - "public/data/cover-corrections.json"
@@ -44,24 +45,29 @@ jobs:
           cp public/index.html /tmp/index-before.html
       - name: Проверить live tenure
         run: node scripts/audit-live-chart.mjs
-      - name: Проверить original/remix matcher
+      - name: Проверить resolver до сетевого аудита
         run: node scripts/chart-artwork-regression.mjs
-      - name: Собрать cover registry и Apple metadata
+      - name: Собрать и перепроверить artwork registry
         run: |
           cp public/data/covers.json /tmp/covers-before.json
           node scripts/build-covers.mjs
+          node scripts/chart-artwork-regression.mjs
           node - <<'NODE'
           const fs = require("fs");
           const before = JSON.parse(fs.readFileSync("/tmp/covers-before.json","utf8"));
           const after = JSON.parse(fs.readFileSync("public/data/covers.json","utf8"));
           const corrections = JSON.parse(fs.readFileSync("public/data/cover-corrections.json","utf8"));
           for (const [key, url] of Object.entries(after)) {
-            if (!/^https:\/\/[^/]*mzstatic\.com\//i.test(String(url || ""))) {
-              throw new Error("non-Apple artwork in cover registry: " + key);
+            if (!/^https:\/\/(?:[^/]*mzstatic\.com|[^/]*dzcdn\.net)\//i.test(String(url || ""))) {
+              throw new Error("untrusted artwork in cover registry: " + key);
             }
           }
           const changed = Object.keys(after).filter(k => before[k] && before[k] !== after[k]);
-          console.log("cover registry updates:", changed.length, "existing rows changed only by explicit correction or exact dedicated Apple single/EP");
+          const audit = JSON.parse(fs.readFileSync("public/data/artwork-audit.json","utf8"));
+          if (audit.schema !== 2 || audit.rows !== 50 || Object.keys(audit.entries||{}).length !== 50) {
+            throw new Error("artwork audit is not complete for all 50 chart rows");
+          }
+          console.log("cover registry updates:", changed.length, "schema-v2 verified rows:", Object.keys(audit.entries).length);
           NODE
           cmp -s public/data/top50.json /tmp/top50-before.json || {
             echo "ERROR: artwork audit modified Top 50 ranking data"
@@ -82,12 +88,12 @@ jobs:
         run: |
           git config user.name "music98 apple-data bot"
           git config user.email "actions@users.noreply.github.com"
-          git add public/data/covers.json public/data/apple-names.json public/data/cover-corrections.json public/data/loudness.json
+          git add public/data/covers.json public/data/artwork-audit.json public/data/apple-names.json public/data/cover-corrections.json public/data/loudness.json
           if git diff --cached --quiet; then
             echo "данные Apple без изменений"
             exit 0
           fi
-          git commit -m "apple/audio: обновление обложек, metadata и loudness"
+          git commit -m "artwork/audio: verified provider audit"
           git push || {
             echo "main успел измениться — ребейзим сгенерированные данные и повторяем push"
             git pull --rebase origin main
