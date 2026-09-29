@@ -183,7 +183,8 @@ async function reserveTicketmasterCall(env, scope="interactive") {
     ? (rawReset>1e12 ? rawReset : rawReset>1e9 ? rawReset*1000 : 0)
     : 0;
   const originWindowStillActive=!resetMs || Date.now()<resetMs;
-  if(originWindowStillActive &&
+  if(observed?.headerObserved===true &&
+     originWindowStillActive &&
      Date.now()-observedAt<12*60*60*1000 &&
      Number.isFinite(observedAvailable)){
     const floor=scope==="interactive" ? TM_ORIGIN_INTERACTIVE_RESERVE : TM_ORIGIN_SCHEDULED_RESERVE;
@@ -239,11 +240,13 @@ async function tmJson(url, env, scope="interactive") {
 
     // Ticketmaster exposes authoritative quota state in response headers.
     // Keep the latest observed value in KV as a second safety signal.
-    const available=Number(res.headers?.get?.("Rate-Limit-Available"));
+    const availableHeader=res.headers?.get?.("Rate-Limit-Available");
+    const availableText=availableHeader==null ? "" : String(availableHeader).trim();
+    const available=availableText ? Number(availableText) : Number.NaN;
     const reset=String(res.headers?.get?.("Rate-Limit-Reset")||"");
     if(Number.isFinite(available) && env?.DESK){
       kvPutJson(env,"ticketmaster:quota:last",{
-        available,reset,observedAt:new Date().toISOString()
+        available,reset,headerObserved:true,observedAt:new Date().toISOString()
       },{expirationTtl:172800}).catch(()=>{});
     }
 
