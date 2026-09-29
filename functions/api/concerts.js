@@ -143,28 +143,46 @@ function baseEventUrl(apiKey) {
 }
 
 const TM_DAILY_GUARD_DEFAULT = 3000;
+const TM_INTERACTIVE_GUARD_DEFAULT = 900;
 let tmSharedLastFetchAt = 0;
 
-async function reserveTicketmasterCall(env) {
+async function readBudget(env,key) {
+  try{ return Number(await env.DESK.get(key))||0; }catch(e){ return 0; }
+}
+async function writeBudget(env,key,value) {
+  try{ await env.DESK.put(key,String(value),{expirationTtl:172800}); }catch(e){}
+}
+async function reserveTicketmasterCall(env, scope="interactive") {
   if (!env?.DESK) return;
   const configured=Number(env.TICKETMASTER_DAILY_BUDGET);
-  const limit=Number.isFinite(configured) && configured>0
+  const globalLimit=Number.isFinite(configured) && configured>0
     ? Math.max(100,Math.floor(configured))
     : TM_DAILY_GUARD_DEFAULT;
+  const configuredInteractive=Number(env.TICKETMASTER_INTERACTIVE_DAILY_BUDGET);
+  const interactiveLimit=Number.isFinite(configuredInteractive) && configuredInteractive>0
+    ? Math.max(50,Math.floor(configuredInteractive))
+    : TM_INTERACTIVE_GUARD_DEFAULT;
+
   const day=new Date().toISOString().slice(0,10);
-  const key="ticketmaster:daily:"+day;
-  let used=0;
-  try{ used=Number(await env.DESK.get(key))||0; }catch(e){}
-  if(used>=limit){
-    throw Object.assign(new Error("ticketmaster_budget_guard"),{status:429});
+  const globalKey="ticketmaster:daily:global:"+day;
+  const globalUsed=await readBudget(env,globalKey);
+  if(globalUsed>=globalLimit){
+    throw Object.assign(new Error("ticketmaster_budget_guard"),{status:429,scope:"global"});
   }
-  try{
-    await env.DESK.put(key,String(used+1),{expirationTtl:172800});
-  }catch(e){}
+
+  if(scope==="interactive"){
+    const interactiveKey="ticketmaster:daily:interactive:"+day;
+    const interactiveUsed=await readBudget(env,interactiveKey);
+    if(interactiveUsed>=interactiveLimit){
+      throw Object.assign(new Error("ticketmaster_budget_guard"),{status:429,scope:"interactive"});
+    }
+    await writeBudget(env,interactiveKey,interactiveUsed+1);
+  }
+  await writeBudget(env,globalKey,globalUsed+1);
 }
 
-async function tmJson(url, env) {
-  await reserveTicketmasterCall(env);
+async function tmJson(url, env, scope="interactive") {
+  await reserveTicketmasterCall(env,scope);
   const wait=Math.max(0,225-(Date.now()-tmSharedLastFetchAt));
   if(wait) await new Promise(resolve=>setTimeout(resolve,wait));
 
@@ -290,7 +308,7 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
   tm.searchParams.set("size", "20");
   tm.searchParams.set("sort", "relevance,desc");
 
-  const raw = await tmJson(tm, env);
+  const raw = await tmJson(tm, env, "scheduled");
   const wanted = normName(name);
   const events = raw?._embedded?.events || [];
 
@@ -362,7 +380,7 @@ function sleep(ms) {
 }
 
 async function hotspotTmJson(url, env) {
-  const out = await tmJson(url, env);
+  const out = await tmJson(url, env, "scheduled");
   hotspotLastFetchAt = Date.now();
   return out;
 }
