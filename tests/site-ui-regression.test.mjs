@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 
 const page=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
+const worker=readFileSync(new URL("../worker.js",import.meta.url),"utf8");
 
 test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/\.nav\{[^}]*width:410px;[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
@@ -39,4 +40,17 @@ test("Subscribe press cannot resize the email row",()=>{
 test("footer social icons stay in one row",()=>{
   assert.match(page,/\.social \.icons\{display:grid;grid-template-columns:repeat\(4,42px\);gap:10px;width:198px/);
   assert.match(page,/grid-template-columns:minmax\(320px,1fr\) 150px 180px 198px/);
+});
+
+
+test("corrected chart art is enforced at final row render",()=>{
+  assert.match(page,/const fixedArt = fixedChartArt\(r\)/);
+  assert.match(page,/const art = fixedArt \? esc\(fixedArt\) : presetCover/);
+  assert.match(page,/\$\{fixedArt \? "" : " data-need=/);
+  assert.match(page,/title\.startsWith\("loser"\) && artist\.includes\("tame impala"\)/);
+});
+
+test("clean Chart and Concerts routes are no-store",()=>{
+  assert.match(worker,/\^\\\/\(\?:releases\|chart\|charts\|concerts\)/);
+  assert.match(worker,/headers\.set\("Cache-Control", "no-store, max-age=0"\)/);
 });
