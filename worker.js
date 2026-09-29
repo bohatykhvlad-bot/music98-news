@@ -235,10 +235,12 @@ export default {
 
       // The half-hour job advances resumable background state. The 03:15 UTC
       // job explicitly starts a fresh Popular ranking once per day.
-      try{ await refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 16 }); }catch(e){}
+      // Prioritize the visible map: capital snapshots are the cheapest data
+      // users need immediately and should not be starved by the world scan.
+      try{ await refreshCapitalEventSnapshots(env,2); }catch(e){}
+      try{ await refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 12 }); }catch(e){}
       try{ await refreshPopularSnapshot(env,dailyKickoff); }catch(e){}
       try{ await refreshPopularTourSnapshots(env,4); }catch(e){}
-      try{ await refreshCapitalEventSnapshots(env,2); }catch(e){}
     })());
   },
 };
