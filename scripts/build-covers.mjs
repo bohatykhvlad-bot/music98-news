@@ -31,6 +31,11 @@ const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
 const REVALIDATE_EXISTING = process.env.REVALIDATE_EXISTING === "1";
 
 const DIRECT_COLLECTION = {
+  /* Exact official Apple releases for identities where generic search has
+     repeatedly drifted to a later package/variant. */
+  "animal|katseye": "6793209963",          // Animal - Single
+  "hootiefrutti|katseye": "1891779764",    // WILD - EP
+  "billiejean|michaeljackson": "269572838",// Thriller
   "pinkblush|dollybabe": "6783917228",
 };
 const CORRECTIONS = path.resolve("public/data/cover-corrections.json");
@@ -124,6 +129,25 @@ async function lookupCollection(collectionId, title, artist) {
   ) || null;
 }
 
+function pickDedicatedAppleRelease(title, artist, songs) {
+  const wantTitle = normTitle(stripParen(title));
+  const wantArtist = primaryArtist(artist);
+  const dedicated = (songs || []).filter((x) => {
+    if (!appleCandidateCompatible(title, artist, x)) return false;
+    const collectionArtist = primaryArtist(x.collectionArtistName || x.artistName);
+    if (wantArtist && collectionArtist !== wantArtist) return false;
+    const trackCount = Math.max(0, Number(x.trackCount || 0));
+    if (trackCount < 1 || trackCount > 5) return false;
+    return normTitle(collectionBase(x.collectionName)) === wantTitle;
+  });
+  dedicated.sort((a, b) => {
+    const da = releaseMs(a);
+    const db = releaseMs(b);
+    return da - db || (Number(a.trackId) || Number.MAX_SAFE_INTEGER) - (Number(b.trackId) || Number.MAX_SAFE_INTEGER);
+  });
+  return dedicated[0] || null;
+}
+
 async function resolveApple(title, artist) {
   const key = mergeKey(title, artist);
 
@@ -135,19 +159,24 @@ async function resolveApple(title, artist) {
   const songs = await songSearch(title, artist);
   if (!songs.length) return null;
 
-  // Shared matcher rejects derivative release packages for plain studio rows
-  // and prefers the artist's original release era over later compilations.
-  const hit = pickAppleCandidate(title, artist, songs);
+  /* Prefer a dedicated exact-title Apple single/EP when one exists. This is
+     the release whose artwork was actually issued for the song, and avoids a
+     later album/variant package winning merely because it has more tracks.
+     Explicit DIRECT_COLLECTION entries remain the highest authority. */
+  const dedicated = pickDedicatedAppleRelease(title, artist, songs);
+  const hit = dedicated || pickAppleCandidate(title, artist, songs);
   if (!hit?.artworkUrl100) return null;
 
   const trackCount = Math.max(0, Number(hit.trackCount || 0));
   const sameCollectionArtist =
     primaryArtist(hit.collectionArtistName || hit.artistName) === primaryArtist(artist);
-  const reason = sameCollectionArtist && trackCount >= 6
-    ? "canonical-album"
-    : sameCollectionArtist && trackCount >= 2
-      ? "canonical-ep"
-      : "canonical-single";
+  const reason = dedicated
+    ? (trackCount >= 2 ? "dedicated-ep" : "dedicated-single")
+    : sameCollectionArtist && trackCount >= 6
+      ? "canonical-album"
+      : sameCollectionArtist && trackCount >= 2
+        ? "canonical-ep"
+        : "canonical-single";
   return { hit, reason };
 }
 
