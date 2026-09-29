@@ -616,6 +616,12 @@ export async function refreshPopularSnapshot(env, force = false) {
         state.found.length<POPULAR_LIMIT &&
         processed<POPULAR_BATCH_SIZE){
     const candidate=state.candidates[state.index++];
+
+    // Cached real-event evidence is already strict enough. Walk past confirmed
+    // candidates without spending another Ticketmaster call; the small batch
+    // budget is reserved only for artists that still need validation.
+    if(state.found.some(x=>normName(x?.name)===normName(candidate.name))) continue;
+
     processed++;
     try{
       const artist=await validatePopularArtist(
