@@ -163,6 +163,12 @@ async function enrichArtByIds(tracks, stats) {
    Savage)". Apple - в артистах: "Lady Gaga, Bruno Mars". Переносим фит в строку артистов,
    чтобы на сайте не было ни "w/", ни разнобоя от источника. Смысл не меняется, а
    идентичность песни та же (normTitle скобки всё равно отбрасывает). */
+function leadArtistDisplay(artist) {
+  return String(artist || "")
+    .split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)[0]
+    .trim();
+}
+
 function cleanDisplay(title, artist) {
   const t0 = String(title || "").trim();
   const m = t0.match(/\s*[(\[](?:w\/|w\.|with|feat\.?|ft\.?|featuring)\s+([^)\]]+)[)\]]\s*$/i);
@@ -722,7 +728,7 @@ export async function buildTop50(origin, env) {
 
 async function itunesLookup(title, artist) {
   const term = encodeURIComponent(`${artist} ${stripParen(title)}`.trim());
-  const data = await getJson(`https://itunes.apple.com/search?term=${term}&entity=song&limit=25&country=US`);
+  const data = await getJson(`https://itunes.apple.com/search?term=${term}&entity=song&limit=100&country=US`);
   const hit = pickAppleCandidate(title, artist, data.results || []);
   if (!hit) return {};
   const album = String(hit.collectionId || "");
@@ -748,8 +754,12 @@ async function enrichApple(tracks) {
       let extra = await grab(t.title, t.artist);
       const incomplete = !(extra.prev && isApplePreview(extra.prev)) || !extra.url;
       if (incomplete) {
-        /* second chance without featured-artist noise in the term */
-        try { extra = await grab(t.title, ""); } catch {}
+        /* Second chance with only the lead artist. Never search with a blank
+           artist: an exact common title by a different act can otherwise pass. */
+        const lead = leadArtistDisplay(t.artist);
+        if (lead && lead.toLowerCase() !== String(t.artist || "").toLowerCase()) {
+          try { extra = await grab(t.title, lead); } catch {}
+        }
       }
       if (extra.prev && isApplePreview(extra.prev)) t.prev = extra.prev;
       if (extra.url && !t.url) t.url = extra.url;
