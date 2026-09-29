@@ -1,8 +1,8 @@
 /* Apple-first chart cover registry.
  *
- * public/data/covers.json is immutable: once a song identity gets a verified
- * Apple artwork URL, daily automation never replaces it. Existing locks change
- * only by an explicit editorial correction.
+ * public/data/covers.json is a verified Apple registry. Daily runs keep existing
+ * resolved identities stable, while a deep audit may replace a stale lock only
+ * with a newly verified canonical Apple track. Editorial corrections always win.
  *
  * New song resolution:
  *   1. known exact Apple collection override (rare catalog-search miss)
@@ -20,6 +20,7 @@ import {
   primaryArtist,
   stripParen,
   versionSignature,
+  pickAppleCandidate,
 } from "../functions/lib/chart-identity.js";
 
 dns.setDefaultResultOrder("ipv4first");
@@ -27,9 +28,11 @@ dns.setDefaultResultOrder("ipv4first");
 const OUT = path.resolve("public/data/covers.json");
 const OUT_NAMES = path.resolve("public/data/apple-names.json");
 const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
+const REVALIDATE_EXISTING = /^(?:1|true|yes)$/i.test(String(process.env.REVALIDATE_EXISTING || ""));
 
 const DIRECT_COLLECTION = {
-  "loser|tameimpala": "1842957385",
+  /* Keep only true catalog-search misses here. Do not use this as an artwork
+     preference mechanism: normal songs must go through the canonical matcher. */
   "pinkblush|dollybabe": "6783917228",
 };
 const CORRECTIONS = path.resolve("public/data/cover-corrections.json");
@@ -128,60 +131,25 @@ async function resolveApple(title, artist) {
 
   if (DIRECT_COLLECTION[key]) {
     const hit = await lookupCollection(DIRECT_COLLECTION[key], title, artist);
-    if (hit && hit.artworkUrl100) return { hit, reason: "direct-original" };
+    if (hit && hit.artworkUrl100) return { hit, reason: "direct-catalog-miss" };
   }
 
-  const [albums, songs] = await Promise.all([
-    albumSearch(title, artist),
-    songSearch(title, artist),
-  ]);
-
-  const wantT = normTitle(title);
-  const wantV = versionSignature(title);
-
-  const dedicated = albums
-    .filter((a) =>
-      normTitle(collectionBase(a.collectionName)) === wantT &&
-      versionSignature(a.collectionName) === wantV &&
-      !derivativeCollection(a.collectionName)
-    )
-    .sort((a, b) => releaseMs(a) - releaseMs(b) || Number(a.collectionId) - Number(b.collectionId));
-
-  for (const a of dedicated) {
-    const hit = await lookupCollection(a.collectionId, title, artist);
-    if (hit && hit.artworkUrl100) return { hit, reason: "dedicated-single" };
-  }
-
+  const songs = await songSearch(title, artist);
   if (!songs.length) return null;
 
-  const albumById = new Map(albums.map((a) => [String(a.collectionId || ""), a]));
-  const firstTrackDate = Math.min(...songs.map(releaseMs));
+  const hit = pickAppleCandidate(title, artist, songs);
+  if (!hit?.artworkUrl100) return null;
 
-  const ranked = songs.map((hit) => {
-    const album = albumById.get(String(hit.collectionId || ""));
-    const ownRelease = !!album;
-    const comp = genericCompilation(hit.collectionName, hit.primaryGenreName);
-    const albumDate = album ? releaseMs(album) : Number.MAX_SAFE_INTEGER;
-    const gapDays = Number.isFinite(albumDate) && Number.isFinite(firstTrackDate)
-      ? Math.abs(albumDate - firstTrackDate) / 86400000
-      : 999999;
-    let score = 0;
-    if (ownRelease) score += 1000;
-    if (!derivativeCollection(hit.collectionName)) score += 250;
-    score -= comp * 180;
-    score -= Math.min(600, gapDays / 15);
-    return { hit, score, albumDate, comp };
-  }).sort((a, b) =>
-    b.score - a.score ||
-    a.albumDate - b.albumDate ||
-    releaseMs(a.hit) - releaseMs(b.hit) ||
-    Number(a.hit.trackId) - Number(b.hit.trackId)
-  );
+  const trackCount = Math.max(0, Number(hit.trackCount || 0));
+  const sameCollectionArtist =
+    primaryArtist(hit.collectionArtistName || hit.artistName) === primaryArtist(artist);
+  const reason = sameCollectionArtist && trackCount >= 6
+    ? "canonical-album"
+    : sameCollectionArtist && trackCount >= 2
+      ? "canonical-ep"
+      : "canonical-single";
 
-  const best = ranked[0];
-  return best && best.hit && best.hit.artworkUrl100
-    ? { hit: best.hit, reason: "artist-release" }
-    : null;
+  return { hit, reason };
 }
 
 const chart = await (await fetch(
@@ -206,8 +174,8 @@ for (const [key, rec] of Object.entries(editorialCorrections)) {
     correctionsApplied.push(key);
   }
 }
-const pinCover = (key, url) => {
-  if (!key || !url || covers[key]) return false;
+const setVerifiedCover = (key, url) => {
+  if (!key || !url || covers[key] === url) return false;
   covers[key] = url;
   return true;
 };
@@ -220,6 +188,7 @@ try {
 const names = {};
 
 console.log(`закреплённых Apple-обложек до сборки: ${lockedAtStart.size}`);
+console.log(`режим глубокой перепроверки: ${REVALIDATE_EXISTING ? "ON" : "off"}`);
 if (correctionsApplied.length) console.log(`исправлены явные cover-lock: ${correctionsApplied.join(", ")}`);
 
 /* Keep Apple metadata fresh cheaply for rows that already have a track ID. */
@@ -240,27 +209,37 @@ if (idWanted.length) {
   for (const [t, id] of idWanted) {
     const key = mergeKey(t.title, t.artist);
     const hit = byId.get(id);
-    if (hit && appleCandidateCompatible(t.title, t.artist, hit)) names[key] = appleRecord(hit);
+    if (!hit || !appleCandidateCompatible(t.title, t.artist, hit)) continue;
+    names[key] = appleRecord(hit);
+    /* Exact Apple track IDs may refresh artwork in place. This is safe because
+       appleCandidateCompatible now rejects derivative collection mismatches. */
+    if (!editorialCorrections[key]) setVerifiedCover(key, art600(hit.artworkUrl100));
   }
 }
 
-/* Only unseen cover keys go through discovery. Existing locks are immutable. */
+/* New keys always resolve. Existing current-chart keys are re-resolved only in
+   deep-audit mode, which is used after matcher changes/manual runs. This keeps
+   normal daily traffic cheap while still giving us a deterministic repair path. */
 for (const t of tracks) {
   const key = mergeKey(t.title, t.artist);
-  if (covers[key]) {
+  if (editorialCorrections[key]) {
+    if (!names[key] && previousNames[key]) names[key] = previousNames[key];
+    continue;
+  }
+  if (covers[key] && !REVALIDATE_EXISTING) {
     if (!names[key] && previousNames[key]) names[key] = previousNames[key];
     continue;
   }
   try {
     const resolved = await resolveApple(t.title, t.artist);
     if (!resolved) {
-      console.log(`  Apple cover не найден: ${t.artist} - ${t.title}`);
+      console.log(`  Apple cover не найден безопасно: ${t.artist} - ${t.title}`);
       if (previousNames[key]) names[key] = previousNames[key];
       continue;
     }
     const url = art600(resolved.hit.artworkUrl100);
-    if (pinCover(key, url)) {
-      console.log(`  Apple lock [${resolved.reason}]: ${t.artist} - ${t.title} -> ${resolved.hit.collectionName}`);
+    if (setVerifiedCover(key, url)) {
+      console.log(`  Apple verified [${resolved.reason}]: ${t.artist} - ${t.title} -> ${resolved.hit.collectionName}`);
     }
     names[key] = appleRecord(resolved.hit);
   } catch (e) {
@@ -273,7 +252,7 @@ const missing = tracks.filter((t) => !covers[mergeKey(t.title, t.artist)]);
 const sorted = Object.fromEntries(Object.entries(covers).sort(([a], [b]) => a.localeCompare(b)));
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
 fs.writeFileSync(OUT, JSON.stringify(sorted, null, 2) + "\n");
-console.log(`\nв registry ${Object.keys(sorted).length} Apple cover-locks (+${Object.keys(sorted).length - lockedAtStart.size} новых)`);
+console.log(`\nв registry ${Object.keys(sorted).length} verified Apple covers (+${Object.keys(sorted).length - lockedAtStart.size} новых)`);
 console.log(`без Apple cover-lock: ${missing.length}${missing.length ? " -> " + missing.map((t) => `${t.artist} - ${t.title}`).join("; ") : ""}`);
 
 const sortedNames = Object.fromEntries(Object.entries(names).sort(([a], [b]) => a.localeCompare(b)));
