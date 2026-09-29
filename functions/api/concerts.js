@@ -27,7 +27,7 @@ const POPULAR_CANDIDATE_LIMIT = 250;
 const POPULAR_SNAPSHOT_KEY = "concert-popular:v4";
 const POPULAR_STATE_KEY = "concert-popular:v4:state";
 const POPULAR_REFRESH_MS = 24 * 60 * 60 * 1000;
-const POPULAR_BATCH_SIZE = 6;
+const POPULAR_BATCH_SIZE = 10;
 const POPULAR_TOUR_STATE_KEY = "concert-popular:v4:tours-state";
 const POPULAR_TOUR_PREFIX = "concert-popular:v4:tour:";
 const CAPITAL_EVENTS_STATE_KEY = "concert-capitals:v1:state";
@@ -39,7 +39,7 @@ const MAP_WARM_LOCK_MS = 15 * 60 * 1000;
 const MAP_MARKET_VERSION = "concert-markets-v1";
 const MAP_MARKET_STATE_KEY = "concert-markets:v1:state";
 const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v1:snapshot";
-const MAP_MARKET_BATCH_SIZE = 24;
+const MAP_MARKET_BATCH_SIZE = 20;
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
