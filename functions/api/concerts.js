@@ -26,7 +26,7 @@ const POPULAR_CANDIDATE_LIMIT = 250;
 const POPULAR_SNAPSHOT_KEY = "concert-popular:v4";
 const POPULAR_STATE_KEY = "concert-popular:v4:state";
 const POPULAR_REFRESH_MS = 24 * 60 * 60 * 1000;
-const POPULAR_BATCH_SIZE = 20;
+const POPULAR_BATCH_SIZE = 6;
 const POPULAR_TOUR_STATE_KEY = "concert-popular:v4:tours-state";
 const POPULAR_TOUR_PREFIX = "concert-popular:v4:tour:";
 const CAPITAL_EVENTS_STATE_KEY = "concert-capitals:v1:state";
@@ -1279,10 +1279,9 @@ export async function onRequestGet({ request, env, waitUntil }) {
   void region;
 
   if (mode === "hotspots") {
+    // The UI now uses a static global discovery layer, so this compatibility
+    // endpoint is read-only. Never let a visitor start Ticketmaster/KV warmup.
     const payload = await hotspotSnapshotPayload(env);
-    // Self-heal only when the map is effectively empty. A KV lock prevents a
-    // visitor stampede from multiplying Ticketmaster calls.
-    await scheduleMapWarmupIfSparse(env,waitUntil,payload?.hotspots?.length||0);
     return json(payload, 200, {
       "Cache-Control": payload.partial
         ? "public, max-age=30, s-maxage=60"
