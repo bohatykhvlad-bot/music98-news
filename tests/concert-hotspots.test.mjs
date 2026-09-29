@@ -24,7 +24,13 @@ import {
   cityKey,
   snapshotFromState,
 } from "../functions/lib/concert-hotspots.js";
-import { refreshHotspotSnapshot, refreshPopularSnapshot, onRequestGet } from "../functions/api/concerts.js";
+import {
+  refreshHotspotSnapshot,
+  refreshPopularSnapshot,
+  refreshPopularTourSnapshots,
+  refreshCapitalEventSnapshots,
+  onRequestGet
+} from "../functions/api/concerts.js";
 
 test("hotspot threshold is 10 or more", () => {
   assert.equal(HOTSPOT_THRESHOLD, 10);
@@ -446,5 +452,138 @@ test("Popular builder retries the same ranked artist after a transient 5xx", asy
     assert.equal(state.found.length,0);
   }finally{
     globalThis.fetch=oldFetch;
+  }
+});
+
+
+test("Popular ranking keeps the last real Spotify snapshot when the ranking source falls back", async () => {
+  const kv=memoryKv();
+  const artists=Array.from({length:30},(_,i)=>({
+    id:"existing-"+i,name:"Existing "+i,rank:i+1,popularityRank:i+1
+  }));
+  await kv.put("concert-popular:v3",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v3",
+    builtAt:new Date(Date.now()-25*60*60*1000).toISOString(),
+    source:"spotify_monthly_listeners",
+    artists
+  }));
+
+  const oldFetch=globalThis.fetch;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net") return new Response("broken",{status:503});
+    throw new Error("Ticketmaster must not be queried when ranking source is unavailable");
+  };
+  try{
+    const result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv},true);
+    assert.equal(result.keptExisting,true);
+    assert.equal(result.reason,"popular_ranking_source_unavailable");
+    const snap=JSON.parse(kv.raw("concert-popular:v3"));
+    assert.equal(snap.artists.length,30);
+    assert.equal(snap.source,"spotify_monthly_listeners");
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
+test("popular artist tours are prewarmed and later served from KV without Ticketmaster", async () => {
+  const kv=memoryKv();
+  const builtAt=new Date().toISOString();
+  await kv.put("concert-popular:v3",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v3",builtAt,
+    source:"spotify_monthly_listeners",
+    artists:[{id:"artist-1",name:"Artist One",rank:1,popularityRank:1}]
+  }));
+
+  const oldFetch=globalThis.fetch;
+  const oldCaches=globalThis.caches;
+  let tmCalls=0;
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      tmCalls++;
+      assert.equal(u.searchParams.get("attractionId"),"artist-1");
+      return new Response(JSON.stringify({
+        _embedded:{events:[{
+          id:"e1",name:"Show",dates:{start:{localDate:"2026-10-10",localTime:"20:00:00"}},
+          _embedded:{
+            attractions:[{id:"artist-1",name:"Artist One",images:[]}],
+            venues:[{name:"Venue",city:{name:"Paris"},country:{name:"France",countryCode:"FR"},location:{latitude:"48.8566",longitude:"2.3522"}}]
+          },images:[]
+        }]},
+        page:{size:200,totalElements:1,totalPages:1,number:0}
+      }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+
+  try{
+    const warm=await refreshPopularTourSnapshots({TICKETMASTER_API_KEY:"test",DESK:kv},1);
+    assert.equal(warm.complete,true);
+    assert.equal(tmCalls,1);
+
+    globalThis.fetch=async()=>{ throw new Error("prewarmed visitor read must not call Ticketmaster"); };
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?attractionId=artist-1"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.events.length,1);
+    assert.equal(data.events[0].artist,"Artist One");
+    assert.equal(tmCalls,1);
+  }finally{
+    globalThis.fetch=oldFetch;
+    globalThis.caches=oldCaches;
+  }
+});
+
+test("European capital event lists are prewarmed for Cloudflare-only map clicks", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  const oldCaches=globalThis.caches;
+  let tmCalls=0;
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      tmCalls++;
+      const city=u.searchParams.get("city");
+      const cc=u.searchParams.get("countryCode");
+      return new Response(JSON.stringify({
+        _embedded:{events:[{
+          id:"city-"+tmCalls,name:"Show",dates:{start:{localDate:"2026-10-11",localTime:"20:00:00"}},
+          _embedded:{
+            attractions:[{id:"artist",name:"Artist",images:[]}],
+            venues:[{name:"Venue",city:{name:city},country:{name:cc,countryCode:cc},location:{latitude:"48.8566",longitude:"2.3522"}}]
+          },images:[]
+        }]},
+        page:{size:200,totalElements:1,totalPages:1,number:0}
+      }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+
+  try{
+    const warm=await refreshCapitalEventSnapshots({TICKETMASTER_API_KEY:"test",DESK:kv},1);
+    assert.equal(warm.index,1);
+    assert.equal(tmCalls,1);
+
+    globalThis.fetch=async()=>{ throw new Error("capital visitor click must use KV"); };
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?city=Paris&countryCode=FR"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.events.length,1);
+    assert.equal(data.query.city,"Paris");
+    assert.equal(tmCalls,1);
+  }finally{
+    globalThis.fetch=oldFetch;
+    globalThis.caches=oldCaches;
   }
 });
