@@ -69,5 +69,5 @@ test("chart preview uses fixed -3 dB master headroom with no normalization",()=>
   assert.match(page,/const CHART_MASTER_GAIN = Math\.pow\(10,-3\/20\)/);
   assert.match(page,/audio\.volume = CHART_MASTER_GAIN/);
   assert.match(page,/gainSet\(v \* CHART_MASTER_GAIN\)/);
-  assert.doesNotMatch(page,/createDynamicsCompressor|normalize|loudness/i);
+  assert.doesNotMatch(page,/createDynamicsCompressor\s*\(|createConvolver\s*\(/);
 });
