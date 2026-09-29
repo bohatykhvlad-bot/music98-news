@@ -196,7 +196,15 @@ console.log(`закреплённых Apple-обложек до сборки: ${
 if (correctionsApplied.length) console.log(`исправлены явные cover-lock: ${correctionsApplied.join(", ")}`);
 
 /* Keep Apple metadata fresh cheaply for rows that already have a track ID. */
-const idWanted = tracks.map((t) => [t, idOf(t.url)]).filter(([, id]) => id);
+const idWanted = tracks
+  .map((t) => [t, idOf(t.url)])
+  .filter(([t, id]) => {
+    if (!id) return false;
+    const key = mergeKey(t.title, t.artist);
+    /* Existing verified metadata is a lock just like artwork. Daily runs must
+       not silently swap an old row to a newly-ranked Apple variant. */
+    return !previousNames[key] && !editorialCorrections[key];
+  });
 if (idWanted.length) {
   const ids = [...new Set(idWanted.map(([, id]) => id))];
   const byId = new Map();
