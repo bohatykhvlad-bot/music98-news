@@ -1341,9 +1341,11 @@ const RMONO = '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="2
    toggles opacity instead of replacing innerHTML. Both glyphs are
    envelope-symmetric, so the swap is pixel-stable as well. */
 const ICON_STACK = RMONO;
-// Keep Apple preview dynamics intact but leave 3 dB of headroom. This is a
-// fixed master attenuation only — no compressor/normalizer and no per-song boost.
-const CHART_MASTER_GAIN = Math.pow(10,-3/20);
+// Keep Apple preview dynamics intact but leave 6 dB of headroom. Apple Music
+// playback can be loudness-normalized while raw preview AAC is not, so a fixed
+// master attenuation avoids previews sounding artificially hotter on the site.
+// No compressor, normalizer or per-song boost is applied.
+const CHART_MASTER_GAIN = Math.pow(10,-6/20);
 const audio = new Audio();
 audio.preload = "auto";
 audio.playsInline = true;
@@ -1352,7 +1354,7 @@ audio.setAttribute("webkit-playsinline", "");
 audio.crossOrigin = "anonymous";
 audio.muted = false;
 audio.defaultMuted = false;
-audio.volume = CHART_MASTER_GAIN; /* -3 dB master headroom; fade logic preserves source dynamics */
+audio.volume = CHART_MASTER_GAIN; /* -6 dB master headroom; fade logic preserves source dynamics */
 const IS_ANDROID = /Android/i.test(navigator.userAgent);
 /* iOS gets the same onset guard as Android: the PC build never blasts because
    desktop browsers honour element volume instantly, mobile WebKit can hand
