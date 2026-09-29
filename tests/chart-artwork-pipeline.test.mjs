@@ -56,7 +56,9 @@ test("versioned chart rows still select their matching Apple version",()=>{
 
 test("runtime trusts only provenance-verified covers and self-heals unproven rows",()=>{
   assert.equal(COVER_RESOLVER_VERSION,3);
-  assert.deepEqual(meta,{});
+  assert.equal(meta["loser|tameimpala"].resolverVersion,3);
+  assert.equal(meta["loser|tameimpala"].trackId,"1836226731");
+  assert.equal(meta["loser|tameimpala"].collectionName,"Deadbeat");
   assert.match(top50,/const TOP50_KV = "top50v33"/);
   assert.match(top50,/coverMetaSeed/);
   assert.match(top50,/Number\(rec\.resolverVersion\) !== COVER_RESOLVER_VERSION/);
