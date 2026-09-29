@@ -9,18 +9,17 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/\.nav\{[^}]*width:410px;[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(page,/\.nav-btn\{width:100%;text-indent:var\(--ink-x,0px\);/);
   assert.match(page,/window\.music98InkShift/);
-  assert.match(page,/getImageData\(/);
+  assert.match(page,/getImageData\(/);\n  assert.match(page,/Math\\.round\\(\\(advance\\/2-inkCenter\\)\\*2\\)\\/2/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
-test("Subscribe scales around a fixed center with no axis translation or font-metric jump",()=>{
+test("Subscribe compositor-scales the complete rendered pill including text",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
-  assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(page,/\.press-pill-label\{[^}]*position:absolute;inset:0;[^}]*place-items:center;[^}]*text-indent:var\(--ink-x,0px\);[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
-  assert.match(page,/\.press-pill\.press \.press-pill-label\{transform:none\}/);
-  assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*font-size:/);
-  assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*translate:/);
+  assert.match(page,/\.press-pill\{[^}]*transform:translateZ\(0\) scale\(1\)!important;[^}]*will-change:transform/);
+  assert.match(page,/\.press-pill\.press\{transform:translateZ\(0\) scale\(\.985\)!important\}/);
+  assert.match(page,/\.press-pill-label\{[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
+  assert.doesNotMatch(page,/\.press-pill\.press::before\{transform:scale/);
 });
 
 test("chart artwork is server-audited and has no browser point-fix table",()=>{
@@ -30,7 +29,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260930-4/);
+  assert.match(page,/concerts-app\.js\?v=20260930-5/);
 });
 
 
@@ -60,10 +59,10 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 
 test("same-day chart cache is an instant paint and always revalidates",()=>{
-  assert.match(page,/const DAILYKEY = "music98news_daily_v37"/);
+  assert.match(page,/const DAILYKEY = "music98news_daily_v38"/);
   assert.match(page,/const hasFreshCache=!!\(cached/);
   assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
-  assert.match(page,/rev=37/);
+  assert.match(page,/rev=38/);
 });
 
 
@@ -85,4 +84,11 @@ test("browser iTunes fallback rejects derivative releases and never falls back t
   assert.match(page,/if\(wantV && collectionVersion && collectionVersion!==wantV\) continue;/);
   assert.match(page,/const lead=itunesLeadArtistName\(artist\)/);
   assert.doesNotMatch(page,/itunesLookup\(title, "", r2=>/);
+});
+
+
+test("valid empty Desk feed does not resurrect bundled News/Releases",()=>{
+  assert.match(page,/if\(!j \|\| !Array\.isArray\(j\.posts\)\) throw new Error\("invalid desk payload"\)/);
+  assert.match(page,/const live = j\.posts\.filter\(isLivePost\);[\s\S]*paint\(live\);/);
+  assert.doesNotMatch(page,/paint\(live\.length \? live :/);
 });

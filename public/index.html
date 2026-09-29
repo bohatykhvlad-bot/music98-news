@@ -487,10 +487,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .sub-in input{flex:1 1 0;min-width:0;width:0;border-radius:999px;height:43px;padding:0 18px;background:rgba(255,255,255,.75)}
 .sub-in input:focus,.sub-in input:focus-visible{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent);outline:none}
 .sub-in .btn{flex:0 0 126px;width:126px;min-width:126px;height:43px;padding:0;display:inline-flex;align-items:center;justify-content:center}
-.press-pill{position:relative;isolation:isolate;background:transparent!important;border-color:transparent!important;transform:none!important;transition:color .16s ease;font-size:14px;line-height:1}
-.press-pill::before{content:"";position:absolute;z-index:-1;inset:0;border:1px solid var(--pill-press-border,var(--line));border-radius:inherit;background:var(--pill-press-bg,var(--bg2));transform:scale(1);transform-origin:50% 50%;transition:transform .09s cubic-bezier(.34,1.2,.64,1),background .14s ease,border-color .14s ease;will-change:transform}
+.press-pill{position:relative;isolation:isolate;background:transparent!important;border-color:transparent!important;transform:translateZ(0) scale(1)!important;transform-origin:50% 50%;transition:transform .09s cubic-bezier(.34,1.2,.64,1),color .16s ease;font-size:14px;line-height:1;will-change:transform;backface-visibility:hidden}
+.press-pill::before{content:"";position:absolute;z-index:-1;inset:0;border:1px solid var(--pill-press-border,var(--line));border-radius:inherit;background:var(--pill-press-bg,var(--bg2));transition:background .14s ease,border-color .14s ease}
 .press-pill-label{position:absolute;inset:0;display:grid;place-items:center;text-indent:var(--ink-x,0px);line-height:1;text-box:trim-both cap alphabetic;font-size:14px;transform:none;translate:none;transition:none;pointer-events:none}
-.press-pill.press::before{transform:scale(.98)}
+.press-pill.press{transform:translateZ(0) scale(.985)!important}
 .press-pill.press .press-pill-label{transform:none}
 .subscribe .btn.primary.press-pill{--pill-press-bg:var(--accent);--pill-press-border:var(--accent);color:#03282b}
 .subscribe .btn.primary.press-pill:hover{filter:none;color:#03282b}
@@ -1186,7 +1186,7 @@ const lsSet = v => lsSetRaw(KEY, v);
 /* ============ settings & Apple integrations ============ */
 /* Measure the painted glyph pixels, not only CSS advance width. Pretendard has
    asymmetric side-bearings on some labels, so mathematical box centering can
-   still look 1-2 px off. Integer-only correction keeps text rasterization crisp. */
+   still look 1-2 px off. Half-pixel correction removes the residual 0.5px visual bias while preserving the same pill geometry. */
 window.music98InkShift = window.music98InkShift || function music98InkShift(el){
   if(!el) return 0;
   const txt=String(el.textContent||"").trim();
@@ -1217,7 +1217,7 @@ window.music98InkShift = window.music98InkShift || function music98InkShift(el){
   }
   if(maxX<minX) return 0;
   const inkCenter=((minX+maxX+1)/2)/scale-x0;
-  return Math.max(-2,Math.min(2,Math.round(advance/2-inkCenter)));
+  return Math.max(-2,Math.min(2,Math.round((advance/2-inkCenter)*2)/2));
 };
 window.music98CenterPillInk = window.music98CenterPillInk || function music98CenterPillInk(el){
   if(el) el.style.setProperty("--ink-x",window.music98InkShift(el)+"px");
@@ -1243,7 +1243,7 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v37";
+const DAILYKEY = "music98news_daily_v38";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -2071,8 +2071,11 @@ function loadPublishedDesk(){
     route();
   };
   grab("/api/desk").catch(()=> grab("/data/desk.json")).then(j=>{
-    const live = (j && Array.isArray(j.posts)) ? j.posts.filter(isLivePost) : [];
-    paint(live.length ? live : JSON.parse(JSON.stringify(SEED.posts)));
+    if(!j || !Array.isArray(j.posts)) throw new Error("invalid desk payload");
+    const live = j.posts.filter(isLivePost);
+    // A valid empty feed is intentional. The old fallback resurrected bundled
+    // News/Releases after editors removed or scheduled every live post.
+    paint(live);
   }).catch(()=>{
     paint(JSON.parse(JSON.stringify(SEED.posts)));
   });
@@ -2217,7 +2220,7 @@ function refreshDailyTop50(){
   // Always revalidate so an updated chart cannot stay frozen until tomorrow.
   const grab = u => fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   /* ?d + rev bust both browser and edge copies after chart/cache fixes. */
-  grab("/api/top50?d=" + todayUTC() + "&rev=37").catch(()=> grab("/data/top50.json?rev=37")).then(j=>{
+  grab("/api/top50?d=" + todayUTC() + "&rev=38").catch(()=> grab("/data/top50.json?rev=38")).then(j=>{
     const tracks = (j && j.tracks) || [];
     if(tracks.length < 10) throw 0;
     lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
@@ -3777,6 +3780,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260930-4" defer></script>
+<script src="/concerts-app.js?v=20260930-5" defer></script>
 </body>
 </html>
