@@ -793,7 +793,9 @@ async function loadArtistArea(lat,lng,label,radius){
     const grid=searchGridCenter(lat,lng,searchRadius);
     const data=await getPayload({lat:grid.lat,lng:grid.lng,radius:searchRadius});
     if(requestId!==areaRequestSeq || !artistContext || artistKey(artistContext.item)!==contextKey || activeMode!=="artist-area") return;
-    const events=data.events||[];
+    let events=stabilizeArtistCoordinates(data.events||[]);
+    const maxDistance=searchRadius*1.35+18;
+    events=events.filter(e=>distanceKm(lat,lng,Number(e.lat),Number(e.lng))<=maxDistance);
     const total=Number(data.page?.totalElements ?? events.length) || events.length;
     artistContext.areaEvents=events;
     artistContext.areaTotal=total;
@@ -1066,7 +1068,11 @@ async function loadArea(lat,lng,label,opts={}){
       ? await getPayload({city:opts.city,countryCode:opts.countryCode||""})
       : await getPayload({lat:grid.lat,lng:grid.lng,radius:searchRadius});
     if(requestId!==areaRequestSeq) return;
-    const events=data.events||[];
+    let events=stabilizeArtistCoordinates(data.events||[]);
+    if(!opts.city){
+      const maxDistance=searchRadius*1.35+18;
+      events=events.filter(e=>distanceKm(lat,lng,Number(e.lat),Number(e.lng))<=maxDistance);
+    }
     const total=Number(data.page?.totalElements ?? events.length) || events.length;
 
     nearbyEvents=events;
