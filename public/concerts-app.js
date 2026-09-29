@@ -151,13 +151,24 @@ function isEuropeanCapital(h){
   return names.some(x=>normPlaceName(x)===n);
 }
 function hubsGeoJSON(){
+  const capitals=hotspots.filter(isEuropeanCapital);
+  const fallback=new Set(
+    capitals.length ? [] : hotspots.slice().sort((a,b)=>Number(b.count||0)-Number(a.count||0)).slice(0,12)
+  );
   return {
     type:"FeatureCollection",
-    features:hotspots.map(h=>({
-      type:"Feature",
-      geometry:{type:"Point",coordinates:[h.lng,h.lat]},
-      properties:{name:h.city,countryCode:h.countryCode||"",count:h.count||0,capital:isEuropeanCapital(h)?1:0}
-    }))
+    features:hotspots.map(h=>{
+      const capital=isEuropeanCapital(h);
+      return {
+        type:"Feature",
+        geometry:{type:"Point",coordinates:[h.lng,h.lat]},
+        properties:{
+          name:h.city,countryCode:h.countryCode||"",count:h.count||0,
+          capital:capital?1:0,
+          overview:(capital||fallback.has(h))?1:0
+        }
+      };
+    })
   };
 }
 
@@ -197,6 +208,19 @@ function addConcertTriangle(){
 }
 
 function addTopographicRelief(){
+  const layers=map.getStyle()?.layers||[];
+  for(const layer of layers){
+    const id=String(layer.id||"");
+    try{
+      if(layer.type==="fill" && /(park|landcover|landuse|wood|grass|scrub|pitch|golf|cemetery)/i.test(id)){
+        map.setPaintProperty(id,"fill-color","#eceff0");
+        map.setPaintProperty(id,"fill-opacity",.58);
+      }
+      if(layer.type==="fill" && /water/i.test(id)){
+        map.setPaintProperty(id,"fill-color","#dcebf0");
+      }
+    }catch(e){}
+  }
   if(map.getSource("m98-dem")) return;
   map.addSource("m98-dem",{type:"raster-dem",url:"mapbox://mapbox.mapbox-terrain-dem-v1",tileSize:512,maxzoom:14});
   const before=map.getStyle()?.layers?.find(x=>x.type==="symbol")?.id;
@@ -223,7 +247,7 @@ function addLayers(){
 
   // Wide view: only qualifying European capitals. Zoom in: all qualifying cities.
   map.addLayer({
-    id:"capital-points",type:"symbol",source:"hubs",maxzoom:4.7,filter:["==",["get","capital"],1],
+    id:"capital-points",type:"symbol",source:"hubs",maxzoom:4.7,filter:["==",["get","overview"],1],
     layout:{
       "icon-image":"m98-triangle",
       "icon-size":["interpolate",["linear"],["zoom"],1.5,.62,3,.74,4.6,.86],
@@ -231,7 +255,7 @@ function addLayers(){
     }
   });
   map.addLayer({
-    id:"capital-labels",type:"symbol",source:"hubs",minzoom:2,maxzoom:4.7,filter:["==",["get","capital"],1],
+    id:"capital-labels",type:"symbol",source:"hubs",minzoom:2,maxzoom:4.7,filter:["==",["get","overview"],1],
     layout:{
       "text-field":["get","name"],"text-size":11,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],
       "text-offset":[0,-1.25],"text-anchor":"bottom","text-allow-overlap":false
@@ -239,7 +263,7 @@ function addLayers(){
     paint:{"text-color":"#20272a","text-halo-color":"rgba(255,255,255,.96)","text-halo-width":1.5}
   });
   map.addLayer({
-    id:"hub-hit-capital",type:"circle",source:"hubs",maxzoom:4.7,filter:["==",["get","capital"],1],
+    id:"hub-hit-capital",type:"circle",source:"hubs",maxzoom:4.7,filter:["==",["get","overview"],1],
     paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":18,"circle-opacity":.001,"circle-stroke-width":0}
   });
 
