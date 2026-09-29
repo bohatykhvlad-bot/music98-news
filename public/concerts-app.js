@@ -718,7 +718,11 @@ function showPopup(e){
 }
 
 function focusEventOnMap(e){
-  if(!e || !Number.isFinite(Number(e.lat)) || !Number.isFinite(Number(e.lng))) return;
+  if(!e) return;
+  if(!Number.isFinite(Number(e.lat)) || !Number.isFinite(Number(e.lng))){
+    if(e.url) window.open(e.url,"_blank","noopener");
+    return;
+  }
   userMoving=false;
   const targetZoom=Math.min(Math.max(map.getZoom(),6.3),8.2);
   map.easeTo({center:[Number(e.lng),Number(e.lat)],zoom:targetZoom,duration:380});
