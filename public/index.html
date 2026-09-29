@@ -315,6 +315,7 @@ main{position:relative;z-index:1}
 .loadmore-btn::before{content:"";position:absolute;z-index:-1;inset:0;border:1px solid var(--line);border-radius:inherit;background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);transition:border-color .18s}
 .loadmore-btn:hover{color:var(--text)}
 .loadmore-btn:hover::before{border-color:var(--muted2)}
+.loadmore-btn:active{transform:scale(.985) translateZ(0)}
 a.card,a.hero{color:inherit;text-decoration:none}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:box-shadow .2s ease,transform .2s ease;display:flex;flex-direction:column;position:relative;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .card:active,.card:focus,.card:focus-visible{border-color:var(--line);outline:none;box-shadow:none;transform:none}
@@ -491,8 +492,9 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .press-pill{position:relative;isolation:isolate;background:transparent!important;border-color:transparent!important;transform:translateZ(0);transform-origin:50% 50%;will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;-webkit-font-smoothing:antialiased;transition:transform .09s cubic-bezier(.34,1.2,.64,1),color .16s ease;font-size:14px;line-height:1}
 .press-pill::before{content:"";position:absolute;z-index:-1;inset:0;border:1px solid var(--pill-press-border,var(--line));border-radius:inherit;background:var(--pill-press-bg,var(--bg2));transition:background .14s ease,border-color .14s ease}
 .press-pill-label{position:absolute;inset:0;display:grid;place-items:center;text-indent:var(--ink-x,0px);line-height:1;text-box:trim-both cap alphabetic;font-size:14px;transform:none;translate:none;transition:none;pointer-events:none}
-.subscribe .btn.primary.press-pill{color:#0b0d0e}
-.subscribe .btn.primary.press-pill:hover{filter:none;color:#0b0d0e}
+.press-pill.press{transform:scale(.985) translateZ(0)}
+.subscribe .btn.primary.press-pill{--pill-press-bg:var(--accent);--pill-press-border:var(--accent);color:#03282b}
+.subscribe .btn.primary.press-pill:hover{filter:none;color:#03282b}
 .btn{border:1px solid var(--line);background:var(--bg2);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
 .btn:hover{border-color:var(--accent-dim);color:var(--acc2)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#03282b}
@@ -785,34 +787,6 @@ textarea{resize:vertical;min-height:64px}
   .ctext .ctrack{font-size:13px}
   .crow{grid-template-columns:24px 1fr 1fr 70px;grid-auto-rows:auto}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
-}
-
-/* ---------- admin-desk pill parity ---------- */
-/* Only Subscribe and Load More use the admin-desk button system.
-   Top navigation and other interface controls keep their previous styling. */
-.loadmore-btn,.press-pill{
-  background:transparent!important;border-color:transparent!important;transform:none;
-  transition:transform .12s cubic-bezier(.34,1.2,.64,1);-webkit-tap-highlight-color:transparent;will-change:transform
-}
-.loadmore-btn{color:#15181a;font-weight:700}
-.loadmore-btn::before,.press-pill::before{
-  background:#f4f6f7;border:1px solid #e2e8ea;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;
-  transition:background .15s ease,border-color .15s ease,box-shadow .15s ease
-}
-.loadmore-btn:hover{color:#15181a}
-.loadmore-btn:hover::before{background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba(15,30,34,.07)}
-.loadmore-btn:active{transform:scale(.96)}
-.loadmore-btn:active::before{background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba(15,30,34,.08)}
-.loadmore-btn:focus-visible{outline:2px solid #8a979c;outline-offset:2px}
-.press-pill{color:#0b0d0e;font-weight:700}
-.press-pill:hover{filter:none;color:#0b0d0e}
-.press-pill:hover::before{background:#fff;border-color:#8a979c;box-shadow:0 1px 3px rgba(15,30,34,.09)}
-.press-pill:active,.press-pill.press{transform:scale(.96)}
-.press-pill:active::before,.press-pill.press::before{background:#fff;border-color:#15181a;box-shadow:inset 0 2px 4px rgba(15,30,34,.1)}
-.press-pill:focus-visible{outline:2px solid #8a979c;outline-offset:2px}
-@media (prefers-reduced-motion:reduce){
-  .loadmore-btn,.press-pill,.loadmore-btn::before,.press-pill::before{transition:none}
-  .loadmore-btn:active,.press-pill:active,.press-pill.press{transform:none}
 }
 </style>
 </head>
@@ -3808,6 +3782,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260930-7" defer></script>
+<script src="/concerts-app.js?v=20260930-6" defer></script>
 </body>
 </html>

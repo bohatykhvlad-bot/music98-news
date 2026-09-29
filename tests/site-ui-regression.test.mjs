@@ -16,13 +16,13 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
-test("Subscribe mirrors admin-desk primary pill states through its pseudo background",()=>{
+test("Subscribe pre-promotes the whole pill and scales text with the button",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
-  assert.match(page,/\.press-pill\{color:#0b0d0e;font-weight:700\}/);
-  assert.match(page,/\.press-pill:active,\.press-pill\.press\{transform:scale\(\.96\)\}/);
+  assert.match(page,/\.press-pill\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
+  assert.match(page,/\.press-pill\.press\{transform:scale\(\.985\) translateZ\(0\)\}/);
   assert.match(page,/\.press-pill-label\{[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
-  assert.match(page,/\.press-pill:active::before,\.press-pill\.press::before\{background:#fff;border-color:#15181a;box-shadow:inset 0 2px 4px rgba\(15,30,34,\.1\)\}/);
+  assert.doesNotMatch(page,/\.press-pill\.press::before/);
   assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label/);
 });
 
@@ -33,7 +33,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260930-7/);
+  assert.match(page,/concerts-app\.js\?v=20260930-6/);
 });
 
 
@@ -98,17 +98,8 @@ test("valid empty Desk feed does not resurrect bundled News/Releases",()=>{
 });
 
 
-test("Load More mirrors admin-desk regular pill states through its pseudo background",()=>{
-  assert.match(page,/\.loadmore-btn\{color:#15181a;font-weight:700\}/);
-  assert.match(page,/\.loadmore-btn:active\{transform:scale\(\.96\)\}/);
-  assert.match(page,/\.loadmore-btn:active::before\{background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba\(15,30,34,\.08\)\}/);
-});
-
-
-test("public admin parity excludes navigation and interface chips",()=>{
-  assert.match(page,/\.nav-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
-  assert.match(page,/\.nav-btn\.active\{background:var\(--accent\);color:#03282b\}/);
-  assert.match(page,/\.loadmore-btn:active\{transform:scale\(\.96\)\}/);
-  assert.match(page,/\.press-pill:active,\.press-pill\.press\{transform:scale\(\.96\)\}/);
-  assert.doesNotMatch(page,/\.nav-btn,\.hint-chip\{[\s\S]*?background:#f4f6f7/);
+test("Load More pre-promotes and scales the whole pill",()=>{
+  assert.match(page,/\.loadmore-btn\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
+  assert.match(page,/\.loadmore-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.doesNotMatch(page,/\.loadmore-btn:active::before/);
 });
