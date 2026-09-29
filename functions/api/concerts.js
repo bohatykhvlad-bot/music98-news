@@ -142,12 +142,38 @@ function baseEventUrl(apiKey) {
   return tm;
 }
 
-async function tmJson(url) {
+const TM_DAILY_GUARD_DEFAULT = 3000;
+let tmSharedLastFetchAt = 0;
+
+async function reserveTicketmasterCall(env) {
+  if (!env?.DESK) return;
+  const configured=Number(env.TICKETMASTER_DAILY_BUDGET);
+  const limit=Number.isFinite(configured) && configured>0
+    ? Math.max(100,Math.floor(configured))
+    : TM_DAILY_GUARD_DEFAULT;
+  const day=new Date().toISOString().slice(0,10);
+  const key="ticketmaster:daily:"+day;
+  let used=0;
+  try{ used=Number(await env.DESK.get(key))||0; }catch(e){}
+  if(used>=limit){
+    throw Object.assign(new Error("ticketmaster_budget_guard"),{status:429});
+  }
+  try{
+    await env.DESK.put(key,String(used+1),{expirationTtl:172800});
+  }catch(e){}
+}
+
+async function tmJson(url, env) {
+  await reserveTicketmasterCall(env);
+  const wait=Math.max(0,225-(Date.now()-tmSharedLastFetchAt));
+  if(wait) await new Promise(resolve=>setTimeout(resolve,wait));
+
   let res;
   try {
     res = await fetch(url.toString(), {
       headers: { "Accept": "application/json", "User-Agent": "music98.news/1.0" },
     });
+    tmSharedLastFetchAt=Date.now();
   } catch {
     throw Object.assign(new Error("ticketmaster_unavailable"), { status: 502 });
   }
@@ -222,13 +248,13 @@ function normName(s) {
     .toLowerCase();
 }
 
-async function validatePopularArtist(apiKey, name, popularityRank, listeners) {
-  const tm = baseEventUrl(apiKey);
+async function validatePopularArtist(env, name, popularityRank, listeners) {
+  const tm = baseEventUrl(env.TICKETMASTER_API_KEY);
   tm.searchParams.set("keyword", name);
   tm.searchParams.set("size", "20");
   tm.searchParams.set("sort", "relevance,desc");
 
-  const raw = await tmJson(tm);
+  const raw = await tmJson(tm, env);
   const wanted = normName(name);
   const events = raw?._embedded?.events || [];
 
@@ -250,7 +276,7 @@ async function validatePopularArtist(apiKey, name, popularityRank, listeners) {
   return null;
 }
 
-async function popularPayload(apiKey) {
+async function popularPayload(env) {
   const ranking = await kworbArtists();
   const candidates = ranking.artists.slice(0, 42);
   const found = [];
@@ -259,7 +285,7 @@ async function popularPayload(apiKey) {
   for (let i = 0; i < candidates.length && found.length < 10; i += 4) {
     const chunk = candidates.slice(i, i + 4);
     const checked = await Promise.all(chunk.map(a =>
-      validatePopularArtist(apiKey, a.name, a.rank, a.listeners).catch(() => null)
+      validatePopularArtist(env, a.name, a.rank, a.listeners).catch(() => null)
     ));
     for (const artist of checked) {
       if (!artist || found.some(x => x.id === artist.id)) continue;
@@ -299,10 +325,8 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function hotspotTmJson(url) {
-  const wait = Math.max(0, 225 - (Date.now() - hotspotLastFetchAt));
-  if (wait) await sleep(wait);
-  const out = await tmJson(url);
+async function hotspotTmJson(url, env) {
+  const out = await tmJson(url, env);
   hotspotLastFetchAt = Date.now();
   return out;
 }
@@ -333,7 +357,7 @@ export async function refreshPopularSnapshot(env, force = false) {
   if (!force && existing?.artists?.length && age < POPULAR_REFRESH_MS) {
     return { ok:true, fresh:true, artists:existing.artists.length };
   }
-  const payload = await popularPayload(env.TICKETMASTER_API_KEY);
+  const payload = await popularPayload(env);
   const snapshot = { ...payload, builtAt:new Date().toISOString(), version:"popular-v2" };
   await kvPutJson(env, POPULAR_SNAPSHOT_KEY, snapshot);
   return { ok:true, fresh:false, artists:snapshot.artists.length };
@@ -383,7 +407,7 @@ async function venuePage(env, apiKey, job, page = 0) {
   tm.searchParams.set("page", String(page));
   tm.searchParams.set("locale", "en-us,en,*");
 
-  const raw = await hotspotTmJson(tm);
+  const raw = await hotspotTmJson(tm, env);
   await kvPutJson(env, cacheKey, raw, { expirationTtl: HOTSPOT_CACHE_TTL }).catch(() => {});
   return raw;
 }
@@ -408,7 +432,7 @@ async function verifyHotspotCity(env, apiKey, record) {
     tm.searchParams.set("size", "1");
     tm.searchParams.set("sort", "date,asc");
 
-    const raw = await hotspotTmJson(tm);
+    const raw = await hotspotTmJson(tm, env);
     count = Number(raw?.page?.totalElements || 0);
     await kvPutJson(env, cacheKey, { count }, { expirationTtl: HOTSPOT_CACHE_TTL }).catch(() => {});
   }
@@ -702,7 +726,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
       tm.searchParams.set("includeTest", "no");
       tm.searchParams.set("locale", "en-us,en,*");
       tm.searchParams.set("size", "6");
-      const raw = await tmJson(tm);
+      const raw = await tmJson(tm, env);
       const artists = (raw?._embedded?.attractions || []).map(x => ({
         id: String(x?.id || ""),
         name: String(x?.name || ""),
@@ -730,7 +754,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
       tm.searchParams.set("unit", "km");
     }
 
-    const raw = await tmJson(tm);
+    const raw = await tmJson(tm, env);
     const events = (raw?._embedded?.events || []).map(normalizeEvent).filter(Boolean);
     const payload = {
       ok: true,
@@ -745,6 +769,9 @@ export async function onRequestGet({ request, env, waitUntil }) {
     await cache.put(cacheKey, res.clone()).catch(() => {});
     return res;
   } catch (err) {
+    if (err?.message === "ticketmaster_budget_guard") {
+      return json({ error:"ticketmaster_temporarily_limited" }, 429, { "Retry-After":"3600" });
+    }
     if (err?.message === "ticketmaster_unavailable") {
       return json({ error: "ticketmaster_unavailable" }, 502);
     }
