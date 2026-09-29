@@ -66,7 +66,7 @@ export function rankArtworkCandidates(track,candidates) {
   const ranked=clean.map(c=>{
     const y=releaseYear(c.releaseDate), rk=normalizedRelease(c.releaseTitle);
     const consensus=rk?(releaseProviders.get(rk)?.size||0):0;
-    let score=c.provider==="apple-feed"?520:c.provider==="apple-chart"?340:c.provider==="apple"?300:c.provider==="deezer"?260:180;
+    let score=c.provider==="apple-feed"?520:c.provider==="apple-chart"?340:c.provider==="apple"?300:c.provider==="deezer"?260:c.provider==="apple-runtime"?240:180;
     if(c.provider==="apple-feed") score+=420;
     if(c.provider==="apple-chart") score+=100;
     if(c.releaseClass==="dedicated") score+=catalog?90:230;
@@ -77,7 +77,7 @@ export function rankArtworkCandidates(track,candidates) {
     }
     if(consensus>=2) score+=240;
     if(c.provider==="apple") score+=15;
-    const confidence=c.provider==="apple-feed"?99:consensus>=2?98:c.provider==="apple-chart"?96:c.provider==="apple"?94:c.provider==="deezer"?91:88;
+    const confidence=c.provider==="apple-feed"?99:consensus>=2?98:c.provider==="apple-chart"?96:c.provider==="apple"?94:c.provider==="apple-runtime"?92:c.provider==="deezer"?91:88;
     return {...c,score,confidence,consensus,earliestReleaseYear:earliest||null,catalog};
   });
   ranked.sort((a,b)=>b.score-a.score||b.confidence-a.confidence||releaseYear(a.releaseDate)-releaseYear(b.releaseDate)||String(a.provider).localeCompare(String(b.provider))||String(a.id||"").localeCompare(String(b.id||"")));

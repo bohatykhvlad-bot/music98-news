@@ -130,6 +130,24 @@ function safePrevious(track,p){
 }
 function publicCandidate(c){ if(!c)return null; return {provider:c.provider,id:c.id,collectionId:c.collectionId,releaseTitle:c.releaseTitle,releaseArtist:c.releaseArtist,releaseDate:c.releaseDate,releaseClass:c.releaseClass,art:c.art,url:c.url,score:c.score,confidence:c.confidence,consensus:c.consensus,earliestReleaseYear:c.earliestReleaseYear}; }
 
+function runtimeAppleCandidate(track){
+  const art=String(track?.art||"");
+  const url=String(track?.url||"");
+  if(!/^https:\/\/[^/]*mzstatic\.com\//i.test(art)) return null;
+  if(url && !/^https:\/\/(?:music|geo)\.apple\.com\//i.test(url)) return null;
+  /* This is only a last-resort bridge for a brand-new chart row that Apple has
+     already supplied to /api/top50 but whose catalog/search indexes have not
+     caught up yet. It is never allowed to overwrite an existing audited row. */
+  return {
+    provider:"apple-runtime",id:trackIdFrom(url),collectionId:"",
+    trackTitle:String(track?.title||""),artist:String(track?.artist||""),
+    releaseTitle:"",releaseArtist:String(track?.artist||""),
+    releaseDate:"",trackCount:0,genre:"",
+    art,url,preview:String(track?.prev||track?.preview||""),raw:null,
+    runtimeBridge:true
+  };
+}
+
 const chart=await json(CHART+(CHART.includes("?")?"&":"?")+"artworkAudit="+Date.now());
 const tracks=Array.isArray(chart?.tracks)?chart.tracks:[];
 if(!tracks.length) throw new Error("chart is empty");
@@ -150,8 +168,18 @@ for(let i=0;i<tracks.length;i++){
     try{candidates.push(...await searchDeezer(t));}catch(e){console.log("ARTWORK_AUDIT deezer fail",i+1,t.artist,"-",t.title,String(e.message||e));}
   }
   const dedup=new Map(); for(const c of candidates){const k=[c.provider,c.id,c.collectionId,c.art].join("|");if(!dedup.has(k))dedup.set(k,c);} candidates=[...dedup.values()];
-  const {selected,ranked}=selectArtworkCandidate(t,candidates);
-  let chosen=selected; const prev=safePrevious(t,oldAudit[identity]);
+  let ranked=rankArtworkCandidates(t,candidates);
+  let selected=ranked[0]||null;
+  const prev=safePrevious(t,oldAudit[identity]);
+  if(!selected && !prev){
+    const runtime=runtimeAppleCandidate(t);
+    if(runtime && candidateCompatible(t,runtime)){
+      candidates.push(runtime);
+      ranked=rankArtworkCandidates(t,candidates);
+      selected=ranked[0]||null;
+    }
+  }
+  let chosen=selected;
   if(!chosen&&prev) chosen={...prev,provider:"previous-audit",score:Number(prev.score||0),confidence:Number(prev.confidence||92),releaseClass:prev.releaseClass||"album"};
   else if(chosen&&prev&&chosen.art!==prev.art){
     const strong=chosen.provider==="apple-feed"||chosen.consensus>=2||chosen.confidence>=98;
