@@ -1146,6 +1146,54 @@ async function selectArtistSuggestion(item){
   const card=toursEl.querySelector(".tour-card");
   if(card) await toggleArtist(item,card,"popular");
 }
+function localArtistMatches(q){
+  const n=normPlaceName(q);
+  if(!n) return [];
+  return popularArtists
+    .filter(a=>normPlaceName(a.name).includes(n))
+    .sort((a,b)=>{
+      const an=normPlaceName(a.name),bn=normPlaceName(b.name);
+      const ae=an===n?0:an.startsWith(n)?1:2;
+      const be=bn===n?0:bn.startsWith(n)?1:2;
+      return ae-be||Number(a.rank||999)-Number(b.rank||999);
+    })
+    .slice(0,4);
+}
+function localHotspotMatches(q){
+  const n=normPlaceName(q);
+  if(!n) return [];
+  return hotspots
+    .filter(h=>normPlaceName(h.city).includes(n))
+    .sort((a,b)=>{
+      const an=normPlaceName(a.city),bn=normPlaceName(b.city);
+      const ae=an===n?0:an.startsWith(n)?1:2;
+      const be=bn===n?0:bn.startsWith(n)?1:2;
+      return ae-be||Number(b.count||0)-Number(a.count||0);
+    })
+    .slice(0,4);
+}
+async function selectHotspotSuggestion(h){
+  if(!h) return;
+  const lat=Number(h.lat),lng=Number(h.lng);
+  if(!Number.isFinite(lat)||!Number.isFinite(lng)) return;
+  const label=[h.city,h.countryCode].filter(Boolean).join(", ");
+  search.value=label;
+  suggestions.hidden=true;
+  userMoving=false;
+  map.flyTo({center:[lng,lat],zoom:8.5,duration:600});
+  await loadArea(lat,lng,h.city||label,{fit:false,radius:45,city:h.city||"",countryCode:h.countryCode||""});
+}
+function addHotspotSuggestion(h){
+  const b=document.createElement("button"); b.className="suggestion suggestion-location"; b.type="button";
+  const cp=document.createElement("span"); cp.className="suggestion-copy";
+  const title=document.createElement("span"); title.className="suggestion-title";
+  title.textContent=[h.city,h.countryCode].filter(Boolean).join(", ");
+  const kind=document.createElement("span"); kind.className="suggestion-kind";
+  kind.textContent=Number(h.count||0)+" upcoming concerts";
+  cp.append(title,kind); b.appendChild(cp);
+  b.addEventListener("click",()=>selectHotspotSuggestion(h)); suggestions.appendChild(b);
+}
+
 function addArtistSuggestion(item){
   const b=document.createElement("button"); b.className="suggestion"; b.type="button";
   const img=document.createElement("img"); img.className="suggestion-art"; img.src=item.image||"/logo.png"; img.alt="";
@@ -1164,10 +1212,16 @@ function addPlaceSuggestion(f){
   cp.append(title,kind); b.appendChild(cp);
   b.addEventListener("click",()=>selectFeature(f)); suggestions.appendChild(b);
 }
-function renderSuggestions(places,artists){
+function renderSuggestions(places,artists,hubs=[]){
   suggestions.textContent="";
-  (artists||[]).slice(0,4).forEach(addArtistSuggestion);
-  (places||[]).slice(0,4).forEach(addPlaceSuggestion);
+  const seenArtists=new Set();
+  (artists||[]).forEach(a=>{
+    const key=artistKey(a);
+    if(!key||seenArtists.has(key)||seenArtists.size>=4) return;
+    seenArtists.add(key); addArtistSuggestion(a);
+  });
+  (hubs||[]).slice(0,3).forEach(addHotspotSuggestion);
+  (places||[]).slice(0,3).forEach(addPlaceSuggestion);
   suggestions.hidden=!suggestions.childElementCount;
 }
 
@@ -1195,12 +1249,14 @@ search.addEventListener("input",()=>{
   const q=search.value.trim();
   if(q.length<2){ suggestions.hidden=true; return; }
   suggestTimer=setTimeout(async()=>{
-    const artistWork=q.length>=3 ? searchArtists(q) : Promise.resolve([]);
+    const localArtists=localArtistMatches(q);
+    const localHubs=localHotspotMatches(q);
+    const artistWork=q.length>=3 && localArtists.length<4 ? searchArtists(q) : Promise.resolve([]);
     const [placesResult,artistsResult]=await Promise.allSettled([geocode(q,true),artistWork]);
     if(seq!==suggestSeq || search.value.trim()!==q) return;
     const places=placesResult.status==="fulfilled"?placesResult.value:[];
-    const artists=artistsResult.status==="fulfilled"?artistsResult.value:[];
-    renderSuggestions(places,artists);
+    const remoteArtists=artistsResult.status==="fulfilled"?artistsResult.value:[];
+    renderSuggestions(places,[...localArtists,...remoteArtists],localHubs);
   },340);
 });
 search.addEventListener("keydown",async e=>{
@@ -1208,11 +1264,17 @@ search.addEventListener("keydown",async e=>{
   e.preventDefault();
   ++suggestSeq;
   const q=search.value.trim(); if(!q) return;
+  const localArtists=localArtistMatches(q);
+  const exactLocalArtist=localArtists.find(a=>normPlaceName(a.name)===normPlaceName(q));
+  if(exactLocalArtist){ await selectArtistSuggestion(exactLocalArtist); return; }
+  const localHubs=localHotspotMatches(q);
+  const exactHub=localHubs.find(h=>normPlaceName(h.city)===normPlaceName(q));
+  if(exactHub){ await selectHotspotSuggestion(exactHub); return; }
+
   const [placesResult,artistsResult]=await Promise.allSettled([geocode(q,false),searchArtists(q)]);
   const places=placesResult.status==="fulfilled"?placesResult.value:[];
   const artists=artistsResult.status==="fulfilled"?artistsResult.value:[];
-  const norm=s=>String(s||"").trim().toLowerCase();
-  const exact=artists.find(a=>norm(a.name)===norm(q));
+  const exact=artists.find(a=>normPlaceName(a.name)===normPlaceName(q));
   if(exact){ await selectArtistSuggestion(exact); return; }
   if(places[0]){ await selectFeature(places[0]); return; }
   if(artists[0]){ await selectArtistSuggestion(artists[0]); return; }
