@@ -6,7 +6,7 @@ workers_dev = true
 compatibility_flags = ["global_fetch_strictly_public"]
 
 [triggers]
-crons = ["20 0 * * *", "45 2,4,6,8,10,12,14,16,18,20,22 * * *"]
+crons = ["20 0 * * *", "20 1 * * *", "*/10 * * * *"]
 
 [vars]
 FROM_EMAIL = "music98.news <onboarding@resend.dev>"

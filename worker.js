@@ -249,15 +249,37 @@ export default {
 
   async scheduled(controller, env, ctx) {
     ctx.waitUntil((async()=>{
-      const dailyKickoff=String(controller?.cron||"")==="20 0 * * *";
+      const cron=String(controller?.cron||"");
+      const mapDaily=cron==="20 0 * * *";
+      const popularDaily=cron==="20 1 * * *";
 
-      // Build one daily verified map snapshot from a fixed candidate list.
-      // Only cities with at least one real upcoming Ticketmaster music event
-      // are published. The batch size keeps the total scheduled subrequests
-      // below the Worker ceiling while avoiding visitor-triggered discovery.
-      try{ await refreshMapMarketSnapshot(env,dailyKickoff); }catch(e){}
-      try{ await refreshPopularSnapshot(env,dailyKickoff); }catch(e){}
-      try{ await refreshPopularTourSnapshots(env,1); }catch(e){}
+      if(mapDaily){
+        let r=null;
+        for(let i=0;i<2;i++){
+          try{ r=await refreshMapMarketSnapshot(env,i===0); }catch(e){ break; }
+          if(r?.complete || r?.retry) break;
+        }
+        return;
+      }
+
+      if(popularDaily){
+        let r=null;
+        for(let i=0;i<4;i++){
+          try{ r=await refreshPopularSnapshot(env,i===0); }catch(e){ break; }
+          if(r?.complete || r?.retry) break;
+        }
+        if(r?.complete){
+          try{ await refreshPopularTourSnapshots(env,1); }catch(e){}
+        }
+        return;
+      }
+
+      let popularResult=null;
+      try{ await refreshMapMarketSnapshot(env,false); }catch(e){}
+      try{ popularResult=await refreshPopularSnapshot(env,false); }catch(e){}
+      if(popularResult?.complete){
+        try{ await refreshPopularTourSnapshots(env,1); }catch(e){}
+      }
     })());
   },
 };

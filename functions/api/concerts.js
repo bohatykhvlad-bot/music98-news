@@ -36,10 +36,11 @@ const CAPITAL_HUB_SNAPSHOT_KEY = "concert-capitals:v1:hubs";
 const PREWARM_MAX_AGE_MS = 26 * 60 * 60 * 1000;
 const MAP_WARM_LOCK_KEY = "concert-map:warm-lock:v1";
 const MAP_WARM_LOCK_MS = 15 * 60 * 1000;
-const MAP_MARKET_VERSION = "concert-markets-v3";
-const MAP_MARKET_STATE_KEY = "concert-markets:v3:state";
-const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v3:snapshot";
-const MAP_MARKET_LEGACY_SNAPSHOT_KEY = "concert-markets:v2:snapshot";
+const MAP_MARKET_VERSION = "concert-markets-v4";
+const MAP_MARKET_STATE_KEY = "concert-markets:v4:state";
+const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v4:snapshot";
+const MAP_MARKET_LEGACY_SNAPSHOT_KEY = "concert-markets:v3:snapshot";
+const MAP_MARKET_LEGACY2_SNAPSHOT_KEY = "concert-markets:v2:snapshot";
 const MAP_MARKET_BATCH_SIZE = 20;
 
 /* The source list is intentionally human-readable and grouped, but a batch must
@@ -1072,18 +1073,22 @@ export async function refreshMapMarketSnapshot(env, force=false){
 }
 
 async function marketSnapshotPayload(env){
-  const [snapshot,state,legacySnapshot]=await Promise.all([
+  const [snapshot,state,legacySnapshot,legacySnapshot2]=await Promise.all([
     kvGetJson(env,MAP_MARKET_SNAPSHOT_KEY),
     kvGetJson(env,MAP_MARKET_STATE_KEY),
     kvGetJson(env,MAP_MARKET_LEGACY_SNAPSHOT_KEY),
+    kvGetJson(env,MAP_MARKET_LEGACY2_SNAPSHOT_KEY),
   ]);
 
   const cycle=new Date().toISOString().slice(0,10);
   const snapshotMarkets=snapshot?.version===MAP_MARKET_VERSION && Array.isArray(snapshot.markets)
     ? snapshot.markets.filter(x=>Number(x?.count||0)>0)
     : [];
-  const legacyMarkets=legacySnapshot?.version==="concert-markets-v2" && Array.isArray(legacySnapshot.markets)
+  const legacyMarkets=legacySnapshot?.version==="concert-markets-v3" && Array.isArray(legacySnapshot.markets)
     ? legacySnapshot.markets.filter(x=>Number(x?.count||0)>0)
+    : [];
+  const legacyMarkets2=legacySnapshot2?.version==="concert-markets-v2" && Array.isArray(legacySnapshot2.markets)
+    ? legacySnapshot2.markets.filter(x=>Number(x?.count||0)>0)
     : [];
   const currentState=state?.version===MAP_MARKET_VERSION && state?.cycle===cycle && Array.isArray(state.markets);
   const warming=currentState
@@ -1108,15 +1113,14 @@ async function marketSnapshotPayload(env){
 
   let previous=snapshotMarkets;
   let usedLegacyFallback=false;
-  if(!snapshotMatchesCurrentSeedSet && legacyMarkets.length){
-    previous=[...legacyMarkets,...previous];
+  if(!snapshotMatchesCurrentSeedSet && (legacyMarkets.length || legacyMarkets2.length)){
+    previous=[...legacyMarkets2,...legacyMarkets,...previous];
     usedLegacyFallback=true;
   }
-  /* A partial daily scan starts with Europe, so replacing the old world data
-     with only today's first batch makes the USA, Dubai, Asia, etc. disappear.
-     While the current fixed-seed scan is incomplete (or the stored snapshot was
-     built against an older seed list), merge the last verified world hotspot
-     snapshot underneath it. Today's verified rows still win by city key. */
+  /* Never replace a previously verified world view with a partial scan.
+     v4 scans regions round-robin, so its first batch already contains the US,
+     Americas, Europe, Africa, Middle East, Asia and Pacific. While incomplete,
+     merge older verified rows underneath; today's verified rows always win. */
   if(!snapshotMatchesCurrentSeedSet || (stateIsNewer && !state?.complete) || !previous.length){
     const fallback=await hotspotSnapshotPayload(env);
     const world=(fallback?.hotspots||[])

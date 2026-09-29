@@ -18,12 +18,11 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
   assert.match(app,/\.venue-event-name\{display:block;font-size:var\(--event-main-size\)/);
 });
 
-test("Buy Tickets pill scales while text uses a crisp native pressed size",()=>{
-  assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
+test("Buy Tickets compositor-scales the complete rendered pill including text",()=>{
+  assert.match(app,/\.buy\{[^}]*transform:translateZ\(0\) scale\(1\);[^}]*will-change:transform/);
   assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
-  assert.match(app,/\.buy\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(app,/\.buy\.press \.buy-label\{font-size:13px\}/);
-  assert.doesNotMatch(app,/\.buy\.press \.buy-label\{[^}]*transform/);
+  assert.match(app,/\.buy\.press\{transform:translateZ\(0\) scale\(\.985\)\}/);
+  assert.doesNotMatch(app,/\.buy\.press::before\{transform:scale/);
 });
 
 test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
@@ -37,11 +36,11 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
 });
 
 test("Popular UI renders strict confirmed cache immediately without an explanatory banner",()=>{
-  assert.match(app,/music98:concert-popular:v8/);
+  assert.match(app,/music98:concert-popular:v9/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
   assert.match(app,/ticketmaster_event_payload_gt_0/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/mode:"popular",v:"popular-v8"/);
+  assert.match(app,/mode:"popular",v:"popular-v9"/);
   assert.match(app,/sideSub\.textContent="";/);
   assert.doesNotMatch(app,/Popular artists with confirmed upcoming Ticketmaster shows\./);
 });
@@ -49,8 +48,8 @@ test("Popular UI renders strict confirmed cache immediately without an explanato
 test("map uses only the daily verified market snapshot",()=>{
   assert.doesNotMatch(app,/STATIC_GLOBAL_MARKETS/);
   assert.doesNotMatch(app,/STATIC_US_STATE_CAPITALS/);
-  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v6"/);
-  assert.match(app,/mode:"markets",v:"concert-markets-v6"/);
+  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v7"/);
+  assert.match(app,/mode:"markets",v:"concert-markets-v7"/);
   assert.match(app,/loadMarkets\(\);/);
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
@@ -96,7 +95,7 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tab\{\\n  width:100%;min-width:0;max-width:none/);
   assert.match(app,/\.side-tab\{[\s\S]*?transition:\.18s;/);
   assert.match(app,/\.side-tab\{[\s\S]*?display:grid;place-items:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1/);
-  assert.match(app,/function pillInkShift\(el\)/);
+  assert.match(app,/function pillInkShift\(el\)/);\n  assert.match(app,/Math\\.round\\(raw\\*2\\)\\/2/);
   assert.match(app,/getImageData\(/);
   assert.match(app,/\.tour-more\{[^}]*display:grid;place-items:center;text-align:center/);
   assert.match(app,/\.map-mode-btn\{[^}]*display:grid;place-items:center;text-align:center/);
@@ -142,4 +141,11 @@ test("tour-more keeps text pixels stable on press", async () => {
   assert.match(app,/\.tour-more:active\{transform:none/);
   assert.doesNotMatch(app,/\.tour-more:active\{transform:scale/);
   assert.match(app,/\.buy\.press \.buy-label\{font-size:13px\}/);
+});
+
+
+test("Popular warming state polls only the precomputed KV snapshot",()=>{
+  assert.match(app,/function schedulePopularWarmRetry\(\)/);
+  assert.match(app,/loadPopular\(true\)/);
+  assert.match(app,/if\(data\?\.warming\) schedulePopularWarmRetry\(\)/);
 });

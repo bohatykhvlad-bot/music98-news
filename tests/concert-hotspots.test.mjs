@@ -436,7 +436,7 @@ test("daily market snapshot publishes only cities with real upcoming Ticketmaste
     });
     assert.equal(response.status,200);
     const data=await response.json();
-    assert.equal(data.version,"concert-markets-v3");
+    assert.equal(data.version,"concert-markets-v4");
     assert.equal(data.complete,true);
     assert.ok(data.markets.length>=4);
     assert.ok(data.markets.every(x=>x.verified===true && Number(x.count)>0));
@@ -471,7 +471,7 @@ test("public market read exposes verified worldwide rows before the whole daily 
       waitUntil:()=>{}
     });
     const data=await response.json();
-    assert.equal(data.version,"concert-markets-v3");
+    assert.equal(data.version,"concert-markets-v4");
     assert.equal(data.complete,false);
     assert.equal(data.warming,true);
     assert.ok(data.markets.some(x=>x.city==="London" && x.countryCode==="GB" && Number(x.count)===7));
@@ -1133,16 +1133,16 @@ test("tour prewarm skips a fresh validation cache without spending its origin-ca
 test("new daily market state overrides an older complete snapshot before the world scan finishes", async () => {
   const kv=memoryKv();
   const cycle=new Date().toISOString().slice(0,10);
-  await kv.put("concert-markets:v2:snapshot",JSON.stringify({
-    ok:true,mode:"markets",version:"concert-markets-v2",
+  await kv.put("concert-markets:v3:snapshot",JSON.stringify({
+    ok:true,mode:"markets",version:"concert-markets-v3",
     cycle:"2026-09-28",builtAt:"2026-09-28T23:00:00.000Z",
     markets:[
       {city:"Paris",countryCode:"FR",stateCode:"",lat:48.8566,lng:2.3522,count:20,verified:true,pinned:1,tier:1}
     ],
     candidateCount:100,verifiedCount:1
   }));
-  await kv.put("concert-markets:v3:state",JSON.stringify({
-    version:"concert-markets-v3",cycle,index:20,complete:false,
+  await kv.put("concert-markets:v4:state",JSON.stringify({
+    version:"concert-markets-v4",cycle,index:20,complete:false,
     updatedAt:new Date().toISOString(),
     markets:[
       {city:"Rome",countryCode:"IT",stateCode:"",lat:41.9028,lng:12.4964,count:7,verified:true,pinned:1,tier:1}
@@ -1162,7 +1162,7 @@ test("new daily market state overrides an older complete snapshot before the wor
   globalThis.fetch=async()=>{ externalCalls++; throw new Error("public market read must stay snapshot-only"); };
   try{
     const response=await onRequestGet({
-      request:new Request("https://music98.news/api/concerts?mode=markets&v=concert-markets-v6"),
+      request:new Request("https://music98.news/api/concerts?mode=markets&v=concert-markets-v7"),
       env:{TICKETMASTER_API_KEY:"test",DESK:kv},
       waitUntil:()=>{}
     });
@@ -1193,4 +1193,18 @@ test("Ticketmaster quota accounting is leased so Free KV writes are not spent pe
   assert.match(src,/available<=tmObservedAvailable-25/);
   assert.doesNotMatch(src,/writeBudget\(env,interactiveKey,interactiveUsed\+1\)/);
   assert.doesNotMatch(src,/writeBudget\(env,globalKey,globalUsed\+1\)/);
+});
+
+
+test("daily Popular and map snapshots are built by cron, never by visitors", async () => {
+  const fs = await import("node:fs");
+  const worker = fs.readFileSync(new URL("../worker.js", import.meta.url), "utf8");
+  const wrangler = fs.readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
+  assert.match(wrangler,/20 0 \* \* \*/);
+  assert.match(wrangler,/20 1 \* \* \*/);
+  assert.match(wrangler,/\*\/10 \* \* \* \*/);
+  assert.match(worker,/for\(let i=0;i<4;i\+\+\)[\s\S]*refreshPopularSnapshot\(env,i===0\)/);
+  assert.match(worker,/for\(let i=0;i<2;i\+\+\)[\s\S]*refreshMapMarketSnapshot\(env,i===0\)/);
+  const api = fs.readFileSync(new URL("../functions/api/concerts.js", import.meta.url), "utf8");
+  assert.match(api,/const MAP_MARKET_VERSION = "concert-markets-v4"/);
 });
