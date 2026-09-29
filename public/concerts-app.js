@@ -112,7 +112,7 @@ function applyMapMode(){
   const area=activeMode==="nearby" || activeMode==="artist-area";
   const popular=activeMode==="popular";
   ["artist-points","artist-hit"].forEach(id=>setLayerVisible(id,artist));
-  ["clusters","event-points","event-hit","event-labels"].forEach(id=>setLayerVisible(id,area));
+  ["clusters","cluster-hit","event-points","event-hit","event-labels"].forEach(id=>setLayerVisible(id,area));
   [
     "capital-points","capital-labels","hub-hit-capital",
     "city-major-points","city-major-labels","hub-hit-major",
@@ -298,7 +298,7 @@ function addLayers(){
   });
   map.addLayer({
     id:"hub-hit-capital",type:"circle",source:"hubs",maxzoom:4.7,filter:["==",["get","overview"],1],
-    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":18,"circle-opacity":.001,"circle-stroke-width":0}
+    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":22,"circle-opacity":.001,"circle-stroke-width":0}
   });
 
   // Progressive reveal keeps the map readable: busiest cities first,
@@ -315,7 +315,7 @@ function addLayers(){
   });
   map.addLayer({
     id:"hub-hit-major",type:"circle",source:"hubs",minzoom:4.7,maxzoom:5.7,filter:[">=",["get","count"],40],
-    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":18,"circle-opacity":.001,"circle-stroke-width":0}
+    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":22,"circle-opacity":.001,"circle-stroke-width":0}
   });
 
   map.addLayer({
@@ -329,7 +329,7 @@ function addLayers(){
   });
   map.addLayer({
     id:"hub-hit-mid",type:"circle",source:"hubs",minzoom:5.7,maxzoom:6.4,filter:[">=",["get","count"],20],
-    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":18,"circle-opacity":.001,"circle-stroke-width":0}
+    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":22,"circle-opacity":.001,"circle-stroke-width":0}
   });
 
   map.addLayer({
@@ -343,7 +343,7 @@ function addLayers(){
   });
   map.addLayer({
     id:"hub-hit-all",type:"circle",source:"hubs",minzoom:6.4,maxzoom:12,
-    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":18,"circle-opacity":.001,"circle-stroke-width":0}
+    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":22,"circle-opacity":.001,"circle-stroke-width":0}
   });
 
   map.addSource("events",{type:"geojson",data:toGeoJSON([]),cluster:true,clusterMaxZoom:5,clusterRadius:40});
@@ -356,6 +356,10 @@ function addLayers(){
     }
   });
   map.addLayer({
+    id:"cluster-hit",type:"circle",source:"events",filter:["has","point_count"],
+    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":24,"circle-opacity":.001,"circle-stroke-width":0}
+  });
+  map.addLayer({
     id:"event-points",type:"symbol",source:"events",minzoom:4.3,filter:["!",["has","point_count"]],
     layout:{
       "icon-image":"m98-triangle",
@@ -364,7 +368,7 @@ function addLayers(){
     }
   });
   map.addLayer({id:"event-hit",type:"circle",source:"events",minzoom:3.2,filter:["!",["has","point_count"]],paint:{
-    "circle-color":"rgba(0,0,0,0.001)","circle-radius":["interpolate",["linear"],["zoom"],3.2,22,5,20,8,18,12,18],
+    "circle-color":"rgba(0,0,0,0.001)","circle-radius":["interpolate",["linear"],["zoom"],3.2,25,5,24,8,22,12,22],
     "circle-opacity":0.001,"circle-stroke-width":0
   }});
 
@@ -378,7 +382,7 @@ function addLayers(){
     }
   });
   map.addLayer({id:"artist-hit",type:"circle",source:"artist-events",minzoom:0,paint:{
-    "circle-color":"rgba(0,0,0,0.001)","circle-radius":["interpolate",["linear"],["zoom"],0,26,3,24,5,22,8,20,12,20],
+    "circle-color":"rgba(0,0,0,0.001)","circle-radius":["interpolate",["linear"],["zoom"],0,28,3,26,5,24,8,22,12,22],
     "circle-opacity":0.001,"circle-stroke-width":0
   }});
 
@@ -389,8 +393,8 @@ function addLayers(){
 
   ["hub-hit-capital","hub-hit-major","hub-hit-mid","hub-hit-all"].forEach(layer=>map.on("click",layer,handleHubClick));
 
-  map.on("click","clusters",async e=>{
-    const f=map.queryRenderedFeatures(e.point,{layers:["clusters"]})[0];
+  map.on("click","cluster-hit",async e=>{
+    const f=map.queryRenderedFeatures(e.point,{layers:["cluster-hit"]})[0];
     if(!f||!map.getSource("events")) return;
     try{
       const z=await map.getSource("events").getClusterExpansionZoom(f.properties.cluster_id);
@@ -414,7 +418,7 @@ function addLayers(){
     group.length>1 ? showVenuePopup(group) : showPopup(ev);
   });
 
-  ["hub-hit-capital","hub-hit-major","hub-hit-mid","hub-hit-all","clusters","event-hit","artist-hit"].forEach(layer=>{
+  ["hub-hit-capital","hub-hit-major","hub-hit-mid","hub-hit-all","cluster-hit","event-hit","artist-hit"].forEach(layer=>{
     map.on("mouseenter",layer,()=>map.getCanvas().style.cursor="pointer");
     map.on("mouseleave",layer,()=>map.getCanvas().style.cursor="");
   });
@@ -536,19 +540,19 @@ function syncPopupPresentation(){
   if(!el) return;
 
   const z=map.getZoom();
-  const t=Math.max(0,Math.min(1,(z-4.0)/(8.2-4.0)));
+  const t=Math.max(0,Math.min(1,(z-2.3)/(8.2-2.3)));
   const mapWidth=Math.max(0,map.getContainer()?.clientWidth||0);
   const mobile=mapWidth>0 && mapWidth<700;
-  const maxByViewport=Math.max(176,mapWidth-(mobile?24:32));
-  const width=Math.round(Math.min(maxByViewport,popupLerp(188,286,t)));
-  const imageH=Math.round(popupLerp(64,142,t));
-  const pad=popupLerp(8,13,t);
-  const titleSize=popupLerp(12.5,16,t);
-  const metaSize=popupLerp(10.5,13,t);
-  const titleGap=popupLerp(3.5,6,t);
-  const metaGap=popupLerp(1.5,3,t);
-  const radius=popupLerp(12,15,t);
-  const listH=Math.round(popupLerp(126,190,t));
+  const maxByViewport=Math.max(164,mapWidth-(mobile?24:32));
+  const width=Math.round(Math.min(maxByViewport,popupLerp(172,286,t)));
+  const imageH=Math.round(popupLerp(52,142,t));
+  const pad=popupLerp(7,13,t);
+  const titleSize=popupLerp(11.5,16,t);
+  const metaSize=popupLerp(9.8,13,t);
+  const titleGap=popupLerp(3,6,t);
+  const metaGap=popupLerp(1,3,t);
+  const radius=popupLerp(11,15,t);
+  const listH=Math.round(popupLerp(112,190,t));
 
   el.style.setProperty("--pop-w",width+"px");
   el.style.setProperty("--pop-img-h",imageH+"px");
