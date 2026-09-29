@@ -1198,7 +1198,7 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v29";
+const DAILYKEY = "music98news_daily_v30";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -2132,7 +2132,7 @@ function refreshDailyTop50(){
   applyDaily(TOP50, "snap");
   const grab = u => fetch(u).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   /* ?d= keys the CDN cache per day: no 24h-old responses survive a reset */
-  grab("/api/top50?d=" + todayUTC() + "&rev=29").catch(()=> grab("/data/top50.json?rev=29")).then(j=>{
+  grab("/api/top50?d=" + todayUTC() + "&rev=30").catch(()=> grab("/data/top50.json?rev=30")).then(j=>{
     const tracks = (j && j.tracks) || [];
     if(tracks.length < 10) throw 0;
     lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
@@ -2786,7 +2786,8 @@ function renderCharts(){
     const w = parseInt(r.weeks,10)||0;
     const wk = w === 1 ? "1 day on chart" : w + " days on chart";
     const key = (r.title||"")+"|"+(r.artist||"");
-    const art = r.art ? esc(r.art) : presetCover(i, r.title || r.artist, true);
+    const fixedArt = fixedChartArt(r);
+    const art = fixedArt ? esc(fixedArt) : presetCover(i, r.title || r.artist, true);
     const searchUrl = aff("https://music.apple.com/us/search?term=" + encodeURIComponent((r.title||"") + " " + (r.artist||"")));
     const badgeImg = '<img src="/badges/listen-on-apple-music.svg" alt="Listen on Apple Music" height="28">';
     const cleanUrl = (r.url && r.url !== "#") ? r.url : "";
@@ -2794,7 +2795,7 @@ function renderCharts(){
     const badge = `<a class="abadge"${r.url ? "" : ' data-lk="'+esc(key)+'"'} rel="nofollow sponsored" href="${esc(appleUrl)}" title="Listen on Apple Music" aria-label="Listen on Apple Music">${badgeImg}</a>`;
     return `<div class="chart-row${i<3?" top":""}" data-key="${esc(key)}" data-title="${esc(r.title)}" data-artist="${esc(r.artist)}" data-url="${esc(appleUrl==="#" ? "" : appleUrl)}" data-prev="${esc(applePreview(r.prev||""))}" tabindex="0" role="listitem" aria-label="Position ${i+1}: ${esc(r.title)} by ${esc(r.artist)} — press Enter to play the preview">
       <div class="delta ${dcls}">${dtxt}</div>
-      <div class="artwrap"><img data-lk="${esc(key)}"${r.art ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} - ${esc(r.artist)}" loading="lazy"></div>
+      <div class="artwrap"><img data-lk="${esc(key)}"${fixedArt ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} - ${esc(r.artist)}" loading="lazy"></div>
       <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span><span class="cartist">${esc(r.artist)}</span></div><div class="ctrack">${esc(r.title)}</div></div></div>
       <div class="cmid">
         <button class="rplay" title="Play preview" aria-label="Play preview of ${esc(r.title)}">${ICON_STACK}</button>
