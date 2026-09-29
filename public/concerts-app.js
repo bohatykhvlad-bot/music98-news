@@ -427,7 +427,6 @@ function handleHubClick(e){
   if(!f) return;
   const [lng,lat]=f.geometry.coordinates;
   const name=String(f.properties?.name||"Selected city");
-  const count=Number(f.properties?.count||0);
   userMoving=false;
   map.flyTo({center:[lng,lat],zoom:8.5,duration:650});
   loadArea(lat,lng,name,{fit:false,radius:45,city:name,countryCode:String(f.properties?.countryCode||"")});
@@ -1013,7 +1012,7 @@ async function loadPopular(force=false){
 async function loadArea(lat,lng,label,opts={}){
   const searchRadius=Math.max(5,Math.min(500,Number(opts.radius ?? radiusEl.value)||100));
   const reuseDistance=Math.max(6,searchRadius*.22);
-  if(!opts.force && lastArea && Number(lastArea.radius)===searchRadius &&
+  if(!opts.force && !opts.city && !lastArea?.city && lastArea && Number(lastArea.radius)===searchRadius &&
       distanceKm(lat,lng,lastArea.lat,lastArea.lng)<reuseDistance &&
       nearbyEvents.length){
     clearArtistContext();
