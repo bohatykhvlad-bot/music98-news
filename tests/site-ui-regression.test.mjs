@@ -13,8 +13,8 @@ test("desktop navigation uses four equal-width pill segments",()=>{
 test("Subscribe uses the same crisp press-state binder as concert tickets",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit">Subscribe<\/button>/);
-  assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.97\)\}/);
-  assert.match(page,/\.press-pill\.press\{font-size:13\.5px\}/);
+  assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.98\)\}/);
+  assert.match(page,/\.press-pill\.press\{font-size:14px\}/);
   assert.doesNotMatch(page,/\.press-pill\.press\{[^}]*transform:/);
 });
 
@@ -26,5 +26,17 @@ test("verified chart artwork overrides apply even to same-day browser cache",()=
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260929-30/);
+  assert.match(page,/concerts-app\.js\?v=20260929-31/);
+});
+
+
+test("Subscribe press cannot resize the email row",()=>{
+  assert.match(page,/\.sub-in input\{flex:1 1 0;min-width:0;width:0/);
+  assert.match(page,/\.sub-in \.btn\{flex:0 0 126px;width:126px;min-width:126px/);
+  assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.sub-in \.btn\{flex:0 0 126px;width:126px;min-width:126px/);
+});
+
+test("footer social icons stay in one row",()=>{
+  assert.match(page,/\.social \.icons\{display:grid;grid-template-columns:repeat\(4,42px\);gap:10px;width:198px/);
+  assert.match(page,/grid-template-columns:minmax\(320px,1fr\) 150px 180px 198px/);
 });
