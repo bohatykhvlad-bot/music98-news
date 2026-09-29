@@ -947,6 +947,26 @@ async function loadHotspotState(env) {
   return state;
 }
 
+function hotspotErrorIsTransient(err){
+  const status=Number(err?.status||0);
+  return err?.message==="ticketmaster_budget_guard" ||
+    err?.message==="ticketmaster_unavailable" ||
+    status===429 || status>=500 || status===0;
+}
+
+function recordRejectedHotspot(state,kind,id,err){
+  if(!Array.isArray(state.rejected)) state.rejected=[];
+  state.rejected.push({
+    kind:String(kind||""),
+    id:String(id||""),
+    status:Number(err?.status||0),
+    error:String(err?.message||err||""),
+    detail:String(err?.detail||"").slice(0,220),
+    at:new Date().toISOString(),
+  });
+  if(state.rejected.length>120) state.rejected=state.rejected.slice(-120);
+}
+
 export async function refreshHotspotSnapshot(env, options = {}) {
   if (!env?.TICKETMASTER_API_KEY || !env?.DESK) return { ok:false, reason:"hotspot_storage_or_key_missing" };
 
@@ -966,10 +986,21 @@ export async function refreshHotspotSnapshot(env, options = {}) {
       if (result?.queried) jobsDone++;
     } catch (err) {
       state.errors = Number(state.errors || 0) + 1;
-      state.queue.unshift({ ...job, attempts:Number(job?.attempts || 0) + 1 });
-      state.updatedAt = new Date().toISOString();
-      await kvPutJson(env, HOTSPOT_STATE_KEY, state);
-      return { ok:false, complete:false, retry:true, status:Number(err?.status || 0), error:String(err?.message || err) };
+      if(hotspotErrorIsTransient(err)){
+        state.queue.unshift({ ...job, attempts:Number(job?.attempts || 0) + 1 });
+        state.updatedAt = new Date().toISOString();
+        await kvPutJson(env, HOTSPOT_STATE_KEY, state);
+        return {
+          ok:false,complete:false,retry:true,
+          status:Number(err?.status||0),error:String(err?.message||err),
+          job:String(job?.id||"")
+        };
+      }
+
+      // A permanent 4xx on one country/state/geo query must not pin the
+      // resumable world scan forever. Record it for audit and continue.
+      recordRejectedHotspot(state,"venue-job",job?.id,err);
+      jobsDone++;
     }
   }
 
@@ -980,11 +1011,24 @@ export async function refreshHotspotSnapshot(env, options = {}) {
       await processCityVerification(env, env.TICKETMASTER_API_KEY, state, key);
       verifiedDone++;
     } catch (err) {
-      state.verifyQueue.unshift(key);
       state.errors = Number(state.errors || 0) + 1;
-      state.updatedAt = new Date().toISOString();
-      await kvPutJson(env, HOTSPOT_STATE_KEY, state);
-      return { ok:false, complete:false, retry:true, status:Number(err?.status || 0), error:String(err?.message || err) };
+      if(hotspotErrorIsTransient(err)){
+        state.verifyQueue.unshift(key);
+        state.updatedAt = new Date().toISOString();
+        await kvPutJson(env, HOTSPOT_STATE_KEY, state);
+        return {
+          ok:false,complete:false,retry:true,
+          status:Number(err?.status||0),error:String(err?.message||err),
+          candidate:String(key||"")
+        };
+      }
+
+      // Unsupported/invalid city filters are permanent for this build.
+      // Mark the candidate consumed and continue with later cities.
+      const rec=state.candidates?.[key];
+      if(rec) rec.verified=true;
+      recordRejectedHotspot(state,"city-verify",key,err);
+      verifiedDone++;
     }
   }
 
@@ -1010,6 +1054,7 @@ export async function refreshHotspotSnapshot(env, options = {}) {
     queue:state.queue.length,
     verifyQueue:state.verifyQueue.length,
     verified:Object.keys(state.verified || {}).length,
+    rejected:Array.isArray(state.rejected)?state.rejected.length:0,
   };
 }
 
