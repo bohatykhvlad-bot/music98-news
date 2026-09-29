@@ -111,17 +111,17 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
 .nav{justify-self:center;width:410px;max-width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;height:40px;gap:4px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}
-.nav-btn{width:100%;text-indent:var(--ink-x,0px);border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 8px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transform:translateZ(0);transform-origin:50% 50%;will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden;-webkit-font-smoothing:antialiased;transition:transform .09s cubic-bezier(.34,1.2,.64,1),color .18s ease,background .18s ease;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
-/* Keep the text on the flex centerline. Horizontal ink compensation below is
-   quantized to whole CSS pixels so press-time compositing starts on a stable
-   raster position without a half-pixel vertical nudge. */
-.nav-btn{position:relative;top:0}
+.nav-btn{width:100%;text-indent:var(--ink-x,0px);border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 8px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+/* optical ink centering (owner: text reads high even though the pixel
+   envelope is symmetric 11/11 and 19/18): cap-height words concentrate mass
+   above the midline, so the eye wants a hair more air on top. Nudge the text
+   node itself down half a pixel - layout, capsule and hit-area untouched: */
+.nav-btn{position:relative;top:.5px}
 /* optical, mechanism not numbers: trim-both cap alphabetic shrinks the text
    box to the real ink (cap top .. baseline) so flex centering centers the
    LETTERS on every OS/rasterizer - owner measured ink 1.1px high on Windows.
    Browsers without text-box fall back to normal centering (already even). */
 .nav-btn:hover{color:var(--text)}
-.nav-btn:active{transform:scale(.985) translateZ(0)}
 .nav-btn.active{background:var(--accent);color:#03282b}
 .top-actions{display:flex;align-items:center;gap:10px;justify-self:end}
 .search{position:relative;width:230px;height:40px}
@@ -3782,6 +3782,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260930-8" defer></script>
+<script src="/concerts-app.js?v=20260930-9" defer></script>
 </body>
 </html>
