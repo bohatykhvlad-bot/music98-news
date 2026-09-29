@@ -1003,19 +1003,36 @@ async function marketSnapshotPayload(env){
     kvGetJson(env,MAP_MARKET_SNAPSHOT_KEY),
     kvGetJson(env,MAP_MARKET_STATE_KEY),
   ]);
-  if(snapshot?.version===MAP_MARKET_VERSION && Array.isArray(snapshot.markets) && snapshot.markets.length){
-    return {...snapshot,complete:true};
-  }
 
   const cycle=new Date().toISOString().slice(0,10);
-  const warming=state?.version===MAP_MARKET_VERSION && state?.cycle===cycle && Array.isArray(state.markets)
+  const snapshotMarkets=snapshot?.version===MAP_MARKET_VERSION && Array.isArray(snapshot.markets)
+    ? snapshot.markets.filter(x=>Number(x?.count||0)>0)
+    : [];
+  const currentState=state?.version===MAP_MARKET_VERSION && state?.cycle===cycle && Array.isArray(state.markets);
+  const warming=currentState
     ? state.markets.filter(x=>Number(x?.count||0)>0)
     : [];
+  const snapshotAt=Date.parse(snapshot?.builtAt||"")||0;
+  const stateAt=Date.parse(state?.updatedAt||"")||0;
+  const stateIsNewer=currentState && stateAt>=snapshotAt;
 
-  const fallback=await hotspotSnapshotPayload(env);
-  const previous=(fallback?.hotspots||[])
-    .filter(x=>Number(x?.count||0)>0)
-    .map(x=>({...x,verified:true,pinned:1,tier:(String(x?.countryCode||"")==="US"&&x?.stateCode)?2:1}));
+  // Do not let yesterday's completed snapshot hide cities already verified by
+  // today's scan. Rome is in the first scheduled batch, so once today's state
+  // confirms it the public map must see it immediately instead of waiting for
+  // the entire global scan to finish.
+  if(snapshotMarkets.length && (!stateIsNewer || !warming.length)){
+    return {...snapshot,markets:snapshotMarkets,complete:true};
+  }
+
+  let previous=snapshotMarkets;
+  let usedLegacyFallback=false;
+  if(!previous.length){
+    const fallback=await hotspotSnapshotPayload(env);
+    previous=(fallback?.hotspots||[])
+      .filter(x=>Number(x?.count||0)>0)
+      .map(x=>({...x,verified:true,pinned:1,tier:(String(x?.countryCode||"")==="US"&&x?.stateCode)?2:1}));
+    usedLegacyFallback=previous.length>0;
+  }
 
   const merged=new Map();
   for(const row of [...previous,...warming]){
@@ -1030,14 +1047,14 @@ async function marketSnapshotPayload(env){
     ok:true,
     mode:"markets",
     version:MAP_MARKET_VERSION,
-    builtAt:String(state?.updatedAt||fallback?.builtAt||""),
+    builtAt:String(stateIsNewer ? state?.updatedAt||"" : snapshot?.builtAt||""),
     markets,
     candidateCount:MAP_MARKET_SEEDS.length,
     verifiedCount:markets.length,
-    complete:false,
-    warming:true,
-    progress:{index:Number(state?.index||0),total:MAP_MARKET_SEEDS.length},
-    fallback:previous.length>0,
+    complete:stateIsNewer ? !!state?.complete : snapshotMarkets.length>0,
+    warming:stateIsNewer ? !state?.complete : snapshotMarkets.length===0,
+    progress:stateIsNewer ? {index:Number(state?.index||0),total:MAP_MARKET_SEEDS.length} : undefined,
+    fallback:usedLegacyFallback,
   };
 }
 
