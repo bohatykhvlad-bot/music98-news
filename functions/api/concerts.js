@@ -287,8 +287,8 @@ async function popularPayload(apiKey) {
 const HOTSPOT_BUILD_JOB_BUDGET = 2;
 const HOTSPOT_VERIFY_BUDGET = 10;
 const HOTSPOT_CACHE_TTL = 24 * 60 * 60;
-const HOTSPOT_VENUE_CACHE_PREFIX = "concert-hotspots:v18:venue:";
-const HOTSPOT_CITY_CACHE_PREFIX = "concert-hotspots:v18:city:";
+const HOTSPOT_VENUE_CACHE_PREFIX = "concert-hotspots:v19:venue:";
+const HOTSPOT_CITY_CACHE_PREFIX = "concert-hotspots:v19:city:";
 let hotspotLastFetchAt = 0;
 
 function sleep(ms) {
@@ -549,17 +549,27 @@ export async function refreshHotspotSnapshot(env, options = {}) {
 async function hotspotSnapshotPayload(env) {
   const snapshot = await kvGetJson(env, HOTSPOT_SNAPSHOT_KEY);
   if (snapshot?.version === HOTSPOT_VERSION && Array.isArray(snapshot.hotspots)) {
-    return { ...snapshot, partial:false, warming:false };
+    return { ...snapshot, partial:false, warming:false, stale:false };
   }
 
   const storedState = await kvGetJson(env, HOTSPOT_STATE_KEY);
   const state = normalizeBuildState(storedState);
   const progress = snapshotFromState(state);
+
+  // Never blank the public map while a new generation is rebuilding.
+  // v18 stays read-only fallback data; only the scheduler can build v19.
+  const legacy = await kvGetJson(env, "concert-hotspots:v18:snapshot");
+  const fallback = Array.isArray(legacy?.hotspots) ? legacy.hotspots : [];
+  const live = Array.isArray(progress.hotspots) ? progress.hotspots : [];
+  const visible = live.length ? live : fallback;
+
   return {
     ...progress,
+    version:HOTSPOT_VERSION,
+    hotspots:visible,
     partial:true,
     warming:true,
-    cold:!storedState,
+    stale:!live.length && !!fallback.length,
     progress:{
       queue:state.queue.length,
       verifyQueue:state.verifyQueue.length,
@@ -575,17 +585,13 @@ export async function onRequestGet({ request, env, waitUntil }) {
   void region;
 
   if (mode === "hotspots") {
+    // Read-only public endpoint: a visitor can never trigger Ticketmaster
+    // hotspot discovery. The scheduled Worker owns all refresh work.
     const payload = await hotspotSnapshotPayload(env);
-    if (payload.cold && env?.TICKETMASTER_API_KEY && env?.DESK && typeof waitUntil === "function") {
-      waitUntil(refreshHotspotSnapshot(env, { jobBudget:3, verifyBudget:12 }).catch(() => {}));
-    }
-    if (!payload.hotspots.length && !env?.TICKETMASTER_API_KEY) {
-      return json({ error:"ticketmaster_key_missing", ...payload }, 503);
-    }
     return json(payload, 200, {
       "Cache-Control": payload.partial
-        ? "public, max-age=15, s-maxage=30"
-        : "public, max-age=300, s-maxage=3600"
+        ? "public, max-age=60, s-maxage=180"
+        : "public, max-age=600, s-maxage=3600"
     });
   }
 
@@ -607,7 +613,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const cache = caches.default;
   const cacheUrl = new URL(request.url);
   cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v18");
+  cacheUrl.searchParams.set("__cachev", "concerts-global-v19");
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
