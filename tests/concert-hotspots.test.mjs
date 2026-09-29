@@ -1119,3 +1119,45 @@ test("tour prewarm skips a fresh validation cache without spending its origin-ca
     globalThis.fetch=oldFetch;
   }
 });
+
+
+test("new daily market state overrides an older complete snapshot before the world scan finishes", async () => {
+  const kv=memoryKv();
+  const cycle=new Date().toISOString().slice(0,10);
+  await kv.put("concert-markets:v2:snapshot",JSON.stringify({
+    ok:true,mode:"markets",version:"concert-markets-v2",
+    cycle:"2026-09-28",builtAt:"2026-09-28T23:00:00.000Z",
+    markets:[
+      {city:"Paris",countryCode:"FR",stateCode:"",lat:48.8566,lng:2.3522,count:20,verified:true,pinned:1,tier:1}
+    ],
+    candidateCount:100,verifiedCount:1
+  }));
+  await kv.put("concert-markets:v2:state",JSON.stringify({
+    version:"concert-markets-v2",cycle,index:20,complete:false,
+    updatedAt:new Date().toISOString(),
+    markets:[
+      {city:"Rome",countryCode:"IT",stateCode:"",lat:41.9028,lng:12.4964,count:7,verified:true,pinned:1,tier:1}
+    ]
+  }));
+
+  const oldFetch=globalThis.fetch;
+  let externalCalls=0;
+  globalThis.fetch=async()=>{ externalCalls++; throw new Error("public market read must stay snapshot-only"); };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?mode=markets&v=concert-markets-v4"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.complete,false);
+    assert.equal(data.warming,true);
+    assert.ok(data.markets.some(x=>x.city==="Paris" && x.countryCode==="FR"));
+    assert.ok(data.markets.some(x=>x.city==="Rome" && x.countryCode==="IT" && Number(x.count)===7));
+    assert.equal(data.progress.index,20);
+    assert.equal(externalCalls,0);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
