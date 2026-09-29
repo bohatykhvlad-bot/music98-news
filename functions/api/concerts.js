@@ -20,6 +20,11 @@ const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
 const TM_ATTRACTIONS_ROOT = "https://app.ticketmaster.com/discovery/v2/attractions.json";
 const TM_VENUES_ROOT = "https://app.ticketmaster.com/discovery/v2/venues.json";
 const KWORB_ARTISTS_URL = "https://kworb.net/spotify/listeners.html";
+const POPULAR_LIMIT = 30;
+const POPULAR_CANDIDATE_LIMIT = 120;
+const POPULAR_SNAPSHOT_KEY = "concert-popular:v3";
+const POPULAR_LEGACY_SNAPSHOT_KEY = "concert-popular:v2";
+const POPULAR_REFRESH_MS = 24 * 60 * 60 * 1000;
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
@@ -142,9 +147,11 @@ function baseEventUrl(apiKey) {
   return tm;
 }
 
-const TM_DAILY_GUARD_DEFAULT = 3000;
-const TM_INTERACTIVE_GUARD_DEFAULT = 900;
+const TM_DAILY_GUARD_DEFAULT = 2500;
+const TM_INTERACTIVE_GUARD_DEFAULT = 600;
+const TM_MIN_INTERVAL_MS = 550;
 let tmSharedLastFetchAt = 0;
+let tmGate = Promise.resolve();
 
 async function readBudget(env,key) {
   try{ return Number(await env.DESK.get(key))||0; }catch(e){ return 0; }
@@ -182,27 +189,42 @@ async function reserveTicketmasterCall(env, scope="interactive") {
 }
 
 async function tmJson(url, env, scope="interactive") {
-  await reserveTicketmasterCall(env,scope);
-  const wait=Math.max(0,225-(Date.now()-tmSharedLastFetchAt));
-  if(wait) await new Promise(resolve=>setTimeout(resolve,wait));
+  const run = tmGate.catch(()=>{}).then(async()=>{
+    await reserveTicketmasterCall(env,scope);
+    const wait=Math.max(0,TM_MIN_INTERVAL_MS-(Date.now()-tmSharedLastFetchAt));
+    if(wait) await new Promise(resolve=>setTimeout(resolve,wait));
 
-  let res;
-  try {
-    res = await fetch(url.toString(), {
-      headers: { "Accept": "application/json", "User-Agent": "music98.news/1.0" },
-    });
-    tmSharedLastFetchAt=Date.now();
-  } catch {
-    throw Object.assign(new Error("ticketmaster_unavailable"), { status: 502 });
-  }
-  if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    const err = new Error("ticketmaster_error");
-    err.status = res.status;
-    err.detail = detail.slice(0, 300);
-    throw err;
-  }
-  return res.json();
+    let res;
+    try {
+      res = await fetch(url.toString(), {
+        headers: { "Accept":"application/json", "User-Agent":"music98.news/1.0" },
+      });
+      tmSharedLastFetchAt=Date.now();
+    } catch {
+      throw Object.assign(new Error("ticketmaster_unavailable"), { status:502 });
+    }
+
+    // Ticketmaster exposes authoritative quota state in response headers.
+    // Keep the latest observed value in KV as a second safety signal.
+    const available=Number(res.headers?.get?.("Rate-Limit-Available"));
+    const reset=String(res.headers?.get?.("Rate-Limit-Reset")||"");
+    if(Number.isFinite(available) && env?.DESK){
+      kvPutJson(env,"ticketmaster:quota:last",{
+        available,reset,observedAt:new Date().toISOString()
+      },{expirationTtl:172800}).catch(()=>{});
+    }
+
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      const err = new Error("ticketmaster_error");
+      err.status = res.status;
+      err.detail = detail.slice(0, 300);
+      throw err;
+    }
+    return res.json();
+  });
+  tmGate=run.catch(()=>{});
+  return run;
 }
 
 async function tmEventPages(url, env, maxPages = 5) {
@@ -284,7 +306,7 @@ async function kworbArtists() {
     }
 
     artists.sort((a,b)=>a.rank-b.rank);
-    return artists.length >= 10
+    return artists.length >= POPULAR_LIMIT
       ? { artists, source: "spotify_monthly_listeners" }
       : { artists: KWORB_FALLBACK.map((name,i)=>({name,rank:i+1,listeners:0})), source: "spotify_monthly_fallback" };
   } catch {
@@ -332,13 +354,14 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
 
 async function popularPayload(env) {
   const ranking = await kworbArtists();
-  const candidates = ranking.artists.slice(0, 42);
+  const candidates = ranking.artists.slice(0, POPULAR_CANDIDATE_LIMIT);
   const found = [];
 
-  // Scheduled-only work is deliberately sequential. This keeps every
-  // Ticketmaster call behind the same 225ms gate instead of creating bursts.
+  // Scheduled-only work is deliberately sequential. We walk the Spotify
+  // monthly-listener ranking from the top and keep only artists for whom
+  // Ticketmaster has an exact-name attraction on a future music event.
   for (const candidate of candidates) {
-    if (found.length >= 10) break;
+    if (found.length >= POPULAR_LIMIT) break;
     let artist=null;
     try{
       artist=await validatePopularArtist(env,candidate.name,candidate.rank,candidate.listeners);
@@ -354,7 +377,7 @@ async function popularPayload(env) {
   return {
     ok: true,
     mode: "popular",
-    artists: found.slice(0, 10).map((a, i) => ({
+    artists: found.slice(0, POPULAR_LIMIT).map((a, i) => ({
       id: a.id,
       name: a.name,
       image: a.image,
@@ -365,11 +388,11 @@ async function popularPayload(env) {
     })),
     source: ranking.source,
     ranking: "Spotify monthly listeners",
+    candidateCount: candidates.length,
+    eligibleCount: found.length,
+    targetCount: POPULAR_LIMIT,
   };
 }
-
-const POPULAR_SNAPSHOT_KEY = "concert-popular:v2";
-const POPULAR_REFRESH_MS = 6 * 60 * 60 * 1000;
 const HOTSPOT_BUILD_JOB_BUDGET = 2;
 const HOTSPOT_VERIFY_BUDGET = 10;
 const HOTSPOT_CACHE_TTL = 24 * 60 * 60;
@@ -418,20 +441,33 @@ export async function refreshPopularSnapshot(env, force = false) {
     return { ok:false, fresh:false, keptExisting:!!existing?.artists?.length, reason:"popular_refresh_empty" };
   }
   // Never replace a healthy list with a suspiciously tiny transient result.
-  if(existing?.artists?.length>=5 && payload.artists.length<5){
+  if(existing?.artists?.length>=20 && payload.artists.length<20){
     return { ok:false, fresh:false, keptExisting:true, reason:"popular_refresh_too_small" };
   }
-  const snapshot = { ...payload, builtAt:new Date().toISOString(), version:"popular-v2" };
+  const snapshot = { ...payload, builtAt:new Date().toISOString(), version:"popular-v3" };
   await kvPutJson(env, POPULAR_SNAPSHOT_KEY, snapshot);
   return { ok:true, fresh:false, artists:snapshot.artists.length };
 }
 
 async function popularSnapshotPayload(env) {
   const snapshot = await kvGetJson(env, POPULAR_SNAPSHOT_KEY);
-  if (snapshot?.version === "popular-v2" && Array.isArray(snapshot.artists)) return snapshot;
+  if (snapshot?.version === "popular-v3" && Array.isArray(snapshot.artists)) {
+    return { ...snapshot, stale:false, warming:false };
+  }
+  const legacy = await kvGetJson(env, POPULAR_LEGACY_SNAPSHOT_KEY);
+  if (legacy && Array.isArray(legacy.artists) && legacy.artists.length) {
+    return {
+      ...legacy,
+      version:"popular-v3",
+      stale:true,
+      warming:true,
+      targetCount:POPULAR_LIMIT,
+    };
+  }
   return {
-    ok:true,mode:"popular",version:"popular-v2",builtAt:"",
-    artists:[],source:"scheduled",ranking:"Spotify monthly listeners",warming:true
+    ok:true,mode:"popular",version:"popular-v3",builtAt:"",
+    artists:[],source:"scheduled",ranking:"Spotify monthly listeners",
+    targetCount:POPULAR_LIMIT,stale:false,warming:true
   };
 }
 
