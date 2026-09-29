@@ -15,6 +15,7 @@ import path from "node:path";
 import dns from "node:dns";
 import {
   appleCandidateCompatible,
+  COVER_COVER_RESOLVER_VERSION,
   mergeKey,
   primaryArtist,
   stripParen,
@@ -26,7 +27,6 @@ dns.setDefaultResultOrder("ipv4first");
 const OUT = path.resolve("public/data/covers.json");
 const OUT_NAMES = path.resolve("public/data/apple-names.json");
 const OUT_META = path.resolve("public/data/apple-cover-meta.json");
-const RESOLVER_VERSION = 3; // bump whenever canonical-selection semantics change
 const BAKED_TOP = path.resolve("public/data/top50.json");
 const INDEX_HTML = path.resolve("public/index.html");
 const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
@@ -144,7 +144,7 @@ for (const [key, rec] of Object.entries(editorialCorrections)) {
     correctionsApplied.push(key);
   }
   coverMeta[key] = {
-    resolverVersion: RESOLVER_VERSION,
+    resolverVersion: COVER_RESOLVER_VERSION,
     source: "editorial",
     trackId: String(rec?.appleTrackId || ""),
     collectionId: String(rec?.appleCollectionId || ""),
@@ -195,7 +195,7 @@ if (idWanted.length) {
        An old single ID must not become "canonical" merely because it still exists. */
     if (!editorialCorrections[key]) {
       const meta = coverMeta[key];
-      if (meta?.resolverVersion === RESOLVER_VERSION && String(meta?.trackId || "") === String(hit.trackId || "")) {
+      if (meta?.resolverVersion === COVER_RESOLVER_VERSION && String(meta?.trackId || "") === String(hit.trackId || "")) {
         const art = art600(hit.artworkUrl100);
         setVerifiedCover(key, art);
         coverMeta[key] = {...meta, art, verifiedAt:new Date().toISOString()};
@@ -215,7 +215,7 @@ for (const t of tracks) {
   }
   const meta = coverMeta[key];
   const canonicalCurrent =
-    meta?.resolverVersion === RESOLVER_VERSION &&
+    meta?.resolverVersion === COVER_RESOLVER_VERSION &&
     meta?.source === "resolver" &&
     meta?.art === covers[key] &&
     !!meta?.trackId;
@@ -235,7 +235,7 @@ for (const t of tracks) {
       console.log(`  Apple verified [${resolved.reason}]: ${t.artist} - ${t.title} -> ${resolved.hit.collectionName}`);
     }
     coverMeta[key] = {
-      resolverVersion: RESOLVER_VERSION,
+      resolverVersion: COVER_RESOLVER_VERSION,
       source: "resolver",
       reason: resolved.reason,
       trackId: String(resolved.hit.trackId || ""),
