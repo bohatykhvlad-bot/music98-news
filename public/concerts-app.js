@@ -1005,7 +1005,7 @@ function mergeHotspots(rows){
   return [...byKey.values()].sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
 }
 
-const POPULAR_CACHE_KEY="music98:concert-popular:v7";
+const POPULAR_CACHE_KEY="music98:concert-popular:v8";
 function readPopularCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(POPULAR_CACHE_KEY)||"null");
@@ -1079,7 +1079,7 @@ async function loadPopular(force=false){
     setEventData(popularEvents);
     setStatus("");
     sideEmpty.hidden=true;
-  }else if(popularArtists.length && !force){
+  }else if(popularArtists.length>=30 && !force){
     renderArtists(popularArtists,"popular");
     setEventData(popularEvents);
     setStatus("");
@@ -1090,14 +1090,22 @@ async function loadPopular(force=false){
   }
 
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v7"});
-    if(data.artists?.length && (!popularArtists.length || data.artists.length>=popularArtists.length)){
-      popularArtists=data.artists;
+    const data=await getPayload({mode:"popular",v:"popular-v8"});
+    if(Array.isArray(data.artists) && data.artists.length>=30){
+      popularArtists=data.artists.slice(0,30);
     }
     popularEvents=[];
     writePopularCache(data);
     if(requestId!==popularRequestSeq || activeMode!=="popular" || artistContext) return;
-    renderArtists(popularArtists,"popular");
+    if(popularArtists.length>=30){
+      renderArtists(popularArtists.slice(0,30),"popular");
+      sideEmpty.hidden=true;
+    }else{
+      popularArtists=[];
+      toursEl.textContent="";
+      sideEmpty.hidden=false;
+      sideEmpty.textContent=data?.warming ? "Updating popular artists..." : "No popular artists are available right now.";
+    }
     setEventData([]);
     setStatus("");
   }catch(err){

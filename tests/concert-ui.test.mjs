@@ -37,11 +37,11 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
 });
 
 test("Popular UI renders strict confirmed cache immediately without an explanatory banner",()=>{
-  assert.match(app,/music98:concert-popular:v7/);
+  assert.match(app,/music98:concert-popular:v8/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
   assert.match(app,/ticketmaster_event_payload_gt_0/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/mode:"popular",v:"popular-v7"/);
+  assert.match(app,/mode:"popular",v:"popular-v8"/);
   assert.match(app,/sideSub\.textContent="";/);
   assert.doesNotMatch(app,/Popular artists with confirmed upcoming Ticketmaster shows\./);
 });
@@ -79,11 +79,13 @@ test("Buy Tickets uses the shared site press binder",()=>{
 });
 
 
-test("concert snapshot requests bypass browser cache and local Popular cache never freezes a partial list",()=>{
+test("concert snapshot requests bypass browser cache and Popular never renders a partial list",()=>{
   assert.match(app,/fetch\(u,\{cache:"no-store",headers:\{"Accept":"application\/json","Cache-Control":"no-cache"\}\}\)/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/data\.artists\.length<30/);
-  assert.match(app,/!popularArtists\.length \|\| data\.artists\.length>=popularArtists\.length/);
+  assert.match(app,/Array\.isArray\(data\.artists\) && data\.artists\.length>=30/);
+  assert.match(app,/popularArtists=data\.artists\.slice\(0,30\)/);
+  assert.match(app,/if\(popularArtists\.length>=30\)/);
+  assert.match(app,/sideEmpty\.textContent=data\?\.warming \? "Updating popular artists\.\.\."/);
 });
 
 

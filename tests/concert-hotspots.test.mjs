@@ -472,12 +472,14 @@ test("public market read exposes verified Rome before the whole daily scan finis
   }
 });
 
-test("public Popular read is snapshot-only and spends no Ticketmaster call", async () => {
+test("public Popular read serves only a complete Top 30 and spends no Ticketmaster call", async () => {
   const kv=memoryKv();
+  const artists=Array.from({length:30},(_,i)=>({
+    id:"a"+(i+1),name:"Artist "+(i+1),image:"",rank:i+1,popularityRank:i+1,shows:2,eventConfirmed:true
+  }));
   await kv.put("concert-popular:v4",JSON.stringify({
     ok:true,mode:"popular",version:"popular-v4",builtAt:new Date().toISOString(),
-    eligibility:"ticketmaster_event_payload_gt_0",
-    artists:[{id:"a1",name:"Artist",image:"",rank:1,popularityRank:1,shows:2,eventConfirmed:true}]
+    eligibility:"ticketmaster_event_payload_gt_0",artists,targetCount:30
   }));
   const oldFetch=globalThis.fetch;
   let externalCalls=0;
@@ -490,14 +492,16 @@ test("public Popular read is snapshot-only and spends no Ticketmaster call", asy
     });
     assert.equal(response.status,200);
     const data=await response.json();
-    assert.equal(data.artists[0].name,"Artist");
+    assert.equal(data.artists.length,30);
+    assert.equal(data.artists[0].name,"Artist 1");
+    assert.equal(data.warming,false);
     assert.equal(externalCalls,0);
   }finally{
     globalThis.fetch=oldFetch;
   }
 });
 
-test("public Popular excludes rows without current Ticketmaster upcoming-show evidence", async () => {
+test("public Popular never exposes an incomplete or weakly verified snapshot", async () => {
   const kv=memoryKv();
   await kv.put("concert-popular:v4",JSON.stringify({
     ok:true,mode:"popular",version:"popular-v4",builtAt:new Date().toISOString(),
@@ -517,8 +521,9 @@ test("public Popular excludes rows without current Ticketmaster upcoming-show ev
   });
   assert.equal(response.status,200);
   const data=await response.json();
-  assert.deepEqual(data.artists.map(x=>x.name),["Has Shows"]);
+  assert.deepEqual(data.artists,[]);
   assert.equal(data.warming,true);
+  assert.equal(data.targetCount,30);
 });
 
 test("exact-city user query paginates and stays scoped to that city", async () => {
@@ -732,7 +737,7 @@ test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30"
   }
 });
 
-test("public Popular read exposes in-progress validated artists without Ticketmaster calls", async () => {
+test("public Popular keeps in-progress validated artists private until Top 30 is complete", async () => {
   const kv=memoryKv();
   const snapshotArtists=Array.from({length:8},(_,i)=>({
     id:"artist-"+(i+1),name:"Artist "+(i+1),rank:i+1,popularityRank:i+1,shows:3,eventConfirmed:true
@@ -760,7 +765,8 @@ test("public Popular read exposes in-progress validated artists without Ticketma
     });
     assert.equal(response.status,200);
     const data=await response.json();
-    assert.equal(data.artists.length,12);
+    assert.deepEqual(data.artists,[]);
+    assert.equal(data.validatedCount,12);
     assert.equal(data.warming,true);
     assert.equal(data.targetCount,30);
     assert.equal(externalCalls,0);
