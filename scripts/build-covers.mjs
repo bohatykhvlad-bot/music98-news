@@ -206,6 +206,10 @@ if (idWanted.length) {
   }
   for (const [t, id] of idWanted) {
     const key = mergeKey(t.title, t.artist);
+    if (editorialCorrections[key]) {
+      if (previousNames[key]) names[key] = previousNames[key];
+      continue;
+    }
     const hit = byId.get(id);
     if (hit && appleCandidateCompatible(t.title, t.artist, hit)) names[key] = appleRecord(hit);
   }
@@ -215,7 +219,7 @@ if (idWanted.length) {
 for (const t of tracks) {
   const key = mergeKey(t.title, t.artist);
   if (editorialCorrections[key]) {
-    if (!names[key] && previousNames[key]) names[key] = previousNames[key];
+    if (previousNames[key]) names[key] = previousNames[key];
     continue;
   }
   if (covers[key] && !REVALIDATE_EXISTING) {
