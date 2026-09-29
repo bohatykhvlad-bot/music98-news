@@ -471,6 +471,9 @@ export async function refreshPopularSnapshot(env, force = false) {
     if(existing?.artists?.length>=20 &&
        existing?.source==="spotify_monthly_listeners" &&
        ranking.source!=="spotify_monthly_listeners"){
+      // Do not continue an old half-built ranking after a failed daily kickoff.
+      // Next cron will try the real source again from a clean state.
+      await kvDelete(env,POPULAR_STATE_KEY);
       return {
         ok:false,retry:true,keptExisting:true,
         reason:"popular_ranking_source_unavailable",
