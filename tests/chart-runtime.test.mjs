@@ -12,3 +12,11 @@ test("cached Top 50 refreshes only display metadata/artwork before response",()=
   assert.doesNotMatch(top50,/decorateCachedTop50[\s\S]{0,600}sort\(/);
   assert.doesNotMatch(top50,/decorateCachedTop50[\s\S]{0,600}rank\s*=/);
 });
+
+
+test("server Apple fallback keeps lead artist and never retries title-only",()=>{
+  assert.match(top50,/function leadArtistName\(s\)/);
+  assert.match(top50,/const lead = leadArtistName\(t\.artist\)/);
+  assert.match(top50,/extra = await grab\(t\.title, lead\)/);
+  assert.doesNotMatch(top50,/grab\(t\.title, ""\)/);
+});
