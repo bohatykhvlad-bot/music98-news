@@ -158,6 +158,8 @@ function baseEventUrl(apiKey) {
 const TM_DAILY_GUARD_DEFAULT = 2500;
 const TM_INTERACTIVE_GUARD_DEFAULT = 600;
 const TM_MIN_INTERVAL_MS = 550;
+const TM_ORIGIN_INTERACTIVE_RESERVE = 1000;
+const TM_ORIGIN_SCHEDULED_RESERVE = 500;
 let tmSharedLastFetchAt = 0;
 let tmGate = Promise.resolve();
 
@@ -169,6 +171,21 @@ async function writeBudget(env,key,value) {
 }
 async function reserveTicketmasterCall(env, scope="interactive") {
   if (!env?.DESK) return;
+
+  // Ticketmaster's own Rate-Limit-Available header is more authoritative than
+  // our soft KV counter (which is intentionally only a safety estimate).
+  const observed=await kvGetJson(env,"ticketmaster:quota:last");
+  const observedAt=Date.parse(observed?.observedAt||0)||0;
+  const observedAvailable=Number(observed?.available);
+  if(Date.now()-observedAt<12*60*60*1000 && Number.isFinite(observedAvailable)){
+    const floor=scope==="interactive" ? TM_ORIGIN_INTERACTIVE_RESERVE : TM_ORIGIN_SCHEDULED_RESERVE;
+    if(observedAvailable<=floor){
+      throw Object.assign(new Error("ticketmaster_budget_guard"),{
+        status:429,scope,originAvailable:observedAvailable
+      });
+    }
+  }
+
   const configured=Number(env.TICKETMASTER_DAILY_BUDGET);
   const globalLimit=Number.isFinite(configured) && configured>0
     ? Math.max(100,Math.floor(configured))
@@ -538,6 +555,12 @@ export async function refreshPopularSnapshot(env, force = false) {
   return {ok:true,fresh:false,complete:true,artists:artists.length,processed};
 }
 
+function isTransientTicketmasterError(err){
+  const status=Number(err?.status||0);
+  return err?.message==="ticketmaster_budget_guard" ||
+    err?.message==="ticketmaster_unavailable" ||
+    status===429 || status>=500;
+}
 function prewarmFresh(payload,now=Date.now()){
   const built=Date.parse(payload?.builtAt||0)||0;
   return !!built && now-built<PREWARM_MAX_AGE_MS && Array.isArray(payload?.events);
@@ -598,10 +621,13 @@ export async function refreshPopularTourSnapshots(env,budget=4){
       payload.artistId=artist.id;
       await kvPutJson(env,key,payload,{expirationTtl:36*60*60});
     }catch(err){
-      state.index=Math.max(0,state.index-1);
-      state.updatedAt=new Date().toISOString();
-      await kvPutJson(env,POPULAR_TOUR_STATE_KEY,state,{expirationTtl:172800});
-      return {ok:false,retry:true,status:Number(err?.status||0),index:state.index,processed};
+      if(isTransientTicketmasterError(err)){
+        state.index=Math.max(0,state.index-1);
+        state.updatedAt=new Date().toISOString();
+        await kvPutJson(env,POPULAR_TOUR_STATE_KEY,state,{expirationTtl:172800});
+        return {ok:false,retry:true,status:Number(err?.status||0),index:state.index,processed};
+      }
+      // A permanently invalid attraction must not block all later prewarms.
     }
   }
 
@@ -632,10 +658,13 @@ export async function refreshCapitalEventSnapshots(env,budget=2){
       payload.capital=true;
       await kvPutJson(env,key,payload,{expirationTtl:36*60*60});
     }catch(err){
-      state.index=Math.max(0,state.index-1);
-      state.updatedAt=new Date().toISOString();
-      await kvPutJson(env,CAPITAL_EVENTS_STATE_KEY,state,{expirationTtl:172800});
-      return {ok:false,retry:true,status:Number(err?.status||0),index:state.index,processed};
+      if(isTransientTicketmasterError(err)){
+        state.index=Math.max(0,state.index-1);
+        state.updatedAt=new Date().toISOString();
+        await kvPutJson(env,CAPITAL_EVENTS_STATE_KEY,state,{expirationTtl:172800});
+        return {ok:false,retry:true,status:Number(err?.status||0),index:state.index,processed};
+      }
+      // Unsupported/invalid market: skip it and continue the rest of Europe.
     }
   }
 
@@ -648,7 +677,8 @@ export async function refreshCapitalEventSnapshots(env,budget=2){
 async function popularSnapshotPayload(env) {
   const snapshot = await kvGetJson(env, POPULAR_SNAPSHOT_KEY);
   if (snapshot?.version === "popular-v3" && Array.isArray(snapshot.artists)) {
-    return { ...snapshot, stale:false, warming:false };
+    const age=Date.now()-(Date.parse(snapshot.builtAt||0)||0);
+    return { ...snapshot, stale:age>30*60*60*1000, warming:false };
   }
   const legacy = await kvGetJson(env, POPULAR_LEGACY_SNAPSHOT_KEY);
   if (legacy && Array.isArray(legacy.artists) && legacy.artists.length) {
@@ -995,9 +1025,6 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json(payload, 200, { "Cache-Control": "public, max-age=600, s-maxage=3600" });
   }
 
-  if (!env?.TICKETMASTER_API_KEY) {
-    return json({ error: "ticketmaster_key_missing" }, 503);
-  }
   const q = String(u.searchParams.get("q") || "").trim().slice(0, 120);
   const lat = finite(u.searchParams.get("lat"));
   const lng = finite(u.searchParams.get("lng"));
@@ -1030,6 +1057,10 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
+
+  if (!env?.TICKETMASTER_API_KEY) {
+    return json({ error: "ticketmaster_key_missing" }, 503);
+  }
 
   try {
     if (mode === "artist-search") {
