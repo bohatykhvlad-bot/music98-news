@@ -5,7 +5,7 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "test": "node --test tests/*.test.mjs",
-    "check": "node --check public/concerts-app.js && node --check functions/api/concerts.js && node --test tests/*.test.mjs && wrangler deploy --dry-run"
+    "check": "node --check public/concerts-app.js && node --check functions/api/concerts.js && node --check functions/lib/chart-identity.js && node --check scripts/build-covers.mjs && node scripts/chart-artwork-regression.mjs && node --test tests/*.test.mjs && wrangler deploy --dry-run"
   },
   "devDependencies": {
     "wrangler": "4.134.0"
