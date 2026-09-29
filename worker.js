@@ -2,10 +2,9 @@ import { onRequest as desk } from "./functions/api/desk.js";
 import { onRequestGet as top50 } from "./functions/api/top50.js";
 import {
   onRequestGet as concerts,
-  refreshHotspotSnapshot,
   refreshPopularSnapshot,
   refreshPopularTourSnapshots,
-  refreshCapitalEventSnapshots,
+  refreshMapMarketSnapshot,
 } from "./functions/api/concerts.js";
 import { onRequestGet as preview } from "./functions/api/preview.js";
 import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
@@ -185,7 +184,10 @@ export default {
     if (/^\/(?:releases|chart|charts|concerts)\/?$/.test(path) &&
         (request.method === "GET" || request.method === "HEAD")) {
       const u = new URL(request.url);
-      return env.ASSETS.fetch(new Request(u.origin + "/index.html", request));
+      const res = await env.ASSETS.fetch(new Request(u.origin + "/index.html", request));
+      const headers = new Headers(res.headers);
+      headers.set("Cache-Control", "no-store, max-age=0");
+      return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
     }
     /* legal/info pages: clean URLs -> /about, /contacts, /privacy, /terms */
     const legal = path.match(/^(\/about|\/contacts|\/privacy|\/terms)\/?$/);
@@ -237,12 +239,13 @@ export default {
     ctx.waitUntil((async()=>{
       const dailyKickoff=String(controller?.cron||"")==="20 0 * * *";
 
-      // Static map seeds removed the need for global hotspot discovery.
-      // Keep only small resumable slices for Popular/tour evidence so scheduled
-      // work stays well below the old Worker/KV/Ticketmaster footprint.
-      try{ await refreshCapitalEventSnapshots(env,1); }catch(e){}
+      // Build one daily verified map snapshot from a fixed candidate list.
+      // Only cities with at least one real upcoming Ticketmaster music event
+      // are published. The batch size keeps the total scheduled subrequests
+      // below the Worker ceiling while avoiding visitor-triggered discovery.
+      try{ await refreshMapMarketSnapshot(env,dailyKickoff); }catch(e){}
       try{ await refreshPopularSnapshot(env,dailyKickoff); }catch(e){}
-      try{ await refreshPopularTourSnapshots(env,2); }catch(e){}
+      try{ await refreshPopularTourSnapshots(env,1); }catch(e){}
     })());
   },
 };
