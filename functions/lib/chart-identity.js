@@ -5,6 +5,8 @@
  * which prevents an original song from collapsing into a remix/live/sped-up row.
  */
 
+export const COVER_RESOLVER_VERSION = 3;
+
 export const stripParen = (s) => String(s || "").replace(/\([^)]*\)|\[[^\]]*\]/g, " ");
 
 export function normTitle(s) {
@@ -38,6 +40,9 @@ export function versionSignature(s) {
   add("extended", /\bextended\b/);
   add("edit", /\b(?:radio\s+)?edit\b/);
   add("remaster", /\bremaster(?:ed)?\b/);
+  add("deluxe", /\bdeluxe\b/);
+  add("anniversary", /\banniversary\b/);
+  add("expanded", /\bexpanded\b/);
   add("rerecorded", /\b(?:re-?recorded|taylor['’]s\s+version)\b/);
   add("mix", /\b(?:dj\s+mix|mixed|mix)\b/);
   add("stripped", /\bstripped\b/);
@@ -66,6 +71,16 @@ function simpleText(s) {
 function releaseMs(item) {
   const n = Date.parse(String((item && item.releaseDate) || ""));
   return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+}
+
+function collectionPenalty(item) {
+  const name = String(item?.collectionName || "").toLowerCase();
+  const genre = String(item?.primaryGenreName || "").toLowerCase();
+  let penalty = 0;
+  if (/\b(?:greatest hits|best of|essentials?|anthology|collection|compilation)\b/.test(name)) penalty += 420;
+  if (/\b(?:various artists|karaoke|tribute)\b/.test(name)) penalty += 700;
+  if (/\b(?:soundtrack|original motion picture)\b/.test(name) || genre === "soundtrack") penalty += 160;
+  return penalty;
 }
 
 /* Strict original/version matching.
@@ -115,6 +130,7 @@ export function appleCandidateScore(wantedTitle, wantedArtist, item) {
        the same master on the artist's own release. */
     score += 20;
   }
+  score -= collectionPenalty(item);
 
   const collBase = String(item.collectionName || "").replace(/\s*-\s*(?:single|ep)\s*$/i, "");
   if (normTitle(collBase) === normTitle(wantedTitle)) score += 20;
