@@ -25,6 +25,8 @@ dns.setDefaultResultOrder("ipv4first");
 
 const OUT = path.resolve("public/data/covers.json");
 const OUT_NAMES = path.resolve("public/data/apple-names.json");
+const OUT_META = path.resolve("public/data/apple-cover-meta.json");
+const RESOLVER_VERSION = 3; // bump whenever canonical-selection semantics change
 const BAKED_TOP = path.resolve("public/data/top50.json");
 const INDEX_HTML = path.resolve("public/index.html");
 const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
@@ -127,6 +129,11 @@ try {
   if (saved && typeof saved === "object" && !Array.isArray(saved)) covers = { ...saved };
 } catch {}
 const lockedAtStart = new Set(Object.keys(covers));
+let coverMeta = {};
+try {
+  const saved = JSON.parse(fs.readFileSync(OUT_META, "utf8"));
+  if (saved && typeof saved === "object" && !Array.isArray(saved)) coverMeta = { ...saved };
+} catch {}
 const editorialCorrections = JSON.parse(fs.readFileSync(CORRECTIONS, "utf8"));
 const correctionsApplied = [];
 for (const [key, rec] of Object.entries(editorialCorrections)) {
@@ -136,6 +143,15 @@ for (const [key, rec] of Object.entries(editorialCorrections)) {
     covers[key] = art;
     correctionsApplied.push(key);
   }
+  coverMeta[key] = {
+    resolverVersion: RESOLVER_VERSION,
+    source: "editorial",
+    trackId: String(rec?.appleTrackId || ""),
+    collectionId: String(rec?.appleCollectionId || ""),
+    collectionName: String(rec?.collectionName || ""),
+    art,
+    verifiedAt: new Date().toISOString(),
+  };
 }
 const setVerifiedCover = (key, url) => {
   if (!key || !url || covers[key] === url) return false;
@@ -174,9 +190,17 @@ if (idWanted.length) {
     const hit = byId.get(id);
     if (!hit || !appleCandidateCompatible(t.title, t.artist, hit)) continue;
     names[key] = appleRecord(hit);
-    /* Exact Apple track IDs may refresh artwork in place. This is safe because
-       appleCandidateCompatible now rejects derivative collection mismatches. */
-    if (!editorialCorrections[key]) setVerifiedCover(key, art600(hit.artworkUrl100));
+    /* Exact Apple track IDs may refresh artwork in place only when they are
+       already the canonical identity produced by this resolver generation.
+       An old single ID must not become "canonical" merely because it still exists. */
+    if (!editorialCorrections[key]) {
+      const meta = coverMeta[key];
+      if (meta?.resolverVersion === RESOLVER_VERSION && String(meta?.trackId || "") === String(hit.trackId || "")) {
+        const art = art600(hit.artworkUrl100);
+        setVerifiedCover(key, art);
+        coverMeta[key] = {...meta, art, verifiedAt:new Date().toISOString()};
+      }
+    }
   }
 }
 
@@ -189,7 +213,13 @@ for (const t of tracks) {
     if (!names[key] && previousNames[key]) names[key] = previousNames[key];
     continue;
   }
-  if (covers[key] && !REVALIDATE_EXISTING) {
+  const meta = coverMeta[key];
+  const canonicalCurrent =
+    meta?.resolverVersion === RESOLVER_VERSION &&
+    meta?.source === "resolver" &&
+    meta?.art === covers[key] &&
+    !!meta?.trackId;
+  if (covers[key] && canonicalCurrent && !REVALIDATE_EXISTING) {
     if (!names[key] && previousNames[key]) names[key] = previousNames[key];
     continue;
   }
@@ -204,6 +234,16 @@ for (const t of tracks) {
     if (setVerifiedCover(key, url)) {
       console.log(`  Apple verified [${resolved.reason}]: ${t.artist} - ${t.title} -> ${resolved.hit.collectionName}`);
     }
+    coverMeta[key] = {
+      resolverVersion: RESOLVER_VERSION,
+      source: "resolver",
+      reason: resolved.reason,
+      trackId: String(resolved.hit.trackId || ""),
+      collectionId: String(resolved.hit.collectionId || ""),
+      collectionName: String(resolved.hit.collectionName || ""),
+      art: url,
+      verifiedAt: new Date().toISOString(),
+    };
     names[key] = appleRecord(resolved.hit);
   } catch (e) {
     console.log(`  Apple resolver ошибка: ${t.artist} - ${t.title}: ${e.message}`);
@@ -220,7 +260,9 @@ console.log(`без Apple cover-lock: ${missing.length}${missing.length ? " -> "
 
 const sortedNames = Object.fromEntries(Object.entries(names).sort(([a], [b]) => a.localeCompare(b)));
 fs.writeFileSync(OUT_NAMES, JSON.stringify(sortedNames, null, 2) + "\n");
-console.log(`записано ${Object.keys(sortedNames).length} Apple metadata rows`);
+const sortedMeta = Object.fromEntries(Object.entries(coverMeta).sort(([a], [b]) => a.localeCompare(b)));
+fs.writeFileSync(OUT_META, JSON.stringify(sortedMeta, null, 2) + "\n");
+console.log(`записано ${Object.keys(sortedNames).length} Apple metadata rows; resolver meta ${Object.keys(sortedMeta).length}`);
 
 /* Keep the emergency baked chart consistent with the verified registry. This does
    not recalculate positions, arrows or tenure; it only repairs Apple metadata for
