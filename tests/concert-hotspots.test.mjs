@@ -383,7 +383,7 @@ test("sparse public hotspot read is read-only and never starts background warmup
     assert.equal(response.status,200);
     assert.equal(queued.length,0);
     assert.equal(externalCalls,0);
-    assert.equal(kv.raw("concert-map:warm-lock:v1"),undefined);
+    assert.equal(kv.raw("concert-map:warm-lock:v1"),null);
   }finally{
     globalThis.fetch=oldFetch;
   }
