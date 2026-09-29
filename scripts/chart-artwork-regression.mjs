@@ -83,7 +83,7 @@ const resolverSource = fs.readFileSync(new URL("./build-covers.mjs", import.meta
 assert.match(resolverSource, /"animal\\|katseye": "6793209963"/);
 assert.match(resolverSource, /"hootiefrutti\\|katseye": "1891779764"/);
 assert.match(resolverSource, /"billiejean\\|michaeljackson": "269572838"/);
-assert.match(resolverSource, /function pickDedicatedAppleRelease\\(/);
+assert.match(resolverSource, /function pickDedicatedAppleRelease\(/);
 
 
 const beautyStudio={
