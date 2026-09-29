@@ -6,6 +6,7 @@ import {
   HOTSPOT_STATE_KEY,
   HOTSPOT_SNAPSHOT_KEY,
   SUPPORTED_COUNTRY_CODES,
+  EUROPE_CAPITAL_SEEDS,
   COUNTRY_BOUNDS,
   freshState,
   countryJob,
@@ -24,19 +25,23 @@ import {
 } from "../functions/lib/concert-hotspots.js";
 import { refreshHotspotSnapshot } from "../functions/api/concerts.js";
 
-test("hotspot threshold is strictly more than 10", () => {
-  assert.equal(HOTSPOT_THRESHOLD, 11);
+test("hotspot threshold is 10 or more", () => {
+  assert.equal(HOTSPOT_THRESHOLD, 10);
   const state=freshState(Date.UTC(2026,8,29));
-  state.verified.a={city:"A",countryCode:"US",lat:1,lng:2,count:10};
-  state.verified.b={city:"B",countryCode:"US",lat:1,lng:2,count:11};
+  state.verified.a={city:"A",countryCode:"US",lat:1,lng:2,count:9};
+  state.verified.b={city:"B",countryCode:"US",lat:1,lng:2,count:10};
   const snap=snapshotFromState(state,Date.UTC(2026,8,29));
   assert.deepEqual(snap.hotspots.map(x=>x.city),["B"]);
 });
 
-test("first-pass jobs are country queries and include the missing European markets", () => {
+test("first-pass jobs are country queries and European capitals are verified first", () => {
   const state=freshState(Date.UTC(2026,8,29));
   assert.equal(state.queue.length,SUPPORTED_COUNTRY_CODES.length);
   assert.ok(state.queue.every(j=>j.kind==="country" && validJob(j)));
+  assert.equal(state.verifyQueue.length,EUROPE_CAPITAL_SEEDS.length);
+  assert.equal(state.candidates[state.verifyQueue[0]].city,"Paris");
+  assert.equal(state.candidates[state.verifyQueue[1]].city,"Madrid");
+  assert.equal(state.candidates[state.verifyQueue[2]].city,"Berlin");
 
   for(const code of ["FR","ES","DE","AT","CZ","PL"]){
     assert.ok(SUPPORTED_COUNTRY_CODES.includes(code),code+" must be queried directly");
@@ -162,6 +167,8 @@ test("builder reads every venue page and publishes only a verified 11+ city", as
   const kv=memoryKv();
   const state=freshState(Date.UTC(2026,8,29));
   state.queue=[countryJob("FR")];
+  state.candidates={};
+  state.verifyQueue=[];
   await kv.put(HOTSPOT_STATE_KEY,JSON.stringify(state));
 
   const oldFetch=globalThis.fetch;
@@ -214,6 +221,8 @@ test("429 is requeued and is never cached as an empty successful snapshot", asyn
   const kv=memoryKv();
   const state=freshState(Date.UTC(2026,8,29));
   state.queue=[countryJob("FR")];
+  state.candidates={};
+  state.verifyQueue=[];
   await kv.put(HOTSPOT_STATE_KEY,JSON.stringify(state));
 
   const oldFetch=globalThis.fetch;
