@@ -587,7 +587,16 @@ async function hotspotSnapshotPayload(env) {
   const legacy = await kvGetJson(env, "concert-hotspots:v18:snapshot");
   const fallback = Array.isArray(legacy?.hotspots) ? legacy.hotspots : [];
   const live = Array.isArray(progress.hotspots) ? progress.hotspots : [];
-  const visible = live.length ? live : fallback;
+  const merged = new Map();
+  for (const h of fallback) {
+    const key=[h?.city,h?.stateCode,h?.countryCode].map(x=>String(x||"").trim().toLowerCase()).join("|");
+    if(key!=="||") merged.set(key,h);
+  }
+  for (const h of live) {
+    const key=[h?.city,h?.stateCode,h?.countryCode].map(x=>String(x||"").trim().toLowerCase()).join("|");
+    if(key!=="||") merged.set(key,h);
+  }
+  const visible=[...merged.values()].sort((a,b)=>Number(b?.count||0)-Number(a?.count||0));
 
   return {
     ...progress,
@@ -595,7 +604,7 @@ async function hotspotSnapshotPayload(env) {
     hotspots:visible,
     partial:true,
     warming:true,
-    stale:!live.length && !!fallback.length,
+    stale:!!fallback.length,
     progress:{
       queue:state.queue.length,
       verifyQueue:state.verifyQueue.length,
