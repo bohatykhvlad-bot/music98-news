@@ -589,7 +589,7 @@ function installPopup(next){
   return own;
 }
 function showVenuePopup(events){
-  if(!events?.length) return;
+  if(!events?.length || map.getZoom()<POPUP_CITY_MIN_ZOOM) return;
   const first=events[0];
   installPopup(new mapboxgl.Popup({offset:16,closeButton:true,maxWidth:"286px",focusAfterOpen:false})
     .setLngLat([first.lng,first.lat]).setDOMContent(venuePopupContent(events))).addTo(map);
@@ -630,6 +630,7 @@ function ensurePopupFullyVisible(){
 }
 
 function showPopup(e){
+  if(map.getZoom()<POPUP_CITY_MIN_ZOOM) return;
   installPopup(new mapboxgl.Popup({offset:16,closeButton:true,maxWidth:"286px",focusAfterOpen:false})
     .setLngLat([e.lng,e.lat]).setDOMContent(popupContent(e))).addTo(map);
   syncPopupPresentation();
