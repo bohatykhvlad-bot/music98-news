@@ -869,7 +869,7 @@ async function loadArtistArea(lat,lng,label,radius){
     artistContext.areaTotal=total;
     artistContext.areaCenter={lat,lng,radius:searchRadius};
     setEventData(events,total);
-    setStatus(total ? total+" concerts · "+label : "No Ticketmaster concerts found · "+label);
+    setStatus("");
   }catch(err){
     if(requestId!==areaRequestSeq) return;
     console.error(err);
@@ -1163,7 +1163,7 @@ async function loadArea(lat,lng,label,opts={}){
     sideSub.textContent=opts.city
       ? "Artists with upcoming events in "+label+"."
       : "Artists with the most upcoming events in this area.";
-    setStatus(total ? total+" concerts · "+label : "No Ticketmaster concerts found · "+label);
+    setStatus("");
   }catch(err){
     if(requestId!==areaRequestSeq) return;
     console.error(err);
