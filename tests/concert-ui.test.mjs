@@ -143,7 +143,7 @@ test("tour-more keeps text pixels stable on press", async () => {
   const app = fs.readFileSync(new URL("../public/concerts-app.js", import.meta.url), "utf8");
   assert.match(app,/\.tour-more:active\{transform:none/);
   assert.doesNotMatch(app,/\.tour-more:active\{transform:scale/);
-  assert.match(app,/\.buy\.press \.buy-label\{font-size:13px\}/);
+  assert.doesNotMatch(app,/\.buy\.press \.buy-label/);
 });
 
 
