@@ -55,6 +55,7 @@ jobs:
           const before = JSON.parse(fs.readFileSync("/tmp/covers-before.json","utf8"));
           const after = JSON.parse(fs.readFileSync("public/data/covers.json","utf8"));
           const names = JSON.parse(fs.readFileSync("public/data/apple-names.json","utf8"));
+          const meta = JSON.parse(fs.readFileSync("public/data/apple-cover-meta.json","utf8"));
           const corrections = JSON.parse(fs.readFileSync("public/data/cover-corrections.json","utf8"));
           const appleArt = (u) => {
             try {
@@ -72,10 +73,15 @@ jobs:
               continue;
             }
             const rec = names[key];
+            const proof = meta[key];
             if (!rec?.url || !rec?.title || !rec?.artist) {
               throw new Error("revalidated cover has no matching Apple identity: " + key);
             }
-            console.log("verified Apple cover refresh:", key, "->", rec.url);
+            if (!proof || proof.source !== "resolver" || proof.resolverVersion !== 3 ||
+                proof.art !== url || !proof.trackId || !proof.collectionId) {
+              throw new Error("revalidated cover has no current canonical resolver proof: " + key);
+            }
+            console.log("verified Apple cover refresh:", key, "->", rec.url, proof.collectionName);
           }
           console.log("cover registry safety: PASS", changed, "verified changes");
           NODE
@@ -83,7 +89,7 @@ jobs:
         run: |
           git config user.name "music98 apple-data bot"
           git config user.email "actions@users.noreply.github.com"
-          git add public/data/covers.json public/data/apple-names.json public/data/cover-corrections.json public/data/top50.json public/index.html
+          git add public/data/covers.json public/data/apple-names.json public/data/apple-cover-meta.json public/data/cover-corrections.json public/data/top50.json public/index.html
           if git diff --cached --quiet; then
             echo "данные Apple без изменений"
             exit 0
