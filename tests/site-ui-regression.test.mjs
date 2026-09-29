@@ -7,7 +7,9 @@ const worker=readFileSync(new URL("../worker.js",import.meta.url),"utf8");
 
 test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/\.nav\{[^}]*width:410px;[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
-  assert.match(page,/\.nav-btn\{width:100%;/);
+  assert.match(page,/\.nav-btn\{width:100%;text-indent:var\(--ink-x,0px\);/);
+  assert.match(page,/window\.music98InkShift/);
+  assert.match(page,/getImageData\(/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
@@ -15,7 +17,7 @@ test("Subscribe scales around a fixed center with no axis translation or font-me
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
   assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(page,/\.press-pill-label\{[^}]*position:absolute;inset:0;[^}]*place-items:center;[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
+  assert.match(page,/\.press-pill-label\{[^}]*position:absolute;inset:0;[^}]*place-items:center;[^}]*text-indent:var\(--ink-x,0px\);[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
   assert.match(page,/\.press-pill\.press \.press-pill-label\{transform:none\}/);
   assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*font-size:/);
   assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*translate:/);
