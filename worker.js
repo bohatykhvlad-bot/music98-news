@@ -165,6 +165,25 @@ export default {
       return proxyAppleGw(request, rawPath);
     }
     if (path === "/api/top50" && request.method === "GET") return top50(c);
+    if (path === "/api/__m98-concert-recover-9c41e6" && request.method === "GET") {
+      const task=String(url.searchParams.get("task")||"");
+      let result;
+      if(task==="popular"){
+        result=await refreshPopularSnapshot(env,url.searchParams.get("reset")==="1");
+      }else if(task==="capitals"){
+        result=await refreshCapitalEventSnapshots(env,4);
+      }else if(task==="tours"){
+        result=await refreshPopularTourSnapshots(env,4);
+      }else if(task==="hotspots"){
+        result=await refreshHotspotSnapshot(env,{jobBudget:2,verifyBudget:10});
+      }else{
+        result={ok:false,error:"unknown_task"};
+      }
+      return new Response(JSON.stringify(result),{
+        status:200,
+        headers:{"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store"}
+      });
+    }
     if (path === "/api/concerts" && request.method === "GET") return concerts(c);
     if (path === "/api/preview" && (request.method === "GET" || request.method === "HEAD")) return preview(c);
     if (path === "/api/desk") return desk(c);
