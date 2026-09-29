@@ -1111,8 +1111,16 @@ export async function onRequestGet({ request, env, waitUntil }) {
 
   if (mode === "popular") {
     // Same rule for the default right panel: KV snapshot only, no quota spend.
+    // Never let a partial rebuild (for example 8/30) become a long-lived
+    // browser/CDN response. Only a complete Top 30 is cacheable.
     const payload = await popularSnapshotPayload(env);
-    return json(payload, 200, { "Cache-Control": "public, max-age=600, s-maxage=3600" });
+    const complete=Array.isArray(payload.artists) &&
+      payload.artists.length>=Number(payload.targetCount||POPULAR_LIMIT);
+    return json(payload, 200, {
+      "Cache-Control": complete
+        ? "public, max-age=300, s-maxage=900"
+        : "no-store, max-age=0"
+    });
   }
 
   const q = String(u.searchParams.get("q") || "").trim().slice(0, 120);
