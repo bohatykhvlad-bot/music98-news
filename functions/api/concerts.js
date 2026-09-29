@@ -23,17 +23,18 @@ const TM_VENUES_ROOT = "https://app.ticketmaster.com/discovery/v2/venues.json";
 const KWORB_ARTISTS_URL = "https://kworb.net/spotify/listeners.html";
 const POPULAR_LIMIT = 30;
 const POPULAR_CANDIDATE_LIMIT = 250;
-const POPULAR_SNAPSHOT_KEY = "concert-popular:v3";
-const POPULAR_STATE_KEY = "concert-popular:v3:state";
-const POPULAR_LEGACY_SNAPSHOT_KEY = "concert-popular:v2";
+const POPULAR_SNAPSHOT_KEY = "concert-popular:v4";
+const POPULAR_STATE_KEY = "concert-popular:v4:state";
 const POPULAR_REFRESH_MS = 24 * 60 * 60 * 1000;
 const POPULAR_BATCH_SIZE = 20;
-const POPULAR_TOUR_STATE_KEY = "concert-popular:v3:tours-state";
-const POPULAR_TOUR_PREFIX = "concert-popular:v3:tour:";
+const POPULAR_TOUR_STATE_KEY = "concert-popular:v4:tours-state";
+const POPULAR_TOUR_PREFIX = "concert-popular:v4:tour:";
 const CAPITAL_EVENTS_STATE_KEY = "concert-capitals:v1:state";
 const CAPITAL_EVENTS_PREFIX = "concert-capitals:v1:city:";
 const CAPITAL_HUB_SNAPSHOT_KEY = "concert-capitals:v1:hubs";
 const PREWARM_MAX_AGE_MS = 26 * 60 * 60 * 1000;
+const MAP_WARM_LOCK_KEY = "concert-map:warm-lock:v1";
+const MAP_WARM_LOCK_MS = 15 * 60 * 1000;
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
@@ -443,7 +444,7 @@ async function kvDelete(env,key){
 
 function newPopularBuildState(ranking,now=Date.now()){
   return {
-    version:"popular-v3",
+    version:"popular-v4",
     startedAt:new Date(now).toISOString(),
     updatedAt:new Date(now).toISOString(),
     source:ranking.source,
@@ -464,12 +465,12 @@ export async function refreshPopularSnapshot(env, force = false) {
   let state = await kvGetJson(env, POPULAR_STATE_KEY);
   const age = Date.now() - (Date.parse(existing?.builtAt || 0) || 0);
 
-  if(!force && !state && existing?.version==="popular-v3" &&
+  if(!force && !state && existing?.version==="popular-v4" &&
      existing?.artists?.length>=POPULAR_LIMIT && age < POPULAR_REFRESH_MS){
     return { ok:true, fresh:true, complete:true, artists:existing.artists.length };
   }
 
-  if(force || !state || state.version!=="popular-v3" ||
+  if(force || !state || state.version!=="popular-v4" ||
      !Array.isArray(state.candidates) || !Array.isArray(state.found)){
     const ranking=await kworbArtists();
     if(existing?.artists?.length>=20 &&
@@ -491,7 +492,7 @@ export async function refreshPopularSnapshot(env, force = false) {
     // candidate the previous build reached so an 8/30 snapshot cannot freeze
     // for the rest of the day or repeatedly restart from rank 1.
     if(!force &&
-       existing?.version==="popular-v3" &&
+       existing?.version==="popular-v4" &&
        existing?.source===ranking.source &&
        Array.isArray(existing?.artists) &&
        existing.artists.length>0 &&
@@ -550,11 +551,12 @@ export async function refreshPopularSnapshot(env, force = false) {
 
   const artists=state.found
     .slice()
+    .filter(a=>Number(a?.shows||0)>0)
     .sort((a,b)=>Number(a.popularityRank||999999)-Number(b.popularityRank||999999))
     .slice(0,POPULAR_LIMIT)
     .map((a,i)=>({
     id:a.id,name:a.name,image:a.image,rank:i+1,
-    popularityRank:a.popularityRank,listeners:a.listeners,firstDate:a.firstDate,
+    popularityRank:a.popularityRank,listeners:a.listeners,shows:Number(a.shows||0),firstDate:a.firstDate,
   }));
 
   // Never replace a healthy snapshot with a suspiciously small partial result.
@@ -573,11 +575,12 @@ export async function refreshPopularSnapshot(env, force = false) {
   }
 
   const snapshot={
-    ok:true,mode:"popular",version:"popular-v3",
+    ok:true,mode:"popular",version:"popular-v4",
     builtAt:new Date().toISOString(),
     artists,
     source:state.source,
     ranking:state.ranking,
+    eligibility:"ticketmaster_upcoming_events_gt_0",
     candidateCount:state.index,
     eligibleCount:artists.length,
     targetCount:POPULAR_LIMIT,
@@ -730,20 +733,25 @@ async function capitalHubSnapshot(env, force=false){
 }
 
 async function popularSnapshotPayload(env) {
-  const [snapshot,state,legacy]=await Promise.all([
+  const [snapshot,state]=await Promise.all([
     kvGetJson(env, POPULAR_SNAPSHOT_KEY),
     kvGetJson(env, POPULAR_STATE_KEY),
-    kvGetJson(env, POPULAR_LEGACY_SNAPSHOT_KEY),
   ]);
 
   const sources=[];
-  if(snapshot?.version==="popular-v3" && Array.isArray(snapshot.artists)) sources.push(snapshot.artists);
-  if(state?.version==="popular-v3" && Array.isArray(state.found)) sources.push(state.found);
-  if(legacy && Array.isArray(legacy.artists)) sources.push(legacy.artists);
+  if(snapshot?.version==="popular-v4" &&
+     snapshot?.eligibility==="ticketmaster_upcoming_events_gt_0" &&
+     Array.isArray(snapshot.artists)){
+    sources.push(snapshot.artists);
+  }
+  if(state?.version==="popular-v4" && Array.isArray(state.found)){
+    sources.push(state.found);
+  }
 
   const merged=new Map();
   for(const list of sources){
     for(const artist of list){
+      if(Number(artist?.shows||0)<=0) continue;
       const key=String(artist?.id||artist?.name||"").trim().toLowerCase();
       if(!key) continue;
       const prev=merged.get(key);
@@ -756,16 +764,16 @@ async function popularSnapshotPayload(env) {
   const artists=[...merged.values()]
     .sort((a,b)=>Number(a?.popularityRank||a?.rank||999999)-Number(b?.popularityRank||b?.rank||999999))
     .slice(0,POPULAR_LIMIT)
-    .map((a,i)=>({...a,rank:i+1}));
+    .map((a,i)=>({...a,rank:i+1,shows:Number(a.shows||0)}));
 
   if(artists.length){
-    const age=Date.now()-(Date.parse(snapshot?.builtAt||legacy?.builtAt||0)||0);
+    const age=Date.now()-(Date.parse(snapshot?.builtAt||0)||0);
     return {
-      ...(legacy||{}),
       ...(snapshot||{}),
       ok:true,
       mode:"popular",
-      version:"popular-v3",
+      version:"popular-v4",
+      eligibility:"ticketmaster_upcoming_events_gt_0",
       artists,
       targetCount:POPULAR_LIMIT,
       stale:age>30*60*60*1000,
@@ -774,8 +782,9 @@ async function popularSnapshotPayload(env) {
   }
 
   return {
-    ok:true,mode:"popular",version:"popular-v3",builtAt:"",
+    ok:true,mode:"popular",version:"popular-v4",builtAt:"",
     artists:[],source:"scheduled",ranking:"Spotify monthly listeners",
+    eligibility:"ticketmaster_upcoming_events_gt_0",
     targetCount:POPULAR_LIMIT,stale:false,warming:true
   };
 }
@@ -1004,6 +1013,26 @@ export async function refreshHotspotSnapshot(env, options = {}) {
   };
 }
 
+async function scheduleMapWarmupIfSparse(env,waitUntil,visibleCount){
+  if(!env?.DESK || !env?.TICKETMASTER_API_KEY || typeof waitUntil!=="function" || Number(visibleCount||0)>=3) return;
+  const lock=await kvGetJson(env,MAP_WARM_LOCK_KEY);
+  const lockAt=Date.parse(lock?.at||0)||0;
+  if(Date.now()-lockAt<MAP_WARM_LOCK_MS) return;
+
+  await kvPutJson(env,MAP_WARM_LOCK_KEY,{at:new Date().toISOString()},{expirationTtl:20*60});
+  waitUntil((async()=>{
+    try{
+      // Cheap first-aid path: refresh a small capital batch so the public map
+      // gets real Ticketmaster-backed points quickly. The normal cron keeps
+      // advancing the full global hotspot builder separately.
+      await refreshCapitalEventSnapshots(env,4);
+    }catch(e){}
+    try{
+      await refreshHotspotSnapshot(env,{jobBudget:2,verifyBudget:10});
+    }catch(e){}
+  })());
+}
+
 async function hotspotSnapshotPayload(env) {
   const snapshot = await kvGetJson(env, HOTSPOT_SNAPSHOT_KEY);
   if (snapshot?.version === HOTSPOT_VERSION &&
@@ -1099,13 +1128,14 @@ export async function onRequestGet({ request, env, waitUntil }) {
   void region;
 
   if (mode === "hotspots") {
-    // Read-only public endpoint: a visitor can never trigger Ticketmaster
-    // hotspot discovery. The scheduled Worker owns all refresh work.
     const payload = await hotspotSnapshotPayload(env);
+    // Self-heal only when the map is effectively empty. A KV lock prevents a
+    // visitor stampede from multiplying Ticketmaster calls.
+    await scheduleMapWarmupIfSparse(env,waitUntil,payload?.hotspots?.length||0);
     return json(payload, 200, {
       "Cache-Control": payload.partial
-        ? "public, max-age=60, s-maxage=180"
-        : "public, max-age=600, s-maxage=3600"
+        ? "public, max-age=30, s-maxage=60"
+        : "public, max-age=300, s-maxage=900"
     });
   }
 
