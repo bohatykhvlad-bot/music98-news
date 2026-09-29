@@ -6,7 +6,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v32";
+const TOP50_KV = "top50v33";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -95,22 +95,23 @@ async function applyCovers(env, tracks, origin) {
   for (const t of tracks) {
     const key = mergeKey(t.title, t.artist);
     const cached = covers[key];
-    /* Registry lock wins unconditionally, regardless of provider.
-       If the song is not in the checked-in registry yet, keep the first runtime
-       cover already cached for it. Only a truly unseen key may take today's
-       source artwork. */
-    const chosen = seed[key] || cached;
-    const temporary = !chosen && isAppleArt(t.art) ? t.art : "";
-    if (chosen) {
-      if (seed[key] && covers[key] !== seed[key]) {
-        covers[key] = seed[key];
+
+    /* Confidence order:
+       1) current Apple chart artwork;
+       2) artwork verified by exact Apple track ID / strict Apple search;
+       3) checked-in Apple registry;
+       4) runtime Apple cache.
+       A stale registry can no longer overwrite a fresher exact Apple identity. */
+    const exact = isAppleArt(t.appleExact?.art) ? t.appleExact.art : "";
+    const verified = isAppleArt(t.verifiedAppleArt) ? t.verifiedAppleArt : "";
+    const searched = isAppleArt(t.searchedAppleArt) ? t.searchedAppleArt : "";
+    const chosen = exact || verified || searched || seed[key] || cached || "";
+    if (chosen && isAppleArt(chosen)) {
+      if ((exact || verified || searched || seed[key]) && covers[key] !== chosen) {
+        covers[key] = chosen;
         changed = true;
       }
       t.art = chosen;
-    } else if (temporary) {
-      /* Temporary Apple display only. Never persist an unreviewed runtime image
-         as the canonical lock. The GitHub Apple resolver will pin it later. */
-      t.art = temporary;
     } else {
       t.art = "";
     }
@@ -125,7 +126,6 @@ async function applyCovers(env, tracks, origin) {
 async function enrichArtByIds(tracks, stats) {
   const want = [];
   for (const t of tracks) {
-    if (t.art) continue;
     const m = String(t.url || "").match(/[?&]i=(\d+)/);
     if (m) want.push([t, m[1]]);
   }
@@ -150,6 +150,7 @@ async function enrichArtByIds(tracks, stats) {
       const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
       if (art) {
         t.art = art;
+        t.verifiedAppleArt = art;
         if (stats) stats.filled += 1;
       }
     }
@@ -216,7 +217,9 @@ async function applyNames(env, tracks, origin) {
        Apple, а запечённый файл чарта может вести на версию-вариант или быть пустым
        (живой пример: строка без ссылки, потому что iTunes из воркера не ответил). */
     if (sd) {
-      if (sd.url) t.url = sd.url;
+      /* A current Apple chart row is more authoritative than yesterday's
+         generated seed. Never let stale metadata replace Apple's live track URL. */
+      if (sd.url && !t.appleExact?.url) t.url = sd.url;
       if (sd.prev) t.prev = sd.prev;
       if (sd.year && !t.year) t.year = sd.year;
     }
@@ -591,6 +594,11 @@ function ingest(bucket, src, rows) {
       rec.title = row.title;
       rec.artist = row.artist;
       rec.nameSrc = "A";
+      rec.appleExact = {
+        url: row.url || "",
+        art: isAppleArt(row.art) ? row.art : "",
+        year: row.year || "",
+      };
     }
     if (row.url && !rec.url) rec.url = row.url;
     /* обложку предпочитаем Apple, Deezer оставляем только как запасной вариант */
@@ -679,6 +687,7 @@ export async function buildTop50(origin, env) {
     prev: isApplePreview(rec.prev) ? rec.prev : "",
     year: rec.year || "",
     nameSrc: rec.nameSrc || "",
+    appleExact: rec.appleExact || null,
   }));
   const coverStats = { asked: 0, filled: 0, failed: 0 };
   /* порядок важен: сначала данные Apple из засева (имя, ссылка, превью, год),
@@ -686,19 +695,22 @@ export async function buildTop50(origin, env) {
   await applyNames(env, tracks, origin);
   tracks.forEach((t) => { delete t.nameSrc; });
   await seedBaked(origin || "", tracks);
-  await applyCovers(env, tracks, origin);  /* засев -> память -> сборка -> Deezer -> пусто */
-  await enrichArtByIds(tracks, coverStats); /* точный релиз по Apple-ID из ссылки */
-  await enrichApple(tracks);               /* добор ссылки/превью/года, если Apple ответил */
-  await applyCovers(env, tracks, origin);  /* запомнить найденное */
+  await applyCovers(env, tracks, origin);  /* initial safe Apple registry/current feed */
+  await enrichArtByIds(tracks, coverStats); /* exact Apple track ID overrides stale cover locks */
+  await enrichApple(tracks);               /* strict search for missing Apple metadata */
+  await applyCovers(env, tracks, origin);  /* persist only verified Apple artwork */
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
     if (!isApplePreview(t.prev)) t.prev = "";
+    delete t.appleExact;
+    delete t.verifiedAppleArt;
+    delete t.searchedAppleArt;
   });
   return {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v32",
+    rev: "feat-v33",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
@@ -743,6 +755,10 @@ async function enrichApple(tracks) {
       }
       if (extra.prev && isApplePreview(extra.prev)) t.prev = extra.prev;
       if (extra.url && !t.url) t.url = extra.url;
+      if (extra.art && isAppleArt(extra.art)) {
+        t.art = extra.art;
+        t.searchedAppleArt = extra.art;
+      }
       if (extra.year && !t.year) t.year = extra.year;
     } catch {}
   }));
