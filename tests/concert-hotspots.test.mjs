@@ -271,3 +271,78 @@ test("public hotspot read never triggers Ticketmaster discovery", async () => {
     globalThis.fetch=oldFetch;
   }
 });
+
+
+test("public Popular read is snapshot-only and spends no Ticketmaster call", async () => {
+  const kv=memoryKv();
+  await kv.put("concert-popular:v2",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v2",builtAt:new Date().toISOString(),
+    artists:[{id:"a1",name:"Artist",image:"",rank:1}]
+  }));
+  const oldFetch=globalThis.fetch;
+  let externalCalls=0;
+  globalThis.fetch=async()=>{ externalCalls++; throw new Error("popular read must not hit Ticketmaster"); };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?mode=popular"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.artists[0].name,"Artist");
+    assert.equal(externalCalls,0);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
+test("exact-city user query paginates and stays scoped to that city", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  const oldCaches=globalThis.caches;
+  const seen=[];
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    seen.push(u);
+    if(!u.pathname.endsWith("/events.json")) return new Response("not found",{status:404});
+    assert.equal(u.searchParams.get("city"),"Paris");
+    assert.equal(u.searchParams.get("countryCode"),"FR");
+    const page=Number(u.searchParams.get("page")||0);
+    const event={
+      id:"e"+page,
+      name:"Show "+page,
+      dates:{start:{localDate:"2026-10-0"+(page+1),localTime:"20:00:00"}},
+      _embedded:{
+        attractions:[{id:"artist",name:"Artist",images:[]}],
+        venues:[{
+          id:"venue",name:"Venue",city:{name:"Paris"},
+          country:{name:"France",countryCode:"FR"},
+          location:{latitude:"48.8566",longitude:"2.3522"}
+        }]
+      },
+      images:[]
+    };
+    return new Response(JSON.stringify({
+      _embedded:{events:[event]},
+      page:{size:200,totalElements:201,totalPages:2,number:page}
+    }),{status:200,headers:{"content-type":"application/json"}});
+  };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?city=Paris&countryCode=FR"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.events.length,2);
+    assert.equal(data.pagesFetched,2);
+    assert.equal(data.partial,false);
+    assert.equal(seen.length,2);
+  }finally{
+    globalThis.fetch=oldFetch;
+    globalThis.caches=oldCaches;
+  }
+});
