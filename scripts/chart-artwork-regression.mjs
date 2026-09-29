@@ -75,6 +75,16 @@ const vocal = {
 };
 assert.equal(pickAppleCandidate("Dracula (with JENNIE)", "Tame Impala", [instr, vocal]).trackId, 301);
 
+/* The repository resolver pins known canonical Apple collections for catalog
+ * cases where search ranking can drift between alternate packages. These IDs are
+ * official Apple releases and the artwork job must not silently fall back to a
+ * playlist/variant package on a later run. */
+const resolverSource = fs.readFileSync(new URL("./build-covers.mjs", import.meta.url), "utf8");
+assert.match(resolverSource, /"animal\\|katseye": "6793209963"/);
+assert.match(resolverSource, /"hootiefrutti\\|katseye": "1891779764"/);
+assert.match(resolverSource, /"billiejean\\|michaeljackson": "269572838"/);
+assert.match(resolverSource, /function pickDedicatedAppleRelease\\(/);
+
 
 const beautyStudio={
   trackId:500,trackName:"Beauty and a Beat (feat. Nicki Minaj)",
