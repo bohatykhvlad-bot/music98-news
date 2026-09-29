@@ -79,7 +79,7 @@ jobs:
           curl -fsS --max-time 45 'https://music98.news/api/concerts?city=Paris&countryCode=FR&verify=20260929b' |
             python -c 'import json,sys; d=json.load(sys.stdin); e=d.get("events") or []; assert len(e)>0, d; assert any(x.get("lat") is not None and x.get("lng") is not None for x in e), e; print("verified_paris_events=",len(e))'
 
-          curl -fsS --max-time 30 'https://music98.news/concerts-app.js?v=20260929-24' > /tmp/concerts-app.js
+          curl -fsS --max-time 30 'https://music98.news/concerts-app.js?v=20260929-25' > /tmp/concerts-app.js
           grep -q 'music98:concert-popular:v5' /tmp/concerts-app.js
           if grep -q 'Loading concert data' /tmp/concerts-app.js; then
             echo "stale concert app asset still served"
