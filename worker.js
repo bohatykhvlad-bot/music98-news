@@ -217,6 +217,10 @@ export default {
     const res = await env.ASSETS.fetch(request);
     const type = (res.headers.get("content-type") || "").toLowerCase();
     const headers = new Headers(res.headers);
+    if (path === "/concerts-app.js") {
+      headers.set("Cache-Control", "no-store, max-age=0");
+      return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+    }
     if (type.includes("text/html") || path === "/data/desk.json") {
       headers.set("Cache-Control", "no-store, max-age=0");
       return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
