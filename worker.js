@@ -1,6 +1,12 @@
 import { onRequest as desk } from "./functions/api/desk.js";
 import { onRequestGet as top50 } from "./functions/api/top50.js";
-import { onRequestGet as concerts, refreshHotspotSnapshot, refreshPopularSnapshot } from "./functions/api/concerts.js";
+import {
+  onRequestGet as concerts,
+  refreshHotspotSnapshot,
+  refreshPopularSnapshot,
+  refreshPopularTourSnapshots,
+  refreshCapitalEventSnapshots,
+} from "./functions/api/concerts.js";
 import { onRequestGet as preview } from "./functions/api/preview.js";
 import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
 import { onRequestGet as subscribers, onRequestDelete as subscribersRemove } from "./functions/api/subscribers.js";
@@ -225,8 +231,14 @@ export default {
 
   async scheduled(controller, env, ctx) {
     ctx.waitUntil((async()=>{
+      const dailyKickoff=String(controller?.cron||"")==="15 3 * * *";
+
+      // The half-hour job advances resumable background state. The 03:15 UTC
+      // job explicitly starts a fresh Popular ranking once per day.
       try{ await refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 16 }); }catch(e){}
-      try{ await refreshPopularSnapshot(env); }catch(e){}
+      try{ await refreshPopularSnapshot(env,dailyKickoff); }catch(e){}
+      try{ await refreshPopularTourSnapshots(env,4); }catch(e){}
+      try{ await refreshCapitalEventSnapshots(env,2); }catch(e){}
     })());
   },
 };
