@@ -264,6 +264,7 @@ test("empty current hotspot snapshot falls back instead of blanking the public m
     builtAt:new Date().toISOString(),
     hotspots:[{city:"Paris",countryCode:"FR",stateCode:"",lat:48.8566,lng:2.3522,count:11}]
   }));
+  await kv.put("concert-map:warm-lock:v1",JSON.stringify({at:new Date().toISOString()}));
 
   const oldFetch=globalThis.fetch;
   let externalCalls=0;
@@ -290,7 +291,11 @@ test("public hotspot read never triggers Ticketmaster discovery", async () => {
   await kv.put(HOTSPOT_SNAPSHOT_KEY,JSON.stringify({
     ok:true,mode:"hotspots",version:HOTSPOT_VERSION,threshold:HOTSPOT_THRESHOLD,
     partial:false,builtAt:new Date().toISOString(),
-    hotspots:[{city:"Paris",countryCode:"FR",stateCode:"",lat:48.8566,lng:2.3522,count:10}]
+    hotspots:[
+      {city:"Paris",countryCode:"FR",stateCode:"",lat:48.8566,lng:2.3522,count:10},
+      {city:"London",countryCode:"GB",stateCode:"",lat:51.5072,lng:-0.1276,count:12},
+      {city:"Berlin",countryCode:"DE",stateCode:"",lat:52.52,lng:13.405,count:14}
+    ]
   }));
 
   const oldFetch=globalThis.fetch;
@@ -311,6 +316,47 @@ test("public hotspot read never triggers Ticketmaster discovery", async () => {
   }
 });
 
+
+test("sparse public hotspot read schedules exactly one locked background warmup", async () => {
+  const kv=memoryKv();
+  await kv.put(HOTSPOT_SNAPSHOT_KEY,JSON.stringify({
+    ok:true,mode:"hotspots",version:HOTSPOT_VERSION,threshold:HOTSPOT_THRESHOLD,
+    partial:false,builtAt:new Date().toISOString(),hotspots:[]
+  }));
+
+  const queued=[];
+  const oldFetch=globalThis.fetch;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="app.ticketmaster.com"){
+      return new Response(JSON.stringify({page:{size:200,totalElements:0,totalPages:0,number:0}}),
+        {status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?mode=hotspots"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:p=>queued.push(p)
+    });
+    assert.equal(response.status,200);
+    assert.equal(queued.length,1);
+    assert.ok(kv.raw("concert-map:warm-lock:v1"));
+    await Promise.allSettled(queued);
+
+    const queuedAgain=[];
+    const second=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?mode=hotspots"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:p=>queuedAgain.push(p)
+    });
+    assert.equal(second.status,200);
+    assert.equal(queuedAgain.length,0);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
 
 test("public Popular read is snapshot-only and spends no Ticketmaster call", async () => {
   const kv=memoryKv();
