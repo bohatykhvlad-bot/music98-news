@@ -109,7 +109,7 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.map-mode-btn\{[^}]*display:grid;place-items:center;text-align:center/);
   assert.match(app,/\.side-tabs\{[\s\S]*?margin:0 0 10px/);
   assert.match(app,/\.map-mode-switch\{[^}]*display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-  assert.match(app,/\.map-mode-btn\{width:100%;[^}]*transition:\.18s/);
+  assert.match(app,/\.map-mode-btn\{width:100%;[^}]*transition:background \.18s ease,border-color \.18s ease,color \.18s ease/);
   assert.doesNotMatch(app,/\.nav-btn:active\{[^}]*transform:/);
   assert.match(app,/\.nav-btn\{width:100%;[^}]*transition:\.18s;[^}]*top:\.5px/);
 });
