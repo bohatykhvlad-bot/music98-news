@@ -4,6 +4,6 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": ""
+    "measuredAt": "2026-09-29T20:53:52.804Z"
   }
 }
