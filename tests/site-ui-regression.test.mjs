@@ -29,7 +29,7 @@ test("verified chart artwork overrides apply even to same-day browser cache",()=
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260929-34/);
+  assert.match(page,/concerts-app\.js\?v=20260929-35/);
 });
 
 
