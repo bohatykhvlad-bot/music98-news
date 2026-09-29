@@ -5,6 +5,8 @@
  * which prevents an original song from collapsing into a remix/live/sped-up row.
  */
 
+export const COVER_RESOLVER_VERSION = 3;
+
 export const stripParen = (s) => String(s || "").replace(/\([^)]*\)|\[[^\]]*\]/g, " ");
 
 export function normTitle(s) {
@@ -26,7 +28,7 @@ export function versionSignature(s) {
   const x = String(s || "").toLowerCase().replace(/[–—]/g, "-");
   const tags = [];
   const add = (name, re) => { if (re.test(x)) tags.push(name); };
-  add("remix", /\b(?:remix|rmx)\b/);
+  add("remix", /\b(?:remix(?:es)?|rmx)\b/);
   add("live", /\blive\b/);
   add("acoustic", /\bacoustic\b/);
   add("instrumental", /\binstrumental\b/);
@@ -38,8 +40,16 @@ export function versionSignature(s) {
   add("extended", /\bextended\b/);
   add("edit", /\b(?:radio\s+)?edit\b/);
   add("remaster", /\bremaster(?:ed)?\b/);
+  add("deluxe", /\bdeluxe\b/);
+  add("anniversary", /\banniversary\b/);
+  add("expanded", /\bexpanded\b/);
   add("rerecorded", /\b(?:re-?recorded|taylor['’]s\s+version)\b/);
   add("mix", /\b(?:dj\s+mix|mixed|mix)\b/);
+  add("stripped", /\bstripped\b/);
+  add("piano", /\bpiano\s+(?:version|mix)\b/);
+  add("orchestral", /\borchestral\b/);
+  add("nightcore", /\bnightcore\b/);
+  add("cover", /\bcover\s+(?:version|mix)\b/);
   if (!tags.length && /\bversion\b/.test(x)) tags.push("version");
   return [...new Set(tags)].sort().join("+");
 }
@@ -63,10 +73,26 @@ function releaseMs(item) {
   return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
 }
 
-/* Strict track-version match, softer collection penalty.
- * A plain chart title can never choose "Remix", "Live", "Sped Up", etc. as the
- * track itself. A deluxe/remaster/live collection is only a fallback when Apple
- * has no cleaner copy of the exact track/version.
+function collectionPenalty(item) {
+  const name = String(item?.collectionName || "").toLowerCase();
+  const genre = String(item?.primaryGenreName || "").toLowerCase();
+  let penalty = 0;
+  if (/\b(?:greatest hits|best of|essentials?|anthology|collection|compilation)\b/.test(name)) penalty += 420;
+  if (/\b(?:various artists|karaoke|tribute)\b/.test(name)) penalty += 700;
+  if (/\b(?:soundtrack|original motion picture)\b/.test(name) || genre === "soundtrack") penalty += 160;
+  return penalty;
+}
+
+/* Strict original/version matching.
+ *
+ * The track title AND the collection have to agree with the requested version.
+ * This is deliberately fail-closed: for an unversioned chart row we would rather
+ * show no Apple cover than borrow artwork from a Remix/Live/Acoustic/etc. pack.
+ *
+ * When Apple exposes both a one-track single and the same studio master on the
+ * artist's full release, prefer the full artist release. That matches the normal
+ * Apple Music song page and prevents search-order accidents from pinning promo or
+ * remix-package sleeves forever.
  */
 export function appleCandidateScore(wantedTitle, wantedArtist, item) {
   if (!item || normTitle(item.trackName) !== normTitle(wantedTitle)) return null;
@@ -80,15 +106,34 @@ export function appleCandidateScore(wantedTitle, wantedArtist, item) {
   if (trackVersion !== wantedVersion) return null;
 
   const collectionVersion = versionSignature(item.collectionName);
+  if (!wantedVersion && collectionVersion) return null;
+  if (wantedVersion && collectionVersion && collectionVersion !== wantedVersion) return null;
+
+  const collectionArtist = primaryArtist(item.collectionArtistName || item.artistName);
+  const trackCount = Math.max(0, Number(item.trackCount || 0));
   let score = 1000;
+
   if (wantArtist && gotArtist === wantArtist) score += 200;
   if (simpleText(item.trackName) === simpleText(wantedTitle)) score += 80;
-  if (!collectionVersion) score += 50;
-  else if (collectionVersion === wantedVersion) score += 20;
-  else score -= 120;
+  if (!collectionVersion) score += 60;
+  else if (collectionVersion === wantedVersion) score += 30;
+
+  /* Prefer the artist's canonical album/EP master over a one-track promo single.
+     Standalone singles still win automatically when no album copy exists. */
+  if (wantArtist && collectionArtist === wantArtist) {
+    score += 120;
+    if (trackCount >= 6) score += 220;
+    else if (trackCount >= 2) score += 100;
+    else if (trackCount === 1) score += 20;
+  } else if (trackCount >= 6) {
+    /* Various-artists compilations/soundtracks stay valid, but never outrank
+       the same master on the artist's own release. */
+    score += 20;
+  }
+  score -= collectionPenalty(item);
 
   const collBase = String(item.collectionName || "").replace(/\s*-\s*(?:single|ep)\s*$/i, "");
-  if (normTitle(collBase) === normTitle(wantedTitle)) score += 30;
+  if (normTitle(collBase) === normTitle(wantedTitle)) score += 20;
 
   return { score, release: releaseMs(item), id: Number(item.trackId) || Number.MAX_SAFE_INTEGER };
 }
