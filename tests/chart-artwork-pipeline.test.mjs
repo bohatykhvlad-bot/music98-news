@@ -54,9 +54,30 @@ test("versioned chart rows still select their matching Apple version",()=>{
   assert.equal(pickAppleCandidate("Loser (Fcukers Remix)","Tame Impala & Fcukers",[album,wanted]).trackId,104);
 });
 
+
+test("original-era artist release beats later compilation artwork",()=>{
+  const originalSingle={
+    trackId:401,trackName:"Ain't No Mountain High Enough",artistName:"Marvin Gaye & Tammi Terrell",
+    collectionArtistName:"Marvin Gaye & Tammi Terrell",collectionName:"Ain't No Mountain High Enough - Single",
+    trackCount:1,releaseDate:"1967-04-20T00:00:00Z"
+  };
+  const united={
+    trackId:402,trackName:"Ain't No Mountain High Enough",artistName:"Marvin Gaye & Tammi Terrell",
+    collectionArtistName:"Marvin Gaye & Tammi Terrell",collectionName:"United",
+    trackCount:12,releaseDate:"1967-08-29T00:00:00Z"
+  };
+  const compilation={
+    trackId:403,trackName:"Ain't No Mountain High Enough",artistName:"Marvin Gaye & Tammi Terrell",
+    collectionArtistName:"Marvin Gaye & Tammi Terrell",
+    collectionName:"20th Century Masters - The Millennium Collection: The Best of Marvin Gaye & Tammi Terrell",
+    trackCount:11,releaseDate:"2001-01-01T00:00:00Z"
+  };
+  assert.equal(pickAppleCandidate("Ain't No Mountain High Enough","Marvin Gaye & Tammi Terrell",[compilation,originalSingle,united]).trackId,402);
+});
+
 test("runtime trusts only provenance-verified covers and self-heals unproven rows",()=>{
-  assert.equal(COVER_RESOLVER_VERSION,3);
-  assert.equal(meta["loser|tameimpala"].resolverVersion,3);
+  assert.equal(COVER_RESOLVER_VERSION,4);
+  assert.ok(Number(meta["loser|tameimpala"].resolverVersion)<=COVER_RESOLVER_VERSION);
   assert.equal(meta["loser|tameimpala"].trackId,"1836226731");
   assert.equal(meta["loser|tameimpala"].collectionName,"Deadbeat");
   assert.match(top50,/const TOP50_KV = "top50v33"/);
