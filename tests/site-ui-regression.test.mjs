@@ -19,7 +19,7 @@ test("desktop navigation uses four equal-width pill segments",()=>{
 test("Subscribe only fills cyan on hover and has no press animation",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
-  assert.match(page,/\.subscribe \.btn\.primary\.press-pill\{--pill-press-bg:var\(--bg2\);--pill-press-border:var\(--line\);color:var\(--text\)\}/);
+  assert.match(page,/\.subscribe \.btn\.primary\.press-pill\{--pill-press-bg:transparent;--pill-press-border:var\(--line\);color:var\(--text\)\}/);
   assert.match(page,/\.subscribe \.btn\.primary\.press-pill:hover::before\{background:var\(--accent\);border-color:var\(--accent\)\}/);
   assert.match(page,/\.press-pill:active,\.press-pill\.press\{transform:none\}/);
   assert.doesNotMatch(page,/\.press-pill\.press\{transform:scale/);
