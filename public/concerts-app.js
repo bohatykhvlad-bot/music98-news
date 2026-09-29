@@ -967,7 +967,7 @@ async function getPayload(params){
   if(payloadInflight.has(key)) return payloadInflight.get(key);
 
   const work=(async()=>{
-    const r=await fetch(u,{headers:{"Accept":"application/json"}});
+    const r=await fetch(u,{cache:"no-store",headers:{"Accept":"application/json","Cache-Control":"no-cache"}});
     const j=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(j.error||"concerts_unavailable");
     payloadCache.set(key,{at:Date.now(),data:j});
@@ -995,7 +995,7 @@ function mergeHotspots(rows){
   return [...byKey.values()].sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
 }
 
-const POPULAR_CACHE_KEY="music98:concert-popular:v6";
+const POPULAR_CACHE_KEY="music98:concert-popular:v7";
 function readPopularCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(POPULAR_CACHE_KEY)||"null");
@@ -1003,7 +1003,7 @@ function readPopularCache(){
     if(cached?.version==="popular-v4" &&
        cached?.eligibility==="ticketmaster_event_payload_gt_0" &&
        Array.isArray(cached.artists) &&
-       cached.artists.length>0 &&
+       cached.artists.length>=30 &&
        cached.artists.every(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0) &&
        age<26*60*60*1000) return cached;
   }catch(e){}
@@ -1014,12 +1014,12 @@ function writePopularCache(data){
      data?.version!=="popular-v4" ||
      data?.eligibility!=="ticketmaster_event_payload_gt_0" ||
      !Array.isArray(data.artists) ||
-     !data.artists.length ||
+     data.artists.length<30 ||
      !data.artists.every(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0)) return;
   try{localStorage.setItem(POPULAR_CACHE_KEY,JSON.stringify(data));}catch(e){}
 }
 
-const MARKET_CACHE_KEY="music98:concert-markets:v1";
+const MARKET_CACHE_KEY="music98:concert-markets:v2";
 function readMarketCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(MARKET_CACHE_KEY)||"null");
@@ -1040,7 +1040,7 @@ async function loadMarkets(){
     if(src) src.setData(hubsGeoJSON());
   }
   try{
-    const data=await getPayload({mode:"markets",v:"concert-markets-v1"});
+    const data=await getPayload({mode:"markets",v:"concert-markets-v2"});
     if(data?.markets?.length){
       hotspots=mergeHotspots(data.markets);
       const src=map.getSource("hubs");
@@ -1078,8 +1078,8 @@ async function loadPopular(force=false){
   }
 
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v6"});
-    if(data.artists?.length && (!data.stale || !popularArtists.length || data.artists.length>=popularArtists.length)){
+    const data=await getPayload({mode:"popular",v:"popular-v7"});
+    if(data.artists?.length && (!popularArtists.length || data.artists.length>=popularArtists.length)){
       popularArtists=data.artists;
     }
     popularEvents=[];
