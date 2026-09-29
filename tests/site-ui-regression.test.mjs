@@ -11,13 +11,14 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
-test("Subscribe scales its label with the pill without axis translation",()=>{
+test("Subscribe scales around a fixed center with no axis translation or font-metric jump",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
   assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(page,/\.press-pill-label\{[^}]*height:18px;[^}]*text-box:trim-both cap alphabetic;[^}]*transform:none;translate:none/);
-  assert.match(page,/\.press-pill\.press \.press-pill-label\{font-size:13\.72px\}/);
-  assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*transform:/);
+  assert.match(page,/\.press-pill-label\{[^}]*position:absolute;inset:0;[^}]*place-items:center;[^}]*font-size:14px;[^}]*transform:scale\(1\);[^}]*transform-origin:50% 50%;translate:none/);
+  assert.match(page,/\.press-pill\.press \.press-pill-label\{transform:scale\(\.98\)\}/);
+  assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*font-size:/);
+  assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*translate:/);
 });
 
 test("verified chart artwork overrides apply even to same-day browser cache",()=>{
