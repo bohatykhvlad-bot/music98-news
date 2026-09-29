@@ -646,7 +646,7 @@ function nearbyCacheStep(radius) {
 function snapCoord(value, step) {
   return Math.round(Number(value) / step) * step;
 }
-function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,radius}) {
+function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,radius}) {
   const out = new URL(requestUrl);
   out.search = "";
   out.searchParams.set("__cachev","concerts-global-v20");
@@ -662,6 +662,11 @@ function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionI
   }
   if(artist){
     out.searchParams.set("artist",String(artist).trim().toLowerCase());
+    return out;
+  }
+  if(city){
+    out.searchParams.set("city",String(city).trim().toLowerCase());
+    if(countryCode) out.searchParams.set("countryCode",String(countryCode).trim().toUpperCase());
     return out;
   }
 
@@ -703,15 +708,17 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const lng = finite(u.searchParams.get("lng"));
   const artist = String(u.searchParams.get("artist") || "").trim().slice(0, 120);
   const attractionId = String(u.searchParams.get("attractionId") || "").trim().slice(0, 160);
+  const city = String(u.searchParams.get("city") || "").trim().slice(0, 120);
+  const countryCode = String(u.searchParams.get("countryCode") || "").trim().toUpperCase().slice(0, 3);
   const radius = Math.min(500, Math.max(5, finite(u.searchParams.get("radius")) || 100));
 
-  if (mode !== "popular" && mode !== "artist-search" && !artist && !attractionId &&
+  if (mode !== "popular" && mode !== "artist-search" && !artist && !attractionId && !city &&
       (lat == null || lng == null || lat < -90 || lat > 90 || lng < -180 || lng > 180)) {
     return json({ error: "location_required" }, 400);
   }
 
   const cache = caches.default;
-  const cacheUrl = canonicalConcertCacheUrl(request.url,{mode,q,lat,lng,artist,attractionId,radius});
+  const cacheUrl = canonicalConcertCacheUrl(request.url,{mode,q,lat,lng,artist,attractionId,city,countryCode,radius});
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
@@ -739,12 +746,15 @@ export async function onRequestGet({ request, env, waitUntil }) {
 
     const tm = baseEventUrl(env.TICKETMASTER_API_KEY);
     tm.searchParams.set("size", "200");
-    tm.searchParams.set("sort", (artist || attractionId) ? "date,asc" : "distance,date,asc");
+    tm.searchParams.set("sort", (artist || attractionId || city) ? "date,asc" : "distance,date,asc");
 
     if (attractionId) {
       tm.searchParams.set("attractionId", attractionId);
     } else if (artist) {
       tm.searchParams.set("keyword", artist);
+    } else if (city) {
+      tm.searchParams.set("city", city);
+      if(countryCode) tm.searchParams.set("countryCode", countryCode);
     } else {
       const step=nearbyCacheStep(radius);
       const queryLat=snapCoord(lat,step);
@@ -760,7 +770,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
       ok: true,
       events,
       page: raw?.page || { size: events.length, totalElements: events.length, totalPages: 1, number: 0 },
-      query: attractionId ? { attractionId } : artist ? { artist } : { lat, lng, radius, unit: "km" },
+      query: attractionId ? { attractionId } : artist ? { artist } : city ? { city, countryCode } : { lat, lng, radius, unit: "km" },
     };
     const cacheControl=(artist||attractionId)
       ? "public, max-age=300, s-maxage=7200, stale-while-revalidate=21600"
