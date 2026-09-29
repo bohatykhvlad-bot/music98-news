@@ -1493,7 +1493,9 @@ export async function onRequestGet({ request, env, waitUntil }) {
   if (mode === "markets") {
     const payload=await marketSnapshotPayload(env);
     return json(payload,200,{
-      "Cache-Control":"public, max-age=300, s-maxage=3600"
+      "Cache-Control":payload.complete===false
+        ? "no-store, max-age=0"
+        : "public, max-age=300, s-maxage=900"
     });
   }
 
