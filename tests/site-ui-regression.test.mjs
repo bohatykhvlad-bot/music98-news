@@ -11,18 +11,18 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/window\.music98InkShift/);
   assert.match(page,/getImageData\(/);
   assert.match(page,/Math\.round\(advance\/2-inkCenter\)/);
-  assert.match(page,/\.nav-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.match(page,/\.nav-btn:active,\.hint-chip:active\{transform:scale\(\.96\);background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba\(15,30,34,\.08\)/);
   assert.doesNotMatch(page,/\.nav-btn\{position:relative;top:\.5px\}/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
-test("Subscribe pre-promotes the whole pill and scales text with the button",()=>{
+test("Subscribe mirrors admin-desk primary pill states through its pseudo background",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
-  assert.match(page,/\.press-pill\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
-  assert.match(page,/\.press-pill\.press\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.match(page,/\.press-pill\{color:#0b0d0e;font-weight:700\}/);
+  assert.match(page,/\.press-pill:active,\.press-pill\.press\{transform:scale\(\.96\)\}/);
   assert.match(page,/\.press-pill-label\{[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
-  assert.doesNotMatch(page,/\.press-pill\.press::before/);
+  assert.match(page,/\.press-pill:active::before,\.press-pill\.press::before\{background:#fff;border-color:#15181a;box-shadow:inset 0 2px 4px rgba\(15,30,34,\.1\)\}/);
   assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label/);
 });
 
@@ -33,7 +33,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260930-6/);
+  assert.match(page,/concerts-app\.js\?v=20260930-7/);
 });
 
 
@@ -98,8 +98,20 @@ test("valid empty Desk feed does not resurrect bundled News/Releases",()=>{
 });
 
 
-test("Load More pre-promotes and scales the whole pill",()=>{
-  assert.match(page,/\.loadmore-btn\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
-  assert.match(page,/\.loadmore-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
-  assert.doesNotMatch(page,/\.loadmore-btn:active::before/);
+test("Load More mirrors admin-desk regular pill states through its pseudo background",()=>{
+  assert.match(page,/\.loadmore-btn\{color:#15181a;font-weight:700\}/);
+  assert.match(page,/\.loadmore-btn:active\{transform:scale\(\.96\)\}/);
+  assert.match(page,/\.loadmore-btn:active::before\{background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba\(15,30,34,\.08\)\}/);
+});
+
+
+test("public text pills use the admin-desk palette and reduced-motion fallback",()=>{
+  assert.match(page,/\.nav-btn,\.hint-chip\{[\s\S]*?background:#f4f6f7;border:1px solid #e2e8ea;color:#15181a;font-weight:700/);
+  assert.match(page,/\.nav-btn:hover,\.hint-chip:hover\{background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba\(15,30,34,\.07\)/);
+  assert.match(page,/\.nav-btn\.active\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b/);
+  assert.match(page,/@media \(hover:none\)\{[\s\S]*?\.nav-btn:hover\{background:#f4f6f7;border-color:#e2e8ea;box-shadow:none;color:#15181a\}/);
+  assert.match(page,/@media \(prefers-reduced-motion:reduce\)\{[\s\S]*?\.nav-btn:active,\.hint-chip:active,\.loadmore-btn:active,\.press-pill:active,\.press-pill\.press\{transform:none\}/);
+  assert.doesNotMatch(page,/\.nav-btn:active\{transform:scale\(\.985\)/);
+  assert.doesNotMatch(page,/\.loadmore-btn:active\{transform:scale\(\.985\)/);
+  assert.doesNotMatch(page,/\.press-pill\.press\{transform:scale\(\.985\)/);
 });
