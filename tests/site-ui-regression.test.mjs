@@ -11,7 +11,7 @@ const corrections=JSON.parse(readFileSync(new URL("../public/data/cover-correcti
 const baked=JSON.parse(readFileSync(new URL("../public/data/top50.json",import.meta.url),"utf8"));
 
 test("desktop top navigation uses equal-width pills like mobile",()=>{
-  assert.match(page,/\.nav\{[^}]*width:430px;[^}]*justify-content:stretch/);
+  assert.match(page,/\.nav\{[^}]*justify-content:stretch;[^}]*width:430px/);
   assert.match(page,/\.nav-btn\{flex:1 1 0;min-width:0;/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav-btn\{flex:1;/);
 });
