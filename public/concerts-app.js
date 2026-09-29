@@ -947,7 +947,7 @@ async function loadPopular(force=false){
     return;
   }
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v15"});
+    const data=await getPayload({mode:"popular",v:"popular-v2"});
     popularArtists=data.artists||[];
     popularEvents=[];
     if(requestId!==popularRequestSeq || activeMode!=="popular" || artistContext) return;
