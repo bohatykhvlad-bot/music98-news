@@ -50,13 +50,13 @@ const MAP_MARKET_BATCH_SIZE = 20;
    this changes scan order, never which cities are published. */
 function mapMarketRegion(seed){
   const cc=String(seed?.countryCode||"").toUpperCase();
-  const lat=Number(seed?.lat),lng=Number(seed?.lng);
+  const lng=Number(seed?.lng);
   if(cc==="US" || cc==="PR") return "us";
   if(Number.isFinite(lng) && lng < -30) return "americas";
-  if(Number.isFinite(lng) && lng >= 35 && lng < 75 && Number.isFinite(lat) && lat >= 12) return "middle-east";
-  if(Number.isFinite(lng) && lng >= 75 && lng < 135) return "asia";
-  if((Number.isFinite(lng) && lng >= 135) || (Number.isFinite(lat) && lat < -20 && Number.isFinite(lng) && lng > 60)) return "pacific";
-  if(Number.isFinite(lat) && lat < 32 && Number.isFinite(lng) && lng > -30 && lng < 60) return "africa";
+  if(["AE","QA","SA","KW","BH","OM","JO","IL","LB"].includes(cc)) return "middle-east";
+  if(["JP","KR","SG","TH","PH","ID","MY","IN","HK"].includes(cc)) return "asia";
+  if(["AU","NZ"].includes(cc)) return "pacific";
+  if(["EG","ZA"].includes(cc)) return "africa";
   return "europe";
 }
 function orderedMapMarketSeeds(){

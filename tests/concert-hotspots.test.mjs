@@ -447,16 +447,17 @@ test("daily market snapshot publishes only cities with real upcoming Ticketmaste
   }
 });
 
-test("public market read exposes verified Rome before the whole daily scan finishes", async () => {
+test("public market read exposes verified worldwide rows before the whole daily scan finishes", async () => {
   const kv=memoryKv();
   const oldFetch=globalThis.fetch;
   globalThis.fetch=async input=>{
     const u=new URL(String(input));
     if(!u.pathname.endsWith("/events.json")) return new Response("not found",{status:404});
-    const hasShows=u.searchParams.get("countryCode")==="IT";
+    const cc=u.searchParams.get("countryCode");
+    const hasShows=cc==="GB" || cc==="AE";
     return new Response(JSON.stringify(hasShows ? {
-      _embedded:{events:[{id:"rome-event",dates:{start:{localDate:"2026-10-10"}}}]},
-      page:{totalElements:7,totalPages:1,size:1,number:0}
+      _embedded:{events:[{id:"event-"+cc,dates:{start:{localDate:"2026-10-10"}}}]},
+      page:{totalElements:cc==="AE"?5:7,totalPages:1,size:1,number:0}
     } : {page:{totalElements:0,totalPages:0,size:1,number:0}}),
     {status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
   };
@@ -473,7 +474,8 @@ test("public market read exposes verified Rome before the whole daily scan finis
     assert.equal(data.version,"concert-markets-v3");
     assert.equal(data.complete,false);
     assert.equal(data.warming,true);
-    assert.ok(data.markets.some(x=>x.city==="Rome" && x.countryCode==="IT" && Number(x.count)===7));
+    assert.ok(data.markets.some(x=>x.city==="London" && x.countryCode==="GB" && Number(x.count)===7));
+    assert.ok(data.markets.some(x=>x.city==="Dubai" && x.countryCode==="AE" && Number(x.count)===5));
   }finally{
     globalThis.fetch=oldFetch;
   }
