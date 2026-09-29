@@ -237,14 +237,12 @@ export default {
     ctx.waitUntil((async()=>{
       const dailyKickoff=String(controller?.cron||"")==="15 3 * * *";
 
-      // The half-hour job advances resumable background state. The 03:15 UTC
-      // job explicitly starts a fresh Popular ranking once per day.
-      // Prioritize cheap visible data first, then finish the daily Top 30
-      // before the heavier world scan can consume the remaining subrequests.
-      try{ await refreshCapitalEventSnapshots(env,2); }catch(e){}
+      // Static map seeds removed the need for global hotspot discovery.
+      // Keep only small resumable slices for Popular/tour evidence so scheduled
+      // work stays well below the old Worker/KV/Ticketmaster footprint.
+      try{ await refreshCapitalEventSnapshots(env,1); }catch(e){}
       try{ await refreshPopularSnapshot(env,dailyKickoff); }catch(e){}
-      try{ await refreshPopularTourSnapshots(env,4); }catch(e){}
-      try{ await refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 12 }); }catch(e){}
+      try{ await refreshPopularTourSnapshots(env,2); }catch(e){}
     })());
   },
 };

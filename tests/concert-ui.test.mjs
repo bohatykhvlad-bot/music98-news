@@ -31,7 +31,7 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
   assert.doesNotMatch(app,/function popupLerp/);
   assert.doesNotMatch(app,/const t=Math\.max\(0,Math\.min\(1,\(z-2\.3\)/);
   assert.match(app,/popup\.setMaxWidth\("286px"\)/);
-  assert.match(app,/map\.on\("zoom",\(\)=>\{\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\)\{ closePopup\(\); return; \}/);
+  assert.match(app,/map\.on\("zoom",\(\)=>\{\n  applyMapMode\(\);\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\)\{ closePopup\(\); return; \}/);
   assert.match(app,/function showPopup\(e\)\{\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
   assert.match(app,/function showVenuePopup\(events\)\{\n  if\(!events\?\.length \|\| map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
 });
@@ -52,4 +52,30 @@ test("Popular UI requires a complete Ticketmaster-eligible Top 30 before browser
 
 test("map loading status is hidden while real statuses remain available",()=>{
   assert.match(app,/\^loading concerts\?\(\?: data\)\?\/i/);
+});
+
+
+test("world overview is static and restores pinned markets after zooming out",()=>{
+  assert.match(app,/const STATIC_GLOBAL_MARKETS=\[/);
+  assert.match(app,/const STATIC_US_STATE_CAPITALS=\[/);
+  assert.match(app,/\["Dubai","AE",25\.2048,55\.2708\]/);
+  assert.match(app,/\["Washington","DC",38\.9072,-77\.0369\]/);
+  assert.match(app,/state-capital-labels/);
+  assert.match(app,/const overviewZoom=map\.getZoom\(\)<4\.7/);
+  assert.match(app,/const showHubs=activeMode==="popular" \|\| overviewZoom/);
+  assert.doesNotMatch(app,/map\.on\("load",\(\)=>\{[\s\S]*?loadHotspots\(\);/);
+});
+
+test("map has one compact reset control and no Overview or Fit results controls",()=>{
+  assert.match(app,/id=\"resetMapBtn\"[^>]*>−<\/button>/);
+  assert.doesNotMatch(app,/id=\"overviewBtn\"/);
+  assert.doesNotMatch(app,/id=\"fitBtn\"/);
+  assert.match(app,/resetMapBtn\.addEventListener\("click"/);
+  assert.match(app,/radiusEl\.value="100"/);
+  assert.match(app,/map\.easeTo\(\{center:\[5,25\],zoom:1\.55/);
+});
+
+test("Buy Tickets uses the shared site press binder",()=>{
+  assert.match(app,/typeof window\.music98PillPress==="function"/);
+  assert.doesNotMatch(app,/a\.addEventListener\("pointerdown"/);
 });

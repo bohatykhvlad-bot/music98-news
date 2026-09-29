@@ -26,7 +26,7 @@ const POPULAR_CANDIDATE_LIMIT = 250;
 const POPULAR_SNAPSHOT_KEY = "concert-popular:v4";
 const POPULAR_STATE_KEY = "concert-popular:v4:state";
 const POPULAR_REFRESH_MS = 24 * 60 * 60 * 1000;
-const POPULAR_BATCH_SIZE = 20;
+const POPULAR_BATCH_SIZE = 6;
 const POPULAR_TOUR_STATE_KEY = "concert-popular:v4:tours-state";
 const POPULAR_TOUR_PREFIX = "concert-popular:v4:tour:";
 const CAPITAL_EVENTS_STATE_KEY = "concert-capitals:v1:state";
@@ -616,6 +616,12 @@ export async function refreshPopularSnapshot(env, force = false) {
         state.found.length<POPULAR_LIMIT &&
         processed<POPULAR_BATCH_SIZE){
     const candidate=state.candidates[state.index++];
+
+    // Cached real-event evidence is already strict enough. Walk past confirmed
+    // candidates without spending another Ticketmaster call; the small batch
+    // budget is reserved only for artists that still need validation.
+    if(state.found.some(x=>normName(x?.name)===normName(candidate.name))) continue;
+
     processed++;
     try{
       const artist=await validatePopularArtist(
@@ -1241,7 +1247,7 @@ function nearbyCacheStep(radius) {
 function snapCoord(value, step) {
   return Math.round(Number(value) / step) * step;
 }
-function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,radius}) {
+function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,stateCode,radius}) {
   const out = new URL(requestUrl);
   out.search = "";
   out.searchParams.set("__cachev","concerts-global-v20");
@@ -1279,10 +1285,9 @@ export async function onRequestGet({ request, env, waitUntil }) {
   void region;
 
   if (mode === "hotspots") {
+    // The UI now uses a static global discovery layer, so this compatibility
+    // endpoint is read-only. Never let a visitor start Ticketmaster/KV warmup.
     const payload = await hotspotSnapshotPayload(env);
-    // Self-heal only when the map is effectively empty. A KV lock prevents a
-    // visitor stampede from multiplying Ticketmaster calls.
-    await scheduleMapWarmupIfSparse(env,waitUntil,payload?.hotspots?.length||0);
     return json(payload, 200, {
       "Cache-Control": payload.partial
         ? "public, max-age=30, s-maxage=60"
@@ -1310,7 +1315,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const artist = String(u.searchParams.get("artist") || "").trim().slice(0, 120);
   const attractionId = String(u.searchParams.get("attractionId") || "").trim().slice(0, 160);
   const city = String(u.searchParams.get("city") || "").trim().slice(0, 120);
-  const countryCode = String(u.searchParams.get("countryCode") || "").trim().toUpperCase().slice(0, 3);
+  const countryCode = String(u.searchParams.get("countryCode") || "").trim().toUpperCase().slice(0, 3);\n  const stateCode = String(u.searchParams.get("stateCode") || "").trim().toUpperCase().slice(0, 3);
   const radius = Math.min(500, Math.max(5, finite(u.searchParams.get("radius")) || 100));
 
   if (mode !== "popular" && mode !== "artist-search" && !artist && !attractionId && !city &&
@@ -1332,7 +1337,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   }
 
   const cache = caches.default;
-  const cacheUrl = canonicalConcertCacheUrl(request.url,{mode,q,lat,lng,artist,attractionId,city,countryCode,radius});
+  const cacheUrl = canonicalConcertCacheUrl(request.url,{mode,q,lat,lng,artist,attractionId,city,countryCode,stateCode,radius});
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
@@ -1372,7 +1377,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
       tm.searchParams.set("keyword", artist);
     } else if (city) {
       tm.searchParams.set("city", city);
-      if(countryCode) tm.searchParams.set("countryCode", countryCode);
+      if(countryCode) tm.searchParams.set("countryCode", countryCode);\n      if(stateCode) tm.searchParams.set("stateCode", stateCode);
     } else {
       const step=nearbyCacheStep(radius);
       const queryLat=snapCoord(lat,step);
@@ -1401,7 +1406,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     await cache.put(cacheKey, res.clone()).catch(() => {});
     return res;
   } catch (err) {
-    if (err?.message === "ticketmaster_budget_guard") {
+    if (err?.message === "ticketmaster_budget_guard" || Number(err?.status||0)===429) {
       return json({ error:"ticketmaster_temporarily_limited" }, 429, { "Retry-After":"3600" });
     }
     if (err?.message === "ticketmaster_unavailable") {

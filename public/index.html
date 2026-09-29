@@ -110,8 +110,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none;justify-self:start}
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
-.nav{justify-self:center;display:flex;align-items:center;height:40px;gap:6px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}
-.nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+.nav{justify-self:center;width:410px;max-width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;height:40px;gap:4px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}
+.nav-btn{width:100%;border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 8px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 /* optical ink centering (owner: text reads high even though the pixel
    envelope is symmetric 11/11 and 19/18): cap-height words concentrate mass
    above the midline, so the eye wants a hair more air on top. Nudge the text
@@ -487,6 +487,12 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .sub-in input{border-radius:999px;height:43px;padding:0 18px;background:rgba(255,255,255,.75)}
 .sub-in input:focus,.sub-in input:focus-visible{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent);outline:none}
 .sub-in .btn{height:43px;padding:0 24px;display:inline-flex;align-items:center;justify-content:center}
+.press-pill{position:relative;isolation:isolate;background:transparent!important;border-color:transparent!important;transform:none!important;transition:color .16s ease;font-size:14px}
+.press-pill::before{content:"";position:absolute;z-index:-1;inset:0;border:1px solid var(--pill-press-border,var(--line));border-radius:inherit;background:var(--pill-press-bg,var(--bg2));transform:scale(1);transform-origin:50% 50%;transition:transform .09s cubic-bezier(.34,1.2,.64,1),background .14s ease,border-color .14s ease;will-change:transform}
+.press-pill.press::before{transform:scale(.92)}
+.press-pill.press{font-size:13px}
+.subscribe .btn.primary.press-pill{--pill-press-bg:var(--accent);--pill-press-border:var(--accent);color:#03282b}
+.subscribe .btn.primary.press-pill:hover{filter:none;color:#03282b}
 .btn{border:1px solid var(--line);background:var(--bg2);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
 .btn:hover{border-color:var(--accent-dim);color:var(--acc2)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#03282b}
@@ -851,7 +857,7 @@ textarea{resize:vertical;min-height:64px}
   <div class="sub-in">
     <h2>The week in one email</h2>
     <p>News, releases and the Top 50 — Fridays.</p>
-    <form id="subForm"><input type="email" required placeholder="your@email.com"><button class="btn primary" type="submit">Subscribe</button></form>
+    <form id="subForm"><input type="email" required placeholder="your@email.com"><button class="btn primary press-pill" data-pill-press type="submit">Subscribe</button></form>
   </div>
 </section>
 
@@ -1177,6 +1183,20 @@ const lsGet = () => lsGetRaw(KEY);
 const lsSet = v => lsSetRaw(KEY, v);
 
 /* ============ settings & Apple integrations ============ */
+window.music98PillPress = window.music98PillPress || function music98PillPress(el){
+  if(!el || el.dataset.pressBound==="1") return el;
+  el.dataset.pressBound="1";
+  const release=()=>el.classList.remove("press");
+  el.addEventListener("pointerdown",ev=>{
+    if(ev.button!=null && ev.button!==0) return;
+    el.classList.add("press");
+    try{el.setPointerCapture?.(ev.pointerId);}catch(e){}
+  });
+  ["pointerup","pointercancel","lostpointercapture","pointerleave"].forEach(type=>el.addEventListener(type,release));
+  return el;
+};
+document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
+
 const SKEY = "music98news_settings_v2";
 const DAILYKEY = "music98news_daily_v28";
 const APPLE_AT = "1001l3aZW";
@@ -2064,9 +2084,20 @@ function setChartStatus(f, tag){
   st.hidden = !txt;
 }
 function todayUTC(){ return new Date().toISOString().slice(0,10); }
+const CHART_ART_FIXES={
+  "loser|tame impala":"https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/57/6f/a2/576fa272-91c5-658d-9d05-88d9787c0f1d/196873662978.jpg/600x600bb.jpg",
+  "get lucky|daft punk":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/600x600bb.jpg"
+};
+function fixedChartArt(t){
+  const title=String(t?.title||"").toLowerCase().replace(/[’']/g,"").replace(/\s+/g," ").trim();
+  const artist=String(t?.artist||"").toLowerCase().replace(/[’']/g,"").replace(/\s+/g," ").trim();
+  if(title==="loser" && artist==="tame impala") return CHART_ART_FIXES["loser|tame impala"];
+  if(title.startsWith("get lucky") && artist.includes("daft punk")) return CHART_ART_FIXES["get lucky|daft punk"];
+  return t?.art||"";
+}
 function rowsFromTracks(tracks){
   return (tracks||[]).map(t=>({
-    title: t.title, artist: t.artist, url: t.url ? aff(t.url) : "", art: t.art||"",
+    title: t.title, artist: t.artist, url: t.url ? aff(t.url) : "", art: fixedChartArt(t),
     prev: applePreview(t.prev||t.preview||""), year: t.year||"",
     weeks: t.weeks||1, delta: t.delta==null ? "0" : String(t.delta)
   }));
@@ -3660,6 +3691,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260929-28" defer></script>
+<script src="/concerts-app.js?v=20260929-29" defer></script>
 </body>
 </html>
