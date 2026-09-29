@@ -1198,7 +1198,7 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v28";
+const DAILYKEY = "music98news_daily_v29";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -2132,7 +2132,7 @@ function refreshDailyTop50(){
   applyDaily(TOP50, "snap");
   const grab = u => fetch(u).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   /* ?d= keys the CDN cache per day: no 24h-old responses survive a reset */
-  grab("/api/top50?d=" + todayUTC()).catch(()=> grab("/data/top50.json")).then(j=>{
+  grab("/api/top50?d=" + todayUTC() + "&rev=29").catch(()=> grab("/data/top50.json?rev=29")).then(j=>{
     const tracks = (j && j.tracks) || [];
     if(tracks.length < 10) throw 0;
     lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
