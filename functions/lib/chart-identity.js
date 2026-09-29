@@ -80,17 +80,36 @@ export function appleCandidateScore(wantedTitle, wantedArtist, item) {
   if (trackVersion !== wantedVersion) return null;
 
   const collectionVersion = versionSignature(item.collectionName);
+  // A plain studio chart row must never borrow artwork from a derivative
+  // release package (Live, Remix, Acoustic, Deluxe, etc.). Reject it outright
+  // instead of merely giving it a small score penalty.
+  if (!wantedVersion && collectionVersion) return null;
+  if (wantedVersion && collectionVersion && collectionVersion !== wantedVersion) return null;
+
+  const collectionName = String(item.collectionName || "").toLowerCase();
+  let collectionPenalty = 0;
+  if (/\b(?:greatest hits?|best of|essentials?|anthology|collection|compilation|retrospective)\b/.test(collectionName)) collectionPenalty += 520;
+  if (/\b(?:20th century masters|millennium collection|number ones|complete singles?|classic hits?)\b/.test(collectionName)) collectionPenalty += 560;
+  if (/\b(?:various artists|karaoke|tribute)\b/.test(collectionName)) collectionPenalty += 800;
+  if (/\b(?:soundtrack|original motion picture)\b/.test(collectionName) || String(item.primaryGenreName || "").toLowerCase() === "soundtrack") collectionPenalty += 180;
+
   let score = 1000;
   if (wantArtist && gotArtist === wantArtist) score += 200;
   if (simpleText(item.trackName) === simpleText(wantedTitle)) score += 80;
   if (!collectionVersion) score += 50;
   else if (collectionVersion === wantedVersion) score += 20;
-  else score -= 120;
+  score -= collectionPenalty;
+
+  const trackCount = Math.max(0, Number(item.trackCount || 0));
+  const collectionArtist = primaryArtist(item.collectionArtistName || item.artistName);
+  if (wantArtist && collectionArtist === wantArtist) {
+    score += trackCount >= 6 ? 180 : trackCount >= 2 ? 80 : 0;
+  }
 
   const collBase = String(item.collectionName || "").replace(/\s*-\s*(?:single|ep)\s*$/i, "");
   if (normTitle(collBase) === normTitle(wantedTitle)) score += 30;
 
-  return { score, release: releaseMs(item), id: Number(item.trackId) || Number.MAX_SAFE_INTEGER };
+  return { score, release: releaseMs(item), id: Number(item.trackId) || Number.MAX_SAFE_INTEGER, collectionPenalty };
 }
 
 export function pickAppleCandidate(wantedTitle, wantedArtist, results) {
@@ -99,12 +118,25 @@ export function pickAppleCandidate(wantedTitle, wantedArtist, results) {
     const meta = appleCandidateScore(wantedTitle, wantedArtist, item);
     if (meta) ranked.push({ item, ...meta });
   }
-  ranked.sort((a, b) =>
+  if (!ranked.length) return null;
+
+  // Canonical-original rule: establish the earliest credible Apple release of
+  // the exact song/version, then choose only within the original release era.
+  // This prevents a decades-later anthology/live package from stealing art.
+  const credible = ranked.filter(x => x.collectionPenalty < 500 && Number.isFinite(x.release));
+  const earliest = credible.length ? Math.min(...credible.map(x => x.release)) : Number.MAX_SAFE_INTEGER;
+  const ORIGINAL_WINDOW_MS = 548 * 86400000; // 18 months
+  const pool = Number.isFinite(earliest) && earliest < Number.MAX_SAFE_INTEGER
+    ? ranked.filter(x => x.release <= earliest + ORIGINAL_WINDOW_MS)
+    : ranked;
+  const finalPool = pool.length ? pool : ranked;
+  finalPool.sort((a, b) =>
     b.score - a.score ||
+    a.collectionPenalty - b.collectionPenalty ||
     a.release - b.release ||
     a.id - b.id
   );
-  return ranked.length ? ranked[0].item : null;
+  return finalPool[0].item;
 }
 
 export function appleCandidateCompatible(wantedTitle, wantedArtist, item) {

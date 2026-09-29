@@ -49,8 +49,8 @@ test("Popular UI renders strict confirmed cache immediately without an explanato
 test("map uses only the daily verified market snapshot",()=>{
   assert.doesNotMatch(app,/STATIC_GLOBAL_MARKETS/);
   assert.doesNotMatch(app,/STATIC_US_STATE_CAPITALS/);
-  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v2"/);
-  assert.match(app,/mode:"markets",v:"concert-markets-v2"/);
+  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v3"/);
+  assert.match(app,/mode:"markets",v:"concert-markets-v3"/);
   assert.match(app,/loadMarkets\(\);/);
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
@@ -84,4 +84,24 @@ test("concert snapshot requests bypass browser cache and local Popular cache nev
   assert.match(app,/cached\.artists\.length>=30/);
   assert.match(app,/data\.artists\.length<30/);
   assert.match(app,/!popularArtists\.length \|\| data\.artists\.length>=popularArtists\.length/);
+});
+
+
+test("concert pills match top-nav timing and use equal-width segments",()=>{
+  assert.match(app,/\.side-tabs\{\\n  width:244px;max-width:100%;display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(app,/\.side-tab\{\\n  width:100%;min-width:0;max-width:none/);
+  assert.match(app,/\.side-tab\{[\s\S]*?transition:\.18s;/);
+  assert.match(app,/\.map-mode-switch\{[^}]*display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(app,/\.map-mode-btn\{width:100%;[^}]*transition:\.18s/);
+});
+
+test("artist subtitle shares the exact left edge with artist name",()=>{
+  assert.match(app,/\.tour-copy\{[^}]*width:100%;padding:0;margin:0;display:grid/);
+  assert.match(app,/\.tour-name\{[^}]*width:100%;margin:0;padding:0;text-indent:0;text-align:left/);
+  assert.match(app,/\.tour-meta\{[^}]*width:100%;margin:3px 0 0;padding:0;text-indent:0;text-align:left/);
+});
+
+test("warming verified market pins merge with the last complete map",()=>{
+  assert.match(app,/data\.complete===false[\s\S]*mergeHotspots\(\[\.\.\.\(hotspots\|\|\[\]\),\.\.\.data\.markets\]\)/);
+  assert.match(app,/if\(data\.complete!==false\) writeMarketCache\(data\)/);
 });

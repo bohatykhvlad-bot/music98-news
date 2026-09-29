@@ -11,14 +11,18 @@ const original = {
   trackId: 100,
   trackName: "Loser",
   artistName: "Tame Impala",
+  collectionArtistName: "Tame Impala",
   collectionName: "Loser - Single",
+  trackCount: 1,
   releaseDate: "2025-09-01T00:00:00Z",
 };
 const album = {
   trackId: 101,
   trackName: "Loser",
   artistName: "Tame Impala",
+  collectionArtistName: "Tame Impala",
   collectionName: "Deadbeat",
+  trackCount: 12,
   releaseDate: "2025-10-17T00:00:00Z",
 };
 const remix = {
@@ -35,7 +39,7 @@ assert.equal(versionSignature("Dracula (Boys Noize Disko Version)"), "version");
 assert.equal(versionSignature("Bad Times (Extended Version)"), "extended");
 assert.equal(appleCandidateCompatible("Loser", "Tame Impala", remix), false);
 assert.equal(appleCandidateCompatible("Loser", "Tame Impala", original), true);
-assert.equal(pickAppleCandidate("Loser", "Tame Impala", [remix, album, original]).trackId, 100);
+assert.equal(pickAppleCandidate("Loser", "Tame Impala", [remix, album, original]).trackId, 101);
 
 const live = {
   trackId: 200,
@@ -71,12 +75,35 @@ assert.equal(pickAppleCandidate("Dracula (with JENNIE)", "Tame Impala", [instr, 
 
 const corrections = JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json", import.meta.url), "utf8"));
 const tameCorrection = corrections["loser|tameimpala"];
-assert.equal(tameCorrection.appleCollectionId, "1842957385");
-assert.equal(tameCorrection.appleTrackId, "1842957386");
-assert.match(tameCorrection.art, /196873662978\.jpg\/600x600bb\.jpg$/);
+assert.equal(tameCorrection.appleCollectionId, "1836226516");
+assert.equal(tameCorrection.appleTrackId, "1836226731");
+assert.match(tameCorrection.art, /196873555331\.jpg\/600x600bb\.jpg$/);
 const daftCorrection = corrections["getlucky~v:edit|daftpunk"];
 assert.equal(daftCorrection.appleCollectionId, "617154241");
 assert.match(daftCorrection.art, /886443919266\.jpg\/600x600bb\.jpg$/);
 assert.match(daftCorrection.reason, /never.*Remix/);
 
 console.log("chart artwork regression: PASS");
+
+const livePackPlain={
+  trackId:400,trackName:"Ain't No Mountain High Enough",
+  artistName:"Marvin Gaye & Tammi Terrell",
+  collectionArtistName:"Marvin Gaye & Tammi Terrell",
+  collectionName:"Ain't No Mountain High Enough (Live) - EP",
+  trackCount:4,releaseDate:"2026-01-01T00:00:00Z"
+};
+const united={
+  trackId:401,trackName:"Ain't No Mountain High Enough",
+  artistName:"Marvin Gaye & Tammi Terrell",
+  collectionArtistName:"Marvin Gaye & Tammi Terrell",
+  collectionName:"United",trackCount:12,releaseDate:"1967-08-29T00:00:00Z"
+};
+const compilation={
+  trackId:402,trackName:"Ain't No Mountain High Enough",
+  artistName:"Marvin Gaye & Tammi Terrell",
+  collectionArtistName:"Marvin Gaye & Tammi Terrell",
+  collectionName:"20th Century Masters - The Millennium Collection: The Best of Marvin Gaye & Tammi Terrell",
+  trackCount:11,releaseDate:"2001-01-01T00:00:00Z"
+};
+assert.equal(appleCandidateCompatible("Ain't No Mountain High Enough","Marvin Gaye & Tammi Terrell",livePackPlain),false);
+assert.equal(pickAppleCandidate("Ain't No Mountain High Enough","Marvin Gaye & Tammi Terrell",[compilation,livePackPlain,united]).trackId,401);
