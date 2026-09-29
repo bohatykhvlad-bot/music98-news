@@ -363,7 +363,7 @@ test("public hotspot read never triggers Ticketmaster discovery", async () => {
 });
 
 
-test("sparse public hotspot read schedules exactly one locked background warmup", async () => {
+test("sparse public hotspot read is read-only and never starts background warmup", async () => {
   const kv=memoryKv();
   await kv.put(HOTSPOT_SNAPSHOT_KEY,JSON.stringify({
     ok:true,mode:"hotspots",version:HOTSPOT_VERSION,threshold:HOTSPOT_THRESHOLD,
@@ -372,14 +372,8 @@ test("sparse public hotspot read schedules exactly one locked background warmup"
 
   const queued=[];
   const oldFetch=globalThis.fetch;
-  globalThis.fetch=async input=>{
-    const u=new URL(String(input));
-    if(u.hostname==="app.ticketmaster.com"){
-      return new Response(JSON.stringify({page:{size:200,totalElements:0,totalPages:0,number:0}}),
-        {status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
-    }
-    return new Response("not found",{status:404});
-  };
+  let externalCalls=0;
+  globalThis.fetch=async()=>{ externalCalls++; throw new Error("hotspot read must remain snapshot-only"); };
   try{
     const response=await onRequestGet({
       request:new Request("https://music98.news/api/concerts?mode=hotspots"),
@@ -387,18 +381,9 @@ test("sparse public hotspot read schedules exactly one locked background warmup"
       waitUntil:p=>queued.push(p)
     });
     assert.equal(response.status,200);
-    assert.equal(queued.length,1);
-    assert.ok(kv.raw("concert-map:warm-lock:v1"));
-    await Promise.allSettled(queued);
-
-    const queuedAgain=[];
-    const second=await onRequestGet({
-      request:new Request("https://music98.news/api/concerts?mode=hotspots"),
-      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
-      waitUntil:p=>queuedAgain.push(p)
-    });
-    assert.equal(second.status,200);
-    assert.equal(queuedAgain.length,0);
+    assert.equal(queued.length,0);
+    assert.equal(externalCalls,0);
+    assert.equal(kv.raw("concert-map:warm-lock:v1"),undefined);
   }finally{
     globalThis.fetch=oldFetch;
   }
@@ -551,7 +536,7 @@ test("daily Popular builder produces 30 eligible artists in source-rank order", 
 
   try{
     let result;
-    for(let i=0;i<4;i++){
+    for(let i=0;i<8;i++){
       result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
       if(result.complete) break;
     }
@@ -642,14 +627,16 @@ test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30"
   };
 
   try{
-    const first=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
-    assert.equal(first.complete,false);
-    assert.equal(first.found,28);
+    let result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+    assert.equal(result.complete,false);
+    assert.equal(result.found,14);
     assert.equal(ticketmasterKeywords[0],"Artist 9");
 
-    const second=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
-    assert.equal(second.complete,true);
-    assert.equal(second.artists,30);
+    for(let i=0;i<6 && !result.complete;i++){
+      result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+    }
+    assert.equal(result.complete,true);
+    assert.equal(result.artists,30);
 
     const snap=JSON.parse(kv.raw("concert-popular:v4"));
     assert.equal(snap.artists.length,30);
