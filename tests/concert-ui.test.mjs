@@ -37,11 +37,11 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
 });
 
 test("Popular UI renders strict confirmed cache immediately without an explanatory banner",()=>{
-  assert.match(app,/music98:concert-popular:v6/);
+  assert.match(app,/music98:concert-popular:v7/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
   assert.match(app,/ticketmaster_event_payload_gt_0/);
   assert.match(app,/cached\.artists\.length>0/);
-  assert.match(app,/mode:"popular",v:"popular-v6"/);
+  assert.match(app,/mode:"popular",v:"popular-v7"/);
   assert.match(app,/sideSub\.textContent="";/);
   assert.doesNotMatch(app,/Popular artists with confirmed upcoming Ticketmaster shows\./);
 });
@@ -49,8 +49,8 @@ test("Popular UI renders strict confirmed cache immediately without an explanato
 test("map uses only the daily verified market snapshot",()=>{
   assert.doesNotMatch(app,/STATIC_GLOBAL_MARKETS/);
   assert.doesNotMatch(app,/STATIC_US_STATE_CAPITALS/);
-  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v1"/);
-  assert.match(app,/mode:"markets",v:"concert-markets-v1"/);
+  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v2"/);
+  assert.match(app,/mode:"markets",v:"concert-markets-v2"/);
   assert.match(app,/loadMarkets\(\);/);
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
@@ -76,4 +76,12 @@ test("More button sits slightly lower than the previous equal-margin position",(
 test("Buy Tickets uses the shared site press binder",()=>{
   assert.match(app,/typeof window\.music98PillPress==="function"/);
   assert.doesNotMatch(app,/a\.addEventListener\("pointerdown"/);
+});
+
+
+test("concert snapshot requests bypass browser cache and local Popular cache never freezes a partial list",()=>{
+  assert.match(app,/fetch\(u,\{cache:"no-store",headers:\{"Accept":"application\/json","Cache-Control":"no-cache"\}\}\)/);
+  assert.match(app,/cached\.artists\.length>=30/);
+  assert.match(app,/data\.artists\.length<30/);
+  assert.match(app,/!popularArtists\.length \|\| data\.artists\.length>=popularArtists\.length/);
 });
