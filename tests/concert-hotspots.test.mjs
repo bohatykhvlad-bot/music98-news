@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  HOTSPOT_VERSION,
   HOTSPOT_THRESHOLD,
   HOTSPOT_MAX_RADIUS_KM,
   HOTSPOT_STATE_KEY,
@@ -23,7 +24,7 @@ import {
   cityKey,
   snapshotFromState,
 } from "../functions/lib/concert-hotspots.js";
-import { refreshHotspotSnapshot } from "../functions/api/concerts.js";
+import { refreshHotspotSnapshot, onRequestGet } from "../functions/api/concerts.js";
 
 test("hotspot threshold is 10 or more", () => {
   assert.equal(HOTSPOT_THRESHOLD, 10);
@@ -163,7 +164,7 @@ function memoryKv() {
   };
 }
 
-test("builder reads every venue page and publishes only a verified 11+ city", async () => {
+test("builder reads every venue page and publishes only a verified 10+ city", async () => {
   const kv=memoryKv();
   const state=freshState(Date.UTC(2026,8,29));
   state.queue=[countryJob("FR")];
@@ -239,6 +240,33 @@ test("429 is requeued and is never cached as an empty successful snapshot", asyn
     assert.equal(saved.queue.length,1);
     assert.equal(saved.queue[0].countryCode,"FR");
     assert.equal(kv.raw(HOTSPOT_SNAPSHOT_KEY),null);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
+
+test("public hotspot read never triggers Ticketmaster discovery", async () => {
+  const kv=memoryKv();
+  await kv.put(HOTSPOT_SNAPSHOT_KEY,JSON.stringify({
+    ok:true,mode:"hotspots",version:HOTSPOT_VERSION,threshold:HOTSPOT_THRESHOLD,
+    partial:false,builtAt:new Date().toISOString(),
+    hotspots:[{city:"Paris",countryCode:"FR",stateCode:"",lat:48.8566,lng:2.3522,count:10}]
+  }));
+
+  const oldFetch=globalThis.fetch;
+  let externalCalls=0;
+  globalThis.fetch=async()=>{ externalCalls++; throw new Error("visitor must not scan Ticketmaster"); };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?mode=hotspots"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{ throw new Error("visitor hotspot read must not schedule rebuild"); }
+    });
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.hotspots[0].city,"Paris");
+    assert.equal(externalCalls,0);
   }finally{
     globalThis.fetch=oldFetch;
   }
