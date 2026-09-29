@@ -60,6 +60,7 @@ let areaRequestSeq=0;
 let popularRequestSeq=0;
 let popup=null;
 let userMoving=false;
+let pendingAreaSearch=null;
 let expandedKey="";
 let artistContext=null;
 const artistEventCache=new Map();
@@ -68,6 +69,20 @@ const payloadInflight=new Map();
 const PAYLOAD_CACHE_MS=3*60*1000;
 
 function setStatus(s){ statusEl.textContent=s||""; }
+function hidePendingAreaSearch(){
+  pendingAreaSearch=null;
+  searchAreaBtn.hidden=true;
+}
+function syncFitButton(){
+  const pool=activeMode==="artist" ? artistMapEvents : currentEvents;
+  fitBtn.hidden=!(Array.isArray(pool) && pool.length);
+}
+function closePopup(){
+  if(!popup) return;
+  const own=popup;
+  own.remove();
+  if(popup===own) popup=null;
+}
 function fmtDate(e){
   if(!e.date) return "Date TBA";
   const d=new Date(e.date+"T12:00:00");
@@ -194,12 +209,14 @@ function setEventData(events,total=null){
   const src=map.getSource("events");
   if(src) src.setData(toGeoJSON(currentEvents));
   if(map.getLayer("cluster-count")) setLayerVisible("cluster-count",false);
+  syncFitButton();
 }
 
 function setArtistMapData(events){
   artistMapEvents=events||[];
   const src=map.getSource("artist-events");
   if(src) src.setData(toGeoJSON(artistMapEvents));
+  syncFitButton();
 }
 
 
@@ -470,7 +487,10 @@ function popupContent(e){
   body.appendChild(place);
   if(e.url){
     const a=document.createElement("a"); a.className="buy"; a.href=e.url; a.target="_blank"; a.rel="sponsored noopener";
-    a.textContent="Buy Tickets";
+    const label=document.createElement("span");
+    label.className="buy-label";
+    label.textContent="Buy Tickets";
+    a.appendChild(label);
     a.addEventListener("pointerdown",()=>{
       a.classList.add("press");
       const up=()=>{
@@ -803,6 +823,7 @@ function restoreArtistSide(){
 }
 function showArtistContext(){
   if(!artistContext) return;
+  hidePendingAreaSearch();
   clearTimeout(moveTimer);
   moveTimer=0;
   areaRequestSeq++;
@@ -815,6 +836,7 @@ function showArtistContext(){
 }
 async function loadArtistArea(lat,lng,label,radius){
   if(!artistContext) return;
+  hidePendingAreaSearch();
   const searchRadius=Math.max(5,Math.min(500,Number(radius)||100));
   const prev=artistContext.areaCenter;
   if(prev && Number(prev.radius)===searchRadius &&
@@ -952,6 +974,7 @@ function renderArtists(items,mode){
 }
 
 function restoreModeMap(){
+  hidePendingAreaSearch();
   setArtistMapData([]);
   if(activeMode==="popular"){
     setEventData(popularEvents);
@@ -1041,6 +1064,7 @@ async function loadHotspots(){
 }
 
 async function loadPopular(force=false){
+  hidePendingAreaSearch();
   clearTimeout(moveTimer);
   moveTimer=0;
   areaRequestSeq++;
@@ -1086,6 +1110,7 @@ async function loadPopular(force=false){
 }
 
 async function loadArea(lat,lng,label,opts={}){
+  hidePendingAreaSearch();
   const searchRadius=Math.max(5,Math.min(500,Number(opts.radius ?? radiusEl.value)||100));
   const reuseDistance=Math.max(6,searchRadius*.22);
   if(!opts.force && !opts.city && !lastArea?.city && lastArea && Number(lastArea.radius)===searchRadius &&
@@ -1297,6 +1322,36 @@ popularTab.addEventListener("click",()=>loadPopular());
 mapArtistBtn.addEventListener("click",showArtistContext);
 mapAllBtn.addEventListener("click",showAllConcertsInMapArea);
 
+overviewBtn.addEventListener("click",()=>{
+  clearTimeout(moveTimer);
+  moveTimer=0;
+  hidePendingAreaSearch();
+  closePopup();
+  search.value="";
+  suggestions.hidden=true;
+  closeRadiusMenu();
+  userMoving=false;
+  loadPopular();
+  map.easeTo({center:[12,49],zoom:2.45,duration:520});
+});
+
+fitBtn.addEventListener("click",()=>{
+  hidePendingAreaSearch();
+  const pool=activeMode==="artist" ? artistMapEvents : currentEvents;
+  if(pool?.length) fitEvents(pool);
+});
+
+searchAreaBtn.addEventListener("click",()=>{
+  const pending=pendingAreaSearch;
+  hidePendingAreaSearch();
+  if(!pending) return;
+  if(pending.mode==="artist-area" && artistContext){
+    loadArtistArea(pending.lat,pending.lng,"Map area",pending.radius);
+  }else{
+    loadArea(pending.lat,pending.lng,"Map area",{fit:false,radius:pending.radius,force:true});
+  }
+});
+
 search.addEventListener("input",()=>{
   clearTimeout(suggestTimer);
   const seq=++suggestSeq;
@@ -1368,6 +1423,7 @@ root.addEventListener("click",e=>{ if(!e.target.closest(".radius-menu")) closeRa
 root.addEventListener("keydown",e=>{ if(e.key==="Escape") closeRadiusMenu(); });
 
 radiusEl.addEventListener("change",()=>{
+  hidePendingAreaSearch();
   if(activeMode==="artist") return;
   if(activeMode==="artist-area" && artistContext){
     const c=map.getCenter();
@@ -1426,18 +1482,18 @@ map.on("zoomend",()=>{
 map.on("moveend",()=>{
   if(!userMoving) return;
   userMoving=false;
-  if(map.getZoom()<4) return;
-  if(activeMode!=="nearby" && activeMode!=="artist-area") return;
-  clearTimeout(moveTimer);
-  moveTimer=setTimeout(()=>{
-    if(activeMode!=="nearby" && activeMode!=="artist-area") return;
-    const c=map.getCenter();
-    if(activeMode==="artist-area" && artistContext){
-      loadArtistArea(c.lat,c.lng,"Map area",Number(radiusEl.value)||100);
-    }else{
-      loadArea(c.lat,c.lng,"Map area",{fit:false,radius:Number(radiusEl.value)||100});
-    }
-  },520);
+  if(map.getZoom()<4 || (activeMode!=="nearby" && activeMode!=="artist-area")){
+    hidePendingAreaSearch();
+    return;
+  }
+  const center=map.getCenter();
+  pendingAreaSearch={
+    lat:center.lat,
+    lng:center.lng,
+    radius:Number(radiusEl.value)||100,
+    mode:activeMode
+  };
+  searchAreaBtn.hidden=false;
 });
 
 function resizeMapStable(){
