@@ -13,10 +13,11 @@ test("desktop navigation uses four equal-width pill segments",()=>{
 
 test("Subscribe scales its label with the pill without axis translation",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
-  assert.match(page,/data-pill-press type="submit">Subscribe<\/button>/);
+  assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
   assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(page,/\.press-pill\.press\{font-size:13\.72px;line-height:1\}/);
-  assert.doesNotMatch(page,/\.press-pill\.press\{[^}]*transform:/);
+  assert.match(page,/\.press-pill-label\{[^}]*height:18px;[^}]*text-box:trim-both cap alphabetic;[^}]*font-size:14px;[^}]*transform:none;translate:none/);
+  assert.match(page,/\.press-pill\.press \.press-pill-label\{font-size:13\.72px\}/);
+  assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*transform:/);
 });
 
 test("browser never overrides server-resolved Apple artwork per song",()=>{
@@ -26,7 +27,7 @@ test("browser never overrides server-resolved Apple artwork per song",()=>{
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260929-32/);
+  assert.match(page,/concerts-app\.js\?v=20260929-33/);
 });
 
 
