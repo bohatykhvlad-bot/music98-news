@@ -32,7 +32,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260930-14/);
+  assert.match(page,/concerts-app\.js\?v=20260930-15/);
 });
 
 

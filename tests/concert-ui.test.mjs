@@ -178,3 +178,12 @@ test("map interface pills stay on the normal text raster in their resting state"
   assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*backface-visibility:hidden/);
   assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*transform:translateZ/);
 });
+
+
+test("inactive map toggles use the radius-style gray hover highlight",()=>{
+  assert.match(app,/\.side-tab:hover:not\(\.active\)\{background:var\(--bg2\);color:var\(--text\)\}/);
+  assert.match(app,/\.map-mode-btn\{[^}]*background-color:transparent/);
+  assert.match(app,/\.map-mode-btn:hover:not\(\.active\)\{background-color:var\(--bg2\);color:var\(--text\)\}/);
+  assert.match(app,/\.side-tab\.active\{background:var\(--accent\);color:#03282b\}/);
+  assert.match(app,/\.map-mode-btn\.active\{background-color:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
+});
