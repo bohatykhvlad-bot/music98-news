@@ -122,16 +122,24 @@ function syncMapModeSwitch(){
 function applyMapMode(){
   const artist=activeMode==="artist";
   const area=activeMode==="nearby" || activeMode==="artist-area";
-  const overviewZoom=map.getZoom()<4.7;
-  const showHubs=activeMode==="popular" || overviewZoom;
-  ["artist-points","artist-hit"].forEach(id=>setLayerVisible(id,artist && !overviewZoom));
-  ["clusters","cluster-hit","event-points","event-hit","event-labels"].forEach(id=>setLayerVisible(id,area && !overviewZoom));
+  const showHubs=activeMode==="popular";
+
+  // Modes are mutually exclusive. Artist mode must never leak the global
+  // market layer, including at the world/continent zoom. Artist markers stay
+  // visible at every zoom so the map shows only cities where that artist plays.
+  ["artist-points","artist-hit"].forEach(id=>setLayerVisible(id,artist));
+  ["clusters","cluster-hit","event-points","event-hit","event-labels"].forEach(id=>setLayerVisible(id,area));
+
   [
     "capital-points","capital-labels","state-capital-labels","hub-hit-capital",
-    "city-major-points","city-major-labels","hub-hit-major",
-    "city-mid-points","city-mid-labels","hub-hit-mid",
-    "city-all-points","city-all-labels","hub-hit-all"
+    "city-major-labels","hub-hit-major",
+    "city-mid-labels","hub-hit-mid",
+    "city-all-labels","hub-hit-all"
   ].forEach(id=>setLayerVisible(id,showHubs));
+
+  // Legacy progressive point layers are permanently disabled; the stable
+  // capital-points layer now carries every verified market at every zoom.
+  ["city-major-points","city-mid-points","city-all-points"].forEach(id=>setLayerVisible(id,false));
   if(map.getLayer("cluster-count")) setLayerVisible("cluster-count",false);
 }
 function setMode(mode){
@@ -289,12 +297,14 @@ function addLayers(){
   map.addSource("hubs",{type:"geojson",data:hubsGeoJSON()});
   requestAnimationFrame(()=>{ const src=map.getSource("hubs"); if(src) src.setData(hubsGeoJSON()); });
 
-  // Wide view: only qualifying European capitals. Zoom in: all qualifying cities.
+  // One stable marker layer for every verified Ticketmaster market at every zoom.
+  // Labels can still reveal progressively, but the marker itself must never
+  // disappear just because the camera crosses a zoom threshold.
   map.addLayer({
-    id:"capital-points",type:"symbol",source:"hubs",maxzoom:4.7,filter:["==",["get","overview"],1],
+    id:"capital-points",type:"symbol",source:"hubs",minzoom:0,maxzoom:18,
     layout:{
       "icon-image":"m98-triangle",
-      "icon-size":["step",["get","count"],.68,20,.76,40,.84,80,.94,160,1.04,300,1.12],
+      "icon-size":["interpolate",["linear"],["zoom"],0,.58,3,.68,5,.82,7,.94,12,1.08],
       "icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true
     }
   });
@@ -325,7 +335,7 @@ function addLayers(){
   const hubIconSize=["step",["get","count"],.72,20,.80,40,.90,80,1.00,160,1.10,300,1.18];
   map.addLayer({
     id:"city-major-points",type:"symbol",source:"hubs",minzoom:4.7,maxzoom:5.7,filter:["any",[">=",["get","count"],40],["==",["get","pinned"],1]],
-    layout:{"icon-image":"m98-triangle","icon-size":hubIconSize,"icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true}
+    layout:{"visibility":"none","icon-image":"m98-triangle","icon-size":hubIconSize,"icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true}
   });
   map.addLayer({
     id:"city-major-labels",type:"symbol",source:"hubs",minzoom:4.9,maxzoom:5.7,filter:["any",[">=",["get","count"],40],["==",["get","pinned"],1]],
@@ -339,7 +349,7 @@ function addLayers(){
 
   map.addLayer({
     id:"city-mid-points",type:"symbol",source:"hubs",minzoom:5.7,maxzoom:6.4,filter:["any",[">=",["get","count"],20],["==",["get","pinned"],1]],
-    layout:{"icon-image":"m98-triangle","icon-size":hubIconSize,"icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true}
+    layout:{"visibility":"none","icon-image":"m98-triangle","icon-size":hubIconSize,"icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true}
   });
   map.addLayer({
     id:"city-mid-labels",type:"symbol",source:"hubs",minzoom:5.9,maxzoom:6.4,filter:["any",[">=",["get","count"],20],["==",["get","pinned"],1]],
@@ -353,7 +363,7 @@ function addLayers(){
 
   map.addLayer({
     id:"city-all-points",type:"symbol",source:"hubs",minzoom:6.4,maxzoom:18,
-    layout:{"icon-image":"m98-triangle","icon-size":hubIconSize,"icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true}
+    layout:{"visibility":"none","icon-image":"m98-triangle","icon-size":hubIconSize,"icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true}
   });
   map.addLayer({
     id:"city-all-labels",type:"symbol",source:"hubs",minzoom:6.6,maxzoom:12,
