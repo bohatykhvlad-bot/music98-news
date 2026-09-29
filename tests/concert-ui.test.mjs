@@ -41,12 +41,12 @@ test("More button keeps its existing behavior with equal vertical spacing",()=>{
 
 test("Popular UI requires a complete Ticketmaster-eligible Top 30 before browser caching",()=>{
   assert.match(app,/Top 30 popular artists with upcoming Ticketmaster shows\./);
-  assert.match(app,/music98:concert-popular:v5/);
+  assert.match(app,/music98:concert-popular:v6/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
-  assert.match(app,/ticketmaster_upcoming_events_gt_0/);
+  assert.match(app,/ticketmaster_event_payload_gt_0/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/cached\.artists\.every\(a=>Number\(a\?\.shows\|\|0\)>0\)/);
-  assert.match(app,/mode:"popular",v:"popular-v5"/);
+  assert.match(app,/cached\.artists\.every\(a=>a\?\.eventConfirmed===true && Number\(a\?\.shows\|\|0\)>0\)/);
+  assert.match(app,/mode:"popular",v:"popular-v6"/);
 });
 
 test("map loading status is hidden while real statuses remain available",()=>{
