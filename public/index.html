@@ -489,8 +489,8 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .sub-in .btn{flex:0 0 126px;width:126px;min-width:126px;height:43px;padding:0;display:inline-flex;align-items:center;justify-content:center}
 .press-pill{position:relative;isolation:isolate;background:transparent!important;border-color:transparent!important;transform:none!important;transition:color .16s ease;font-size:14px}
 .press-pill::before{content:"";position:absolute;z-index:-1;inset:0;border:1px solid var(--pill-press-border,var(--line));border-radius:inherit;background:var(--pill-press-bg,var(--bg2));transform:scale(1);transform-origin:50% 50%;transition:transform .09s cubic-bezier(.34,1.2,.64,1),background .14s ease,border-color .14s ease;will-change:transform}
-.press-pill.press::before{transform:scale(.97)}
-.press-pill.press{font-size:13.5px}
+.press-pill.press::before{transform:scale(.98)}
+.press-pill.press{font-size:14px}
 .subscribe .btn.primary.press-pill{--pill-press-bg:var(--accent);--pill-press-border:var(--accent);color:#03282b}
 .subscribe .btn.primary.press-pill:hover{filter:none;color:#03282b}
 .btn{border:1px solid var(--line);background:var(--bg2);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
@@ -503,12 +503,12 @@ body.editmode .card .tag{top:auto;bottom:10px}
 
 /* ---------- footer ---------- */
 footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
-.foot-in{max-width:1180px;margin:0 auto;padding:40px 20px 44px;display:grid;grid-template-columns:minmax(330px,1fr) 150px 200px 170px;column-gap:54px;row-gap:30px;align-items:start}
+.foot-in{max-width:1180px;margin:0 auto;padding:40px 20px 44px;display:grid;grid-template-columns:minmax(320px,1fr) 150px 180px 198px;column-gap:44px;row-gap:30px;align-items:start;justify-content:space-between}
 .foot-col h3{margin:0 0 14px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
 .foot-col p{margin:0;color:var(--muted);font-size:14px;line-height:1.55;max-width:340px}
 .flink{display:block;width:max-content;max-width:100%;color:var(--muted);text-decoration:none;font-size:14px;line-height:1.55;padding:5px 0;transition:.15s;white-space:nowrap}
 .flink:hover{color:var(--acc2)}
-.social .icons{display:flex;gap:10px;flex-wrap:wrap}
+.social .icons{display:grid;grid-template-columns:repeat(4,42px);gap:10px;width:198px;max-width:100%;align-items:center;justify-items:center}
 .social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--acc2);text-decoration:none}
 .social a:active{border-color:var(--accent)}
 .social svg{width:18px;height:18px}
@@ -2091,7 +2091,7 @@ const CHART_ART_FIXES={
 function fixedChartArt(t){
   const title=String(t?.title||"").toLowerCase().replace(/[’']/g,"").replace(/\s+/g," ").trim();
   const artist=String(t?.artist||"").toLowerCase().replace(/[’']/g,"").replace(/\s+/g," ").trim();
-  if(title==="loser" && artist==="tame impala") return CHART_ART_FIXES["loser|tame impala"];
+  if(title.startsWith("loser") && artist.includes("tame impala")) return CHART_ART_FIXES["loser|tame impala"];
   if(title.startsWith("get lucky") && artist.includes("daft punk")) return CHART_ART_FIXES["get lucky|daft punk"];
   return t?.art||"";
 }
@@ -3692,6 +3692,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260929-30" defer></script>
+<script src="/concerts-app.js?v=20260929-31" defer></script>
 </body>
 </html>
