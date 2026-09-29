@@ -295,55 +295,43 @@ function addConcertTriangle(){
 }
 
 function addTopographicRelief(){
+  // Bright flat cartography only. Do not add DEM/hillshade: the owner prefers
+  // the cleaner high-key map and it also avoids gray relief bands.
   try{
-  const layers=map.getStyle()?.layers||[];
-  for(const layer of layers){
-    const id=String(layer.id||"");
-    try{
-      if(layer.type==="background"){
-        map.setPaintProperty(id,"background-color","#ffffff");
-      }
-      if(layer.type==="fill" && /(^land$|land-|park|landcover|landuse|wood|grass|scrub|pitch|golf|cemetery)/i.test(id)){
-        map.setPaintProperty(id,"fill-color","#fbfcfc");
-        map.setPaintProperty(id,"fill-opacity",.88);
-      }
-      if(layer.type==="fill" && /building/i.test(id)){
-        map.setPaintProperty(id,"fill-color","#f6f8f8");
-        map.setPaintProperty(id,"fill-opacity",.82);
-      }
-      if(layer.type==="fill" && /water/i.test(id)){
-        map.setPaintProperty(id,"fill-color","#dff4fa");
-      }
-      if(layer.type==="line" && /waterway|river|canal|stream/i.test(id)){
-        map.setPaintProperty(id,"line-color","#cfeaf2");
-      }else if(layer.type==="line" && /(admin|boundary|country|state)/i.test(id)){
-        map.setPaintProperty(id,"line-color","#d8e0e2");
-      }else if(layer.type==="line" && /(road|street|motorway|trunk|primary|secondary|tertiary)/i.test(id)){
-        map.setPaintProperty(id,"line-color",/(motorway|trunk|primary)/i.test(id)?"#dde3e5":"#edf0f1");
-      }
-      if(layer.type==="symbol" && /(poi|transit|airport|ferry)/i.test(id) && typeof map.setLayerZoomRange==="function"){
-        map.setLayerZoomRange(id,8.5,24);
-      }else if(layer.type==="symbol" && /(road.*label|road-label)/i.test(id) && typeof map.setLayerZoomRange==="function"){
-        map.setLayerZoomRange(id,6.5,24);
-      }
-    }catch(e){}
-  }
-  if(map.getSource("m98-dem")) return;
-  map.addSource("m98-dem",{type:"raster-dem",url:"mapbox://mapbox.mapbox-terrain-dem-v1",tileSize:512,maxzoom:14});
-  const before=map.getStyle()?.layers?.find(x=>x.type==="symbol")?.id;
-  map.addLayer({
-    id:"m98-hillshade",
-    type:"hillshade",
-    source:"m98-dem",
-    paint:{
-      "hillshade-exaggeration":0.07,
-      "hillshade-shadow-color":"#c7ced1",
-      "hillshade-highlight-color":"#ffffff",
-      "hillshade-accent-color":"#d9dfe1"
+    const layers=map.getStyle()?.layers||[];
+    for(const layer of layers){
+      const id=String(layer.id||"");
+      try{
+        if(layer.type==="background"){
+          map.setPaintProperty(id,"background-color","#ffffff");
+        }
+        if(layer.type==="fill" && /(^land$|land-|park|landcover|landuse|wood|grass|scrub|pitch|golf|cemetery)/i.test(id)){
+          map.setPaintProperty(id,"fill-color","#fbfcfc");
+          map.setPaintProperty(id,"fill-opacity",.92);
+        }
+        if(layer.type==="fill" && /building/i.test(id)){
+          map.setPaintProperty(id,"fill-color","#f6f8f8");
+          map.setPaintProperty(id,"fill-opacity",.78);
+        }
+        if(layer.type==="fill" && /water/i.test(id)){
+          map.setPaintProperty(id,"fill-color","#dff4fa");
+        }
+        if(layer.type==="line" && /waterway|river|canal|stream/i.test(id)){
+          map.setPaintProperty(id,"line-color","#cfeaf2");
+        }else if(layer.type==="line" && /(admin|boundary|country|state)/i.test(id)){
+          map.setPaintProperty(id,"line-color","#d8e0e2");
+        }else if(layer.type==="line" && /(road|street|motorway|trunk|primary|secondary|tertiary)/i.test(id)){
+          map.setPaintProperty(id,"line-color",/(motorway|trunk|primary)/i.test(id)?"#dde3e5":"#edf0f1");
+        }
+        if(layer.type==="symbol" && /(poi|transit|airport|ferry)/i.test(id) && typeof map.setLayerZoomRange==="function"){
+          map.setLayerZoomRange(id,8.5,24);
+        }else if(layer.type==="symbol" && /(road.*label|road-label)/i.test(id) && typeof map.setLayerZoomRange==="function"){
+          map.setLayerZoomRange(id,6.5,24);
+        }
+      }catch(e){}
     }
-  },before);
   }catch(err){
-    console.warn("Optional map relief disabled",err);
+    console.warn("Optional map palette adjustment disabled",err);
   }
 }
 
