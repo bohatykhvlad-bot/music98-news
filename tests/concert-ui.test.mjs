@@ -97,7 +97,9 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/function pillInkShift\(el\)/);
   assert.match(app,/Math\.round\(raw\)/);
   assert.match(app,/\.action,\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab,\.map-mode-btn,\.tour-more\{\\n  transform:translateZ\(0\)/);
-  assert.match(app,/\.action:active,\.radius-trigger:active,\.radius-option:active,\.search-area-btn:active,\.side-tab:active,\.map-mode-btn:active\{\\n  transform:translateZ\(0\)!important/);
+  assert.match(app,/\.radius-trigger:active,\.radius-option:active,\.search-area-btn:active,\.side-tab:active,\.map-mode-btn:active\{\\n  transform:translateZ\(0\)!important/);
+  assert.match(app,/\.action:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
+  assert.match(app,/\.action:active\{transform:none\}/);
   assert.match(app,/\.map-tool-btn:active\{transform:none!important\}/);
   assert.doesNotMatch(app,/\.side-tab:active[^}]*scale\(/);
   assert.doesNotMatch(app,/\.map-mode-btn:active[^}]*scale\(/);
