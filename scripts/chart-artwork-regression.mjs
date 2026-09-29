@@ -37,6 +37,8 @@ assert.notEqual(mergeKey("Loser", "Tame Impala"), mergeKey("Loser (Fcukers Remix
 assert.equal(versionSignature("Dracula (with JENNIE)"), "");
 assert.equal(versionSignature("Dracula (Boys Noize Disko Version)"), "version");
 assert.equal(versionSignature("Bad Times (Extended Version)"), "extended");
+assert.equal(versionSignature("Beauty and a Beat (Wideboys Dub)"), "dub");
+assert.equal(versionSignature("Song (Unplugged Session)"), "session");
 assert.equal(appleCandidateCompatible("Loser", "Tame Impala", remix), false);
 assert.equal(appleCandidateCompatible("Loser", "Tame Impala", original), true);
 assert.equal(pickAppleCandidate("Loser", "Tame Impala", [remix, album, original]).trackId, 101);
@@ -72,6 +74,20 @@ const vocal = {
   releaseDate: "2026-08-01T00:00:00Z",
 };
 assert.equal(pickAppleCandidate("Dracula (with JENNIE)", "Tame Impala", [instr, vocal]).trackId, 301);
+
+
+const beautyStudio={
+  trackId:500,trackName:"Beauty and a Beat (feat. Nicki Minaj)",
+  artistName:"Justin Bieber",collectionArtistName:"Justin Bieber",
+  collectionName:"Believe",trackCount:16,releaseDate:"2012-06-15T00:00:00Z"
+};
+const beautyDub={
+  trackId:501,trackName:"Beauty and a Beat (Wideboys Dub)",
+  artistName:"Justin Bieber",collectionArtistName:"Justin Bieber",
+  collectionName:"Beauty and a Beat (Wideboys Dub) - Single",trackCount:1,releaseDate:"2012-12-01T00:00:00Z"
+};
+assert.equal(appleCandidateCompatible("Beauty and a Beat (feat. Nicki Minaj)","Justin Bieber",beautyDub),false);
+assert.equal(pickAppleCandidate("Beauty and a Beat (feat. Nicki Minaj)","Justin Bieber",[beautyDub,beautyStudio]).trackId,500);
 
 const corrections = JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json", import.meta.url), "utf8"));
 const tameCorrection = corrections["loser|tameimpala"];
