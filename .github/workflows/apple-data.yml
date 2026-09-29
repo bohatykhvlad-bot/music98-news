@@ -11,7 +11,13 @@ name: apple-data
 # Это же снимает проблему "w/"-написания: имя всегда эпловское.
 
 on:
-  # Do not invoke the live chart Worker on every related source push. The
+  push:
+    paths:
+      - "functions/lib/chart-identity.js"
+      - "scripts/build-covers.mjs"
+      - "public/data/cover-corrections.json"
+  # Artwork code changes may refresh artwork immediately, but must never rebuild
+  # or reorder the Top 50 itself. The
   # committed registry already ships the correction; refresh happens once a day
   # or when an editor explicitly runs this workflow.
   schedule:
@@ -31,6 +37,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Зафиксировать ranking-файлы до artwork audit
+        run: |
+          cp public/data/top50.json /tmp/top50-before.json
+          cp public/index.html /tmp/index-before.html
       - name: Проверить live tenure
         run: node scripts/audit-live-chart.mjs
       - name: Проверить original/remix matcher
@@ -38,23 +48,28 @@ jobs:
       - name: Собрать cover registry и Apple metadata
         run: |
           cp public/data/covers.json /tmp/covers-before.json
-          node scripts/build-covers.mjs
+          REVALIDATE_EXISTING=1 node scripts/build-covers.mjs
           node - <<'NODE'
           const fs = require("fs");
           const before = JSON.parse(fs.readFileSync("/tmp/covers-before.json","utf8"));
           const after = JSON.parse(fs.readFileSync("public/data/covers.json","utf8"));
           const corrections = JSON.parse(fs.readFileSync("public/data/cover-corrections.json","utf8"));
-          for (const [key, url] of Object.entries(before)) {
-            if (after[key] !== url) {
-              if (corrections[key] && corrections[key].art === after[key]) {
-                console.log("approved editorial cover correction:", key);
-                continue;
-              }
-              throw new Error("immutable cover changed: " + key + "\nwas: " + url + "\nnow: " + after[key]);
+          for (const [key, url] of Object.entries(after)) {
+            if (!/^https:\/\/[^/]*mzstatic\.com\//i.test(String(url || ""))) {
+              throw new Error("non-Apple artwork in cover registry: " + key);
             }
           }
-          console.log("cover registry immutability: PASS", Object.keys(before).length, "existing locks preserved");
+          const changed = Object.keys(after).filter(k => before[k] && before[k] !== after[k]);
+          console.log("canonical cover revalidation:", changed.length, "existing rows corrected");
           NODE
+          cmp -s public/data/top50.json /tmp/top50-before.json || {
+            echo "ERROR: artwork audit modified Top 50 ranking data"
+            exit 1
+          }
+          cmp -s public/index.html /tmp/index-before.html || {
+            echo "ERROR: artwork audit modified embedded Top 50/site markup"
+            exit 1
+          }
       - name: Закоммитить, если изменилось
         run: |
           git config user.name "music98 apple-data bot"
