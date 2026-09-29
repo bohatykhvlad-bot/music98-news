@@ -59,6 +59,9 @@ let userMoving=false;
 let expandedKey="";
 let artistContext=null;
 const artistEventCache=new Map();
+const payloadCache=new Map();
+const payloadInflight=new Map();
+const PAYLOAD_CACHE_MS=3*60*1000;
 
 function setStatus(s){ statusEl.textContent=s||""; }
 function fmtDate(e){
@@ -725,18 +728,6 @@ async function eventsForArtist(item,mode){
   return events;
 }
 
-function prefetchArtist(item){
-  const key=item.id ? "id:"+item.id : "name:"+String(item.name||"").toLowerCase();
-  if(!key || artistEventCache.has(key)) return;
-  eventsForArtist(item,"popular").catch(()=>{});
-}
-
-function prefetchPopular(items){
-  const work=()=>items.slice(0,4).forEach(prefetchArtist);
-  if("requestIdleCallback" in window) requestIdleCallback(work,{timeout:1200});
-  else setTimeout(work,220);
-}
-
 function clearArtistContext(){
   artistContext=null;
   setArtistMapData([]);
@@ -777,19 +768,30 @@ function showArtistContext(){
 }
 async function loadArtistArea(lat,lng,label,radius){
   if(!artistContext) return;
+  const searchRadius=Math.max(5,Math.min(500,Number(radius)||100));
+  const prev=artistContext.areaCenter;
+  if(prev && Number(prev.radius)===searchRadius &&
+     distanceKm(lat,lng,prev.lat,prev.lng)<Math.max(6,searchRadius*.22) &&
+     Array.isArray(artistContext.areaEvents)){
+    setMode("artist-area");
+    setArtistMapData([]);
+    setEventData(artistContext.areaEvents,artistContext.areaTotal||artistContext.areaEvents.length);
+    return;
+  }
+
   const requestId=++areaRequestSeq;
   const contextKey=artistKey(artistContext.item);
   setMode("artist-area");
   setArtistMapData([]);
   setStatus("Loading concerts...");
   try{
-    const searchRadius=Math.max(5,Math.min(500,Number(radius)||100));
     const data=await getPayload({lat,lng,radius:searchRadius});
     if(requestId!==areaRequestSeq || !artistContext || artistKey(artistContext.item)!==contextKey || activeMode!=="artist-area") return;
     const events=data.events||[];
     const total=Number(data.page?.totalElements ?? events.length) || events.length;
     artistContext.areaEvents=events;
     artistContext.areaTotal=total;
+    artistContext.areaCenter={lat,lng,radius:searchRadius};
     setEventData(events,total);
     setStatus(total ? total+" concerts · "+label : "No Ticketmaster concerts found · "+label);
   }catch(err){
@@ -895,10 +897,6 @@ function renderArtists(items,mode){
     row.append(rank,art,copy,chev);
     const box=document.createElement("div"); box.className="tour-events";
     row.addEventListener("click",()=>toggleArtist(item,card,mode));
-    if(mode==="popular"){
-      row.addEventListener("pointerenter",()=>prefetchArtist(item),{once:true});
-      row.addEventListener("focus",()=>prefetchArtist(item),{once:true});
-    }
     card.append(row,box); toursEl.appendChild(card);
   });
 }
@@ -918,10 +916,20 @@ function restoreModeMap(){
 async function getPayload(params){
   const u=new URL("/api/concerts",location.origin);
   Object.entries(params).forEach(([k,v])=>{ if(v!==""&&v!=null) u.searchParams.set(k,v); });
-  const r=await fetch(u,{headers:{"Accept":"application/json"}});
-  const j=await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(j.error||"concerts_unavailable");
-  return j;
+  const key=u.pathname+"?"+[...u.searchParams.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>k+"="+v).join("&");
+  const cached=payloadCache.get(key);
+  if(cached && Date.now()-cached.at<PAYLOAD_CACHE_MS) return cached.data;
+  if(payloadInflight.has(key)) return payloadInflight.get(key);
+
+  const work=(async()=>{
+    const r=await fetch(u,{headers:{"Accept":"application/json"}});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error||"concerts_unavailable");
+    payloadCache.set(key,{at:Date.now(),data:j});
+    return j;
+  })();
+  payloadInflight.set(key,work);
+  try{return await work;}finally{payloadInflight.delete(key);}
 }
 async function getEvents(params){ return (await getPayload(params)).events||[]; }
 
@@ -990,7 +998,6 @@ async function loadPopular(force=false){
     popularEvents=[];
     if(requestId!==popularRequestSeq || activeMode!=="popular" || artistContext) return;
     renderArtists(popularArtists,"popular");
-    prefetchPopular(popularArtists);
     setEventData([]);
     setStatus("");
   }catch(err){
@@ -1004,13 +1011,25 @@ async function loadPopular(force=false){
 }
 
 async function loadArea(lat,lng,label,opts={}){
+  const searchRadius=Math.max(5,Math.min(500,Number(opts.radius ?? radiusEl.value)||100));
+  const reuseDistance=Math.max(6,searchRadius*.22);
+  if(!opts.force && lastArea && Number(lastArea.radius)===searchRadius &&
+      distanceKm(lat,lng,lastArea.lat,lastArea.lng)<reuseDistance &&
+      nearbyEvents.length){
+    clearArtistContext();
+    setMode("nearby");
+    sideSub.textContent="Artists with the most upcoming events in this area.";
+    renderArtists(groupedNearby(nearbyEvents),"nearby");
+    setEventData(nearbyEvents,nearbyTotal);
+    return;
+  }
+
   const requestId=++areaRequestSeq;
   clearArtistContext();
   setMode("nearby");
   sideSub.textContent="Artists with the most upcoming events in this area.";
   setStatus("Loading concerts...");
   try{
-    const searchRadius=Math.max(5,Math.min(500,Number(opts.radius ?? radiusEl.value)||100));
     const data=await getPayload({lat,lng,radius:searchRadius});
     if(requestId!==areaRequestSeq) return;
     const events=data.events||[];
@@ -1145,12 +1164,13 @@ search.addEventListener("input",()=>{
   const q=search.value.trim();
   if(q.length<2){ suggestions.hidden=true; return; }
   suggestTimer=setTimeout(async()=>{
-    const [placesResult,artistsResult]=await Promise.allSettled([geocode(q,true),searchArtists(q)]);
+    const artistWork=q.length>=3 ? searchArtists(q) : Promise.resolve([]);
+    const [placesResult,artistsResult]=await Promise.allSettled([geocode(q,true),artistWork]);
     if(seq!==suggestSeq || search.value.trim()!==q) return;
     const places=placesResult.status==="fulfilled"?placesResult.value:[];
     const artists=artistsResult.status==="fulfilled"?artistsResult.value:[];
     renderSuggestions(places,artists);
-  },240);
+  },340);
 });
 search.addEventListener("keydown",async e=>{
   if(e.key!=="Enter") return;
@@ -1204,10 +1224,11 @@ radiusEl.addEventListener("change",()=>{
   if(activeMode==="artist") return;
   if(activeMode==="artist-area" && artistContext){
     const c=map.getCenter();
+    if(artistContext) artistContext.areaCenter=null;
     loadArtistArea(c.lat,c.lng,"Map area",Number(radiusEl.value)||100);
     return;
   }
-  if(lastArea) loadArea(lastArea.lat,lastArea.lng,lastArea.label,{fit:false,radius:Number(radiusEl.value)});
+  if(lastArea) loadArea(lastArea.lat,lastArea.lng,lastArea.label,{fit:false,radius:Number(radiusEl.value),force:true});
   else if(map.getZoom()>=4){
     const c=map.getCenter(); loadArea(c.lat,c.lng,"Map area",{fit:false,radius:Number(radiusEl.value)});
   }
@@ -1253,7 +1274,7 @@ map.on("moveend",()=>{
     }else{
       loadArea(c.lat,c.lng,"Map area",{fit:false,radius:Number(radiusEl.value)||100});
     }
-  },360);
+  },520);
 });
 
 function resizeMapStable(){
