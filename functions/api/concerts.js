@@ -23,8 +23,10 @@ const KWORB_ARTISTS_URL = "https://kworb.net/spotify/listeners.html";
 const POPULAR_LIMIT = 30;
 const POPULAR_CANDIDATE_LIMIT = 120;
 const POPULAR_SNAPSHOT_KEY = "concert-popular:v3";
+const POPULAR_STATE_KEY = "concert-popular:v3:state";
 const POPULAR_LEGACY_SNAPSHOT_KEY = "concert-popular:v2";
 const POPULAR_REFRESH_MS = 24 * 60 * 60 * 1000;
+const POPULAR_BATCH_SIZE = 12;
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
@@ -428,25 +430,114 @@ async function kvPutJson(env, key, value, options = undefined) {
   if (!env?.DESK) return;
   await env.DESK.put(key, JSON.stringify(value), options);
 }
+async function kvDelete(env,key){
+  if(!env?.DESK?.delete) return;
+  try{await env.DESK.delete(key);}catch(e){}
+}
+
+function newPopularBuildState(ranking,now=Date.now()){
+  return {
+    version:"popular-v3",
+    startedAt:new Date(now).toISOString(),
+    updatedAt:new Date(now).toISOString(),
+    source:ranking.source,
+    ranking:"Spotify monthly listeners",
+    candidates:ranking.artists.slice(0,POPULAR_CANDIDATE_LIMIT),
+    index:0,
+    found:[],
+    errors:0,
+  };
+}
 
 export async function refreshPopularSnapshot(env, force = false) {
-  if (!env?.TICKETMASTER_API_KEY || !env?.DESK) return { ok:false, reason:"popular_storage_or_key_missing" };
+  if (!env?.TICKETMASTER_API_KEY || !env?.DESK) {
+    return { ok:false, reason:"popular_storage_or_key_missing" };
+  }
+
   const existing = await kvGetJson(env, POPULAR_SNAPSHOT_KEY);
+  let state = await kvGetJson(env, POPULAR_STATE_KEY);
   const age = Date.now() - (Date.parse(existing?.builtAt || 0) || 0);
-  if (!force && existing?.artists?.length && age < POPULAR_REFRESH_MS) {
-    return { ok:true, fresh:true, artists:existing.artists.length };
+
+  if(!force && !state && existing?.version==="popular-v3" &&
+     existing?.artists?.length && age < POPULAR_REFRESH_MS){
+    return { ok:true, fresh:true, complete:true, artists:existing.artists.length };
   }
-  const payload = await popularPayload(env);
-  if(!payload.artists?.length){
-    return { ok:false, fresh:false, keptExisting:!!existing?.artists?.length, reason:"popular_refresh_empty" };
+
+  if(force || !state || state.version!=="popular-v3" ||
+     !Array.isArray(state.candidates) || !Array.isArray(state.found)){
+    const ranking=await kworbArtists();
+    state=newPopularBuildState(ranking);
   }
-  // Never replace a healthy list with a suspiciously tiny transient result.
-  if(existing?.artists?.length>=20 && payload.artists.length<20){
-    return { ok:false, fresh:false, keptExisting:true, reason:"popular_refresh_too_small" };
+
+  let processed=0;
+  while(state.index<state.candidates.length &&
+        state.found.length<POPULAR_LIMIT &&
+        processed<POPULAR_BATCH_SIZE){
+    const candidate=state.candidates[state.index++];
+    processed++;
+    try{
+      const artist=await validatePopularArtist(
+        env,candidate.name,candidate.rank,candidate.listeners
+      );
+      if(artist && !state.found.some(x=>x.id===artist.id)) state.found.push(artist);
+    }catch(err){
+      state.errors=Number(state.errors||0)+1;
+      state.updatedAt=new Date().toISOString();
+      await kvPutJson(env,POPULAR_STATE_KEY,state);
+      if(err?.message==="ticketmaster_budget_guard" || Number(err?.status)===429 ||
+         err?.message==="ticketmaster_unavailable"){
+        return {
+          ok:false,retry:true,status:Number(err?.status||0),
+          processed,index:state.index,found:state.found.length
+        };
+      }
+    }
   }
-  const snapshot = { ...payload, builtAt:new Date().toISOString(), version:"popular-v3" };
-  await kvPutJson(env, POPULAR_SNAPSHOT_KEY, snapshot);
-  return { ok:true, fresh:false, artists:snapshot.artists.length };
+
+  state.updatedAt=new Date().toISOString();
+  const complete=state.found.length>=POPULAR_LIMIT || state.index>=state.candidates.length;
+
+  if(!complete){
+    await kvPutJson(env,POPULAR_STATE_KEY,state);
+    return {
+      ok:true,fresh:false,complete:false,processed,
+      index:state.index,totalCandidates:state.candidates.length,found:state.found.length
+    };
+  }
+
+  const artists=state.found.slice(0,POPULAR_LIMIT).map((a,i)=>({
+    id:a.id,name:a.name,image:a.image,rank:i+1,
+    popularityRank:a.popularityRank,listeners:a.listeners,firstDate:a.firstDate,
+  }));
+
+  // Never replace a healthy snapshot with a suspiciously small partial result.
+  if(existing?.artists?.length>=20 && artists.length<20){
+    state.failedAt=new Date().toISOString();
+    await kvPutJson(env,POPULAR_STATE_KEY,state,{expirationTtl:21600});
+    return {
+      ok:false,fresh:false,complete:true,keptExisting:true,
+      reason:"popular_refresh_too_small",artists:artists.length
+    };
+  }
+  if(!artists.length){
+    state.failedAt=new Date().toISOString();
+    await kvPutJson(env,POPULAR_STATE_KEY,state,{expirationTtl:21600});
+    return {ok:false,fresh:false,complete:true,reason:"popular_refresh_empty"};
+  }
+
+  const snapshot={
+    ok:true,mode:"popular",version:"popular-v3",
+    builtAt:new Date().toISOString(),
+    artists,
+    source:state.source,
+    ranking:state.ranking,
+    candidateCount:state.index,
+    eligibleCount:artists.length,
+    targetCount:POPULAR_LIMIT,
+  };
+  await kvPutJson(env,POPULAR_SNAPSHOT_KEY,snapshot);
+  await kvDelete(env,POPULAR_STATE_KEY);
+  return {ok:true,fresh:false,complete:true,artists:artists.length,processed};
 }
 
 async function popularSnapshotPayload(env) {
