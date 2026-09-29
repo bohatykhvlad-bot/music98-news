@@ -13,6 +13,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/af/19/98/af1998ee-ed0e-4655-ec27-610c78dcb4fc/mzaf_18150537039377466708.plus.aac.p.m4a",
     "year": "2026"
   },
+  "aintnomountainhighenough|marvingaye": {
+    "title": "Ain't No Mountain High Enough",
+    "artist": "Marvin Gaye & Tammi Terrell",
+    "url": "https://music.apple.com/us/album/1469575128?i=1469575663",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/81/67/32/81673294-d60a-5538-3373-0d20e661d606/mzaf_14870705510932042101.plus.aac.p.m4a",
+    "year": "1967"
+  },
   "animal|katseye": {
     "title": "Animal",
     "artist": "KATSEYE",
@@ -34,6 +41,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/14/4b/6a/144b6aa7-a2af-41a7-fd2f-8e8aac953c41/mzaf_15506372320552650974.plus.aac.p.m4a",
     "year": "2026"
   },
+  "badtimes|imaelangel": {
+    "title": "Bad Times",
+    "artist": "Imael Angel",
+    "url": "https://music.apple.com/us/album/1890718114?i=1890718115",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4e/55/ca/4e55ca42-78bd-fa3e-175a-8a89ebbd8143/mzaf_5073687979000968235.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "bbywow|karolg": {
     "title": "BbY WOW",
     "artist": "KAROL G, Judeline & rusowsky",
@@ -48,13 +62,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/b4/da/eab4da01-c422-c640-1ac3-97d746c5871c/mzaf_12363686639555987211.plus.aac.p.m4a",
     "year": "2012"
   },
-  "bebyyou|lukecombs": {
-    "title": "Be By You",
-    "artist": "Luke Combs",
-    "url": "https://music.apple.com/us/album/1862634688?i=1862634805",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a1/3a/eb/a13aeb88-1a04-0f07-c062-02f1b18b8392/mzaf_7787513642053136740.plus.aac.p.m4a",
-    "year": "2026"
-  },
   "beenbynow|morganwallen": {
     "title": "Been By Now",
     "artist": "Morgan Wallen",
@@ -68,6 +75,13 @@
     "url": "https://music.apple.com/us/album/1869436835?i=1869436845",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c8/7c/d4/c87cd4df-1197-1d1d-a07c-c5139d59a58f/mzaf_8671653320488087674.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "billiejean|michaeljackson": {
+    "title": "Billie Jean",
+    "artist": "Michael Jackson",
+    "url": "https://music.apple.com/us/album/160021509?i=160022413",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/81/1c/33/811c3302-2f45-b692-b492-257e612a900c/mzaf_5657255964929171362.plus.aac.p.m4a",
+    "year": "1966"
   },
   "boston|stellalefty": {
     "title": "Boston",
@@ -160,13 +174,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/57/33/a4/5733a427-883b-586d-d90e-281c91d9ef4e/mzaf_201398670995826930.plus.aac.p.m4a",
     "year": "2026"
   },
-  "ijustmight|brunomars": {
-    "title": "I Just Might",
-    "artist": "Bruno Mars",
-    "url": "https://music.apple.com/us/album/1866732792?i=1866732800",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/ef/58/86ef584b-cb46-43df-12e3-fce4b436688c/mzaf_10081886156675578892.plus.aac.p.m4a",
-    "year": "2026"
-  },
   "iknewitiknewyou|taylorswift": {
     "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
     "artist": "Taylor Swift",
@@ -195,13 +202,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4c/fd/bc/4cfdbc05-8385-dcca-13d7-c15b0b81d644/mzaf_343675252092765252.plus.aac.p.m4a",
     "year": "2025"
   },
-  "lovinglifeagain|ellalangley": {
-    "title": "Loving Life Again",
-    "artist": "Ella Langley",
-    "url": "https://music.apple.com/us/album/1869436835?i=1869436847",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cd/f7/c9/cdf7c910-e4c6-9828-c83a-9e7a215bb70c/mzaf_1496635585165093785.plus.aac.p.m4a",
-    "year": "2026"
-  },
   "manineed|oliviadean": {
     "title": "Man I Need",
     "artist": "Olivia Dean",
@@ -223,6 +223,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/43/06/4f/43064fd1-7e64-a917-7734-a91f12df53fb/mzaf_9705965089268547948.plus.aac.p.m4a",
     "year": "2026"
   },
+  "movintothesun|hugel": {
+    "title": "Movin' To The Sun",
+    "artist": "HUGEL, Imael Angel & Ultra Naté",
+    "url": "https://music.apple.com/us/album/6769069923?i=6769070199",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a9/d2/09/a9d209b4-55a5-67e8-2e15-949cb00e716d/mzaf_11935934741751979581.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "nicolekidman|adla": {
     "title": "Nicole Kidman",
     "artist": "ADÉLA",
@@ -236,13 +243,6 @@
     "url": "https://music.apple.com/us/album/6814997249?i=6814997425",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0b/be/8c/0bbe8c0a-dc77-af41-97a5-c745cc43d38c/mzaf_11790447166833591507.plus.aac.p.m4a",
     "year": "2026"
-  },
-  "pinkblush|dollybabe": {
-    "title": "Pink Blush",
-    "artist": "Dolly Babe",
-    "url": "https://music.apple.com/us/album/6783917228?i=6783917229",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d6/89/52/d689522d-416e-0fcf-e4fd-db989c677437/mzaf_1043987127463886777.plus.aac.p.m4a",
-    "year": "2025"
   },
   "pinkclouding|taylorswift": {
     "title": "Pink Clouding",
@@ -271,6 +271,13 @@
     "url": "https://music.apple.com/us/album/1456623332?i=1456623340",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/49/2d/44/492d441e-f0ce-5c3a-dcc6-3a892d2600f2/mzaf_2765278844043228646.plus.aac.p.m4a",
     "year": "1978"
+  },
+  "skyfall|adele": {
+    "title": "Skyfall",
+    "artist": "Adele",
+    "url": "https://music.apple.com/us/album/566322358?i=566322365",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6c/48/0e/6c480edc-89f5-a9cf-b309-63c5237efe92/mzaf_3142604484249449871.plus.aac.p.m4a",
+    "year": "2012"
   },
   "soeasy|oliviadean": {
     "title": "So Easy (To Fall In Love)",
@@ -306,6 +313,13 @@
     "url": "https://music.apple.com/us/album/1833328839?i=1833328840",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4b/07/28/4b07285f-b50c-7aff-cb40-2d732256b703/mzaf_16739866530441939982.plus.aac.p.m4a",
     "year": "2025"
+  },
+  "theonethatgotaway|katyperry": {
+    "title": "The One That Got Away (feat. B.o.B)",
+    "artist": "Katy Perry",
+    "url": "https://music.apple.com/us/album/716371974?i=716372249",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/b9/2b/d3/b92bd3c6-84d0-e9aa-6982-085480888209/mzaf_5211920859080298380.plus.aac.p.m4a",
+    "year": "2011"
   },
   "whatyouneed|tems": {
     "title": "What You Need",
