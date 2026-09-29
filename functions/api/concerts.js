@@ -32,6 +32,7 @@ const POPULAR_TOUR_STATE_KEY = "concert-popular:v3:tours-state";
 const POPULAR_TOUR_PREFIX = "concert-popular:v3:tour:";
 const CAPITAL_EVENTS_STATE_KEY = "concert-capitals:v1:state";
 const CAPITAL_EVENTS_PREFIX = "concert-capitals:v1:city:";
+const CAPITAL_HUB_SNAPSHOT_KEY = "concert-capitals:v1:hubs";
 const PREWARM_MAX_AGE_MS = 26 * 60 * 60 * 1000;
 
 const KWORB_FALLBACK = [
@@ -681,7 +682,30 @@ export async function refreshCapitalEventSnapshots(env,budget=2){
   state.updatedAt=new Date().toISOString();
   state.complete=state.index>=EUROPE_CAPITAL_SEEDS.length;
   await kvPutJson(env,CAPITAL_EVENTS_STATE_KEY,state,{expirationTtl:172800});
+  await capitalHubSnapshot(env,true).catch(()=>null);
   return {ok:true,complete:state.complete,index:state.index,total:EUROPE_CAPITAL_SEEDS.length,processed};
+}
+
+async function capitalHubSnapshot(env, force=false){
+  const stored=await kvGetJson(env,CAPITAL_HUB_SNAPSHOT_KEY);
+  const storedAge=Date.now()-(Date.parse(stored?.builtAt||0)||0);
+  if(!force && stored?.version==="capital-hubs-v1" && Array.isArray(stored.hotspots) && storedAge<2*60*60*1000){
+    return stored;
+  }
+
+  const rows=await Promise.all(EUROPE_CAPITAL_SEEDS.map(async seed=>{
+    const payload=await kvGetJson(env,capitalEventCacheKey(seed.city,seed.countryCode));
+    const count=Number(payload?.page?.totalElements||payload?.events?.length||0);
+    if(count<HOTSPOT_THRESHOLD) return null;
+    return {
+      city:seed.city,stateCode:"",countryCode:seed.countryCode,
+      lat:Number(seed.lat),lng:Number(seed.lng),count
+    };
+  }));
+  const hotspots=rows.filter(Boolean).sort((a,b)=>Number(b.count||0)-Number(a.count||0));
+  const snapshot={version:"capital-hubs-v1",builtAt:new Date().toISOString(),hotspots};
+  if(hotspots.length) await kvPutJson(env,CAPITAL_HUB_SNAPSHOT_KEY,snapshot,{expirationTtl:6*60*60}).catch(()=>{});
+  return snapshot;
 }
 
 async function popularSnapshotPayload(env) {
@@ -942,18 +966,22 @@ async function hotspotSnapshotPayload(env) {
   const progress = snapshotFromState(state);
 
   // Never blank the public map while a new generation is rebuilding.
-  // v18 stays read-only fallback data; only the scheduler can build v19.
-  const legacy = await kvGetJson(env, "concert-hotspots:v18:snapshot");
-  const fallback = Array.isArray(legacy?.hotspots) ? legacy.hotspots : [];
-  const live = Array.isArray(progress.hotspots) ? progress.hotspots : [];
-  const merged = new Map();
-  for (const h of fallback) {
-    const key=[h?.city,h?.stateCode,h?.countryCode].map(x=>String(x||"").trim().toLowerCase()).join("|");
-    if(key!=="||") merged.set(key,h);
-  }
-  for (const h of live) {
-    const key=[h?.city,h?.stateCode,h?.countryCode].map(x=>String(x||"").trim().toLowerCase()).join("|");
-    if(key!=="||") merged.set(key,h);
+  // Merge every safe read-only source we already have in Cloudflare.
+  const [legacy18,legacy17,capitalHubs]=await Promise.all([
+    kvGetJson(env,"concert-hotspots:v18:snapshot"),
+    kvGetJson(env,"concert-hotspots:v17:snapshot"),
+    capitalHubSnapshot(env).catch(()=>({hotspots:[]})),
+  ]);
+  const fallback18=Array.isArray(legacy18?.hotspots)?legacy18.hotspots:[];
+  const fallback17=Array.isArray(legacy17?.hotspots)?legacy17.hotspots:[];
+  const capitalFallback=Array.isArray(capitalHubs?.hotspots)?capitalHubs.hotspots:[];
+  const live=Array.isArray(progress.hotspots)?progress.hotspots:[];
+  const merged=new Map();
+  for(const list of [fallback17,fallback18,capitalFallback,live]){
+    for(const h of list){
+      const key=[h?.city,h?.stateCode,h?.countryCode].map(x=>String(x||"").trim().toLowerCase()).join("|");
+      if(key!=="||") merged.set(key,h);
+    }
   }
   const visible=[...merged.values()].sort((a,b)=>Number(b?.count||0)-Number(a?.count||0));
 
@@ -963,7 +991,7 @@ async function hotspotSnapshotPayload(env) {
     hotspots:visible,
     partial:true,
     warming:true,
-    stale:!!fallback.length,
+    stale:!!(fallback17.length||fallback18.length||capitalFallback.length),
     progress:{
       queue:state.queue.length,
       verifyQueue:state.verifyQueue.length,
