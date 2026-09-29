@@ -16,43 +16,49 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: One-time recover concert data
+      - name: One-time verify/recover concert data
         shell: bash
         run: |
           set -euo pipefail
           base="https://music98.news/api/__m98-concert-recover-9c41e6"
 
-          reset=""
-          for i in $(seq 1 18); do
-            if reset="$(curl -fsS --max-time 50 "$base?task=popular&reset=1")"; then
-              echo "$reset"
-              break
-            fi
-            sleep 5
-          done
-          test -n "$reset"
+          existing="$(curl -fsS --max-time 30 'https://music98.news/api/concerts?mode=popular&v=popular-v5&verify=precheck')"
+          popular_ok="$(printf '%s' "$existing" | python -c 'import json,sys; d=json.load(sys.stdin); a=d.get("artists") or []; print("1" if d.get("version")=="popular-v4" and d.get("eligibility")=="ticketmaster_upcoming_events_gt_0" and len(a)>=30 and all(int(x.get("shows") or 0)>0 for x in a) else "0")')"
 
-          popular_complete="false"
-          popular_artists="0"
-          for i in $(seq 1 12); do
-            body="$(curl -fsS --max-time 50 "$base?task=popular")"
-            echo "$body"
-            parsed="$(BODY="$body" python -c 'import json,os; d=json.loads(os.environ["BODY"]); print(str(bool(d.get("complete"))).lower(), int(d.get("artists") or 0), int(d.get("found") or 0))')"
-            read -r popular_complete popular_artists popular_found <<<"$parsed"
-            echo "popular step=$i complete=$popular_complete artists=$popular_artists found=$popular_found"
-            if [ "$popular_complete" = "true" ] && [ "$popular_artists" -ge 30 ]; then
-              break
-            fi
-            sleep 1
-          done
-          test "$popular_complete" = "true"
-          test "$popular_artists" -ge 30
+          if [ "$popular_ok" != "1" ]; then
+            reset=""
+            for i in $(seq 1 18); do
+              if reset="$(curl -fsS --max-time 50 "$base?task=popular&reset=1")"; then
+                echo "$reset"
+                break
+              fi
+              sleep 5
+            done
+            test -n "$reset"
+
+            popular_complete="false"
+            popular_artists="0"
+            for i in $(seq 1 12); do
+              body="$(curl -fsS --max-time 50 "$base?task=popular")"
+              echo "$body"
+              parsed="$(printf '%s' "$body" | python -c 'import json,sys; d=json.load(sys.stdin); print(str(bool(d.get("complete"))).lower(), int(d.get("artists") or 0), int(d.get("found") or 0))')"
+              read -r popular_complete popular_artists popular_found <<<"$parsed"
+              echo "popular step=$i complete=$popular_complete artists=$popular_artists found=$popular_found"
+              if [ "$popular_complete" = "true" ] && [ "$popular_artists" -ge 30 ]; then
+                break
+              fi
+              sleep 1
+            done
+            test "$popular_complete" = "true"
+            test "$popular_artists" -ge 30
+          else
+            echo "Popular v4 already verified; skipping rebuild."
+          fi
 
           capital_complete="false"
           for i in $(seq 1 18); do
             body="$(curl -fsS --max-time 60 "$base?task=capitals")"
-            echo "$body"
-            parsed="$(BODY="$body" python -c 'import json,os; d=json.loads(os.environ["BODY"]); print(str(bool(d.get("complete"))).lower(), int(d.get("index") or 0), int(d.get("total") or 0))')"
+            parsed="$(printf '%s' "$body" | python -c 'import json,sys; d=json.load(sys.stdin); print(str(bool(d.get("complete"))).lower(), int(d.get("index") or 0), int(d.get("total") or 0))')"
             read -r capital_complete capital_index capital_total <<<"$parsed"
             echo "capitals step=$i complete=$capital_complete index=$capital_index total=$capital_total"
             if [ "$capital_complete" = "true" ]; then
@@ -62,31 +68,20 @@ jobs:
           done
           test "$capital_complete" = "true"
 
-          curl -fsS --max-time 60 "$base?task=hotspots" || true
+          public="$(curl -fsS --max-time 30 'https://music98.news/api/concerts?mode=popular&v=popular-v5&verify=20260929b')"
+          printf '%s' "$public" | python -c 'import json,sys; d=json.load(sys.stdin); a=d.get("artists") or []; assert d.get("version")=="popular-v4", d; assert d.get("eligibility")=="ticketmaster_upcoming_events_gt_0", d; assert len(a)>=30, len(a); assert all(int(x.get("shows") or 0)>0 for x in a), a; print("verified_popular=",len(a))'
 
-          public="$(curl -fsS --max-time 30 'https://music98.news/api/concerts?mode=popular&v=popular-v5&verify=20260929')"
-          echo "$public"
-          PUBLIC="$public" python -c 'import json,os; d=json.loads(os.environ["PUBLIC"]); a=d.get("artists") or []; assert d.get("version")=="popular-v4", d; assert d.get("eligibility")=="ticketmaster_upcoming_events_gt_0", d; assert len(a)>=30, len(a); assert all(int(x.get("shows") or 0)>0 for x in a), a; print("verified_popular=",len(a))'
-
-          hotspot_count="0"
-          for i in $(seq 1 12); do
-            hs="$(curl -fsS --max-time 30 "https://music98.news/api/concerts?mode=hotspots&v=hotspots-v19&verify=$i")"
-            echo "$hs"
-            hotspot_count="$(BODY="$hs" python -c 'import json,os; d=json.loads(os.environ["BODY"]); print(len(d.get("hotspots") or []))')"
-            echo "verified_hotspots=$hotspot_count"
-            if [ "$hotspot_count" -ge 3 ]; then
-              break
-            fi
-            sleep 2
-          done
+          hs="$(curl -fsS --max-time 30 'https://music98.news/api/concerts?mode=hotspots&v=hotspots-v19&verify=final')"
+          hotspot_count="$(printf '%s' "$hs" | python -c 'import json,sys; d=json.load(sys.stdin); print(len(d.get("hotspots") or []))')"
+          echo "verified_hotspots=$hotspot_count"
           test "$hotspot_count" -ge 3
 
-          paris="$(curl -fsS --max-time 45 'https://music98.news/api/concerts?city=Paris&countryCode=FR&verify=20260929')"
-          PARIS="$paris" python -c 'import json,os; d=json.loads(os.environ["PARIS"]); e=d.get("events") or []; assert len(e)>0, d; assert any(x.get("lat") is not None and x.get("lng") is not None for x in e), e; print("verified_paris_events=",len(e))'
+          curl -fsS --max-time 45 'https://music98.news/api/concerts?city=Paris&countryCode=FR&verify=20260929b' |
+            python -c 'import json,sys; d=json.load(sys.stdin); e=d.get("events") or []; assert len(e)>0, d; assert any(x.get("lat") is not None and x.get("lng") is not None for x in e), e; print("verified_paris_events=",len(e))'
 
-          js="$(curl -fsS --max-time 30 'https://music98.news/concerts-app.js?v=20260929-24')"
-          printf '%s' "$js" | grep -q 'music98:concert-popular:v5'
-          if printf '%s' "$js" | grep -q 'Loading concert data'; then
+          curl -fsS --max-time 30 'https://music98.news/concerts-app.js?v=20260929-24' > /tmp/concerts-app.js
+          grep -q 'music98:concert-popular:v5' /tmp/concerts-app.js
+          if grep -q 'Loading concert data' /tmp/concerts-app.js; then
             echo "stale concert app asset still served"
             exit 1
           fi
