@@ -253,6 +253,38 @@ test("429 is requeued and is never cached as an empty successful snapshot", asyn
 });
 
 
+test("empty current hotspot snapshot falls back instead of blanking the public map", async () => {
+  const kv=memoryKv();
+  await kv.put(HOTSPOT_SNAPSHOT_KEY,JSON.stringify({
+    ok:true,mode:"hotspots",version:HOTSPOT_VERSION,threshold:HOTSPOT_THRESHOLD,
+    partial:false,builtAt:new Date().toISOString(),hotspots:[]
+  }));
+  await kv.put("concert-hotspots:v18:snapshot",JSON.stringify({
+    ok:true,mode:"hotspots",version:"hotspots-v18",
+    builtAt:new Date().toISOString(),
+    hotspots:[{city:"Paris",countryCode:"FR",stateCode:"",lat:48.8566,lng:2.3522,count:11}]
+  }));
+
+  const oldFetch=globalThis.fetch;
+  let externalCalls=0;
+  globalThis.fetch=async()=>{ externalCalls++; throw new Error("public fallback read must not hit Ticketmaster"); };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?mode=hotspots"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{ throw new Error("public hotspot fallback read must stay snapshot-only"); }
+    });
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.hotspots.length,1);
+    assert.equal(data.hotspots[0].city,"Paris");
+    assert.equal(data.hotspots[0].count,11);
+    assert.equal(externalCalls,0);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
 test("public hotspot read never triggers Ticketmaster discovery", async () => {
   const kv=memoryKv();
   await kv.put(HOTSPOT_SNAPSHOT_KEY,JSON.stringify({
@@ -414,6 +446,115 @@ test("daily Popular builder produces 30 eligible artists in source-rank order", 
   }
 });
 
+
+test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30", async () => {
+  const kv=memoryKv();
+  const partial=Array.from({length:8},(_,i)=>({
+    id:"artist-"+(i+1),
+    name:"Artist "+(i+1),
+    image:"",
+    rank:i+1,
+    popularityRank:i+1,
+    listeners:100000000-i*1000,
+    firstDate:""
+  }));
+  await kv.put("concert-popular:v3",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v3",
+    builtAt:new Date().toISOString(),
+    source:"spotify_monthly_listeners",
+    ranking:"Spotify monthly listeners",
+    candidateCount:8,
+    eligibleCount:8,
+    targetCount:30,
+    artists:partial
+  }));
+
+  const rows=Array.from({length:40},(_,i)=>
+    "<tr><td>"+(i+1)+"</td><td>Artist "+(i+1)+"</td><td>"+(100000000-i*1000)+"</td></tr>"
+  ).join("");
+
+  const oldFetch=globalThis.fetch;
+  const ticketmasterKeywords=[];
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net"){
+      return new Response("<table>"+rows+"</table>",{status:200,headers:{"content-type":"text/html"}});
+    }
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/attractions.json")){
+      const name=u.searchParams.get("keyword")||"";
+      ticketmasterKeywords.push(name);
+      const n=Number(name.replace(/[^0-9]/g,""))||1;
+      return new Response(JSON.stringify({
+        _embedded:{attractions:[{
+          id:"artist-"+n,
+          name,
+          images:[],
+          classifications:[{segment:{name:"Music"}}],
+          upcomingEvents:{_total:3}
+        }]},
+        page:{totalElements:1,totalPages:1,size:50,number:0}
+      }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+
+  try{
+    const first=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+    assert.equal(first.complete,false);
+    assert.equal(first.found,28);
+    assert.equal(ticketmasterKeywords[0],"Artist 9");
+
+    const second=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+    assert.equal(second.complete,true);
+    assert.equal(second.artists,30);
+
+    const snap=JSON.parse(kv.raw("concert-popular:v3"));
+    assert.equal(snap.artists.length,30);
+    assert.deepEqual(snap.artists.map(x=>x.rank),Array.from({length:30},(_,i)=>i+1));
+    assert.deepEqual(snap.artists.map(x=>x.popularityRank),Array.from({length:30},(_,i)=>i+1));
+    assert.equal(ticketmasterKeywords.includes("Artist 1"),false);
+    assert.equal(ticketmasterKeywords.includes("Artist 8"),false);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
+test("public Popular read exposes in-progress validated artists without Ticketmaster calls", async () => {
+  const kv=memoryKv();
+  const snapshotArtists=Array.from({length:8},(_,i)=>({
+    id:"artist-"+(i+1),name:"Artist "+(i+1),rank:i+1,popularityRank:i+1
+  }));
+  const stateArtists=Array.from({length:12},(_,i)=>({
+    id:"artist-"+(i+1),name:"Artist "+(i+1),rank:i+1,popularityRank:i+1
+  }));
+  await kv.put("concert-popular:v3",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v3",builtAt:new Date().toISOString(),
+    source:"spotify_monthly_listeners",artists:snapshotArtists,targetCount:30
+  }));
+  await kv.put("concert-popular:v3:state",JSON.stringify({
+    version:"popular-v3",source:"spotify_monthly_listeners",
+    candidates:[],index:12,found:stateArtists,errors:0
+  }));
+
+  const oldFetch=globalThis.fetch;
+  let externalCalls=0;
+  globalThis.fetch=async()=>{ externalCalls++; throw new Error("Popular public read must stay snapshot-only"); };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?mode=popular"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.artists.length,12);
+    assert.equal(data.warming,true);
+    assert.equal(data.targetCount,30);
+    assert.equal(externalCalls,0);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
 
 test("Popular builder retries the same ranked artist after a transient 5xx", async () => {
   const kv=memoryKv();

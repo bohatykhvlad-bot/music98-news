@@ -462,7 +462,7 @@ export async function refreshPopularSnapshot(env, force = false) {
   const age = Date.now() - (Date.parse(existing?.builtAt || 0) || 0);
 
   if(!force && !state && existing?.version==="popular-v3" &&
-     existing?.artists?.length && age < POPULAR_REFRESH_MS){
+     existing?.artists?.length>=POPULAR_LIMIT && age < POPULAR_REFRESH_MS){
     return { ok:true, fresh:true, complete:true, artists:existing.artists.length };
   }
 
@@ -482,6 +482,24 @@ export async function refreshPopularSnapshot(env, force = false) {
       };
     }
     state=newPopularBuildState(ranking);
+
+    // A partial snapshot must be resumed, not treated as a finished daily
+    // result. Reuse already-validated artists and continue after the last
+    // candidate the previous build reached so an 8/30 snapshot cannot freeze
+    // for the rest of the day or repeatedly restart from rank 1.
+    if(!force &&
+       existing?.version==="popular-v3" &&
+       existing?.source===ranking.source &&
+       Array.isArray(existing?.artists) &&
+       existing.artists.length>0 &&
+       existing.artists.length<POPULAR_LIMIT &&
+       age<POPULAR_REFRESH_MS){
+      state.found=existing.artists.map(a=>({...a}));
+      const rankedMax=state.found.reduce((m,a)=>Math.max(m,Number(a?.popularityRank||0)),0);
+      const storedCursor=Number(existing.candidateCount||0);
+      const resumeAt=Math.max(rankedMax,Number.isFinite(storedCursor)?storedCursor:0);
+      state.index=Math.max(0,Math.min(state.candidates.length,resumeAt));
+    }
   }
 
   let processed=0;
@@ -709,21 +727,49 @@ async function capitalHubSnapshot(env, force=false){
 }
 
 async function popularSnapshotPayload(env) {
-  const snapshot = await kvGetJson(env, POPULAR_SNAPSHOT_KEY);
-  if (snapshot?.version === "popular-v3" && Array.isArray(snapshot.artists)) {
-    const age=Date.now()-(Date.parse(snapshot.builtAt||0)||0);
-    return { ...snapshot, stale:age>30*60*60*1000, warming:false };
+  const [snapshot,state,legacy]=await Promise.all([
+    kvGetJson(env, POPULAR_SNAPSHOT_KEY),
+    kvGetJson(env, POPULAR_STATE_KEY),
+    kvGetJson(env, POPULAR_LEGACY_SNAPSHOT_KEY),
+  ]);
+
+  const sources=[];
+  if(snapshot?.version==="popular-v3" && Array.isArray(snapshot.artists)) sources.push(snapshot.artists);
+  if(state?.version==="popular-v3" && Array.isArray(state.found)) sources.push(state.found);
+  if(legacy && Array.isArray(legacy.artists)) sources.push(legacy.artists);
+
+  const merged=new Map();
+  for(const list of sources){
+    for(const artist of list){
+      const key=String(artist?.id||artist?.name||"").trim().toLowerCase();
+      if(!key) continue;
+      const prev=merged.get(key);
+      const nextRank=Number(artist?.popularityRank||artist?.rank||999999);
+      const prevRank=Number(prev?.popularityRank||prev?.rank||999999);
+      if(!prev || nextRank<prevRank) merged.set(key,artist);
+    }
   }
-  const legacy = await kvGetJson(env, POPULAR_LEGACY_SNAPSHOT_KEY);
-  if (legacy && Array.isArray(legacy.artists) && legacy.artists.length) {
+
+  const artists=[...merged.values()]
+    .sort((a,b)=>Number(a?.popularityRank||a?.rank||999999)-Number(b?.popularityRank||b?.rank||999999))
+    .slice(0,POPULAR_LIMIT)
+    .map((a,i)=>({...a,rank:i+1}));
+
+  if(artists.length){
+    const age=Date.now()-(Date.parse(snapshot?.builtAt||legacy?.builtAt||0)||0);
     return {
-      ...legacy,
+      ...(legacy||{}),
+      ...(snapshot||{}),
+      ok:true,
+      mode:"popular",
       version:"popular-v3",
-      stale:true,
-      warming:true,
+      artists,
       targetCount:POPULAR_LIMIT,
+      stale:age>30*60*60*1000,
+      warming:artists.length<POPULAR_LIMIT,
     };
   }
+
   return {
     ok:true,mode:"popular",version:"popular-v3",builtAt:"",
     artists:[],source:"scheduled",ranking:"Spotify monthly listeners",
@@ -957,7 +1003,9 @@ export async function refreshHotspotSnapshot(env, options = {}) {
 
 async function hotspotSnapshotPayload(env) {
   const snapshot = await kvGetJson(env, HOTSPOT_SNAPSHOT_KEY);
-  if (snapshot?.version === HOTSPOT_VERSION && Array.isArray(snapshot.hotspots)) {
+  if (snapshot?.version === HOTSPOT_VERSION &&
+      Array.isArray(snapshot.hotspots) &&
+      snapshot.hotspots.length) {
     return { ...snapshot, partial:false, warming:false, stale:false };
   }
 
@@ -975,9 +1023,10 @@ async function hotspotSnapshotPayload(env) {
   const fallback18=Array.isArray(legacy18?.hotspots)?legacy18.hotspots:[];
   const fallback17=Array.isArray(legacy17?.hotspots)?legacy17.hotspots:[];
   const capitalFallback=Array.isArray(capitalHubs?.hotspots)?capitalHubs.hotspots:[];
+  const current=Array.isArray(snapshot?.hotspots)?snapshot.hotspots:[];
   const live=Array.isArray(progress.hotspots)?progress.hotspots:[];
   const merged=new Map();
-  for(const list of [fallback17,fallback18,capitalFallback,live]){
+  for(const list of [fallback17,fallback18,capitalFallback,current,live]){
     for(const h of list){
       const key=[h?.city,h?.stateCode,h?.countryCode].map(x=>String(x||"").trim().toLowerCase()).join("|");
       if(key!=="||") merged.set(key,h);
