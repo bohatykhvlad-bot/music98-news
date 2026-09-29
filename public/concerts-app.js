@@ -1026,7 +1026,7 @@ function readPopularCache(){
   return null;
 }
 function writePopularCache(data){
-  if(data?.version!=="popular-v3" || !Array.isArray(data.artists) || !data.artists.length) return;
+  if(data?.stale || data?.warming || data?.version!=="popular-v3" || !Array.isArray(data.artists) || !data.artists.length) return;
   try{localStorage.setItem(POPULAR_CACHE_KEY,JSON.stringify(data));}catch(e){}
 }
 
