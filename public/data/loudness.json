@@ -1,0 +1,9 @@
+{
+  "__meta": {
+    "schema": 1,
+    "targetLufs": -16,
+    "truePeakCeilingDbtp": -1,
+    "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
+    "measuredAt": ""
+  }
+}

@@ -1168,7 +1168,7 @@ test("Ticketmaster quota accounting is leased so Free KV writes are not spent pe
   const src = fs.readFileSync(new URL("../functions/api/concerts.js", import.meta.url), "utf8");
   assert.match(src,/TM_GLOBAL_LEASE_SIZE = 25/);
   assert.match(src,/TM_INTERACTIVE_LEASE_SIZE = 10/);
-  assert.match(src,/MAP_MARKET_BATCH_SIZE = 12/);
+  assert.match(src,/MAP_MARKET_BATCH_SIZE = 20/);
   assert.match(src,/consumeBudgetLease\(/);
   assert.match(src,/available<=tmObservedAvailable-25/);
   assert.doesNotMatch(src,/writeBudget\(env,interactiveKey,interactiveUsed\+1\)/);

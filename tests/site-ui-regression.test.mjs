@@ -59,17 +59,18 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 
 test("same-day chart cache is an instant paint and always revalidates",()=>{
-  assert.match(page,/const DAILYKEY = "music98news_daily_v33"/);
+  assert.match(page,/const DAILYKEY = "music98news_daily_v35"/);
   assert.match(page,/const hasFreshCache=!!\(cached/);
   assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
-  assert.match(page,/rev=33/);
+  assert.match(page,/rev=35/);
 });
 
 
-test("chart preview uses fixed -6 dB master headroom with no normalization",()=>{
-  assert.match(page,/const CHART_MASTER_GAIN = Math\.pow\(10,-6\/20\)/);
-  assert.match(page,/audio\.volume = CHART_MASTER_GAIN/);
-  assert.match(page,/gainSet\(v \* CHART_MASTER_GAIN\)/);
+test("chart preview uses measured attenuation-only loudness normalization",()=>{
+  assert.match(page,/const CHART_FALLBACK_GAIN_DB = -8/);
+  assert.match(page,/let chartTrackGain = gainFromDb\(CHART_FALLBACK_GAIN_DB\)/);
+  assert.match(page,/data-gain-db=/);
+  assert.match(page,/gainSet\(v \* chartTrackGain\)/);
   assert.doesNotMatch(page,/createDynamicsCompressor\s*\(|createConvolver\s*\(/);
 });
 

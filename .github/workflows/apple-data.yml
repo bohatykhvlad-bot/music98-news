@@ -15,6 +15,7 @@ on:
     paths:
       - "functions/lib/chart-identity.js"
       - "scripts/build-covers.mjs"
+      - "scripts/build-loudness.mjs"
       - "public/data/cover-corrections.json"
   # Artwork code changes may refresh artwork immediately, but must never rebuild
   # or reorder the Top 50 itself. The
@@ -70,16 +71,20 @@ jobs:
             echo "ERROR: artwork audit modified embedded Top 50/site markup"
             exit 1
           }
+      - name: Измерить громкость Apple previews
+        run: |
+          ffmpeg -version | head -n 1
+          node scripts/build-loudness.mjs
       - name: Закоммитить, если изменилось
         run: |
           git config user.name "music98 apple-data bot"
           git config user.email "actions@users.noreply.github.com"
-          git add public/data/covers.json public/data/apple-names.json public/data/cover-corrections.json
+          git add public/data/covers.json public/data/apple-names.json public/data/cover-corrections.json public/data/loudness.json
           if git diff --cached --quiet; then
             echo "данные Apple без изменений"
             exit 0
           fi
-          git commit -m "apple: ежедневное обновление обложек и написаний"
+          git commit -m "apple/audio: обновление обложек, metadata и loudness"
           git push || {
             echo "main успел измениться — ребейзим сгенерированные данные и повторяем push"
             git pull --rebase origin main

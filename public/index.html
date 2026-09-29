@@ -1199,7 +1199,7 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v34";
+const DAILYKEY = "music98news_daily_v35";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -1366,11 +1366,17 @@ const RMONO = '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="2
    toggles opacity instead of replacing innerHTML. Both glyphs are
    envelope-symmetric, so the swap is pixel-stable as well. */
 const ICON_STACK = RMONO;
-// Keep Apple preview dynamics intact but leave 6 dB of headroom. Apple Music
-// playback can be loudness-normalized while raw preview AAC is not, so a fixed
-// master attenuation avoids previews sounding artificially hotter on the site.
-// No compressor, normalizer or per-song boost is applied.
-const CHART_MASTER_GAIN = Math.pow(10,-6/20);
+// Raw Apple preview AAC is not guaranteed to arrive at the same perceived
+// loudness as Apple Music playback with Sound Check. Nightly BS.1770/EBU
+// measurements provide an attenuation-only per-track gain. Missing measurements
+// fall back to -8 dB, which is deliberately quieter than the old fixed -6 dB.
+const CHART_FALLBACK_GAIN_DB = -8;
+const gainFromDb = db => Math.pow(10, Math.max(-24, Math.min(0, Number(db)||0)) / 20);
+let chartTrackGain = gainFromDb(CHART_FALLBACK_GAIN_DB);
+function rowTrackGain(row){
+  const db = Number(row && row.dataset ? row.dataset.gainDb : Number.NaN);
+  return gainFromDb(Number.isFinite(db) ? db : CHART_FALLBACK_GAIN_DB);
+}
 const audio = new Audio();
 audio.preload = "auto";
 audio.playsInline = true;
@@ -1379,7 +1385,7 @@ audio.setAttribute("webkit-playsinline", "");
 audio.crossOrigin = "anonymous";
 audio.muted = false;
 audio.defaultMuted = false;
-audio.volume = CHART_MASTER_GAIN; /* -6 dB master headroom; fade logic preserves source dynamics */
+audio.volume = chartTrackGain; /* measured per-track attenuation; never boosts above source level */
 const IS_ANDROID = /Android/i.test(navigator.userAgent);
 /* iOS gets the same onset guard as Android: the PC build never blasts because
    desktop browsers honour element volume instantly, mobile WebKit can hand
@@ -1424,11 +1430,11 @@ const VOL_DB = 60, VOL_MAX_DT = 40, VOL_UNMUTE_LATEST = 600, VOL_FALLBACK_WAIT =
 function volWrite(v){
   volLevel = v;
   if(gainOwns){
-    gainSet(v * CHART_MASTER_GAIN);
+    gainSet(v * chartTrackGain);
     try{ audio.volume = v; }catch(e){}
   }else{
     gainSet(v);
-    try{ audio.volume = v * CHART_MASTER_GAIN; }catch(e){}
+    try{ audio.volume = v * chartTrackGain; }catch(e){}
   }
 }
 function volUnmute(acc){
@@ -1611,10 +1617,10 @@ function deviceVol(){
   audio.muted = false;
   audio.defaultMuted = false;
   if(gainOwns){
-    gainSet(CHART_MASTER_GAIN);
+    gainSet(chartTrackGain);
     audio.volume = 1;
   }else{
-    audio.volume = CHART_MASTER_GAIN;
+    audio.volume = chartTrackGain;
   }
 }
 function attachOut(){
@@ -1852,6 +1858,7 @@ function useItunes(key, r, url, gen){
     markRows();
 }
 function selectTrack(key, title, artist, url, prev, row){
+  chartTrackGain = rowTrackGain(row);
   attachOut();
   if(curKey === key){           /* same row: play/pause toggle */
     if(audio.paused){ userPaused = false; tryPlay(true); }   /* resume: warm fade, no 500ms hole */
@@ -2143,6 +2150,7 @@ function rowsFromTracks(tracks){
   return (tracks||[]).map(t=>({
     title: t.title, artist: t.artist, url: t.url ? aff(t.url) : "", art: fixedChartArt(t),
     prev: applePreview(t.prev||t.preview||""), year: t.year||"",
+    gainDb: Number.isFinite(Number(t.gainDb)) ? Number(t.gainDb) : CHART_FALLBACK_GAIN_DB,
     weeks: t.weeks||1, delta: t.delta==null ? "0" : String(t.delta)
   }));
 }
@@ -2176,7 +2184,7 @@ function refreshDailyTop50(){
   // Always revalidate so an updated chart cannot stay frozen until tomorrow.
   const grab = u => fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   /* ?d + rev bust both browser and edge copies after chart/cache fixes. */
-  grab("/api/top50?d=" + todayUTC() + "&rev=34").catch(()=> grab("/data/top50.json?rev=34")).then(j=>{
+  grab("/api/top50?d=" + todayUTC() + "&rev=35").catch(()=> grab("/data/top50.json?rev=35")).then(j=>{
     const tracks = (j && j.tracks) || [];
     if(tracks.length < 10) throw 0;
     lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
@@ -2837,7 +2845,7 @@ function renderCharts(){
     const cleanUrl = (r.url && r.url !== "#") ? r.url : "";
     const appleUrl = cleanUrl ? aff(cleanUrl) : searchUrl;
     const badge = `<a class="abadge"${r.url ? "" : ' data-lk="'+esc(key)+'"'} rel="nofollow sponsored" href="${esc(appleUrl)}" title="Listen on Apple Music" aria-label="Listen on Apple Music">${badgeImg}</a>`;
-    return `<div class="chart-row${i<3?" top":""}" data-key="${esc(key)}" data-title="${esc(r.title)}" data-artist="${esc(r.artist)}" data-url="${esc(appleUrl==="#" ? "" : appleUrl)}" data-prev="${esc(applePreview(r.prev||""))}" tabindex="0" role="listitem" aria-label="Position ${i+1}: ${esc(r.title)} by ${esc(r.artist)} — press Enter to play the preview">
+    return `<div class="chart-row${i<3?" top":""}" data-key="${esc(key)}" data-title="${esc(r.title)}" data-artist="${esc(r.artist)}" data-url="${esc(appleUrl==="#" ? "" : appleUrl)}" data-prev="${esc(applePreview(r.prev||""))}" data-gain-db="${esc(Number.isFinite(Number(r.gainDb)) ? Number(r.gainDb) : CHART_FALLBACK_GAIN_DB)}" tabindex="0" role="listitem" aria-label="Position ${i+1}: ${esc(r.title)} by ${esc(r.artist)} — press Enter to play the preview">
       <div class="delta ${dcls}">${dtxt}</div>
       <div class="artwrap"><img data-lk="${esc(key)}"${fixedArt ? "" : " data-need=\"1\""} src="${art}" alt="Artwork: ${esc(r.title)} - ${esc(r.artist)}" loading="lazy"></div>
       <div class="ctext"><div class="tnames"><div class="cname"><span class="pos">${i+1}</span><span class="cartist">${esc(r.artist)}</span></div><div class="ctrack">${esc(r.title)}</div></div></div>

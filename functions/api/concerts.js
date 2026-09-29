@@ -39,7 +39,7 @@ const MAP_WARM_LOCK_MS = 15 * 60 * 1000;
 const MAP_MARKET_VERSION = "concert-markets-v2";
 const MAP_MARKET_STATE_KEY = "concert-markets:v2:state";
 const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v2:snapshot";
-const MAP_MARKET_BATCH_SIZE = 12;
+const MAP_MARKET_BATCH_SIZE = 20;
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",

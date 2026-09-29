@@ -73,6 +73,7 @@ async function readSeed(env, origin, file) {
 }
 let COVER_SEED = null;
 let NAME_SEED = null;
+let LOUDNESS_SEED = null;
 async function coverSeed(env, origin) {
   if (COVER_SEED) return COVER_SEED;
   const v = await readSeed(env, origin, "covers.json");
@@ -84,6 +85,25 @@ async function nameSeed(env, origin) {
   const v = await readSeed(env, origin, "apple-names.json");
   if (v && typeof v === "object" && Object.keys(v).length) NAME_SEED = v;
   return v && typeof v === "object" ? v : {};
+}
+async function loudnessSeed(env, origin) {
+  if (LOUDNESS_SEED) return LOUDNESS_SEED;
+  const v = await readSeed(env, origin, "loudness.json");
+  if (v && typeof v === "object" && Object.keys(v).length) LOUDNESS_SEED = v;
+  return v && typeof v === "object" ? v : {};
+}
+async function applyLoudness(env, tracks, origin) {
+  const seed = await loudnessSeed(env, origin);
+  for (const t of tracks || []) {
+    const rec = seed[mergeKey(t.title, t.artist)];
+    const db = Number(rec && rec.gainDb);
+    if (Number.isFinite(db)) {
+      t.gainDb = Math.max(-24, Math.min(0, db));
+      t.lufs = Number(rec.integratedLufs);
+      t.truePeakDbtp = Number(rec.truePeakDbtp);
+    }
+  }
+  return tracks;
 }
 async function applyCovers(env, tracks, origin) {
   const seed = await coverSeed(env, origin);
@@ -690,6 +710,7 @@ export async function buildTop50(origin, env) {
   await enrichArtByIds(tracks, coverStats); /* точный релиз по Apple-ID из ссылки */
   await enrichApple(tracks);               /* добор ссылки/превью/года, если Apple ответил */
   await applyCovers(env, tracks, origin);  /* запомнить найденное */
+  await applyLoudness(env, tracks, origin);
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
     if (!isApplePreview(t.prev)) t.prev = "";
@@ -704,6 +725,7 @@ export async function buildTop50(origin, env) {
       covers: Object.keys(COVER_SEED || {}).length,
       names: Object.keys(NAME_SEED || {}).length,
       namesWithUrl: Object.values(NAME_SEED || {}).filter((v) => v && v.url).length,
+      loudness: Object.keys(LOUDNESS_SEED || {}).filter((k) => k !== "__meta").length,
     },
     covers: { ...coverStats, missing: tracks.filter((t) => !t.art).length },
     tracks,
@@ -802,6 +824,7 @@ async function bakedWithCovers(env, baked, origin) {
     try {
       await applyNames(env, baked.tracks, origin);
       await applyCovers(env, baked.tracks, origin);
+      await applyLoudness(env, baked.tracks, origin);
     } catch {}
   }
   return baked;
@@ -814,6 +837,7 @@ async function decorateCachedTop50(env, payload, origin) {
       // movement and tenure stay byte-for-byte as stored in the chart payload.
       await applyNames(env, payload.tracks, origin);
       await applyCovers(env, payload.tracks, origin);
+      await applyLoudness(env, payload.tracks, origin);
     } catch {}
   }
   return payload;
