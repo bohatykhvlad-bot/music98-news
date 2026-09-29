@@ -115,11 +115,14 @@ const ZERO_QUOTA_POPULAR_SUPPLEMENT=[
 ];
 function withVerifiedPopularSupplement(rows){
   const out=[];
-  const seen=new Set();
+  const seenIds=new Set(),seenNames=new Set();
   const add=item=>{
-    const key=String(item?.id||item?.name||"").trim().toLowerCase();
-    if(!key || seen.has(key)) return;
-    seen.add(key);
+    const id=String(item?.id||"").trim().toLowerCase();
+    const name=String(item?.name||"").trim().toLowerCase();
+    if(!id && !name) return;
+    if((id && seenIds.has(id)) || (name && seenNames.has(name))) return;
+    if(id) seenIds.add(id);
+    if(name) seenNames.add(name);
     out.push({...item});
   };
   (rows||[]).forEach(add);
