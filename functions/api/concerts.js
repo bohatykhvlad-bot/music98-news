@@ -1047,54 +1047,41 @@ async function popularSnapshotPayload(env) {
     kvGetJson(env, POPULAR_STATE_KEY),
   ]);
 
-  const sources=[];
-  if(snapshot?.version==="popular-v4" &&
-     snapshot?.eligibility==="ticketmaster_event_payload_gt_0" &&
-     Array.isArray(snapshot.artists)){
-    sources.push(snapshot.artists);
-  }
-  if(state?.version==="popular-v4" && Array.isArray(state.found)){
-    sources.push(state.found.filter(a=>a?.eventConfirmed===true));
-  }
+  const strict=(list)=>Array.isArray(list)
+    ? list.filter(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0)
+        .sort((a,b)=>Number(a?.popularityRank||a?.rank||999999)-Number(b?.popularityRank||b?.rank||999999))
+        .slice(0,POPULAR_LIMIT)
+        .map((a,i)=>({...a,rank:i+1,shows:Number(a.shows||0),eventConfirmed:true}))
+    : [];
 
-  const merged=new Map();
-  for(const list of sources){
-    for(const artist of list){
-      if(artist?.eventConfirmed!==true || Number(artist?.shows||0)<=0) continue;
-      const key=String(artist?.id||artist?.name||"").trim().toLowerCase();
-      if(!key) continue;
-      const prev=merged.get(key);
-      const nextRank=Number(artist?.popularityRank||artist?.rank||999999);
-      const prevRank=Number(prev?.popularityRank||prev?.rank||999999);
-      if(!prev || nextRank<prevRank) merged.set(key,artist);
-    }
-  }
+  const published=snapshot?.version==="popular-v4" &&
+    snapshot?.eligibility==="ticketmaster_event_payload_gt_0"
+      ? strict(snapshot.artists)
+      : [];
 
-  const artists=[...merged.values()]
-    .sort((a,b)=>Number(a?.popularityRank||a?.rank||999999)-Number(b?.popularityRank||b?.rank||999999))
-    .slice(0,POPULAR_LIMIT)
-    .map((a,i)=>({...a,rank:i+1,shows:Number(a.shows||0),eventConfirmed:true}));
-
-  if(artists.length){
+  // Public UI is atomic: never expose 27/28/29 while the scheduled builder is
+  // still working. Keep the last complete Top 30, or show a warming state.
+  if(published.length>=POPULAR_LIMIT){
     const age=Date.now()-(Date.parse(snapshot?.builtAt||0)||0);
     return {
-      ...(snapshot||{}),
+      ...snapshot,
       ok:true,
       mode:"popular",
       version:"popular-v4",
       eligibility:"ticketmaster_event_payload_gt_0",
-      artists,
+      artists:published,
       targetCount:POPULAR_LIMIT,
       stale:age>30*60*60*1000,
-      warming:artists.length<POPULAR_LIMIT,
+      warming:false,
     };
   }
 
+  const validated=state?.version==="popular-v4" ? strict(state.found).length : 0;
   return {
     ok:true,mode:"popular",version:"popular-v4",builtAt:"",
     artists:[],source:"scheduled",ranking:"Spotify monthly listeners",
     eligibility:"ticketmaster_event_payload_gt_0",
-    targetCount:POPULAR_LIMIT,stale:false,warming:true
+    targetCount:POPULAR_LIMIT,validatedCount:validated,stale:false,warming:true
   };
 }
 
