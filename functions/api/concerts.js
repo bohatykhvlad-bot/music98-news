@@ -16,6 +16,7 @@ import {
   candidatePoint,
   snapshotFromState,
 } from "../lib/concert-hotspots.js";
+import { MAP_MARKET_SEEDS } from "../lib/concert-map-seeds.js";
 
 const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
 const TM_ATTRACTIONS_ROOT = "https://app.ticketmaster.com/discovery/v2/attractions.json";
@@ -35,6 +36,10 @@ const CAPITAL_HUB_SNAPSHOT_KEY = "concert-capitals:v1:hubs";
 const PREWARM_MAX_AGE_MS = 26 * 60 * 60 * 1000;
 const MAP_WARM_LOCK_KEY = "concert-map:warm-lock:v1";
 const MAP_WARM_LOCK_MS = 15 * 60 * 1000;
+const MAP_MARKET_VERSION = "concert-markets-v1";
+const MAP_MARKET_STATE_KEY = "concert-markets:v1:state";
+const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v1:snapshot";
+const MAP_MARKET_BATCH_SIZE = 24;
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
@@ -844,6 +849,128 @@ async function capitalHubSnapshot(env, force=false){
   return snapshot;
 }
 
+async function marketSeedResult(env,seed){
+  const tm=baseEventUrl(env.TICKETMASTER_API_KEY);
+  tm.searchParams.set("size","1");
+  tm.searchParams.set("sort","date,asc");
+  tm.searchParams.set("city",seed.city);
+  tm.searchParams.set("countryCode",seed.countryCode);
+  if(seed.stateCode) tm.searchParams.set("stateCode",seed.stateCode);
+
+  const raw=await tmJson(tm,env,"scheduled");
+  const events=raw?._embedded?.events||[];
+  const total=Number(raw?.page?.totalElements ?? events.length) || 0;
+  if(total<=0) return null;
+  const first=events[0]||{};
+  return {
+    city:seed.city,
+    stateCode:seed.stateCode||"",
+    countryCode:seed.countryCode,
+    lat:Number(seed.lat),
+    lng:Number(seed.lng),
+    count:total,
+    firstDate:String(first?.dates?.start?.localDate||""),
+    verified:true,
+  };
+}
+
+export async function refreshMapMarketSnapshot(env, force=false){
+  if(!env?.TICKETMASTER_API_KEY || !env?.DESK) return {ok:false,reason:"market_snapshot_missing_env"};
+
+  const cycle=new Date().toISOString().slice(0,10);
+  let state=await kvGetJson(env,MAP_MARKET_STATE_KEY);
+  if(force || !state || state.version!==MAP_MARKET_VERSION || state.cycle!==cycle){
+    state={
+      version:MAP_MARKET_VERSION,
+      cycle,
+      index:0,
+      markets:[],
+      updatedAt:new Date().toISOString(),
+    };
+  }
+
+  const seen=new Map(
+    (Array.isArray(state.markets)?state.markets:[])
+      .map(x=>[String(x.city||"").toLowerCase()+"|"+String(x.stateCode||"").toUpperCase()+"|"+String(x.countryCode||"").toUpperCase(),x])
+  );
+
+  let processed=0;
+  while(state.index<MAP_MARKET_SEEDS.length && processed<MAP_MARKET_BATCH_SIZE){
+    const seed=MAP_MARKET_SEEDS[state.index++];
+    processed++;
+    try{
+      const row=await marketSeedResult(env,seed);
+      if(row){
+        const key=String(row.city).toLowerCase()+"|"+String(row.stateCode||"").toUpperCase()+"|"+String(row.countryCode||"").toUpperCase();
+        seen.set(key,row);
+      }
+    }catch(err){
+      if(isTransientTicketmasterError(err)){
+        state.index=Math.max(0,state.index-1);
+        state.markets=[...seen.values()];
+        state.updatedAt=new Date().toISOString();
+        await kvPutJson(env,MAP_MARKET_STATE_KEY,state,{expirationTtl:3*24*60*60});
+        return {ok:false,retry:true,status:Number(err?.status||0),index:state.index,processed,found:state.markets.length};
+      }
+      // Unsupported/invalid market: skip it and continue.
+    }
+  }
+
+  state.markets=[...seen.values()]
+    .filter(x=>Number(x.count||0)>0)
+    .sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
+  state.updatedAt=new Date().toISOString();
+  state.complete=state.index>=MAP_MARKET_SEEDS.length;
+  await kvPutJson(env,MAP_MARKET_STATE_KEY,state,{expirationTtl:3*24*60*60});
+
+  if(state.complete){
+    const snapshot={
+      ok:true,
+      mode:"markets",
+      version:MAP_MARKET_VERSION,
+      cycle,
+      builtAt:new Date().toISOString(),
+      markets:state.markets,
+      candidateCount:MAP_MARKET_SEEDS.length,
+      verifiedCount:state.markets.length,
+    };
+    await kvPutJson(env,MAP_MARKET_SNAPSHOT_KEY,snapshot,{expirationTtl:3*24*60*60});
+  }
+
+  return {
+    ok:true,
+    complete:state.complete,
+    index:state.index,
+    total:MAP_MARKET_SEEDS.length,
+    processed,
+    found:state.markets.length,
+  };
+}
+
+async function marketSnapshotPayload(env){
+  const snapshot=await kvGetJson(env,MAP_MARKET_SNAPSHOT_KEY);
+  if(snapshot?.version===MAP_MARKET_VERSION && Array.isArray(snapshot.markets) && snapshot.markets.length){
+    return snapshot;
+  }
+
+  // Until the first new daily cycle completes, reuse only the already-verified
+  // old hotspot snapshot. Do not invent markers from the candidate seed list.
+  const fallback=await hotspotSnapshotPayload(env);
+  const markets=(fallback?.hotspots||[])
+    .filter(x=>Number(x?.count||0)>0)
+    .map(x=>({...x,verified:true}));
+  return {
+    ok:true,
+    mode:"markets",
+    version:MAP_MARKET_VERSION,
+    builtAt:String(fallback?.builtAt||""),
+    markets,
+    candidateCount:MAP_MARKET_SEEDS.length,
+    verifiedCount:markets.length,
+    fallback:true,
+  };
+}
+
 async function popularSnapshotPayload(env) {
   const [snapshot,state]=await Promise.all([
     kvGetJson(env, POPULAR_SNAPSHOT_KEY),
@@ -1283,6 +1410,13 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const mode = String(u.searchParams.get("mode") || "").toLowerCase();
   const region = String(u.searchParams.get("region") || "").toLowerCase();
   void region;
+
+  if (mode === "markets") {
+    const payload=await marketSnapshotPayload(env);
+    return json(payload,200,{
+      "Cache-Control":"public, max-age=300, s-maxage=3600"
+    });
+  }
 
   if (mode === "hotspots") {
     // The UI now uses a static global discovery layer, so this compatibility
