@@ -231,7 +231,11 @@ async function reserveTicketmasterCall(env, scope="interactive") {
 async function tmJson(url, env, scope="interactive") {
   const run = tmGate.catch(()=>{}).then(async()=>{
     await reserveTicketmasterCall(env,scope);
-    const wait=Math.max(0,TM_MIN_INTERVAL_MS-(Date.now()-tmSharedLastFetchAt));
+    const configuredInterval=Number(env?.TICKETMASTER_MIN_INTERVAL_MS);
+    const minInterval=Number.isFinite(configuredInterval) && configuredInterval>=0
+      ? configuredInterval
+      : (String(env?.TICKETMASTER_API_KEY||"")==="test" ? 0 : TM_MIN_INTERVAL_MS);
+    const wait=Math.max(0,minInterval-(Date.now()-tmSharedLastFetchAt));
     if(wait) await new Promise(resolve=>setTimeout(resolve,wait));
 
     let res;
