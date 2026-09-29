@@ -38,12 +38,8 @@ jobs:
           for i in $(seq 1 16); do
             body="$(curl -fsS --max-time 45 "$base")"
             echo "$body"
-            read -r complete artists found <<<"$(BODY="$body" python - <<'PY'
-import json, os
-d=json.loads(os.environ["BODY"])
-print(str(bool(d.get("complete"))).lower(), int(d.get("artists") or 0), int(d.get("found") or 0))
-PY
-)"
+            parsed="$(BODY="$body" python -c 'import json,os; d=json.loads(os.environ["BODY"]); print(str(bool(d.get("complete"))).lower(), int(d.get("artists") or 0), int(d.get("found") or 0))')"
+            read -r complete artists found <<<"$parsed"
             echo "step=$i complete=$complete artists=$artists found=$found"
             if [ "$complete" = "true" ] && [ "$artists" -ge 30 ]; then
               break
@@ -56,12 +52,5 @@ PY
 
           public="$(curl -fsS --max-time 30 'https://music98.news/api/concerts?mode=popular&v=popular-v4&forcecheck=20260929')"
           echo "$public"
-          PUBLIC="$public" python - <<'PY'
-import json, os
-d=json.loads(os.environ["PUBLIC"])
-artists=d.get("artists") or []
-assert len(artists) >= 30, f"public Popular returned {len(artists)} artists"
-assert d.get("warming") is False, f"public Popular still warming: {d}"
-print("verified_public_artists=", len(artists))
-PY
+          PUBLIC="$public" python -c 'import json,os; d=json.loads(os.environ["PUBLIC"]); a=d.get("artists") or []; assert len(a) >= 30, f"public Popular returned {len(a)} artists"; assert d.get("warming") is False, f"public Popular still warming: {d}"; print("verified_public_artists=", len(a))'
       - run: npm run check
