@@ -1089,17 +1089,17 @@ function writePopularCache(data){
   try{localStorage.setItem(POPULAR_CACHE_KEY,JSON.stringify(data));}catch(e){}
 }
 
-const MARKET_CACHE_KEY="music98:concert-markets:v5";
+const MARKET_CACHE_KEY="music98:concert-markets:v6";
 function readMarketCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(MARKET_CACHE_KEY)||"null");
     const age=Date.now()-(Date.parse(cached?.builtAt||0)||0);
-    if(cached?.version==="concert-markets-v2" && Array.isArray(cached.markets) && cached.markets.length && age<30*60*60*1000) return cached;
+    if(cached?.version==="concert-markets-v3" && Array.isArray(cached.markets) && cached.markets.length && age<30*60*60*1000) return cached;
   }catch(e){}
   return null;
 }
 function writeMarketCache(data){
-  if(data?.version!=="concert-markets-v2" || !Array.isArray(data.markets) || !data.markets.length) return;
+  if(data?.version!=="concert-markets-v3" || !Array.isArray(data.markets) || !data.markets.length) return;
   try{localStorage.setItem(MARKET_CACHE_KEY,JSON.stringify(data));}catch(e){}
 }
 async function loadMarkets(){
@@ -1110,7 +1110,7 @@ async function loadMarkets(){
     if(src) src.setData(hubsGeoJSON());
   }
   try{
-    const data=await getPayload({mode:"markets",v:"concert-markets-v4"});
+    const data=await getPayload({mode:"markets",v:"concert-markets-v6"});
     if(data?.markets?.length){
       hotspots=data.complete===false
         ? mergeHotspots([...(hotspots||[]),...data.markets])

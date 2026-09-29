@@ -36,10 +36,45 @@ const CAPITAL_HUB_SNAPSHOT_KEY = "concert-capitals:v1:hubs";
 const PREWARM_MAX_AGE_MS = 26 * 60 * 60 * 1000;
 const MAP_WARM_LOCK_KEY = "concert-map:warm-lock:v1";
 const MAP_WARM_LOCK_MS = 15 * 60 * 1000;
-const MAP_MARKET_VERSION = "concert-markets-v2";
-const MAP_MARKET_STATE_KEY = "concert-markets:v2:state";
-const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v2:snapshot";
+const MAP_MARKET_VERSION = "concert-markets-v3";
+const MAP_MARKET_STATE_KEY = "concert-markets:v3:state";
+const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v3:snapshot";
+const MAP_MARKET_LEGACY_SNAPSHOT_KEY = "concert-markets:v2:snapshot";
 const MAP_MARKET_BATCH_SIZE = 20;
+
+/* The source list is intentionally human-readable and grouped, but a batch must
+   not scan Europe for hours before touching the rest of the world. Build a
+   deterministic round-robin order across broad geographic regions so the very
+   first 20 Ticketmaster validations include the US, Americas, Europe, Africa,
+   Middle East, Asia and Pacific. Correctness still comes only from Ticketmaster:
+   this changes scan order, never which cities are published. */
+function mapMarketRegion(seed){
+  const cc=String(seed?.countryCode||"").toUpperCase();
+  const lat=Number(seed?.lat),lng=Number(seed?.lng);
+  if(cc==="US" || cc==="PR") return "us";
+  if(Number.isFinite(lng) && lng < -30) return "americas";
+  if(Number.isFinite(lng) && lng >= 35 && lng < 75 && Number.isFinite(lat) && lat >= 12) return "middle-east";
+  if(Number.isFinite(lng) && lng >= 75 && lng < 135) return "asia";
+  if((Number.isFinite(lng) && lng >= 135) || (Number.isFinite(lat) && lat < -20 && Number.isFinite(lng) && lng > 60)) return "pacific";
+  if(Number.isFinite(lat) && lat < 32 && Number.isFinite(lng) && lng > -30 && lng < 60) return "africa";
+  return "europe";
+}
+function orderedMapMarketSeeds(){
+  const order=["us","americas","europe","africa","middle-east","asia","pacific"];
+  const buckets=new Map(order.map(k=>[k,[]]));
+  for(const seed of MAP_MARKET_SEEDS) (buckets.get(mapMarketRegion(seed))||buckets.get("europe")).push(seed);
+  const out=[];
+  let added=true;
+  for(let i=0;added;i++){
+    added=false;
+    for(const key of order){
+      const row=buckets.get(key)[i];
+      if(row){out.push(row);added=true;}
+    }
+  }
+  return out;
+}
+const ORDERED_MAP_MARKET_SEEDS=orderedMapMarketSeeds();
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
@@ -975,7 +1010,7 @@ export async function refreshMapMarketSnapshot(env, force=false){
       updatedAt:new Date().toISOString(),
     };
   }else if(state.complete){
-    return {ok:true,complete:true,fresh:true,index:state.index,total:MAP_MARKET_SEEDS.length,processed:0,found:Array.isArray(state.markets)?state.markets.length:0};
+    return {ok:true,complete:true,fresh:true,index:state.index,total:ORDERED_MAP_MARKET_SEEDS.length,processed:0,found:Array.isArray(state.markets)?state.markets.length:0};
   }
 
   const seen=new Map(
@@ -984,8 +1019,8 @@ export async function refreshMapMarketSnapshot(env, force=false){
   );
 
   let processed=0;
-  while(state.index<MAP_MARKET_SEEDS.length && processed<MAP_MARKET_BATCH_SIZE){
-    const seed=MAP_MARKET_SEEDS[state.index++];
+  while(state.index<ORDERED_MAP_MARKET_SEEDS.length && processed<MAP_MARKET_BATCH_SIZE){
+    const seed=ORDERED_MAP_MARKET_SEEDS[state.index++];
     processed++;
     try{
       const row=await marketSeedResult(env,seed);
@@ -1009,7 +1044,7 @@ export async function refreshMapMarketSnapshot(env, force=false){
     .filter(x=>Number(x.count||0)>0)
     .sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
   state.updatedAt=new Date().toISOString();
-  state.complete=state.index>=MAP_MARKET_SEEDS.length;
+  state.complete=state.index>=ORDERED_MAP_MARKET_SEEDS.length;
   await kvPutJson(env,MAP_MARKET_STATE_KEY,state,{expirationTtl:3*24*60*60});
 
   if(state.complete){
@@ -1020,7 +1055,7 @@ export async function refreshMapMarketSnapshot(env, force=false){
       cycle,
       builtAt:new Date().toISOString(),
       markets:state.markets,
-      candidateCount:MAP_MARKET_SEEDS.length,
+      candidateCount:ORDERED_MAP_MARKET_SEEDS.length,
       verifiedCount:state.markets.length,
     };
     await kvPutJson(env,MAP_MARKET_SNAPSHOT_KEY,snapshot,{expirationTtl:3*24*60*60});
@@ -1030,21 +1065,25 @@ export async function refreshMapMarketSnapshot(env, force=false){
     ok:true,
     complete:state.complete,
     index:state.index,
-    total:MAP_MARKET_SEEDS.length,
+    total:ORDERED_MAP_MARKET_SEEDS.length,
     processed,
     found:state.markets.length,
   };
 }
 
 async function marketSnapshotPayload(env){
-  const [snapshot,state]=await Promise.all([
+  const [snapshot,state,legacySnapshot]=await Promise.all([
     kvGetJson(env,MAP_MARKET_SNAPSHOT_KEY),
     kvGetJson(env,MAP_MARKET_STATE_KEY),
+    kvGetJson(env,MAP_MARKET_LEGACY_SNAPSHOT_KEY),
   ]);
 
   const cycle=new Date().toISOString().slice(0,10);
   const snapshotMarkets=snapshot?.version===MAP_MARKET_VERSION && Array.isArray(snapshot.markets)
     ? snapshot.markets.filter(x=>Number(x?.count||0)>0)
+    : [];
+  const legacyMarkets=legacySnapshot?.version==="concert-markets-v2" && Array.isArray(legacySnapshot.markets)
+    ? legacySnapshot.markets.filter(x=>Number(x?.count||0)>0)
     : [];
   const currentState=state?.version===MAP_MARKET_VERSION && state?.cycle===cycle && Array.isArray(state.markets);
   const warming=currentState
@@ -1059,7 +1098,7 @@ async function marketSnapshotPayload(env){
   // confirms it the public map must see it immediately instead of waiting for
   // the entire global scan to finish.
   const snapshotMatchesCurrentSeedSet=
-    Number(snapshot?.candidateCount||0)===MAP_MARKET_SEEDS.length &&
+    Number(snapshot?.candidateCount||0)===ORDERED_MAP_MARKET_SEEDS.length &&
     snapshot?.complete!==false;
 
   if(snapshotMarkets.length && snapshotMatchesCurrentSeedSet &&
@@ -1069,6 +1108,10 @@ async function marketSnapshotPayload(env){
 
   let previous=snapshotMarkets;
   let usedLegacyFallback=false;
+  if(!snapshotMatchesCurrentSeedSet && legacyMarkets.length){
+    previous=[...legacyMarkets,...previous];
+    usedLegacyFallback=true;
+  }
   /* A partial daily scan starts with Europe, so replacing the old world data
      with only today's first batch makes the USA, Dubai, Asia, etc. disappear.
      While the current fixed-seed scan is incomplete (or the stored snapshot was
@@ -1100,11 +1143,11 @@ async function marketSnapshotPayload(env){
     version:MAP_MARKET_VERSION,
     builtAt:String(stateIsNewer ? state?.updatedAt||"" : snapshot?.builtAt||""),
     markets,
-    candidateCount:MAP_MARKET_SEEDS.length,
+    candidateCount:ORDERED_MAP_MARKET_SEEDS.length,
     verifiedCount:markets.length,
     complete:stateIsNewer ? !!state?.complete : snapshotMarkets.length>0,
     warming:stateIsNewer ? !state?.complete : snapshotMarkets.length===0,
-    progress:stateIsNewer ? {index:Number(state?.index||0),total:MAP_MARKET_SEEDS.length} : undefined,
+    progress:stateIsNewer ? {index:Number(state?.index||0),total:ORDERED_MAP_MARKET_SEEDS.length} : undefined,
     fallback:usedLegacyFallback,
   };
 }

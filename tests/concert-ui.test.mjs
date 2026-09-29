@@ -49,8 +49,8 @@ test("Popular UI renders strict confirmed cache immediately without an explanato
 test("map uses only the daily verified market snapshot",()=>{
   assert.doesNotMatch(app,/STATIC_GLOBAL_MARKETS/);
   assert.doesNotMatch(app,/STATIC_US_STATE_CAPITALS/);
-  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v5"/);
-  assert.match(app,/mode:"markets",v:"concert-markets-v4"/);
+  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v6"/);
+  assert.match(app,/mode:"markets",v:"concert-markets-v6"/);
   assert.match(app,/loadMarkets\(\);/);
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });

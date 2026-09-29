@@ -394,6 +394,7 @@ test("daily market snapshot publishes only cities with real upcoming Ticketmaste
   const kv=memoryKv();
   const oldFetch=globalThis.fetch;
   let calls=0;
+  const firstBatchCountries=[];
   globalThis.fetch=async input=>{
     const u=new URL(String(input));
     if(!u.pathname.endsWith("/events.json")) return new Response("not found",{status:404});
@@ -404,6 +405,7 @@ test("daily market snapshot publishes only cities with real upcoming Ticketmaste
     assert.equal(u.searchParams.get("city"),null);
     assert.equal(u.searchParams.get("unit"),"km");
     const cc=u.searchParams.get("countryCode")||"";
+    if(firstBatchCountries.length<20) firstBatchCountries.push(cc);
     const hasShows=["GB","FR","IT","AE"].includes(cc);
     return new Response(JSON.stringify(hasShows ? {
       _embedded:{events:[{id:"e-"+cc,dates:{start:{localDate:"2026-10-10"}}}]},
@@ -421,6 +423,11 @@ test("daily market snapshot publishes only cities with real upcoming Ticketmaste
     }
     assert.equal(result.complete,true);
     assert.ok(calls>100);
+    assert.ok(firstBatchCountries.includes("US"));
+    assert.ok(firstBatchCountries.includes("AE"));
+    assert.ok(firstBatchCountries.includes("CA"));
+    assert.ok(firstBatchCountries.includes("JP") || firstBatchCountries.includes("AU"));
+    assert.ok(firstBatchCountries.includes("GB") || firstBatchCountries.includes("FR"));
 
     const response=await onRequestGet({
       request:new Request("https://music98.news/api/concerts?mode=markets"),
@@ -429,7 +436,7 @@ test("daily market snapshot publishes only cities with real upcoming Ticketmaste
     });
     assert.equal(response.status,200);
     const data=await response.json();
-    assert.equal(data.version,"concert-markets-v2");
+    assert.equal(data.version,"concert-markets-v3");
     assert.equal(data.complete,true);
     assert.ok(data.markets.length>=4);
     assert.ok(data.markets.every(x=>x.verified===true && Number(x.count)>0));
@@ -463,7 +470,7 @@ test("public market read exposes verified Rome before the whole daily scan finis
       waitUntil:()=>{}
     });
     const data=await response.json();
-    assert.equal(data.version,"concert-markets-v2");
+    assert.equal(data.version,"concert-markets-v3");
     assert.equal(data.complete,false);
     assert.equal(data.warming,true);
     assert.ok(data.markets.some(x=>x.city==="Rome" && x.countryCode==="IT" && Number(x.count)===7));
@@ -1132,8 +1139,8 @@ test("new daily market state overrides an older complete snapshot before the wor
     ],
     candidateCount:100,verifiedCount:1
   }));
-  await kv.put("concert-markets:v2:state",JSON.stringify({
-    version:"concert-markets-v2",cycle,index:20,complete:false,
+  await kv.put("concert-markets:v3:state",JSON.stringify({
+    version:"concert-markets-v3",cycle,index:20,complete:false,
     updatedAt:new Date().toISOString(),
     markets:[
       {city:"Rome",countryCode:"IT",stateCode:"",lat:41.9028,lng:12.4964,count:7,verified:true,pinned:1,tier:1}
@@ -1153,7 +1160,7 @@ test("new daily market state overrides an older complete snapshot before the wor
   globalThis.fetch=async()=>{ externalCalls++; throw new Error("public market read must stay snapshot-only"); };
   try{
     const response=await onRequestGet({
-      request:new Request("https://music98.news/api/concerts?mode=markets&v=concert-markets-v4"),
+      request:new Request("https://music98.news/api/concerts?mode=markets&v=concert-markets-v6"),
       env:{TICKETMASTER_API_KEY:"test",DESK:kv},
       waitUntil:()=>{}
     });
