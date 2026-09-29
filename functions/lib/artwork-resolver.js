@@ -27,10 +27,14 @@ export function isGenericRelease(name, releaseArtist="", genre="") {
   if (g==="karaoke") return true;
   return false;
 }
+function derivativeTrackQualifier(title){
+  return /\b(?:live\s+(?:at|from)|session|performance|unplugged|rehearsal|from\s+the\s+carwash)\b/i.test(String(title||""));
+}
 export function candidateCompatible(track,candidate) {
   if(!track||!candidate) return false;
   if(normTitle(candidate.trackTitle)!==normTitle(track.title)) return false;
   if(versionSignature(candidate.trackTitle)!==versionSignature(track.title)) return false;
+  if(!derivativeTrackQualifier(track.title) && derivativeTrackQualifier(candidate.trackTitle)) return false;
   const want=artworkArtistSignature(track.artist), got=artworkArtistSignature(candidate.artist);
   return !!want && want===got;
 }

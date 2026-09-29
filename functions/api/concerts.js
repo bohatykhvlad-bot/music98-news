@@ -1058,18 +1058,31 @@ async function marketSnapshotPayload(env){
   // today's scan. Rome is in the first scheduled batch, so once today's state
   // confirms it the public map must see it immediately instead of waiting for
   // the entire global scan to finish.
-  if(snapshotMarkets.length && (!stateIsNewer || !warming.length)){
+  const snapshotMatchesCurrentSeedSet=
+    Number(snapshot?.candidateCount||0)===MAP_MARKET_SEEDS.length &&
+    snapshot?.complete!==false;
+
+  if(snapshotMarkets.length && snapshotMatchesCurrentSeedSet &&
+     (!stateIsNewer || state?.complete || !warming.length)){
     return {...snapshot,markets:snapshotMarkets,complete:true};
   }
 
   let previous=snapshotMarkets;
   let usedLegacyFallback=false;
-  if(!previous.length){
+  /* A partial daily scan starts with Europe, so replacing the old world data
+     with only today's first batch makes the USA, Dubai, Asia, etc. disappear.
+     While the current fixed-seed scan is incomplete (or the stored snapshot was
+     built against an older seed list), merge the last verified world hotspot
+     snapshot underneath it. Today's verified rows still win by city key. */
+  if(!snapshotMatchesCurrentSeedSet || (stateIsNewer && !state?.complete) || !previous.length){
     const fallback=await hotspotSnapshotPayload(env);
-    previous=(fallback?.hotspots||[])
+    const world=(fallback?.hotspots||[])
       .filter(x=>Number(x?.count||0)>0)
       .map(x=>({...x,verified:true,pinned:1,tier:(String(x?.countryCode||"")==="US"&&x?.stateCode)?2:1}));
-    usedLegacyFallback=previous.length>0;
+    if(world.length){
+      previous=[...world,...previous];
+      usedLegacyFallback=true;
+    }
   }
 
   const merged=new Map();

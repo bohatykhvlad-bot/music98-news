@@ -1139,6 +1139,14 @@ test("new daily market state overrides an older complete snapshot before the wor
       {city:"Rome",countryCode:"IT",stateCode:"",lat:41.9028,lng:12.4964,count:7,verified:true,pinned:1,tier:1}
     ]
   }));
+  await kv.put(HOTSPOT_SNAPSHOT_KEY,JSON.stringify({
+    version:HOTSPOT_VERSION,builtAt:new Date().toISOString(),
+    hotspots:[
+      {city:"New York",countryCode:"US",stateCode:"NY",lat:40.7128,lng:-74.006,count:80},
+      {city:"Dubai",countryCode:"AE",stateCode:"",lat:25.2048,lng:55.2708,count:18},
+      {city:"Tokyo",countryCode:"JP",stateCode:"",lat:35.6762,lng:139.6503,count:45}
+    ]
+  }));
 
   const oldFetch=globalThis.fetch;
   let externalCalls=0;
@@ -1155,6 +1163,9 @@ test("new daily market state overrides an older complete snapshot before the wor
     assert.equal(data.warming,true);
     assert.ok(data.markets.some(x=>x.city==="Paris" && x.countryCode==="FR"));
     assert.ok(data.markets.some(x=>x.city==="Rome" && x.countryCode==="IT" && Number(x.count)===7));
+    assert.ok(data.markets.some(x=>x.city==="New York" && x.countryCode==="US"));
+    assert.ok(data.markets.some(x=>x.city==="Dubai" && x.countryCode==="AE"));
+    assert.ok(data.markets.some(x=>x.city==="Tokyo" && x.countryCode==="JP"));
     assert.equal(data.progress.index,20);
     assert.equal(externalCalls,0);
   }finally{

@@ -15,8 +15,8 @@ test("Subscribe scales around a fixed center with no axis translation or font-me
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
   assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(page,/\.press-pill-label\{[^}]*position:absolute;inset:0;[^}]*place-items:center;[^}]*font-size:14px;[^}]*transform:scale\(1\);[^}]*transform-origin:50% 50%;translate:none/);
-  assert.match(page,/\.press-pill\.press \.press-pill-label\{transform:scale\(\.98\)\}/);
+  assert.match(page,/\.press-pill-label\{[^}]*position:absolute;inset:0;[^}]*place-items:center;[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
+  assert.match(page,/\.press-pill\.press \.press-pill-label\{transform:none\}/);
   assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*font-size:/);
   assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*translate:/);
 });
@@ -29,7 +29,7 @@ test("verified chart artwork overrides apply even to same-day browser cache",()=
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260929-36/);
+  assert.match(page,/concerts-app\.js\?v=20260930-1/);
 });
 
 
@@ -52,7 +52,8 @@ test("corrected chart art is enforced at final row render",()=>{
 
 test("clean Chart and Concerts routes are no-store",()=>{
   assert.match(worker,/\^\\\/\(\?:releases\|chart\|charts\|concerts\)/);
-  assert.match(worker,/headers\.set\("Cache-Control", "no-store, max-age=0"\)/);
+  assert.match(worker,/headers\.set\("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"\)/);
+  assert.match(worker,/Cloudflare-CDN-Cache-Control/);
 });
 
 

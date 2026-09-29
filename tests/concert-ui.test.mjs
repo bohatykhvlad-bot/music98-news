@@ -22,7 +22,7 @@ test("Buy Tickets pill scales while text uses a crisp native pressed size",()=>{
   assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
   assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
   assert.match(app,/\.buy\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(app,/\.buy\.press \.buy-label\{font-size:12\.75px\}/);
+  assert.match(app,/\.buy\.press \.buy-label\{font-size:13px\}/);
   assert.doesNotMatch(app,/\.buy\.press \.buy-label\{[^}]*transform/);
 });
 
@@ -49,7 +49,7 @@ test("Popular UI renders strict confirmed cache immediately without an explanato
 test("map uses only the daily verified market snapshot",()=>{
   assert.doesNotMatch(app,/STATIC_GLOBAL_MARKETS/);
   assert.doesNotMatch(app,/STATIC_US_STATE_CAPITALS/);
-  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v4"/);
+  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v5"/);
   assert.match(app,/mode:"markets",v:"concert-markets-v4"/);
   assert.match(app,/loadMarkets\(\);/);
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
@@ -95,7 +95,9 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tabs\{\\n  width:244px;max-width:100%;display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(app,/\.side-tab\{\\n  width:100%;min-width:0;max-width:none/);
   assert.match(app,/\.side-tab\{[\s\S]*?transition:\.18s;/);
-  assert.match(app,/\.side-tab\{[\s\S]*?display:grid;place-items:center;text-align:center;line-height:1/);
+  assert.match(app,/\.side-tab\{[\s\S]*?display:grid;place-items:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1/);
+  assert.match(app,/function pillInkShift\(el\)/);
+  assert.match(app,/getImageData\(/);
   assert.match(app,/\.tour-more\{[^}]*display:grid;place-items:center;text-align:center/);
   assert.match(app,/\.map-mode-btn\{[^}]*display:grid;place-items:center;text-align:center/);
   assert.match(app,/\.side-tabs\{[\s\S]*?margin:0 0 10px/);
@@ -119,7 +121,9 @@ test("artist mode hides global markets and keeps only artist markers at every zo
   assert.match(app,/const showHubs=activeMode==="popular";/);
   assert.match(app,/\["artist-points","artist-hit"\]\.forEach\(id=>setLayerVisible\(id,artist\)\)/);
   assert.match(app,/\["clusters","cluster-hit","event-points","event-hit","event-labels"\]\.forEach\(id=>setLayerVisible\(id,area\)\)/);
-  assert.doesNotMatch(app,/showHubs=activeMode==="popular" \|\| overviewZoom/);
+  assert.match(app,/const overviewZoom=map\.getZoom\(\)<4\.7/);
+  assert.match(app,/const showHubs=activeMode==="popular" \|\| \(area && overviewZoom\)/);
+  assert.match(app,/const showArea=area && !overviewZoom/);
   assert.doesNotMatch(app,/artist && !overviewZoom/);
 });
 

@@ -186,7 +186,11 @@ export default {
       const u = new URL(request.url);
       const res = await env.ASSETS.fetch(new Request(u.origin + "/index.html", request));
       const headers = new Headers(res.headers);
-      headers.set("Cache-Control", "no-store, max-age=0");
+      headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+      headers.set("CDN-Cache-Control", "no-store");
+      headers.set("Cloudflare-CDN-Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      headers.set("Expires", "0");
       return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
     }
     /* legal/info pages: clean URLs -> /about, /contacts, /privacy, /terms */
@@ -220,11 +224,19 @@ export default {
     const type = (res.headers.get("content-type") || "").toLowerCase();
     const headers = new Headers(res.headers);
     if (path === "/concerts-app.js") {
-      headers.set("Cache-Control", "no-store, max-age=0");
+      headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+      headers.set("CDN-Cache-Control", "no-store");
+      headers.set("Cloudflare-CDN-Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      headers.set("Expires", "0");
       return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
     }
     if (type.includes("text/html") || path === "/data/desk.json") {
-      headers.set("Cache-Control", "no-store, max-age=0");
+      headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+      headers.set("CDN-Cache-Control", "no-store");
+      headers.set("Cloudflare-CDN-Cache-Control", "no-store");
+      headers.set("Pragma", "no-cache");
+      headers.set("Expires", "0");
       return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
     }
     if (path.startsWith("/photos/")) {
