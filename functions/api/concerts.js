@@ -1279,10 +1279,10 @@ export async function onRequestGet({ request, env, waitUntil }) {
   void region;
 
   if (mode === "hotspots") {
+    // Legacy/read-only endpoint. The live UI uses static worldwide hubs and
+    // never needs this request. Crucially, a visitor cannot start a Ticketmaster
+    // warmup or consume KV/API quota through this mode.
     const payload = await hotspotSnapshotPayload(env);
-    // Self-heal only when the map is effectively empty. A KV lock prevents a
-    // visitor stampede from multiplying Ticketmaster calls.
-    await scheduleMapWarmupIfSparse(env,waitUntil,payload?.hotspots?.length||0);
     return json(payload, 200, {
       "Cache-Control": payload.partial
         ? "public, max-age=30, s-maxage=60"
