@@ -14,13 +14,14 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
-test("Subscribe compositor-scales the complete rendered pill including text",()=>{
+test("Subscribe scales only its background so text is never raster-scaled",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
-  assert.match(page,/\.press-pill\{[^}]*transform:translateZ\(0\) scale\(1\)!important;[^}]*will-change:transform/);
-  assert.match(page,/\.press-pill\.press\{transform:translateZ\(0\) scale\(\.985\)!important\}/);
-  assert.match(page,/\.press-pill-label\{[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
-  assert.doesNotMatch(page,/\.press-pill\.press::before\{transform:scale/);
+  assert.match(page,/\.press-pill\{[^}]*transform:none!important/);
+  assert.match(page,/\.press-pill::before\{[^}]*transform:scale\(1\);[^}]*will-change:transform/);
+  assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.985\)\}/);
+  assert.match(page,/\.press-pill-label\{[^}]*transform:none;translate:none;transition:none/);
+  assert.doesNotMatch(page,/\.press-pill\.press\{[^}]*scale\(/);
 });
 
 test("chart artwork is server-audited and has no browser point-fix table",()=>{
@@ -92,4 +93,11 @@ test("valid empty Desk feed does not resurrect bundled News/Releases",()=>{
   assert.match(page,/if\(!j \|\| !Array\.isArray\(j\.posts\)\) throw new Error\("invalid desk payload"\)/);
   assert.match(page,/const live = j\.posts\.filter\(isLivePost\);[\s\S]*paint\(live\);/);
   assert.doesNotMatch(page,/paint\(live\.length \? live :/);
+});
+
+
+test("Load More scales only its background so its text stays sharp",()=>{
+  assert.match(page,/\.loadmore-btn::before\{[^}]*transform:scale\(1\);[^}]*will-change:transform/);
+  assert.match(page,/\.loadmore-btn:active::before\{transform:scale\(\.98\)\}/);
+  assert.doesNotMatch(page,/\.loadmore-btn:active\{transform:scale/);
 });

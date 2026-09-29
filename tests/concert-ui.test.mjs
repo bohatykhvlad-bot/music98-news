@@ -18,11 +18,13 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
   assert.match(app,/\.venue-event-name\{display:block;font-size:var\(--event-main-size\)/);
 });
 
-test("Buy Tickets compositor-scales the complete rendered pill including text",()=>{
-  assert.match(app,/\.buy\{[^}]*transform:translateZ\(0\) scale\(1\);[^}]*will-change:transform/);
-  assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
-  assert.match(app,/\.buy\.press\{transform:translateZ\(0\) scale\(\.985\)\}/);
-  assert.doesNotMatch(app,/\.buy\.press::before\{transform:scale/);
+test("Buy Tickets scales only its background so text is never raster-scaled",()=>{
+  assert.match(app,/\.buy\{[^}]*transform:none;transition:color/);
+  assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);[^}]*will-change:transform/);
+  assert.match(app,/\.buy\.press::before\{transform:scale\(\.985\)\}/);
+  assert.match(app,/\.buy-label\{[^}]*transform:none;translate:none;transition:none/);
+  assert.doesNotMatch(app,/\.buy\.press\{[^}]*scale\(/);
+  assert.doesNotMatch(app,/\.buy\.press \.buy-label/);
 });
 
 test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
