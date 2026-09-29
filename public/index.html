@@ -110,8 +110,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none;justify-self:start}
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
-.nav{justify-self:center;display:flex;align-items:center;height:40px;gap:6px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}
-.nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+.nav{justify-self:center;display:flex;align-items:center;justify-content:stretch;width:430px;max-width:100%;height:40px;gap:6px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}
+.nav-btn{flex:1 1 0;min-width:0;border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 10px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 /* optical ink centering (owner: text reads high even though the pixel
    envelope is symmetric 11/11 and 19/18): cap-height words concentrate mass
    above the midline, so the eye wants a hair more air on top. Nudge the text
@@ -486,7 +486,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .sub-in form{display:flex;gap:12px;max-width:460px;margin:0 auto}
 .sub-in input{border-radius:999px;height:43px;padding:0 18px;background:rgba(255,255,255,.75)}
 .sub-in input:focus,.sub-in input:focus-visible{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent);outline:none}
-.sub-in .btn{height:43px;padding:0 24px;display:inline-flex;align-items:center;justify-content:center}
+.sub-in .btn{height:43px;padding:0 24px;display:inline-flex;align-items:center;justify-content:center}\n.sub-in .btn.primary{--m98-press-bg:var(--accent);--m98-press-border:var(--accent);--m98-press-scale:.92;--m98-press-font:14px;--m98-press-font-pressed:13px}
 .btn{border:1px solid var(--line);background:var(--bg2);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
 .btn:hover{border-color:var(--accent-dim);color:var(--acc2)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#03282b}
@@ -851,7 +851,7 @@ textarea{resize:vertical;min-height:64px}
   <div class="sub-in">
     <h2>The week in one email</h2>
     <p>News, releases and the Top 50 — Fridays.</p>
-    <form id="subForm"><input type="email" required placeholder="your@email.com"><button class="btn primary" type="submit">Subscribe</button></form>
+    <form id="subForm"><input type="email" required placeholder="your@email.com"><button class="btn primary" type="submit" data-m98-press data-m98-press-mode="pill"><span class="m98-press-label">Subscribe</span></button></form>
   </div>
 </section>
 
@@ -1178,10 +1178,15 @@ const lsSet = v => lsSetRaw(KEY, v);
 
 /* ============ settings & Apple integrations ============ */
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v28";
+const DAILYKEY = "music98news_daily_v29";
+const CHART_BROWSER_CACHE_MS = 60*60*1000;
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
+const CHART_COVER_FIXES=[
+  {title:"loser",artist:"tame impala",art:"https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/57/6f/a2/576fa272-91c5-658d-9d05-88d9787c0f1d/196873662978.jpg/600x600bb.jpg"},
+  {title:"get lucky",artist:"daft punk",art:"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/600x600bb.jpg"}
+];
 const DESK_URL = "admin-desk";
 let S = Object.assign({at:APPLE_AT, ct:APPLE_CT, autoChart:true, feed:"us-songs"}, (()=>{
   try{
@@ -2064,9 +2069,15 @@ function setChartStatus(f, tag){
   st.hidden = !txt;
 }
 function todayUTC(){ return new Date().toISOString().slice(0,10); }
+function chartCoverFix(title,artist,art){
+  const clean=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+  const t=clean(title),a=clean(artist);
+  const hit=CHART_COVER_FIXES.find(x=>t.startsWith(x.title) && a.includes(x.artist));
+  return hit?.art||art||"";
+}
 function rowsFromTracks(tracks){
   return (tracks||[]).map(t=>({
-    title: t.title, artist: t.artist, url: t.url ? aff(t.url) : "", art: t.art||"",
+    title: t.title, artist: t.artist, url: t.url ? aff(t.url) : "", art: chartCoverFix(t.title,t.artist,t.art),
     prev: applePreview(t.prev||t.preview||""), year: t.year||"",
     weeks: t.weeks||1, delta: t.delta==null ? "0" : String(t.delta)
   }));
@@ -2094,17 +2105,20 @@ function refreshDailyTop50(){
   }
   let cached = null;
   try{ cached = JSON.parse(lsGetRaw(DAILYKEY)||"null"); }catch(e){ cached = null; }
-  if(cached && cached.date === todayUTC() && cached.tracks && cached.tracks.length >= 10){
+  const hasTodayCache=!!(cached && cached.date === todayUTC() && cached.tracks && cached.tracks.length >= 10);
+  if(hasTodayCache){
     applyDaily(cached.tracks, "cache");
-    return;
+    const age=Date.now()-Number(cached.fetchedAt||0);
+    if(Number.isFinite(age) && age>=0 && age<CHART_BROWSER_CACHE_MS) return;
+  }else{
+    applyDaily(TOP50, "snap");
   }
-  applyDaily(TOP50, "snap");
-  const grab = u => fetch(u).then(r=>{ if(!r.ok) throw 0; return r.json(); });
+  const grab = u => fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   /* ?d= keys the CDN cache per day: no 24h-old responses survive a reset */
   grab("/api/top50?d=" + todayUTC()).catch(()=> grab("/data/top50.json")).then(j=>{
     const tracks = (j && j.tracks) || [];
     if(tracks.length < 10) throw 0;
-    lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
+    lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), fetchedAt:Date.now(), tracks}));
     applyDaily(tracks, "live");
   }).catch(()=>{});
 }
@@ -3660,6 +3674,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260929-28" defer></script>
+<script src="/ui-press.js?v=20260929-1"></script>\n<script src="/concerts-app.js?v=20260929-29" defer></script>
 </body>
 </html>

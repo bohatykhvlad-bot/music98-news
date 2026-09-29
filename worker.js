@@ -2,10 +2,8 @@ import { onRequest as desk } from "./functions/api/desk.js";
 import { onRequestGet as top50 } from "./functions/api/top50.js";
 import {
   onRequestGet as concerts,
-  refreshHotspotSnapshot,
   refreshPopularSnapshot,
   refreshPopularTourSnapshots,
-  refreshCapitalEventSnapshots,
 } from "./functions/api/concerts.js";
 import { onRequestGet as preview } from "./functions/api/preview.js";
 import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
@@ -237,14 +235,12 @@ export default {
     ctx.waitUntil((async()=>{
       const dailyKickoff=String(controller?.cron||"")==="15 3 * * *";
 
-      // The half-hour job advances resumable background state. The 03:15 UTC
-      // job explicitly starts a fresh Popular ranking once per day.
-      // Prioritize cheap visible data first, then finish the daily Top 30
-      // before the heavier world scan can consume the remaining subrequests.
-      try{ await refreshCapitalEventSnapshots(env,2); }catch(e){}
+      // The map's world/capital entry points are static client assets, so the
+      // scheduled Worker no longer spends Ticketmaster/KV quota scanning the
+      // world or prewarming capital cities. Only Popular and its tour caches
+      // advance in the background; the 03:15 UTC run starts the daily ranking.
       try{ await refreshPopularSnapshot(env,dailyKickoff); }catch(e){}
       try{ await refreshPopularTourSnapshots(env,4); }catch(e){}
-      try{ await refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 12 }); }catch(e){}
     })());
   },
 };

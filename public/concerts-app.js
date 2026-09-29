@@ -1,7 +1,7 @@
 "use strict";
 
-const CONCERTS_CSS="\n:host{\n  --bg:#fff;--bg2:#f4f6f7;--card:#fff;--card2:#edf1f2;--line:#e2e8ea;--text:#15181a;--muted:#5c6a70;\n  --muted2:#8a969b;--accent:#00fdfb;--shadow:0 12px 34px rgba(15,45,55,.10);--r:16px;\n  --event-date-size:11.5px;--event-main-size:12.5px;--event-sub-size:11px;--event-art-size:42px;--event-date-col:54px;--event-gap:8px;--event-pad-y:9px;--event-pad-x:10px;--event-radius:14px;\n  --font:\"Pretendard\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif;\n}\n*{box-sizing:border-box}\nhtml{overflow-x:clip}\nbody{margin:0;padding-top:70px;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.45;-webkit-font-smoothing:antialiased}\nbutton,input,select{font:inherit}\na{color:inherit}\n.topbar{position:fixed;inset:0 0 auto;z-index:20;background:rgba(255,255,255,.82);border-bottom:1px solid rgba(226,232,234,.85);backdrop-filter:blur(14px) saturate(170%);-webkit-backdrop-filter:blur(14px) saturate(170%)}\n.topbar-in{max-width:1180px;margin:auto;height:68px;padding:0 20px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}\n.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:20px;letter-spacing:-.015em}\n.brand img{width:40px;height:40px;border-radius:50%}\n.nav{justify-self:center;display:flex;align-items:center;height:40px;gap:6px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}\n.nav-btn{border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 18px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;position:relative;top:.5px}\n.nav-btn:hover{color:var(--text)}\n.nav-btn.active{background:var(--accent);color:#03282b}\n.topfill{justify-self:end;color:var(--muted);font-size:13px}\n.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 50px}\n.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 16px}\n.hero h1{font-size:clamp(30px,4vw,44px);line-height:1.05;letter-spacing:-.04em;margin:0}\n.hero p{margin:0;color:var(--muted);font-size:15px}\n.controls{display:grid;grid-template-columns:minmax(260px,1fr) 160px 122px;gap:10px;margin:0 0 16px}\n.search-wrap{position:relative}\n.city-input{width:100%;height:43px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);padding:0 16px 0 41px;outline:none;color:var(--text);font-size:14px}\n.city-input:focus,.city-input:focus-visible{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent);outline:none}\n.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted2);pointer-events:none}\n.suggestions{position:absolute;z-index:30;top:49px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}\n.suggestion{width:100%;min-height:48px;border:0;background:#fff;text-align:left;padding:7px 12px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:10px}\n.suggestion:hover,.suggestion:focus{background:var(--bg2);outline:none}\n.suggestion-art{width:36px;height:36px;flex:0 0 36px;border:1px solid var(--line);border-radius:10px;object-fit:cover;background:var(--card2)}\n.suggestion-copy{min-width:0;display:flex;flex-direction:column}\n.suggestion-title{font-size:13.5px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.suggestion-kind{font-size:10.5px;color:var(--muted);margin-top:2px}\n.suggestion-location{padding-left:14px}\n.action,.radius-trigger{height:43px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);padding:0 18px;color:var(--text);font-size:14px;font-weight:600;white-space:nowrap;font-family:var(--font);outline:none;-webkit-tap-highlight-color:transparent}\n.action{width:160px;cursor:pointer}\n.action:hover,.radius-trigger:hover{border-color:var(--line)}\n.radius-menu{position:relative;width:122px;min-width:122px;max-width:122px}\n.radius-trigger{width:122px;min-width:122px;max-width:122px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;outline:none;font-variant-numeric:tabular-nums}\n.radius-chevron{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}\n.radius-menu.open .radius-chevron{transform:rotate(180deg)}\n.radius-options{position:absolute;z-index:40;top:calc(100% + 7px);right:0;width:122px;min-width:122px;max-width:122px;padding:5px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 30px rgba(15,45,55,.13);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-5px);transform-origin:top right;transition:opacity .14s ease,transform .16s ease,visibility .16s}\n.radius-menu.open .radius-options{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}\n.radius-option{width:100%;height:34px;display:flex;align-items:center;justify-content:flex-start;border:0;border-radius:999px;background:transparent;padding:0 13px;color:var(--text);font:600 13.5px/1 var(--font);cursor:pointer;white-space:nowrap}\n.radius-option:hover{background:var(--bg2)}\n.radius-option.active{background:var(--accent);color:#03282b}\n.layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:16px;align-items:start}\n.map-shell{position:relative;height:420px;min-height:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fafbfb;box-shadow:var(--shadow)}\n@media(min-width:1100px){.map-shell{width:100%;height:420px}}\n#map{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}\n#map .mapboxgl-map,#map .mapboxgl-canvas-container{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important}\n#map .mapboxgl-canvas{display:block;margin:0!important}\n.map-status{position:absolute;z-index:5;left:14px;top:14px;max-width:min(560px,calc(100% - 28px));padding:8px 12px;border:1px solid rgba(255,255,255,.92);background:#fff;border-radius:999px;box-shadow:0 4px 14px rgba(15,45,55,.08);font-size:12.5px;color:#425158}\n.map-status:empty{display:none}\n.map-shell.artist-context .map-status{top:62px}\n.map-mode-switch{position:absolute;z-index:8;left:14px;top:14px;max-width:calc(100% - 28px);height:40px;padding:4px;display:inline-flex;align-items:center;gap:4px;border:1px solid rgba(15,60,64,.14);border-radius:999px;background:#fff;box-shadow:0 4px 14px rgba(15,45,55,.08)}\n.map-mode-switch[hidden]{display:none!important}\n.map-mode-btn{height:32px;min-width:0;max-width:220px;padding:0 16px;border:0;border-radius:999px;background-color:transparent;color:var(--muted);font:600 14px/1 var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,color .18s ease}\n.map-mode-btn.active{background-color:var(--accent);color:#03282b}\n.map-mode-btn:hover{color:var(--text)}\n.map-mode-btn.active:hover{color:#03282b}\n.map-tool-stack{position:absolute;z-index:8;right:14px;top:14px;display:flex;gap:6px}\n.map-tool-btn,.search-area-btn{border:1px solid rgba(15,60,64,.14);background:#fff;color:var(--text);font:600 12.5px/1 var(--font);box-shadow:0 4px 14px rgba(15,45,55,.08);cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}\n.map-tool-btn{height:34px;padding:0 12px;border-radius:999px}\n.map-tool-btn:hover,.search-area-btn:hover{background:var(--accent);border-color:var(--accent);color:#03282b}\n.map-tool-btn[hidden],.search-area-btn[hidden]{display:none!important}\n.search-area-btn{position:absolute;z-index:8;left:50%;bottom:16px;translate:-50% 0;height:36px;padding:0 16px;border-radius:999px;white-space:nowrap}\n.side{border:1px solid var(--line);border-radius:var(--r);background:#fff;padding:13px;height:420px;min-height:420px;display:flex;flex-direction:column;box-shadow:var(--shadow);overflow:hidden}\n.side-tabs{\n  width:auto;max-width:100%;display:inline-flex;align-items:center;align-self:center;gap:4px;\n  height:40px;padding:4px;background:rgba(255,255,255,.55);\n  border:1px solid rgba(15,60,64,.14);border-radius:999px;margin:0 0 10px;\n  position:relative;top:auto;z-index:5;flex:0 0 auto;pointer-events:none\n}\n.side-tab{\n  flex:0 0 auto;width:auto;min-width:0;max-width:190px;height:32px;padding:0 18px;border:0;border-radius:999px;\n  background:transparent;color:var(--muted);font-size:14px;font-weight:600;\n  line-height:1;text-box:trim-both cap alphabetic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;\n  transition:background .16s ease,color .16s ease;pointer-events:auto;outline:none;-webkit-tap-highlight-color:transparent\n}\n.side-tab:hover{color:var(--text)}\n.side-tab.active{background:var(--accent);color:#03282b}\n.side-sub{font-size:12.5px;color:var(--muted);margin:0 4px 10px;line-height:1.4;flex:0 0 auto}\n.tours{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-gutter:stable;padding-right:3px;overscroll-behavior:contain}\n.tour-card{\n  flex:0 0 auto;min-height:62px;\n  border:1px solid transparent;border-radius:24px;overflow:hidden;background:transparent;\n  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease\n}\n.tour-card.open{\n  background:var(--bg2);border-color:var(--line);box-shadow:0 6px 18px rgba(15,45,55,.06)\n}\n.tour-row{\n  width:100%;min-height:62px;display:grid;grid-template-columns:24px 48px minmax(0,1fr) 18px;gap:8px;align-items:center;\n  border:0;background:transparent;border-radius:999px;padding:7px 8px;text-align:left;cursor:pointer;color:var(--text);\n  transition:background .16s ease\n}\n.tour-row:hover{background:var(--bg2)}\n.tour-card.open .tour-row{background:#fff}\n.tour-rank{font-weight:800;font-size:11.5px;color:#879398;text-align:center;font-variant-numeric:tabular-nums}\n.tour-art{width:48px;height:48px;padding:2px;border-radius:12px;border:1px solid var(--line);background:#fff;overflow:hidden;transition:.16s}\n.tour-art img{width:100%;height:100%;display:block;object-fit:cover;border-radius:9px;background:var(--card2)}\n.tour-card.open .tour-art{background:var(--accent);border-color:var(--accent)}\n.tour-copy{min-width:0}\n.tour-name{display:block;font-size:15px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.015em;text-rendering:geometricPrecision}\n.tour-meta{display:block;font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-rendering:geometricPrecision}\n.tour-chevron{width:18px;height:18px;display:grid;place-items:center;color:var(--muted);transition:transform .18s ease}\n.tour-chevron svg{width:14px;height:14px}\n.tour-card.open .tour-chevron{transform:rotate(90deg)}\n.tour-events{\n  max-height:0;opacity:0;overflow:hidden;pointer-events:none;\n  padding:0 9px;\n  transition:max-height .28s cubic-bezier(.3,.7,.4,1),opacity .18s ease,padding .28s cubic-bezier(.3,.7,.4,1)\n}\n.tour-card.open .tour-events{\n  max-height:4800px;opacity:1;pointer-events:auto;padding:2px 9px 10px\n}\n.tour-loading,.tour-none{font-size:11.5px;color:var(--muted);padding:7px 2px 9px}\n.event-link{\n  width:100%;display:grid;grid-template-columns:var(--event-date-col) var(--event-art-size) minmax(0,1fr);gap:var(--event-gap);border:0;\n  background:rgba(255,255,255,.72);color:inherit;text-align:left;cursor:pointer;text-decoration:none;\n  padding:var(--event-pad-y) var(--event-pad-x);border-radius:var(--event-radius);margin:4px 0;align-items:center;outline:none\n}\n.event-link:hover{background:#fff}\n.event-date{font-size:var(--event-date-size);font-weight:800;color:var(--text);text-transform:uppercase;line-height:1.25;text-rendering:geometricPrecision}\n.event-art{width:var(--event-art-size);height:var(--event-art-size);border-radius:10px;object-fit:cover;background:var(--card2);display:block}\n.event-place{min-width:0}\n.event-city{display:block;font-size:var(--event-main-size);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-rendering:geometricPrecision}\n.event-venue{display:block;font-size:var(--event-sub-size);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;text-rendering:geometricPrecision}\n.side-empty{font-size:12.5px;color:var(--muted);padding:12px 5px}\n.disclosure{margin-top:8px;padding:10px 4px 2px;font-size:10.5px;color:#7a878c;line-height:1.4;flex:0 0 auto}\n.mapboxgl-popup{max-width:var(--pop-w,286px)!important}\n.mapboxgl-popup-content{width:var(--pop-w,286px);max-width:calc(100vw - 28px);padding:0;border-radius:var(--pop-radius,15px);overflow:hidden;box-shadow:0 14px 38px rgba(15,45,55,.2);font-family:var(--font)}\n.pop-img{display:block;width:100%;height:var(--pop-img-h,142px);object-fit:cover;background:#eef2f3}\n.pop-body{padding:var(--pop-pad,13px)}\n.pop-title{font-size:var(--pop-title-size,16px);font-weight:800;line-height:1.18;margin:0 26px var(--pop-title-gap,6px) 0}\n.pop-meta{font-size:var(--pop-meta-size,13px);color:#56656b;margin:var(--pop-meta-gap,3px) 0}\n.venue-list{max-height:var(--venue-list-h,190px);overflow:auto;padding:2px 0 0;scrollbar-width:thin}\n.buy{position:relative;isolation:isolate;width:112px;max-width:100%;height:36px;margin:10px auto 0;padding:0;border:0;border-radius:999px;background:transparent;color:var(--text);text-decoration:none;font-family:var(--font);font-weight:700;outline:none;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:color .16s ease}\n.buy::before{content:\"\";position:absolute;z-index:-1;inset:1px 2px;border:1px solid var(--line);border-radius:999px;background:#fff;transform:scale(1);transform-origin:50% 50%;transition:transform .09s cubic-bezier(.34,1.2,.64,1),background .14s ease,border-color .14s ease;will-change:transform}\n.buy-label{position:relative;width:100%;height:100%;display:grid;place-items:center;font-size:13px;line-height:1;white-space:nowrap;text-rendering:geometricPrecision;transform:none;translate:none;transition:none;-webkit-font-smoothing:antialiased}\n.mapboxgl-popup-close-button{font-size:20px;padding:5px 8px;color:#344}\n.mapboxgl-ctrl-group{border-radius:11px!important;overflow:hidden}\n.action,.radius-trigger,.side-tab,.tour-row,.event-link,.suggestion,.mapboxgl-ctrl button{\n  transform:none!important;transition:background .16s ease,border-color .16s ease,box-shadow .16s ease,color .16s ease;\n}\n.action:active,.radius-trigger:active,.side-tab:active,.tour-row:active,.event-link:active,.suggestion:active,.mapboxgl-ctrl button:active{transform:none!important}\n.buy:hover{color:#03282b}\n.buy:hover::before{background:var(--accent);border-color:var(--accent)}\n.buy.press::before{transform:scale(.92)}\n.buy.press .buy-label{font-size:12px}\n@media(prefers-reduced-motion:reduce){\n  .action,.radius-trigger,.side-tab,.tour-row,.event-link,.buy,.suggestion,.mapboxgl-ctrl button{transition:none}\n}\n@media(max-width:900px){\n  .layout{grid-template-columns:1fr}\n  .map-shell{height:420px}\n  .side{height:auto;max-height:620px}\n  .topfill{display:none}\n}\n@media(max-width:700px){\n  body{padding-top:126px}\n  .topbar-in{height:auto;min-height:118px;padding:8px 14px;display:flex;flex-wrap:wrap;gap:8px}\n  .brand{font-size:17px}\n  .brand img{width:32px;height:32px}\n  .nav{order:3;width:100%;height:48px;gap:4px;padding:4px;justify-content:stretch;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14)}\n  .nav-btn{flex:1;height:40px;padding:0 8px;font-size:13px;justify-content:center}\n  .wrap{padding:18px 14px 36px}\n  .hero{align-items:flex-start;flex-direction:column}\n  .controls{grid-template-columns:minmax(0,1.35fr) minmax(96px,.65fr);gap:8px}\n  .search-wrap{grid-column:1/-1}\n  .city-input,.action,.radius-trigger{height:46px}\n  .action,.radius-menu,.radius-trigger{width:100%;min-width:0;max-width:none}.action,.radius-trigger{padding:0 12px}\n  .radius-options{width:100%;min-width:100%;max-width:none}\n  .radius-option{height:42px}\n  .suggestions{top:52px;max-height:min(55svh,360px);overflow-y:auto;overscroll-behavior:contain}\n  .map-shell{height:min(58svh,460px);min-height:350px;max-height:460px;border-radius:15px}\n  .map-mode-switch{left:10px;top:10px;max-width:calc(100% - 20px)}\n  .map-mode-btn{height:36px;padding:0 13px;font-size:13px}\n  .map-tool-stack{left:52px;right:52px;top:auto;bottom:10px;gap:5px;justify-content:center}\n  .map-tool-btn{height:40px;padding:0 12px;font-size:12px}\n  .search-area-btn{bottom:60px;height:40px}\n  .map-shell.artist-context .map-status{top:60px}\n  .mapboxgl-ctrl button{width:42px!important;height:42px!important}\n  .mapboxgl-popup-close-button{width:40px;height:40px;padding:0;display:grid;place-items:center;line-height:1}\n  .side{border-radius:15px;max-height:none}\n  .side-tabs{height:44px}\n  .side-tab{height:36px}\n  .tours{overflow:visible;padding-right:0;scrollbar-gutter:auto}\n  .tour-events{padding-left:9px}\n  .buy{min-height:38px}\n}\n@media(max-width:390px){\n  .controls{grid-template-columns:minmax(0,1fr) 104px}\n  .action,.radius-trigger{font-size:13px;padding:0 10px}\n  .map-shell{min-height:330px;height:54svh}\n}\n\n:host{display:block;width:100%;font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}\n.wrap{padding:0 0 18px;max-width:none}\n.hero{margin:0 0 16px;align-items:center}\n.hero h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.03em;margin:0}\n.hero p{font-size:15px}\n\n.tour-more{width:fit-content;max-width:100%;height:32px;padding:0 16px;margin:5px auto 5px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:999px;background:var(--bg2);color:var(--text);font-size:12.5px;font-weight:600;line-height:1;text-box:trim-both cap alphabetic;cursor:pointer;outline:none;transform-origin:center;transition:transform .12s cubic-bezier(.34,1.2,.64,1),background .15s ease,border-color .15s ease,box-shadow .15s ease;-webkit-tap-highlight-color:transparent;will-change:transform}.tour-more:hover{background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba(15,30,34,.07)}.tour-more:active{transform:scale(.96);background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba(15,30,34,.08)}\n\n.venue-event{width:100%;border:0;background:rgba(255,255,255,.72);border-radius:var(--event-radius);padding:var(--event-pad-y) var(--event-pad-x);display:grid;grid-template-columns:var(--event-date-col) var(--event-art-size) minmax(0,1fr);gap:var(--event-gap);align-items:center;text-align:left;color:var(--text);cursor:pointer;outline:none;margin:4px 0}\n.venue-event:hover{background:#fff}\n.venue-event-date{font-size:var(--event-date-size);font-weight:800;text-transform:uppercase;line-height:1.25}\n.venue-event-art{width:var(--event-art-size);height:var(--event-art-size);border-radius:10px;object-fit:cover;background:var(--card2);display:block}\n.venue-event-copy{min-width:0}\n.venue-event-name{display:block;font-size:var(--event-main-size);font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.venue-event-time{display:block;font-size:var(--event-sub-size);color:var(--muted);margin-top:2px}\n";
-const CONCERTS_HTML="<main class=\"wrap\">\n  <section class=\"hero\">\n    <div>\n      <h1>Concerts Near You</h1>\n      \n    </div>\n  </section>\n\n  <div class=\"controls\">\n    <div class=\"search-wrap\">\n      <svg class=\"search-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/></svg>\n      <input class=\"city-input\" id=\"citySearch\" type=\"search\" autocomplete=\"off\" placeholder=\"Search city or artist...\" aria-label=\"Search city or artist\">\n      <div class=\"suggestions\" id=\"suggestions\" hidden></div>\n    </div>\n    <button class=\"action\" id=\"locateBtn\" type=\"button\">Use my location</button>\n    <div class=\"radius-menu\" id=\"radiusMenu\">\n      <input id=\"radius\" type=\"hidden\" value=\"100\">\n      <button class=\"radius-trigger\" id=\"radiusTrigger\" type=\"button\" aria-haspopup=\"listbox\" aria-expanded=\"false\">\n        <span id=\"radiusLabel\">100 km</span>\n        <svg class=\"radius-chevron\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"m6 8 4 4 4-4\"/></svg>\n      </button>\n      <div class=\"radius-options\" id=\"radiusOptions\" role=\"listbox\" aria-label=\"Search radius\">\n        <button class=\"radius-option\" type=\"button\" role=\"option\" data-value=\"25\" aria-selected=\"false\">25 km</button>\n        <button class=\"radius-option\" type=\"button\" role=\"option\" data-value=\"50\" aria-selected=\"false\">50 km</button>\n        <button class=\"radius-option active\" type=\"button\" role=\"option\" data-value=\"100\" aria-selected=\"true\">100 km</button>\n        <button class=\"radius-option\" type=\"button\" role=\"option\" data-value=\"250\" aria-selected=\"false\">250 km</button>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"layout\">\n    <section class=\"map-shell\" id=\"mapShell\" aria-label=\"Concert map\">\n      <div id=\"map\"></div>\n      <div class=\"map-mode-switch\" id=\"mapModeSwitch\" role=\"tablist\" aria-label=\"Map concert filter\" hidden>\n        <button class=\"map-mode-btn active\" id=\"mapArtistBtn\" type=\"button\" role=\"tab\" aria-selected=\"true\">Artist</button>\n        <button class=\"map-mode-btn\" id=\"mapAllBtn\" type=\"button\" role=\"tab\" aria-selected=\"false\">All concerts</button>\n      </div>\n      <div class=\"map-tool-stack\" aria-label=\"Map tools\">\n        <button class=\"map-tool-btn\" id=\"overviewBtn\" type=\"button\">Overview</button>\n        <button class=\"map-tool-btn\" id=\"fitBtn\" type=\"button\" hidden>Fit results</button>\n      </div>\n      <button class=\"search-area-btn\" id=\"searchAreaBtn\" type=\"button\" hidden>Search this area</button>\n      <div class=\"map-status\" id=\"status\"></div>\n    </section>\n    <aside class=\"side\">\n      <div class=\"side-tabs\" role=\"tablist\" aria-label=\"Concert discovery\">\n        <button class=\"side-tab\" id=\"nearTab\" type=\"button\" role=\"tab\" aria-selected=\"false\">Near me</button>\n        <button class=\"side-tab active\" id=\"popularTab\" type=\"button\" role=\"tab\" aria-selected=\"true\">Popular</button>\n      </div>\n      <p class=\"side-sub\" id=\"sideSub\">Top 30 popular artists with upcoming Ticketmaster shows.</p>\n      <div class=\"tours\" id=\"tours\"></div>\n      <div class=\"side-empty\" id=\"sideEmpty\">Loading popular artists...</div>\n      <p class=\"disclosure\">Ticketing by Ticketmaster.</p>\n    </aside>\n  </div>\n</main>";
+const CONCERTS_CSS="\n:host{\n  --bg:#fff;--bg2:#f4f6f7;--card:#fff;--card2:#edf1f2;--line:#e2e8ea;--text:#15181a;--muted:#5c6a70;\n  --muted2:#8a969b;--accent:#00fdfb;--shadow:0 12px 34px rgba(15,45,55,.10);--r:16px;\n  --event-date-size:11.5px;--event-main-size:12.5px;--event-sub-size:11px;--event-art-size:42px;--event-date-col:54px;--event-gap:8px;--event-pad-y:9px;--event-pad-x:10px;--event-radius:14px;\n  --font:\"Pretendard\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif;\n}\n*{box-sizing:border-box}\nhtml{overflow-x:clip}\nbody{margin:0;padding-top:70px;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.45;-webkit-font-smoothing:antialiased}\nbutton,input,select{font:inherit}\na{color:inherit}\n.topbar{position:fixed;inset:0 0 auto;z-index:20;background:rgba(255,255,255,.82);border-bottom:1px solid rgba(226,232,234,.85);backdrop-filter:blur(14px) saturate(170%);-webkit-backdrop-filter:blur(14px) saturate(170%)}\n.topbar-in{max-width:1180px;margin:auto;height:68px;padding:0 20px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}\n.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:20px;letter-spacing:-.015em}\n.brand img{width:40px;height:40px;border-radius:50%}\n.nav{justify-self:center;display:flex;align-items:center;justify-content:stretch;width:430px;max-width:100%;height:40px;gap:6px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}\n.nav-btn{flex:1 1 0;min-width:0;border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 10px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;position:relative;top:.5px}\n.nav-btn:hover{color:var(--text)}\n.nav-btn.active{background:var(--accent);color:#03282b}\n.topfill{justify-self:end;color:var(--muted);font-size:13px}\n.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 50px}\n.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 16px}\n.hero h1{font-size:clamp(30px,4vw,44px);line-height:1.05;letter-spacing:-.04em;margin:0}\n.hero p{margin:0;color:var(--muted);font-size:15px}\n.controls{display:grid;grid-template-columns:minmax(260px,1fr) 160px 122px;gap:10px;margin:0 0 16px}\n.search-wrap{position:relative}\n.city-input{width:100%;height:43px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);padding:0 16px 0 41px;outline:none;color:var(--text);font-size:14px}\n.city-input:focus,.city-input:focus-visible{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent);outline:none}\n.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted2);pointer-events:none}\n.suggestions{position:absolute;z-index:30;top:49px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}\n.suggestion{width:100%;min-height:48px;border:0;background:#fff;text-align:left;padding:7px 12px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:10px}\n.suggestion:hover,.suggestion:focus{background:var(--bg2);outline:none}\n.suggestion-art{width:36px;height:36px;flex:0 0 36px;border:1px solid var(--line);border-radius:10px;object-fit:cover;background:var(--card2)}\n.suggestion-copy{min-width:0;display:flex;flex-direction:column}\n.suggestion-title{font-size:13.5px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.suggestion-kind{font-size:10.5px;color:var(--muted);margin-top:2px}\n.suggestion-location{padding-left:14px}\n.action,.radius-trigger{height:43px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);padding:0 18px;color:var(--text);font-size:14px;font-weight:600;white-space:nowrap;font-family:var(--font);outline:none;-webkit-tap-highlight-color:transparent}\n.action{width:160px;cursor:pointer}\n.action:hover,.radius-trigger:hover{border-color:var(--line)}\n.radius-menu{position:relative;width:122px;min-width:122px;max-width:122px}\n.radius-trigger{width:122px;min-width:122px;max-width:122px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;outline:none;font-variant-numeric:tabular-nums}\n.radius-chevron{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}\n.radius-menu.open .radius-chevron{transform:rotate(180deg)}\n.radius-options{position:absolute;z-index:40;top:calc(100% + 7px);right:0;width:122px;min-width:122px;max-width:122px;padding:5px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 30px rgba(15,45,55,.13);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-5px);transform-origin:top right;transition:opacity .14s ease,transform .16s ease,visibility .16s}\n.radius-menu.open .radius-options{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}\n.radius-option{width:100%;height:34px;display:flex;align-items:center;justify-content:flex-start;border:0;border-radius:999px;background:transparent;padding:0 13px;color:var(--text);font:600 13.5px/1 var(--font);cursor:pointer;white-space:nowrap}\n.radius-option:hover{background:var(--bg2)}\n.radius-option.active{background:var(--accent);color:#03282b}\n.layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:16px;align-items:start}\n.map-shell{position:relative;height:420px;min-height:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fafbfb;box-shadow:var(--shadow)}\n@media(min-width:1100px){.map-shell{width:100%;height:420px}}\n#map{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}\n#map .mapboxgl-map,#map .mapboxgl-canvas-container{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important}\n#map .mapboxgl-canvas{display:block;margin:0!important}\n.map-status{position:absolute;z-index:5;left:14px;top:14px;max-width:min(560px,calc(100% - 28px));padding:8px 12px;border:1px solid rgba(255,255,255,.92);background:#fff;border-radius:999px;box-shadow:0 4px 14px rgba(15,45,55,.08);font-size:12.5px;color:#425158}\n.map-status:empty{display:none}\n.map-shell.artist-context .map-status{top:62px}\n.map-mode-switch{position:absolute;z-index:8;left:14px;top:14px;max-width:calc(100% - 28px);height:40px;padding:4px;display:inline-flex;align-items:center;gap:4px;border:1px solid rgba(15,60,64,.14);border-radius:999px;background:#fff;box-shadow:0 4px 14px rgba(15,45,55,.08)}\n.map-mode-switch[hidden]{display:none!important}\n.map-mode-btn{height:32px;min-width:0;max-width:220px;padding:0 16px;border:0;border-radius:999px;background-color:transparent;color:var(--muted);font:600 14px/1 var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;transition:background-color .18s ease,color .18s ease}\n.map-mode-btn.active{background-color:var(--accent);color:#03282b}\n.map-mode-btn:hover{color:var(--text)}\n.map-mode-btn.active:hover{color:#03282b}\n.map-tool-stack{position:absolute;z-index:8;right:14px;top:14px;display:flex;gap:6px}\n.map-tool-btn,.search-area-btn{border:1px solid rgba(15,60,64,.14);background:#fff;color:var(--text);font:600 12.5px/1 var(--font);box-shadow:0 4px 14px rgba(15,45,55,.08);cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}\n.map-tool-btn{height:34px;padding:0 12px;border-radius:999px}\n.map-tool-btn:hover,.search-area-btn:hover{background:var(--accent);border-color:var(--accent);color:#03282b}\n.map-tool-btn[hidden],.search-area-btn[hidden]{display:none!important}\n.map-reset-btn{position:absolute;z-index:9;right:14px;top:14px;width:38px;height:38px;border:1px solid rgba(15,60,64,.14);border-radius:999px;background:#fff;color:var(--text);display:grid;place-items:center;padding:0;font:700 24px/1 var(--font);box-shadow:0 4px 14px rgba(15,45,55,.08);cursor:pointer;outline:none;--m98-press-scale:.92}\n.map-reset-btn:hover{background:var(--accent);border-color:var(--accent);color:#03282b}\n.search-area-btn{position:absolute;z-index:8;left:50%;bottom:16px;translate:-50% 0;height:36px;padding:0 16px;border-radius:999px;white-space:nowrap}\n.side{border:1px solid var(--line);border-radius:var(--r);background:#fff;padding:13px;height:420px;min-height:420px;display:flex;flex-direction:column;box-shadow:var(--shadow);overflow:hidden}\n.side-tabs{\n  width:auto;max-width:100%;display:inline-flex;align-items:center;align-self:center;gap:4px;\n  height:40px;padding:4px;background:rgba(255,255,255,.55);\n  border:1px solid rgba(15,60,64,.14);border-radius:999px;margin:0 0 10px;\n  position:relative;top:auto;z-index:5;flex:0 0 auto;pointer-events:none\n}\n.side-tab{\n  flex:0 0 auto;width:auto;min-width:0;max-width:190px;height:32px;padding:0 18px;border:0;border-radius:999px;\n  background:transparent;color:var(--muted);font-size:14px;font-weight:600;\n  line-height:1;text-box:trim-both cap alphabetic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;\n  transition:background .16s ease,color .16s ease;pointer-events:auto;outline:none;-webkit-tap-highlight-color:transparent\n}\n.side-tab:hover{color:var(--text)}\n.side-tab.active{background:var(--accent);color:#03282b}\n.side-sub{font-size:12.5px;color:var(--muted);margin:0 4px 10px;line-height:1.4;flex:0 0 auto}\n.tours{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-gutter:stable;padding-right:3px;overscroll-behavior:contain}\n.tour-card{\n  flex:0 0 auto;min-height:62px;\n  border:1px solid transparent;border-radius:24px;overflow:hidden;background:transparent;\n  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease\n}\n.tour-card.open{\n  background:var(--bg2);border-color:var(--line);box-shadow:0 6px 18px rgba(15,45,55,.06)\n}\n.tour-row{\n  width:100%;min-height:62px;display:grid;grid-template-columns:24px 48px minmax(0,1fr) 18px;gap:8px;align-items:center;\n  border:0;background:transparent;border-radius:999px;padding:7px 8px;text-align:left;cursor:pointer;color:var(--text);\n  transition:background .16s ease\n}\n.tour-row:hover{background:var(--bg2)}\n.tour-card.open .tour-row{background:#fff}\n.tour-rank{font-weight:800;font-size:11.5px;color:#879398;text-align:center;font-variant-numeric:tabular-nums}\n.tour-art{width:48px;height:48px;padding:2px;border-radius:12px;border:1px solid var(--line);background:#fff;overflow:hidden;transition:.16s}\n.tour-art img{width:100%;height:100%;display:block;object-fit:cover;border-radius:9px;background:var(--card2)}\n.tour-card.open .tour-art{background:var(--accent);border-color:var(--accent)}\n.tour-copy{min-width:0}\n.tour-name{display:block;font-size:15px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.015em;text-rendering:geometricPrecision}\n.tour-meta{display:block;font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-rendering:geometricPrecision}\n.tour-chevron{width:18px;height:18px;display:grid;place-items:center;color:var(--muted);transition:transform .18s ease}\n.tour-chevron svg{width:14px;height:14px}\n.tour-card.open .tour-chevron{transform:rotate(90deg)}\n.tour-events{\n  max-height:0;opacity:0;overflow:hidden;pointer-events:none;\n  padding:0 9px;\n  transition:max-height .28s cubic-bezier(.3,.7,.4,1),opacity .18s ease,padding .28s cubic-bezier(.3,.7,.4,1)\n}\n.tour-card.open .tour-events{\n  max-height:4800px;opacity:1;pointer-events:auto;padding:2px 9px 10px\n}\n.tour-loading,.tour-none{font-size:11.5px;color:var(--muted);padding:7px 2px 9px}\n.event-link{\n  width:100%;display:grid;grid-template-columns:var(--event-date-col) var(--event-art-size) minmax(0,1fr);gap:var(--event-gap);border:0;\n  background:rgba(255,255,255,.72);color:inherit;text-align:left;cursor:pointer;text-decoration:none;\n  padding:var(--event-pad-y) var(--event-pad-x);border-radius:var(--event-radius);margin:4px 0;align-items:center;outline:none\n}\n.event-link:hover{background:#fff}\n.event-date{font-size:var(--event-date-size);font-weight:800;color:var(--text);text-transform:uppercase;line-height:1.25;text-rendering:geometricPrecision}\n.event-art{width:var(--event-art-size);height:var(--event-art-size);border-radius:10px;object-fit:cover;background:var(--card2);display:block}\n.event-place{min-width:0}\n.event-city{display:block;font-size:var(--event-main-size);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-rendering:geometricPrecision}\n.event-venue{display:block;font-size:var(--event-sub-size);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;text-rendering:geometricPrecision}\n.side-empty{font-size:12.5px;color:var(--muted);padding:12px 5px}\n.disclosure{margin-top:8px;padding:10px 4px 2px;font-size:10.5px;color:#7a878c;line-height:1.4;flex:0 0 auto}\n.mapboxgl-popup{max-width:var(--pop-w,286px)!important}\n.mapboxgl-popup-content{width:var(--pop-w,286px);max-width:calc(100vw - 28px);padding:0;border-radius:var(--pop-radius,15px);overflow:hidden;box-shadow:0 14px 38px rgba(15,45,55,.2);font-family:var(--font)}\n.pop-img{display:block;width:100%;height:var(--pop-img-h,142px);object-fit:cover;background:#eef2f3}\n.pop-body{padding:var(--pop-pad,13px)}\n.pop-title{font-size:var(--pop-title-size,16px);font-weight:800;line-height:1.18;margin:0 26px var(--pop-title-gap,6px) 0}\n.pop-meta{font-size:var(--pop-meta-size,13px);color:#56656b;margin:var(--pop-meta-gap,3px) 0}\n.venue-list{max-height:var(--venue-list-h,190px);overflow:auto;padding:2px 0 0;scrollbar-width:thin}\n.buy{position:relative;isolation:isolate;width:112px;max-width:100%;height:36px;margin:10px auto 0;padding:0;border:0;border-radius:999px;background:transparent;color:var(--text);text-decoration:none;font-family:var(--font);font-weight:700;outline:none;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:color .16s ease;--m98-press-inset:1px 2px;--m98-press-bg:#fff;--m98-press-border:var(--line);--m98-press-scale:.92;--m98-press-font:13px;--m98-press-font-pressed:12px}\n.buy-label{position:relative;width:100%;height:100%;white-space:nowrap}\n.mapboxgl-popup-close-button{font-size:20px;padding:5px 8px;color:#344}\n.mapboxgl-ctrl-group{border-radius:11px!important;overflow:hidden}\n.action,.radius-trigger,.side-tab,.tour-row,.event-link,.suggestion,.mapboxgl-ctrl button{\n  transform:none!important;transition:background .16s ease,border-color .16s ease,box-shadow .16s ease,color .16s ease;\n}\n.action:active,.radius-trigger:active,.side-tab:active,.tour-row:active,.event-link:active,.suggestion:active,.mapboxgl-ctrl button:active{transform:none!important}\n.buy:hover{--m98-press-bg:var(--accent);--m98-press-border:var(--accent);color:#03282b}\n@media(prefers-reduced-motion:reduce){\n  .action,.radius-trigger,.side-tab,.tour-row,.event-link,.buy,.suggestion,.mapboxgl-ctrl button{transition:none}\n}\n@media(max-width:900px){\n  .layout{grid-template-columns:1fr}\n  .map-shell{height:420px}\n  .side{height:auto;max-height:620px}\n  .topfill{display:none}\n}\n@media(max-width:700px){\n  body{padding-top:126px}\n  .topbar-in{height:auto;min-height:118px;padding:8px 14px;display:flex;flex-wrap:wrap;gap:8px}\n  .brand{font-size:17px}\n  .brand img{width:32px;height:32px}\n  .nav{order:3;width:100%;height:48px;gap:4px;padding:4px;justify-content:stretch;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14)}\n  .nav-btn{flex:1;height:40px;padding:0 8px;font-size:13px;justify-content:center}\n  .wrap{padding:18px 14px 36px}\n  .hero{align-items:flex-start;flex-direction:column}\n  .controls{grid-template-columns:minmax(0,1.35fr) minmax(96px,.65fr);gap:8px}\n  .search-wrap{grid-column:1/-1}\n  .city-input,.action,.radius-trigger{height:46px}\n  .action,.radius-menu,.radius-trigger{width:100%;min-width:0;max-width:none}.action,.radius-trigger{padding:0 12px}\n  .radius-options{width:100%;min-width:100%;max-width:none}\n  .radius-option{height:42px}\n  .suggestions{top:52px;max-height:min(55svh,360px);overflow-y:auto;overscroll-behavior:contain}\n  .map-shell{height:min(58svh,460px);min-height:350px;max-height:460px;border-radius:15px}\n  .map-mode-switch{left:10px;top:10px;max-width:calc(100% - 20px)}\n  .map-mode-btn{height:36px;padding:0 13px;font-size:13px}\n  .map-tool-stack{left:52px;right:52px;top:auto;bottom:10px;gap:5px;justify-content:center}\n  .map-tool-btn{height:40px;padding:0 12px;font-size:12px}\n  .map-reset-btn{right:10px;top:10px;width:40px;height:40px}\n  .search-area-btn{bottom:60px;height:40px}\n  .map-shell.artist-context .map-status{top:60px}\n  .mapboxgl-ctrl button{width:42px!important;height:42px!important}\n  .mapboxgl-popup-close-button{width:40px;height:40px;padding:0;display:grid;place-items:center;line-height:1}\n  .side{border-radius:15px;max-height:none}\n  .side-tabs{height:44px}\n  .side-tab{height:36px}\n  .tours{overflow:visible;padding-right:0;scrollbar-gutter:auto}\n  .tour-events{padding-left:9px}\n  .buy{min-height:38px}\n}\n@media(max-width:390px){\n  .controls{grid-template-columns:minmax(0,1fr) 104px}\n  .action,.radius-trigger{font-size:13px;padding:0 10px}\n  .map-shell{min-height:330px;height:54svh}\n}\n\n:host{display:block;width:100%;font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}\n.wrap{padding:0 0 18px;max-width:none}\n.hero{margin:0 0 16px;align-items:center}\n.hero h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.03em;margin:0}\n.hero p{font-size:15px}\n\n.tour-more{width:fit-content;max-width:100%;height:32px;padding:0 16px;margin:5px auto 5px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:999px;background:var(--bg2);color:var(--text);font-size:12.5px;font-weight:600;line-height:1;text-box:trim-both cap alphabetic;cursor:pointer;outline:none;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease;-webkit-tap-highlight-color:transparent;--m98-press-scale:.96}.tour-more:hover{background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba(15,30,34,.07)}.tour-more:active{background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba(15,30,34,.08)}\n\n.venue-event{width:100%;border:0;background:rgba(255,255,255,.72);border-radius:var(--event-radius);padding:var(--event-pad-y) var(--event-pad-x);display:grid;grid-template-columns:var(--event-date-col) var(--event-art-size) minmax(0,1fr);gap:var(--event-gap);align-items:center;text-align:left;color:var(--text);cursor:pointer;outline:none;margin:4px 0}\n.venue-event:hover{background:#fff}\n.venue-event-date{font-size:var(--event-date-size);font-weight:800;text-transform:uppercase;line-height:1.25}\n.venue-event-art{width:var(--event-art-size);height:var(--event-art-size);border-radius:10px;object-fit:cover;background:var(--card2);display:block}\n.venue-event-copy{min-width:0}\n.venue-event-name{display:block;font-size:var(--event-main-size);font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.venue-event-time{display:block;font-size:var(--event-sub-size);color:var(--muted);margin-top:2px}\n";
+const CONCERTS_HTML="<main class=\"wrap\">\n  <section class=\"hero\">\n    <div>\n      <h1>Concerts Near You</h1>\n      \n    </div>\n  </section>\n\n  <div class=\"controls\">\n    <div class=\"search-wrap\">\n      <svg class=\"search-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/></svg>\n      <input class=\"city-input\" id=\"citySearch\" type=\"search\" autocomplete=\"off\" placeholder=\"Search city or artist...\" aria-label=\"Search city or artist\">\n      <div class=\"suggestions\" id=\"suggestions\" hidden></div>\n    </div>\n    <button class=\"action\" id=\"locateBtn\" type=\"button\">Use my location</button>\n    <div class=\"radius-menu\" id=\"radiusMenu\">\n      <input id=\"radius\" type=\"hidden\" value=\"100\">\n      <button class=\"radius-trigger\" id=\"radiusTrigger\" type=\"button\" aria-haspopup=\"listbox\" aria-expanded=\"false\">\n        <span id=\"radiusLabel\">100 km</span>\n        <svg class=\"radius-chevron\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"m6 8 4 4 4-4\"/></svg>\n      </button>\n      <div class=\"radius-options\" id=\"radiusOptions\" role=\"listbox\" aria-label=\"Search radius\">\n        <button class=\"radius-option\" type=\"button\" role=\"option\" data-value=\"25\" aria-selected=\"false\">25 km</button>\n        <button class=\"radius-option\" type=\"button\" role=\"option\" data-value=\"50\" aria-selected=\"false\">50 km</button>\n        <button class=\"radius-option active\" type=\"button\" role=\"option\" data-value=\"100\" aria-selected=\"true\">100 km</button>\n        <button class=\"radius-option\" type=\"button\" role=\"option\" data-value=\"250\" aria-selected=\"false\">250 km</button>\n      </div>\n    </div>\n  </div>\n\n  <div class=\"layout\">\n    <section class=\"map-shell\" id=\"mapShell\" aria-label=\"Concert map\">\n      <div id=\"map\"></div>\n      <div class=\"map-mode-switch\" id=\"mapModeSwitch\" role=\"tablist\" aria-label=\"Map concert filter\" hidden>\n        <button class=\"map-mode-btn active\" id=\"mapArtistBtn\" type=\"button\" role=\"tab\" aria-selected=\"true\">Artist</button>\n        <button class=\"map-mode-btn\" id=\"mapAllBtn\" type=\"button\" role=\"tab\" aria-selected=\"false\">All concerts</button>\n      </div>\n      <button class=\"map-reset-btn\" id=\"resetMapBtn\" type=\"button\" aria-label=\"Reset filters and zoom out\" title=\"Reset filters and zoom out\">−</button>\n      <button class=\"search-area-btn\" id=\"searchAreaBtn\" type=\"button\" hidden>Search this area</button>\n      <div class=\"map-status\" id=\"status\"></div>\n    </section>\n    <aside class=\"side\">\n      <div class=\"side-tabs\" role=\"tablist\" aria-label=\"Concert discovery\">\n        <button class=\"side-tab\" id=\"nearTab\" type=\"button\" role=\"tab\" aria-selected=\"false\">Near me</button>\n        <button class=\"side-tab active\" id=\"popularTab\" type=\"button\" role=\"tab\" aria-selected=\"true\">Popular</button>\n      </div>\n      <p class=\"side-sub\" id=\"sideSub\">Top 30 popular artists with upcoming Ticketmaster shows.</p>\n      <div class=\"tours\" id=\"tours\"></div>\n      <div class=\"side-empty\" id=\"sideEmpty\">Loading popular artists...</div>\n      <p class=\"disclosure\">Ticketing by Ticketmaster.</p>\n    </aside>\n  </div>\n</main>";
 
 function ensureMapbox(){
   if(window.mapboxgl) return Promise.resolve(window.mapboxgl);
@@ -21,7 +21,61 @@ function initConcerts(root,host){
 const MAPBOX_TOKEN = "pk.eyJ1IjoibXVzaWM5OCIsImEiOiJjbXVsaWM1M2kxbm4xMnpxeW83bWR5aHg5In0.8Y56YcxjJ3kpa5g51Yl3aw";
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
-let hotspots=[];
+const STATIC_HUBS=[
+  // Europe: permanent capital entry points.
+  ["London","","GB",51.5074,-0.1278],["Dublin","","IE",53.3498,-6.2603],["Paris","","FR",48.8566,2.3522],
+  ["Madrid","","ES",40.4168,-3.7038],["Lisbon","","PT",38.7223,-9.1393],["Berlin","","DE",52.5200,13.4050],
+  ["Vienna","","AT",48.2082,16.3738],["Prague","","CZ",50.0755,14.4378],["Warsaw","","PL",52.2297,21.0122],
+  ["Amsterdam","","NL",52.3676,4.9041],["Brussels","","BE",50.8503,4.3517],["Bern","","CH",46.9480,7.4474],
+  ["Rome","","IT",41.9028,12.4964],["Copenhagen","","DK",55.6761,12.5683],["Oslo","","NO",59.9139,10.7522],
+  ["Stockholm","","SE",59.3293,18.0686],["Helsinki","","FI",60.1699,24.9384],["Reykjavik","","IS",64.1466,-21.9426],
+  ["Athens","","GR",37.9838,23.7275],["Budapest","","HU",47.4979,19.0402],["Bucharest","","RO",44.4268,26.1025],
+  ["Sofia","","BG",42.6977,23.3219],["Zagreb","","HR",45.8150,15.9819],["Ljubljana","","SI",46.0569,14.5058],
+  ["Bratislava","","SK",48.1486,17.1077],["Tallinn","","EE",59.4370,24.7536],["Riga","","LV",56.9496,24.1052],
+  ["Vilnius","","LT",54.6872,25.2797],["Luxembourg","","LU",49.6116,6.1319],["Valletta","","MT",35.8989,14.5146],
+  ["Nicosia","","CY",35.1856,33.3823],["Belgrade","","RS",44.7866,20.4489],["Podgorica","","ME",42.4304,19.2594],
+  ["Sarajevo","","BA",43.8563,18.4131],["Skopje","","MK",41.9981,21.4254],["Tirana","","AL",41.3275,19.8187],
+  ["Chisinau","","MD",47.0105,28.8638],["Kyiv","","UA",50.4501,30.5234],["Ankara","","TR",39.9334,32.8597],
+  ["Tbilisi","","GE",41.7151,44.8271],["Baku","","AZ",40.4093,49.8671],["Yerevan","","AM",40.1792,44.4991],
+  ["Andorra la Vella","","AD",42.5063,1.5218],["Monaco","","MC",43.7384,7.4246],
+
+  // United States: every state capital + Washington, D.C.
+  ["Montgomery","AL","US",32.3777,-86.3006],["Juneau","AK","US",58.3019,-134.4197],["Phoenix","AZ","US",33.4484,-112.0740],
+  ["Little Rock","AR","US",34.7465,-92.2896],["Sacramento","CA","US",38.5816,-121.4944],["Denver","CO","US",39.7392,-104.9903],
+  ["Hartford","CT","US",41.7658,-72.6734],["Dover","DE","US",39.1582,-75.5244],["Tallahassee","FL","US",30.4383,-84.2807],
+  ["Atlanta","GA","US",33.7490,-84.3880],["Honolulu","HI","US",21.3070,-157.8584],["Boise","ID","US",43.6150,-116.2023],
+  ["Springfield","IL","US",39.7989,-89.6440],["Indianapolis","IN","US",39.7684,-86.1581],["Des Moines","IA","US",41.5868,-93.6250],
+  ["Topeka","KS","US",39.0473,-95.6752],["Frankfort","KY","US",38.2009,-84.8777],["Baton Rouge","LA","US",30.4515,-91.1871],
+  ["Augusta","ME","US",44.3106,-69.7795],["Annapolis","MD","US",38.9784,-76.4922],["Boston","MA","US",42.3601,-71.0589],
+  ["Lansing","MI","US",42.7325,-84.5555],["Saint Paul","MN","US",44.9537,-93.0900],["Jackson","MS","US",32.2988,-90.1848],
+  ["Jefferson City","MO","US",38.5767,-92.1735],["Helena","MT","US",46.5891,-112.0391],["Lincoln","NE","US",40.8136,-96.7026],
+  ["Carson City","NV","US",39.1638,-119.7674],["Concord","NH","US",43.2081,-71.5376],["Trenton","NJ","US",40.2171,-74.7429],
+  ["Santa Fe","NM","US",35.6870,-105.9378],["Albany","NY","US",42.6526,-73.7562],["Raleigh","NC","US",35.7796,-78.6382],
+  ["Bismarck","ND","US",46.8083,-100.7837],["Columbus","OH","US",39.9612,-82.9988],["Oklahoma City","OK","US",35.4676,-97.5164],
+  ["Salem","OR","US",44.9429,-123.0351],["Harrisburg","PA","US",40.2732,-76.8867],["Providence","RI","US",41.8240,-71.4128],
+  ["Columbia","SC","US",34.0007,-81.0348],["Pierre","SD","US",44.3683,-100.3510],["Nashville","TN","US",36.1627,-86.7816],
+  ["Austin","TX","US",30.2672,-97.7431],["Salt Lake City","UT","US",40.7608,-111.8910],["Montpelier","VT","US",44.2601,-72.5754],
+  ["Richmond","VA","US",37.5407,-77.4360],["Olympia","WA","US",47.0379,-122.9007],["Charleston","WV","US",38.3498,-81.6326],
+  ["Madison","WI","US",43.0731,-89.4012],["Cheyenne","WY","US",41.1400,-104.8202],["Washington","DC","US",38.9072,-77.0369],
+
+  // Other permanent Ticketmaster-oriented major markets/capitals worldwide.
+  ["New York","NY","US",40.7128,-74.0060],["Los Angeles","CA","US",34.0522,-118.2437],["Chicago","IL","US",41.8781,-87.6298],
+  ["Toronto","ON","CA",43.6532,-79.3832],["Ottawa","ON","CA",45.4215,-75.6972],["Vancouver","BC","CA",49.2827,-123.1207],
+  ["Mexico City","","MX",19.4326,-99.1332],["Monterrey","","MX",25.6866,-100.3161],["São Paulo","","BR",-23.5505,-46.6333],
+  ["Brasilia","","BR",-15.7939,-47.8828],["Buenos Aires","","AR",-34.6037,-58.3816],["Santiago","","CL",-33.4489,-70.6693],
+  ["Bogota","","CO",4.7110,-74.0721],["Lima","","PE",-12.0464,-77.0428],["San Jose","","CR",9.9281,-84.0907],
+  ["Panama City","","PA",8.9824,-79.5199],["San Juan","PR","US",18.4655,-66.1057],
+  ["Dubai","","AE",25.2048,55.2708],["Abu Dhabi","","AE",24.4539,54.3773],["Doha","","QA",25.2854,51.5310],
+  ["Riyadh","","SA",24.7136,46.6753],["Tokyo","","JP",35.6762,139.6503],["Seoul","","KR",37.5665,126.9780],
+  ["Singapore","","SG",1.3521,103.8198],["Bangkok","","TH",13.7563,100.5018],["Manila","","PH",14.5995,120.9842],
+  ["Kuala Lumpur","","MY",3.1390,101.6869],["Jakarta","","ID",-6.2088,106.8456],["Hong Kong","","HK",22.3193,114.1694],
+  ["Taipei","","TW",25.0330,121.5654],["Mumbai","MH","IN",19.0760,72.8777],["New Delhi","DL","IN",28.6139,77.2090],
+  ["Sydney","NSW","AU",-33.8688,151.2093],["Melbourne","VIC","AU",-37.8136,144.9631],["Brisbane","QLD","AU",-27.4698,153.0251],
+  ["Perth","WA","AU",-31.9505,115.8605],["Auckland","","NZ",-36.8509,174.7645],["Johannesburg","","ZA",-26.2041,28.0473],
+  ["Cape Town","","ZA",-33.9249,18.4241]
+].map(([city,stateCode,countryCode,lat,lng])=>({city,stateCode,countryCode,lat,lng,count:0,static:1}));
+let hotspots=mergeStaticHubSeed();
+function mergeStaticHubSeed(){ return STATIC_HUBS.map(h=>({...h})); }
 
 const map = new mapboxgl.Map({
   container:root.querySelector("#map"),
@@ -42,7 +96,7 @@ const sideSub=$("#sideSub"), search=$("#citySearch"), suggestions=$("#suggestion
 const radiusMenu=$("#radiusMenu"), radiusTrigger=$("#radiusTrigger"), radiusLabel=$("#radiusLabel"), radiusOptions=$("#radiusOptions");
 const nearTab=$("#nearTab"), popularTab=$("#popularTab");
 const mapShell=$("#mapShell"), mapModeSwitch=$("#mapModeSwitch"), mapArtistBtn=$("#mapArtistBtn"), mapAllBtn=$("#mapAllBtn");
-const overviewBtn=$("#overviewBtn"), fitBtn=$("#fitBtn"), searchAreaBtn=$("#searchAreaBtn");
+const resetMapBtn=$("#resetMapBtn"), searchAreaBtn=$("#searchAreaBtn");
 
 let currentEvents=[];
 let artistMapEvents=[];
@@ -51,6 +105,37 @@ let nearbyTotal=0;
 let currentTotal=0;
 let popularEvents=[];
 let popularArtists=[];
+const ZERO_QUOTA_POPULAR_SUPPLEMENT=[
+  // Current Ticketmaster public pages checked 2026-09-29. One real event is
+  // embedded for each fallback so expanding these rows costs zero Worker/API quota.
+  {name:"Teddy Swims",image:"",shows:73,eventConfirmed:true,webVerified:true,popularityRank:1001,
+   events:[{id:"web-teddy-swims-20261002",artist:"Teddy Swims",name:"Teddy Swims: The UGLY Tour",date:"2026-10-02",time:"19:00:00",city:"Brooklyn",state:"NY",country:"United States",venue:"Barclays Center",url:"https://www.ticketmaster.com/teddy-swims-tickets/artist/2712573"}]},
+  {name:"Chris Stapleton",image:"",shows:6,eventConfirmed:true,webVerified:true,popularityRank:1002,
+   events:[{id:"web-chris-stapleton-20261002",artist:"Chris Stapleton",name:"Chris Stapleton's All-American Road Show",date:"2026-10-02",time:"19:30:00",city:"Bristow",state:"VA",country:"United States",venue:"Jiffy Lube Live",url:"https://www.ticketmaster.com/chris-stapleton-tickets/artist/1828177"}]},
+  {name:"Twenty One Pilots",image:"",shows:10,eventConfirmed:true,webVerified:true,popularityRank:1003,
+   events:[{id:"web-twenty-one-pilots-20261004",artist:"Twenty One Pilots",name:"Austin City Limits Music Festival - Weekend One",date:"2026-10-04",time:"12:00:00",city:"Austin",state:"TX",country:"United States",venue:"Zilker Park",url:"https://www.ticketmaster.com/twenty-one-pilots-tickets/artist/1495843"}]},
+  {name:"Luke Combs",image:"",shows:12,eventConfirmed:true,webVerified:true,popularityRank:1004,
+   events:[{id:"web-luke-combs-20270403",artist:"Luke Combs",name:"Luke Combs w/ Treaty Oak Revival",date:"2027-04-03",time:"17:20:00",city:"Arlington",state:"TX",country:"United States",venue:"AT&T Stadium",url:"https://www.ticketmaster.com/luke-combs-tickets/artist/2150342"}]},
+  {name:"Benson Boone",image:"",shows:1,eventConfirmed:true,webVerified:true,popularityRank:1005,
+   events:[{id:"web-benson-boone-20261102",artist:"Benson Boone",name:"Benson Boone – Live in Singapore",date:"2026-11-02",time:"20:00:00",city:"Singapore",state:"",country:"Singapore",venue:"The Star Theatre",url:"https://www.ticketmaster.com/benson-boone-tickets/artist/2892837"}]}
+];
+
+function withVerifiedPopularSupplement(rows){
+  const out=[];
+  const seenIds=new Set(),seenNames=new Set();
+  const add=item=>{
+    const id=String(item?.id||"").trim().toLowerCase();
+    const name=String(item?.name||"").trim().toLowerCase();
+    if(!id && !name) return;
+    if((id && seenIds.has(id)) || (name && seenNames.has(name))) return;
+    if(id) seenIds.add(id);
+    if(name) seenNames.add(name);
+    out.push({...item});
+  };
+  (rows||[]).forEach(add);
+  if(out.length<30) ZERO_QUOTA_POPULAR_SUPPLEMENT.forEach(add);
+  return out.slice(0,30).map((item,i)=>({...item,rank:i+1}));
+}
 let lastArea=null;
 let activeMode="popular";
 let suggestTimer=0;
@@ -75,10 +160,7 @@ function hidePendingAreaSearch(){
   pendingAreaSearch=null;
   searchAreaBtn.hidden=true;
 }
-function syncFitButton(){
-  const pool=activeMode==="artist" ? artistMapEvents : currentEvents;
-  fitBtn.hidden=!(Array.isArray(pool) && pool.length);
-}
+function syncFitButton(){}
 function closePopup(){
   if(!popup) return;
   const own=popup;
@@ -129,14 +211,17 @@ function applyMapMode(){
   const artist=activeMode==="artist";
   const area=activeMode==="nearby" || activeMode==="artist-area";
   const popular=activeMode==="popular";
+  const overview=map.getZoom()<4.7;
+  const showHubs=popular || overview;
+  const showArea=area && !overview;
   ["artist-points","artist-hit"].forEach(id=>setLayerVisible(id,artist));
-  ["clusters","cluster-hit","event-points","event-hit","event-labels"].forEach(id=>setLayerVisible(id,area));
+  ["clusters","cluster-hit","event-points","event-hit","event-labels"].forEach(id=>setLayerVisible(id,showArea));
   [
     "capital-points","capital-labels","hub-hit-capital",
     "city-major-points","city-major-labels","hub-hit-major",
     "city-mid-points","city-mid-labels","hub-hit-mid",
     "city-all-points","city-all-labels","hub-hit-all"
-  ].forEach(id=>setLayerVisible(id,popular));
+  ].forEach(id=>setLayerVisible(id,showHubs));
   if(map.getLayer("cluster-count")) setLayerVisible("cluster-count",false);
 }
 function setMode(mode){
@@ -190,6 +275,7 @@ function hubsGeoJSON(){
     type:"FeatureCollection",
     features:hotspots.map(h=>{
       const capital=isEuropeanCapital(h);
+      const permanent=Number(h?.static||0)===1;
       const cc=String(h.countryCode||"").toUpperCase();
       const europe=!!EUROPE_CAPITALS[cc];
       const count=Number(h.count||0);
@@ -200,7 +286,8 @@ function hubsGeoJSON(){
         properties:{
           name:h.city,countryCode:cc,count,
           capital:capital?1:0,
-          overview:(capital||outsideMajor||fallback.has(h))?1:0
+          static:permanent?1:0,
+          overview:(permanent||capital||outsideMajor||fallback.has(h))?1:0
         }
       };
     })
@@ -494,23 +581,12 @@ function popupContent(e){
   const place=document.createElement("div"); place.className="pop-meta"; place.textContent=placeLine(e);
   body.appendChild(place);
   if(e.url){
-    const a=document.createElement("a"); a.className="buy"; a.href=e.url; a.target="_blank"; a.rel="sponsored noopener";
+    const a=document.createElement("a"); a.className="buy"; a.href=e.url; a.target="_blank"; a.rel="sponsored noopener"; a.dataset.m98Press=""; a.dataset.m98PressMode="pill";
     const label=document.createElement("span");
-    label.className="buy-label";
+    label.className="buy-label m98-press-label";
     label.dataset.label="Buy Tickets";
     label.textContent="Buy Tickets";
     a.appendChild(label);
-    a.addEventListener("pointerdown",()=>{
-      a.classList.add("press");
-      const up=()=>{
-        a.classList.remove("press");
-        window.removeEventListener("pointerup",up);
-        window.removeEventListener("pointercancel",up);
-      };
-      window.addEventListener("pointerup",up);
-      window.addEventListener("pointercancel",up);
-    });
-    a.addEventListener("pointerleave",()=>a.classList.remove("press"));
     body.appendChild(a);
 
   }
@@ -639,7 +715,11 @@ function showPopup(e){
 }
 
 function focusEventOnMap(e){
-  if(!e || !Number.isFinite(Number(e.lat)) || !Number.isFinite(Number(e.lng))) return;
+  if(!e) return;
+  if(!Number.isFinite(Number(e.lat)) || !Number.isFinite(Number(e.lng))){
+    if(e.url) window.open(e.url,"_blank","noopener");
+    return;
+  }
   userMoving=false;
   const targetZoom=Math.min(Math.max(map.getZoom(),6.3),8.2);
   map.easeTo({center:[Number(e.lng),Number(e.lat)],zoom:targetZoom,duration:380});
@@ -779,7 +859,7 @@ function renderEventList(box,events){
 }
 
 async function eventsForArtist(item,mode){
-  if(mode==="nearby" && Array.isArray(item.events)) return item.events;
+  if(Array.isArray(item.events) && item.events.length) return item.events;
   const key=item.id ? "id:"+item.id : "name:"+String(item.name||"").toLowerCase();
   if(artistEventCache.has(key)) return artistEventCache.get(key);
   const params=item.id ? {attractionId:item.id} : {artist:item.name};
@@ -860,7 +940,7 @@ async function loadArtistArea(lat,lng,label,radius){
   }catch(err){
     if(requestId!==areaRequestSeq) return;
     console.error(err);
-    setStatus("Could not load concerts in this area.");
+    setStatus(concertErrorMessage(err,"Could not load concerts in this area."));
   }
 }
 async function showAllConcertsInMapArea(){
@@ -918,7 +998,7 @@ async function toggleArtist(item,card,mode){
   }catch(err){
     console.error(err);
     box.textContent="";
-    const n=document.createElement("div"); n.className="tour-none"; n.textContent="Could not load tour dates.";
+    const n=document.createElement("div"); n.className="tour-none"; n.textContent=concertErrorMessage(err,"Could not load tour dates.");
     box.appendChild(n);
   }
 }
@@ -994,15 +1074,26 @@ async function getPayload(params){
   try{return await work;}finally{payloadInflight.delete(key);}
 }
 async function getEvents(params){ return (await getPayload(params)).events||[]; }
+function concertErrorMessage(err,fallback){
+  const code=String(err?.message||"");
+  if(code==="ticketmaster_temporarily_limited") return "Ticketmaster is temporarily limiting requests. Please try again later.";
+  if(code==="ticketmaster_key_missing") return "Concert search is being connected. Please try again shortly.";
+  return fallback;
+}
 
 function mergeHotspots(rows){
   const byKey=new Map();
-  for(const h of rows){
+  for(const h of [...STATIC_HUBS,...(rows||[])]){
     const key=(String(h.city||"")+"|"+String(h.stateCode||"")+"|"+String(h.countryCode||"")).toLowerCase();
     const prev=byKey.get(key);
-    if(!prev || Number(h.count||0)>Number(prev.count||0)) byKey.set(key,h);
+    if(!prev){
+      byKey.set(key,{...h});
+      continue;
+    }
+    const use=Number(h.count||0)>Number(prev.count||0) ? h : prev;
+    byKey.set(key,{...prev,...use,static:Number(prev.static||h.static||0)?1:0});
   }
-  return [...byKey.values()].sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
+  return [...byKey.values()].sort((a,b)=>Number(b.static||0)-Number(a.static||0)||Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
 }
 
 const POPULAR_CACHE_KEY="music98:concert-popular:v6";
@@ -1072,7 +1163,7 @@ async function loadPopular(force=false){
 
   const cached=!force ? readPopularCache() : null;
   if(!popularArtists.length && cached?.artists?.length){
-    popularArtists=cached.artists;
+    popularArtists=withVerifiedPopularSupplement(cached.artists);
     renderArtists(popularArtists,"popular");
     setEventData(popularEvents);
     setStatus("");
@@ -1089,8 +1180,8 @@ async function loadPopular(force=false){
 
   try{
     const data=await getPayload({mode:"popular",v:"popular-v6"});
-    if(data.artists?.length && (!data.stale || !popularArtists.length || data.artists.length>=popularArtists.length)){
-      popularArtists=data.artists;
+    if(data.artists?.length && (!data.stale || !popularArtists.length || withVerifiedPopularSupplement(data.artists).length>=popularArtists.length)){
+      popularArtists=withVerifiedPopularSupplement(data.artists);
     }
     popularEvents=[];
     writePopularCache(data);
@@ -1271,7 +1362,7 @@ function addHotspotSuggestion(h){
   const title=document.createElement("span"); title.className="suggestion-title";
   title.textContent=[h.city,h.countryCode].filter(Boolean).join(", ");
   const kind=document.createElement("span"); kind.className="suggestion-kind";
-  kind.textContent=Number(h.count||0)+" upcoming concerts";
+  kind.textContent=Number(h.count||0)>0 ? Number(h.count||0)+" upcoming concerts" : "Major concert market";
   cp.append(title,kind); b.appendChild(cp);
   b.addEventListener("click",()=>selectHotspotSuggestion(h)); suggestions.appendChild(b);
 }
@@ -1320,25 +1411,35 @@ nearTab.addEventListener("click",()=>{
   }
 });
 popularTab.addEventListener("click",()=>loadPopular());
-mapArtistBtn.addEventListener("click",showArtistContext);
-mapAllBtn.addEventListener("click",showAllConcertsInMapArea);
-
-overviewBtn.addEventListener("click",()=>{
+resetMapBtn.addEventListener("click",()=>{
   hidePendingAreaSearch();
+  areaRequestSeq++;
   closePopup();
+  expandedKey="";
+  clearArtistContext();
   search.value="";
   suggestions.hidden=true;
   closeRadiusMenu();
+  radiusEl.value="100";
+  radiusLabel.textContent="100 km";
+  radiusOptions.querySelectorAll(".radius-option").forEach(btn=>{
+    const active=String(btn.dataset.value||"")==="100";
+    btn.classList.toggle("active",active);
+    btn.setAttribute("aria-selected",active?"true":"false");
+  });
+  lastArea=null;
+  nearbyEvents=[];
+  nearbyTotal=0;
   userMoving=false;
-  loadPopular();
-  map.easeTo({center:[12,49],zoom:2.45,duration:520});
+  setMode("popular");
+  renderArtists(popularArtists,"popular");
+  setEventData([]);
+  sideSub.textContent="Top 30 popular artists with upcoming Ticketmaster shows.";
+  setStatus("");
+  map.easeTo({center:[12,39],zoom:2.15,duration:520});
 });
-
-fitBtn.addEventListener("click",()=>{
-  hidePendingAreaSearch();
-  const pool=activeMode==="artist" ? artistMapEvents : currentEvents;
-  if(pool?.length) fitEvents(pool);
-});
+mapArtistBtn.addEventListener("click",showArtistContext);
+mapAllBtn.addEventListener("click",showAllConcertsInMapArea);
 
 searchAreaBtn.addEventListener("click",()=>{
   const pending=pendingAreaSearch;
@@ -1465,6 +1566,7 @@ map.on("styleimagemissing",e=>{
 });
 map.on("render",()=>{ if(popup) snapPopup(); });
 map.on("zoom",()=>{
+  applyMapMode();
   if(!popup) return;
   if(map.getZoom()<POPUP_CITY_MIN_ZOOM){ closePopup(); return; }
 });
@@ -1500,7 +1602,6 @@ function resizeMapStable(){
 map.on("load",()=>{
   resizeMapStable();
   addLayers();
-  loadHotspots();
   loadPopular();
   requestAnimationFrame(resizeMapStable);
   setTimeout(resizeMapStable,90);
@@ -1546,6 +1647,7 @@ class Music98Concerts extends HTMLElement{
       const shell=document.createElement("div");
       shell.innerHTML=CONCERTS_HTML;
       this.shadowRoot.append(mapCss,style,...shell.childNodes);
+      window.Music98Press?.install(this.shadowRoot);
     }
 
     const start=()=>{
