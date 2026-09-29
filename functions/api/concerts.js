@@ -434,12 +434,19 @@ export async function refreshPopularSnapshot(env, force = false) {
       if(artist && !state.found.some(x=>x.id===artist.id)) state.found.push(artist);
     }catch(err){
       state.errors=Number(state.errors||0)+1;
+      const status=Number(err?.status||0);
+      const transient=err?.message==="ticketmaster_budget_guard" ||
+        err?.message==="ticketmaster_unavailable" || status===429 || status>=500;
+
+      // A transient origin/quota failure must not silently discard a ranked
+      // candidate. Rewind the cursor so the next cron retries the same artist.
+      if(transient) state.index=Math.max(0,state.index-1);
       state.updatedAt=new Date().toISOString();
       await kvPutJson(env,POPULAR_STATE_KEY,state);
-      if(err?.message==="ticketmaster_budget_guard" || Number(err?.status)===429 ||
-         err?.message==="ticketmaster_unavailable"){
+
+      if(transient){
         return {
-          ok:false,retry:true,status:Number(err?.status||0),
+          ok:false,retry:true,status,
           processed,index:state.index,found:state.found.length
         };
       }
