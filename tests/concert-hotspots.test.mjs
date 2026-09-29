@@ -1202,7 +1202,7 @@ test("daily Popular and map snapshots are built by cron, never by visitors", asy
   const wrangler = fs.readFileSync(new URL("../wrangler.toml", import.meta.url), "utf8");
   assert.match(wrangler,/20 0 \* \* \*/);
   assert.match(wrangler,/20 1 \* \* \*/);
-  assert.match(wrangler,/\*\/5 \* \* \* \*/);
+  assert.match(wrangler,/"\* \* \* \* \*"/);
   assert.match(worker,/for\(let i=0;i<4;i\+\+\)[\s\S]*refreshPopularSnapshot\(env,i===0\)/);
   assert.match(worker,/for\(let i=0;i<2;i\+\+\)[\s\S]*refreshMapMarketSnapshot\(env,i===0\)/);
   const api = fs.readFileSync(new URL("../functions/api/concerts.js", import.meta.url), "utf8");

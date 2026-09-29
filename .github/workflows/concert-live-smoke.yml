@@ -1,0 +1,72 @@
+name: concert live smoke
+
+on:
+  push:
+    paths:
+      - "worker.js"
+      - "wrangler.toml"
+      - "functions/api/concerts.js"
+      - "public/concerts-app.js"
+      - ".github/workflows/concert-live-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Verify deployed world map and cached Popular 30
+        run: |
+          python - <<'PY'
+          import json, time, urllib.request
+
+          BASE="https://music98.news/api/concerts"
+          def get(mode, version):
+              url=f"{BASE}?mode={mode}&v={version}&livecheck={int(time.time()*1000)}"
+              req=urllib.request.Request(url,headers={
+                  "User-Agent":"music98-live-smoke/1.0",
+                  "Cache-Control":"no-cache",
+                  "Accept":"application/json",
+              })
+              with urllib.request.urlopen(req,timeout=20) as r:
+                  return json.loads(r.read().decode("utf-8"))
+
+          last={}
+          for attempt in range(12):
+              try:
+                  markets=get("markets","concert-markets-v7")
+                  popular=get("popular","popular-v9")
+                  countries={str(x.get("countryCode","")).upper() for x in markets.get("markets",[])}
+                  world_ok=(
+                      markets.get("version")=="concert-markets-v4"
+                      and "US" in countries
+                      and "AE" in countries
+                      and bool(countries & {"GB","FR","DE","IT","ES","NL"})
+                  )
+                  artists=popular.get("artists") or []
+                  popular_ok=(
+                      len(artists)==30
+                      and all(a.get("eventConfirmed") is True and int(a.get("shows") or 0)>0 for a in artists)
+                  )
+                  last={
+                      "attempt":attempt+1,
+                      "mapVersion":markets.get("version"),
+                      "marketCount":len(markets.get("markets") or []),
+                      "countries":sorted(countries),
+                      "popularCount":len(artists),
+                      "popularWarming":popular.get("warming"),
+                  }
+                  print("LIVE_CHECK",json.dumps(last,ensure_ascii=False))
+                  if world_ok and popular_ok:
+                      print("LIVE_CONCERTS_PASS",json.dumps(last,ensure_ascii=False))
+                      raise SystemExit(0)
+              except Exception as e:
+                  last={"attempt":attempt+1,"error":repr(e)}
+                  print("LIVE_CHECK_ERROR",json.dumps(last))
+              time.sleep(60)
+
+          print("LIVE_CONCERTS_FAIL",json.dumps(last,ensure_ascii=False))
+          raise SystemExit(1)
+          PY
