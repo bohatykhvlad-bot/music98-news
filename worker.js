@@ -235,7 +235,7 @@ export default {
 
   async scheduled(controller, env, ctx) {
     ctx.waitUntil((async()=>{
-      const dailyKickoff=String(controller?.cron||"")==="15 3 * * *";
+      const dailyKickoff=String(controller?.cron||"")==="20 0 * * *";
 
       // Static map seeds removed the need for global hotspot discovery.
       // Keep only small resumable slices for Popular/tour evidence so scheduled
