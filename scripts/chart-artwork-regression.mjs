@@ -35,7 +35,8 @@ const single=c({provider:"apple",id:"6816228072",trackTitle:bby.title,artist:bby
 assert.equal(selectArtworkCandidate(bby,[single,album]).selected.provider,"apple-feed");
 
 const source=fs.readFileSync(new URL("./build-covers.mjs",import.meta.url),"utf8");
-assert.match(source,/APPLE_FEED/); assert.match(source,/api\.deezer\.com/); assert.match(source,/currentAppleCandidate/); assert.match(source,/ARTWORK_UNRESOLVED/);
+assert.match(source,/APPLE_FEED/);
+assert.match(source,/feedDirect:true/, "official Apple chart feed must cover lookup-index lag"); assert.match(source,/api\.deezer\.com/); assert.match(source,/currentAppleCandidate/); assert.match(source,/ARTWORK_UNRESOLVED/);
 assert.doesNotMatch(source,/DIRECT_COLLECTION|animal\\\|katseye|billiejean\\\|michaeljackson|boston\\\|stellalefty/);
 const corrections=JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json",import.meta.url),"utf8"));
 assert.deepEqual(corrections,{});

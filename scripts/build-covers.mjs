@@ -54,13 +54,34 @@ function deezerCandidate(track,album){
 }
 async function appleFeedCandidates(){
   const feed=await json(APPLE_FEED);
-  const rows=(feed?.feed?.results||[]).map((x,i)=>({pos:i+1,id:String(x.id||trackIdFrom(x.url)||"")})).filter(x=>x.id);
+  const rows=(feed?.feed?.results||[]).map((x,i)=>({
+    pos:i+1,id:String(x.id||trackIdFrom(x.url)||""),raw:x
+  })).filter(x=>x.id);
   const ids=[...new Set(rows.map(x=>x.id))], byId=new Map();
   for(let i=0;i<ids.length;i+=50){
     const d=await json(`https://itunes.apple.com/lookup?id=${ids.slice(i,i+50).join(",")}&entity=song&country=US`);
     for(const x of d.results||[]) if(x.trackId) byId.set(String(x.trackId),x);
   }
-  return rows.map(r=>appleCandidate(byId.get(r.id),"apple-feed",{chartPos:r.pos})).filter(Boolean);
+  return rows.map(r=>{
+    const looked=byId.get(r.id);
+    if(looked) return appleCandidate(looked,"apple-feed",{chartPos:r.pos});
+    /* Newly released Apple Music rows can appear in the official chart feed
+       hours before the legacy iTunes lookup/search index catches up. The feed
+       already carries Apple's own artwork/title/artist, so use that official
+       row directly instead of failing or falling back to a random package. */
+    const x=r.raw||{};
+    const art=art600(x.artworkUrl100||x.artworkUrl||"");
+    if(!art || !x.name || !x.artistName) return null;
+    return {
+      provider:"apple-feed",id:r.id,collectionId:"",
+      trackTitle:String(x.name||""),artist:String(x.artistName||""),
+      releaseTitle:String(x.name||""),releaseArtist:String(x.artistName||""),
+      releaseDate:String(x.releaseDate||""),trackCount:1,
+      genre:String(x.genres?.[0]?.name||""),
+      art,url:String(x.url||""),preview:"",raw:null,chartPos:r.pos,
+      feedDirect:true
+    };
+  }).filter(Boolean);
 }
 async function currentAppleCandidate(track){
   const id=trackIdFrom(track?.url);
