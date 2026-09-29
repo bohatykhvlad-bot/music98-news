@@ -5,7 +5,7 @@
  * which prevents an original song from collapsing into a remix/live/sped-up row.
  */
 
-export const COVER_RESOLVER_VERSION = 3;
+export const COVER_RESOLVER_VERSION = 4;
 
 export const stripParen = (s) => String(s || "").replace(/\([^)]*\)|\[[^\]]*\]/g, " ");
 
