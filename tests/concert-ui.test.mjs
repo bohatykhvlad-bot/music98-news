@@ -96,8 +96,8 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tab\{[\s\S]*?display:grid;place-items:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1/);
   assert.match(app,/function pillInkShift\(el\)/);
   assert.match(app,/Math\.round\(raw\)/);
-  assert.match(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{\\n  transform:translateZ\(0\)/);
-  assert.match(app,/\.radius-trigger:active,\.radius-option:active,\.search-area-btn:active,\.side-tab:active\{\\n  transform:translateZ\(0\)!important/);
+  assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*transform:translateZ/);
+  assert.match(app,/\.radius-trigger:active,\.radius-option:active,\.search-area-btn:active,\.side-tab:active,\.map-mode-btn:active\{transform:none\}/);
   assert.match(app,/\.action:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
   assert.match(app,/\.action:active\{transform:none\}/);
   assert.match(app,/\.map-tool-btn:active\{transform:none!important\}/);
@@ -167,4 +167,14 @@ test("map mode toggle has no duplicate outer capsule and no resting compositor t
   assert.match(app,/\.map-mode-btn\.active\{background-color:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
   assert.match(app,/\.map-mode-btn:active\{transform:none\}/);
   assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab,\.map-mode-btn\{/);
+});
+
+
+test("map interface pills stay on the normal text raster in their resting state",()=>{
+  assert.match(app,/\.action\{width:160px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1\}/);
+  assert.match(app,/\.radius-trigger\{[^}]*border:0;line-height:1/);
+  assert.match(app,/\.radius-option:hover\{background:transparent\}/);
+  assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*will-change:transform/);
+  assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*backface-visibility:hidden/);
+  assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*transform:translateZ/);
 });
