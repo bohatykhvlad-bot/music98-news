@@ -23,6 +23,49 @@ export const SUPPORTED_COUNTRY_CODES = [
 ];
 
 /* High-volume countries use official state/province filters before geography. */
+export const EUROPE_CAPITAL_SEEDS = [
+  {city:"Paris",countryCode:"FR",lat:48.8566,lng:2.3522},
+  {city:"Madrid",countryCode:"ES",lat:40.4168,lng:-3.7038},
+  {city:"Berlin",countryCode:"DE",lat:52.5200,lng:13.4050},
+  {city:"Vienna",countryCode:"AT",lat:48.2082,lng:16.3738},
+  {city:"Prague",countryCode:"CZ",lat:50.0755,lng:14.4378},
+  {city:"Warsaw",countryCode:"PL",lat:52.2297,lng:21.0122},
+  {city:"London",countryCode:"GB",lat:51.5074,lng:-0.1278},
+  {city:"Dublin",countryCode:"IE",lat:53.3498,lng:-6.2603},
+  {city:"Belfast",countryCode:"ND",lat:54.5973,lng:-5.9301},
+  {city:"Amsterdam",countryCode:"NL",lat:52.3676,lng:4.9041},
+  {city:"Brussels",countryCode:"BE",lat:50.8503,lng:4.3517},
+  {city:"Bern",countryCode:"CH",lat:46.9480,lng:7.4474},
+  {city:"Rome",countryCode:"IT",lat:41.9028,lng:12.4964},
+  {city:"Lisbon",countryCode:"PT",lat:38.7223,lng:-9.1393},
+  {city:"Stockholm",countryCode:"SE",lat:59.3293,lng:18.0686},
+  {city:"Oslo",countryCode:"NO",lat:59.9139,lng:10.7522},
+  {city:"Copenhagen",countryCode:"DK",lat:55.6761,lng:12.5683},
+  {city:"Helsinki",countryCode:"FI",lat:60.1699,lng:24.9384},
+  {city:"Reykjavik",countryCode:"IS",lat:64.1466,lng:-21.9426},
+  {city:"Athens",countryCode:"GR",lat:37.9838,lng:23.7275},
+  {city:"Budapest",countryCode:"HU",lat:47.4979,lng:19.0402},
+  {city:"Bucharest",countryCode:"RO",lat:44.4268,lng:26.1025},
+  {city:"Sofia",countryCode:"BG",lat:42.6977,lng:23.3219},
+  {city:"Zagreb",countryCode:"HR",lat:45.8150,lng:15.9819},
+  {city:"Ljubljana",countryCode:"SI",lat:46.0569,lng:14.5058},
+  {city:"Bratislava",countryCode:"SK",lat:48.1486,lng:17.1077},
+  {city:"Tallinn",countryCode:"EE",lat:59.4370,lng:24.7536},
+  {city:"Riga",countryCode:"LV",lat:56.9496,lng:24.1052},
+  {city:"Vilnius",countryCode:"LT",lat:54.6872,lng:25.2797},
+  {city:"Luxembourg",countryCode:"LU",lat:49.6116,lng:6.1319},
+  {city:"Valletta",countryCode:"MT",lat:35.8989,lng:14.5146},
+  {city:"Nicosia",countryCode:"CY",lat:35.1856,lng:33.3823},
+  {city:"Belgrade",countryCode:"RS",lat:44.7866,lng:20.4489},
+  {city:"Podgorica",countryCode:"ME",lat:42.4304,lng:19.2594},
+  {city:"Andorra la Vella",countryCode:"AD",lat:42.5063,lng:1.5218},
+  {city:"Monaco",countryCode:"MC",lat:43.7384,lng:7.4246},
+  {city:"Ankara",countryCode:"TR",lat:39.9334,lng:32.8597},
+  {city:"Kyiv",countryCode:"UA",lat:50.4501,lng:30.5234},
+  {city:"Tbilisi",countryCode:"GE",lat:41.7151,lng:44.8271},
+  {city:"Baku",countryCode:"AZ",lat:40.4093,lng:49.8671},
+];
+
 export const COUNTRY_STATE_CODES = {
   US:[
     "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS",
@@ -225,13 +268,24 @@ export function shouldSplitVenueResult(totalElements,job) {
 }
 
 export function freshState(now=Date.now()) {
+  const candidates={};
+  const verifyQueue=[];
+  for(const seed of EUROPE_CAPITAL_SEEDS){
+    const key=cityKey(seed.city,"",seed.countryCode);
+    candidates[key]={
+      city:seed.city,stateCode:"",countryCode:seed.countryCode,
+      latSum:Number(seed.lat),lngSum:Number(seed.lng),samples:1,queued:true,verified:false,
+      seed:true,
+    };
+    verifyQueue.push(key);
+  }
   return {
     version:HOTSPOT_VERSION,
     startedAt:new Date(now).toISOString(),
     updatedAt:new Date(now).toISOString(),
     queue:SUPPORTED_COUNTRY_CODES.map(countryJob),
-    candidates:{},
-    verifyQueue:[],
+    candidates,
+    verifyQueue,
     verified:{},
     partial:false,
     overflow:[],
