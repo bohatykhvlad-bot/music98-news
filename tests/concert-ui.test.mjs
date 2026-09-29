@@ -63,7 +63,8 @@ test("world overview is static and restores pinned markets after zooming out",()
   assert.match(app,/state-capital-labels/);
   assert.match(app,/const overviewZoom=map\.getZoom\(\)<4\.7/);
   assert.match(app,/const showHubs=activeMode==="popular" \|\| overviewZoom/);
-  assert.match(app,/map\.on\("load",\(\)=>\{\n  resizeMapStable\(\);\n  addTopographicRelief\(\);\n  addLayers\(\);/);\n  assert.doesNotMatch(app,/map\.on\("load",\(\)=>\{\n  resizeMapStable\(\);\n  addLayers\(\);\n  loadHotspots\(\);/);
+  assert.match(app,/map\.on\("load",\(\)=>\{\n  resizeMapStable\(\);\n  addTopographicRelief\(\);\n  addLayers\(\);/);
+  assert.doesNotMatch(app,/map\.on\("load",\(\)=>\{\n  resizeMapStable\(\);\n  addLayers\(\);\n  loadHotspots\(\);/);
 });
 
 test("map has one compact reset control and no Overview or Fit results controls",()=>{
