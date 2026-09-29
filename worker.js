@@ -1,6 +1,6 @@
 import { onRequest as desk } from "./functions/api/desk.js";
 import { onRequestGet as top50 } from "./functions/api/top50.js";
-import { onRequestGet as concerts, refreshHotspotSnapshot } from "./functions/api/concerts.js";
+import { onRequestGet as concerts, refreshHotspotSnapshot, refreshPopularSnapshot } from "./functions/api/concerts.js";
 import { onRequestGet as preview } from "./functions/api/preview.js";
 import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
 import { onRequestGet as subscribers, onRequestDelete as subscribersRemove } from "./functions/api/subscribers.js";
@@ -224,9 +224,9 @@ export default {
   },
 
   async scheduled(controller, env, ctx) {
-    ctx.waitUntil(
-      refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 16 })
-        .catch(() => {})
-    );
+    ctx.waitUntil(Promise.allSettled([
+      refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 16 }),
+      refreshPopularSnapshot(env),
+    ]));
   },
 };
