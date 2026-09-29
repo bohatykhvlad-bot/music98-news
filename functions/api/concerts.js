@@ -3,6 +3,7 @@ import {
   HOTSPOT_THRESHOLD,
   HOTSPOT_STATE_KEY,
   HOTSPOT_SNAPSHOT_KEY,
+  EUROPE_CAPITAL_SEEDS,
   freshState,
   validJob,
   jobSearchCircle,
@@ -26,7 +27,12 @@ const POPULAR_SNAPSHOT_KEY = "concert-popular:v3";
 const POPULAR_STATE_KEY = "concert-popular:v3:state";
 const POPULAR_LEGACY_SNAPSHOT_KEY = "concert-popular:v2";
 const POPULAR_REFRESH_MS = 24 * 60 * 60 * 1000;
-const POPULAR_BATCH_SIZE = 12;
+const POPULAR_BATCH_SIZE = 20;
+const POPULAR_TOUR_STATE_KEY = "concert-popular:v3:tours-state";
+const POPULAR_TOUR_PREFIX = "concert-popular:v3:tour:";
+const CAPITAL_EVENTS_STATE_KEY = "concert-capitals:v1:state";
+const CAPITAL_EVENTS_PREFIX = "concert-capitals:v1:city:";
+const PREWARM_MAX_AGE_MS = 26 * 60 * 60 * 1000;
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
@@ -229,8 +235,8 @@ async function tmJson(url, env, scope="interactive") {
   return run;
 }
 
-async function tmEventPages(url, env, maxPages = 5) {
-  const first = await tmJson(url, env);
+async function tmEventPages(url, env, maxPages = 5, scope = "interactive") {
+  const first = await tmJson(url, env, scope);
   const totalPages = Math.max(1, Number(first?.page?.totalPages || 1));
   const pages = [first];
   const limit = Math.min(Math.max(1, Number(maxPages || 1)), 5, totalPages);
@@ -239,7 +245,7 @@ async function tmEventPages(url, env, maxPages = 5) {
     const nextUrl = new URL(url.toString());
     nextUrl.searchParams.set("page", String(page));
     try {
-      pages.push(await tmJson(nextUrl, env));
+      pages.push(await tmJson(nextUrl, env, scope));
     } catch (err) {
       // First page is still useful. Avoid turning a single later-page failure
       // into an empty map/card; expose that the result is partial instead.
@@ -438,6 +444,15 @@ export async function refreshPopularSnapshot(env, force = false) {
   if(force || !state || state.version!=="popular-v3" ||
      !Array.isArray(state.candidates) || !Array.isArray(state.found)){
     const ranking=await kworbArtists();
+    if(existing?.artists?.length>=20 &&
+       existing?.source==="spotify_monthly_listeners" &&
+       ranking.source!=="spotify_monthly_listeners"){
+      return {
+        ok:false,retry:true,keptExisting:true,
+        reason:"popular_ranking_source_unavailable",
+        artists:existing.artists.length
+      };
+    }
     state=newPopularBuildState(ranking);
   }
 
@@ -484,7 +499,11 @@ export async function refreshPopularSnapshot(env, force = false) {
     };
   }
 
-  const artists=state.found.slice(0,POPULAR_LIMIT).map((a,i)=>({
+  const artists=state.found
+    .slice()
+    .sort((a,b)=>Number(a.popularityRank||999999)-Number(b.popularityRank||999999))
+    .slice(0,POPULAR_LIMIT)
+    .map((a,i)=>({
     id:a.id,name:a.name,image:a.image,rank:i+1,
     popularityRank:a.popularityRank,listeners:a.listeners,firstDate:a.firstDate,
   }));
@@ -517,6 +536,113 @@ export async function refreshPopularSnapshot(env, force = false) {
   await kvPutJson(env,POPULAR_SNAPSHOT_KEY,snapshot);
   await kvDelete(env,POPULAR_STATE_KEY);
   return {ok:true,fresh:false,complete:true,artists:artists.length,processed};
+}
+
+function prewarmFresh(payload,now=Date.now()){
+  const built=Date.parse(payload?.builtAt||0)||0;
+  return !!built && now-built<PREWARM_MAX_AGE_MS && Array.isArray(payload?.events);
+}
+function popularTourCacheKey(id){
+  return POPULAR_TOUR_PREFIX+encodeURIComponent(String(id||"").trim());
+}
+function capitalEventCacheKey(city,countryCode){
+  return CAPITAL_EVENTS_PREFIX+encodeURIComponent(
+    String(countryCode||"").trim().toUpperCase()+"|"+String(city||"").trim().toLowerCase()
+  );
+}
+async function scheduledEventPayload(env,params){
+  const tm=baseEventUrl(env.TICKETMASTER_API_KEY);
+  tm.searchParams.set("size","200");
+  tm.searchParams.set("sort","date,asc");
+  if(params.attractionId){
+    tm.searchParams.set("attractionId",params.attractionId);
+  }else{
+    tm.searchParams.set("city",params.city);
+    tm.searchParams.set("countryCode",params.countryCode);
+  }
+  const merged=await tmEventPages(tm,env,5,"scheduled");
+  const events=merged.events.map(normalizeEvent).filter(Boolean);
+  return {
+    ok:true,
+    events,
+    page:merged.page||{size:events.length,totalElements:events.length,totalPages:1,number:0},
+    partial:!!merged.partial,
+    pagesFetched:Number(merged.pagesFetched||1),
+    query:params.attractionId ? {attractionId:params.attractionId} : {city:params.city,countryCode:params.countryCode},
+    builtAt:new Date().toISOString(),
+  };
+}
+
+export async function refreshPopularTourSnapshots(env,budget=4){
+  if(!env?.TICKETMASTER_API_KEY || !env?.DESK) return {ok:false,reason:"tour_prewarm_missing_env"};
+  const popular=await kvGetJson(env,POPULAR_SNAPSHOT_KEY);
+  if(!popular?.artists?.length) return {ok:false,reason:"popular_snapshot_missing"};
+
+  let state=await kvGetJson(env,POPULAR_TOUR_STATE_KEY);
+  if(!state || state.version!=="popular-tours-v1" || state.sourceBuiltAt!==popular.builtAt){
+    state={version:"popular-tours-v1",sourceBuiltAt:popular.builtAt,index:0,updatedAt:new Date().toISOString()};
+  }
+
+  let processed=0;
+  const limit=Math.max(1,Math.min(6,Number(budget)||4));
+  while(state.index<popular.artists.length && processed<limit){
+    const artist=popular.artists[state.index++];
+    processed++;
+    if(!artist?.id) continue;
+    const key=popularTourCacheKey(artist.id);
+    const cached=await kvGetJson(env,key);
+    if(cached?.sourceBuiltAt===popular.builtAt && prewarmFresh(cached)) continue;
+    try{
+      const payload=await scheduledEventPayload(env,{attractionId:artist.id});
+      payload.sourceBuiltAt=popular.builtAt;
+      payload.artistId=artist.id;
+      await kvPutJson(env,key,payload,{expirationTtl:36*60*60});
+    }catch(err){
+      state.index=Math.max(0,state.index-1);
+      state.updatedAt=new Date().toISOString();
+      await kvPutJson(env,POPULAR_TOUR_STATE_KEY,state,{expirationTtl:172800});
+      return {ok:false,retry:true,status:Number(err?.status||0),index:state.index,processed};
+    }
+  }
+
+  state.updatedAt=new Date().toISOString();
+  state.complete=state.index>=popular.artists.length;
+  await kvPutJson(env,POPULAR_TOUR_STATE_KEY,state,{expirationTtl:172800});
+  return {ok:true,complete:state.complete,index:state.index,total:popular.artists.length,processed};
+}
+
+export async function refreshCapitalEventSnapshots(env,budget=2){
+  if(!env?.TICKETMASTER_API_KEY || !env?.DESK) return {ok:false,reason:"capital_prewarm_missing_env"};
+  let state=await kvGetJson(env,CAPITAL_EVENTS_STATE_KEY);
+  const cycle=new Date().toISOString().slice(0,10);
+  if(!state || state.version!=="capital-events-v1" || state.cycle!==cycle){
+    state={version:"capital-events-v1",cycle,index:0,updatedAt:new Date().toISOString()};
+  }
+
+  let processed=0;
+  const limit=Math.max(1,Math.min(4,Number(budget)||2));
+  while(state.index<EUROPE_CAPITAL_SEEDS.length && processed<limit){
+    const capital=EUROPE_CAPITAL_SEEDS[state.index++];
+    processed++;
+    const key=capitalEventCacheKey(capital.city,capital.countryCode);
+    const cached=await kvGetJson(env,key);
+    if(prewarmFresh(cached)) continue;
+    try{
+      const payload=await scheduledEventPayload(env,{city:capital.city,countryCode:capital.countryCode});
+      payload.capital=true;
+      await kvPutJson(env,key,payload,{expirationTtl:36*60*60});
+    }catch(err){
+      state.index=Math.max(0,state.index-1);
+      state.updatedAt=new Date().toISOString();
+      await kvPutJson(env,CAPITAL_EVENTS_STATE_KEY,state,{expirationTtl:172800});
+      return {ok:false,retry:true,status:Number(err?.status||0),index:state.index,processed};
+    }
+  }
+
+  state.updatedAt=new Date().toISOString();
+  state.complete=state.index>=EUROPE_CAPITAL_SEEDS.length;
+  await kvPutJson(env,CAPITAL_EVENTS_STATE_KEY,state,{expirationTtl:172800});
+  return {ok:true,complete:state.complete,index:state.index,total:EUROPE_CAPITAL_SEEDS.length,processed};
 }
 
 async function popularSnapshotPayload(env) {
@@ -884,6 +1010,19 @@ export async function onRequestGet({ request, env, waitUntil }) {
   if (mode !== "popular" && mode !== "artist-search" && !artist && !attractionId && !city &&
       (lat == null || lng == null || lat < -90 || lat > 90 || lng < -180 || lng > 180)) {
     return json({ error: "location_required" }, 400);
+  }
+
+  if(attractionId){
+    const prewarmed=await kvGetJson(env,popularTourCacheKey(attractionId));
+    if(prewarmFresh(prewarmed)){
+      return json(prewarmed,200,{"Cache-Control":"public, max-age=600, s-maxage=3600"});
+    }
+  }
+  if(city && countryCode){
+    const prewarmed=await kvGetJson(env,capitalEventCacheKey(city,countryCode));
+    if(prewarmFresh(prewarmed)){
+      return json(prewarmed,200,{"Cache-Control":"public, max-age=600, s-maxage=3600"});
+    }
   }
 
   const cache = caches.default;
