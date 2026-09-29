@@ -49,8 +49,8 @@ test("Popular UI renders strict confirmed cache immediately without an explanato
 test("map uses only the daily verified market snapshot",()=>{
   assert.doesNotMatch(app,/STATIC_GLOBAL_MARKETS/);
   assert.doesNotMatch(app,/STATIC_US_STATE_CAPITALS/);
-  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v3"/);
-  assert.match(app,/mode:"markets",v:"concert-markets-v3"/);
+  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v4"/);
+  assert.match(app,/mode:"markets",v:"concert-markets-v4"/);
   assert.match(app,/loadMarkets\(\);/);
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
@@ -69,8 +69,10 @@ test("map shell has no gray shadow gap and canvas fills it",()=>{
   assert.match(app,/#map \.mapboxgl-canvas\{[^}]*width:100%!important;height:100%!important/);
 });
 
-test("More button sits slightly lower than the previous equal-margin position",()=>{
-  assert.match(app,/\.tour-more\{[^}]*margin:7px auto 3px/);
+test("More button is optically centered inside the expanded event block",()=>{
+  assert.match(app,/\.tour-card\.open \.tour-events\{[^}]*padding:2px 9px 10px/);
+  assert.match(app,/\.event-link\{[^}]*margin:4px 0/);
+  assert.match(app,/\.tour-more\{[^}]*margin:8px auto 2px/);
 });
 
 test("Buy Tickets uses the shared site press binder",()=>{
@@ -93,7 +95,7 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tabs\{\\n  width:244px;max-width:100%;display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(app,/\.side-tab\{\\n  width:100%;min-width:0;max-width:none/);
   assert.match(app,/\.side-tab\{[\s\S]*?transition:\.18s;/);
-  assert.match(app,/\.side-tabs\{[\s\S]*?margin:4px 0 6px/);
+  assert.match(app,/\.side-tabs\{[\s\S]*?margin:0 0 10px/);
   assert.match(app,/\.map-mode-switch\{[^}]*display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(app,/\.map-mode-btn\{width:100%;[^}]*transition:\.18s/);
 });
