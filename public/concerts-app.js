@@ -340,7 +340,7 @@ function addLayers(){
     id:"clusters",type:"symbol",source:"events",filter:["has","point_count"],
     layout:{
       "icon-image":"m98-triangle",
-      "icon-size":["interpolate",["linear"],["zoom"],1.2,.62,3,.72,5,.9],
+      "icon-size":["step",["get","point_count"],.68,2,.76,5,.84,10,.94,25,1.04,60,1.12],
       "icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true
     }
   });
