@@ -113,6 +113,10 @@ for (const [key, collectionId, trackId] of [
   assert.equal(lockedCovers[key], corrections[key].art);
   assert.match(appleNames[key].url, new RegExp("/" + collectionId + "\\?i=" + trackId + "(?:&|$)"));
 }
+const bostonCorrection = corrections["boston|stellalefty"];
+assert.equal(bostonCorrection.appleCollectionId, "1884403092");
+assert.equal(bostonCorrection.appleTrackId, "1884403093");
+assert.match(bostonCorrection.art, /810129961546\.jpg\/600x600bb\.jpg$/);
 const tameCorrection = corrections["loser|tameimpala"];
 assert.equal(tameCorrection.appleCollectionId, "1836226516");
 assert.equal(tameCorrection.appleTrackId, "1836226731");

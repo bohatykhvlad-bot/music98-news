@@ -11,6 +11,12 @@
     "appleTrackId": "269573364",
     "reason": "Verified Apple Music Thriller (1982) by Michael Jackson. Use the original Thriller release artwork and metadata, not later catalog/compilation matches."
   },
+  "boston|stellalefty": {
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7c/de/5e/7cde5e7a-612d-9714-d34c-1eb234c85ebb/810129961546.jpg/600x600bb.jpg",
+    "appleCollectionId": "1884403092",
+    "appleTrackId": "1884403093",
+    "reason": "Verified Apple Music Boston - Single by STELLA LEFTY (March 27, 2026). Use the dedicated official single artwork shown on Apple Music, not the later Is This Heaven? EP artwork."
+  },
   "getlucky~v:edit|daftpunk": {
     "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/600x600bb.jpg",
     "appleCollectionId": "617154241",
