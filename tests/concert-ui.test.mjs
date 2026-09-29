@@ -18,11 +18,11 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
   assert.match(app,/\.venue-event-name\{display:block;font-size:var\(--event-main-size\)/);
 });
 
-test("Buy Tickets press shrinks from center like the chart play button",()=>{
-  assert.match(app,/\.buy\{[^}]*transform-origin:center;scale:1;[^}]*scale \.09s ease/);
-  assert.match(app,/\.buy\.press\{scale:\.92\}/);
-  assert.doesNotMatch(app,/\.buy\.press::before\{[^}]*inset/);
-  assert.doesNotMatch(app,/\.buy-label::before,\.buy-label::after/);
+test("Buy Tickets shrinks its pill around a fixed text center",()=>{
+  assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
+  assert.match(app,/\.buy\.press::before\{transform:scale\(\.92\)\}/);
+  assert.match(app,/\.buy-label\{[^}]*transform:none!important;translate:none!important/);
+  assert.doesNotMatch(app,/\.buy\.press\{[^}]*(?:transform|scale|translate)/);
 });
 
 test("concert popup closes while zooming out below detail zoom in every mode",()=>{
@@ -30,15 +30,20 @@ test("concert popup closes while zooming out below detail zoom in every mode",()
   assert.match(app,/map\.on\("zoomend",\(\)=>\{\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<4\.8\)\{ closePopup\(\); return; \}/);
 });
 
-test("More button is centered and uses the admin press animation",()=>{
-  assert.match(app,/\.tour-more\{width:fit-content;max-width:100%;[^}]*margin:8px auto 2px/);
-  assert.match(app,/\.tour-more:active\{transform:scale\(\.96\);background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba\(15,30,34,\.08\)\}/);
+test("More button keeps its existing behavior with equal vertical spacing",()=>{
+  assert.match(app,/\.tour-more\{width:fit-content;max-width:100%;[^}]*margin:5px auto 5px/);
 });
 
-test("Popular UI requires a complete Top 30 before browser caching",()=>{
+test("Popular UI requires a complete Ticketmaster-eligible Top 30 before browser caching",()=>{
   assert.match(app,/Top 30 popular artists with upcoming Ticketmaster shows\./);
-  assert.match(app,/music98:concert-popular:v4/);
+  assert.match(app,/music98:concert-popular:v5/);
+  assert.match(app,/cached\?\.version==="popular-v4"/);
+  assert.match(app,/ticketmaster_upcoming_events_gt_0/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/data\.artists\.length<30/);
-  assert.match(app,/mode:"popular",v:"popular-v4"/);
+  assert.match(app,/cached\.artists\.every\(a=>Number\(a\?\.shows\|\|0\)>0\)/);
+  assert.match(app,/mode:"popular",v:"popular-v5"/);
+});
+
+test("map loading status is hidden while real statuses remain available",()=>{
+  assert.match(app,/\^loading concerts\?\(\?: data\)\?\/i/);
 });
