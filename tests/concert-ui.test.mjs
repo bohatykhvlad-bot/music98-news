@@ -18,22 +18,23 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
   assert.match(app,/\.venue-event-name\{display:block;font-size:var\(--event-main-size\)/);
 });
 
-test("Buy Tickets pill scales while text uses a crisp native pressed size",()=>{
-  assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
-  assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
-  assert.match(app,/\.buy\.press::before\{transform:scale\(\.92\)\}/);
-  assert.match(app,/\.buy\.press \.buy-label\{font-size:12px\}/);
-  assert.doesNotMatch(app,/\.buy\.press \.buy-label\{[^}]*transform/);
+test("Buy Tickets uses the shared crisp pill press helper",()=>{
+  assert.match(app,/a\.dataset\.m98Press=""; a\.dataset\.m98PressMode="pill"/);
+  assert.match(app,/label\.className="buy-label m98-press-label"/);
+  assert.match(app,/--m98-press-scale:\.92;--m98-press-font:13px;--m98-press-font-pressed:12px/);
+  assert.match(app,/window\.Music98Press\?\.install\(this\.shadowRoot\)/);
+  assert.doesNotMatch(app,/\.buy\.press/);
+  assert.doesNotMatch(app,/a\.addEventListener\("pointerdown"/);
 });
 
-test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
+test("concert popup keeps fixed geometry, hubs return on zoom-out, and popup disappears",()=>{
   assert.match(app,/const POPUP_CITY_MIN_ZOOM=6\.2/);
   assert.doesNotMatch(app,/function popupLerp/);
-  assert.doesNotMatch(app,/const t=Math\.max\(0,Math\.min\(1,\(z-2\.3\)/);
   assert.match(app,/popup\.setMaxWidth\("286px"\)/);
-  assert.match(app,/map\.on\("zoom",\(\)=>\{\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\)\{ closePopup\(\); return; \}/);
+  assert.match(app,/map\.on\("zoom",\(\)=>\{\n  applyMapMode\(\);\n  if\(!popup\) return;/);
+  assert.match(app,/if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\)\{ closePopup\(\); return; \}/);
+  assert.match(app,/const showHubs=popular \|\| overview/);
   assert.match(app,/function showPopup\(e\)\{\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
-  assert.match(app,/function showVenuePopup\(events\)\{\n  if\(!events\?\.length \|\| map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
 });
 
 test("More button keeps its existing behavior with equal vertical spacing",()=>{
@@ -52,4 +53,33 @@ test("Popular UI requires a complete Ticketmaster-eligible Top 30 before browser
 
 test("map loading status is hidden while real statuses remain available",()=>{
   assert.match(app,/\^loading concerts\?\(\?: data\)\?\/i/);
+});
+
+test("world map uses permanent static hubs without a hotspot API read on load",()=>{
+  assert.match(app,/const STATIC_HUBS=\[/);
+  for(const name of ["Paris","Vienna","Kyiv","Dubai","Tokyo","Sacramento","Austin","Boston","Washington"]){
+    assert.equal(app.includes('["'+name+'"'),true,name+" must be preloaded");
+  }
+  assert.match(app,/static:permanent\?1:0/);
+  assert.match(app,/overview:\(permanent\|\|capital\|\|outsideMajor\|\|fallback\.has\(h\)\)\?1:0/);
+  assert.doesNotMatch(app,/map\.on\("load",\(\)=>\{[\s\S]{0,300}loadHotspots\(\)/);
+});
+
+test("map exposes one reset control and hides legacy Overview/Fit controls",()=>{
+  assert.match(app,/id=\\"resetMapBtn\\"[^>]*>−<\/button>/);
+  assert.match(app,/id=\\"overviewBtn\\"[^>]*tabindex=\\"-1\\"/);
+  assert.match(app,/map-tool-stack\\" hidden aria-hidden=\\"true\\"/);
+  assert.match(app,/resetMapBtn\.addEventListener\("click"/);
+  assert.match(app,/radiusEl\.value="100"/);
+  assert.match(app,/lastArea=null/);
+  assert.match(app,/map\.easeTo\(\{center:\[12,39\],zoom:2\.15/);
+});
+
+test("Popular can reach 30 from only web-verified Ticketmaster supplements without prefetch",()=>{
+  for(const name of ["Teddy Swims","Chris Stapleton","Twenty One Pilots","Luke Combs","Benson Boone"]){
+    assert.equal(app.includes('name:"'+name+'"'),true,name+" supplement missing");
+  }
+  assert.match(app,/webVerified:true/);
+  assert.match(app,/return out\.slice\(0,30\)\.map/);
+  assert.doesNotMatch(app,/prefetchPopular\(popularArtists\)/);
 });
