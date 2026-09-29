@@ -165,6 +165,21 @@ export default {
       return proxyAppleGw(request, rawPath);
     }
     if (path === "/api/top50" && request.method === "GET") return top50(c);
+    if (path === "/api/__m98-popular-strict-rebuild-72df1c" && request.method === "GET") {
+      const task=String(url.searchParams.get("task")||"popular");
+      let result;
+      if(task==="popular"){
+        result=await refreshPopularSnapshot(env,url.searchParams.get("reset")==="1");
+      }else if(task==="tours"){
+        result=await refreshPopularTourSnapshots(env,6);
+      }else{
+        result={ok:false,error:"unknown_task"};
+      }
+      return new Response(JSON.stringify(result),{
+        status:200,
+        headers:{"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store"}
+      });
+    }
     if (path === "/api/concerts" && request.method === "GET") return concerts(c);
     if (path === "/api/preview" && (request.method === "GET" || request.method === "HEAD")) return preview(c);
     if (path === "/api/desk") return desk(c);
