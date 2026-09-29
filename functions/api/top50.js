@@ -797,18 +797,31 @@ async function bakedWithCovers(env, baked, origin) {
   return baked;
 }
 
+async function decorateCachedTop50(env, payload, origin) {
+  if (payload && Array.isArray(payload.tracks) && payload.tracks.length) {
+    try {
+      // Metadata/artwork refresh is deliberately display-only: rank, order,
+      // movement and tenure stay byte-for-byte as stored in the chart payload.
+      await applyNames(env, payload.tracks, origin);
+      await applyCovers(env, payload.tracks, origin);
+    } catch {}
+  }
+  return payload;
+}
+
 export async function onRequestGet({ env, request }) {
   const today = new Date().toISOString().slice(0, 10);
+  const origin = new URL(request.url).origin;
   if (env && env.DESK) {
     try {
       const cached = await env.DESK.get(TOP50_KV, { type: "json" });
       if (cached && cached.updated === today && Array.isArray(cached.tracks) && cached.tracks.length) {
-        return top50Response(cached);
+        return top50Response(await decorateCachedTop50(env, cached, origin));
       }
     } catch {}
   }
   try {
-    const payload = await withTimeout(buildTop50(new URL(request.url).origin, env), 14000);
+    const payload = await withTimeout(buildTop50(origin, env), 14000);
     const memory = {};
     payload.tracks = await applyTenure(env, payload.tracks, memory);
     payload.memory = memory;
@@ -819,8 +832,8 @@ export async function onRequestGet({ env, request }) {
     if (payload.tracks && payload.tracks.length) return top50Response(payload);
   } catch (err) {
     const good = await lastGood(env);
-    if (good) return top50Response(good);
-    const baked = await bakedWithCovers(env, await bakedTop50(request), new URL(request.url).origin);
+    if (good) return top50Response(await decorateCachedTop50(env, good, origin));
+    const baked = await bakedWithCovers(env, await bakedTop50(request), origin);
     if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
     return new Response(JSON.stringify({ error: "rebuild_failed", detail: String(err) }), {
       status: 502,
@@ -828,8 +841,8 @@ export async function onRequestGet({ env, request }) {
     });
   }
   const good = await lastGood(env);
-  if (good) return top50Response(good);
-  const baked = await bakedWithCovers(env, await bakedTop50(request), new URL(request.url).origin);
+  if (good) return top50Response(await decorateCachedTop50(env, good, origin));
+  const baked = await bakedWithCovers(env, await bakedTop50(request), origin);
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
   return new Response(JSON.stringify({ error: "rebuild_failed" }), {
     status: 502,
