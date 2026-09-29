@@ -96,8 +96,8 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tab\{[\s\S]*?display:grid;place-items:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1/);
   assert.match(app,/function pillInkShift\(el\)/);
   assert.match(app,/Math\.round\(raw\)/);
-  assert.match(app,/\.action,\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab,\.map-mode-btn,\.tour-more\{\\n  transform:translateZ\(0\)/);
-  assert.match(app,/\.radius-trigger:active,\.radius-option:active,\.search-area-btn:active,\.side-tab:active,\.map-mode-btn:active\{\\n  transform:translateZ\(0\)!important/);
+  assert.match(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{\\n  transform:translateZ\(0\)/);
+  assert.match(app,/\.radius-trigger:active,\.radius-option:active,\.search-area-btn:active,\.side-tab:active\{\\n  transform:translateZ\(0\)!important/);
   assert.match(app,/\.action:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
   assert.match(app,/\.action:active\{transform:none\}/);
   assert.match(app,/\.map-tool-btn:active\{transform:none!important\}/);
@@ -158,4 +158,13 @@ test("Popular warming state polls only the precomputed KV snapshot",()=>{
   assert.match(app,/function schedulePopularWarmRetry\(\)/);
   assert.match(app,/loadPopular\(true\)/);
   assert.match(app,/if\(data\?\.warming\) schedulePopularWarmRetry\(\)/);
+});
+
+
+test("map mode toggle has no duplicate outer capsule and no resting compositor transform",()=>{
+  assert.match(app,/\.map-mode-switch\{[^}]*border:0;[^}]*background:transparent;box-shadow:none/);
+  assert.match(app,/\.map-mode-btn\{[^}]*border:1px solid var\(--line\);[^}]*background-color:var\(--bg2\)/);
+  assert.match(app,/\.map-mode-btn\.active\{background-color:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
+  assert.match(app,/\.map-mode-btn:active\{transform:none\}/);
+  assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab,\.map-mode-btn\{/);
 });
