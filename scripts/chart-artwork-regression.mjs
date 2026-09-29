@@ -85,6 +85,12 @@ const vocal = {
 };
 assert.equal(pickAppleCandidate("Dracula (with JENNIE)", "Tame Impala", [instr, vocal]).trackId, 301);
 
+
+const motownSingle={trackId:410,trackName:"Ain't No Mountain High Enough",artistName:"Marvin Gaye & Tammi Terrell",collectionArtistName:"Marvin Gaye & Tammi Terrell",collectionName:"Ain't No Mountain High Enough - Single",trackCount:1,releaseDate:"1967-04-20T00:00:00Z"};
+const united={trackId:411,trackName:"Ain't No Mountain High Enough",artistName:"Marvin Gaye & Tammi Terrell",collectionArtistName:"Marvin Gaye & Tammi Terrell",collectionName:"United",trackCount:12,releaseDate:"1967-08-29T00:00:00Z"};
+const laterCompilation={trackId:412,trackName:"Ain't No Mountain High Enough",artistName:"Marvin Gaye & Tammi Terrell",collectionArtistName:"Marvin Gaye & Tammi Terrell",collectionName:"20th Century Masters - The Millennium Collection: The Best of Marvin Gaye & Tammi Terrell",trackCount:11,releaseDate:"2001-01-01T00:00:00Z"};
+assert.equal(pickAppleCandidate("Ain't No Mountain High Enough","Marvin Gaye & Tammi Terrell",[laterCompilation,motownSingle,united]).trackId,411);
+
 const corrections = JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json", import.meta.url), "utf8"));
 assert.equal(corrections["loser|tameimpala"], undefined);
 const daftCorrection = corrections["getlucky~v:edit|daftpunk"];
