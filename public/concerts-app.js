@@ -107,7 +107,12 @@ function applyMapMode(){
   const popular=activeMode==="popular";
   ["artist-points","artist-hit"].forEach(id=>setLayerVisible(id,artist));
   ["clusters","event-points","event-hit","event-labels"].forEach(id=>setLayerVisible(id,area));
-  ["capital-points","capital-labels","city-points","city-labels","hub-hit-capital","hub-hit-city"].forEach(id=>setLayerVisible(id,popular));
+  [
+    "capital-points","capital-labels","hub-hit-capital",
+    "city-major-points","city-major-labels","hub-hit-major",
+    "city-mid-points","city-mid-labels","hub-hit-mid",
+    "city-all-points","city-all-labels","hub-hit-all"
+  ].forEach(id=>setLayerVisible(id,popular));
   if(map.getLayer("cluster-count")) setLayerVisible("cluster-count",false);
 }
 function setMode(mode){
@@ -159,13 +164,17 @@ function hubsGeoJSON(){
     type:"FeatureCollection",
     features:hotspots.map(h=>{
       const capital=isEuropeanCapital(h);
+      const cc=String(h.countryCode||"").toUpperCase();
+      const europe=!!EUROPE_CAPITALS[cc];
+      const count=Number(h.count||0);
+      const outsideMajor=!europe && count>=40;
       return {
         type:"Feature",
         geometry:{type:"Point",coordinates:[h.lng,h.lat]},
         properties:{
-          name:h.city,countryCode:h.countryCode||"",count:h.count||0,
+          name:h.city,countryCode:cc,count,
           capital:capital?1:0,
-          overview:(capital||fallback.has(h))?1:0
+          overview:(capital||outsideMajor||fallback.has(h))?1:0
         }
       };
     })
@@ -219,6 +228,11 @@ function addTopographicRelief(){
       if(layer.type==="fill" && /water/i.test(id)){
         map.setPaintProperty(id,"fill-color","#dcebf0");
       }
+      if(layer.type==="symbol" && /(poi|transit|airport|ferry)/i.test(id) && typeof map.setLayerZoomRange==="function"){
+        map.setLayerZoomRange(id,8.5,24);
+      }else if(layer.type==="symbol" && /(road.*label|road-label)/i.test(id) && typeof map.setLayerZoomRange==="function"){
+        map.setLayerZoomRange(id,6.5,24);
+      }
     }catch(e){}
   }
   if(map.getSource("m98-dem")) return;
@@ -250,7 +264,7 @@ function addLayers(){
     id:"capital-points",type:"symbol",source:"hubs",maxzoom:4.7,filter:["==",["get","overview"],1],
     layout:{
       "icon-image":"m98-triangle",
-      "icon-size":["interpolate",["linear"],["zoom"],1.5,.62,3,.74,4.6,.86],
+      "icon-size":["step",["get","count"],.68,20,.76,40,.84,80,.94,160,1.04,300,1.12],
       "icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true
     }
   });
@@ -267,24 +281,48 @@ function addLayers(){
     paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":18,"circle-opacity":.001,"circle-stroke-width":0}
   });
 
+  // Progressive reveal keeps the map readable: busiest cities first,
+  // then medium hubs, then every verified 10+ city.
+  const hubIconSize=["step",["get","count"],.72,20,.80,40,.90,80,1.00,160,1.10,300,1.18];
   map.addLayer({
-    id:"city-points",type:"symbol",source:"hubs",minzoom:4.7,maxzoom:8,
-    layout:{
-      "icon-image":"m98-triangle",
-      "icon-size":["interpolate",["linear"],["zoom"],4.7,.72,6,.9,8,1.03],
-      "icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true
-    }
+    id:"city-major-points",type:"symbol",source:"hubs",minzoom:4.7,maxzoom:5.7,filter:[">=",["get","count"],40],
+    layout:{"icon-image":"m98-triangle","icon-size":hubIconSize,"icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true}
   });
   map.addLayer({
-    id:"city-labels",type:"symbol",source:"hubs",minzoom:5.2,maxzoom:8,
-    layout:{
-      "text-field":["get","name"],"text-size":11,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],
-      "text-offset":[0,-1.3],"text-anchor":"bottom","text-allow-overlap":false
-    },
+    id:"city-major-labels",type:"symbol",source:"hubs",minzoom:4.9,maxzoom:5.7,filter:[">=",["get","count"],40],
+    layout:{"text-field":["get","name"],"text-size":11,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],"text-offset":[0,-1.3],"text-anchor":"bottom","text-allow-overlap":false},
     paint:{"text-color":"#20272a","text-halo-color":"rgba(255,255,255,.96)","text-halo-width":1.5}
   });
   map.addLayer({
-    id:"hub-hit-city",type:"circle",source:"hubs",minzoom:4.7,maxzoom:8,
+    id:"hub-hit-major",type:"circle",source:"hubs",minzoom:4.7,maxzoom:5.7,filter:[">=",["get","count"],40],
+    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":18,"circle-opacity":.001,"circle-stroke-width":0}
+  });
+
+  map.addLayer({
+    id:"city-mid-points",type:"symbol",source:"hubs",minzoom:5.7,maxzoom:6.4,filter:[">=",["get","count"],20],
+    layout:{"icon-image":"m98-triangle","icon-size":hubIconSize,"icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true}
+  });
+  map.addLayer({
+    id:"city-mid-labels",type:"symbol",source:"hubs",minzoom:5.9,maxzoom:6.4,filter:[">=",["get","count"],20],
+    layout:{"text-field":["get","name"],"text-size":11,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],"text-offset":[0,-1.3],"text-anchor":"bottom","text-allow-overlap":false},
+    paint:{"text-color":"#20272a","text-halo-color":"rgba(255,255,255,.96)","text-halo-width":1.5}
+  });
+  map.addLayer({
+    id:"hub-hit-mid",type:"circle",source:"hubs",minzoom:5.7,maxzoom:6.4,filter:[">=",["get","count"],20],
+    paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":18,"circle-opacity":.001,"circle-stroke-width":0}
+  });
+
+  map.addLayer({
+    id:"city-all-points",type:"symbol",source:"hubs",minzoom:6.4,maxzoom:12,
+    layout:{"icon-image":"m98-triangle","icon-size":hubIconSize,"icon-anchor":"bottom","icon-allow-overlap":true,"icon-ignore-placement":true}
+  });
+  map.addLayer({
+    id:"city-all-labels",type:"symbol",source:"hubs",minzoom:6.6,maxzoom:12,
+    layout:{"text-field":["get","name"],"text-size":11,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],"text-offset":[0,-1.3],"text-anchor":"bottom","text-allow-overlap":false},
+    paint:{"text-color":"#20272a","text-halo-color":"rgba(255,255,255,.96)","text-halo-width":1.5}
+  });
+  map.addLayer({
+    id:"hub-hit-all",type:"circle",source:"hubs",minzoom:6.4,maxzoom:12,
     paint:{"circle-color":"rgba(0,0,0,.001)","circle-radius":18,"circle-opacity":.001,"circle-stroke-width":0}
   });
 
@@ -329,7 +367,7 @@ function addLayers(){
     "text-offset":[0,1.35],"text-anchor":"top","text-max-width":14,"text-allow-overlap":false
   },paint:{"text-color":"#15181a","text-halo-color":"#ffffff","text-halo-width":1.5}});
 
-  ["hub-hit-capital","hub-hit-city"].forEach(layer=>map.on("click",layer,handleHubClick));
+  ["hub-hit-capital","hub-hit-major","hub-hit-mid","hub-hit-all"].forEach(layer=>map.on("click",layer,handleHubClick));
 
   map.on("click","clusters",async e=>{
     const f=map.queryRenderedFeatures(e.point,{layers:["clusters"]})[0];
@@ -356,7 +394,7 @@ function addLayers(){
     group.length>1 ? showVenuePopup(group) : showPopup(ev);
   });
 
-  ["hub-hit-capital","hub-hit-city","clusters","event-hit","artist-hit"].forEach(layer=>{
+  ["hub-hit-capital","hub-hit-major","hub-hit-mid","hub-hit-all","clusters","event-hit","artist-hit"].forEach(layer=>{
     map.on("mouseenter",layer,()=>map.getCanvas().style.cursor="pointer");
     map.on("mouseleave",layer,()=>map.getCanvas().style.cursor="");
   });
