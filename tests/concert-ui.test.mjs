@@ -35,7 +35,10 @@ test("More button is centered and uses the admin press animation",()=>{
   assert.match(app,/\.tour-more:active\{transform:scale\(\.96\);background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba\(15,30,34,\.08\)\}/);
 });
 
-test("Popular UI is configured for Top 30",()=>{
+test("Popular UI requires a complete Top 30 before browser caching",()=>{
   assert.match(app,/Top 30 popular artists with upcoming Ticketmaster shows\./);
-  assert.match(app,/music98:concert-popular:v3/);
+  assert.match(app,/music98:concert-popular:v4/);
+  assert.match(app,/cached\.artists\.length>=30/);
+  assert.match(app,/data\.artists\.length<30/);
+  assert.match(app,/mode:"popular",v:"popular-v4"/);
 });
