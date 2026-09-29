@@ -599,7 +599,7 @@ test("public Popular read exposes in-progress validated artists without Ticketma
     id:"artist-"+(i+1),name:"Artist "+(i+1),rank:i+1,popularityRank:i+1,shows:3
   }));
   const stateArtists=Array.from({length:12},(_,i)=>({
-    id:"artist-"+(i+1),name:"Artist "+(i+1),rank:i+1,popularityRank:i+1
+    id:"artist-"+(i+1),name:"Artist "+(i+1),rank:i+1,popularityRank:i+1,shows:3
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
     ok:true,mode:"popular",version:"popular-v4",builtAt:new Date().toISOString(),
