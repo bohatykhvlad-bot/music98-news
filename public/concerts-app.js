@@ -74,7 +74,8 @@ const STATIC_HUBS=[
   ["Perth","WA","AU",-31.9505,115.8605],["Auckland","","NZ",-36.8509,174.7645],["Johannesburg","","ZA",-26.2041,28.0473],
   ["Cape Town","","ZA",-33.9249,18.4241]
 ].map(([city,stateCode,countryCode,lat,lng])=>({city,stateCode,countryCode,lat,lng,count:0,static:1}));
-let hotspots=mergeStaticHubSeed();\nfunction mergeStaticHubSeed(){ return STATIC_HUBS.map(h=>({...h})); }
+let hotspots=mergeStaticHubSeed();
+function mergeStaticHubSeed(){ return STATIC_HUBS.map(h=>({...h})); }
 
 const map = new mapboxgl.Map({
   container:root.querySelector("#map"),
