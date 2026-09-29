@@ -5,7 +5,7 @@
  * only by an explicit editorial correction.
  *
  * New song resolution:
- *   1. known exact Apple collection override (rare catalog-search miss)
+ *   1. known exact Apple collection override (verified canonical release)
  *   2. dedicated Apple single/EP for the exact song/version
  *   3. exact Apple song on the artist's own release closest to first release
  * Generic compilations, soundtracks and alternate packs lose to artist releases.
