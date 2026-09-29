@@ -67,6 +67,11 @@ function gainFor(i, tp) {
 
 const previous = loadPrevious();
 const tracks = await loadChart();
+let localApple = {};
+try {
+  const j = JSON.parse(fs.readFileSync(path.resolve("public/data/apple-names.json"), "utf8"));
+  if (j && typeof j === "object" && !Array.isArray(j)) localApple = j;
+} catch {}
 const out = {
   __meta: {
     schema: 1,
@@ -80,7 +85,10 @@ const out = {
 let measured = 0, reused = 0, failed = 0;
 for (const t of tracks) {
   const key = mergeKey(t.title, t.artist);
-  const preview = String(t.prev || t.preview || "");
+  /* Apple metadata is generated immediately before this audit. Prefer its exact
+     preview URL so cover/metadata corrections and loudness measurement are from
+     the same release in the same workflow run. */
+  const preview = String(localApple[key]?.prev || t.prev || t.preview || "");
   if (!key || !preview) continue;
   const old = previous[key];
   if (
