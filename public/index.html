@@ -1198,7 +1198,7 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v31";
+const DAILYKEY = "music98news_daily_v32";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -2084,17 +2084,10 @@ function setChartStatus(f, tag){
   st.hidden = !txt;
 }
 function todayUTC(){ return new Date().toISOString().slice(0,10); }
-const CHART_ART_FIXES={
-  "loser|tame impala":"https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/80/54/11/80541122-c1c4-50ad-a673-ff79f4cf8aa7/196873555331.jpg/600x600bb.jpg",
-  "get lucky|daft punk":"https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/600x600bb.jpg"
-};
-function fixedChartArt(t){
-  const title=String(t?.title||"").toLowerCase().replace(/[’']/g,"").replace(/\s+/g," ").trim();
-  const artist=String(t?.artist||"").toLowerCase().replace(/[’']/g,"").replace(/\s+/g," ").trim();
-  if(title.startsWith("loser") && artist.includes("tame impala")) return CHART_ART_FIXES["loser|tame impala"];
-  if(title.startsWith("get lucky") && artist.includes("daft punk")) return CHART_ART_FIXES["get lucky|daft punk"];
-  return t?.art||"";
-}
+/* Artwork is resolved server-side from the canonical Apple track identity.
+   Do not keep per-song browser overrides here: they can outlive the catalog
+   correction and re-introduce the wrong remix/single sleeve. */
+function fixedChartArt(t){ return t?.art||""; }
 function rowsFromTracks(tracks){
   return (tracks||[]).map(t=>({
     title: t.title, artist: t.artist, url: t.url ? aff(t.url) : "", art: fixedChartArt(t),
@@ -2132,7 +2125,7 @@ function refreshDailyTop50(){
   // Always revalidate so an updated chart cannot stay frozen until tomorrow.
   const grab = u => fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   /* ?d + rev bust both browser and edge copies after chart/cache fixes. */
-  grab("/api/top50?d=" + todayUTC() + "&rev=31").catch(()=> grab("/data/top50.json?rev=31")).then(j=>{
+  grab("/api/top50?d=" + todayUTC() + "&rev=32").catch(()=> grab("/data/top50.json?rev=32")).then(j=>{
     const tracks = (j && j.tracks) || [];
     if(tracks.length < 10) throw 0;
     lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
