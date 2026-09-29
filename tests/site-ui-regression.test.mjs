@@ -13,9 +13,10 @@ test("desktop navigation uses four equal-width pill segments",()=>{
 
 test("Subscribe scales its label with the pill without axis translation",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
-  assert.match(page,/data-pill-press type="submit">Subscribe<\/button>/);
+  assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
   assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(page,/\.press-pill-label\{[^}]*height:18px;[^}]*text-box:trim-both cap alphabetic;[^}]*transform:none;translate:none/);\n  assert.match(page,/\.press-pill\.press \.press-pill-label\{font-size:13\.72px\}/);
+  assert.match(page,/\.press-pill-label\{[^}]*height:18px;[^}]*text-box:trim-both cap alphabetic;[^}]*transform:none;translate:none/);
+  assert.match(page,/\.press-pill\.press \.press-pill-label\{font-size:13\.72px\}/);
   assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*transform:/);
 });
 
