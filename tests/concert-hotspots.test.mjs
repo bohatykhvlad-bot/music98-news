@@ -908,3 +908,43 @@ test("European capital event lists are prewarmed for Cloudflare-only map clicks"
     globalThis.caches=oldCaches;
   }
 });
+
+
+test("incomplete validated Popular rebuild never publishes a 29-row snapshot", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  const rows=Array.from({length:30},(_,i)=>
+    "<tr><td>"+(i+1)+"</td><td>Atomic Artist "+(i+1)+"</td><td>"+(80000000-i*1000)+"</td></tr>"
+  ).join("");
+
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net"){
+      return new Response("<table>"+rows+"</table>",{status:200,headers:{"content-type":"text/html"}});
+    }
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/attractions.json")){
+      const name=u.searchParams.get("keyword")||"";
+      const n=Number(name.replace(/[^0-9]/g,""))||1;
+      return new Response(JSON.stringify({_embedded:{attractions:[{
+        id:"atomic-"+n,name,images:[],classifications:[{segment:{name:"Music"}}],upcomingEvents:{_total:2}
+      }]},page:{totalElements:1,totalPages:1,size:50,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      const id=u.searchParams.get("attractionId")||"";
+      const n=Number(id.replace(/[^0-9]/g,""))||1;
+      if(n===30) return new Response(JSON.stringify({page:{totalElements:0,totalPages:0,size:1,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+      return new Response(JSON.stringify({_embedded:{events:[{id:"atomic-event-"+n,dates:{start:{localDate:"2026-12-01"}}}]},page:{totalElements:2,totalPages:2,size:1,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+
+  try{
+    let result;
+    for(let i=0;i<4;i++) result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+    assert.equal(result.reason,"popular_refresh_incomplete");
+    assert.equal(result.artists,29);
+    assert.equal(kv.raw("concert-popular:v4"),null);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
