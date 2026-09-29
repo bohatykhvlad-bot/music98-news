@@ -98,9 +98,9 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tab\{[\s\S]*?display:grid;place-items:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1/);
   assert.match(app,/function pillInkShift\(el\)/);
   assert.match(app,/Math\.round\(raw\)/);
-  assert.match(app,/\.nav-btn,\.action,\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab,\.map-mode-btn,\.tour-more\{\\n  background:#f4f6f7;border:1px solid #e2e8ea;color:#15181a;font-weight:700;transform:none/);
-  assert.match(app,/\.nav-btn\.active,\.side-tab\.active,\.map-mode-btn\.active\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b/);
-  assert.match(app,/\.radius-option\.active\{background:#fff;border-color:#8a979c;color:#15181a/);
+  assert.match(app,/\.side-tab,\.map-mode-btn,\.tour-more\{\\n  background:#f4f6f7;border:1px solid #e2e8ea;color:#15181a;font-weight:700;transform:none/);
+  assert.match(app,/\.side-tab\.active,\.map-mode-btn\.active\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b/);
+  assert.match(app,/\.radius-option\.active\{background:var\(--accent\);color:#03282b\}/);
   assert.doesNotMatch(app,/\.search-area-btn\{[^}]*translate:-50%/);
   assert.match(app,/getImageData\(/);
   assert.match(app,/\.tour-more\{[^}]*display:grid;place-items:center;text-align:center/);
@@ -144,7 +144,7 @@ test("verified market marker layer is zoom-stable for Rome and every other count
 test("tour-more scales the whole pill on press without changing font size", async () => {
   const fs = await import("node:fs");
   const app = fs.readFileSync(new URL("../public/concerts-app.js", import.meta.url), "utf8");
-  assert.match(app,/\.nav-btn:active,\.action:active,\.radius-trigger:active,\.radius-option:active,\.search-area-btn:active,\.side-tab:active,\.map-mode-btn:active,\.tour-more:active\{\\n  transform:scale\(\.96\)/);
+  assert.match(app,/\.side-tab:active,\.map-mode-btn:active,\.tour-more:active\{\\n  transform:scale\(\.96\)/);
   assert.match(app,/\.tour-more\{[^}]*font-size:12\.5px/);
   assert.doesNotMatch(app,/\.tour-more:active\{[^}]*font-size/);
   assert.doesNotMatch(app,/\.buy\.press \.buy-label/);
@@ -158,11 +158,10 @@ test("Popular warming state polls only the precomputed KV snapshot",()=>{
 });
 
 
-test("concert text pills match admin-desk hover press focus and reduced motion",()=>{
-  assert.match(app,/\.nav-btn:hover,\.action:hover,\.radius-trigger:hover,\.radius-option:hover,\.search-area-btn:hover,\.side-tab:hover,\.map-mode-btn:hover,\.tour-more:hover\{\\n  background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba\(15,30,34,\.07\)/);
+test("concert admin parity excludes navigation and interface controls",()=>{
+  assert.match(app,/\.nav-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.match(app,/\.radius-option\.active\{background:var\(--accent\);color:#03282b\}/);
+  assert.match(app,/\.side-tab:hover,\.map-mode-btn:hover,\.tour-more:hover\{\\n  background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba\(15,30,34,\.07\)/);
   assert.match(app,/\.buy:hover::before\{background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba\(15,30,34,\.07\)\}/);
-  assert.match(app,/@media\(prefers-reduced-motion:reduce\)\{[\s\S]*?\.buy:active,\.buy\.press\{transform:none\}/);
-  assert.doesNotMatch(app,/\.buy\.press\{transform:scale\(\.985\)/);
-  assert.doesNotMatch(app,/\.tour-more:active\{transform:scale\(\.985\)/);
-  assert.doesNotMatch(app,/\.radius-option\.active\{background:var\(--accent\)/);
+  assert.doesNotMatch(app,/\.nav-btn,\.action,\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab/);
 });

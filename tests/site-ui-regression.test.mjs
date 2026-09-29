@@ -11,7 +11,7 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/window\.music98InkShift/);
   assert.match(page,/getImageData\(/);
   assert.match(page,/Math\.round\(advance\/2-inkCenter\)/);
-  assert.match(page,/\.nav-btn:active,\.hint-chip:active\{transform:scale\(\.96\);background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba\(15,30,34,\.08\)/);
+  assert.match(page,/\.nav-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
   assert.doesNotMatch(page,/\.nav-btn\{position:relative;top:\.5px\}/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
@@ -105,13 +105,10 @@ test("Load More mirrors admin-desk regular pill states through its pseudo backgr
 });
 
 
-test("public text pills use the admin-desk palette and reduced-motion fallback",()=>{
-  assert.match(page,/\.nav-btn,\.hint-chip\{[\s\S]*?background:#f4f6f7;border:1px solid #e2e8ea;color:#15181a;font-weight:700/);
-  assert.match(page,/\.nav-btn:hover,\.hint-chip:hover\{background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba\(15,30,34,\.07\)/);
-  assert.match(page,/\.nav-btn\.active\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b/);
-  assert.match(page,/@media \(hover:none\)\{[\s\S]*?\.nav-btn:hover\{background:#f4f6f7;border-color:#e2e8ea;box-shadow:none;color:#15181a\}/);
-  assert.match(page,/@media \(prefers-reduced-motion:reduce\)\{[\s\S]*?\.nav-btn:active,\.hint-chip:active,\.loadmore-btn:active,\.press-pill:active,\.press-pill\.press\{transform:none\}/);
-  assert.doesNotMatch(page,/\.nav-btn:active\{transform:scale\(\.985\)/);
-  assert.doesNotMatch(page,/\.loadmore-btn:active\{transform:scale\(\.985\)/);
-  assert.doesNotMatch(page,/\.press-pill\.press\{transform:scale\(\.985\)/);
+test("public admin parity excludes navigation and interface chips",()=>{
+  assert.match(page,/\.nav-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.match(page,/\.nav-btn\.active\{background:var\(--accent\);color:#03282b\}/);
+  assert.match(page,/\.loadmore-btn:active\{transform:scale\(\.96\)\}/);
+  assert.match(page,/\.press-pill:active,\.press-pill\.press\{transform:scale\(\.96\)\}/);
+  assert.doesNotMatch(page,/\.nav-btn,\.hint-chip\{[\s\S]*?background:#f4f6f7/);
 });

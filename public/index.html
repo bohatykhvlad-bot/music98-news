@@ -121,6 +121,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
    LETTERS on every OS/rasterizer - owner measured ink 1.1px high on Windows.
    Browsers without text-box fall back to normal centering (already even). */
 .nav-btn:hover{color:var(--text)}
+.nav-btn:active{transform:scale(.985) translateZ(0)}
 .nav-btn.active{background:var(--accent);color:#03282b}
 .top-actions{display:flex;align-items:center;gap:10px;justify-self:end}
 .search{position:relative;width:230px;height:40px}
@@ -787,20 +788,8 @@ textarea{resize:vertical;min-height:64px}
 }
 
 /* ---------- admin-desk pill parity ---------- */
-/* Visual states intentionally copy /admin-desk .btn. Existing dimensions
-   (height/padding/font-size) stay owned by each public-site component. */
-.nav-btn,.hint-chip{
-  background:#f4f6f7;border:1px solid #e2e8ea;color:#15181a;font-weight:700;
-  transform:none;transition:transform .12s cubic-bezier(.34,1.2,.64,1),background .15s ease,border-color .15s ease,box-shadow .15s ease;
-  -webkit-tap-highlight-color:transparent;will-change:transform
-}
-.nav-btn:hover,.hint-chip:hover{background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba(15,30,34,.07);color:#15181a}
-.nav-btn:active,.hint-chip:active{transform:scale(.96);background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba(15,30,34,.08);color:#15181a}
-.nav-btn:focus-visible,.hint-chip:focus-visible{outline:2px solid #8a979c;outline-offset:2px}
-.nav-btn.active{background:var(--accent);border-color:var(--accent);color:#03282b;box-shadow:none}
-.nav-btn.active:hover{background:var(--accent);border-color:var(--accent);color:#03282b;box-shadow:none}
-.nav-btn.active:active{transform:scale(.96);background:var(--accent);border-color:var(--accent);color:#03282b;box-shadow:none}
-
+/* Only Subscribe and Load More use the admin-desk button system.
+   Top navigation and other interface controls keep their previous styling. */
 .loadmore-btn,.press-pill{
   background:transparent!important;border-color:transparent!important;transform:none;
   transition:transform .12s cubic-bezier(.34,1.2,.64,1);-webkit-tap-highlight-color:transparent;will-change:transform
@@ -815,23 +804,15 @@ textarea{resize:vertical;min-height:64px}
 .loadmore-btn:active{transform:scale(.96)}
 .loadmore-btn:active::before{background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba(15,30,34,.08)}
 .loadmore-btn:focus-visible{outline:2px solid #8a979c;outline-offset:2px}
-
 .press-pill{color:#0b0d0e;font-weight:700}
 .press-pill:hover{filter:none;color:#0b0d0e}
 .press-pill:hover::before{background:#fff;border-color:#8a979c;box-shadow:0 1px 3px rgba(15,30,34,.09)}
 .press-pill:active,.press-pill.press{transform:scale(.96)}
 .press-pill:active::before,.press-pill.press::before{background:#fff;border-color:#15181a;box-shadow:inset 0 2px 4px rgba(15,30,34,.1)}
 .press-pill:focus-visible{outline:2px solid #8a979c;outline-offset:2px}
-
-@media (hover:none){
-  .nav-btn:hover{background:#f4f6f7;border-color:#e2e8ea;box-shadow:none;color:#15181a}
-  .nav-btn:active{transform:scale(.96);background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba(15,30,34,.08);color:#15181a}
-  .nav-btn.active:hover{background:var(--accent);border-color:var(--accent);box-shadow:none;color:#03282b}
-  .nav-btn.active:active{transform:scale(.96);background:var(--accent);border-color:var(--accent);box-shadow:none;color:#03282b}
-}
 @media (prefers-reduced-motion:reduce){
-  .nav-btn,.hint-chip,.loadmore-btn,.press-pill,.loadmore-btn::before,.press-pill::before{transition:none}
-  .nav-btn:active,.hint-chip:active,.loadmore-btn:active,.press-pill:active,.press-pill.press{transform:none}
+  .loadmore-btn,.press-pill,.loadmore-btn::before,.press-pill::before{transition:none}
+  .loadmore-btn:active,.press-pill:active,.press-pill.press{transform:none}
 }
 </style>
 </head>
