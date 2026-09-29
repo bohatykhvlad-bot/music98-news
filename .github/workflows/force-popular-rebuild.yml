@@ -63,3 +63,5 @@ assert len(artists) >= 30, f"public Popular returned {len(artists)} artists"
 assert d.get("warming") is False, f"public Popular still warming: {d}"
 print("verified_public_artists=", len(artists))
 PY
+
+# trigger-once
