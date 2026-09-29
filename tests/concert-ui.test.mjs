@@ -18,11 +18,12 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
   assert.match(app,/\.venue-event-name\{display:block;font-size:var\(--event-main-size\)/);
 });
 
-test("Buy Tickets pill and text scale together from the same center",()=>{
+test("Buy Tickets pill scales while text uses a crisp native pressed size",()=>{
   assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
-  assert.match(app,/\.buy-label\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
-  assert.match(app,/\.buy\.press::before,\.buy\.press \.buy-label\{transform:scale\(\.92\)\}/);
-  assert.doesNotMatch(app,/\.buy\.press\{[^}]*(?:transform|scale|translate)/);
+  assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
+  assert.match(app,/\.buy\.press::before\{transform:scale\(\.92\)\}/);
+  assert.match(app,/\.buy\.press \.buy-label\{font-size:12px\}/);
+  assert.doesNotMatch(app,/\.buy\.press \.buy-label\{[^}]*transform/);
 });
 
 test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
