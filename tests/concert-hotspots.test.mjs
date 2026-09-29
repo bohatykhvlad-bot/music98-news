@@ -29,6 +29,7 @@ import {
   refreshPopularSnapshot,
   refreshPopularTourSnapshots,
   refreshCapitalEventSnapshots,
+  refreshMapMarketSnapshot,
   onRequestGet
 } from "../functions/api/concerts.js";
 
@@ -384,6 +385,53 @@ test("sparse public hotspot read is read-only and never starts background warmup
     assert.equal(queued.length,0);
     assert.equal(externalCalls,0);
     assert.equal(kv.raw("concert-map:warm-lock:v1"),null);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
+test("daily market snapshot publishes only cities with real upcoming Ticketmaster music events", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  let calls=0;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(!u.pathname.endsWith("/events.json")) return new Response("not found",{status:404});
+    calls++;
+    assert.equal(u.searchParams.get("classificationName"),"music");
+    assert.ok(u.searchParams.get("startDateTime"));
+    const city=u.searchParams.get("city")||"";
+    const hasShows=["London","Paris","Los Angeles","Dubai"].includes(city);
+    return new Response(JSON.stringify(hasShows ? {
+      _embedded:{events:[{id:"e-"+city,dates:{start:{localDate:"2026-10-10"}}}]},
+      page:{totalElements:3,totalPages:3,size:1,number:0}
+    } : {
+      page:{totalElements:0,totalPages:0,size:1,number:0}
+    }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+  };
+
+  try{
+    let result;
+    for(let i=0;i<8;i++){
+      result=await refreshMapMarketSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv},i===0);
+      if(result.complete) break;
+    }
+    assert.equal(result.complete,true);
+    assert.ok(calls>100);
+
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?mode=markets"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.version,"concert-markets-v1");
+    assert.ok(data.markets.length>=4);
+    assert.ok(data.markets.every(x=>x.verified===true && Number(x.count)>0));
+    assert.ok(data.markets.some(x=>x.city==="Dubai"));
+    assert.ok(data.markets.some(x=>x.city==="Los Angeles"));
+    assert.equal(data.markets.some(x=>x.city==="Yerevan"),false);
   }finally{
     globalThis.fetch=oldFetch;
   }
