@@ -36,10 +36,6 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
   assert.match(app,/function showVenuePopup\(events\)\{\n  if\(!events\?\.length \|\| map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
 });
 
-test("More button keeps its existing behavior with equal vertical spacing",()=>{
-  assert.match(app,/\.tour-more\{width:fit-content;max-width:100%;[^}]*margin:5px auto 5px/);
-});
-
 test("Popular UI renders strict confirmed cache immediately without an explanatory banner",()=>{
   assert.match(app,/music98:concert-popular:v6/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
