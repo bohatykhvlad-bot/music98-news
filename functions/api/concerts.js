@@ -1406,7 +1406,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     await cache.put(cacheKey, res.clone()).catch(() => {});
     return res;
   } catch (err) {
-    if (err?.message === "ticketmaster_budget_guard") {
+    if (err?.message === "ticketmaster_budget_guard" || Number(err?.status||0)===429) {
       return json({ error:"ticketmaster_temporarily_limited" }, 429, { "Retry-After":"3600" });
     }
     if (err?.message === "ticketmaster_unavailable") {
