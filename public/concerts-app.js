@@ -105,14 +105,19 @@ let currentTotal=0;
 let popularEvents=[];
 let popularArtists=[];
 const ZERO_QUOTA_POPULAR_SUPPLEMENT=[
-  // Ticketmaster web pages were checked on 2026-09-29. These are only used
-  // while the strict Worker snapshot is below 30; the server list always wins.
-  {name:"Teddy Swims",image:"",shows:73,eventConfirmed:true,webVerified:true,popularityRank:1001},
-  {name:"Chris Stapleton",image:"",shows:6,eventConfirmed:true,webVerified:true,popularityRank:1002},
-  {name:"Twenty One Pilots",image:"",shows:11,eventConfirmed:true,webVerified:true,popularityRank:1003},
-  {name:"Luke Combs",image:"",shows:12,eventConfirmed:true,webVerified:true,popularityRank:1004},
-  {name:"Benson Boone",image:"",shows:1,eventConfirmed:true,webVerified:true,popularityRank:1005}
-];
+  // Current Ticketmaster public pages checked 2026-09-29. One real event is
+  // embedded for each fallback so expanding these rows costs zero Worker/API quota.
+  {name:"Teddy Swims",image:"",shows:73,eventConfirmed:true,webVerified:true,popularityRank:1001,
+   events:[{id:"web-teddy-swims-20261002",artist:"Teddy Swims",name:"Teddy Swims: The UGLY Tour",date:"2026-10-02",time:"19:00:00",city:"Brooklyn",state:"NY",country:"United States",venue:"Barclays Center",url:"https://www.ticketmaster.com/teddy-swims-tickets/artist/2712573"}]},
+  {name:"Chris Stapleton",image:"",shows:6,eventConfirmed:true,webVerified:true,popularityRank:1002,
+   events:[{id:"web-chris-stapleton-20261002",artist:"Chris Stapleton",name:"Chris Stapleton's All-American Road Show",date:"2026-10-02",time:"19:30:00",city:"Bristow",state:"VA",country:"United States",venue:"Jiffy Lube Live",url:"https://www.ticketmaster.com/chris-stapleton-tickets/artist/1828177"}]},
+  {name:"Twenty One Pilots",image:"",shows:10,eventConfirmed:true,webVerified:true,popularityRank:1003,
+   events:[{id:"web-twenty-one-pilots-20261004",artist:"Twenty One Pilots",name:"Austin City Limits Music Festival - Weekend One",date:"2026-10-04",time:"12:00:00",city:"Austin",state:"TX",country:"United States",venue:"Zilker Park",url:"https://www.ticketmaster.com/twenty-one-pilots-tickets/artist/1495843"}]},
+  {name:"Luke Combs",image:"",shows:12,eventConfirmed:true,webVerified:true,popularityRank:1004,
+   events:[{id:"web-luke-combs-20270403",artist:"Luke Combs",name:"Luke Combs w/ Treaty Oak Revival",date:"2027-04-03",time:"17:20:00",city:"Arlington",state:"TX",country:"United States",venue:"AT&T Stadium",url:"https://www.ticketmaster.com/luke-combs-tickets/artist/2150342"}]},
+  {name:"Benson Boone",image:"",shows:1,eventConfirmed:true,webVerified:true,popularityRank:1005,
+   events:[{id:"web-benson-boone-20261102",artist:"Benson Boone",name:"Benson Boone – Live in Singapore",date:"2026-11-02",time:"20:00:00",city:"Singapore",state:"",country:"Singapore",venue:"The Star Theatre",url:"https://www.ticketmaster.com/benson-boone-tickets/artist/2892837"}]}
+
 function withVerifiedPopularSupplement(rows){
   const out=[];
   const seenIds=new Set(),seenNames=new Set();
@@ -849,7 +854,7 @@ function renderEventList(box,events){
 }
 
 async function eventsForArtist(item,mode){
-  if(mode==="nearby" && Array.isArray(item.events)) return item.events;
+  if(Array.isArray(item.events) && item.events.length) return item.events;
   const key=item.id ? "id:"+item.id : "name:"+String(item.name||"").toLowerCase();
   if(artistEventCache.has(key)) return artistEventCache.get(key);
   const params=item.id ? {attractionId:item.id} : {artist:item.name};
