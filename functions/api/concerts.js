@@ -354,61 +354,13 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
   return null;
 }
 
-async function popularPayload(env) {
-  const ranking = await kworbArtists();
-  const candidates = ranking.artists.slice(0, POPULAR_CANDIDATE_LIMIT);
-  const found = [];
-
-  // Scheduled-only work is deliberately sequential. We walk the Spotify
-  // monthly-listener ranking from the top and keep only artists for whom
-  // Ticketmaster has an exact-name attraction on a future music event.
-  for (const candidate of candidates) {
-    if (found.length >= POPULAR_LIMIT) break;
-    let artist=null;
-    try{
-      artist=await validatePopularArtist(env,candidate.name,candidate.rank,candidate.listeners);
-    }catch(err){
-      if(err?.message==="ticketmaster_budget_guard" || Number(err?.status)===429 ||
-         err?.message==="ticketmaster_unavailable") throw err;
-      continue;
-    }
-    if (!artist || found.some(x => x.id === artist.id)) continue;
-    found.push(artist);
-  }
-
-  return {
-    ok: true,
-    mode: "popular",
-    artists: found.slice(0, POPULAR_LIMIT).map((a, i) => ({
-      id: a.id,
-      name: a.name,
-      image: a.image,
-      rank: i + 1,
-      popularityRank: a.popularityRank,
-      listeners: a.listeners,
-      firstDate: a.firstDate,
-    })),
-    source: ranking.source,
-    ranking: "Spotify monthly listeners",
-    candidateCount: candidates.length,
-    eligibleCount: found.length,
-    targetCount: POPULAR_LIMIT,
-  };
-}
 const HOTSPOT_BUILD_JOB_BUDGET = 2;
 const HOTSPOT_VERIFY_BUDGET = 10;
 const HOTSPOT_CACHE_TTL = 24 * 60 * 60;
 const HOTSPOT_VENUE_CACHE_PREFIX = "concert-hotspots:v19:venue:";
 const HOTSPOT_CITY_CACHE_PREFIX = "concert-hotspots:v19:city:";
-let hotspotLastFetchAt = 0;
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 async function hotspotTmJson(url, env) {
   const out = await tmJson(url, env, "scheduled");
-  hotspotLastFetchAt = Date.now();
   return out;
 }
 
