@@ -1,1 +1,12 @@
-{}
+{
+  "loser|tameimpala": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "1836226731",
+    "collectionId": "1836226516",
+    "collectionName": "Deadbeat",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/80/54/11/80541122-c1c4-50ad-a673-ff79f4cf8aa7/196873555331.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T17:45:00.000Z"
+  }
+}
