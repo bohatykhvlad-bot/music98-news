@@ -10,18 +10,20 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/\.nav-btn\{width:100%;text-indent:var\(--ink-x,0px\);/);
   assert.match(page,/window\.music98InkShift/);
   assert.match(page,/getImageData\(/);
-  assert.match(page,/Math\.round\(\(advance\/2-inkCenter\)\*2\)\/2/);
+  assert.match(page,/Math\.round\(advance\/2-inkCenter\)/);
+  assert.match(page,/\.nav-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.doesNotMatch(page,/\.nav-btn\{position:relative;top:\.5px\}/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
-test("Subscribe scales only its background so text is never raster-scaled",()=>{
+test("Subscribe pre-promotes the whole pill and scales text with the button",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
-  assert.match(page,/\.press-pill\{[^}]*transform:none!important/);
-  assert.match(page,/\.press-pill::before\{[^}]*transform:scale\(1\);[^}]*will-change:transform/);
-  assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.985\)\}/);
-  assert.match(page,/\.press-pill-label\{[^}]*transform:none;translate:none;transition:none/);
-  assert.doesNotMatch(page,/\.press-pill\.press\{[^}]*scale\(/);
+  assert.match(page,/\.press-pill\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
+  assert.match(page,/\.press-pill\.press\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.match(page,/\.press-pill-label\{[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
+  assert.doesNotMatch(page,/\.press-pill\.press::before/);
+  assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label/);
 });
 
 test("chart artwork is server-audited and has no browser point-fix table",()=>{
@@ -96,8 +98,8 @@ test("valid empty Desk feed does not resurrect bundled News/Releases",()=>{
 });
 
 
-test("Load More scales only its background so its text stays sharp",()=>{
-  assert.match(page,/\.loadmore-btn::before\{[^}]*transform:scale\(1\);[^}]*will-change:transform/);
-  assert.match(page,/\.loadmore-btn:active::before\{transform:scale\(\.98\)\}/);
-  assert.doesNotMatch(page,/\.loadmore-btn:active\{transform:scale/);
+test("Load More pre-promotes and scales the whole pill",()=>{
+  assert.match(page,/\.loadmore-btn\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
+  assert.match(page,/\.loadmore-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.doesNotMatch(page,/\.loadmore-btn:active::before/);
 });

@@ -18,12 +18,11 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
   assert.match(app,/\.venue-event-name\{display:block;font-size:var\(--event-main-size\)/);
 });
 
-test("Buy Tickets scales only its background so text is never raster-scaled",()=>{
-  assert.match(app,/\.buy\{[^}]*transform:none;transition:color/);
-  assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);[^}]*will-change:transform/);
-  assert.match(app,/\.buy\.press::before\{transform:scale\(\.985\)\}/);
-  assert.match(app,/\.buy-label\{[^}]*transform:none;translate:none;transition:none/);
-  assert.doesNotMatch(app,/\.buy\.press\{[^}]*scale\(/);
+test("Buy Tickets pre-promotes the whole pill and scales its text",()=>{
+  assert.match(app,/\.buy\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
+  assert.match(app,/\.buy\.press\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
+  assert.doesNotMatch(app,/\.buy\.press::before/);
   assert.doesNotMatch(app,/\.buy\.press \.buy-label/);
 });
 
@@ -98,7 +97,10 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tab\{[\s\S]*?transition:\.18s;/);
   assert.match(app,/\.side-tab\{[\s\S]*?display:grid;place-items:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1/);
   assert.match(app,/function pillInkShift\(el\)/);
-  assert.match(app,/Math\.round\(raw\*2\)\/2/);
+  assert.match(app,/Math\.round\(raw\)/);
+  assert.match(app,/\.action,\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab,\.map-mode-btn,\.tour-more\{\\n  transform:translateZ\(0\)/);
+  assert.match(app,/\.side-tab:active,\.map-mode-btn:active/);
+  assert.doesNotMatch(app,/\.search-area-btn\{[^}]*translate:-50%/);
   assert.match(app,/getImageData\(/);
   assert.match(app,/\.tour-more\{[^}]*display:grid;place-items:center;text-align:center/);
   assert.match(app,/\.map-mode-btn\{[^}]*display:grid;place-items:center;text-align:center/);
@@ -138,11 +140,12 @@ test("verified market marker layer is zoom-stable for Rome and every other count
 });
 
 
-test("tour-more keeps text pixels stable on press", async () => {
+test("tour-more scales the whole pill on press without changing font size", async () => {
   const fs = await import("node:fs");
   const app = fs.readFileSync(new URL("../public/concerts-app.js", import.meta.url), "utf8");
-  assert.match(app,/\.tour-more:active\{transform:none/);
-  assert.doesNotMatch(app,/\.tour-more:active\{transform:scale/);
+  assert.match(app,/\.tour-more:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
+  assert.match(app,/\.tour-more\{[^}]*font-size:12\.5px/);
+  assert.doesNotMatch(app,/\.tour-more:active\{[^}]*font-size/);
   assert.doesNotMatch(app,/\.buy\.press \.buy-label/);
 });
 
