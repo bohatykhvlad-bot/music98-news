@@ -948,3 +948,133 @@ test("incomplete validated Popular rebuild never publishes a 29-row snapshot", a
     globalThis.fetch=oldFetch;
   }
 });
+
+
+test("legacy exhausted 27-row Popular state expands to the new candidate depth and reaches 30", async () => {
+  const kv=memoryKv();
+  const found=Array.from({length:27},(_,i)=>({
+    id:"artist-"+(i+1),name:"Artist "+(i+1),image:"",
+    rank:i+1,popularityRank:i+1,listeners:100000000-i*1000,
+    shows:2,eventConfirmed:true,firstDate:"2026-12-01"
+  }));
+  const oldCandidates=Array.from({length:30},(_,i)=>({
+    name:"Artist "+(i+1),rank:i+1,listeners:100000000-i*1000
+  }));
+  await kv.put("concert-popular:v4",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v4",builtAt:new Date().toISOString(),
+    source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
+    eligibility:"ticketmaster_event_payload_gt_0",candidateCount:30,
+    eligibleCount:27,targetCount:30,artists:found
+  }));
+  await kv.put("concert-popular:v4:state",JSON.stringify({
+    version:"popular-v4",startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+    source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
+    candidates:oldCandidates,index:30,found:found.map(x=>({...x})),errors:0
+  }));
+
+  const rows=Array.from({length:40},(_,i)=>
+    "<tr><td>"+(i+1)+"</td><td>Artist "+(i+1)+"</td><td>"+(100000000-i*1000)+"</td></tr>"
+  ).join("");
+  const oldFetch=globalThis.fetch;
+  const keywords=[];
+  const eventSizes=[];
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net"){
+      return new Response("<table>"+rows+"</table>",{status:200,headers:{"content-type":"text/html"}});
+    }
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/attractions.json")){
+      const name=u.searchParams.get("keyword")||"";
+      keywords.push(name);
+      const n=Number(name.replace(/[^0-9]/g,""))||1;
+      return new Response(JSON.stringify({_embedded:{attractions:[{
+        id:"artist-"+n,name,images:[],classifications:[{segment:{name:"Music"}}],upcomingEvents:{_total:2}
+      }]},page:{totalElements:1,totalPages:1,size:50,number:0}}),
+      {status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      eventSizes.push(u.searchParams.get("size"));
+      const id=u.searchParams.get("attractionId")||"";
+      const n=Number(id.replace(/[^0-9]/g,""))||1;
+      return new Response(JSON.stringify({
+        _embedded:{events:[{
+          id:"event-"+n,name:"Artist "+n+" Live",url:"https://example.com/event-"+n,
+          dates:{start:{localDate:"2026-12-01",localTime:"20:00:00"}},
+          _embedded:{
+            attractions:[{id:"artist-"+n,name:"Artist "+n,images:[]}],
+            venues:[{name:"Venue",city:{name:"Paris"},country:{name:"France",countryCode:"FR"},location:{latitude:"48.8566",longitude:"2.3522"}}]
+          },images:[]
+        }]},
+        page:{totalElements:2,totalPages:1,size:200,number:0}
+      }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+
+  try{
+    const result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+    assert.equal(result.complete,true);
+    assert.equal(result.artists,30);
+    assert.equal(keywords[0],"Artist 31");
+    assert.deepEqual(keywords.slice(0,3),["Artist 31","Artist 32","Artist 33"]);
+    assert.equal(eventSizes.every(x=>x==="200"),true);
+
+    const snap=JSON.parse(kv.raw("concert-popular:v4"));
+    assert.equal(snap.artists.length,30);
+    assert.equal(snap.artists[29].name,"Artist 33");
+
+    const seeded=JSON.parse(kv.raw("concert-popular:v4:tour:artist-31"));
+    assert.equal(seeded.evidence,"popular_validation_first_page");
+    assert.equal(seeded.events.length,1);
+    assert.equal(seeded.events[0].artist,"Artist 31");
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
+test("tour prewarm skips a fresh validation cache without spending its origin-call budget", async () => {
+  const kv=memoryKv();
+  const builtAt=new Date().toISOString();
+  await kv.put("concert-popular:v4",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v4",builtAt,
+    source:"spotify_monthly_listeners",eligibility:"ticketmaster_event_payload_gt_0",
+    artists:[
+      {id:"artist-1",name:"Artist One",rank:1,popularityRank:1,shows:1,eventConfirmed:true},
+      {id:"artist-2",name:"Artist Two",rank:2,popularityRank:2,shows:1,eventConfirmed:true}
+    ]
+  }));
+  await kv.put("concert-popular:v4:tour:artist-1",JSON.stringify({
+    ok:true,builtAt:new Date().toISOString(),evidence:"popular_validation_first_page",
+    events:[{id:"cached",artist:"Artist One",lat:1,lng:1}],page:{totalElements:1}
+  }));
+
+  const oldFetch=globalThis.fetch;
+  let tmCalls=0;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      tmCalls++;
+      assert.equal(u.searchParams.get("attractionId"),"artist-2");
+      return new Response(JSON.stringify({
+        _embedded:{events:[{
+          id:"e2",name:"Show",dates:{start:{localDate:"2026-10-10",localTime:"20:00:00"}},
+          _embedded:{
+            attractions:[{id:"artist-2",name:"Artist Two",images:[]}],
+            venues:[{name:"Venue",city:{name:"Paris"},country:{name:"France",countryCode:"FR"},location:{latitude:"48.8566",longitude:"2.3522"}}]
+          },images:[]
+        }]},
+        page:{size:200,totalElements:1,totalPages:1,number:0}
+      }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+
+  try{
+    const warm=await refreshPopularTourSnapshots({TICKETMASTER_API_KEY:"test",DESK:kv},1);
+    assert.equal(warm.complete,true);
+    assert.equal(warm.processed,1);
+    assert.equal(tmCalls,1);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});

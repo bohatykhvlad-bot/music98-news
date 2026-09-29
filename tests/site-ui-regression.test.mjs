@@ -21,7 +21,7 @@ test("Subscribe scales its label with the pill without axis translation",()=>{
 
 test("verified chart artwork overrides apply even to same-day browser cache",()=>{
   assert.match(page,/CHART_ART_FIXES/);
-  assert.match(page,/196873662978\.jpg\/600x600bb\.jpg/);
+  assert.match(page,/Tame-Impala-Loser\.jpg\?fit=cover&quality=85&width=1200/);
   assert.match(page,/886443919266\.jpg\/600x600bb\.jpg/);
   assert.match(page,/art: fixedChartArt\(t\)/);
 });

@@ -412,7 +412,10 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
   // contain artists for whom a real upcoming event payload exists.
   const eventsUrl = baseEventUrl(env.TICKETMASTER_API_KEY);
   eventsUrl.searchParams.set("attractionId", String(exact.id));
-  eventsUrl.searchParams.set("size", "1");
+  // Fetch a useful first page while validating. This is the same Ticketmaster
+  // request we already spend for validation, but it also seeds the click cache
+  // so opening a Popular artist does not immediately need another live request.
+  eventsUrl.searchParams.set("size", "200");
   eventsUrl.searchParams.set("sort", "date,asc");
   eventsUrl.searchParams.set("locale", "en-us,en,*");
   const eventsRaw = await tmJson(eventsUrl, env, "scheduled");
@@ -420,6 +423,22 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
   const total = Number(eventsRaw?.page?.totalElements ?? events.length) || 0;
   const first = events[0];
   if(total<=0 || !first?.id) return null;
+
+  const normalizedEvents=events.map(normalizeEvent).filter(Boolean);
+  if(normalizedEvents.length){
+    const builtAt=new Date().toISOString();
+    await kvPutJson(env,popularTourCacheKey(exact.id),{
+      ok:true,
+      events:normalizedEvents,
+      page:eventsRaw?.page||{size:normalizedEvents.length,totalElements:total,totalPages:1,number:0},
+      partial:normalizedEvents.length<total,
+      pagesFetched:1,
+      query:{attractionId:String(exact.id)},
+      builtAt,
+      artistId:String(exact.id),
+      evidence:"popular_validation_first_page"
+    },{expirationTtl:36*60*60}).catch(()=>{});
+  }
 
   return {
     id:String(exact.id),
@@ -603,6 +622,27 @@ export async function refreshPopularSnapshot(env, force = false) {
     }
   }
 
+  // POPULAR_CANDIDATE_LIMIT was increased after some v4 states already existed
+  // in KV. Extend an exhausted legacy candidate array in place instead of
+  // leaving a 27/30 build permanently parked at the old cursor.
+  if(!force &&
+     state?.version==="popular-v4" &&
+     Array.isArray(state.candidates) &&
+     Array.isArray(state.found) &&
+     state.found.length<POPULAR_LIMIT &&
+     state.index>=state.candidates.length &&
+     state.candidates.length<POPULAR_CANDIDATE_LIMIT){
+    const ranking=await kworbArtists();
+    if(ranking.source===state.source){
+      const expanded=ranking.artists.slice(0,POPULAR_CANDIDATE_LIMIT);
+      if(expanded.length>state.candidates.length){
+        state.candidates=expanded;
+        state.updatedAt=new Date().toISOString();
+        await kvPutJson(env,POPULAR_STATE_KEY,state);
+      }
+    }
+  }
+
   // Reuse recent real Ticketmaster event payloads before spending origin
   // quota. This is stricter than attraction.upcomingEvents and lets a rebuild
   // recover safely even while the Ticketmaster reserve guard is active.
@@ -765,11 +805,13 @@ export async function refreshPopularTourSnapshots(env,budget=4){
   const limit=Math.max(1,Math.min(6,Number(budget)||4));
   while(state.index<popular.artists.length && processed<limit){
     const artist=popular.artists[state.index++];
-    processed++;
     if(!artist?.id) continue;
     const key=popularTourCacheKey(artist.id);
     const cached=await kvGetJson(env,key);
-    if(cached?.sourceBuiltAt===popular.builtAt && prewarmFresh(cached)) continue;
+    // A fresh validation-seeded tour cache is just as useful as a later
+    // prewarm. Skipping it must not consume the one-origin-call cron budget.
+    if(prewarmFresh(cached) && Array.isArray(cached?.events) && cached.events.length) continue;
+    processed++;
     try{
       const payload=await scheduledEventPayload(env,{attractionId:artist.id});
       payload.sourceBuiltAt=popular.builtAt;
