@@ -16,4 +16,52 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: One-time force concert Top 30 rebuild
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="https://music98.news/api/__m98-popular-rebuild-4f9d72c1"
+
+          reset=""
+          for i in $(seq 1 12); do
+            if reset="$(curl -fsS --max-time 45 "$base?reset=1")"; then
+              echo "$reset"
+              break
+            fi
+            sleep 5
+          done
+          test -n "$reset"
+
+          complete="false"
+          artists="0"
+          found="0"
+          for i in $(seq 1 16); do
+            body="$(curl -fsS --max-time 45 "$base")"
+            echo "$body"
+            read -r complete artists found <<<"$(BODY="$body" python - <<'PY'
+import json, os
+d=json.loads(os.environ["BODY"])
+print(str(bool(d.get("complete"))).lower(), int(d.get("artists") or 0), int(d.get("found") or 0))
+PY
+)"
+            echo "step=$i complete=$complete artists=$artists found=$found"
+            if [ "$complete" = "true" ] && [ "$artists" -ge 30 ]; then
+              break
+            fi
+            sleep 1
+          done
+
+          test "$complete" = "true"
+          test "$artists" -ge 30
+
+          public="$(curl -fsS --max-time 30 'https://music98.news/api/concerts?mode=popular&v=popular-v4&forcecheck=20260929')"
+          echo "$public"
+          PUBLIC="$public" python - <<'PY'
+import json, os
+d=json.loads(os.environ["PUBLIC"])
+artists=d.get("artists") or []
+assert len(artists) >= 30, f"public Popular returned {len(artists)} artists"
+assert d.get("warming") is False, f"public Popular still warming: {d}"
+print("verified_public_artists=", len(artists))
+PY
       - run: npm run check
