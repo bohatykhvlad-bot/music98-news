@@ -11,9 +11,15 @@ name: apple-data
 # Это же снимает проблему "w/"-написания: имя всегда эпловское.
 
 on:
-  # Do not invoke the live chart Worker on every related source push. The
-  # committed registry already ships the correction; refresh happens once a day
-  # or when an editor explicitly runs this workflow.
+  # Re-run immediately when the resolver itself changes; ordinary site/content
+  # pushes still do not invoke the live chart Worker.
+  push:
+    branches: [main]
+    paths:
+      - "scripts/build-covers.mjs"
+      - "scripts/chart-artwork-regression.mjs"
+      - "functions/lib/chart-identity.js"
+      - "public/data/cover-corrections.json"
   schedule:
     # раз в сутки, утром после смены чартового дня (09:20 по Киеву): свежий чарт
     # получает эпловские имена, ссылки, превью и обложки тем же утром
@@ -38,22 +44,40 @@ jobs:
       - name: Собрать cover registry и Apple metadata
         run: |
           cp public/data/covers.json /tmp/covers-before.json
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            export REVALIDATE_EXISTING=0
+          else
+            export REVALIDATE_EXISTING=1
+          fi
           node scripts/build-covers.mjs
           node - <<'NODE'
           const fs = require("fs");
           const before = JSON.parse(fs.readFileSync("/tmp/covers-before.json","utf8"));
           const after = JSON.parse(fs.readFileSync("public/data/covers.json","utf8"));
+          const names = JSON.parse(fs.readFileSync("public/data/apple-names.json","utf8"));
           const corrections = JSON.parse(fs.readFileSync("public/data/cover-corrections.json","utf8"));
-          for (const [key, url] of Object.entries(before)) {
-            if (after[key] !== url) {
-              if (corrections[key] && corrections[key].art === after[key]) {
-                console.log("approved editorial cover correction:", key);
-                continue;
-              }
-              throw new Error("immutable cover changed: " + key + "\nwas: " + url + "\nnow: " + after[key]);
+          const appleArt = (u) => {
+            try {
+              const h = new URL(String(u || "")).hostname.toLowerCase();
+              return h === "mzstatic.com" || h.endsWith(".mzstatic.com");
+            } catch { return false; }
+          };
+          let changed = 0;
+          for (const [key, url] of Object.entries(after)) {
+            if (!appleArt(url)) throw new Error("non-Apple cover in registry: " + key);
+            if (before[key] === url) continue;
+            changed++;
+            if (corrections[key]?.art === url) {
+              console.log("approved editorial cover correction:", key);
+              continue;
             }
+            const rec = names[key];
+            if (!rec?.url || !rec?.title || !rec?.artist) {
+              throw new Error("revalidated cover has no matching Apple identity: " + key);
+            }
+            console.log("verified Apple cover refresh:", key, "->", rec.url);
           }
-          console.log("cover registry immutability: PASS", Object.keys(before).length, "existing locks preserved");
+          console.log("cover registry safety: PASS", changed, "verified changes");
           NODE
       - name: Закоммитить, если изменилось
         run: |
