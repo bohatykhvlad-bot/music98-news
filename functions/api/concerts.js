@@ -1315,7 +1315,8 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const artist = String(u.searchParams.get("artist") || "").trim().slice(0, 120);
   const attractionId = String(u.searchParams.get("attractionId") || "").trim().slice(0, 160);
   const city = String(u.searchParams.get("city") || "").trim().slice(0, 120);
-  const countryCode = String(u.searchParams.get("countryCode") || "").trim().toUpperCase().slice(0, 3);\n  const stateCode = String(u.searchParams.get("stateCode") || "").trim().toUpperCase().slice(0, 3);
+  const countryCode = String(u.searchParams.get("countryCode") || "").trim().toUpperCase().slice(0, 3);
+  const stateCode = String(u.searchParams.get("stateCode") || "").trim().toUpperCase().slice(0, 3);
   const radius = Math.min(500, Math.max(5, finite(u.searchParams.get("radius")) || 100));
 
   if (mode !== "popular" && mode !== "artist-search" && !artist && !attractionId && !city &&
@@ -1377,7 +1378,8 @@ export async function onRequestGet({ request, env, waitUntil }) {
       tm.searchParams.set("keyword", artist);
     } else if (city) {
       tm.searchParams.set("city", city);
-      if(countryCode) tm.searchParams.set("countryCode", countryCode);\n      if(stateCode) tm.searchParams.set("stateCode", stateCode);
+      if(countryCode) tm.searchParams.set("countryCode", countryCode);
+      if(stateCode) tm.searchParams.set("stateCode", stateCode);
     } else {
       const step=nearbyCacheStep(radius);
       const queryLat=snapCoord(lat,step);
