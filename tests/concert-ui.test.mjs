@@ -134,3 +134,12 @@ test("verified market marker layer is zoom-stable for Rome and every other count
   assert.match(app,/id:"city-all-points"[\s\S]*?layout:\{"visibility":"none"/);
   assert.match(app,/\["city-major-points","city-mid-points","city-all-points"\]\.forEach\(id=>setLayerVisible\(id,false\)\)/);
 });
+
+
+test("tour-more keeps text pixels stable on press", async () => {
+  const fs = await import("node:fs");
+  const app = fs.readFileSync(new URL("../public/concerts-app.js", import.meta.url), "utf8");
+  assert.match(app,/\.tour-more:active\{transform:none/);
+  assert.doesNotMatch(app,/\.tour-more:active\{transform:scale/);
+  assert.match(app,/\.buy\.press \.buy-label\{font-size:13px\}/);
+});

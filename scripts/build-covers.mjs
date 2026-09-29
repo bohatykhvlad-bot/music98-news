@@ -30,7 +30,11 @@ async function json(url,tries=3){
   }
   throw last||new Error("request failed");
 }
-const trackIdFrom=u=>(String(u||"").match(/[?&]i=(\d+)/)||[])[1]||"";
+const trackIdFrom=u=>{
+  const s=String(u||"");
+  return (s.match(/[?&]i=(\d+)/)||[])[1] ||
+    (s.match(/\/song\/(\d+)(?:[/?#]|$)/i)||[])[1] || "";
+};
 function appleRecord(raw){
   const album=String(raw?.collectionId||""), track=String(raw?.trackId||"");
   return {title:String(raw?.trackName||""),artist:String(raw?.artistName||""),url:album&&track?`https://music.apple.com/us/album/${album}?i=${track}`:String(raw?.trackViewUrl||""),prev:String(raw?.previewUrl||""),year:String(raw?.releaseDate||"").slice(0,4)};
