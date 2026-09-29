@@ -1107,6 +1107,14 @@ async function loadPopular(force=false){
   }catch(err){
     if(requestId!==popularRequestSeq) return;
     console.error(err);
+    // A transient Cloudflare/network failure must not erase a good local Top 30.
+    if(popularArtists.length){
+      renderArtists(popularArtists,"popular");
+      setEventData([]);
+      sideEmpty.hidden=true;
+      setStatus("");
+      return;
+    }
     toursEl.textContent="";
     sideEmpty.hidden=false;
     sideEmpty.textContent="Could not load popular artists right now.";
