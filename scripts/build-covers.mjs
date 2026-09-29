@@ -214,6 +214,10 @@ if (idWanted.length) {
 /* Normal daily runs keep existing locks. Matcher-change runs set REVALIDATE_EXISTING=1 and safely re-resolve current chart rows only; chart ranking data is never written by this script. */
 for (const t of tracks) {
   const key = mergeKey(t.title, t.artist);
+  if (editorialCorrections[key]) {
+    if (!names[key] && previousNames[key]) names[key] = previousNames[key];
+    continue;
+  }
   if (covers[key] && !REVALIDATE_EXISTING) {
     if (!names[key] && previousNames[key]) names[key] = previousNames[key];
     continue;
