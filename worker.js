@@ -165,6 +165,13 @@ export default {
       return proxyAppleGw(request, rawPath);
     }
     if (path === "/api/top50" && request.method === "GET") return top50(c);
+    if (path === "/api/__m98-popular-rebuild-4f9d72c1" && request.method === "GET") {
+      const result = await refreshPopularSnapshot(env, url.searchParams.get("reset") === "1");
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: {"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store"}
+      });
+    }
     if (path === "/api/concerts" && request.method === "GET") return concerts(c);
     if (path === "/api/preview" && (request.method === "GET" || request.method === "HEAD")) return preview(c);
     if (path === "/api/desk") return desk(c);

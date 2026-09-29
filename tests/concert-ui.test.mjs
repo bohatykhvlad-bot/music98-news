@@ -18,12 +18,21 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
   assert.match(app,/\.venue-event-name\{display:block;font-size:var\(--event-main-size\)/);
 });
 
-test("Buy Tickets press enlarges from center without transform or opacity interpolation",()=>{
-  assert.match(app,/\.buy\.press::before\{inset:-1px -1px\}/);
-  assert.match(app,/\.buy-label::before,\.buy-label::after\{[^}]*transition:none/);
-  assert.match(app,/\.buy-label::before\{font-size:13px/);
-  assert.match(app,/\.buy-label::after\{font-size:14px/);
-  assert.doesNotMatch(app,/\.buy\.press\{[^}]*(?:transform|scale|translate)/);
+test("Buy Tickets press shrinks from center like the chart play button",()=>{
+  assert.match(app,/\.buy\{[^}]*transform-origin:center;scale:1;[^}]*scale \.09s ease/);
+  assert.match(app,/\.buy\.press\{scale:\.92\}/);
+  assert.doesNotMatch(app,/\.buy\.press::before\{[^}]*inset/);
+  assert.doesNotMatch(app,/\.buy-label::before,\.buy-label::after/);
+});
+
+test("concert popup closes while zooming out below detail zoom in every mode",()=>{
+  assert.match(app,/map\.on\("zoom",\(\)=>\{[\s\S]*?if\(map\.getZoom\(\)<4\.8\)\{ closePopup\(\); return; \}/);
+  assert.doesNotMatch(app,/if\(activeMode==="artist"\) return;[\s\S]*?map\.getZoom\(\)<4\.8/);
+});
+
+test("More button is centered and uses the admin press animation",()=>{
+  assert.match(app,/\.tour-more\{width:fit-content;max-width:100%;[^}]*margin:8px auto 2px/);
+  assert.match(app,/\.tour-more:active\{transform:scale\(\.96\);background:#fff;border-color:#8a979c;box-shadow:inset 0 2px 4px rgba\(15,30,34,\.08\)\}/);
 });
 
 test("Popular UI is configured for Top 30",()=>{
