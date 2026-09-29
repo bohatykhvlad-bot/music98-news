@@ -23,7 +23,7 @@ const TM_ATTRACTIONS_ROOT = "https://app.ticketmaster.com/discovery/v2/attractio
 const TM_VENUES_ROOT = "https://app.ticketmaster.com/discovery/v2/venues.json";
 const KWORB_ARTISTS_URL = "https://kworb.net/spotify/listeners.html";
 const POPULAR_LIMIT = 30;
-const POPULAR_CANDIDATE_LIMIT = 250;
+const POPULAR_CANDIDATE_LIMIT = 500;
 const POPULAR_SNAPSHOT_KEY = "concert-popular:v4";
 const POPULAR_STATE_KEY = "concert-popular:v4:state";
 const POPULAR_REFRESH_MS = 24 * 60 * 60 * 1000;
@@ -679,20 +679,17 @@ export async function refreshPopularSnapshot(env, force = false) {
     popularityRank:a.popularityRank,listeners:a.listeners,shows:Number(a.shows||0),firstDate:a.firstDate,eventConfirmed:true,
   }));
 
-  // Never replace a healthy snapshot with a suspiciously small partial result.
-  if(existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
-     existing?.artists?.length>=20 && artists.length<20){
+  // A public Popular snapshot is atomic: publish only a complete strict Top 30.
+  // Keep the previous snapshot while a new daily build is still short, so a
+  // 27/30 rebuild can never replace a healthy 30/30 list.
+  if(artists.length<POPULAR_LIMIT){
     state.failedAt=new Date().toISOString();
     await kvPutJson(env,POPULAR_STATE_KEY,state,{expirationTtl:21600});
     return {
-      ok:false,fresh:false,complete:true,keptExisting:true,
-      reason:"popular_refresh_too_small",artists:artists.length
+      ok:false,fresh:false,complete:true,
+      keptExisting:Array.isArray(existing?.artists) && existing.artists.length>=POPULAR_LIMIT,
+      reason:"popular_refresh_incomplete",artists:artists.length,targetCount:POPULAR_LIMIT
     };
-  }
-  if(!artists.length){
-    state.failedAt=new Date().toISOString();
-    await kvPutJson(env,POPULAR_STATE_KEY,state,{expirationTtl:21600});
-    return {ok:false,fresh:false,complete:true,reason:"popular_refresh_empty"};
   }
 
   const snapshot={

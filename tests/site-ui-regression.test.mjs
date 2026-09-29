@@ -11,11 +11,11 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
-test("Subscribe uses the same crisp press-state binder as concert tickets",()=>{
+test("Subscribe scales its label with the pill without axis translation",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit">Subscribe<\/button>/);
   assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(page,/\.press-pill\.press\{font-size:14px\}/);
+  assert.match(page,/\.press-pill\.press\{font-size:13\.72px;line-height:1\}/);
   assert.doesNotMatch(page,/\.press-pill\.press\{[^}]*transform:/);
 });
 
@@ -27,7 +27,7 @@ test("verified chart artwork overrides apply even to same-day browser cache",()=
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260929-31/);
+  assert.match(page,/concerts-app\.js\?v=20260929-32/);
 });
 
 
@@ -53,4 +53,12 @@ test("corrected chart art is enforced at final row render",()=>{
 test("clean Chart and Concerts routes are no-store",()=>{
   assert.match(worker,/\^\\\/\(\?:releases\|chart\|charts\|concerts\)/);
   assert.match(worker,/headers\.set\("Cache-Control", "no-store, max-age=0"\)/);
+});
+
+
+test("same-day chart cache is an instant paint and always revalidates",()=>{
+  assert.match(page,/const DAILYKEY = "music98news_daily_v31"/);
+  assert.match(page,/const hasFreshCache=!!\(cached/);
+  assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
+  assert.match(page,/rev=31/);
 });
