@@ -15,8 +15,8 @@ test("Subscribe scales its label with the pill without axis translation",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit">Subscribe<\/button>/);
   assert.match(page,/\.press-pill\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(page,/\.press-pill\.press\{font-size:13\.72px;line-height:1\}/);
-  assert.doesNotMatch(page,/\.press-pill\.press\{[^}]*transform:/);
+  assert.match(page,/\.press-pill-label\{[^}]*height:18px;[^}]*text-box:trim-both cap alphabetic;[^}]*transform:none;translate:none/);\n  assert.match(page,/\.press-pill\.press \.press-pill-label\{font-size:13\.72px\}/);
+  assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*transform:/);
 });
 
 test("verified chart artwork overrides apply even to same-day browser cache",()=>{
@@ -27,7 +27,7 @@ test("verified chart artwork overrides apply even to same-day browser cache",()=
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260929-32/);
+  assert.match(page,/concerts-app\.js\?v=20260929-33/);
 });
 
 
@@ -61,4 +61,12 @@ test("same-day chart cache is an instant paint and always revalidates",()=>{
   assert.match(page,/const hasFreshCache=!!\(cached/);
   assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
   assert.match(page,/rev=31/);
+});
+
+
+test("chart preview uses fixed -3 dB master headroom with no normalization",()=>{
+  assert.match(page,/const CHART_MASTER_GAIN = Math\.pow\(10,-3\/20\)/);
+  assert.match(page,/audio\.volume = CHART_MASTER_GAIN/);
+  assert.match(page,/gainSet\(v \* CHART_MASTER_GAIN\)/);
+  assert.doesNotMatch(page,/createDynamicsCompressor|normalize|loudness/i);
 });
