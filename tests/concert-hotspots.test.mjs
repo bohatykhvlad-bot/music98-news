@@ -1161,3 +1161,16 @@ test("new daily market state overrides an older complete snapshot before the wor
     globalThis.fetch=oldFetch;
   }
 });
+
+
+test("Ticketmaster quota accounting is leased so Free KV writes are not spent per origin call", async () => {
+  const fs = await import("node:fs");
+  const src = fs.readFileSync(new URL("../functions/api/concerts.js", import.meta.url), "utf8");
+  assert.match(src,/TM_GLOBAL_LEASE_SIZE = 25/);
+  assert.match(src,/TM_INTERACTIVE_LEASE_SIZE = 10/);
+  assert.match(src,/MAP_MARKET_BATCH_SIZE = 12/);
+  assert.match(src,/consumeBudgetLease\(/);
+  assert.match(src,/available<=tmObservedAvailable-25/);
+  assert.doesNotMatch(src,/writeBudget\(env,interactiveKey,interactiveUsed\+1\)/);
+  assert.doesNotMatch(src,/writeBudget\(env,globalKey,globalUsed\+1\)/);
+});

@@ -39,7 +39,7 @@ const MAP_WARM_LOCK_MS = 15 * 60 * 1000;
 const MAP_MARKET_VERSION = "concert-markets-v2";
 const MAP_MARKET_STATE_KEY = "concert-markets:v2:state";
 const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v2:snapshot";
-const MAP_MARKET_BATCH_SIZE = 20;
+const MAP_MARKET_BATCH_SIZE = 12;
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
@@ -169,6 +169,16 @@ const TM_ORIGIN_INTERACTIVE_RESERVE = 1000;
 const TM_ORIGIN_SCHEDULED_RESERVE = 500;
 let tmSharedLastFetchAt = 0;
 let tmGate = Promise.resolve();
+/* Free Workers KV allows only 1,000 writes/day. The old quota guard wrote
+   1-3 KV keys for EVERY Ticketmaster origin call, so background map refreshes
+   could burn the entire free allowance even with very little site traffic.
+   Reserve quota in coarse leases instead: one KV write covers many origin calls. */
+const TM_GLOBAL_LEASE_SIZE = 25;
+const TM_INTERACTIVE_LEASE_SIZE = 10;
+let tmGlobalLease = { day:"", left:0 };
+let tmInteractiveLease = { day:"", left:0 };
+let tmObservedAvailable = Number.NaN;
+let tmObservedAt = 0;
 
 async function readBudget(env,key) {
   try{ return Number(await env.DESK.get(key))||0; }catch(e){ return 0; }
@@ -176,6 +186,22 @@ async function readBudget(env,key) {
 async function writeBudget(env,key,value) {
   try{ await env.DESK.put(key,String(value),{expirationTtl:172800}); }catch(e){}
 }
+async function consumeBudgetLease(env,key,limit,lease,chunk,scope){
+  const day=new Date().toISOString().slice(0,10);
+  if(lease.day===day && lease.left>0){
+    lease.left-=1;
+    return;
+  }
+  const used=await readBudget(env,key+day);
+  if(used>=limit){
+    throw Object.assign(new Error("ticketmaster_budget_guard"),{status:429,scope});
+  }
+  const reserve=Math.max(1,Math.min(chunk,limit-used));
+  await writeBudget(env,key+day,used+reserve);
+  lease.day=day;
+  lease.left=reserve-1;
+}
+
 async function reserveTicketmasterCall(env, scope="interactive") {
   if (!env?.DESK) return;
 
@@ -184,6 +210,10 @@ async function reserveTicketmasterCall(env, scope="interactive") {
   const observed=await kvGetJson(env,"ticketmaster:quota:last");
   const observedAt=Date.parse(observed?.observedAt||0)||0;
   const observedAvailable=Number(observed?.available);
+  if(Number.isFinite(observedAvailable)){
+    tmObservedAvailable=observedAvailable;
+    tmObservedAt=observedAt;
+  }
   const rawReset=Number(observed?.reset);
   const resetMs=Number.isFinite(rawReset)
     ? (rawReset>1e12 ? rawReset : rawReset>1e9 ? rawReset*1000 : 0)
@@ -210,22 +240,16 @@ async function reserveTicketmasterCall(env, scope="interactive") {
     ? Math.max(50,Math.floor(configuredInteractive))
     : TM_INTERACTIVE_GUARD_DEFAULT;
 
-  const day=new Date().toISOString().slice(0,10);
-  const globalKey="ticketmaster:daily:global:"+day;
-  const globalUsed=await readBudget(env,globalKey);
-  if(globalUsed>=globalLimit){
-    throw Object.assign(new Error("ticketmaster_budget_guard"),{status:429,scope:"global"});
-  }
-
+  await consumeBudgetLease(
+    env,"ticketmaster:daily:global:",globalLimit,
+    tmGlobalLease,TM_GLOBAL_LEASE_SIZE,"global"
+  );
   if(scope==="interactive"){
-    const interactiveKey="ticketmaster:daily:interactive:"+day;
-    const interactiveUsed=await readBudget(env,interactiveKey);
-    if(interactiveUsed>=interactiveLimit){
-      throw Object.assign(new Error("ticketmaster_budget_guard"),{status:429,scope:"interactive"});
-    }
-    await writeBudget(env,interactiveKey,interactiveUsed+1);
+    await consumeBudgetLease(
+      env,"ticketmaster:daily:interactive:",interactiveLimit,
+      tmInteractiveLease,TM_INTERACTIVE_LEASE_SIZE,"interactive"
+    );
   }
-  await writeBudget(env,globalKey,globalUsed+1);
 }
 
 async function tmJson(url, env, scope="interactive") {
@@ -255,9 +279,23 @@ async function tmJson(url, env, scope="interactive") {
     const available=availableText ? Number(availableText) : Number.NaN;
     const reset=String(res.headers?.get?.("Rate-Limit-Reset")||"");
     if(Number.isFinite(available) && env?.DESK){
-      kvPutJson(env,"ticketmaster:quota:last",{
-        available,reset,headerObserved:true,observedAt:new Date().toISOString()
-      },{expirationTtl:172800}).catch(()=>{});
+      /* Persist only meaningful quota checkpoints. Previously this wrote on
+         every Ticketmaster response and was a major source of the 1,000/day
+         Free KV write exhaustion. Reads are cheap; writes stay sparse. */
+      const now=Date.now();
+      const quotaFloor=scope==="interactive" ? TM_ORIGIN_INTERACTIVE_RESERVE : TM_ORIGIN_SCHEDULED_RESERVE;
+      const shouldPersist=
+        !Number.isFinite(tmObservedAvailable) ||
+        available<=quotaFloor ||
+        available<=tmObservedAvailable-25 ||
+        now-tmObservedAt>=30*60*1000;
+      if(shouldPersist){
+        tmObservedAvailable=available;
+        tmObservedAt=now;
+        kvPutJson(env,"ticketmaster:quota:last",{
+          available,reset,headerObserved:true,observedAt:new Date(now).toISOString()
+        },{expirationTtl:172800}).catch(()=>{});
+      }
     }
 
     if (!res.ok) {
