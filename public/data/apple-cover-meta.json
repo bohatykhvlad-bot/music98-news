@@ -1,12 +1,231 @@
 {
-  "loser|tameimpala": {
+  "babydoll|dominicfike": {
     "resolverVersion": 3,
     "source": "resolver",
     "reason": "canonical-album",
-    "trackId": "1836226731",
-    "collectionId": "1836226516",
-    "collectionName": "Deadbeat",
-    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/80/54/11/80541122-c1c4-50ad-a673-ff79f4cf8aa7/196873555331.jpg/600x600bb.jpg",
-    "verifiedAt": "2026-09-29T17:45:00.000Z"
+    "trackId": "1438243880",
+    "collectionId": "1438243719",
+    "collectionName": "Don't Forget About Me, Demos - EP",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/2d/37/18/2d3718e9-8620-b603-d3cc-f34ce817070d/886447290170.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:45.226Z"
+  },
+  "bbywow|karolg": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "6796864754",
+    "collectionId": "6796864741",
+    "collectionName": "NO ME ARREPIENTO DE SENTIR TANTO",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2b/66/b2/2b66b26c-ab23-faa1-c4ee-06fa2cce8f76/26UM1IM00558.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:00:51.904Z"
+  },
+  "beatit|michaeljackson": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "269573341",
+    "collectionId": "269572838",
+    "collectionName": "Thriller",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:02:06.520Z"
+  },
+  "beenbynow|morganwallen": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-single",
+    "trackId": "6792676860",
+    "collectionId": "6792676858",
+    "collectionName": "Been By Now - Single",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/9f/8d/52/9f8d52a0-b6d9-d038-327b-4fe58bedce67/26UMGIM94572.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:43.844Z"
+  },
+  "beher|ellalangley": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "1869436845",
+    "collectionId": "1869436835",
+    "collectionName": "Dandelion",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:02.304Z"
+  },
+  "billiejean|michaeljackson": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "269573364",
+    "collectionId": "269572838",
+    "collectionName": "Thriller",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:02:08.742Z"
+  },
+  "choosintexas|ellalangley": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "1869436839",
+    "collectionId": "1869436835",
+    "collectionName": "Dandelion",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:00:51.364Z"
+  },
+  "daidai|shakira": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-single",
+    "trackId": "6768469976",
+    "collectionId": "6768469975",
+    "collectionName": "Dai Dai - Single",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:00:56.621Z"
+  },
+  "deadfresh|lilbaby": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-single",
+    "trackId": "6791695695",
+    "collectionId": "6791695694",
+    "collectionName": "Dead Fresh - Single",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f4/00/dd/f400ddda-01b6-52ee-1888-477ffee6ed67/26UMGIM86003.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:35.611Z"
+  },
+  "dropdead|oliviarodrigo": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "1889992113",
+    "collectionId": "1889992111",
+    "collectionName": "you seem pretty sad for a girl so in love",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:37.904Z"
+  },
+  "getlucky~v:edit|daftpunk": {
+    "resolverVersion": 3,
+    "source": "editorial",
+    "trackId": "",
+    "collectionId": "617154241",
+    "collectionName": "",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:00:48.152Z"
+  },
+  "hatethatimadeyouloveme|arianagrande": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "6763656725",
+    "collectionId": "1895420874",
+    "collectionName": "petal",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/56/f4/96/56f49612-02dd-83f4-44fe-d2118cc70707/26UMGIM51129.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:18.181Z"
+  },
+  "iknewitiknewyou|taylorswift": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-single",
+    "trackId": "6775527443",
+    "collectionId": "6775527442",
+    "collectionName": "I Knew It, I Knew You (From \"Toy Story 5\") - Single",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/34/35/6c/34356cb4-bd0b-3bac-b118-1a6d7264dc64/26UMGIM69942.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:55.411Z"
+  },
+  "janicestfu|drake": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "6769649576",
+    "collectionId": "6769649287",
+    "collectionName": "ICEMAN",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7f/39/61/7f396123-be56-bc11-eaab-976441808e58/26UMGIM63622.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:00:52.881Z"
+  },
+  "lastthingyouneed|morganwallen": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-single",
+    "trackId": "6812477290",
+    "collectionId": "6812476961",
+    "collectionName": "Grand Theft Auto VI: The Album",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/d3/1c/5dd31c9c-1e1c-0bbc-104f-4a42e2bb4c59/075679556424.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:31.162Z"
+  },
+  "loser|tameimpala": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-single",
+    "trackId": "1842957386",
+    "collectionId": "1842957385",
+    "collectionName": "Loser - Single",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/57/6f/a2/576fa272-91c5-658d-9d05-88d9787c0f1d/196873662978.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:20.392Z"
+  },
+  "manineed|oliviadean": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "1817609509",
+    "collectionId": "1817609404",
+    "collectionName": "The Art of Loving",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:25.524Z"
+  },
+  "nicolekidman|adla": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "6807192825",
+    "collectionId": "6807192580",
+    "collectionName": "PRIMA",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/53/c6/9a/53c69a6a-d1c4-0983-a20c-a67dceae554f/26UMGIM82372.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:12.545Z"
+  },
+  "patientzero|taylorswift": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-ep",
+    "trackId": "6814996157",
+    "collectionId": "6814995859",
+    "collectionName": "The Life of a Showgirl: The Encore",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f1/a3/c7/f1a3c711-ff60-caee-2314-37c0dd3f7616/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:31.904Z"
+  },
+  "riskitall|brunomars": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "1866732797",
+    "collectionId": "1866732792",
+    "collectionName": "The Romantic",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/46/bf/ed46bf4e-7cb9-965a-54f3-03059977fe6c/075679589293.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:02:13.368Z"
+  },
+  "september|earth": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "1456446747",
+    "collectionId": "1456445670",
+    "collectionName": "The Eternal Dance",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c6/3b/0d/c63b0ddb-ba2d-49fc-f255-9c925dd4e6e1/886447605004.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:02:21.440Z"
+  },
+  "stupidsong|oliviarodrigo": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "1889992115",
+    "collectionId": "1889992111",
+    "collectionName": "you seem pretty sad for a girl so in love",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:11.950Z"
+  },
+  "thecure|oliviarodrigo": {
+    "resolverVersion": 3,
+    "source": "resolver",
+    "reason": "canonical-album",
+    "trackId": "6779097756",
+    "collectionId": "6779097512",
+    "collectionName": "you seem pretty sad for a girl so in love",
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/b9/92/51/b9925128-dac6-2cef-5674-d5ebbe1a4e83/26UMGIM75556.rgb.jpg/600x600bb.jpg",
+    "verifiedAt": "2026-09-29T18:01:08.645Z"
   }
 }
