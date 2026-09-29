@@ -59,10 +59,10 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 
 test("same-day chart cache is an instant paint and always revalidates",()=>{
-  assert.match(page,/const DAILYKEY = "music98news_daily_v31"/);
+  assert.match(page,/const DAILYKEY = "music98news_daily_v32"/);
   assert.match(page,/const hasFreshCache=!!\(cached/);
   assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
-  assert.match(page,/rev=31/);
+  assert.match(page,/rev=32/);
 });
 
 
@@ -71,4 +71,16 @@ test("chart preview uses fixed -6 dB master headroom with no normalization",()=>
   assert.match(page,/audio\.volume = CHART_MASTER_GAIN/);
   assert.match(page,/gainSet\(v \* CHART_MASTER_GAIN\)/);
   assert.doesNotMatch(page,/createDynamicsCompressor\s*\(|createConvolver\s*\(/);
+});
+
+
+test("browser iTunes fallback rejects derivative releases and never falls back to title-only artist matching",()=>{
+  assert.match(page,/const PREVCACHE = "music98news_prevcache_v7"/);
+  assert.match(page,/add\("dub",\/\\bdub\\b\//);
+  assert.match(page,/add\("rework",\/\\b\(\?:rework\|reworked\|bootleg\|mashup\)\\b\//);
+  assert.match(page,/add\("session",\/\\b\(\?:session\|unplugged\|rehearsal\|performance\|concert\)\\b\//);
+  assert.match(page,/if\(!wantV && collectionVersion\) continue;/);
+  assert.match(page,/if\(wantV && collectionVersion && collectionVersion!==wantV\) continue;/);
+  assert.match(page,/const lead=itunesLeadArtistName\(artist\)/);
+  assert.doesNotMatch(page,/itunesLookup\(title, "", r2=>/);
 });

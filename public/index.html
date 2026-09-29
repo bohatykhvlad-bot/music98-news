@@ -1199,7 +1199,7 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v31";
+const DAILYKEY = "music98news_daily_v32";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -1244,7 +1244,7 @@ function previewPlayUrl(url, page){
   return s;
 }
 /* ---- iTunes Search API via JSONP (preview, artwork, track urls) ---- */
-const PREVCACHE = "music98news_prevcache_v6";
+const PREVCACHE = "music98news_prevcache_v7";
 function prevCache(){ try{ const r = lsGetRaw(PREVCACHE); return r ? JSON.parse(r) : {}; }catch(e){ return {}; } }
 let jsonpN = 0;
 function itunesNorm(s){
@@ -1267,32 +1267,57 @@ function itunesVersion(s){
   add("remaster",/\bremaster(?:ed)?\b/);
   add("rerecorded",/\b(?:re-?recorded|taylor['’]s\s+version)\b/);
   add("mix",/\b(?:dj\s+mix|mixed|mix)\b/);
+  add("dub",/\bdub\b/);
+  add("rework",/\b(?:rework|reworked|bootleg|mashup)\b/);
+  add("session",/\b(?:session|unplugged|rehearsal|performance|concert)\b/);
   if(!tags.length && /\bversion\b/.test(x)) tags.push("version");
   return [...new Set(tags)].sort().join("+");
 }
 function itunesPrimary(s){
   return itunesNorm(String(s||"").split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)[0]);
 }
+function itunesLeadArtistName(s){
+  return String(s||"").split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)[0].trim();
+}
 function itunesPick(results, title, artist){
   const list=results||[];
   if(!list.length) return null;
   const wantT=itunesNorm(title), wantV=itunesVersion(title), wantA=itunesPrimary(artist);
-  const exact=list.filter(item=>{
-    if(itunesNorm(item.trackName)!==wantT) return false;
-    if(itunesVersion(item.trackName)!==wantV) return false;
-    if(wantA && itunesPrimary(item.artistName)!==wantA) return false;
-    return true;
-  });
-  if(!exact.length) return null;
-  exact.sort((a,b)=>{
-    const av=itunesVersion(a.collectionName), bv=itunesVersion(b.collectionName);
-    const ap=av && av!==wantV ? 1 : 0, bp=bv && bv!==wantV ? 1 : 0;
-    if(ap!==bp) return ap-bp;
-    const ad=Date.parse(a.releaseDate||"")||Number.MAX_SAFE_INTEGER;
-    const bd=Date.parse(b.releaseDate||"")||Number.MAX_SAFE_INTEGER;
-    return ad-bd;
-  });
-  return exact[0];
+  const ranked=[];
+  for(const item of list){
+    if(itunesNorm(item.trackName)!==wantT) continue;
+    if(itunesVersion(item.trackName)!==wantV) continue;
+    if(wantA && itunesPrimary(item.artistName)!==wantA) continue;
+
+    const collectionVersion=itunesVersion(item.collectionName);
+    if(!wantV && collectionVersion) continue;
+    if(wantV && collectionVersion && collectionVersion!==wantV) continue;
+
+    const collectionName=String(item.collectionName||"").toLowerCase();
+    let penalty=0;
+    if(/\b(?:greatest hits?|best of|essentials?|anthology|collection|compilation|retrospective)\b/.test(collectionName)) penalty+=520;
+    if(/\b(?:20th century masters|millennium collection|number ones|complete singles?|classic hits?)\b/.test(collectionName)) penalty+=560;
+    if(/\b(?:various artists|karaoke|tribute)\b/.test(collectionName)) penalty+=800;
+    if(/\b(?:soundtrack|original motion picture)\b/.test(collectionName)||String(item.primaryGenreName||"").toLowerCase()==="soundtrack") penalty+=180;
+
+    const release=Date.parse(item.releaseDate||"");
+    const releaseMs=Number.isFinite(release)?release:Number.MAX_SAFE_INTEGER;
+    const trackCount=Math.max(0,Number(item.trackCount||0));
+    let score=1000-penalty;
+    if(wantA && itunesPrimary(item.artistName)===wantA) score+=200;
+    if(itunesNorm(item.trackName)===wantT) score+=80;
+    if(!collectionVersion) score+=50;
+    if(wantA && itunesPrimary(item.collectionArtistName||item.artistName)===wantA) score+=trackCount>=6?180:trackCount>=2?80:0;
+    ranked.push({item,score,penalty,release:releaseMs,id:Number(item.trackId)||Number.MAX_SAFE_INTEGER});
+  }
+  if(!ranked.length) return null;
+  const credible=ranked.filter(x=>x.penalty<500 && Number.isFinite(x.release) && x.release<Number.MAX_SAFE_INTEGER);
+  const earliest=credible.length?Math.min(...credible.map(x=>x.release)):Number.MAX_SAFE_INTEGER;
+  const originalWindow=548*86400000;
+  const pool=earliest<Number.MAX_SAFE_INTEGER?ranked.filter(x=>x.release<=earliest+originalWindow):ranked;
+  const finalPool=pool.length?pool:ranked;
+  finalPool.sort((a,b)=>b.score-a.score||a.penalty-b.penalty||a.release-b.release||a.id-b.id);
+  return finalPool[0].item;
 }
 function itunesLookup(title, artist, cb){
   const term = (title+" "+artist).trim();
@@ -1806,8 +1831,11 @@ function playItunes(key, title, artist, url, gen){
   itunesLookup(title, artist, r=>{
     if(gen !== playGen || curKey !== key) return;
     if(r && applePreview(r.preview)) return useItunes(key, r, url, gen);
-    /* second chance: title only, featured artists often break the match */
-    itunesLookup(title, "", r2=>{
+    /* Second chance keeps the lead artist. Never fall back to title-only:
+       that can attach a cover/live version by a different performer. */
+    const lead=itunesLeadArtistName(artist);
+    if(!lead || lead===String(artist||"").trim()){ toast("No preview found for this track"); stopPreview(); return; }
+    itunesLookup(title, lead, r2=>{
       if(gen !== playGen || curKey !== key) return;
       if(!r2 || !applePreview(r2.preview)){ toast("No preview found for this track"); stopPreview(); return; }
       useItunes(key, r2, url, gen);
@@ -2148,7 +2176,7 @@ function refreshDailyTop50(){
   // Always revalidate so an updated chart cannot stay frozen until tomorrow.
   const grab = u => fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   /* ?d + rev bust both browser and edge copies after chart/cache fixes. */
-  grab("/api/top50?d=" + todayUTC() + "&rev=31").catch(()=> grab("/data/top50.json?rev=31")).then(j=>{
+  grab("/api/top50?d=" + todayUTC() + "&rev=32").catch(()=> grab("/data/top50.json?rev=32")).then(j=>{
     const tracks = (j && j.tracks) || [];
     if(tracks.length < 10) throw 0;
     lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
