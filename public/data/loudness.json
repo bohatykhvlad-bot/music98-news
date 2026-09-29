@@ -4,7 +4,7 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": "2026-09-29T20:57:22.752Z"
+    "measuredAt": "2026-09-29T21:00:41.695Z"
   },
   "ahha|cardib": {
     "integratedLufs": -8.5,
@@ -17,8 +17,8 @@
     "integratedLufs": -6.6,
     "truePeakDbtp": 0.2,
     "gainDb": -9.4,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0a/a9/6f/0aa96f71-8e83-d68d-06bb-a92f95041fd6/mzaf_13423692857576784151.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:31.611Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/af/19/98/af1998ee-ed0e-4655-ec27-610c78dcb4fc/mzaf_18150537039377466708.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:47.977Z"
   },
   "aintnomountainhighenough|marvingaye": {
     "integratedLufs": -10.4,
@@ -59,8 +59,8 @@
     "integratedLufs": -10.3,
     "truePeakDbtp": -0.1,
     "gainDb": -5.7,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f3/08/da/f308da3d-00cc-7682-7be9-87cb882f4ea5/mzaf_129115212197250565.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:23.289Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/94/30/4f/94304f2c-4552-40d6-1f54-b002af014408/mzaf_7346305383337764321.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:42.905Z"
   },
   "beautyandabeat|justinbieber": {
     "integratedLufs": -7.8,
@@ -98,11 +98,11 @@
     "measuredAt": "2026-09-29T20:57:32.961Z"
   },
   "choosintexas|ellalangley": {
-    "integratedLufs": -7.6,
-    "truePeakDbtp": 0.3,
-    "gainDb": -8.4,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/11/d6/3e/11d63e12-7e7e-e297-14e5-815c7b0a1248/mzaf_11639498575020843766.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:23.050Z"
+    "integratedLufs": -7.5,
+    "truePeakDbtp": 0.4,
+    "gainDb": -8.5,
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/38/49/4c/38494cb4-f9e0-1db4-0b84-8c478cb55390/mzaf_4251933786704889664.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:42.403Z"
   },
   "cinderella|macmiller": {
     "integratedLufs": -8.9,
@@ -143,8 +143,8 @@
     "integratedLufs": -8,
     "truePeakDbtp": 0.7,
     "gainDb": -8,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/89/57/ad/8957adf6-1862-4e4e-bcb5-810d6cf79cc4/mzaf_7752581374620577831.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:30.283Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/08/7b/2b/087b2b70-8903-19ea-37ba-60ea677ff6cd/mzaf_11935661324466978204.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:46.901Z"
   },
   "earrings|malcolmtodd": {
     "integratedLufs": -8.3,
@@ -164,8 +164,8 @@
     "integratedLufs": -8.4,
     "truePeakDbtp": 0.2,
     "gainDb": -7.6,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cd/fb/65/cdfb65fe-7d80-abde-0153-d698d1e7bde1/mzaf_14991009929085569283.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:28.029Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9e/85/8d/9e858d51-fb47-3aff-c037-4e9fd284cefe/mzaf_12282803114326162707.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:45.233Z"
   },
   "hootiefrutti|katseye": {
     "integratedLufs": -6.5,
@@ -178,8 +178,8 @@
     "integratedLufs": -7.4,
     "truePeakDbtp": 0.3,
     "gainDb": -8.6,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1d/bf/35/1dbf3531-4434-a183-7552-4d8eba15e756/mzaf_17703032666608891166.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:28.339Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/57/33/a4/5733a427-883b-586d-d90e-281c91d9ef4e/mzaf_201398670995826930.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:45.779Z"
   },
   "iknewitiknewyou|taylorswift": {
     "integratedLufs": -10.9,
@@ -234,8 +234,8 @@
     "integratedLufs": -8.2,
     "truePeakDbtp": 0.8,
     "gainDb": -7.8,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c9/aa/63/c9aa63e1-7f15-8b04-7255-7d4466c10028/mzaf_14263624320297744244.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:30.701Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a9/d2/09/a9d209b4-55a5-67e8-2e15-949cb00e716d/mzaf_11935934741751979581.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:47.421Z"
   },
   "nicolekidman|adla": {
     "integratedLufs": -9.8,
@@ -301,11 +301,11 @@
     "measuredAt": "2026-09-29T20:57:33.924Z"
   },
   "stupidsong|oliviarodrigo": {
-    "integratedLufs": -7.2,
-    "truePeakDbtp": 0.9,
-    "gainDb": -8.8,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/d6/78/abd678a1-bf4e-7ee9-d0b2-ba8afee10914/mzaf_3280183609788906841.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:24.258Z"
+    "integratedLufs": -10,
+    "truePeakDbtp": 0.4,
+    "gainDb": -6,
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/47/83/04/478304d6-4f38-106e-e5ce-1b306b430057/mzaf_4290960669032729666.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:43.478Z"
   },
   "sunflower|postmalone": {
     "integratedLufs": -7.7,
@@ -318,15 +318,15 @@
     "integratedLufs": -4.5,
     "truePeakDbtp": 0.8,
     "gainDb": -11.5,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fe/10/4b/fe104b51-350e-0d09-1293-e8b1bb35c4a0/mzaf_12526264002329817464.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:24.705Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4b/de/df/4bdedfd6-4dd1-d3e3-d7de-b822006dcbc2/mzaf_13336856842728450769.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:44.075Z"
   },
   "thefateofophelia|taylorswift": {
     "integratedLufs": -8.6,
     "truePeakDbtp": 0.5,
     "gainDb": -7.4,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/13/df/c9/13dfc9f2-4fae-9d67-3575-cb42ce43f3e2/mzaf_1591596914482327831.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:27.732Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fd/07/47/fd0747ec-3bda-20f4-a06a-bfdf80a4d29d/mzaf_11829025720061990419.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:44.719Z"
   },
   "theonethatgotaway|katyperry": {
     "integratedLufs": -9.5,
@@ -339,8 +339,8 @@
     "integratedLufs": -9.2,
     "truePeakDbtp": 0.6,
     "gainDb": -6.8,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7e/3c/25/7e3c2565-b83d-e690-49c1-92298bd2a244/mzaf_2428036131779969369.plus.aac.p.m4a",
-    "measuredAt": "2026-09-29T20:57:29.832Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1a/93/e8/1a93e8b9-1e2c-05f3-c406-6a993c4293ec/mzaf_6108695185570497562.plus.aac.p.m4a",
+    "measuredAt": "2026-09-29T21:00:46.349Z"
   },
   "wtfgoin|bellygangkushington": {
     "integratedLufs": -9.4,
