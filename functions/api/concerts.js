@@ -329,7 +329,7 @@ function normName(s) {
 async function validatePopularArtist(env, name, popularityRank, listeners) {
   const tm = baseEventUrl(env.TICKETMASTER_API_KEY);
   tm.searchParams.set("keyword", name);
-  tm.searchParams.set("size", "20");
+  tm.searchParams.set("size", "50");
   tm.searchParams.set("sort", "relevance,desc");
 
   const raw = await tmJson(tm, env, "scheduled");
