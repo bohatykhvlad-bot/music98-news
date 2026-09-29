@@ -118,9 +118,8 @@ test("warming verified market pins merge with the last complete map",()=>{
 
 
 test("artist mode hides global markets and keeps only artist markers at every zoom",()=>{
-  assert.match(app,/const showHubs=activeMode==="popular";/);
   assert.match(app,/\["artist-points","artist-hit"\]\.forEach\(id=>setLayerVisible\(id,artist\)\)/);
-  assert.match(app,/\["clusters","cluster-hit","event-points","event-hit","event-labels"\]\.forEach\(id=>setLayerVisible\(id,area\)\)/);
+  assert.match(app,/\["clusters","cluster-hit","event-points","event-hit","event-labels"\]\.forEach\(id=>setLayerVisible\(id,showArea\)\)/);
   assert.match(app,/const overviewZoom=map\.getZoom\(\)<4\.7/);
   assert.match(app,/const showHubs=activeMode==="popular" \|\| \(area && overviewZoom\)/);
   assert.match(app,/const showArea=area && !overviewZoom/);
