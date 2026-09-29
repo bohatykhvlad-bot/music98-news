@@ -164,6 +164,6 @@ test("concert admin parity is limited to More and Buy Tickets",()=>{
   assert.match(app,/\.map-mode-btn\.active\{background-color:var\(--accent\);color:#03282b\}/);
   assert.match(app,/\.tour-more:hover\{background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba\(15,30,34,\.07\)/);
   assert.match(app,/\.buy:hover::before\{background:#fff;border-color:#a9b6bb;box-shadow:0 1px 3px rgba\(15,30,34,\.07\)\}/);
-  assert.doesNotMatch(app,/\.side-tab,\.map-mode-btn,\.tour-more\{/);
+  assert.doesNotMatch(app,/\.side-tab:hover,\.map-mode-btn:hover,\.tour-more:hover/);
   assert.doesNotMatch(app,/\.side-tab:active,\.map-mode-btn:active,\.tour-more:active/);
 });
