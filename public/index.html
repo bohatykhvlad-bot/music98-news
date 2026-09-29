@@ -736,8 +736,8 @@ textarea{resize:vertical;min-height:64px}
      email field takes the remaining width, Subscribe pill stays compact.
      The stacked full-width input made the pill look lost and tiny under it. */
   .sub-in form{flex-direction:row;max-width:none;width:100%}
-  .sub-in input{flex:1 1 auto;min-width:0;width:auto;box-sizing:border-box}
-  .sub-in .btn{width:auto;align-self:auto;padding:0 24px;white-space:nowrap;box-sizing:border-box}
+  .sub-in input{flex:1 1 0;min-width:0;width:0;box-sizing:border-box}
+  .sub-in .btn{flex:0 0 126px;width:126px;min-width:126px;align-self:auto;padding:0;white-space:nowrap;box-sizing:border-box}
   .chart-row{
     --pw:auto;
     display:grid;
