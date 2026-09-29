@@ -209,8 +209,9 @@ function applyMapMode(){
   const popular=activeMode==="popular";
   const overview=map.getZoom()<4.7;
   const showHubs=popular || overview;
+  const showArea=area && !overview;
   ["artist-points","artist-hit"].forEach(id=>setLayerVisible(id,artist));
-  ["clusters","cluster-hit","event-points","event-hit","event-labels"].forEach(id=>setLayerVisible(id,area));
+  ["clusters","cluster-hit","event-points","event-hit","event-labels"].forEach(id=>setLayerVisible(id,showArea));
   [
     "capital-points","capital-labels","hub-hit-capital",
     "city-major-points","city-major-labels","hub-hit-major",
@@ -1345,7 +1346,7 @@ function addHotspotSuggestion(h){
   const title=document.createElement("span"); title.className="suggestion-title";
   title.textContent=[h.city,h.countryCode].filter(Boolean).join(", ");
   const kind=document.createElement("span"); kind.className="suggestion-kind";
-  kind.textContent=Number(h.count||0)+" upcoming concerts";
+  kind.textContent=Number(h.count||0)>0 ? Number(h.count||0)+" upcoming concerts" : "Major concert market";
   cp.append(title,kind); b.appendChild(cp);
   b.addEventListener("click",()=>selectHotspotSuggestion(h)); suggestions.appendChild(b);
 }
