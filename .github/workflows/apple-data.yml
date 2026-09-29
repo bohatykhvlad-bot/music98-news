@@ -83,7 +83,7 @@ jobs:
         run: |
           git config user.name "music98 apple-data bot"
           git config user.email "actions@users.noreply.github.com"
-          git add public/data/covers.json public/data/apple-names.json public/data/cover-corrections.json
+          git add public/data/covers.json public/data/apple-names.json public/data/cover-corrections.json public/data/top50.json public/index.html
           if git diff --cached --quiet; then
             echo "данные Apple без изменений"
             exit 0
