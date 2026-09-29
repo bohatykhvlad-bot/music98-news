@@ -5,7 +5,7 @@
  * which prevents an original song from collapsing into a remix/live/sped-up row.
  */
 
-export const COVER_RESOLVER_VERSION = 3;
+export const COVER_RESOLVER_VERSION = 4;
 
 export const stripParen = (s) => String(s || "").replace(/\([^)]*\)|\[[^\]]*\]/g, " ");
 
@@ -77,9 +77,12 @@ function collectionPenalty(item) {
   const name = String(item?.collectionName || "").toLowerCase();
   const genre = String(item?.primaryGenreName || "").toLowerCase();
   let penalty = 0;
-  if (/\b(?:greatest hits|best of|essentials?|anthology|collection|compilation)\b/.test(name)) penalty += 420;
-  if (/\b(?:various artists|karaoke|tribute)\b/.test(name)) penalty += 700;
-  if (/\b(?:soundtrack|original motion picture)\b/.test(name) || genre === "soundtrack") penalty += 160;
+  // Generic catalog/repackage releases must never outrank the song's own
+  // contemporary album/single merely because Apple Search returned them first.
+  if (/\b(?:greatest hits?|best of|essentials?|anthology|collection|compilation|retrospective)\b/.test(name)) penalty += 520;
+  if (/\b(?:20th century masters|millennium collection|number ones|no\. ?1s|complete singles?|classic hits?|motown classics?)\b/.test(name)) penalty += 560;
+  if (/\b(?:various artists|karaoke|tribute)\b/.test(name)) penalty += 800;
+  if (/\b(?:soundtrack|original motion picture)\b/.test(name) || genre === "soundtrack") penalty += 180;
   return penalty;
 }
 
@@ -130,12 +133,18 @@ export function appleCandidateScore(wantedTitle, wantedArtist, item) {
        the same master on the artist's own release. */
     score += 20;
   }
-  score -= collectionPenalty(item);
+  const penalty = collectionPenalty(item);
+  score -= penalty;
 
   const collBase = String(item.collectionName || "").replace(/\s*-\s*(?:single|ep)\s*$/i, "");
   if (normTitle(collBase) === normTitle(wantedTitle)) score += 20;
 
-  return { score, release: releaseMs(item), id: Number(item.trackId) || Number.MAX_SAFE_INTEGER };
+  return {
+    score,
+    release: releaseMs(item),
+    id: Number(item.trackId) || Number.MAX_SAFE_INTEGER,
+    collectionPenalty: penalty,
+  };
 }
 
 export function pickAppleCandidate(wantedTitle, wantedArtist, results) {
@@ -144,12 +153,34 @@ export function pickAppleCandidate(wantedTitle, wantedArtist, results) {
     const meta = appleCandidateScore(wantedTitle, wantedArtist, item);
     if (meta) ranked.push({ item, ...meta });
   }
-  ranked.sort((a, b) =>
+  if (!ranked.length) return null;
+
+  /* Canonical-original rule:
+   * 1) exact song/version + artist has already been enforced above;
+   * 2) find the earliest credible Apple release of that studio master;
+   * 3) only compare album/EP/single variants from the original release era
+   *    (18 months). This keeps a same-era album master above a promo single,
+   *    while blocking years-later compilations/repackages from stealing art.
+   *
+   * Apple commonly stores the historical release year on legacy albums, so this
+   * also fixes catalog songs such as Ain't No Mountain High Enough: United-era
+   * artwork can beat a later anthology even when both contain the same master.
+   */
+  const credible = ranked.filter(x => x.collectionPenalty < 500 && Number.isFinite(x.release));
+  const earliest = credible.length ? Math.min(...credible.map(x => x.release)) : Number.MAX_SAFE_INTEGER;
+  const ORIGINAL_WINDOW_MS = 548 * 86400000;
+  const originalEra = Number.isFinite(earliest) && earliest < Number.MAX_SAFE_INTEGER
+    ? ranked.filter(x => x.release <= earliest + ORIGINAL_WINDOW_MS)
+    : ranked;
+
+  const pool = originalEra.length ? originalEra : ranked;
+  pool.sort((a, b) =>
     b.score - a.score ||
+    a.collectionPenalty - b.collectionPenalty ||
     a.release - b.release ||
     a.id - b.id
   );
-  return ranked.length ? ranked[0].item : null;
+  return pool[0].item;
 }
 
 export function appleCandidateCompatible(wantedTitle, wantedArtist, item) {
