@@ -77,7 +77,7 @@ jobs:
             if (!rec?.url || !rec?.title || !rec?.artist) {
               throw new Error("revalidated cover has no matching Apple identity: " + key);
             }
-            if (!proof || proof.source !== "resolver" || proof.resolverVersion !== 3 ||
+            if (!proof || proof.source !== "resolver" || proof.resolverVersion !== 4 ||
                 proof.art !== url || !proof.trackId || !proof.collectionId) {
               throw new Error("revalidated cover has no current canonical resolver proof: " + key);
             }
