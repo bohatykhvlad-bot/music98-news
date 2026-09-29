@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import html as htmlmod
 import json
+import math
 import re
 import ssl
 import sys
@@ -41,7 +42,7 @@ COVERS_PATH = PUBLIC / "data" / "chart-covers.json"
 # offline-built Apple covers (scripts/build-covers.mjs, обновляет GitHub Actions)
 SEED_COVERS_PATH = PUBLIC / "data" / "covers.json"
 COVER_META_PATH = PUBLIC / "data" / "apple-cover-meta.json"
-COVER_RESOLVER_VERSION = 3
+COVER_RESOLVER_VERSION = 4
 # one accepted spelling per song (same idea as the covers: what we took once stays)
 NAMES_PATH = PUBLIC / "data" / "chart-names.json"
 # Apple spellings collected by scripts/build-covers.mjs on the GitHub runner
@@ -184,12 +185,14 @@ def _collection_penalty(item: dict) -> int:
     name = str(item.get("collectionName") or "").lower()
     genre = str(item.get("primaryGenreName") or "").lower()
     penalty = 0
-    if re.search(r"\b(?:greatest hits|best of|essentials?|anthology|collection|compilation)\b", name):
-        penalty += 420
+    if re.search(r"\b(?:greatest hits?|best of|essentials?|anthology|collection|compilation|retrospective)\b", name):
+        penalty += 520
+    if re.search(r"\b(?:20th century masters|millennium collection|number ones|no\.? ?1s|complete singles?|classic hits?|motown classics?)\b", name):
+        penalty += 560
     if re.search(r"\b(?:various artists|karaoke|tribute)\b", name):
-        penalty += 700
+        penalty += 800
     if re.search(r"\b(?:soundtrack|original motion picture)\b", name) or genre == "soundtrack":
-        penalty += 160
+        penalty += 180
     return penalty
 
 
@@ -226,11 +229,12 @@ def apple_candidate_score(title: str, artist: str, item: dict):
         score += 220 if track_count >= 6 else (100 if track_count >= 2 else (20 if track_count == 1 else 0))
     elif track_count >= 6:
         score += 20
-    score -= _collection_penalty(item)
+    penalty = _collection_penalty(item)
+    score -= penalty
     coll_base = re.sub(r"\s*-\s*(?:single|ep)\s*$", "", str(item.get("collectionName") or ""), flags=re.I)
     if norm_title(coll_base) == norm_title(title):
         score += 20
-    return (score, _release_ms(item), int(item.get("trackId") or 2**63 - 1))
+    return (score, _release_ms(item), int(item.get("trackId") or 2**63 - 1), penalty)
 
 
 def pick_apple_candidate(title: str, artist: str, results: list[dict]):
@@ -239,8 +243,17 @@ def pick_apple_candidate(title: str, artist: str, results: list[dict]):
         meta = apple_candidate_score(title, artist, item)
         if meta is not None:
             ranked.append((item, *meta))
-    ranked.sort(key=lambda x: (-x[1], x[2], x[3]))
-    return ranked[0][0] if ranked else None
+    if not ranked:
+        return None
+
+    credible = [x for x in ranked if x[4] < 500 and math.isfinite(x[2])]
+    earliest = min((x[2] for x in credible), default=float("inf"))
+    original_window = 548 * 86400
+    pool = [x for x in ranked if x[2] <= earliest + original_window] if math.isfinite(earliest) else ranked
+    if not pool:
+        pool = ranked
+    pool.sort(key=lambda x: (-x[1], x[4], x[2], x[3]))
+    return pool[0][0]
 
 
 def points(pos) -> int:
