@@ -177,7 +177,14 @@ async function reserveTicketmasterCall(env, scope="interactive") {
   const observed=await kvGetJson(env,"ticketmaster:quota:last");
   const observedAt=Date.parse(observed?.observedAt||0)||0;
   const observedAvailable=Number(observed?.available);
-  if(Date.now()-observedAt<12*60*60*1000 && Number.isFinite(observedAvailable)){
+  const rawReset=Number(observed?.reset);
+  const resetMs=Number.isFinite(rawReset)
+    ? (rawReset>1e12 ? rawReset : rawReset>1e9 ? rawReset*1000 : 0)
+    : 0;
+  const originWindowStillActive=!resetMs || Date.now()<resetMs;
+  if(originWindowStillActive &&
+     Date.now()-observedAt<12*60*60*1000 &&
+     Number.isFinite(observedAvailable)){
     const floor=scope==="interactive" ? TM_ORIGIN_INTERACTIVE_RESERVE : TM_ORIGIN_SCHEDULED_RESERVE;
     if(observedAvailable<=floor){
       throw Object.assign(new Error("ticketmaster_budget_guard"),{
