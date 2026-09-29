@@ -224,9 +224,9 @@ export default {
   },
 
   async scheduled(controller, env, ctx) {
-    ctx.waitUntil(Promise.allSettled([
-      refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 16 }),
-      refreshPopularSnapshot(env),
-    ]));
+    ctx.waitUntil((async()=>{
+      try{ await refreshHotspotSnapshot(env, { jobBudget: 3, verifyBudget: 16 }); }catch(e){}
+      try{ await refreshPopularSnapshot(env); }catch(e){}
+    })());
   },
 };
