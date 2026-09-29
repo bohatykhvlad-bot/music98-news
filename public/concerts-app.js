@@ -430,7 +430,7 @@ function handleHubClick(e){
   const count=Number(f.properties?.count||0);
   userMoving=false;
   map.flyTo({center:[lng,lat],zoom:8.5,duration:650});
-  loadArea(lat,lng,name,{fit:false,radius:45});
+  loadArea(lat,lng,name,{fit:false,radius:45,city:name,countryCode:String(f.properties?.countryCode||"")});
 }
 
 function popupContent(e){
@@ -1030,19 +1030,24 @@ async function loadArea(lat,lng,label,opts={}){
   sideSub.textContent="Artists with the most upcoming events in this area.";
   setStatus("Loading concerts...");
   try{
-    const data=await getPayload({lat,lng,radius:searchRadius});
+    const data=opts.city
+      ? await getPayload({city:opts.city,countryCode:opts.countryCode||""})
+      : await getPayload({lat,lng,radius:searchRadius});
     if(requestId!==areaRequestSeq) return;
     const events=data.events||[];
     const total=Number(data.page?.totalElements ?? events.length) || events.length;
 
     nearbyEvents=events;
     nearbyTotal=total;
-    lastArea={lat,lng,label,radius:searchRadius};
+    lastArea={lat,lng,label,radius:searchRadius,city:opts.city||"",countryCode:opts.countryCode||""};
 
     renderArtists(groupedNearby(events),"nearby");
     setMode("nearby");
     setEventData(events,total);
     if(opts.fit) fitEvents(events);
+    sideSub.textContent=opts.city
+      ? "Artists with upcoming events in "+label+"."
+      : "Artists with the most upcoming events in this area.";
     setStatus(total ? total+" concerts · "+label : "No Ticketmaster concerts found · "+label);
   }catch(err){
     if(requestId!==areaRequestSeq) return;
