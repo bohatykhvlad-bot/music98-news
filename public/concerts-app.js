@@ -869,7 +869,7 @@ function restoreModeMap(){
   setArtistMapData([]);
   if(activeMode==="popular"){
     setEventData(popularEvents);
-    setStatus(popularEvents.length ? "Popular Ticketmaster artists · worldwide" : "");
+    setStatus("");
   }else{
     setEventData(nearbyEvents,nearbyTotal);
     const label=lastArea?.label||"Selected area";
