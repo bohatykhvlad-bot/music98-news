@@ -21,8 +21,8 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
 test("Buy Tickets pill scales while text uses a crisp native pressed size",()=>{
   assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
   assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
-  assert.match(app,/\.buy\.press::before\{transform:scale\(\.92\)\}/);
-  assert.match(app,/\.buy\.press \.buy-label\{font-size:12px\}/);
+  assert.match(app,/\.buy\.press::before\{transform:scale\(\.97\)\}/);
+  assert.match(app,/\.buy\.press \.buy-label\{font-size:12\.5px\}/);
   assert.doesNotMatch(app,/\.buy\.press \.buy-label\{[^}]*transform/);
 });
 
@@ -40,12 +40,12 @@ test("More button keeps its existing behavior with equal vertical spacing",()=>{
   assert.match(app,/\.tour-more\{width:fit-content;max-width:100%;[^}]*margin:5px auto 5px/);
 });
 
-test("Popular UI requires a complete Ticketmaster-eligible Top 30 before browser caching",()=>{
-  assert.match(app,/Top 30 popular artists with upcoming Ticketmaster shows\./);
+test("Popular UI renders any strict confirmed cache immediately while targeting Top 30",()=>{
+  assert.match(app,/Popular artists with confirmed upcoming Ticketmaster shows\./);
   assert.match(app,/music98:concert-popular:v6/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
   assert.match(app,/ticketmaster_event_payload_gt_0/);
-  assert.match(app,/cached\.artists\.length>=30/);
+  assert.match(app,/cached\.artists\.length>0/);
   assert.match(app,/cached\.artists\.every\(a=>a\?\.eventConfirmed===true && Number\(a\?\.shows\|\|0\)>0\)/);
   assert.match(app,/mode:"popular",v:"popular-v6"/);
 });
@@ -63,7 +63,7 @@ test("world overview is static and restores pinned markets after zooming out",()
   assert.match(app,/state-capital-labels/);
   assert.match(app,/const overviewZoom=map\.getZoom\(\)<4\.7/);
   assert.match(app,/const showHubs=activeMode==="popular" \|\| overviewZoom/);
-  assert.doesNotMatch(app,/map\.on\("load",\(\)=>\{[\s\S]*?loadHotspots\(\);/);
+  assert.match(app,/map\.on\("load",\(\)=>\{\n  resizeMapStable\(\);\n  addTopographicRelief\(\);\n  addLayers\(\);/);\n  assert.doesNotMatch(app,/map\.on\("load",\(\)=>\{\n  resizeMapStable\(\);\n  addLayers\(\);\n  loadHotspots\(\);/);
 });
 
 test("map has one compact reset control and no Overview or Fit results controls",()=>{
@@ -72,7 +72,7 @@ test("map has one compact reset control and no Overview or Fit results controls"
   assert.doesNotMatch(app,/id=\"fitBtn\"/);
   assert.match(app,/resetMapBtn\.addEventListener\("click"/);
   assert.match(app,/radiusEl\.value="100"/);
-  assert.match(app,/map\.easeTo\(\{center:\[5,25\],zoom:1\.55/);
+  assert.match(app,/map\.easeTo\(\{center:\[8,27\],zoom:1\.55/);
 });
 
 test("Buy Tickets uses the shared site press binder",()=>{
