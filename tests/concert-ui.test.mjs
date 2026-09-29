@@ -40,7 +40,7 @@ test("Popular UI renders strict confirmed cache immediately without an explanato
   assert.match(app,/music98:concert-popular:v7/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
   assert.match(app,/ticketmaster_event_payload_gt_0/);
-  assert.match(app,/cached\.artists\.length>0/);
+  assert.match(app,/cached\.artists\.length>=30/);
   assert.match(app,/mode:"popular",v:"popular-v7"/);
   assert.match(app,/sideSub\.textContent="";/);
   assert.doesNotMatch(app,/Popular artists with confirmed upcoming Ticketmaster shows\./);
