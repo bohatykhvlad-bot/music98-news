@@ -55,7 +55,6 @@ let lastArea=null;
 let activeMode="popular";
 let suggestTimer=0;
 let suggestSeq=0;
-let moveTimer=0;
 let areaRequestSeq=0;
 let popularRequestSeq=0;
 let popup=null;
@@ -827,8 +826,6 @@ function restoreArtistSide(){
 function showArtistContext(){
   if(!artistContext) return;
   hidePendingAreaSearch();
-  clearTimeout(moveTimer);
-  moveTimer=0;
   areaRequestSeq++;
   popularRequestSeq++;
   setMode("artist");
@@ -902,8 +899,6 @@ async function toggleArtist(item,card,mode){
     return;
   }
 
-  clearTimeout(moveTimer);
-  moveTimer=0;
   areaRequestSeq++;
   popularRequestSeq++;
   artistContext={item:{...item},events:[],sourceMode:mode,sourceItems:sourceItemsForArtist(item,mode)};
@@ -1068,8 +1063,6 @@ async function loadHotspots(){
 
 async function loadPopular(force=false){
   hidePendingAreaSearch();
-  clearTimeout(moveTimer);
-  moveTimer=0;
   areaRequestSeq++;
   const requestId=++popularRequestSeq;
   clearArtistContext();
@@ -1178,8 +1171,6 @@ async function loadArea(lat,lng,label,opts={}){
 }
 
 function requestLocation(){
-  clearTimeout(moveTimer);
-  moveTimer=0;
   areaRequestSeq++;
   popularRequestSeq++;
   clearArtistContext();
@@ -1216,8 +1207,6 @@ async function searchArtists(q){
   return data.artists||[];
 }
 async function selectFeature(f){
-  clearTimeout(moveTimer);
-  moveTimer=0;
   areaRequestSeq++;
   popularRequestSeq++;
   clearArtistContext();
@@ -1318,8 +1307,6 @@ function renderSuggestions(places,artists,hubs=[]){
 }
 
 nearTab.addEventListener("click",()=>{
-  clearTimeout(moveTimer);
-  moveTimer=0;
   if(lastArea){
     clearArtistContext();
     setMode("nearby");
@@ -1336,8 +1323,6 @@ mapArtistBtn.addEventListener("click",showArtistContext);
 mapAllBtn.addEventListener("click",showAllConcertsInMapArea);
 
 overviewBtn.addEventListener("click",()=>{
-  clearTimeout(moveTimer);
-  moveTimer=0;
   hidePendingAreaSearch();
   closePopup();
   search.value="";
@@ -1470,12 +1455,6 @@ function distanceKm(lat1,lng1,lat2,lng2){
   const p1=toRad(lat1),p2=toRad(lat2),dp=toRad(lat2-lat1),dl=toRad(lng2-lng1);
   const h=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;
   return 2*r*Math.atan2(Math.sqrt(h),Math.sqrt(1-h));
-}
-function visibleRadiusKm(){
-  const c=map.getCenter(),b=map.getBounds();
-  const horizontal=distanceKm(c.lat,c.lng,c.lat,b.getEast());
-  const vertical=distanceKm(c.lat,c.lng,b.getNorth(),c.lng);
-  return Math.round(Math.max(5,Math.min(500,Math.max(horizontal,vertical))));
 }
 
 map.on("movestart",e=>{ if(e.originalEvent) userMoving=true; });
