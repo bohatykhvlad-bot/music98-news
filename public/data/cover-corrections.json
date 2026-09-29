@@ -1,13 +1,31 @@
 {
-  "loser|tameimpala": {
-    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/80/54/11/80541122-c1c4-50ad-a673-ff79f4cf8aa7/196873555331.jpg/600x600bb.jpg",
-    "appleCollectionId": "1836226516",
-    "appleTrackId": "1836226731",
-    "reason": "Apple Music currently presents Loser on Deadbeat; use the Deadbeat studio artwork, not the later standalone/remix artwork."
+  "animal|katseye": {
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/35/0e/32/350e32e1-7bfc-6d96-174a-0d11309365ef/26UMGIM84288.rgb.jpg/600x600bb.jpg",
+    "appleCollectionId": "6793209963",
+    "appleTrackId": "6793209964",
+    "reason": "Verified Apple Music Animal - Single by KATSEYE (2026). Use the dedicated official single artwork, not WILD (hot to crazy) or playlist/package artwork."
+  },
+  "billiejean|michaeljackson": {
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg",
+    "appleCollectionId": "269572838",
+    "appleTrackId": "269573364",
+    "reason": "Verified Apple Music Thriller (1982) by Michael Jackson. Use the original Thriller release artwork and metadata, not later catalog/compilation matches."
   },
   "getlucky~v:edit|daftpunk": {
     "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/e8/43/5f/e8435ffa-b6b9-b171-40ab-4ff3959ab661/886443919266.jpg/600x600bb.jpg",
     "appleCollectionId": "617154241",
     "reason": "The chart calls this a radio edit. Use the verified original Daft Punk album artwork, never the Apple search result labelled Daft Punk Remix."
+  },
+  "hootiefrutti|katseye": {
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e2/28/92/e22892a7-fe88-72cf-ecba-691030dfcf7e/26UMGIM41151.rgb.jpg/600x600bb.jpg",
+    "appleCollectionId": "1891779764",
+    "appleTrackId": "1891779777",
+    "reason": "Verified Apple Music WILD - EP by KATSEYE. Hootie Frutti has no separate canonical single in the checked Apple catalog; use the official WILD EP artwork."
+  },
+  "loser|tameimpala": {
+    "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/80/54/11/80541122-c1c4-50ad-a673-ff79f4cf8aa7/196873555331.jpg/600x600bb.jpg",
+    "appleCollectionId": "1836226516",
+    "appleTrackId": "1836226731",
+    "reason": "Apple Music currently presents Loser on Deadbeat; use the Deadbeat studio artwork, not the later standalone/remix artwork."
   }
 }

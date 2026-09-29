@@ -83,7 +83,7 @@ const resolverSource = fs.readFileSync(new URL("./build-covers.mjs", import.meta
 assert.match(resolverSource, /"animal\\|katseye": "6793209963"/);
 assert.match(resolverSource, /"hootiefrutti\\|katseye": "1891779764"/);
 assert.match(resolverSource, /"billiejean\\|michaeljackson": "269572838"/);
-assert.match(resolverSource, /function pickDedicatedAppleRelease\(/);
+assert.doesNotMatch(resolverSource, /pickDedicatedAppleRelease/);
 
 
 const beautyStudio={
@@ -100,6 +100,18 @@ assert.equal(appleCandidateCompatible("Beauty and a Beat (feat. Nicki Minaj)","J
 assert.equal(pickAppleCandidate("Beauty and a Beat (feat. Nicki Minaj)","Justin Bieber",[beautyDub,beautyStudio]).trackId,500);
 
 const corrections = JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json", import.meta.url), "utf8"));
+const lockedCovers = JSON.parse(fs.readFileSync(new URL("../public/data/covers.json", import.meta.url), "utf8"));
+const appleNames = JSON.parse(fs.readFileSync(new URL("../public/data/apple-names.json", import.meta.url), "utf8"));
+for (const [key, collectionId, trackId] of [
+  ["animal|katseye", "6793209963", "6793209964"],
+  ["hootiefrutti|katseye", "1891779764", "1891779777"],
+  ["billiejean|michaeljackson", "269572838", "269573364"],
+]) {
+  assert.equal(corrections[key].appleCollectionId, collectionId);
+  assert.equal(corrections[key].appleTrackId, trackId);
+  assert.equal(lockedCovers[key], corrections[key].art);
+  assert.match(appleNames[key].url, new RegExp("/" + collectionId + "\\?i=" + trackId + "(?:&|$)"));
+}
 const tameCorrection = corrections["loser|tameimpala"];
 assert.equal(tameCorrection.appleCollectionId, "1836226516");
 assert.equal(tameCorrection.appleTrackId, "1836226731");

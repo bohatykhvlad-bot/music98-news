@@ -48,7 +48,7 @@ jobs:
       - name: Собрать cover registry и Apple metadata
         run: |
           cp public/data/covers.json /tmp/covers-before.json
-          REVALIDATE_EXISTING=1 node scripts/build-covers.mjs
+          node scripts/build-covers.mjs
           node - <<'NODE'
           const fs = require("fs");
           const before = JSON.parse(fs.readFileSync("/tmp/covers-before.json","utf8"));
@@ -60,7 +60,7 @@ jobs:
             }
           }
           const changed = Object.keys(after).filter(k => before[k] && before[k] !== after[k]);
-          console.log("canonical cover revalidation:", changed.length, "existing rows corrected");
+          console.log("cover registry updates:", changed.length, "existing rows corrected only by explicit pins/corrections");
           NODE
           cmp -s public/data/top50.json /tmp/top50-before.json || {
             echo "ERROR: artwork audit modified Top 50 ranking data"

@@ -129,54 +129,31 @@ async function lookupCollection(collectionId, title, artist) {
   ) || null;
 }
 
-function pickDedicatedAppleRelease(title, artist, songs) {
-  const wantTitle = normTitle(stripParen(title));
-  const wantArtist = primaryArtist(artist);
-  const dedicated = (songs || []).filter((x) => {
-    if (!appleCandidateCompatible(title, artist, x)) return false;
-    const collectionArtist = primaryArtist(x.collectionArtistName || x.artistName);
-    if (wantArtist && collectionArtist !== wantArtist) return false;
-    const trackCount = Math.max(0, Number(x.trackCount || 0));
-    if (trackCount < 1 || trackCount > 5) return false;
-    return normTitle(collectionBase(x.collectionName)) === wantTitle;
-  });
-  dedicated.sort((a, b) => {
-    const da = releaseMs(a);
-    const db = releaseMs(b);
-    return da - db || (Number(a.trackId) || Number.MAX_SAFE_INTEGER) - (Number(b.trackId) || Number.MAX_SAFE_INTEGER);
-  });
-  return dedicated[0] || null;
-}
-
-async function resolveApple(title, artist) {
+async function resolveApple(title, artist, forcedCollectionId = "") {
   const key = mergeKey(title, artist);
+  const pinnedCollectionId = String(forcedCollectionId || DIRECT_COLLECTION[key] || "");
 
-  if (DIRECT_COLLECTION[key]) {
-    const hit = await lookupCollection(DIRECT_COLLECTION[key], title, artist);
-    if (hit && hit.artworkUrl100) return { hit, reason: "direct-original" };
+  if (pinnedCollectionId) {
+    const hit = await lookupCollection(pinnedCollectionId, title, artist);
+    if (hit && hit.artworkUrl100) return { hit, reason: "pinned-release" };
   }
 
   const songs = await songSearch(title, artist);
   if (!songs.length) return null;
 
-  /* Prefer a dedicated exact-title Apple single/EP when one exists. This is
-     the release whose artwork was actually issued for the song, and avoids a
-     later album/variant package winning merely because it has more tracks.
-     Explicit DIRECT_COLLECTION entries remain the highest authority. */
-  const dedicated = pickDedicatedAppleRelease(title, artist, songs);
-  const hit = dedicated || pickAppleCandidate(title, artist, songs);
+  // Shared matcher rejects derivative release packages and later generic compilations.
+  // Exact exceptions are handled only through verified pinned collection IDs above.
+  const hit = pickAppleCandidate(title, artist, songs);
   if (!hit?.artworkUrl100) return null;
 
   const trackCount = Math.max(0, Number(hit.trackCount || 0));
   const sameCollectionArtist =
     primaryArtist(hit.collectionArtistName || hit.artistName) === primaryArtist(artist);
-  const reason = dedicated
-    ? (trackCount >= 2 ? "dedicated-ep" : "dedicated-single")
-    : sameCollectionArtist && trackCount >= 6
-      ? "canonical-album"
-      : sameCollectionArtist && trackCount >= 2
-        ? "canonical-ep"
-        : "canonical-single";
+  const reason = sameCollectionArtist && trackCount >= 6
+    ? "canonical-album"
+    : sameCollectionArtist && trackCount >= 2
+      ? "canonical-ep"
+      : "canonical-single";
   return { hit, reason };
 }
 
@@ -235,10 +212,7 @@ if (idWanted.length) {
   }
   for (const [t, id] of idWanted) {
     const key = mergeKey(t.title, t.artist);
-    if (editorialCorrections[key]) {
-      if (previousNames[key]) names[key] = previousNames[key];
-      continue;
-    }
+    if (editorialCorrections[key]) continue;
     const hit = byId.get(id);
     if (hit && appleCandidateCompatible(t.title, t.artist, hit)) names[key] = appleRecord(hit);
   }
@@ -247,22 +221,21 @@ if (idWanted.length) {
 /* Normal daily runs keep existing locks. Matcher-change runs set REVALIDATE_EXISTING=1 and safely re-resolve current chart rows only; chart ranking data is never written by this script. */
 for (const t of tracks) {
   const key = mergeKey(t.title, t.artist);
-  if (editorialCorrections[key]) {
-    if (previousNames[key]) names[key] = previousNames[key];
-    continue;
-  }
-  if (covers[key] && !REVALIDATE_EXISTING) {
+  const correction = editorialCorrections[key] || null;
+  if (covers[key] && !REVALIDATE_EXISTING && !correction) {
     if (!names[key] && previousNames[key]) names[key] = previousNames[key];
     continue;
   }
   try {
-    const resolved = await resolveApple(t.title, t.artist);
+    const resolved = await resolveApple(t.title, t.artist, correction && correction.appleCollectionId);
     if (!resolved) {
       console.log(`  Apple cover не найден: ${t.artist} - ${t.title}`);
       if (previousNames[key]) names[key] = previousNames[key];
       continue;
     }
-    const url = art600(resolved.hit.artworkUrl100);
+    const url = correction && correction.art
+      ? String(correction.art)
+      : art600(resolved.hit.artworkUrl100);
     const changed = covers[key] !== url;
     if (changed) covers[key] = url;
     if (changed) console.log(`  Apple verified [${resolved.reason}]: ${t.artist} - ${t.title} -> ${resolved.hit.collectionName}`);
