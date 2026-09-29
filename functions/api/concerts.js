@@ -756,6 +756,8 @@ export async function refreshPopularTourSnapshots(env,budget=4){
   let state=await kvGetJson(env,POPULAR_TOUR_STATE_KEY);
   if(!state || state.version!=="popular-tours-v1" || state.sourceBuiltAt!==popular.builtAt){
     state={version:"popular-tours-v1",sourceBuiltAt:popular.builtAt,index:0,updatedAt:new Date().toISOString()};
+  }else if(state.complete){
+    return {ok:true,complete:true,fresh:true,index:state.index,total:popular.artists.length,processed:0};
   }
 
   let processed=0;
@@ -889,6 +891,8 @@ export async function refreshMapMarketSnapshot(env, force=false){
       markets:[],
       updatedAt:new Date().toISOString(),
     };
+  }else if(state.complete){
+    return {ok:true,complete:true,fresh:true,index:state.index,total:MAP_MARKET_SEEDS.length,processed:0,found:Array.isArray(state.markets)?state.markets.length:0};
   }
 
   const seen=new Map(
