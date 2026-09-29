@@ -25,6 +25,8 @@ dns.setDefaultResultOrder("ipv4first");
 
 const OUT = path.resolve("public/data/covers.json");
 const OUT_NAMES = path.resolve("public/data/apple-names.json");
+const BAKED_TOP = path.resolve("public/data/top50.json");
+const INDEX_HTML = path.resolve("public/index.html");
 const CHART = process.env.CHART_URL || "https://music98.news/api/top50";
 const REVALIDATE_EXISTING = /^(?:1|true|yes)$/i.test(String(process.env.REVALIDATE_EXISTING || ""));
 
@@ -219,3 +221,32 @@ console.log(`без Apple cover-lock: ${missing.length}${missing.length ? " -> "
 const sortedNames = Object.fromEntries(Object.entries(names).sort(([a], [b]) => a.localeCompare(b)));
 fs.writeFileSync(OUT_NAMES, JSON.stringify(sortedNames, null, 2) + "\n");
 console.log(`записано ${Object.keys(sortedNames).length} Apple metadata rows`);
+
+/* Keep the emergency baked chart consistent with the verified registry. This does
+   not recalculate positions, arrows or tenure; it only repairs Apple metadata for
+   rows already present in the baked fallback and its inline first-paint copy. */
+try {
+  const baked = JSON.parse(fs.readFileSync(BAKED_TOP, "utf8"));
+  let bakedChanged = false;
+  for (const t of baked?.tracks || []) {
+    const key = mergeKey(t.title, t.artist);
+    const art = sorted[key];
+    const meta = sortedNames[key];
+    if (art && t.art !== art) { t.art = art; bakedChanged = true; }
+    if (meta?.url && t.url !== meta.url) { t.url = meta.url; bakedChanged = true; }
+    if (meta?.prev && t.prev !== meta.prev) { t.prev = meta.prev; bakedChanged = true; }
+    if (meta?.year && t.year !== meta.year) { t.year = meta.year; bakedChanged = true; }
+  }
+  if (bakedChanged) {
+    fs.writeFileSync(BAKED_TOP, JSON.stringify(baked, null, 2) + "\n");
+    const rows = (baked.tracks || []).map(({ rank, ...t }) => t);
+    const block = "const TOP50 = " + JSON.stringify(rows, null, 2) + ";";
+    const html = fs.readFileSync(INDEX_HTML, "utf8");
+    const next = html.replace(/const TOP50 = \[[\s\S]*?\n\];/, block);
+    if (next === html) throw new Error("inline TOP50 block not found");
+    fs.writeFileSync(INDEX_HTML, next);
+    console.log("обновлены baked top50.json и inline TOP50 только по Apple metadata");
+  }
+} catch (e) {
+  console.log("  baked chart metadata patch ошибка:", e.message);
+}
