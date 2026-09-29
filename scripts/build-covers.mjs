@@ -15,7 +15,7 @@ import path from "node:path";
 import dns from "node:dns";
 import {
   appleCandidateCompatible,
-  COVER_COVER_RESOLVER_VERSION,
+  COVER_RESOLVER_VERSION,
   mergeKey,
   primaryArtist,
   stripParen,
