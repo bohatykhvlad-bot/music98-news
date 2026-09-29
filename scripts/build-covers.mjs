@@ -16,10 +16,8 @@ import dns from "node:dns";
 import {
   appleCandidateCompatible,
   mergeKey,
-  normTitle,
   primaryArtist,
   stripParen,
-  versionSignature,
   pickAppleCandidate,
 } from "../functions/lib/chart-identity.js";
 
@@ -42,11 +40,6 @@ const art600 = (u) => String(u || "")
   .replace("100x100bb.jpg", "600x600bb.jpg")
   .replace("100x100bb", "600x600bb");
 
-const releaseMs = (x) => {
-  const n = Date.parse(String((x && x.releaseDate) || ""));
-  return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
-};
-
 async function json(url) {
   const r = await fetch(url, { headers: { "user-agent": "music98-cover-resolver/1.0" } });
   if (!r.ok) throw new Error(`HTTP ${r.status} ${url}`);
@@ -66,38 +59,6 @@ function appleRecord(hit) {
     prev: hit.previewUrl || "",
     year: String(hit.releaseDate || "").slice(0, 4),
   };
-}
-
-function collectionBase(name) {
-  return String(name || "")
-    .replace(/\s*-\s*(?:single|ep)\s*$/i, "")
-    .trim();
-}
-
-function derivativeCollection(name) {
-  const s = String(name || "").toLowerCase();
-  return /\b(?:remix(?:es)?|rmx|live|acoustic|instrumental|karaoke|demo|sped\s*up|slowed|reverb(?:ed)?|isolated\s+vocals?|singalong|track\s+by\s+track|commentary|limited\s+cover|alternate\s+(?:cover|version)|radio\s+edit|extended\s+(?:mix|version))\b/.test(s);
-}
-
-function genericCompilation(name, genre) {
-  const s = String(name || "").toLowerCase();
-  const g = String(genre || "").toLowerCase();
-  if (g === "soundtrack") return 5;
-  if (/original motion picture soundtrack|soundtrack/.test(s)) return 5;
-  if (/\b(?:70s|80s|90s)\b.*\b(?:hits|gems|anthems)\b/.test(s)) return 5;
-  if (/\b(?:party|disco|flashback|various artists|anthology)\b/.test(s)) return 4;
-  if (/\b(?:greatest hits|essential)\b/.test(s)) return 3;
-  if (/\b(?:best of|collection)\b/.test(s)) return 1;
-  return 0;
-}
-
-async function albumSearch(title, artist) {
-  const term = encodeURIComponent(`${artist} ${stripParen(title)}`.trim());
-  const d = await json(`https://itunes.apple.com/search?term=${term}&entity=album&limit=200&country=US`);
-  const wantA = primaryArtist(artist);
-  return (d.results || []).filter((x) =>
-    !wantA || primaryArtist(x.artistName || x.collectionArtistName) === wantA
-  );
 }
 
 async function songSearch(title, artist) {
