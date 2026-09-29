@@ -25,9 +25,14 @@ test("Buy Tickets shrinks its pill around a fixed text center",()=>{
   assert.doesNotMatch(app,/\.buy\.press\{[^}]*(?:transform|scale|translate)/);
 });
 
-test("concert popup closes while zooming out below detail zoom in every mode",()=>{
-  assert.match(app,/map\.on\("zoom",\(\)=>\{\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<4\.8\)\{ closePopup\(\); return; \}/);
-  assert.match(app,/map\.on\("zoomend",\(\)=>\{\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<4\.8\)\{ closePopup\(\); return; \}/);
+test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
+  assert.match(app,/const POPUP_CITY_MIN_ZOOM=6\.2/);
+  assert.doesNotMatch(app,/function popupLerp/);
+  assert.doesNotMatch(app,/const t=Math\.max\(0,Math\.min\(1,\(z-2\.3\)/);
+  assert.match(app,/popup\.setMaxWidth\("286px"\)/);
+  assert.match(app,/map\.on\("zoom",\(\)=>\{\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\)\{ closePopup\(\); return; \}/);
+  assert.match(app,/function showPopup\(e\)\{\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
+  assert.match(app,/function showVenuePopup\(events\)\{\n  if\(!events\?\.length \|\| map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
 });
 
 test("More button keeps its existing behavior with equal vertical spacing",()=>{
