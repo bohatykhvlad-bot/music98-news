@@ -1018,17 +1018,17 @@ function mergeHotspots(rows){
   return [...byKey.values()].sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
 }
 
-const POPULAR_CACHE_KEY="music98:concert-popular:v3";
+const POPULAR_CACHE_KEY="music98:concert-popular:v4";
 function readPopularCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(POPULAR_CACHE_KEY)||"null");
     const age=Date.now()-(Date.parse(cached?.builtAt||0)||0);
-    if(cached?.version==="popular-v3" && Array.isArray(cached.artists) && age<26*60*60*1000) return cached;
+    if(cached?.version==="popular-v3" && Array.isArray(cached.artists) && cached.artists.length>=30 && age<26*60*60*1000) return cached;
   }catch(e){}
   return null;
 }
 function writePopularCache(data){
-  if(data?.stale || data?.warming || data?.version!=="popular-v3" || !Array.isArray(data.artists) || !data.artists.length) return;
+  if(data?.stale || data?.warming || data?.version!=="popular-v3" || !Array.isArray(data.artists) || data.artists.length<30) return;
   try{localStorage.setItem(POPULAR_CACHE_KEY,JSON.stringify(data));}catch(e){}
 }
 
@@ -1091,7 +1091,7 @@ async function loadPopular(force=false){
   }
 
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v3"});
+    const data=await getPayload({mode:"popular",v:"popular-v4"});
     if(data.artists?.length && (!data.stale || !popularArtists.length || data.artists.length>=popularArtists.length)){
       popularArtists=data.artists;
     }
