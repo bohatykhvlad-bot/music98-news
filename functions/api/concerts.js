@@ -339,9 +339,14 @@ async function popularPayload(env) {
   // Ticketmaster call behind the same 225ms gate instead of creating bursts.
   for (const candidate of candidates) {
     if (found.length >= 10) break;
-    const artist = await validatePopularArtist(
-      env, candidate.name, candidate.rank, candidate.listeners
-    ).catch(() => null);
+    let artist=null;
+    try{
+      artist=await validatePopularArtist(env,candidate.name,candidate.rank,candidate.listeners);
+    }catch(err){
+      if(err?.message==="ticketmaster_budget_guard" || Number(err?.status)===429 ||
+         err?.message==="ticketmaster_unavailable") throw err;
+      continue;
+    }
     if (!artist || found.some(x => x.id === artist.id)) continue;
     found.push(artist);
   }
@@ -409,6 +414,13 @@ export async function refreshPopularSnapshot(env, force = false) {
     return { ok:true, fresh:true, artists:existing.artists.length };
   }
   const payload = await popularPayload(env);
+  if(!payload.artists?.length){
+    return { ok:false, fresh:false, keptExisting:!!existing?.artists?.length, reason:"popular_refresh_empty" };
+  }
+  // Never replace a healthy list with a suspiciously tiny transient result.
+  if(existing?.artists?.length>=5 && payload.artists.length<5){
+    return { ok:false, fresh:false, keptExisting:true, reason:"popular_refresh_too_small" };
+  }
   const snapshot = { ...payload, builtAt:new Date().toISOString(), version:"popular-v2" };
   await kvPutJson(env, POPULAR_SNAPSHOT_KEY, snapshot);
   return { ok:true, fresh:false, artists:snapshot.artists.length };
