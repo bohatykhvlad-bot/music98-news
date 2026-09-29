@@ -40,6 +40,8 @@ FIRST_PATH = PUBLIC / "data" / "chart-first.json"
 COVERS_PATH = PUBLIC / "data" / "chart-covers.json"
 # offline-built Apple covers (scripts/build-covers.mjs, обновляет GitHub Actions)
 SEED_COVERS_PATH = PUBLIC / "data" / "covers.json"
+COVER_META_PATH = PUBLIC / "data" / "apple-cover-meta.json"
+COVER_RESOLVER_VERSION = 3
 # one accepted spelling per song (same idea as the covers: what we took once stays)
 NAMES_PATH = PUBLIC / "data" / "chart-names.json"
 # Apple spellings collected by scripts/build-covers.mjs on the GitHub runner
@@ -127,8 +129,118 @@ def primary_artist(s: str) -> str:
     return ARTIST_ALIASES.get(a, a)
 
 
+def version_signature(s: str) -> str:
+    x = (s or "").lower().replace("–", "-").replace("—", "-")
+    tags: list[str] = []
+    rules = (
+        ("remix", r"\b(?:remix(?:es)?|rmx)\b"),
+        ("live", r"\blive\b"),
+        ("acoustic", r"\bacoustic\b"),
+        ("instrumental", r"\binstrumental\b"),
+        ("karaoke", r"\bkaraoke\b"),
+        ("demo", r"\bdemo\b"),
+        ("spedup", r"\bsped\s*up\b"),
+        ("slowed", r"\bslowed\b"),
+        ("acapella", r"\b(?:acapella|a\s*cappella)\b"),
+        ("extended", r"\bextended\b"),
+        ("edit", r"\b(?:radio\s+)?edit\b"),
+        ("remaster", r"\bremaster(?:ed)?\b"),
+        ("deluxe", r"\bdeluxe\b"),
+        ("anniversary", r"\banniversary\b"),
+        ("expanded", r"\bexpanded\b"),
+        ("rerecorded", r"\b(?:re-?recorded|taylor['’]s\s+version)\b"),
+        ("mix", r"\b(?:dj\s+mix|mixed|mix)\b"),
+        ("stripped", r"\bstripped\b"),
+        ("piano", r"\bpiano\s+(?:version|mix)\b"),
+        ("orchestral", r"\borchestral\b"),
+        ("nightcore", r"\bnightcore\b"),
+        ("cover", r"\bcover\s+(?:version|mix)\b"),
+    )
+    for name, pattern in rules:
+        if re.search(pattern, x):
+            tags.append(name)
+    if not tags and re.search(r"\bversion\b", x):
+        tags.append("version")
+    return "+".join(sorted(set(tags)))
+
+
 def merge_key(title: str, artist: str) -> str:
-    return f"{norm_title(title)}|{primary_artist(artist)}"
+    sig = version_signature(title)
+    return f"{norm_title(title)}{'~v:' + sig if sig else ''}|{primary_artist(artist)}"
+
+
+def _simple_text(s: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", (s or "").lower().replace("’", "'").replace("‘", "'"))
+
+
+def _release_ms(item: dict) -> float:
+    try:
+        return datetime.fromisoformat(str(item.get("releaseDate") or "").replace("Z", "+00:00")).timestamp()
+    except Exception:
+        return float("inf")
+
+
+def _collection_penalty(item: dict) -> int:
+    name = str(item.get("collectionName") or "").lower()
+    genre = str(item.get("primaryGenreName") or "").lower()
+    penalty = 0
+    if re.search(r"\b(?:greatest hits|best of|essentials?|anthology|collection|compilation)\b", name):
+        penalty += 420
+    if re.search(r"\b(?:various artists|karaoke|tribute)\b", name):
+        penalty += 700
+    if re.search(r"\b(?:soundtrack|original motion picture)\b", name) or genre == "soundtrack":
+        penalty += 160
+    return penalty
+
+
+def apple_candidate_score(title: str, artist: str, item: dict):
+    if not item or norm_title(item.get("trackName") or "") != norm_title(title):
+        return None
+    want_artist = primary_artist(artist)
+    got_artist = primary_artist(item.get("artistName") or "")
+    if want_artist and got_artist != want_artist:
+        return None
+    want_version = version_signature(title)
+    track_version = version_signature(item.get("trackName") or "")
+    if track_version != want_version:
+        return None
+    collection_version = version_signature(item.get("collectionName") or "")
+    if not want_version and collection_version:
+        return None
+    if want_version and collection_version and collection_version != want_version:
+        return None
+
+    collection_artist = primary_artist(item.get("collectionArtistName") or item.get("artistName") or "")
+    try:
+        track_count = max(0, int(item.get("trackCount") or 0))
+    except (TypeError, ValueError):
+        track_count = 0
+    score = 1000
+    if want_artist and got_artist == want_artist:
+        score += 200
+    if _simple_text(item.get("trackName") or "") == _simple_text(title):
+        score += 80
+    score += 60 if not collection_version else 30
+    if want_artist and collection_artist == want_artist:
+        score += 120
+        score += 220 if track_count >= 6 else (100 if track_count >= 2 else (20 if track_count == 1 else 0))
+    elif track_count >= 6:
+        score += 20
+    score -= _collection_penalty(item)
+    coll_base = re.sub(r"\s*-\s*(?:single|ep)\s*$", "", str(item.get("collectionName") or ""), flags=re.I)
+    if norm_title(coll_base) == norm_title(title):
+        score += 20
+    return (score, _release_ms(item), int(item.get("trackId") or 2**63 - 1))
+
+
+def pick_apple_candidate(title: str, artist: str, results: list[dict]):
+    ranked = []
+    for item in results or []:
+        meta = apple_candidate_score(title, artist, item)
+        if meta is not None:
+            ranked.append((item, *meta))
+    ranked.sort(key=lambda x: (-x[1], x[2], x[3]))
+    return ranked[0][0] if ranked else None
 
 
 def points(pos) -> int:
@@ -537,20 +649,12 @@ def apple_aff(url: str) -> str:
 
 def itunes_lookup(title: str, artist: str) -> dict:
     term = urllib.parse.quote(f"{artist} {strip_paren(title)}".strip())
-    url = f"https://itunes.apple.com/search?term={term}&entity=song&limit=5&country=US"
+    url = f"https://itunes.apple.com/search?term={term}&entity=song&limit=100&country=US"
     try:
         data = fetch_json(url, timeout=10)
     except Exception:
         return {}
-    want_t, want_a = norm_title(title), primary_artist(artist)
-    hit = None
-    for item in data.get("results") or []:
-        if norm_title(item.get("trackName") or "") == want_t:
-            hit = item
-            if primary_artist(item.get("artistName") or "") == want_a:
-                break
-    if not hit and data.get("results"):
-        hit = data["results"][0]
+    hit = pick_apple_candidate(title, artist, data.get("results") or [])
     if not hit:
         return {}
     album = str(hit.get("collectionId") or "")
