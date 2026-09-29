@@ -1241,7 +1241,7 @@ function nearbyCacheStep(radius) {
 function snapCoord(value, step) {
   return Math.round(Number(value) / step) * step;
 }
-function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,radius}) {
+function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,stateCode,radius}) {
   const out = new URL(requestUrl);
   out.search = "";
   out.searchParams.set("__cachev","concerts-global-v20");
