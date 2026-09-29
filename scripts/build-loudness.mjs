@@ -130,6 +130,10 @@ console.log("LOUDNESS_SUMMARY", JSON.stringify({
   medianLufs:median
 }));
 
+if (rows.length < Math.min(10, tracks.length)) {
+  throw new Error(`loudness audit produced only ${rows.length}/${tracks.length} measurements`);
+}
+
 const sortedEntries = Object.entries(out).sort(([a],[b]) => {
   if (a === "__meta") return -1;
   if (b === "__meta") return 1;

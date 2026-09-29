@@ -49,7 +49,7 @@ jobs:
       - name: Собрать cover registry и Apple metadata
         run: |
           cp public/data/covers.json /tmp/covers-before.json
-          node scripts/build-covers.mjs
+          REVALIDATE_EXISTING=1 node scripts/build-covers.mjs
           node - <<'NODE'
           const fs = require("fs");
           const before = JSON.parse(fs.readFileSync("/tmp/covers-before.json","utf8"));
@@ -61,7 +61,7 @@ jobs:
             }
           }
           const changed = Object.keys(after).filter(k => before[k] && before[k] !== after[k]);
-          console.log("cover registry updates:", changed.length, "existing rows corrected only by explicit pins/corrections");
+          console.log("cover registry updates:", changed.length, "existing rows changed only by explicit correction or exact dedicated Apple single/EP");
           NODE
           cmp -s public/data/top50.json /tmp/top50-before.json || {
             echo "ERROR: artwork audit modified Top 50 ranking data"
@@ -71,10 +71,13 @@ jobs:
             echo "ERROR: artwork audit modified embedded Top 50/site markup"
             exit 1
           }
-      - name: Измерить громкость Apple previews
+      - name: Установить ffmpeg для loudness audit
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
           ffmpeg -version | head -n 1
-          node scripts/build-loudness.mjs
+      - name: Измерить громкость Apple previews
+        run: node scripts/build-loudness.mjs
       - name: Закоммитить, если изменилось
         run: |
           git config user.name "music98 apple-data bot"

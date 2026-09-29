@@ -83,7 +83,9 @@ const resolverSource = fs.readFileSync(new URL("./build-covers.mjs", import.meta
 assert.match(resolverSource, /"animal\\|katseye": "6793209963"/);
 assert.match(resolverSource, /"hootiefrutti\\|katseye": "1891779764"/);
 assert.match(resolverSource, /"billiejean\\|michaeljackson": "269572838"/);
-assert.doesNotMatch(resolverSource, /pickDedicatedAppleRelease/);
+assert.match(resolverSource, /function pickDedicatedAppleRelease\(/);
+assert.match(resolverSource, /full credited artist set match exactly/);
+assert.match(resolverSource, /resolved\.reason !== "dedicated-single"/);
 assert.match(resolverSource, /Existing verified metadata is a lock/);
 
 

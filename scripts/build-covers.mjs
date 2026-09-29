@@ -77,6 +77,45 @@ function collectionBase(name) {
     .trim();
 }
 
+function simpleText(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[^a-z0-9]+/g, "");
+}
+
+function fullArtistKey(s) {
+  return String(s || "")
+    .split(/\s*(?:,|&|\/|\+| x | × | feat\.? | ft\.? | featuring | with | w\/ )\s*/i)
+    .map((x) => simpleText(x))
+    .filter(Boolean)
+    .sort()
+    .join("|");
+}
+
+function pickDedicatedAppleRelease(title, artist, songs) {
+  const wantTitle = simpleText(title);
+  const wantArtists = fullArtistKey(artist);
+  const hits = (songs || []).filter((x) => {
+    if (!appleCandidateCompatible(title, artist, x)) return false;
+    /* Dedicated single/EP is allowed to override an old lock only when the
+       visible track title AND the full credited artist set match exactly.
+       This blocks the real regressions we saw: "Babydoll (From The Carwash)",
+       Katy Perry feat. B.o.B, and extra-collaborator variants. */
+    if (simpleText(x.trackName) !== wantTitle) return false;
+    if (fullArtistKey(x.artistName) !== wantArtists) return false;
+    if (derivativeCollection(x.collectionName)) return false;
+    const trackCount = Math.max(0, Number(x.trackCount || 0));
+    if (trackCount < 1 || trackCount > 5) return false;
+    return simpleText(collectionBase(x.collectionName)) === wantTitle;
+  });
+  hits.sort((a, b) =>
+    releaseMs(a) - releaseMs(b) ||
+    (Number(a.trackId) || Number.MAX_SAFE_INTEGER) - (Number(b.trackId) || Number.MAX_SAFE_INTEGER)
+  );
+  return hits[0] || null;
+}
+
 function derivativeCollection(name) {
   const s = String(name || "").toLowerCase();
   return /\b(?:remix(?:es)?|rmx|live|acoustic|instrumental|karaoke|demo|sped\s*up|slowed|reverb(?:ed)?|isolated\s+vocals?|singalong|track\s+by\s+track|commentary|limited\s+cover|alternate\s+(?:cover|version)|radio\s+edit|extended\s+(?:mix|version))\b/.test(s);
@@ -140,6 +179,15 @@ async function resolveApple(title, artist, forcedCollectionId = "") {
 
   const songs = await songSearch(title, artist);
   if (!songs.length) return null;
+
+  /* Prefer a dedicated Apple single/EP only on an exact visible-title +
+     full-artist match. This is deliberately stricter than the general matcher,
+     so an alternate feature/version cannot steal the artwork. */
+  const dedicated = pickDedicatedAppleRelease(title, artist, songs);
+  if (dedicated?.artworkUrl100) {
+    const n = Math.max(0, Number(dedicated.trackCount || 0));
+    return { hit: dedicated, reason: n >= 2 ? "dedicated-ep" : "dedicated-single" };
+  }
 
   // Shared matcher rejects derivative release packages and later generic compilations.
   // Exact exceptions are handled only through verified pinned collection IDs above.
@@ -238,6 +286,19 @@ for (const t of tracks) {
     const resolved = await resolveApple(t.title, t.artist, correction && correction.appleCollectionId);
     if (!resolved) {
       console.log(`  Apple cover не найден: ${t.artist} - ${t.title}`);
+      if (previousNames[key]) names[key] = previousNames[key];
+      continue;
+    }
+    if (
+      covers[key] &&
+      REVALIDATE_EXISTING &&
+      !correction &&
+      resolved.reason !== "dedicated-single" &&
+      resolved.reason !== "dedicated-ep"
+    ) {
+      /* One-time audits may upgrade a stale lock to an exact official single/EP,
+         but never churn an existing cover merely because generic search ranking
+         prefers a different album today. */
       if (previousNames[key]) names[key] = previousNames[key];
       continue;
     }
