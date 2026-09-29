@@ -277,7 +277,8 @@ function hubsGeoJSON(){
   return {
     type:"FeatureCollection",
     features:hotspots.map(h=>{
-      const capital=isEuropeanCapital(h);\n      const permanent=Number(h?.static||0)===1;
+      const capital=isEuropeanCapital(h);
+      const permanent=Number(h?.static||0)===1;
       const cc=String(h.countryCode||"").toUpperCase();
       const europe=!!EUROPE_CAPITALS[cc];
       const count=Number(h.count||0);
@@ -288,7 +289,8 @@ function hubsGeoJSON(){
         properties:{
           name:h.city,countryCode:cc,count,
           capital:capital?1:0,
-          static:permanent?1:0,\n          overview:(permanent||capital||outsideMajor||fallback.has(h))?1:0
+          static:permanent?1:0,
+          overview:(permanent||capital||outsideMajor||fallback.has(h))?1:0
         }
       };
     })
@@ -1658,7 +1660,8 @@ class Music98Concerts extends HTMLElement{
       style.textContent=CONCERTS_CSS;
       const shell=document.createElement("div");
       shell.innerHTML=CONCERTS_HTML;
-      this.shadowRoot.append(mapCss,style,...shell.childNodes);\n      window.Music98Press?.install(this.shadowRoot);
+      this.shadowRoot.append(mapCss,style,...shell.childNodes);
+      window.Music98Press?.install(this.shadowRoot);
     }
 
     const start=()=>{
