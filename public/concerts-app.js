@@ -868,7 +868,7 @@ async function toggleArtist(item,card,mode){
     setMode(source==="nearby"?"nearby":"popular");
     sideSub.textContent=source==="nearby"
       ? "Artists with the most upcoming events in this area."
-      : "Top 30 popular artists with upcoming Ticketmaster shows.";
+      : "";
     restoreModeMap();
     return;
   }
