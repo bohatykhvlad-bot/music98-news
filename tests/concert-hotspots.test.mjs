@@ -414,3 +414,47 @@ test("daily Popular builder produces 30 eligible artists in source-rank order", 
     globalThis.fetch=oldFetch;
   }
 });
+
+
+test("Popular builder retries the same ranked artist after a transient 5xx", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  let eventCalls=0;
+  const rows=Array.from({length:30},(_,i)=>
+    "<tr><td>"+(i+1)+"</td><td>Retry Artist "+(i+1)+"</td><td>"+(90000000-i*1000)+"</td></tr>"
+  ).join("");
+
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net"){
+      return new Response("<table>"+rows+"</table>",{status:200});
+    }
+    if(u.hostname==="app.ticketmaster.com"){
+      eventCalls++;
+      if(eventCalls===1) return new Response("temporary",{status:503});
+      const name=u.searchParams.get("keyword")||"";
+      return new Response(JSON.stringify({
+        _embedded:{events:[{
+          id:"e-"+eventCalls,name:name+" Live",
+          dates:{start:{localDate:"2026-12-01",localTime:"20:00:00"}},
+          _embedded:{
+            attractions:[{id:"a-"+eventCalls,name,images:[]}],
+            venues:[{name:"Venue",city:{name:"City"},country:{countryCode:"US"},location:{latitude:"40",longitude:"-74"}}]
+          },images:[]
+        }]},page:{totalElements:1,totalPages:1,size:50,number:0}
+      }),{status:200,headers:{"content-type":"application/json"}});
+    }
+    return new Response("not found",{status:404});
+  };
+
+  try{
+    const first=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+    assert.equal(first.retry,true);
+    assert.equal(first.index,0);
+    const state=JSON.parse(kv.raw("concert-popular:v3:state"));
+    assert.equal(state.index,0);
+    assert.equal(state.found.length,0);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
