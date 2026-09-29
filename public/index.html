@@ -1179,6 +1179,7 @@ const lsSet = v => lsSetRaw(KEY, v);
 /* ============ settings & Apple integrations ============ */
 const SKEY = "music98news_settings_v2";
 const DAILYKEY = "music98news_daily_v29";
+const CHART_BROWSER_CACHE_MS = 60*60*1000;
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -2104,17 +2105,20 @@ function refreshDailyTop50(){
   }
   let cached = null;
   try{ cached = JSON.parse(lsGetRaw(DAILYKEY)||"null"); }catch(e){ cached = null; }
-  if(cached && cached.date === todayUTC() && cached.tracks && cached.tracks.length >= 10){
+  const hasTodayCache=!!(cached && cached.date === todayUTC() && cached.tracks && cached.tracks.length >= 10);
+  if(hasTodayCache){
     applyDaily(cached.tracks, "cache");
-    return;
+    const age=Date.now()-Number(cached.fetchedAt||0);
+    if(Number.isFinite(age) && age>=0 && age<CHART_BROWSER_CACHE_MS) return;
+  }else{
+    applyDaily(TOP50, "snap");
   }
-  applyDaily(TOP50, "snap");
   const grab = u => fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   /* ?d= keys the CDN cache per day: no 24h-old responses survive a reset */
   grab("/api/top50?d=" + todayUTC()).catch(()=> grab("/data/top50.json")).then(j=>{
     const tracks = (j && j.tracks) || [];
     if(tracks.length < 10) throw 0;
-    lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
+    lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), fetchedAt:Date.now(), tracks}));
     applyDaily(tracks, "live");
   }).catch(()=>{});
 }
