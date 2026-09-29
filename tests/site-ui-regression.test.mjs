@@ -19,9 +19,10 @@ test("Subscribe scales its label with the pill without axis translation",()=>{
   assert.doesNotMatch(page,/\.press-pill\.press\{[^}]*transform:/);
 });
 
-test("browser never overrides server-resolved Apple artwork per song",()=>{
-  assert.doesNotMatch(page,/CHART_ART_FIXES/);
-  assert.match(page,/function fixedChartArt\(t\)\{ return t\?\.art\|\|""; \}/);
+test("verified chart artwork overrides apply even to same-day browser cache",()=>{
+  assert.match(page,/CHART_ART_FIXES/);
+  assert.match(page,/196873555331\.jpg\/600x600bb\.jpg/);
+  assert.match(page,/886443919266\.jpg\/600x600bb\.jpg/);
   assert.match(page,/art: fixedChartArt\(t\)/);
 });
 
@@ -42,11 +43,11 @@ test("footer social icons stay in one row",()=>{
 });
 
 
-test("final chart row renders only the canonical art supplied by chart data",()=>{
+test("corrected chart art is enforced at final row render",()=>{
   assert.match(page,/const fixedArt = fixedChartArt\(r\)/);
   assert.match(page,/const art = fixedArt \? esc\(fixedArt\) : presetCover/);
   assert.match(page,/\$\{fixedArt \? "" : " data-need=/);
-  assert.doesNotMatch(page,/title\.startsWith\("loser"\)/);
+  assert.match(page,/title\.startsWith\("loser"\) && artist\.includes\("tame impala"\)/);
 });
 
 test("clean Chart and Concerts routes are no-store",()=>{
@@ -56,8 +57,8 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 
 test("same-day chart cache is an instant paint and always revalidates",()=>{
-  assert.match(page,/const DAILYKEY = "music98news_daily_v32"/);
+  assert.match(page,/const DAILYKEY = "music98news_daily_v31"/);
   assert.match(page,/const hasFreshCache=!!\(cached/);
   assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
-  assert.match(page,/rev=32/);
+  assert.match(page,/rev=31/);
 });
