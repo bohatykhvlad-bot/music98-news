@@ -76,7 +76,7 @@
     const style=doc.createElement("style");
     style.dataset.m98PressStyle="";
     style.textContent=STYLE;
-    if(root instanceof ShadowRoot) root.prepend(style);
+    if(root instanceof ShadowRoot) root.append(style);
     else (doc.head||doc.documentElement).appendChild(style);
   }
 
