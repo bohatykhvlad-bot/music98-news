@@ -173,7 +173,7 @@ test("map mode toggle has no duplicate outer capsule and no resting compositor t
 test("map interface pills stay on the normal text raster in their resting state",()=>{
   assert.match(app,/\.action\{width:160px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1\}/);
   assert.match(app,/\.radius-trigger\{[^}]*border:0;line-height:1/);
-  assert.match(app,/\.radius-option:hover\{background:transparent\}/);
+  assert.match(app,/\.radius-option:hover\{background:var\(--bg2\)\}/);
   assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*will-change:transform/);
   assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*backface-visibility:hidden/);
   assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*transform:translateZ/);
