@@ -364,25 +364,18 @@ test("daily Popular builder produces 30 eligible artists in source-rank order", 
       kworbCalls++;
       return new Response("<table>"+rows+"</table>",{status:200,headers:{"content-type":"text/html"}});
     }
-    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/attractions.json")){
       ticketmasterCalls++;
       const name=u.searchParams.get("keyword")||"";
       const n=Number(name.replace(/[^0-9]/g,""))||1;
-      const event={
-        id:"event-"+n,
-        name:name+" Live",
-        dates:{start:{localDate:"2026-12-01",localTime:"20:00:00"}},
-        _embedded:{
-          attractions:[{id:"artist-"+n,name,images:[]}],
-          venues:[{
-            id:"venue-"+n,name:"Venue "+n,city:{name:"City "+n},
-            country:{name:"United States",countryCode:"US"},
-            location:{latitude:"40.0",longitude:"-74.0"}
-          }]
-        },
-        images:[]
+      const attraction={
+        id:"artist-"+n,
+        name,
+        images:[],
+        classifications:[{segment:{name:"Music"}}],
+        upcomingEvents:{_total:3}
       };
-      return new Response(JSON.stringify({_embedded:{events:[event]},page:{totalElements:1,totalPages:1,size:20,number:0}}),
+      return new Response(JSON.stringify({_embedded:{attractions:[attraction]},page:{totalElements:1,totalPages:1,size:50,number:0}}),
         {status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
     }
     return new Response("not found",{status:404});
@@ -434,13 +427,10 @@ test("Popular builder retries the same ranked artist after a transient 5xx", asy
       if(eventCalls===1) return new Response("temporary",{status:503});
       const name=u.searchParams.get("keyword")||"";
       return new Response(JSON.stringify({
-        _embedded:{events:[{
-          id:"e-"+eventCalls,name:name+" Live",
-          dates:{start:{localDate:"2026-12-01",localTime:"20:00:00"}},
-          _embedded:{
-            attractions:[{id:"a-"+eventCalls,name,images:[]}],
-            venues:[{name:"Venue",city:{name:"City"},country:{countryCode:"US"},location:{latitude:"40",longitude:"-74"}}]
-          },images:[]
+        _embedded:{attractions:[{
+          id:"a-"+eventCalls,name,images:[],
+          classifications:[{segment:{name:"Music"}}],
+          upcomingEvents:{_total:2}
         }]},page:{totalElements:1,totalPages:1,size:50,number:0}
       }),{status:200,headers:{"content-type":"application/json"}});
     }
