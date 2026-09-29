@@ -58,6 +58,18 @@ async function appleFeedCandidates(){
   }
   return rows.map(r=>appleCandidate(byId.get(r.id),"apple-feed",{chartPos:r.pos})).filter(Boolean);
 }
+async function currentAppleCandidate(track){
+  const id=trackIdFrom(track?.url);
+  if(!id) return null;
+  try{
+    const d=await json(`https://itunes.apple.com/lookup?id=${encodeURIComponent(id)}&entity=song&country=US`,2);
+    const raw=(d?.results||[]).find(x=>String(x?.trackId||"")===String(id));
+    const c=appleCandidate(raw,"apple-chart",{chartUrl:String(track?.url||"")});
+    return c&&candidateCompatible(track,c)?c:null;
+  }catch{
+    return null;
+  }
+}
 async function searchApple(track){
   const terms=[`${stripParen(track.title)} ${track.artist}`,`${track.artist} ${stripParen(track.title)}`], out=new Map();
   for(const term0 of [...new Set(terms)]){
@@ -107,6 +119,8 @@ for(let i=0;i<tracks.length;i++){
   let candidates=[...feedMatches];
   const cleanFeed=feedMatches.map(c=>({c,cls:classifyCandidate(t,c)})).filter(x=>x.cls==="album"||x.cls==="dedicated");
   if(!cleanFeed.length){
+    const currentApple=await currentAppleCandidate(t);
+    if(currentApple) candidates.push(currentApple);
     try{candidates.push(...await searchApple(t));}catch(e){console.log("ARTWORK_AUDIT apple-search fail",i+1,t.artist,"-",t.title,String(e.message||e));}
     try{candidates.push(...await searchDeezer(t));}catch(e){console.log("ARTWORK_AUDIT deezer fail",i+1,t.artist,"-",t.title,String(e.message||e));}
   }

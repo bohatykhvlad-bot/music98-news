@@ -66,14 +66,29 @@ export function artworkArtistSignature(s) {
     .replace(/[^a-z0-9]+/g, " ")
     .trim()
     .split(/\s+/)
-    .filter(Boolean)
-    .sort();
-  return words.join("");
+    .filter(Boolean);
+  return [...new Set(words)].sort().join("");
+}
+
+export function featuredCreditFromTitle(title) {
+  const out=[];
+  const s=String(title||"");
+  const re=/(?:\bfeat(?:uring)?\.?|\bft\.?)\s+([^\)\]\[]+)/ig;
+  let m;
+  while((m=re.exec(s))){
+    const value=String(m[1]||"").replace(/\s+-\s+.*$/,"").trim();
+    if(value) out.push(value);
+  }
+  return out.join(" ");
+}
+
+export function artworkCreditSignature(title, artist) {
+  return artworkArtistSignature([artist, featuredCreditFromTitle(title)].filter(Boolean).join(" "));
 }
 
 export function artworkKey(title, artist) {
   const sig = versionSignature(title);
-  return `${normTitle(title)}${sig ? "~v:" + sig : ""}|${artworkArtistSignature(artist)}`;
+  return `${normTitle(title)}${sig ? "~v:" + sig : ""}|${artworkCreditSignature(title, artist)}`;
 }
 
 export function isVersionedMergeKey(key) {
