@@ -187,6 +187,42 @@ async function tmJson(url, env) {
   return res.json();
 }
 
+async function tmEventPages(url, env, maxPages = 5) {
+  const first = await tmJson(url, env);
+  const totalPages = Math.max(1, Number(first?.page?.totalPages || 1));
+  const pages = [first];
+  const limit = Math.min(Math.max(1, Number(maxPages || 1)), 5, totalPages);
+
+  for (let page = 1; page < limit; page++) {
+    const nextUrl = new URL(url.toString());
+    nextUrl.searchParams.set("page", String(page));
+    try {
+      pages.push(await tmJson(nextUrl, env));
+    } catch (err) {
+      // First page is still useful. Avoid turning a single later-page failure
+      // into an empty map/card; expose that the result is partial instead.
+      break;
+    }
+  }
+
+  const events = [];
+  const seen = new Set();
+  for (const raw of pages) {
+    for (const ev of raw?._embedded?.events || []) {
+      const id = String(ev?.id || "");
+      if (id && seen.has(id)) continue;
+      if (id) seen.add(id);
+      events.push(ev);
+    }
+  }
+  return {
+    events,
+    page:first?.page || {size:events.length,totalElements:events.length,totalPages:1,number:0},
+    partial:pages.length < totalPages,
+    pagesFetched:pages.length,
+  };
+}
+
 function decodeHtml(s) {
   return String(s || "")
     .replace(/<[^>]*>/g, "")
@@ -764,17 +800,21 @@ export async function onRequestGet({ request, env, waitUntil }) {
       tm.searchParams.set("unit", "km");
     }
 
-    const raw = await tmJson(tm, env);
-    const events = (raw?._embedded?.events || []).map(normalizeEvent).filter(Boolean);
+    const merged = await tmEventPages(tm, env, 5);
+    const events = merged.events.map(normalizeEvent).filter(Boolean);
     const payload = {
       ok: true,
       events,
-      page: raw?.page || { size: events.length, totalElements: events.length, totalPages: 1, number: 0 },
+      page: merged.page || { size: events.length, totalElements: events.length, totalPages: 1, number: 0 },
+      partial:!!merged.partial,
+      pagesFetched:Number(merged.pagesFetched||1),
       query: attractionId ? { attractionId } : artist ? { artist } : city ? { city, countryCode } : { lat, lng, radius, unit: "km" },
     };
-    const cacheControl=(artist||attractionId)
-      ? "public, max-age=300, s-maxage=7200, stale-while-revalidate=21600"
-      : "public, max-age=180, s-maxage=1800, stale-while-revalidate=7200";
+    const cacheControl=payload.partial
+      ? "public, max-age=60, s-maxage=300"
+      : (artist||attractionId)
+        ? "public, max-age=300, s-maxage=7200, stale-while-revalidate=21600"
+        : "public, max-age=180, s-maxage=1800, stale-while-revalidate=7200";
     const res = json(payload, 200, { "Cache-Control":cacheControl });
     await cache.put(cacheKey, res.clone()).catch(() => {});
     return res;
