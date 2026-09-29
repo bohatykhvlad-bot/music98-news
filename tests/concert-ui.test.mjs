@@ -37,8 +37,9 @@ test("concert popup keeps fixed geometry, hubs return on zoom-out, and popup dis
   assert.match(app,/function showPopup\(e\)\{\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
 });
 
-test("More button keeps its existing behavior with equal vertical spacing",()=>{
-  assert.match(app,/\.tour-more\{width:fit-content;max-width:100%;[^}]*margin:5px auto 5px/);
+test("More button stays centered and uses the shared press scale",()=>{
+  assert.match(app,/\.tour-more\{width:fit-content;max-width:100%;[^}]*margin:5px auto 5px;[^}]*--m98-press-scale:\.96/);
+  assert.doesNotMatch(app,/\.tour-more:active\{[^}]*transform:/);
 });
 
 test("Popular UI requires a complete Ticketmaster-eligible Top 30 before browser caching",()=>{
@@ -65,11 +66,13 @@ test("world map uses permanent static hubs without a hotspot API read on load",(
   assert.doesNotMatch(app,/map\.on\("load",\(\)=>\{[\s\S]{0,300}loadHotspots\(\)/);
 });
 
-test("map exposes one reset control and hides legacy Overview/Fit controls",()=>{
+test("map exposes one reset control and removes legacy Overview/Fit controls",()=>{
   assert.match(app,/id=\\"resetMapBtn\\"[^>]*>−<\/button>/);
-  assert.match(app,/id=\\"overviewBtn\\"[^>]*tabindex=\\"-1\\"/);
-  assert.match(app,/map-tool-stack\\" hidden aria-hidden=\\"true\\"/);
+  assert.doesNotMatch(app,/id=\\"overviewBtn\\"/);
+  assert.doesNotMatch(app,/id=\\"fitBtn\\"/);
   assert.match(app,/resetMapBtn\.addEventListener\("click"/);
+  assert.match(app,/areaRequestSeq\+\+/);
+  assert.match(app,/expandedKey=""/);
   assert.match(app,/radiusEl\.value="100"/);
   assert.match(app,/lastArea=null/);
   assert.match(app,/map\.easeTo\(\{center:\[12,39\],zoom:2\.15/);
