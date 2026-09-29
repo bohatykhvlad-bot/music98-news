@@ -1,4 +1,4 @@
-import assert from "node:assert/strict";
+import assert from "node:assert/strict";\nimport fs from "node:fs";
 import {
   appleCandidateCompatible,
   mergeKey,
@@ -67,5 +67,15 @@ const vocal = {
   releaseDate: "2026-08-01T00:00:00Z",
 };
 assert.equal(pickAppleCandidate("Dracula (with JENNIE)", "Tame Impala", [instr, vocal]).trackId, 301);
+
+const corrections = JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json", import.meta.url), "utf8"));
+const loserCorrection = corrections["loser|tameimpala"];
+assert.equal(loserCorrection.appleCollectionId, "1842957385");
+assert.equal(loserCorrection.appleTrackId, "1842957386");
+assert.match(loserCorrection.art, /196873662978\.jpg\/600x600bb\.jpg$/);
+const daftCorrection = corrections["getlucky~v:edit|daftpunk"];
+assert.equal(daftCorrection.appleCollectionId, "617154241");
+assert.match(daftCorrection.art, /886443919266\.jpg\/600x600bb\.jpg$/);
+assert.match(daftCorrection.reason, /never use remix artwork/i);
 
 console.log("chart artwork regression: PASS");
