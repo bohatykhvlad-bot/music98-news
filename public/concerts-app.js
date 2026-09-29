@@ -121,7 +121,9 @@ const PAYLOAD_CACHE_MS=3*60*1000;
 
 function setStatus(s){
   const value=String(s||"");
-  statusEl.textContent=/^loading concerts?(?: data)?/i.test(value) ? "" : value;
+  // Keep the map itself clean: loading/generic failure messages belong in
+  // the results panel, not as a floating pill over the map.
+  statusEl.textContent=/^(?:loading concerts?(?: data)?|could not load concerts|ticketmaster is temporarily limiting requests)/i.test(value) ? "" : value;
 }
 function hidePendingAreaSearch(){
   pendingAreaSearch=null;
