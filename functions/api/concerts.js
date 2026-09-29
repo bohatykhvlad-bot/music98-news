@@ -335,18 +335,15 @@ async function popularPayload(env) {
   const candidates = ranking.artists.slice(0, 42);
   const found = [];
 
-  // Scheduled-only work: stay comfortably under Ticketmaster's burst rate.
-  for (let i = 0; i < candidates.length && found.length < 10; i += 4) {
-    const chunk = candidates.slice(i, i + 4);
-    const checked = await Promise.all(chunk.map(a =>
-      validatePopularArtist(env, a.name, a.rank, a.listeners).catch(() => null)
-    ));
-    for (const artist of checked) {
-      if (!artist || found.some(x => x.id === artist.id)) continue;
-      found.push(artist);
-      if (found.length >= 10) break;
-    }
-    if (i + 4 < candidates.length && found.length < 10) await sleep(900);
+  // Scheduled-only work is deliberately sequential. This keeps every
+  // Ticketmaster call behind the same 225ms gate instead of creating bursts.
+  for (const candidate of candidates) {
+    if (found.length >= 10) break;
+    const artist = await validatePopularArtist(
+      env, candidate.name, candidate.rank, candidate.listeners
+    ).catch(() => null);
+    if (!artist || found.some(x => x.id === artist.id)) continue;
+    found.push(artist);
   }
 
   return {
