@@ -21,11 +21,10 @@ test("Subscribe scales around a fixed center with no axis translation or font-me
   assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label\{[^}]*translate:/);
 });
 
-test("verified chart artwork overrides apply even to same-day browser cache",()=>{
-  assert.match(page,/CHART_ART_FIXES/);
-  assert.match(page,/196873555331\.jpg\/600x600bb\.jpg/);
-  assert.match(page,/886443919266\.jpg\/600x600bb\.jpg/);
-  assert.match(page,/art: fixedChartArt\(t\)/);
+test("chart artwork is server-audited and has no browser point-fix table",()=>{
+  assert.doesNotMatch(page,/CHART_ART_FIXES|fixedChartArt/);
+  assert.match(page,/art: t\.art\|\|""/);
+  assert.match(page,/artwork is server-audited; browser search must not replace it/);
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
@@ -45,9 +44,10 @@ test("footer social icons stay in one row",()=>{
 });
 
 
-test("corrected chart art is enforced at final row render",()=>{
-  assert.match(page,/const art = fixedArt \? esc\(fixedArt\) : presetCover/);
-  assert.match(page,/\$\{fixedArt \? "" : " data-need=/);
+test("verified server artwork is enforced at final row render",()=>{
+  assert.match(page,/const verifiedArt = String\(r\.art\|\|""\)/);
+  assert.match(page,/const art = verifiedArt \? esc\(verifiedArt\) : presetCover/);
+  assert.match(page,/\$\{verifiedArt \? "" : " data-need=/);
 });
 
 test("clean Chart and Concerts routes are no-store",()=>{
