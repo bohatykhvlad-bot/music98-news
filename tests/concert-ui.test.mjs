@@ -18,11 +18,12 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
   assert.match(app,/\.venue-event-name\{display:block;font-size:var\(--event-main-size\)/);
 });
 
-test("Buy Tickets pill and text scale together from the same center",()=>{
+test("Buy Tickets pill scales while text uses a crisp native pressed size",()=>{
   assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
-  assert.match(app,/\.buy-label\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
-  assert.match(app,/\.buy\.press::before,\.buy\.press \.buy-label\{transform:scale\(\.92\)\}/);
-  assert.doesNotMatch(app,/\.buy\.press\{[^}]*(?:transform|scale|translate)/);
+  assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
+  assert.match(app,/\.buy\.press::before\{transform:scale\(\.92\)\}/);
+  assert.match(app,/\.buy\.press \.buy-label\{font-size:12px\}/);
+  assert.doesNotMatch(app,/\.buy\.press \.buy-label\{[^}]*transform/);
 });
 
 test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
@@ -41,12 +42,12 @@ test("More button keeps its existing behavior with equal vertical spacing",()=>{
 
 test("Popular UI requires a complete Ticketmaster-eligible Top 30 before browser caching",()=>{
   assert.match(app,/Top 30 popular artists with upcoming Ticketmaster shows\./);
-  assert.match(app,/music98:concert-popular:v5/);
+  assert.match(app,/music98:concert-popular:v6/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
-  assert.match(app,/ticketmaster_upcoming_events_gt_0/);
+  assert.match(app,/ticketmaster_event_payload_gt_0/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/cached\.artists\.every\(a=>Number\(a\?\.shows\|\|0\)>0\)/);
-  assert.match(app,/mode:"popular",v:"popular-v5"/);
+  assert.match(app,/cached\.artists\.every\(a=>a\?\.eventConfirmed===true && Number\(a\?\.shows\|\|0\)>0\)/);
+  assert.match(app,/mode:"popular",v:"popular-v6"/);
 });
 
 test("map loading status is hidden while real statuses remain available",()=>{

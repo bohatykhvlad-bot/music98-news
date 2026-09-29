@@ -380,8 +380,7 @@ function attractionIsMusic(attraction){
   return classifications.some(x=>normName(x?.segment?.name)==="music");
 }
 async function validatePopularArtist(env, name, popularityRank, listeners) {
-  // Attraction Search is a better identity check than keyword Event Search:
-  // one call gives us the canonical attraction id, images and upcoming count.
+  // First resolve the exact Ticketmaster attraction identity.
   const tm = new URL(TM_ATTRACTIONS_ROOT);
   tm.searchParams.set("apikey", env.TICKETMASTER_API_KEY);
   tm.searchParams.set("keyword", name);
@@ -396,16 +395,32 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
     attractionIsMusic(a) &&
     attractionUpcomingTotal(a)>0
   );
-  if(!exact) return null;
+  if(!exact?.id) return null;
+
+  // Do not trust attraction.upcomingEvents by itself: Ticketmaster can expose
+  // a positive counter while the actual Discovery events endpoint has no
+  // currently returned event for that attraction. The public Top 30 must only
+  // contain artists for whom a real upcoming event payload exists.
+  const eventsUrl = baseEventUrl(env.TICKETMASTER_API_KEY);
+  eventsUrl.searchParams.set("attractionId", String(exact.id));
+  eventsUrl.searchParams.set("size", "1");
+  eventsUrl.searchParams.set("sort", "date,asc");
+  eventsUrl.searchParams.set("locale", "en-us,en,*");
+  const eventsRaw = await tmJson(eventsUrl, env, "scheduled");
+  const events = eventsRaw?._embedded?.events || [];
+  const total = Number(eventsRaw?.page?.totalElements ?? events.length) || 0;
+  const first = events[0];
+  if(total<=0 || !first?.id) return null;
 
   return {
-    id:String(exact.id||""),
+    id:String(exact.id),
     name:String(exact.name||name),
     image:bestArtistImage(exact.images),
     popularityRank,
     listeners,
-    shows:attractionUpcomingTotal(exact),
-    firstDate:"",
+    shows:total,
+    firstDate:String(first?.dates?.start?.localDate||""),
+    eventConfirmed:true,
   };
 }
 
@@ -466,14 +481,18 @@ export async function refreshPopularSnapshot(env, force = false) {
   const age = Date.now() - (Date.parse(existing?.builtAt || 0) || 0);
 
   if(!force && !state && existing?.version==="popular-v4" &&
-     existing?.artists?.length>=POPULAR_LIMIT && age < POPULAR_REFRESH_MS){
+     existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
+     existing?.artists?.length>=POPULAR_LIMIT &&
+     existing.artists.every(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0) &&
+     age < POPULAR_REFRESH_MS){
     return { ok:true, fresh:true, complete:true, artists:existing.artists.length };
   }
 
   if(force || !state || state.version!=="popular-v4" ||
      !Array.isArray(state.candidates) || !Array.isArray(state.found)){
     const ranking=await kworbArtists();
-    if(existing?.artists?.length>=20 &&
+    if(existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
+       existing?.artists?.length>=20 &&
        existing?.source==="spotify_monthly_listeners" &&
        ranking.source!=="spotify_monthly_listeners"){
       // Do not continue an old half-built ranking after a failed daily kickoff.
@@ -493,6 +512,7 @@ export async function refreshPopularSnapshot(env, force = false) {
     // for the rest of the day or repeatedly restart from rank 1.
     if(!force &&
        existing?.version==="popular-v4" &&
+       existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
        existing?.source===ranking.source &&
        Array.isArray(existing?.artists) &&
        existing.artists.length>0 &&
@@ -551,16 +571,17 @@ export async function refreshPopularSnapshot(env, force = false) {
 
   const artists=state.found
     .slice()
-    .filter(a=>Number(a?.shows||0)>0)
+    .filter(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0)
     .sort((a,b)=>Number(a.popularityRank||999999)-Number(b.popularityRank||999999))
     .slice(0,POPULAR_LIMIT)
     .map((a,i)=>({
     id:a.id,name:a.name,image:a.image,rank:i+1,
-    popularityRank:a.popularityRank,listeners:a.listeners,shows:Number(a.shows||0),firstDate:a.firstDate,
+    popularityRank:a.popularityRank,listeners:a.listeners,shows:Number(a.shows||0),firstDate:a.firstDate,eventConfirmed:true,
   }));
 
   // Never replace a healthy snapshot with a suspiciously small partial result.
-  if(existing?.artists?.length>=20 && artists.length<20){
+  if(existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
+     existing?.artists?.length>=20 && artists.length<20){
     state.failedAt=new Date().toISOString();
     await kvPutJson(env,POPULAR_STATE_KEY,state,{expirationTtl:21600});
     return {
@@ -580,7 +601,7 @@ export async function refreshPopularSnapshot(env, force = false) {
     artists,
     source:state.source,
     ranking:state.ranking,
-    eligibility:"ticketmaster_upcoming_events_gt_0",
+    eligibility:"ticketmaster_event_payload_gt_0",
     candidateCount:state.index,
     eligibleCount:artists.length,
     targetCount:POPULAR_LIMIT,
@@ -740,18 +761,18 @@ async function popularSnapshotPayload(env) {
 
   const sources=[];
   if(snapshot?.version==="popular-v4" &&
-     snapshot?.eligibility==="ticketmaster_upcoming_events_gt_0" &&
+     snapshot?.eligibility==="ticketmaster_event_payload_gt_0" &&
      Array.isArray(snapshot.artists)){
     sources.push(snapshot.artists);
   }
   if(state?.version==="popular-v4" && Array.isArray(state.found)){
-    sources.push(state.found);
+    sources.push(state.found.filter(a=>a?.eventConfirmed===true));
   }
 
   const merged=new Map();
   for(const list of sources){
     for(const artist of list){
-      if(Number(artist?.shows||0)<=0) continue;
+      if(artist?.eventConfirmed!==true || Number(artist?.shows||0)<=0) continue;
       const key=String(artist?.id||artist?.name||"").trim().toLowerCase();
       if(!key) continue;
       const prev=merged.get(key);
@@ -764,7 +785,7 @@ async function popularSnapshotPayload(env) {
   const artists=[...merged.values()]
     .sort((a,b)=>Number(a?.popularityRank||a?.rank||999999)-Number(b?.popularityRank||b?.rank||999999))
     .slice(0,POPULAR_LIMIT)
-    .map((a,i)=>({...a,rank:i+1,shows:Number(a.shows||0)}));
+    .map((a,i)=>({...a,rank:i+1,shows:Number(a.shows||0),eventConfirmed:true}));
 
   if(artists.length){
     const age=Date.now()-(Date.parse(snapshot?.builtAt||0)||0);
@@ -773,7 +794,7 @@ async function popularSnapshotPayload(env) {
       ok:true,
       mode:"popular",
       version:"popular-v4",
-      eligibility:"ticketmaster_upcoming_events_gt_0",
+      eligibility:"ticketmaster_event_payload_gt_0",
       artists,
       targetCount:POPULAR_LIMIT,
       stale:age>30*60*60*1000,
@@ -784,7 +805,7 @@ async function popularSnapshotPayload(env) {
   return {
     ok:true,mode:"popular",version:"popular-v4",builtAt:"",
     artists:[],source:"scheduled",ranking:"Spotify monthly listeners",
-    eligibility:"ticketmaster_upcoming_events_gt_0",
+    eligibility:"ticketmaster_event_payload_gt_0",
     targetCount:POPULAR_LIMIT,stale:false,warming:true
   };
 }
