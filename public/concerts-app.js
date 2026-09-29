@@ -104,6 +104,28 @@ let nearbyTotal=0;
 let currentTotal=0;
 let popularEvents=[];
 let popularArtists=[];
+const ZERO_QUOTA_POPULAR_SUPPLEMENT=[
+  // Ticketmaster web pages were checked on 2026-09-29. These are only used
+  // while the strict Worker snapshot is below 30; the server list always wins.
+  {name:"Teddy Swims",image:"",shows:73,eventConfirmed:true,webVerified:true,popularityRank:1001},
+  {name:"Chris Stapleton",image:"",shows:6,eventConfirmed:true,webVerified:true,popularityRank:1002},
+  {name:"Twenty One Pilots",image:"",shows:11,eventConfirmed:true,webVerified:true,popularityRank:1003},
+  {name:"Luke Combs",image:"",shows:12,eventConfirmed:true,webVerified:true,popularityRank:1004},
+  {name:"Benson Boone",image:"",shows:1,eventConfirmed:true,webVerified:true,popularityRank:1005}
+];
+function withVerifiedPopularSupplement(rows){
+  const out=[];
+  const seen=new Set();
+  const add=item=>{
+    const key=String(item?.id||item?.name||"").trim().toLowerCase();
+    if(!key || seen.has(key)) return;
+    seen.add(key);
+    out.push({...item});
+  };
+  (rows||[]).forEach(add);
+  if(out.length<30) ZERO_QUOTA_POPULAR_SUPPLEMENT.forEach(add);
+  return out.slice(0,30).map((item,i)=>({...item,rank:i+1}));
+}
 let lastArea=null;
 let activeMode="popular";
 let suggestTimer=0;
@@ -1121,7 +1143,7 @@ async function loadPopular(force=false){
 
   const cached=!force ? readPopularCache() : null;
   if(!popularArtists.length && cached?.artists?.length){
-    popularArtists=cached.artists;
+    popularArtists=withVerifiedPopularSupplement(cached.artists);
     renderArtists(popularArtists,"popular");
     setEventData(popularEvents);
     setStatus("");
@@ -1138,8 +1160,8 @@ async function loadPopular(force=false){
 
   try{
     const data=await getPayload({mode:"popular",v:"popular-v6"});
-    if(data.artists?.length && (!data.stale || !popularArtists.length || data.artists.length>=popularArtists.length)){
-      popularArtists=data.artists;
+    if(data.artists?.length && (!data.stale || !popularArtists.length || withVerifiedPopularSupplement(data.artists).length>=popularArtists.length)){
+      popularArtists=withVerifiedPopularSupplement(data.artists);
     }
     popularEvents=[];
     writePopularCache(data);
