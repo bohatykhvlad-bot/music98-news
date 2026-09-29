@@ -954,7 +954,7 @@ async function loadPopular(force=false){
     renderArtists(popularArtists,"popular");
     prefetchPopular(popularArtists);
     setEventData([]);
-    setStatus(popularArtists.length ? "" : "Popular concerts are unavailable right now.");
+    setStatus("");
   }catch(err){
     if(requestId!==popularRequestSeq) return;
     console.error(err);
