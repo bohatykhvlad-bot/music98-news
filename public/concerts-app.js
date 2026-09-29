@@ -29,8 +29,11 @@ const map = new mapboxgl.Map({
   projection:"mercator",
   center:[12,49],
   zoom:2.45,
+  renderWorldCopies:false,
   attributionControl:true
 });
+try{map.dragRotate.disable();}catch(e){}
+try{map.touchZoomRotate.disableRotation();}catch(e){}
 map.addControl(new mapboxgl.NavigationControl({showCompass:false}),"bottom-right");
 
 const $ = (s)=>root.querySelector(s);
