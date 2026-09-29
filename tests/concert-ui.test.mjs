@@ -22,7 +22,7 @@ test("Buy Tickets pill scales while text uses a crisp native pressed size",()=>{
   assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
   assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
   assert.match(app,/\.buy\.press::before\{transform:scale\(\.98\)\}/);
-  assert.match(app,/\.buy\.press \.buy-label\{font-size:12\.5px\}/);
+  assert.match(app,/\.buy\.press \.buy-label\{font-size:12\.75px\}/);
   assert.doesNotMatch(app,/\.buy\.press \.buy-label\{[^}]*transform/);
 });
 
