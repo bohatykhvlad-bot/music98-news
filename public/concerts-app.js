@@ -559,17 +559,7 @@ function popupContent(e){
     label.dataset.label="Buy Tickets";
     label.textContent="Buy Tickets";
     a.appendChild(label);
-    a.addEventListener("pointerdown",()=>{
-      a.classList.add("press");
-      const up=()=>{
-        a.classList.remove("press");
-        window.removeEventListener("pointerup",up);
-        window.removeEventListener("pointercancel",up);
-      };
-      window.addEventListener("pointerup",up);
-      window.addEventListener("pointercancel",up);
-    });
-    a.addEventListener("pointerleave",()=>a.classList.remove("press"));
+    if(typeof window.music98PillPress==="function") window.music98PillPress(a);
     body.appendChild(a);
 
   }
