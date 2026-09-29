@@ -26,8 +26,8 @@ test("Buy Tickets press shrinks from center like the chart play button",()=>{
 });
 
 test("concert popup closes while zooming out below detail zoom in every mode",()=>{
-  assert.match(app,/map\.on\("zoom",\(\)=>\{[\s\S]*?if\(map\.getZoom\(\)<4\.8\)\{ closePopup\(\); return; \}/);
-  assert.doesNotMatch(app,/if\(activeMode==="artist"\) return;[\s\S]*?map\.getZoom\(\)<4\.8/);
+  assert.match(app,/map\.on\("zoom",\(\)=>\{\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<4\.8\)\{ closePopup\(\); return; \}/);
+  assert.match(app,/map\.on\("zoomend",\(\)=>\{\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<4\.8\)\{ closePopup\(\); return; \}/);
 });
 
 test("More button is centered and uses the admin press animation",()=>{
