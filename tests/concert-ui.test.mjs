@@ -18,12 +18,10 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
   assert.match(app,/\.venue-event-name\{display:block;font-size:var\(--event-main-size\)/);
 });
 
-test("Buy Tickets pre-promotes the whole pill and scales its text",()=>{
-  assert.match(app,/\.buy\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
-  assert.match(app,/\.buy\.press\{transform:scale\(\.985\) translateZ\(0\)\}/);
-  assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
-  assert.doesNotMatch(app,/\.buy\.press::before/);
-  assert.doesNotMatch(app,/\.buy\.press \.buy-label/);
+test("Buy Tickets only fills cyan on hover and has no press animation",()=>{
+  assert.match(app,/\.buy:hover::before\{background:var\(--accent\);border-color:var\(--accent\)\}/);
+  assert.match(app,/\.buy:active,\.buy\.press\{transform:none\}/);
+  assert.doesNotMatch(app,/\.buy\.press\{transform:scale/);
 });
 
 test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
@@ -145,13 +143,12 @@ test("verified market marker layer is zoom-stable for Rome and every other count
 });
 
 
-test("tour-more scales the whole pill on press without changing font size", async () => {
+test("More only fills cyan on hover and has no press animation", async () => {
   const fs = await import("node:fs");
   const app = fs.readFileSync(new URL("../public/concerts-app.js", import.meta.url), "utf8");
-  assert.match(app,/\.tour-more:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
-  assert.match(app,/\.tour-more\{[^}]*font-size:12\.5px/);
-  assert.doesNotMatch(app,/\.tour-more:active\{[^}]*font-size/);
-  assert.doesNotMatch(app,/\.buy\.press \.buy-label/);
+  assert.match(app,/\.tour-more:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
+  assert.match(app,/\.tour-more:active\{transform:none\}/);
+  assert.doesNotMatch(app,/\.tour-more:active\{transform:scale/);
 });
 
 

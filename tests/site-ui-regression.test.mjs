@@ -16,14 +16,13 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
 });
 
-test("Subscribe pre-promotes the whole pill and scales text with the button",()=>{
+test("Subscribe only fills cyan on hover and has no press animation",()=>{
   assert.match(page,/window\.music98PillPress = window\.music98PillPress/);
   assert.match(page,/data-pill-press type="submit"><span class="press-pill-label">Subscribe<\/span><\/button>/);
-  assert.match(page,/\.press-pill\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
-  assert.match(page,/\.press-pill\.press\{transform:scale\(\.985\) translateZ\(0\)\}/);
-  assert.match(page,/\.press-pill-label\{[^}]*font-size:14px;[^}]*transform:none;translate:none;transition:none/);
-  assert.doesNotMatch(page,/\.press-pill\.press::before/);
-  assert.doesNotMatch(page,/\.press-pill\.press \.press-pill-label/);
+  assert.match(page,/\.subscribe \.btn\.primary\.press-pill\{--pill-press-bg:var\(--bg2\);--pill-press-border:var\(--line\);color:var\(--text\)\}/);
+  assert.match(page,/\.subscribe \.btn\.primary\.press-pill:hover::before\{background:var\(--accent\);border-color:var\(--accent\)\}/);
+  assert.match(page,/\.press-pill:active,\.press-pill\.press\{transform:none\}/);
+  assert.doesNotMatch(page,/\.press-pill\.press\{transform:scale/);
 });
 
 test("chart artwork is server-audited and has no browser point-fix table",()=>{
@@ -33,7 +32,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260930-10/);
+  assert.match(page,/concerts-app\.js\?v=20260930-11/);
 });
 
 
@@ -98,8 +97,8 @@ test("valid empty Desk feed does not resurrect bundled News/Releases",()=>{
 });
 
 
-test("Load More pre-promotes and scales the whole pill",()=>{
-  assert.match(page,/\.loadmore-btn\{[^}]*transform:translateZ\(0\);[^}]*will-change:transform;[^}]*backface-visibility:hidden;[^}]*-webkit-font-smoothing:antialiased/);
-  assert.match(page,/\.loadmore-btn:active\{transform:scale\(\.985\) translateZ\(0\)\}/);
-  assert.doesNotMatch(page,/\.loadmore-btn:active::before/);
+test("Load More only fills cyan on hover and has no press animation",()=>{
+  assert.match(page,/\.loadmore-btn:hover::before\{background:var\(--accent\);border-color:var\(--accent\)\}/);
+  assert.match(page,/\.loadmore-btn:active\{transform:none\}/);
+  assert.doesNotMatch(page,/\.loadmore-btn:active\{transform:scale/);
 });
