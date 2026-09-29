@@ -1,7 +1,7 @@
-export const HOTSPOT_VERSION = "hotspots-v18";
-export const HOTSPOT_THRESHOLD = 11;
-export const HOTSPOT_STATE_KEY = "concert-hotspots:v18:state";
-export const HOTSPOT_SNAPSHOT_KEY = "concert-hotspots:v18:snapshot";
+export const HOTSPOT_VERSION = "hotspots-v19";
+export const HOTSPOT_THRESHOLD = 10;
+export const HOTSPOT_STATE_KEY = "concert-hotspots:v19:state";
+export const HOTSPOT_SNAPSHOT_KEY = "concert-hotspots:v19:snapshot";
 export const HOTSPOT_MAX_RADIUS_KM = 480;
 export const HOTSPOT_MAX_DEPTH = 7;
 
