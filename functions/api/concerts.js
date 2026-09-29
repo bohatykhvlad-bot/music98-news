@@ -630,6 +630,12 @@ export async function onRequestGet({ request, env, waitUntil }) {
     });
   }
 
+  if (mode === "popular") {
+    // Same rule for the default right panel: KV snapshot only, no quota spend.
+    const payload = await popularSnapshotPayload(env);
+    return json(payload, 200, { "Cache-Control": "public, max-age=600, s-maxage=3600" });
+  }
+
   if (!env?.TICKETMASTER_API_KEY) {
     return json({ error: "ticketmaster_key_missing" }, 503);
   }
@@ -670,14 +676,6 @@ export async function onRequestGet({ request, env, waitUntil }) {
         image: bestArtistImage(x?.images) || bestImage(x?.images),
       })).filter(x => x.id && x.name);
       const res = json({ ok:true, mode:"artist-search", artists }, 200, { "Cache-Control":"public, max-age=120, s-maxage=600" });
-      await cache.put(cacheKey, res.clone()).catch(() => {});
-      return res;
-    }
-
-    if (mode === "popular") {
-      // Read-only snapshot: opening the page never spends Ticketmaster quota.
-      const payload = await popularSnapshotPayload(env);
-      const res = json(payload, 200, { "Cache-Control": "public, max-age=600, s-maxage=3600" });
       await cache.put(cacheKey, res.clone()).catch(() => {});
       return res;
     }
