@@ -40,6 +40,9 @@ export function versionSignature(s) {
   add("remaster", /\bremaster(?:ed)?\b/);
   add("rerecorded", /\b(?:re-?recorded|taylor['’]s\s+version)\b/);
   add("mix", /\b(?:dj\s+mix|mixed|mix)\b/);
+  add("dub", /\bdub\b/);
+  add("rework", /\b(?:rework|reworked|bootleg|mashup)\b/);
+  add("session", /\b(?:session|unplugged|rehearsal|performance|concert)\b/);
   if (!tags.length && /\bversion\b/.test(x)) tags.push("version");
   return [...new Set(tags)].sort().join("+");
 }
