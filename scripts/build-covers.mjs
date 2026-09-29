@@ -1,4 +1,4 @@
-/* Apple-first chart cover registry.
+/* Apple-first chart cover registry. Full live rank snapshots are emitted by audit-live-chart.mjs.
  *
  * public/data/covers.json is immutable: once a song identity gets a verified
  * Apple artwork URL, daily automation never replaces it. Existing locks change
@@ -6,8 +6,8 @@
  *
  * New song resolution:
  *   1. known exact Apple collection override (verified canonical release)
- *   2. dedicated Apple single/EP for the exact song/version
- *   3. exact Apple song on the artist's own release closest to first release
+ *   2. strict exact song/version match on an Apple artist release
+ *   3. closest credible original-release-era candidate
  * Generic compilations, soundtracks and alternate packs lose to artist releases.
  */
 import fs from "node:fs";

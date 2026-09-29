@@ -4,6 +4,14 @@ if (!r.ok) throw new Error("live top50 HTTP " + r.status);
 const j = await r.json();
 const news = (j.tracks || []).filter(x => String(x.delta).toLowerCase() === "new");
 const olivia = (j.tracks || []).find(x => /drop dead/i.test(x.title || "") && /olivia rodrigo/i.test(x.artist || ""));
+const rankSnapshot = (j.tracks || []).map((t, i) => ({
+  rank: i + 1,
+  title: t.title,
+  artist: t.artist,
+  weeks: Number(t.weeks) || 0,
+  delta: String(t.delta == null ? "" : t.delta),
+}));
+console.log("RANK_SNAPSHOT", JSON.stringify(rankSnapshot));
 console.log("UPDATED", j.updated, "REV", j.rev);
 console.log("ARROWS", JSON.stringify(j.arrows || {}));
 console.log("MEMORY", JSON.stringify(j.memory || {}));
