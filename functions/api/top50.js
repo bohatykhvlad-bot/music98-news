@@ -1,4 +1,4 @@
-import { appleCandidateCompatible, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
+import { appleCandidateCompatible, COVER_RESOLVER_VERSION, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
 
 const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
@@ -70,11 +70,18 @@ async function readSeed(env, origin, file) {
   try { return await getJson(String(origin || "") + path); } catch { return null; }
 }
 let COVER_SEED = null;
+let COVER_META_SEED = null;
 let NAME_SEED = null;
 async function coverSeed(env, origin) {
   if (COVER_SEED) return COVER_SEED;
   const v = await readSeed(env, origin, "covers.json");
   if (v && typeof v === "object" && Object.keys(v).length) COVER_SEED = v;
+  return v && typeof v === "object" ? v : {};
+}
+async function coverMetaSeed(env, origin) {
+  if (COVER_META_SEED) return COVER_META_SEED;
+  const v = await readSeed(env, origin, "apple-cover-meta.json");
+  if (v && typeof v === "object" && Object.keys(v).length) COVER_META_SEED = v;
   return v && typeof v === "object" ? v : {};
 }
 async function nameSeed(env, origin) {
@@ -83,8 +90,20 @@ async function nameSeed(env, origin) {
   if (v && typeof v === "object" && Object.keys(v).length) NAME_SEED = v;
   return v && typeof v === "object" ? v : {};
 }
+function trustedCover(seed, meta, key) {
+  const art = String(seed?.[key] || "");
+  const rec = meta?.[key];
+  if (!art || !isAppleArt(art) || !rec) return "";
+  if (Number(rec.resolverVersion) !== COVER_RESOLVER_VERSION) return "";
+  if (String(rec.art || "") !== art) return "";
+  if (rec.source !== "resolver" && rec.source !== "editorial") return "";
+  return art;
+}
 async function applyCovers(env, tracks, origin) {
-  const seed = await coverSeed(env, origin);
+  const [seed,meta] = await Promise.all([
+    coverSeed(env, origin),
+    coverMetaSeed(env, origin),
+  ]);
   let covers = {};
   if (env && env.DESK) {
     try { covers = (await env.DESK.get(COVERS_KV, { type: "json" })) || {}; } catch {}
@@ -92,26 +111,23 @@ async function applyCovers(env, tracks, origin) {
   let changed = false;
   for (const t of tracks) {
     const key = mergeKey(t.title, t.artist);
-    const cached = covers[key];
-
-    /* Confidence order:
-       1) current Apple chart artwork;
-       2) artwork verified by exact Apple track ID / strict Apple search;
-       3) checked-in Apple registry;
-       4) runtime Apple cache.
-       A stale registry can no longer overwrite a fresher exact Apple identity. */
-    const exact = isAppleArt(t.appleExact?.art) ? t.appleExact.art : "";
-    const verified = isAppleArt(t.verifiedAppleArt) ? t.verifiedAppleArt : "";
+    const canonical = trustedCover(seed,meta,key);
     const searched = isAppleArt(t.searchedAppleArt) ? t.searchedAppleArt : "";
-    const chosen = exact || verified || searched || seed[key] || cached || "";
-    if (chosen && isAppleArt(chosen)) {
-      if ((exact || verified || searched || seed[key]) && covers[key] !== chosen) {
-        covers[key] = chosen;
-        changed = true;
-      }
-      t.art = chosen;
-    } else {
-      t.art = "";
+    const exact = isAppleArt(t.appleExact?.art) ? t.appleExact.art : "";
+    const exactId = isAppleArt(t.verifiedAppleArt) ? t.verifiedAppleArt : "";
+
+    /* Only resolver/editorial provenance is canonical. A current Apple feed or
+       exact track ID is a safe temporary fallback, but it can still point to a
+       promo single instead of the song's canonical album master. */
+    const chosen = searched || canonical || exact || exactId || "";
+    t.trustedAppleArt = searched || canonical || "";
+    t.art = chosen;
+
+    /* Never persist a current-feed/single fallback as canonical runtime state. */
+    const persist = searched || canonical;
+    if (persist && covers[key] !== persist) {
+      covers[key] = persist;
+      changed = true;
     }
   }
   if (env && env.DESK && changed) {
@@ -119,6 +135,7 @@ async function applyCovers(env, tracks, origin) {
   }
   return tracks;
 }
+
 /* Остальные обложки добираем одним batch-запросом Apple по track id из ссылки:
    это ровно тот релиз, который мы показываем и на который ведёт кнопка. */
 async function enrichArtByIds(tracks, stats) {
@@ -203,7 +220,11 @@ function pickName(seedRec, cachedRec, cur, nameSrc) {
   return { title: cur.title, artist: cur.artist, src: nameSrc || "" };
 }
 async function applyNames(env, tracks, origin) {
-  const seed = await nameSeed(env, origin);
+  const [seed,coverSeedData,meta] = await Promise.all([
+    nameSeed(env, origin),
+    coverSeed(env, origin),
+    coverMetaSeed(env, origin),
+  ]);
   let names = {};
   if (env && env.DESK) {
     try { names = (await env.DESK.get(NAMES_KV, { type: "json" })) || {}; } catch {}
@@ -221,11 +242,12 @@ async function applyNames(env, tracks, origin) {
        Apple, а запечённый файл чарта может вести на версию-вариант или быть пустым
        (живой пример: строка без ссылки, потому что iTunes из воркера не ответил). */
     if (sd) {
-      /* A current Apple chart row is more authoritative than yesterday's
-         generated seed. Never let stale metadata replace Apple's live track URL. */
-      if (sd.url && !t.appleExact?.url) t.url = sd.url;
-      if (sd.prev) t.prev = sd.prev;
-      if (sd.year && !t.year) t.year = sd.year;
+      const canonicalMeta = !!trustedCover(coverSeedData,meta,key);
+      /* Canonical resolver metadata wins over a promo-single URL from Apple's
+         chart feed. Old/unproven seed metadata never overwrites the live feed. */
+      if (sd.url && (canonicalMeta || !t.appleExact?.url)) t.url = sd.url;
+      if (sd.prev && (canonicalMeta || !t.prev)) t.prev = sd.prev;
+      if (sd.year && (canonicalMeta || !t.year)) t.year = sd.year;
     }
     const rec = { title: shown.title, artist: shown.artist, src: chosen.src };
     const old = names[key];
@@ -709,6 +731,7 @@ export async function buildTop50(origin, env) {
     delete t.appleExact;
     delete t.verifiedAppleArt;
     delete t.searchedAppleArt;
+    delete t.trustedAppleArt;
   });
   return {
     updated: new Date().toISOString().slice(0, 10),
@@ -744,8 +767,10 @@ async function itunesLookup(title, artist) {
 
 async function enrichApple(tracks) {
   await Promise.all(tracks.map(async (t) => {
-    /* ссылка и 30-секундное превью нужны всегда; обложку Apple больше не даёт */
-    if (t.url && isApplePreview(t.prev)) return;
+    /* If the checked-in resolver provenance is stale/missing, do a strict Apple
+       search even when URL/preview already exist; this is the runtime self-heal. */
+    const needCanonicalArt = !isAppleArt(t.trustedAppleArt);
+    if (!needCanonicalArt && t.url && isApplePreview(t.prev)) return;
     const grab = (title, artist) => Promise.race([
       itunesLookup(title, artist),
       new Promise((_, reject) => setTimeout(() => reject(new Error("itunes-timeout")), 6000)),
