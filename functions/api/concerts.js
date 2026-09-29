@@ -613,6 +613,41 @@ async function hotspotSnapshotPayload(env) {
   };
 }
 
+function nearbyCacheStep(radius) {
+  if (radius <= 25) return 0.025;
+  if (radius <= 75) return 0.05;
+  if (radius <= 150) return 0.10;
+  return 0.20;
+}
+function snapCoord(value, step) {
+  return Math.round(Number(value) / step) * step;
+}
+function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,radius}) {
+  const out = new URL(requestUrl);
+  out.search = "";
+  out.searchParams.set("__cachev","concerts-global-v20");
+
+  if(mode==="artist-search"){
+    out.searchParams.set("mode","artist-search");
+    out.searchParams.set("q",String(q||"").trim().toLowerCase());
+    return out;
+  }
+  if(attractionId){
+    out.searchParams.set("attractionId",String(attractionId).trim());
+    return out;
+  }
+  if(artist){
+    out.searchParams.set("artist",String(artist).trim().toLowerCase());
+    return out;
+  }
+
+  const step=nearbyCacheStep(radius);
+  out.searchParams.set("lat",snapCoord(lat,step).toFixed(3));
+  out.searchParams.set("lng",snapCoord(lng,step).toFixed(3));
+  out.searchParams.set("radius",String(radius));
+  return out;
+}
+
 export async function onRequestGet({ request, env, waitUntil }) {
   const u = new URL(request.url);
   const mode = String(u.searchParams.get("mode") || "").toLowerCase();
@@ -652,9 +687,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   }
 
   const cache = caches.default;
-  const cacheUrl = new URL(request.url);
-  cacheUrl.searchParams.delete("_");
-  cacheUrl.searchParams.set("__cachev", "concerts-global-v19");
+  const cacheUrl = canonicalConcertCacheUrl(request.url,{mode,q,lat,lng,artist,attractionId,radius});
   const cacheKey = new Request(cacheUrl.toString(), { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
@@ -675,7 +708,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
         name: String(x?.name || ""),
         image: bestArtistImage(x?.images) || bestImage(x?.images),
       })).filter(x => x.id && x.name);
-      const res = json({ ok:true, mode:"artist-search", artists }, 200, { "Cache-Control":"public, max-age=120, s-maxage=600" });
+      const res = json({ ok:true, mode:"artist-search", artists }, 200, { "Cache-Control":"public, max-age=300, s-maxage=21600, stale-while-revalidate=86400" });
       await cache.put(cacheKey, res.clone()).catch(() => {});
       return res;
     }
@@ -689,7 +722,10 @@ export async function onRequestGet({ request, env, waitUntil }) {
     } else if (artist) {
       tm.searchParams.set("keyword", artist);
     } else {
-      tm.searchParams.set("geoPoint", geohash(lat, lng, 8));
+      const step=nearbyCacheStep(radius);
+      const queryLat=snapCoord(lat,step);
+      const queryLng=snapCoord(lng,step);
+      tm.searchParams.set("geoPoint", geohash(queryLat, queryLng, 8));
       tm.searchParams.set("radius", String(radius));
       tm.searchParams.set("unit", "km");
     }
@@ -702,7 +738,10 @@ export async function onRequestGet({ request, env, waitUntil }) {
       page: raw?.page || { size: events.length, totalElements: events.length, totalPages: 1, number: 0 },
       query: attractionId ? { attractionId } : artist ? { artist } : { lat, lng, radius, unit: "km" },
     };
-    const res = json(payload, 200);
+    const cacheControl=(artist||attractionId)
+      ? "public, max-age=300, s-maxage=7200, stale-while-revalidate=21600"
+      : "public, max-age=180, s-maxage=1800, stale-while-revalidate=7200";
+    const res = json(payload, 200, { "Cache-Control":cacheControl });
     await cache.put(cacheKey, res.clone()).catch(() => {});
     return res;
   } catch (err) {
