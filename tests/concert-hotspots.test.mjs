@@ -253,6 +253,52 @@ test("429 is requeued and is never cached as an empty successful snapshot", asyn
 });
 
 
+test("permanent Ticketmaster 400 skips the bad hotspot job and continues the world scan", async () => {
+  const kv=memoryKv();
+  const state=freshState(Date.UTC(2026,8,29));
+  state.queue=[countryJob("FR"),countryJob("ES")];
+  state.candidates={};
+  state.verifyQueue=[];
+  await kv.put(HOTSPOT_STATE_KEY,JSON.stringify(state));
+
+  const oldFetch=globalThis.fetch;
+  const countries=[];
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    const country=u.searchParams.get("countryCode");
+    countries.push(country);
+    if(country==="FR"){
+      return new Response('{"fault":{"faultstring":"unsupported filter"}}',{
+        status:400,headers:{"content-type":"application/json"}
+      });
+    }
+    return new Response(JSON.stringify({
+      _embedded:{venues:[]},
+      page:{totalElements:0,totalPages:1,size:200,number:0}
+    }),{status:200,headers:{"content-type":"application/json"}});
+  };
+
+  try{
+    const result=await refreshHotspotSnapshot(
+      {TICKETMASTER_API_KEY:"test",DESK:kv},
+      {jobBudget:2,verifyBudget:1}
+    );
+    assert.equal(result.ok,true);
+    assert.equal(result.complete,true);
+    assert.equal(result.rejected,1);
+    assert.deepEqual(countries,["FR","ES"]);
+
+    const saved=JSON.parse(kv.raw(HOTSPOT_STATE_KEY));
+    assert.equal(saved.queue.length,0);
+    assert.equal(saved.rejected.length,1);
+    assert.equal(saved.rejected[0].kind,"venue-job");
+    assert.equal(saved.rejected[0].id,"country:FR");
+    assert.equal(saved.rejected[0].status,400);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
 test("empty current hotspot snapshot falls back instead of blanking the public map", async () => {
   const kv=memoryKv();
   await kv.put(HOTSPOT_SNAPSHOT_KEY,JSON.stringify({
