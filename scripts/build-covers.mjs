@@ -143,13 +143,12 @@ async function artistTopSong(title,artist) {
 async function songSearch(title, artist) {
   const terms = [
     `${artist} ${stripParen(title)}`,
-    `${stripParen(title)} ${artist}`,
-    `${artist} ${stripParen(title)} single`,
+    stripParen(title),
   ];
   const out = new Map();
   for (const term0 of terms) {
     const term = encodeURIComponent(term0.trim());
-    const d = await json(`https://itunes.apple.com/search?term=${term}&entity=song&limit=200&country=US`);
+    const d = await json(`https://itunes.apple.com/search?term=${term}&entity=song&limit=100&country=US`);
     for (const x of d.results || []) {
       if (appleCandidateCompatible(title, artist, x) && x.trackId) {
         out.set(String(x.trackId), x);
