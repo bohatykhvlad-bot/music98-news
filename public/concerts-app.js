@@ -79,8 +79,8 @@ const map = new mapboxgl.Map({
   container:root.querySelector("#map"),
   style:"mapbox://styles/mapbox/light-v11",
   projection:"mercator",
-  center:[12,49],
-  zoom:2.45,
+  center:[8,27],
+  zoom:1.55,
   renderWorldCopies:false,
   attributionControl:true
 });
@@ -301,25 +301,25 @@ function addTopographicRelief(){
     const id=String(layer.id||"");
     try{
       if(layer.type==="background"){
-        map.setPaintProperty(id,"background-color","#fbfcfc");
+        map.setPaintProperty(id,"background-color","#ffffff");
       }
       if(layer.type==="fill" && /(^land$|land-|park|landcover|landuse|wood|grass|scrub|pitch|golf|cemetery)/i.test(id)){
-        map.setPaintProperty(id,"fill-color","#f7f8f8");
+        map.setPaintProperty(id,"fill-color","#fbfcfc");
         map.setPaintProperty(id,"fill-opacity",.88);
       }
       if(layer.type==="fill" && /building/i.test(id)){
-        map.setPaintProperty(id,"fill-color","#f1f3f4");
+        map.setPaintProperty(id,"fill-color","#f6f8f8");
         map.setPaintProperty(id,"fill-opacity",.82);
       }
       if(layer.type==="fill" && /water/i.test(id)){
-        map.setPaintProperty(id,"fill-color","#e7f3f7");
+        map.setPaintProperty(id,"fill-color","#dff4fa");
       }
       if(layer.type==="line" && /waterway|river|canal|stream/i.test(id)){
-        map.setPaintProperty(id,"line-color","#d5eaf0");
+        map.setPaintProperty(id,"line-color","#cfeaf2");
       }else if(layer.type==="line" && /(admin|boundary|country|state)/i.test(id)){
-        map.setPaintProperty(id,"line-color","#cfd7da");
+        map.setPaintProperty(id,"line-color","#d8e0e2");
       }else if(layer.type==="line" && /(road|street|motorway|trunk|primary|secondary|tertiary)/i.test(id)){
-        map.setPaintProperty(id,"line-color",/(motorway|trunk|primary)/i.test(id)?"#d5dadd":"#e3e7e9");
+        map.setPaintProperty(id,"line-color",/(motorway|trunk|primary)/i.test(id)?"#dde3e5":"#edf0f1");
       }
       if(layer.type==="symbol" && /(poi|transit|airport|ferry)/i.test(id) && typeof map.setLayerZoomRange==="function"){
         map.setLayerZoomRange(id,8.5,24);
@@ -350,10 +350,11 @@ function addTopographicRelief(){
 function addLayers(){
   if(map.getSource("events")) return;
 
-  addTopographicRelief();
+  // Keep the bright flat Mapbox palette; no DEM hillshade/gray relief.
   try{ addConcertTriangle(); }catch(err){ console.error("Concert marker setup failed",err); }
 
   map.addSource("hubs",{type:"geojson",data:hubsGeoJSON()});
+  requestAnimationFrame(()=>{ const src=map.getSource("hubs"); if(src) src.setData(hubsGeoJSON()); });
 
   // Wide view: only qualifying European capitals. Zoom in: all qualifying cities.
   map.addLayer({
@@ -365,7 +366,7 @@ function addLayers(){
     }
   });
   map.addLayer({
-    id:"capital-labels",type:"symbol",source:"hubs",minzoom:1.25,maxzoom:4.7,filter:["all",["==",["get","overview"],1],["!=",["get","tier"],2]],
+    id:"capital-labels",type:"symbol",source:"hubs",minzoom:2.75,maxzoom:4.7,filter:["all",["==",["get","overview"],1],["!=",["get","tier"],2]],
     layout:{
       "text-field":["get","name"],"text-size":11,"text-font":["Open Sans Semibold","Arial Unicode MS Bold"],
       "text-offset":[0,-1.25],"text-anchor":"bottom","text-allow-overlap":false
@@ -373,7 +374,7 @@ function addLayers(){
     paint:{"text-color":"#20272a","text-halo-color":"rgba(255,255,255,.96)","text-halo-width":1.5}
   });
   map.addLayer({
-    id:"state-capital-labels",type:"symbol",source:"hubs",minzoom:3.35,maxzoom:4.7,filter:["==",["get","tier"],2],
+    id:"state-capital-labels",type:"symbol",source:"hubs",minzoom:4.0,maxzoom:4.7,filter:["==",["get","tier"],2],
     layout:{
       "text-field":["concat",["get","name"]," · ",["get","stateCode"]],"text-size":10.5,
       "text-font":["Open Sans Semibold","Arial Unicode MS Bold"],"text-offset":[0,-1.2],"text-anchor":"bottom",
@@ -1072,18 +1073,18 @@ function readPopularCache(){
     if(cached?.version==="popular-v4" &&
        cached?.eligibility==="ticketmaster_event_payload_gt_0" &&
        Array.isArray(cached.artists) &&
-       cached.artists.length>=30 &&
+       cached.artists.length>0 &&
        cached.artists.every(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0) &&
        age<26*60*60*1000) return cached;
   }catch(e){}
   return null;
 }
 function writePopularCache(data){
-  if(data?.stale || data?.warming ||
+  if(data?.stale ||
      data?.version!=="popular-v4" ||
      data?.eligibility!=="ticketmaster_event_payload_gt_0" ||
      !Array.isArray(data.artists) ||
-     data.artists.length<30 ||
+     !data.artists.length ||
      !data.artists.every(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0)) return;
   try{localStorage.setItem(POPULAR_CACHE_KEY,JSON.stringify(data));}catch(e){}
 }
@@ -1127,7 +1128,7 @@ async function loadPopular(force=false){
   const requestId=++popularRequestSeq;
   clearArtistContext();
   setMode("popular");
-  sideSub.textContent="Top 30 popular artists with upcoming Ticketmaster shows.";
+  sideSub.textContent="Popular artists with confirmed upcoming Ticketmaster shows.";
 
   const cached=!force ? readPopularCache() : null;
   if(!popularArtists.length && cached?.artists?.length){
@@ -1411,7 +1412,7 @@ resetMapBtn.addEventListener("click",()=>{
   }
   setEventData([]);
   setStatus("");
-  map.easeTo({center:[5,25],zoom:1.55,duration:520});
+  map.easeTo({center:[8,27],zoom:1.55,duration:520});
 });
 
 searchAreaBtn.addEventListener("click",()=>{
@@ -1574,7 +1575,11 @@ function resizeMapStable(){
 
 map.on("load",()=>{
   resizeMapStable();
+  addTopographicRelief();
   addLayers();
+  const hubs=map.getSource("hubs");
+  if(hubs) hubs.setData(hubsGeoJSON());
+  applyMapMode();
   loadPopular();
   requestAnimationFrame(resizeMapStable);
   setTimeout(resizeMapStable,90);
