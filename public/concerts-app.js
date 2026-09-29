@@ -563,38 +563,21 @@ function snapPopup(){
   const dy=Math.round(rect.top*dpr)/dpr-rect.top;
   if(Math.abs(dx)>.001 || Math.abs(dy)>.001) el.style.translate=dx.toFixed(3)+"px "+dy.toFixed(3)+"px";
 }
-function popupLerp(a,b,t){ return a+(b-a)*t; }
+const POPUP_CITY_MIN_ZOOM=6.2;
 function syncPopupPresentation(){
   if(!popup) return;
   const el=popup.getElement?.();
   if(!el) return;
 
-  const z=map.getZoom();
-  const t=Math.max(0,Math.min(1,(z-2.3)/(8.2-2.3)));
-  const mapWidth=Math.max(0,map.getContainer()?.clientWidth||0);
-  const mobile=mapWidth>0 && mapWidth<700;
-  const maxByViewport=Math.max(164,mapWidth-(mobile?24:32));
-  const width=Math.round(Math.min(maxByViewport,popupLerp(172,286,t)));
-  const imageH=Math.round(popupLerp(52,142,t));
-  const pad=popupLerp(7,13,t);
-  const titleSize=popupLerp(11.5,16,t);
-  const metaSize=popupLerp(9.8,13,t);
-  const titleGap=popupLerp(3,6,t);
-  const metaGap=popupLerp(1,3,t);
-  const radius=popupLerp(11,15,t);
-  const listH=Math.round(popupLerp(112,190,t));
-
-  el.style.setProperty("--pop-w",width+"px");
-  el.style.setProperty("--pop-img-h",imageH+"px");
-  el.style.setProperty("--pop-pad",pad.toFixed(2)+"px");
-  el.style.setProperty("--pop-title-size",titleSize.toFixed(2)+"px");
-  el.style.setProperty("--pop-meta-size",metaSize.toFixed(2)+"px");
-  el.style.setProperty("--pop-title-gap",titleGap.toFixed(2)+"px");
-  el.style.setProperty("--pop-meta-gap",metaGap.toFixed(2)+"px");
-  el.style.setProperty("--pop-radius",radius.toFixed(2)+"px");
-  el.style.setProperty("--venue-list-h",listH+"px");
-  el.style.maxWidth=width+"px";
-  if(typeof popup.setMaxWidth==="function") popup.setMaxWidth(width+"px");
+  // Popup geometry is intentionally fixed. Zooming the map must never shrink
+  // the card, typography, artwork or inner spacing.
+  [
+    "--pop-w","--pop-img-h","--pop-pad","--pop-title-size",
+    "--pop-meta-size","--pop-title-gap","--pop-meta-gap",
+    "--pop-radius","--venue-list-h"
+  ].forEach(name=>el.style.removeProperty(name));
+  el.style.maxWidth="";
+  if(typeof popup.setMaxWidth==="function") popup.setMaxWidth("286px");
 
   requestAnimationFrame(snapPopup);
 }
@@ -1482,13 +1465,11 @@ map.on("styleimagemissing",e=>{
 map.on("render",()=>{ if(popup) snapPopup(); });
 map.on("zoom",()=>{
   if(!popup) return;
-  if(map.getZoom()<4.8){ closePopup(); return; }
-  syncPopupPresentation();
+  if(map.getZoom()<POPUP_CITY_MIN_ZOOM){ closePopup(); return; }
 });
 map.on("zoomend",()=>{
   if(!popup) return;
-  if(map.getZoom()<4.8){ closePopup(); return; }
-  syncPopupPresentation();
+  if(map.getZoom()<POPUP_CITY_MIN_ZOOM){ closePopup(); return; }
   requestAnimationFrame(ensurePopupFullyVisible);
 });
 map.on("moveend",()=>{
