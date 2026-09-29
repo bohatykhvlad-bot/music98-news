@@ -117,6 +117,7 @@ const ZERO_QUOTA_POPULAR_SUPPLEMENT=[
    events:[{id:"web-luke-combs-20270403",artist:"Luke Combs",name:"Luke Combs w/ Treaty Oak Revival",date:"2027-04-03",time:"17:20:00",city:"Arlington",state:"TX",country:"United States",venue:"AT&T Stadium",url:"https://www.ticketmaster.com/luke-combs-tickets/artist/2150342"}]},
   {name:"Benson Boone",image:"",shows:1,eventConfirmed:true,webVerified:true,popularityRank:1005,
    events:[{id:"web-benson-boone-20261102",artist:"Benson Boone",name:"Benson Boone – Live in Singapore",date:"2026-11-02",time:"20:00:00",city:"Singapore",state:"",country:"Singapore",venue:"The Star Theatre",url:"https://www.ticketmaster.com/benson-boone-tickets/artist/2892837"}]}
+];
 
 function withVerifiedPopularSupplement(rows){
   const out=[];
