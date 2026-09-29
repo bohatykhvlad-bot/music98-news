@@ -871,6 +871,8 @@ async function marketSeedResult(env,seed){
     count:total,
     firstDate:String(first?.dates?.start?.localDate||""),
     verified:true,
+    pinned:1,
+    tier:seed.kind==="state_capital"?2:1,
   };
 }
 
@@ -958,7 +960,7 @@ async function marketSnapshotPayload(env){
   const fallback=await hotspotSnapshotPayload(env);
   const markets=(fallback?.hotspots||[])
     .filter(x=>Number(x?.count||0)>0)
-    .map(x=>({...x,verified:true}));
+    .map(x=>({...x,verified:true,pinned:1,tier:(String(x?.countryCode||"")==="US"&&x?.stateCode)?2:1}));
   return {
     ok:true,
     mode:"markets",
