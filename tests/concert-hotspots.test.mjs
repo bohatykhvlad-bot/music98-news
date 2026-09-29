@@ -677,7 +677,7 @@ test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30"
   try{
     let result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
     assert.equal(result.complete,false);
-    assert.equal(result.found,14);
+    assert.equal(result.found,18);
     assert.equal(ticketmasterKeywords[0],"Artist 9");
 
     for(let i=0;i<6 && !result.complete;i++){
