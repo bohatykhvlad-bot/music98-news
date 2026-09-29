@@ -562,7 +562,7 @@ test("daily Popular builder produces 30 eligible artists in source-rank order", 
     assert.equal(snap.eligibility,"ticketmaster_event_payload_gt_0");
     assert.equal(snap.artists.every(x=>x.eventConfirmed===true && Number(x.shows)>0),true);
     assert.deepEqual(snap.artists.map(x=>x.rank),Array.from({length:30},(_,i)=>i+1));
-    assert.deepEqual(snap.artists.map(x=>x.popularityRank),Array.from({length:30},(_,i)=>i+1));
+    assert.deepEqual(snap.artists.map(x=>x.popularityRank),Array.from({length:30},(_,i)=>i+3));
     assert.equal(snap.artists[0].name,"Artist 3");
     assert.equal(snap.artists[29].name,"Artist 32");
     assert.equal(kworbCalls,1);
