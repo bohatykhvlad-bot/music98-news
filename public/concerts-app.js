@@ -909,7 +909,7 @@ async function loadArtistArea(lat,lng,label,radius){
   }catch(err){
     if(requestId!==areaRequestSeq) return;
     console.error(err);
-    setStatus("Could not load concerts in this area.");
+    setStatus(concertErrorMessage(err,"Could not load concerts in this area."));
   }
 }
 async function showAllConcertsInMapArea(){
@@ -967,7 +967,7 @@ async function toggleArtist(item,card,mode){
   }catch(err){
     console.error(err);
     box.textContent="";
-    const n=document.createElement("div"); n.className="tour-none"; n.textContent="Could not load tour dates.";
+    const n=document.createElement("div"); n.className="tour-none"; n.textContent=concertErrorMessage(err,"Could not load tour dates.");
     box.appendChild(n);
   }
 }
@@ -1043,6 +1043,12 @@ async function getPayload(params){
   try{return await work;}finally{payloadInflight.delete(key);}
 }
 async function getEvents(params){ return (await getPayload(params)).events||[]; }
+function concertErrorMessage(err,fallback){
+  const code=String(err?.message||"");
+  if(code==="ticketmaster_temporarily_limited" || code==="ticketmaster_budget_guard") return "Ticketmaster is temporarily limiting requests. Please try again later.";
+  if(code==="ticketmaster_key_missing") return "Concert search is being connected. Please try again shortly.";
+  return fallback;
+}
 
 function mergeHotspots(rows){
   const byKey=new Map();
