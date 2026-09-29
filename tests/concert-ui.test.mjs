@@ -21,7 +21,7 @@ test("map popup and right-side event rows use the same typography tokens",()=>{
 test("Buy Tickets pill scales while text uses a crisp native pressed size",()=>{
   assert.match(app,/\.buy::before\{[^}]*transform:scale\(1\);transform-origin:50% 50%;[^}]*transform \.09s/);
   assert.match(app,/\.buy-label\{[^}]*font-size:13px;[^}]*transform:none;translate:none;transition:none/);
-  assert.match(app,/\.buy\.press::before\{transform:scale\(\.97\)\}/);
+  assert.match(app,/\.buy\.press::before\{transform:scale\(\.98\)\}/);
   assert.match(app,/\.buy\.press \.buy-label\{font-size:12\.5px\}/);
   assert.doesNotMatch(app,/\.buy\.press \.buy-label\{[^}]*transform/);
 });
@@ -40,40 +40,41 @@ test("More button keeps its existing behavior with equal vertical spacing",()=>{
   assert.match(app,/\.tour-more\{width:fit-content;max-width:100%;[^}]*margin:5px auto 5px/);
 });
 
-test("Popular UI renders any strict confirmed cache immediately while targeting Top 30",()=>{
-  assert.match(app,/Popular artists with confirmed upcoming Ticketmaster shows\./);
+test("Popular UI renders strict confirmed cache immediately without an explanatory banner",()=>{
   assert.match(app,/music98:concert-popular:v6/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
   assert.match(app,/ticketmaster_event_payload_gt_0/);
   assert.match(app,/cached\.artists\.length>0/);
-  assert.match(app,/cached\.artists\.every\(a=>a\?\.eventConfirmed===true && Number\(a\?\.shows\|\|0\)>0\)/);
   assert.match(app,/mode:"popular",v:"popular-v6"/);
+  assert.match(app,/sideSub\.textContent="";/);
+  assert.doesNotMatch(app,/Popular artists with confirmed upcoming Ticketmaster shows\./);
 });
 
-test("map loading status is hidden while real statuses remain available",()=>{
-  assert.match(app,/\^loading concerts\?\(\?: data\)\?\/i/);
+test("map uses only the daily verified market snapshot",()=>{
+  assert.doesNotMatch(app,/STATIC_GLOBAL_MARKETS/);
+  assert.doesNotMatch(app,/STATIC_US_STATE_CAPITALS/);
+  assert.match(app,/const MARKET_CACHE_KEY="music98:concert-markets:v1"/);
+  assert.match(app,/mode:"markets",v:"concert-markets-v1"/);
+  assert.match(app,/loadMarkets\(\);/);
+  assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
 
-
-test("world overview is static and restores pinned markets after zooming out",()=>{
-  assert.match(app,/const STATIC_GLOBAL_MARKETS=\[/);
-  assert.match(app,/const STATIC_US_STATE_CAPITALS=\[/);
-  assert.match(app,/\["Dubai","AE",25\.2048,55\.2708\]/);
-  assert.match(app,/\["Washington","DC",38\.9072,-77\.0369\]/);
-  assert.match(app,/state-capital-labels/);
-  assert.match(app,/const overviewZoom=map\.getZoom\(\)<4\.7/);
-  assert.match(app,/const showHubs=activeMode==="popular" \|\| overviewZoom/);
-  assert.match(app,/map\.on\("load",\(\)=>\{\n  resizeMapStable\(\);\n  addTopographicRelief\(\);\n  addLayers\(\);/);
-  assert.doesNotMatch(app,/map\.on\("load",\(\)=>\{\n  resizeMapStable\(\);\n  addLayers\(\);\n  loadHotspots\(\);/);
-});
-
-test("map has one compact reset control and no Overview or Fit results controls",()=>{
-  assert.match(app,/id=\\\"resetMapBtn\\\"[^>]*>−<\/button>/);
-  assert.doesNotMatch(app,/id=\\\"overviewBtn\\\"/);
-  assert.doesNotMatch(app,/id=\\\"fitBtn\\\"/);
-  assert.match(app,/resetMapBtn\.addEventListener\("click"/);
+test("map has no custom minus or floating status and native zoom-out resets filters",()=>{
+  assert.doesNotMatch(app,/id=\\"resetMapBtn\\"/);
+  assert.doesNotMatch(app,/id=\\"status\\"/);
+  assert.match(app,/function setStatus\(\)\{ \/\* no floating map status UI \*\/ \}/);
+  assert.match(app,/\.mapboxgl-ctrl-zoom-out/);
+  assert.match(app,/btn\.addEventListener\("click",resetMapFilters\)/);
   assert.match(app,/radiusEl\.value="100"/);
-  assert.match(app,/map\.easeTo\(\{center:\[8,27\],zoom:1\.55/);
+});
+
+test("map shell has no gray shadow gap and canvas fills it",()=>{
+  assert.match(app,/\.map-shell\{[^}]*background:#fff;box-shadow:none/);
+  assert.match(app,/#map \.mapboxgl-canvas\{[^}]*width:100%!important;height:100%!important/);
+});
+
+test("More button sits slightly lower than the previous equal-margin position",()=>{
+  assert.match(app,/\.tour-more\{[^}]*margin:7px auto 3px/);
 });
 
 test("Buy Tickets uses the shared site press binder",()=>{
