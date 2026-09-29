@@ -36,12 +36,10 @@ function chartWeek() {
   return Math.max(0, Math.floor((Date.now() - LAUNCH) / 86400000));
 }
 
-/* Canonical cover rule: public/data/covers.json is the authority.
-   Each song identity gets one approved artwork URL and keeps it permanently.
-   External catalogs are only discovery sources for NEW keys. They are never
-   allowed to replace an existing registry entry, even if Apple changes artwork
-   behind the same track ID later. KV is a runtime mirror/fallback, not the source
-   of truth. */
+/* Canonical cover rule: Apple identity outranks remembered artwork.
+   public/data/covers.json is the durable verified seed, but a current Apple chart
+   row or an exact compatible Apple track ID may repair a stale seed/KV cover.
+   Non-Apple artwork is never persisted as canonical. */
 const COVERS_KV = "covers_v7";
 const DZ_HOST = "dzcdn.net";
 function isAppleArt(url) {
