@@ -1005,16 +1005,16 @@ function mergeHotspots(rows){
   return [...byKey.values()].sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
 }
 
-const POPULAR_CACHE_KEY="music98:concert-popular:v5";
+const POPULAR_CACHE_KEY="music98:concert-popular:v6";
 function readPopularCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(POPULAR_CACHE_KEY)||"null");
     const age=Date.now()-(Date.parse(cached?.builtAt||0)||0);
     if(cached?.version==="popular-v4" &&
-       cached?.eligibility==="ticketmaster_upcoming_events_gt_0" &&
+       cached?.eligibility==="ticketmaster_event_payload_gt_0" &&
        Array.isArray(cached.artists) &&
        cached.artists.length>=30 &&
-       cached.artists.every(a=>Number(a?.shows||0)>0) &&
+       cached.artists.every(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0) &&
        age<26*60*60*1000) return cached;
   }catch(e){}
   return null;
@@ -1022,10 +1022,10 @@ function readPopularCache(){
 function writePopularCache(data){
   if(data?.stale || data?.warming ||
      data?.version!=="popular-v4" ||
-     data?.eligibility!=="ticketmaster_upcoming_events_gt_0" ||
+     data?.eligibility!=="ticketmaster_event_payload_gt_0" ||
      !Array.isArray(data.artists) ||
      data.artists.length<30 ||
-     !data.artists.every(a=>Number(a?.shows||0)>0)) return;
+     !data.artists.every(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0)) return;
   try{localStorage.setItem(POPULAR_CACHE_KEY,JSON.stringify(data));}catch(e){}
 }
 
@@ -1088,7 +1088,7 @@ async function loadPopular(force=false){
   }
 
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v5"});
+    const data=await getPayload({mode:"popular",v:"popular-v6"});
     if(data.artists?.length && (!data.stale || !popularArtists.length || data.artists.length>=popularArtists.length)){
       popularArtists=data.artists;
     }
