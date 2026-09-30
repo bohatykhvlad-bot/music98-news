@@ -81,25 +81,19 @@ def upload_lisa():
     return upload_bytes("lisa-viva-la-lisa-2026.jpg",raw)
 
 def write_one(pid, rec):
-    before=fresh()
-    posts=copy.deepcopy(before["posts"])
-    before_map={str(p.get("id")):copy.deepcopy(p) for p in posts}
-    existing=next((p for p in posts if str(p.get("id"))==pid),None)
-    if existing and (existing.get("status") or "live")!="draft":
-        raise RuntimeError("refusing to overwrite non-draft "+pid)
-    if existing is None:
-        posts.insert(0,rec)
-    else:
+    def mutate(posts):
+        existing=next((p for p in posts if str(p.get("id"))==pid),None)
+        if existing and (existing.get("status") or "live")!="draft":
+            raise RuntimeError("refusing to overwrite non-draft "+pid)
+        if existing is None:
+            posts.insert(0,copy.deepcopy(rec))
+            return posts[0]
         keep_publish=existing.get("publishAt")
-        existing.clear(); existing.update(rec)
-        if keep_publish: existing["publishAt"]=keep_publish
-    runner.http(runner.DESK_API,runner.desk_key(),{"posts":posts},method="POST")
-    after=fresh()
-    amap={str(p.get("id")):p for p in after["posts"]}
-    for oid,old in before_map.items():
-        if oid!=pid and (oid not in amap or digest(old)!=digest(amap[oid])):
-            raise RuntimeError("unrelated post changed: "+oid)
-    now=amap[pid]
+        existing.clear(); existing.update(copy.deepcopy(rec))
+        if keep_publish:
+            existing["publishAt"]=keep_publish
+        return existing
+    now=runner.guarded_write(mutate)
     if now.get("status")!="draft":
         raise RuntimeError(pid+" is not draft")
     ok,lines=runner.run_gate(pid,quiet=False)
