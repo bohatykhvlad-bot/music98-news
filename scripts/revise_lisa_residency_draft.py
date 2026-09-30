@@ -19,9 +19,7 @@ EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace t
 
 BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes. The residency now opens a day earlier than first announced and closes a day later, turning each of the two Las Vegas weekends into a three-night run.
 
-The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added performances began September 30 through Ticketmaster, while the four dates announced in March remain in place. Caesars Entertainment says the run makes LISA the first K-pop artist to hold a Las Vegas residency.
-
-The Colosseum is a 4,300-seat theater inside Caesars Palace. The two added dates keep the residency in the same room, extending each of the original weekends by one night.
+The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added performances began September 30 through Ticketmaster, while the four dates announced in March remain in place. Caesars Entertainment says the run makes LISA the first K-pop artist to hold a Las Vegas residency. The Colosseum is a 4,300-seat theater inside Caesars Palace, and the two added dates extend each of the original weekends by one night without changing venues.
 
 The additional shows arrive ahead of *PRESS PLAY*, LISA's six-track EP due October 23 through LLOUD Co. and RCA Records. Its lead single, "SaWaDiKa," was produced by Thom Bridges and Ojivolta. The video was directed by Bang Jae Yeob and filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours.
 
@@ -31,7 +29,7 @@ LISA gave "SaWaDiKa" its first televised performance at the 2026 MTV Video Music
 
 [tickets:__TICKET__]
 
-Beyond the residency, LISA's fall schedule also includes *Always Lalisa*, the Sue Kim-directed documentary that premiered at the Toronto International Film Festival and begins its worldwide theatrical release on October 12. Sony Music Vision says the film follows a pivotal year in which LISA steps away from BLACKPINK for a period of independence while launching her solo career, pursuing acting and building her own brand before returning to the group. The documentary will have a limited theatrical run, including IMAX presentations, before streaming globally on YouTube Premium later this year."""
+Beyond the residency, LISA's fall schedule also includes *Always Lalisa*, the Sue Kim-directed documentary that premiered at the Toronto International Film Festival and is set for a limited worldwide theatrical run. Sony Music Vision says the film follows the year LISA steps away from BLACKPINK for a period of independence while launching her solo career, pursuing acting and building her own brand before returning to the group. The documentary will screen in cinemas worldwide, including IMAX presentations, before streaming globally on YouTube Premium."""
 
 AI_STYLE_FLAGS = ("marks a new chapter","comes at a time","not only","rather than simply","serves as a","underscores","showcases","the announcement lands")
 
