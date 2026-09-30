@@ -287,4 +287,5 @@ fs.mkdirSync(path.dirname(OUT),{recursive:true});
 fs.writeFileSync(OUT,JSON.stringify(sortedCovers,null,2)+"\n");
 fs.writeFileSync(OUT_AUDIT,JSON.stringify({schema:2,updatedAt:new Date().toISOString(),chartUpdated:String(chart.updated||""),chartRev:String(chart.rev||""),rows:tracks.length,verified:Object.keys(sortedAudit).length,unresolved,sourceCounts,entries:sortedAudit},null,2)+"\n");
 fs.writeFileSync(OUT_NAMES,JSON.stringify(sortedNames,null,2)+"\n");
+// The next scheduled run re-checks the full current Top 50; this summary is the publish invariant used by CI.
 console.log("ARTWORK_AUDIT_SUMMARY",JSON.stringify({rows:tracks.length,verified:Object.keys(sortedAudit).length,unresolved:unresolved.length,sourceCounts,covers:Object.keys(sortedCovers).length}));
