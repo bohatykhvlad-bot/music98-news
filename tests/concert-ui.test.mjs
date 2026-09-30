@@ -246,3 +246,44 @@ test("Near me uses resilient current-position fallbacks",()=>{
   assert.match(app,/DEFAULT_RADIUS_KM=100/);
   assert.doesNotMatch(app,/navigator\.permissions/);
 });
+
+test("verified market clicks reuse geographic verification scope",()=>{
+  assert.match(app,/radiusKm:Number\(h\.radiusKm\|\|0\)/);
+  assert.match(app,/Number\(f\.properties\?\.tier\)===2\?45:60/);
+  assert.doesNotMatch(app,/await getPayload\(\{city:opts\.city/);
+  assert.match(app,/stateCode:opts\.stateCode\|\|\"\"/);
+});
+
+test("venue popup groups strict venue identity, never coordinate proximity",()=>{
+  assert.match(app,/if\(tid && eid\) return eid===tid/);
+  assert.doesNotMatch(app,/sameCoords=.*0\.0008/);
+});
+
+test("visible event markers zoom before popup and stale click timers cannot reopen old context",()=>{
+  assert.match(app,/function focusEventGroupOnMap\(events\)/);
+  assert.match(app,/POPUP_CITY_MIN_ZOOM\+\.1/);
+  assert.match(app,/activeMode!==modeAtClick \|\| areaRequestSeq!==contextAtClick/);
+  assert.match(app,/focusEventGroupOnMap\(group\)/);
+});
+
+test("artist dates have TTL, partial-result feedback and stale-response guard",()=>{
+  assert.match(app,/ARTIST_EVENT_CACHE_MS=5\*60\*1000/);
+  assert.match(app,/Date\.now\(\)-cached\.at<ARTIST_EVENT_CACHE_MS/);
+  assert.match(app,/partial:!!payload\?\.partial/);
+  assert.match(app,/requestId!==areaRequestSeq \|\| expandedKey!==key \|\| activeMode!==\"artist\"/);
+  assert.match(app,/Showing \"\+events\.length\+\" loaded dates of \"\+result\.total/);
+});
+
+test("concert feedback and keyboard focus stay in the results panel",()=>{
+  assert.match(app,/id=\\\"sideStatus\\\" role=\\\"status\\\" aria-live=\\\"polite\\\"/);
+  assert.match(app,/function setStatus\(message\)\{ sideStatus\.textContent=/);
+  assert.match(app,/:focus-visible/);
+  assert.match(app,/row\.setAttribute\(\"aria-expanded\",\"false\"\)/);
+});
+
+test("local search suggestions render before remote requests finish",()=>{
+  assert.match(app,/if\(localArtists\.length \|\| localHubs\.length\) renderSuggestions\(\[\],localArtists,localHubs\)/);
+  assert.match(app,/setTimeout\(\(\)=>controller\.abort\(\),8000\)/);
+  assert.match(app,/setTimeout\(\(\)=>controller\.abort\(\),15000\)/);
+});
+

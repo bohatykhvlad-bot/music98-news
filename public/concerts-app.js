@@ -1,7 +1,7 @@
 "use strict";
 
-const CONCERTS_CSS="\n:host{\n  --bg:#fff;--bg2:#f4f6f7;--card:#fff;--card2:#edf1f2;--line:#e2e8ea;--text:#15181a;--muted:#5c6a70;\n  --muted2:#8a969b;--accent:#00fdfb;--shadow:0 12px 34px rgba(15,45,55,.10);--r:16px;\n  --event-date-size:11.5px;--event-main-size:12.5px;--event-sub-size:11px;--event-art-size:42px;--event-date-col:54px;--event-gap:8px;--event-pad-y:9px;--event-pad-x:10px;--event-radius:14px;\n  --font:\"Pretendard\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif;\n}\n*{box-sizing:border-box}\nhtml{overflow-x:clip}\nbody{margin:0;padding-top:70px;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.45;-webkit-font-smoothing:antialiased}\nbutton,input,select{font:inherit}\na{color:inherit}\n.topbar{position:fixed;inset:0 0 auto;z-index:20;background:rgba(255,255,255,.82);border-bottom:1px solid rgba(226,232,234,.85);backdrop-filter:blur(14px) saturate(170%);-webkit-backdrop-filter:blur(14px) saturate(170%)}\n.topbar-in{max-width:1180px;margin:auto;height:68px;padding:0 20px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}\n.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:20px;letter-spacing:-.015em}\n.brand img{width:40px;height:40px;border-radius:50%}\n.nav{justify-self:center;width:410px;max-width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;height:40px;gap:4px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}\n.nav-btn{width:100%;border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 8px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;position:relative;top:.5px}\n.nav-btn:hover{color:var(--text)}\n.nav-btn.active{background:var(--accent);color:#03282b}\n@media(hover:hover) and (pointer:fine){.nav-btn:hover:not(.active){background:var(--bg2);color:var(--text)}}\n.topfill{justify-self:end;color:var(--muted);font-size:13px}\n.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 50px}\n.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 16px}\n.hero h1{font-size:clamp(30px,4vw,44px);line-height:1.05;letter-spacing:-.04em;margin:0}\n.hero p{margin:0;color:var(--muted);font-size:15px}\n.controls{display:block;margin:0 0 16px}\n.search-wrap{position:relative}\n.city-input{width:100%;height:43px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);padding:0 16px 0 41px;outline:none;color:var(--text);font-size:14px}\n.city-input:focus,.city-input:focus-visible{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent);outline:none}\n.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted2);pointer-events:none}\n.suggestions{position:absolute;z-index:30;top:49px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}\n.suggestion{width:100%;min-height:48px;border:0;background:#fff;text-align:left;padding:7px 12px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:10px}\n.suggestion:hover,.suggestion:focus{background:var(--bg2);outline:none}\n.suggestion-art{width:36px;height:36px;flex:0 0 36px;border:1px solid var(--line);border-radius:10px;object-fit:cover;background:var(--card2)}\n.suggestion-copy{min-width:0;display:flex;flex-direction:column}\n.suggestion-title{font-size:13.5px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.suggestion-kind{font-size:10.5px;color:var(--muted);margin-top:2px}\n.suggestion-location{padding-left:14px}\n.layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:16px;align-items:start}\n.map-shell{position:relative;height:420px;min-height:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff;box-shadow:none}\n@media(min-width:1100px){.map-shell{width:100%;height:420px}}\n#map{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#fff}\n#map .mapboxgl-map,#map .mapboxgl-canvas-container{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;background:#fff!important}\n#map .mapboxgl-canvas{position:absolute!important;inset:0!important;display:block;width:100%!important;height:100%!important;margin:0!important}\n.map-status{position:absolute;z-index:5;left:14px;top:14px;max-width:min(560px,calc(100% - 28px));padding:8px 12px;border:1px solid rgba(255,255,255,.92);background:#fff;border-radius:999px;box-shadow:0 4px 14px rgba(15,45,55,.08);font-size:12.5px;color:#425158}\n.map-status:empty{display:none}\n.map-shell.artist-context .map-status{top:62px}\n.map-mode-switch{position:absolute;z-index:8;left:14px;top:14px;width:min(300px,calc(100% - 28px));max-width:calc(100% - 28px);height:40px;padding:4px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;gap:4px;border:0;border-radius:999px;background:transparent;box-shadow:none}\n.map-mode-switch[hidden]{display:none!important}\n.map-mode-btn{width:100%;height:32px;min-width:0;max-width:none;padding:0 12px;border:1px solid var(--line);border-radius:999px;background-color:transparent;color:var(--muted);font:600 14px/1 var(--font);display:grid;place-items:center;text-align:center;text-indent:var(--ink-x,0px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;transition:background .18s ease,border-color .18s ease,color .18s ease}\n.map-mode-btn.active{background-color:var(--accent);border-color:var(--accent);color:#03282b}\n.map-mode-btn:hover:not(.active){background-color:var(--bg2);color:var(--text)}\n.map-mode-btn.active:hover{color:#03282b}\n.map-tool-stack{position:absolute;z-index:8;right:14px;top:14px;display:flex;gap:6px}\n.map-tool-btn,.search-area-btn{border:1px solid rgba(15,60,64,.14);background:#fff;color:var(--text);font:600 12.5px/1 var(--font);box-shadow:0 4px 14px rgba(15,45,55,.08);cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}\n.map-tool-btn{width:38px;height:38px;padding:0;border-radius:999px;display:grid;place-items:center;font-size:23px;font-weight:500;line-height:1;transform-origin:50% 50%}\n.map-tool-btn:hover,.search-area-btn:hover{background:#fff;border-color:rgba(15,60,64,.14);color:var(--text)}\n.map-tool-btn:active{transform:none!important}\n.map-tool-btn[hidden],.search-area-btn[hidden]{display:none!important}\n.search-area-btn{position:absolute;z-index:8;left:0;right:0;bottom:16px;width:max-content;margin-inline:auto;height:36px;padding:0 16px;border-radius:999px;white-space:nowrap;transition:transform .09s cubic-bezier(.34,1.2,.64,1)}\n.side{border:1px solid var(--line);border-radius:var(--r);background:#fff;padding:13px;height:420px;min-height:420px;display:flex;flex-direction:column;box-shadow:var(--shadow);overflow:hidden}\n.side-tabs{\n  width:244px;max-width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;align-self:center;gap:4px;\n  height:40px;padding:4px;background:rgba(255,255,255,.55);\n  border:1px solid rgba(15,60,64,.14);border-radius:999px;margin:0 0 10px;\n  position:relative;top:auto;z-index:5;flex:0 0 auto;pointer-events:auto\n}\n.side-tab{\n  width:100%;min-width:0;max-width:none;height:32px;padding:0 12px;border:0;border-radius:999px;\n  background:transparent;color:var(--muted);font-size:14px;font-weight:600;\n  display:inline-flex;align-items:center;justify-content:center;text-align:center;text-indent:var(--ink-x,0px);line-height:1;text-box:trim-both cap alphabetic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;\n  transition:.18s;pointer-events:auto;outline:none;-webkit-tap-highlight-color:transparent;position:relative;top:0\n}\n.side-tab:hover:not(.active){background:var(--bg2);color:var(--text)}\n.side-tab.active{background:var(--accent);color:#03282b}\n.side-sub{font-size:12.5px;color:var(--muted);margin:0 4px 10px;line-height:1.4;flex:0 0 auto}.side-sub:empty{display:none}\n.tours{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-gutter:stable;padding-right:3px;overscroll-behavior:contain}\n.tour-card{\n  flex:0 0 auto;min-height:62px;\n  border:1px solid transparent;border-radius:24px;overflow:hidden;background:transparent;\n  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease\n}\n.tour-card.open{\n  background:var(--bg2);border-color:var(--line);box-shadow:0 6px 18px rgba(15,45,55,.06)\n}\n.tour-row{\n  width:100%;min-height:62px;display:grid;grid-template-columns:24px 48px minmax(0,1fr) 18px;gap:8px;align-items:center;\n  border:0;background:transparent;border-radius:999px;padding:7px 8px;text-align:left;cursor:pointer;color:var(--text);\n  transition:background .16s ease\n}\n.tour-row:hover{background:var(--bg2)}\n.tour-card.open .tour-row{background:#fff}\n.tour-rank{font-weight:800;font-size:11.5px;color:#879398;text-align:center;font-variant-numeric:tabular-nums}\n.tour-art{width:48px;height:48px;padding:2px;border-radius:12px;border:1px solid var(--line);background:#fff;overflow:hidden;transition:.16s}\n.tour-art img{width:100%;height:100%;display:block;object-fit:cover;border-radius:9px;background:var(--card2)}\n.tour-card.open .tour-art{background:var(--accent);border-color:var(--accent)}\n.tour-copy{min-width:0;width:100%;padding:0;margin:0;display:grid;grid-template-columns:minmax(0,1fr);justify-items:start}\n.tour-name{display:block;width:100%;margin:0;padding:0;text-indent:0;text-align:left;font-size:15px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.015em;text-rendering:geometricPrecision}\n.tour-meta{display:block;width:100%;margin:3px 0 0;padding:0;text-indent:0;text-align:left;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-rendering:geometricPrecision}\n.tour-chevron{width:18px;height:18px;display:grid;place-items:center;color:var(--muted);transition:transform .18s ease}\n.tour-chevron svg{width:14px;height:14px}\n.tour-card.open .tour-chevron{transform:rotate(90deg)}\n.tour-events{\n  max-height:0;opacity:0;overflow:hidden;pointer-events:none;\n  padding:0 9px;\n  transition:max-height .28s cubic-bezier(.3,.7,.4,1),opacity .18s ease,padding .28s cubic-bezier(.3,.7,.4,1)\n}\n.tour-card.open .tour-events{\n  max-height:4800px;opacity:1;pointer-events:auto;padding:2px 9px 10px\n}\n.tour-loading,.tour-none{font-size:11.5px;color:var(--muted);padding:7px 2px 9px}\n.event-link{\n  width:100%;display:grid;grid-template-columns:var(--event-date-col) var(--event-art-size) minmax(0,1fr);gap:var(--event-gap);border:0;\n  background:rgba(255,255,255,.72);color:inherit;text-align:left;cursor:pointer;text-decoration:none;\n  padding:var(--event-pad-y) var(--event-pad-x);border-radius:var(--event-radius);margin:4px 0;align-items:center;outline:none\n}\n.event-link:hover{background:#fff}\n.event-date{font-size:var(--event-date-size);font-weight:800;color:var(--text);text-transform:uppercase;line-height:1.25;text-rendering:geometricPrecision}\n.event-art{width:var(--event-art-size);height:var(--event-art-size);border-radius:10px;object-fit:cover;background:var(--card2);display:block}\n.event-place{min-width:0}\n.event-city{display:block;font-size:var(--event-main-size);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-rendering:geometricPrecision}\n.event-venue{display:block;font-size:var(--event-sub-size);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;text-rendering:geometricPrecision}\n.side-empty{font-size:12.5px;color:var(--muted);padding:12px 5px}\n.disclosure{margin-top:8px;padding:10px 4px 2px;font-size:10.5px;color:#7a878c;line-height:1.4;flex:0 0 auto}\n.mapboxgl-popup{max-width:var(--pop-w,286px)!important}\n.mapboxgl-popup-content{width:var(--pop-w,286px);max-width:calc(100vw - 28px);padding:0;border-radius:var(--pop-radius,15px);overflow:hidden;box-shadow:0 14px 38px rgba(15,45,55,.2);font-family:var(--font)}\n.pop-img{display:block;width:100%;height:var(--pop-img-h,142px);object-fit:cover;background:#eef2f3}\n.pop-body{padding:var(--pop-pad,13px)}\n.pop-title{font-size:var(--pop-title-size,16px);font-weight:800;line-height:1.18;margin:0 26px var(--pop-title-gap,6px) 0}\n.pop-meta{font-size:var(--pop-meta-size,13px);color:#56656b;margin:var(--pop-meta-gap,3px) 0}\n.venue-list{max-height:var(--venue-list-h,190px);overflow:auto;padding:2px 0 0;scrollbar-width:thin}\n.buy{position:relative;isolation:isolate;width:112px;max-width:100%;height:36px;margin:10px auto 0;padding:0;border:0;border-radius:999px;background:transparent;color:var(--text);text-decoration:none;font-family:var(--font);font-weight:700;outline:none;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transform:none;-webkit-font-smoothing:antialiased;transition:color .16s ease}\n.buy::before{content:\"\";position:absolute;z-index:-1;inset:1px 2px;border:1px solid var(--line);border-radius:999px;background:#fff;transition:background .14s ease,border-color .14s ease}\n.buy-label{position:relative;width:100%;text-indent:var(--ink-x,0px);height:100%;display:grid;place-items:center;font-size:13px;line-height:1;white-space:nowrap;text-rendering:geometricPrecision;transform:none;translate:none;transition:none;-webkit-font-smoothing:antialiased}\n.ticket-alt{display:block;width:max-content;max-width:100%;margin:7px auto 0;color:var(--muted);font-size:11.5px;line-height:1.25;text-align:center;text-decoration:underline;text-underline-offset:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.ticket-alt:hover{color:var(--text)}\n.mapboxgl-popup-close-button{font-size:20px;padding:5px 8px;color:#344}\n.mapboxgl-ctrl-group{border-radius:11px!important;overflow:hidden}\n.tour-row,.event-link,.suggestion,.mapboxgl-ctrl button{\n  transform:none!important;transition:background .16s ease,border-color .16s ease,box-shadow .16s ease,color .16s ease;\n}\n.tour-row:active,.event-link:active,.suggestion:active,.mapboxgl-ctrl button:active{transform:none!important}\n.buy:hover{color:#03282b}\n.buy:hover::before{background:var(--accent);border-color:var(--accent)}\n.buy:active,.buy.press{transform:none}\n@media(prefers-reduced-motion:reduce){\n  .side-tab,.tour-row,.event-link,.buy,.suggestion,.mapboxgl-ctrl button{transition:none}\n}\n@media(max-width:900px){\n  .layout{grid-template-columns:1fr}\n  .map-shell{height:420px}\n  .side{height:auto;max-height:620px}\n  .topfill{display:none}\n}\n@media(max-width:700px){\n  body{padding-top:126px}\n  .topbar-in{height:auto;min-height:118px;padding:8px 14px;display:flex;flex-wrap:wrap;gap:8px}\n  .brand{font-size:17px}\n  .brand img{width:32px;height:32px}\n  .nav{order:3;width:100%;height:48px;gap:4px;padding:4px;justify-content:stretch;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14)}\n  .nav-btn{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0}\n  .wrap{padding:18px 14px 36px}\n  .hero{align-items:flex-start;flex-direction:column}\n  .city-input{height:46px}\n  .suggestions{top:52px;max-height:min(55svh,360px);overflow-y:auto;overscroll-behavior:contain}\n  .map-shell{height:min(58svh,460px);min-height:350px;max-height:460px;border-radius:15px}\n  .map-mode-switch{left:10px;top:10px;max-width:calc(100% - 20px)}\n  .map-mode-btn{height:36px;padding:0 13px;font-size:13px}\n  .map-tool-stack{left:auto;right:10px;top:10px;bottom:auto;gap:5px;justify-content:flex-end}\n  .map-tool-btn{width:40px;height:40px;padding:0;font-size:23px}\n  .search-area-btn{left:auto;right:10px;top:10px;bottom:auto;margin-inline:0;height:40px}\n  .map-shell.artist-context .search-area-btn{top:60px}\n  .map-shell.artist-context .map-status{top:60px}\n  .mapboxgl-ctrl button{width:42px!important;height:42px!important}\n  .mapboxgl-popup-close-button{width:40px;height:40px;padding:0;display:grid;place-items:center;line-height:1}\n  .side{border-radius:15px;max-height:none}\n  .side-tabs{height:44px}\n  .side-tab{height:36px}\n  .tours{overflow:visible;padding-right:0;scrollbar-gutter:auto}\n  .tour-events{padding-left:9px}\n  .buy{min-height:38px}\n}\n@media(max-width:390px){\n  .map-shell{min-height:330px;height:54svh}\n}\n\n:host{display:block;width:100%;font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}\n.wrap{padding:0 0 18px;max-width:none}\n.hero{margin:0 0 16px;align-items:center}\n.hero h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.03em;margin:0}\n.hero p{font-size:15px}\n\n.tour-more{width:fit-content;max-width:100%;height:32px;padding:0 16px;margin:8px auto 2px;display:grid;place-items:center;text-align:center;text-indent:var(--ink-x,0px);border:1px solid var(--line);border-radius:999px;background:var(--bg2);color:var(--text);font-size:12.5px;font-weight:600;line-height:1;cursor:pointer;outline:none;transform:none;transition:background .15s ease,border-color .15s ease,color .15s ease;-webkit-tap-highlight-color:transparent}.tour-more:hover{background:var(--accent);border-color:var(--accent);color:#03282b}.tour-more:active{transform:none}\n\n.search-area-btn:active,.side-tab:active,.map-mode-btn:active{transform:none}\n\n.venue-event{width:100%;border:0;background:rgba(255,255,255,.72);border-radius:var(--event-radius);padding:var(--event-pad-y) var(--event-pad-x);display:grid;grid-template-columns:var(--event-date-col) var(--event-art-size) minmax(0,1fr);gap:var(--event-gap);align-items:center;text-align:left;color:var(--text);cursor:pointer;outline:none;margin:4px 0}\n.venue-event:hover{background:#fff}\n.venue-event-date{font-size:var(--event-date-size);font-weight:800;text-transform:uppercase;line-height:1.25}\n.venue-event-art{width:var(--event-art-size);height:var(--event-art-size);border-radius:10px;object-fit:cover;background:var(--card2);display:block}\n.venue-event-copy{min-width:0}\n.venue-event-name{display:block;font-size:var(--event-main-size);font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.venue-event-time{display:block;font-size:var(--event-sub-size);color:var(--muted);margin-top:2px}\n";
-const CONCERTS_HTML="<main class=\"wrap\">\n  <section class=\"hero\">\n    <div>\n      <h1>Concerts Near You</h1>\n      \n    </div>\n  </section>\n\n  <div class=\"controls\">\n    <div class=\"search-wrap\">\n      <svg class=\"search-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/></svg>\n      <input class=\"city-input\" id=\"citySearch\" type=\"search\" autocomplete=\"off\" placeholder=\"Search city or artist...\" aria-label=\"Search city or artist\">\n      <div class=\"suggestions\" id=\"suggestions\" hidden></div>\n    </div>\n  </div>\n\n  <div class=\"layout\">\n    <section class=\"map-shell\" id=\"mapShell\" aria-label=\"Concert map\">\n      <div id=\"map\"></div>\n      <div class=\"map-mode-switch\" id=\"mapModeSwitch\" role=\"tablist\" aria-label=\"Map concert filter\" hidden>\n        <button class=\"map-mode-btn active\" id=\"mapArtistBtn\" type=\"button\" role=\"tab\" aria-selected=\"true\">Artist</button>\n        <button class=\"map-mode-btn\" id=\"mapAllBtn\" type=\"button\" role=\"tab\" aria-selected=\"false\">All concerts</button>\n      </div>\n      <button class=\"search-area-btn\" id=\"searchAreaBtn\" type=\"button\" hidden>Search this area</button>\n    </section>\n    <aside class=\"side\">\n      <div class=\"side-tabs\" role=\"tablist\" aria-label=\"Concert discovery\">\n        <button class=\"side-tab active\" id=\"popularTab\" type=\"button\" role=\"tab\" aria-selected=\"true\">Popular</button>\n        <button class=\"side-tab\" id=\"nearTab\" type=\"button\" role=\"tab\" aria-selected=\"false\">Near me</button>\n      </div>\n      <p class=\"side-sub\" id=\"sideSub\"></p>\n      <div class=\"tours\" id=\"tours\"></div>\n      <div class=\"side-empty\" id=\"sideEmpty\">Loading popular artists...</div>\n      <p class=\"disclosure\">Ticketing by Ticketmaster.</p>\n    </aside>\n  </div>\n</main>";
+const CONCERTS_CSS="\n:host{\n  --bg:#fff;--bg2:#f4f6f7;--card:#fff;--card2:#edf1f2;--line:#e2e8ea;--text:#15181a;--muted:#5c6a70;\n  --muted2:#8a969b;--accent:#00fdfb;--shadow:0 12px 34px rgba(15,45,55,.10);--r:16px;\n  --event-date-size:11.5px;--event-main-size:12.5px;--event-sub-size:11px;--event-art-size:42px;--event-date-col:54px;--event-gap:8px;--event-pad-y:9px;--event-pad-x:10px;--event-radius:14px;\n  --font:\"Pretendard\",Pretendard,-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,sans-serif;\n}\n*{box-sizing:border-box}\nhtml{overflow-x:clip}\nbody{margin:0;padding-top:70px;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.45;-webkit-font-smoothing:antialiased}\nbutton,input,select{font:inherit}\na{color:inherit}\n.topbar{position:fixed;inset:0 0 auto;z-index:20;background:rgba(255,255,255,.82);border-bottom:1px solid rgba(226,232,234,.85);backdrop-filter:blur(14px) saturate(170%);-webkit-backdrop-filter:blur(14px) saturate(170%)}\n.topbar-in{max-width:1180px;margin:auto;height:68px;padding:0 20px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}\n.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:20px;letter-spacing:-.015em}\n.brand img{width:40px;height:40px;border-radius:50%}\n.nav{justify-self:center;width:410px;max-width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;height:40px;gap:4px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:4px;border-radius:999px}\n.nav-btn{width:100%;border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 8px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;position:relative;top:.5px}\n.nav-btn:hover{color:var(--text)}\n.nav-btn.active{background:var(--accent);color:#03282b}\n@media(hover:hover) and (pointer:fine){.nav-btn:hover:not(.active){background:var(--bg2);color:var(--text)}}\n.topfill{justify-self:end;color:var(--muted);font-size:13px}\n.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 50px}\n.hero{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 16px}\n.hero h1{font-size:clamp(30px,4vw,44px);line-height:1.05;letter-spacing:-.04em;margin:0}\n.hero p{margin:0;color:var(--muted);font-size:15px}\n.controls{display:block;margin:0 0 16px}\n.search-wrap{position:relative}\n.city-input{width:100%;height:43px;border:1px solid var(--line);border-radius:999px;background:var(--bg2);padding:0 16px 0 41px;outline:none;color:var(--text);font-size:14px}\n.city-input:focus,.city-input:focus-visible{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent);outline:none}\n.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted2);pointer-events:none}\n.suggestions{position:absolute;z-index:30;top:49px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}\n.suggestion{width:100%;min-height:48px;border:0;background:#fff;text-align:left;padding:7px 12px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:10px}\n.suggestion:hover,.suggestion:focus{background:var(--bg2);outline:none}\n.suggestion-art{width:36px;height:36px;flex:0 0 36px;border:1px solid var(--line);border-radius:10px;object-fit:cover;background:var(--card2)}\n.suggestion-copy{min-width:0;display:flex;flex-direction:column}\n.suggestion-title{font-size:13.5px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.suggestion-kind{font-size:10.5px;color:var(--muted);margin-top:2px}\n.suggestion-location{padding-left:14px}\n.layout{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:16px;align-items:start}\n.map-shell{position:relative;height:420px;min-height:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff;box-shadow:none}\n@media(min-width:1100px){.map-shell{width:100%;height:420px}}\n#map{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#fff}\n#map .mapboxgl-map,#map .mapboxgl-canvas-container{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;background:#fff!important}\n#map .mapboxgl-canvas{position:absolute!important;inset:0!important;display:block;width:100%!important;height:100%!important;margin:0!important}\n.map-status{position:absolute;z-index:5;left:14px;top:14px;max-width:min(560px,calc(100% - 28px));padding:8px 12px;border:1px solid rgba(255,255,255,.92);background:#fff;border-radius:999px;box-shadow:0 4px 14px rgba(15,45,55,.08);font-size:12.5px;color:#425158}\n.map-status:empty{display:none}\n.map-shell.artist-context .map-status{top:62px}\n.map-mode-switch{position:absolute;z-index:8;left:14px;top:14px;width:min(300px,calc(100% - 28px));max-width:calc(100% - 28px);height:40px;padding:4px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;gap:4px;border:0;border-radius:999px;background:transparent;box-shadow:none}\n.map-mode-switch[hidden]{display:none!important}\n.map-mode-btn{width:100%;height:32px;min-width:0;max-width:none;padding:0 12px;border:1px solid var(--line);border-radius:999px;background-color:transparent;color:var(--muted);font:600 14px/1 var(--font);display:grid;place-items:center;text-align:center;text-indent:var(--ink-x,0px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;transition:background .18s ease,border-color .18s ease,color .18s ease}\n.map-mode-btn.active{background-color:var(--accent);border-color:var(--accent);color:#03282b}\n.map-mode-btn:hover:not(.active){background-color:var(--bg2);color:var(--text)}\n.map-mode-btn.active:hover{color:#03282b}\n.map-tool-stack{position:absolute;z-index:8;right:14px;top:14px;display:flex;gap:6px}\n.map-tool-btn,.search-area-btn{border:1px solid rgba(15,60,64,.14);background:#fff;color:var(--text);font:600 12.5px/1 var(--font);box-shadow:0 4px 14px rgba(15,45,55,.08);cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent}\n.map-tool-btn{width:38px;height:38px;padding:0;border-radius:999px;display:grid;place-items:center;font-size:23px;font-weight:500;line-height:1;transform-origin:50% 50%}\n.map-tool-btn:hover,.search-area-btn:hover{background:#fff;border-color:rgba(15,60,64,.14);color:var(--text)}\n.map-tool-btn:active{transform:none!important}\n.map-tool-btn[hidden],.search-area-btn[hidden]{display:none!important}\n.search-area-btn{position:absolute;z-index:8;left:0;right:0;bottom:16px;width:max-content;margin-inline:auto;height:36px;padding:0 16px;border-radius:999px;white-space:nowrap;transition:transform .09s cubic-bezier(.34,1.2,.64,1)}\n.side{border:1px solid var(--line);border-radius:var(--r);background:#fff;padding:13px;height:420px;min-height:420px;display:flex;flex-direction:column;box-shadow:var(--shadow);overflow:hidden}\n.side-tabs{\n  width:244px;max-width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;align-self:center;gap:4px;\n  height:40px;padding:4px;background:rgba(255,255,255,.55);\n  border:1px solid rgba(15,60,64,.14);border-radius:999px;margin:0 0 10px;\n  position:relative;top:auto;z-index:5;flex:0 0 auto;pointer-events:auto\n}\n.side-tab{\n  width:100%;min-width:0;max-width:none;height:32px;padding:0 12px;border:0;border-radius:999px;\n  background:transparent;color:var(--muted);font-size:14px;font-weight:600;\n  display:inline-flex;align-items:center;justify-content:center;text-align:center;text-indent:var(--ink-x,0px);line-height:1;text-box:trim-both cap alphabetic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;\n  transition:.18s;pointer-events:auto;outline:none;-webkit-tap-highlight-color:transparent;position:relative;top:0\n}\n.side-tab:hover:not(.active){background:var(--bg2);color:var(--text)}\n.side-tab.active{background:var(--accent);color:#03282b}\n.side-sub{font-size:12.5px;color:var(--muted);margin:0 4px 10px;line-height:1.4;flex:0 0 auto}.side-sub:empty{display:none}\n.side-status{font-size:12px;color:var(--muted);margin:0 4px 8px;line-height:1.35;flex:0 0 auto}.side-status:empty{display:none}\n.tours{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-gutter:stable;padding-right:3px;overscroll-behavior:contain}\n.tour-card{\n  flex:0 0 auto;min-height:62px;\n  border:1px solid transparent;border-radius:24px;overflow:hidden;background:transparent;\n  transition:background .2s ease,border-color .2s ease,box-shadow .2s ease\n}\n.tour-card.open{\n  background:var(--bg2);border-color:var(--line);box-shadow:0 6px 18px rgba(15,45,55,.06)\n}\n.tour-row{\n  width:100%;min-height:62px;display:grid;grid-template-columns:24px 48px minmax(0,1fr) 18px;gap:8px;align-items:center;\n  border:0;background:transparent;border-radius:999px;padding:7px 8px;text-align:left;cursor:pointer;color:var(--text);\n  transition:background .16s ease\n}\n.tour-row:hover{background:var(--bg2)}\n.tour-card.open .tour-row{background:#fff}\n.tour-rank{font-weight:800;font-size:11.5px;color:#879398;text-align:center;font-variant-numeric:tabular-nums}\n.tour-art{width:48px;height:48px;padding:2px;border-radius:12px;border:1px solid var(--line);background:#fff;overflow:hidden;transition:.16s}\n.tour-art img{width:100%;height:100%;display:block;object-fit:cover;border-radius:9px;background:var(--card2)}\n.tour-card.open .tour-art{background:var(--accent);border-color:var(--accent)}\n.tour-copy{min-width:0;width:100%;padding:0;margin:0;display:grid;grid-template-columns:minmax(0,1fr);justify-items:start}\n.tour-name{display:block;width:100%;margin:0;padding:0;text-indent:0;text-align:left;font-size:15px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.015em;text-rendering:geometricPrecision}\n.tour-meta{display:block;width:100%;margin:3px 0 0;padding:0;text-indent:0;text-align:left;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-rendering:geometricPrecision}\n.tour-chevron{width:18px;height:18px;display:grid;place-items:center;color:var(--muted);transition:transform .18s ease}\n.tour-chevron svg{width:14px;height:14px}\n.tour-card.open .tour-chevron{transform:rotate(90deg)}\n.tour-events{\n  max-height:0;opacity:0;overflow:hidden;pointer-events:none;\n  padding:0 9px;\n  transition:max-height .28s cubic-bezier(.3,.7,.4,1),opacity .18s ease,padding .28s cubic-bezier(.3,.7,.4,1)\n}\n.tour-card.open .tour-events{\n  max-height:4800px;opacity:1;pointer-events:auto;padding:2px 9px 10px\n}\n.tour-loading,.tour-none{font-size:11.5px;color:var(--muted);padding:7px 2px 9px}\n.event-link{\n  width:100%;display:grid;grid-template-columns:var(--event-date-col) var(--event-art-size) minmax(0,1fr);gap:var(--event-gap);border:0;\n  background:rgba(255,255,255,.72);color:inherit;text-align:left;cursor:pointer;text-decoration:none;\n  padding:var(--event-pad-y) var(--event-pad-x);border-radius:var(--event-radius);margin:4px 0;align-items:center;outline:none\n}\n.event-link:hover{background:#fff}\n.event-date{font-size:var(--event-date-size);font-weight:800;color:var(--text);text-transform:uppercase;line-height:1.25;text-rendering:geometricPrecision}\n.event-art{width:var(--event-art-size);height:var(--event-art-size);border-radius:10px;object-fit:cover;background:var(--card2);display:block}\n.event-place{min-width:0}\n.event-city{display:block;font-size:var(--event-main-size);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-rendering:geometricPrecision}\n.event-venue{display:block;font-size:var(--event-sub-size);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;text-rendering:geometricPrecision}\n.side-empty{font-size:12.5px;color:var(--muted);padding:12px 5px}\n.disclosure{margin-top:8px;padding:10px 4px 2px;font-size:10.5px;color:#7a878c;line-height:1.4;flex:0 0 auto}\n.mapboxgl-popup{max-width:var(--pop-w,286px)!important}\n.mapboxgl-popup-content{width:var(--pop-w,286px);max-width:calc(100vw - 28px);padding:0;border-radius:var(--pop-radius,15px);overflow:hidden;box-shadow:0 14px 38px rgba(15,45,55,.2);font-family:var(--font)}\n.pop-img{display:block;width:100%;height:var(--pop-img-h,142px);object-fit:cover;background:#eef2f3}\n.pop-body{padding:var(--pop-pad,13px)}\n.pop-title{font-size:var(--pop-title-size,16px);font-weight:800;line-height:1.18;margin:0 26px var(--pop-title-gap,6px) 0}\n.pop-meta{font-size:var(--pop-meta-size,13px);color:#56656b;margin:var(--pop-meta-gap,3px) 0}\n.venue-list{max-height:var(--venue-list-h,190px);overflow:auto;padding:2px 0 0;scrollbar-width:thin}\n.buy{position:relative;isolation:isolate;width:112px;max-width:100%;height:36px;margin:10px auto 0;padding:0;border:0;border-radius:999px;background:transparent;color:var(--text);text-decoration:none;font-family:var(--font);font-weight:700;outline:none;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transform:none;-webkit-font-smoothing:antialiased;transition:color .16s ease}\n.buy::before{content:\"\";position:absolute;z-index:-1;inset:1px 2px;border:1px solid var(--line);border-radius:999px;background:#fff;transition:background .14s ease,border-color .14s ease}\n.buy-label{position:relative;width:100%;text-indent:var(--ink-x,0px);height:100%;display:grid;place-items:center;font-size:13px;line-height:1;white-space:nowrap;text-rendering:geometricPrecision;transform:none;translate:none;transition:none;-webkit-font-smoothing:antialiased}\n.ticket-alt{display:block;width:max-content;max-width:100%;margin:7px auto 0;color:var(--muted);font-size:11.5px;line-height:1.25;text-align:center;text-decoration:underline;text-underline-offset:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}\n.ticket-alt:hover{color:var(--text)}\n.mapboxgl-popup-close-button{font-size:20px;padding:5px 8px;color:#344}\n.mapboxgl-ctrl-group{border-radius:11px!important;overflow:hidden}\n.tour-row,.event-link,.suggestion,.mapboxgl-ctrl button{\n  transform:none!important;transition:background .16s ease,border-color .16s ease,box-shadow .16s ease,color .16s ease;\n}\n.tour-row:active,.event-link:active,.suggestion:active,.mapboxgl-ctrl button:active{transform:none!important}\n.buy:hover{color:#03282b}\n.buy:hover::before{background:var(--accent);border-color:var(--accent)}\n.buy:active,.buy.press{transform:none}\n@media(prefers-reduced-motion:reduce){\n  .side-tab,.tour-row,.event-link,.buy,.suggestion,.mapboxgl-ctrl button{transition:none}\n}\n@media(max-width:900px){\n  .layout{grid-template-columns:1fr}\n  .map-shell{height:420px}\n  .side{height:auto;max-height:620px}\n  .topfill{display:none}\n}\n@media(max-width:700px){\n  body{padding-top:126px}\n  .topbar-in{height:auto;min-height:118px;padding:8px 14px;display:flex;flex-wrap:wrap;gap:8px}\n  .brand{font-size:17px}\n  .brand img{width:32px;height:32px}\n  .nav{order:3;width:100%;height:48px;gap:4px;padding:4px;justify-content:stretch;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14)}\n  .nav-btn{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0}\n  .wrap{padding:18px 14px 36px}\n  .hero{align-items:flex-start;flex-direction:column}\n  .city-input{height:46px}\n  .suggestions{top:52px;max-height:min(55svh,360px);overflow-y:auto;overscroll-behavior:contain}\n  .map-shell{height:min(58svh,460px);min-height:350px;max-height:460px;border-radius:15px}\n  .map-mode-switch{left:10px;top:10px;max-width:calc(100% - 20px)}\n  .map-mode-btn{height:36px;padding:0 13px;font-size:13px}\n  .map-tool-stack{left:auto;right:10px;top:10px;bottom:auto;gap:5px;justify-content:flex-end}\n  .map-tool-btn{width:40px;height:40px;padding:0;font-size:23px}\n  .search-area-btn{left:auto;right:10px;top:10px;bottom:auto;margin-inline:0;height:40px}\n  .map-shell.artist-context .search-area-btn{top:60px}\n  .map-shell.artist-context .map-status{top:60px}\n  .mapboxgl-ctrl button{width:42px!important;height:42px!important}\n  .mapboxgl-popup-close-button{width:40px;height:40px;padding:0;display:grid;place-items:center;line-height:1}\n  .side{border-radius:15px;max-height:none}\n  .side-tabs{height:44px}\n  .side-tab{height:36px}\n  .tours{overflow:visible;padding-right:0;scrollbar-gutter:auto}\n  .tour-events{padding-left:9px}\n  .buy{min-height:38px}\n}\n@media(max-width:390px){\n  .map-shell{min-height:330px;height:54svh}\n}\n\n:host{display:block;width:100%;font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}\n.wrap{padding:0 0 18px;max-width:none}\n.hero{margin:0 0 16px;align-items:center}\n.hero h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.03em;margin:0}\n.hero p{font-size:15px}\n\n.tour-more{width:fit-content;max-width:100%;height:32px;padding:0 16px;margin:8px auto 2px;display:grid;place-items:center;text-align:center;text-indent:var(--ink-x,0px);border:1px solid var(--line);border-radius:999px;background:var(--bg2);color:var(--text);font-size:12.5px;font-weight:600;line-height:1;cursor:pointer;outline:none;transform:none;transition:background .15s ease,border-color .15s ease,color .15s ease;-webkit-tap-highlight-color:transparent}.tour-more:hover{background:var(--accent);border-color:var(--accent);color:#03282b}.tour-more:active{transform:none}\n\n.search-area-btn:active,.side-tab:active,.map-mode-btn:active{transform:none}\n.side-tab:focus-visible,.map-mode-btn:focus-visible,.tour-row:focus-visible,.event-link:focus-visible,.tour-more:focus-visible,.venue-event:focus-visible,.search-area-btn:focus-visible,.buy:focus-visible{outline:2px solid #007f82;outline-offset:2px}\n\n.venue-event{width:100%;border:0;background:rgba(255,255,255,.72);border-radius:var(--event-radius);padding:var(--event-pad-y) var(--event-pad-x);display:grid;grid-template-columns:var(--event-date-col) var(--event-art-size) minmax(0,1fr);gap:var(--event-gap);align-items:center;text-align:left;color:var(--text);cursor:pointer;outline:none;margin:4px 0}\n.venue-event:hover{background:#fff}\n.venue-event-date{font-size:var(--event-date-size);font-weight:800;text-transform:uppercase;line-height:1.25}\n.venue-event-art{width:var(--event-art-size);height:var(--event-art-size);border-radius:10px;object-fit:cover;background:var(--card2);display:block}\n.venue-event-copy{min-width:0}\n.venue-event-name{display:block;font-size:var(--event-main-size);font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.venue-event-time{display:block;font-size:var(--event-sub-size);color:var(--muted);margin-top:2px}\n";
+const CONCERTS_HTML="<main class=\"wrap\">\n  <section class=\"hero\">\n    <div>\n      <h1>Concerts Near You</h1>\n      \n    </div>\n  </section>\n\n  <div class=\"controls\">\n    <div class=\"search-wrap\">\n      <svg class=\"search-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.1\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-3.5-3.5\"/></svg>\n      <input class=\"city-input\" id=\"citySearch\" type=\"search\" autocomplete=\"off\" placeholder=\"Search city or artist...\" aria-label=\"Search city or artist\">\n      <div class=\"suggestions\" id=\"suggestions\" hidden></div>\n    </div>\n  </div>\n\n  <div class=\"layout\">\n    <section class=\"map-shell\" id=\"mapShell\" aria-label=\"Concert map\">\n      <div id=\"map\"></div>\n      <div class=\"map-mode-switch\" id=\"mapModeSwitch\" role=\"tablist\" aria-label=\"Map concert filter\" hidden>\n        <button class=\"map-mode-btn active\" id=\"mapArtistBtn\" type=\"button\" role=\"tab\" aria-selected=\"true\">Artist</button>\n        <button class=\"map-mode-btn\" id=\"mapAllBtn\" type=\"button\" role=\"tab\" aria-selected=\"false\">All concerts</button>\n      </div>\n      <button class=\"search-area-btn\" id=\"searchAreaBtn\" type=\"button\" hidden>Search this area</button>\n    </section>\n    <aside class=\"side\">\n      <div class=\"side-tabs\" role=\"tablist\" aria-label=\"Concert discovery\">\n        <button class=\"side-tab active\" id=\"popularTab\" type=\"button\" role=\"tab\" aria-selected=\"true\">Popular</button>\n        <button class=\"side-tab\" id=\"nearTab\" type=\"button\" role=\"tab\" aria-selected=\"false\">Near me</button>\n      </div>\n      <p class=\"side-sub\" id=\"sideSub\"></p>\n      <p class=\"side-status\" id=\"sideStatus\" role=\"status\" aria-live=\"polite\"></p>\n      <div class=\"tours\" id=\"tours\"></div>\n      <div class=\"side-empty\" id=\"sideEmpty\">Loading popular artists...</div>\n      <p class=\"disclosure\">Ticketing by Ticketmaster.</p>\n    </aside>\n  </div>\n</main>";
 
 function ensureMapbox(){
   if(window.mapboxgl) return Promise.resolve(window.mapboxgl);
@@ -39,7 +39,7 @@ map.addControl(new mapboxgl.NavigationControl({showCompass:false}),"bottom-right
 
 const $ = (s)=>root.querySelector(s);
 const toursEl=$("#tours"), sideEmpty=$("#sideEmpty");
-const sideSub=$("#sideSub"), search=$("#citySearch"), suggestions=$("#suggestions");
+const sideSub=$("#sideSub"), sideStatus=$("#sideStatus"), search=$("#citySearch"), suggestions=$("#suggestions");
 const nearTab=$("#nearTab"), popularTab=$("#popularTab");
 const mapShell=$("#mapShell"), mapModeSwitch=$("#mapModeSwitch"), mapArtistBtn=$("#mapArtistBtn"), mapAllBtn=$("#mapAllBtn");
 const searchAreaBtn=$("#searchAreaBtn");
@@ -64,6 +64,7 @@ let pendingAreaSearch=null;
 let expandedKey="";
 let artistContext=null;
 const artistEventCache=new Map();
+const ARTIST_EVENT_CACHE_MS=5*60*1000;
 const payloadCache=new Map();
 const payloadInflight=new Map();
 const PAYLOAD_CACHE_MS=3*60*1000;
@@ -124,7 +125,7 @@ function queuePillInkCenter(){
 }
 
 
-function setStatus(){ /* no floating map status UI */ }
+function setStatus(message){ sideStatus.textContent=String(message||"").trim(); }
 function hidePendingAreaSearch(){
   pendingAreaSearch=null;
   searchAreaBtn.hidden=true;
@@ -204,6 +205,7 @@ function applyMapMode(){
   if(map.getLayer("cluster-count")) setLayerVisible("cluster-count",false);
 }
 function setMode(mode){
+  if(activeMode!==mode) closePopup();
   activeMode=mode;
   if(mode!=="popular") clearPopularWarmRetry();
   if(mode!=="nearby" && mode!=="artist-area") hidePendingAreaSearch();
@@ -263,7 +265,7 @@ function hubsGeoJSON(){
         type:"Feature",
         geometry:{type:"Point",coordinates:[h.lng,h.lat]},
         properties:{
-          name:h.city,countryCode:cc,stateCode:String(h.stateCode||""),count,
+          name:h.city,countryCode:cc,stateCode:String(h.stateCode||""),radiusKm:Number(h.radiusKm||0),count,
           capital:capital?1:0,pinned:h.pinned?1:0,tier:Number(h.tier||0),
           overview:(h.verified||h.pinned||capital||outsideMajor||fallback.has(h))?1:0
         }
@@ -499,14 +501,14 @@ function addLayers(){
     const ev=currentEvents.find(x=>x.id===id);
     if(!ev) return;
     const group=eventsAtSameVenue(ev,currentEvents);
-    group.length>1 ? showVenuePopup(group) : showPopup(ev);
+    focusEventGroupOnMap(group);
   });
   map.on("click","artist-hit",e=>{
     const id=String(e.features?.[0]?.properties?.id||"");
     const ev=artistMapEvents.find(x=>x.id===id);
     if(!ev) return;
     const group=eventsAtSameVenue(ev,artistMapEvents);
-    group.length>1 ? showVenuePopup(group) : showPopup(ev);
+    focusEventGroupOnMap(group);
   });
 
   ["hub-hit-capital","hub-hit-major","hub-hit-mid","hub-hit-all","cluster-hit","event-hit","artist-hit"].forEach(layer=>{
@@ -528,7 +530,7 @@ function addLayers(){
     }
     if(best){
       const group=eventsAtSameVenue(best,artistMapEvents);
-      group.length>1 ? showVenuePopup(group) : showPopup(best);
+      focusEventGroupOnMap(group);
     }
   });
   applyMapMode();
@@ -539,9 +541,15 @@ function handleHubClick(e){
   if(!f) return;
   const [lng,lat]=f.geometry.coordinates;
   const name=String(f.properties?.name||"Selected city");
+  const radius=Math.max(5,Number(f.properties?.radiusKm)||(Number(f.properties?.tier)===2?45:60));
   userMoving=false;
   map.flyTo({center:[lng,lat],zoom:8.5,duration:650});
-  loadArea(lat,lng,name,{fit:false,radius:45,city:name,countryCode:String(f.properties?.countryCode||""),stateCode:String(f.properties?.stateCode||"")});
+  loadArea(lat,lng,name,{
+    fit:false,radius,
+    city:name,
+    countryCode:String(f.properties?.countryCode||""),
+    stateCode:String(f.properties?.stateCode||"")
+  });
 }
 
 function popupContent(e){
@@ -587,11 +595,16 @@ function popupContent(e){
 }
 
 function eventsAtSameVenue(target,pool){
-  const tlat=Number(target?.lat),tlng=Number(target?.lng);
+  const tid=String(target?.venueId||"").trim();
+  const norm=v=>String(v||"").trim().toLowerCase();
   return (pool||[]).filter(e=>{
-    const sameCoords=Math.abs(Number(e.lat)-tlat)<0.0008 && Math.abs(Number(e.lng)-tlng)<0.0008;
-    const sameVenue=target.venue && e.venue===target.venue && e.city===target.city;
-    return sameCoords || sameVenue;
+    const eid=String(e?.venueId||"").trim();
+    if(tid && eid) return eid===tid;
+    return !!target?.venue &&
+      norm(e?.venue)===norm(target.venue) &&
+      norm(e?.city)===norm(target.city) &&
+      norm(e?.state)===norm(target.state) &&
+      norm(e?.countryCode||e?.country)===norm(target.countryCode||target.country);
   }).sort((a,b)=>String(a.date||"9999").localeCompare(String(b.date||"9999"))||String(a.time||"").localeCompare(String(b.time||"")));
 }
 
@@ -706,13 +719,21 @@ function showPopup(e){
   setTimeout(ensurePopupFullyVisible,80);
 }
 
-function focusEventOnMap(e){
-  if(!e || !Number.isFinite(Number(e.lat)) || !Number.isFinite(Number(e.lng))) return;
+function focusEventGroupOnMap(events){
+  const group=Array.isArray(events)?events.filter(Boolean):[];
+  const first=group[0];
+  if(!first || !Number.isFinite(Number(first.lat)) || !Number.isFinite(Number(first.lng))) return;
+  const modeAtClick=activeMode;
+  const contextAtClick=areaRequestSeq;
   userMoving=false;
-  const targetZoom=Math.min(Math.max(map.getZoom(),6.3),8.2);
-  map.easeTo({center:[Number(e.lng),Number(e.lat)],zoom:targetZoom,duration:380});
-  setTimeout(()=>showPopup(e),405);
+  const targetZoom=Math.min(Math.max(map.getZoom(),POPUP_CITY_MIN_ZOOM+.1),8.2);
+  map.easeTo({center:[Number(first.lng),Number(first.lat)],zoom:targetZoom,duration:380});
+  setTimeout(()=>{
+    if(activeMode!==modeAtClick || areaRequestSeq!==contextAtClick) return;
+    group.length>1 ? showVenuePopup(group) : showPopup(first);
+  },405);
 }
+function focusEventOnMap(e){ focusEventGroupOnMap([e]); }
 
 function stabilizeArtistCoordinates(events){
   const out=(events||[]).map(e=>({...e}));
@@ -848,16 +869,25 @@ function renderEventList(box,events){
 }
 
 async function eventsForArtist(item,mode){
-  if(mode==="nearby" && Array.isArray(item.events)) return item.events;
+  if(mode==="nearby" && Array.isArray(item.events)){
+    return {events:item.events,total:item.events.length,partial:false};
+  }
   const key=item.id ? "id:"+item.id : "name:"+String(item.name||"").toLowerCase();
-  if(artistEventCache.has(key)) return artistEventCache.get(key);
+  const cached=artistEventCache.get(key);
+  if(cached && Date.now()-cached.at<ARTIST_EVENT_CACHE_MS) return cached.data;
   const params=item.id ? {attractionId:item.id} : {artist:item.name};
-  const events=await getEvents(params);
-  artistEventCache.set(key,events);
-  return events;
+  const payload=await getPayload(params);
+  const data={
+    events:Array.isArray(payload?.events)?payload.events:[],
+    total:Number(payload?.page?.totalElements ?? payload?.events?.length ?? 0)||0,
+    partial:!!payload?.partial
+  };
+  artistEventCache.set(key,{at:Date.now(),data});
+  return data;
 }
 
 function clearArtistContext(){
+  closePopup();
   artistContext=null;
   setArtistMapData([]);
   syncModeTabs();
@@ -945,6 +975,7 @@ async function toggleArtist(item,card,mode){
   root.querySelectorAll(".tour-card.open").forEach(el=>{
     setTourBoxHeight(el.querySelector(".tour-events"),false);
     el.classList.remove("open");
+    el.querySelector(".tour-row")?.setAttribute("aria-expanded","false");
   });
 
   if(!opening){
@@ -959,32 +990,37 @@ async function toggleArtist(item,card,mode){
     return;
   }
 
-  areaRequestSeq++;
+  const requestId=++areaRequestSeq;
   popularRequestSeq++;
   artistContext={item:{...item},events:[],sourceMode:mode,sourceItems:sourceItemsForArtist(item,mode)};
   setMode("artist");
   setEventData([],0);
   expandedKey=key;
+  closePopup();
   card.classList.add("open");
+  card.querySelector(".tour-row")?.setAttribute("aria-expanded","true");
   box.textContent="";
   const loading=document.createElement("div"); loading.className="tour-loading"; loading.textContent="Loading dates...";
   box.appendChild(loading);
   setTourBoxHeight(box,true);
 
   try{
-    const rawEvents=await eventsForArtist(item,mode);
-    if(expandedKey!==key) return;
-    const events=stabilizeArtistCoordinates(rawEvents);
+    const result=await eventsForArtist(item,mode);
+    if(requestId!==areaRequestSeq || expandedKey!==key || activeMode!=="artist" || !artistContext || artistKey(artistContext.item)!==key) return;
+    const events=stabilizeArtistCoordinates(result.events);
     renderEventList(box,events);
     setTourBoxHeight(box,true);
     if(artistContext && artistKey(artistContext.item)===key) artistContext.events=events;
     setMode("artist");
     setEventData([],0);
     setArtistMapData(events);
-    sideSub.textContent="Upcoming concerts for "+item.name+".";
+    sideSub.textContent=result.partial && result.total>events.length
+      ? "Showing "+events.length+" loaded dates of "+result.total+" Ticketmaster results for "+item.name+"."
+      : "Upcoming concerts for "+item.name+".";
     if(events.length) fitEvents(events);
     setStatus(events.length ? events.length+" upcoming concerts · "+item.name : "No upcoming concerts · "+item.name);
   }catch(err){
+    if(requestId!==areaRequestSeq || expandedKey!==key) return;
     console.error(err);
     box.textContent="";
     const n=document.createElement("div"); n.className="tour-none"; n.textContent=concertErrorMessage(err,"Could not load tour dates.");
@@ -1003,7 +1039,7 @@ function renderArtists(items,mode){
 
   items.forEach((item,index)=>{
     const card=document.createElement("div"); card.className="tour-card"; card.dataset.artistKey=artistKey(item);
-    const row=document.createElement("button"); row.type="button"; row.className="tour-row";
+    const row=document.createElement("button"); row.type="button"; row.className="tour-row"; row.setAttribute("aria-expanded","false");
 
     const rank=document.createElement("span"); rank.className="tour-rank"; rank.textContent=String(item.rank||index+1);
 
@@ -1053,7 +1089,14 @@ async function getPayload(params){
   if(payloadInflight.has(key)) return payloadInflight.get(key);
 
   const work=(async()=>{
-    const r=await fetch(u,{cache:"no-store",headers:{"Accept":"application/json","Cache-Control":"no-cache"}});
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),15000);
+    let r;
+    try{
+      r=await fetch(u,{cache:"no-store",headers:{"Accept":"application/json","Cache-Control":"no-cache"},signal:controller.signal});
+    }finally{
+      clearTimeout(timer);
+    }
     const j=await r.json().catch(()=>({}));
     if(!r.ok) throw new Error(j.error||"concerts_unavailable");
     payloadCache.set(key,{at:Date.now(),data:j});
@@ -1062,7 +1105,7 @@ async function getPayload(params){
   payloadInflight.set(key,work);
   try{return await work;}finally{payloadInflight.delete(key);}
 }
-async function getEvents(params){ return (await getPayload(params)).events||[]; }
+
 function concertErrorMessage(err,fallback){
   const code=String(err?.message||"");
   if(code==="ticketmaster_temporarily_limited" || code==="ticketmaster_budget_guard") return "Ticketmaster is temporarily limiting requests. Please try again later.";
@@ -1238,20 +1281,16 @@ async function loadArea(lat,lng,label,opts={}){
   setStatus("Loading concerts...");
   try{
     const grid=searchGridCenter(lat,lng,searchRadius);
-    const data=opts.city
-      ? await getPayload({city:opts.city,countryCode:opts.countryCode||"",stateCode:opts.stateCode||""})
-      : await getPayload({lat:grid.lat,lng:grid.lng,radius:searchRadius});
+    const data=await getPayload({lat:grid.lat,lng:grid.lng,radius:searchRadius});
     if(requestId!==areaRequestSeq) return;
     let events=stabilizeArtistCoordinates(data.events||[]);
-    if(!opts.city){
-      const maxDistance=searchRadius*1.35+18;
-      events=events.filter(e=>distanceKm(lat,lng,Number(e.lat),Number(e.lng))<=maxDistance);
-    }
+    const maxDistance=searchRadius*1.35+18;
+    events=events.filter(e=>distanceKm(lat,lng,Number(e.lat),Number(e.lng))<=maxDistance);
     const total=Number(data.page?.totalElements ?? events.length) || events.length;
 
     nearbyEvents=events;
     nearbyTotal=total;
-    lastArea={lat,lng,label,radius:searchRadius,city:opts.city||"",countryCode:opts.countryCode||""};
+    lastArea={lat,lng,label,radius:searchRadius,city:opts.city||"",countryCode:opts.countryCode||"",stateCode:opts.stateCode||""};
 
     renderArtists(groupedNearby(events),"nearby");
     setMode("nearby");
@@ -1363,7 +1402,12 @@ async function geocode(q,autocomplete=true){
   u.searchParams.set("q",q); u.searchParams.set("access_token",MAPBOX_TOKEN);
   u.searchParams.set("types","place,locality,region,country"); u.searchParams.set("limit","5");
   u.searchParams.set("autocomplete",autocomplete?"true":"false");
-  const r=await fetch(u); if(!r.ok) throw new Error("geocode_failed");
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),8000);
+  let r;
+  try{ r=await fetch(u,{signal:controller.signal}); }
+  finally{ clearTimeout(timer); }
+  if(!r.ok) throw new Error("geocode_failed");
   return (await r.json()).features||[];
 }
 async function searchArtists(q){
@@ -1421,18 +1465,24 @@ async function selectHotspotSuggestion(h){
   if(!h) return;
   const lat=Number(h.lat),lng=Number(h.lng);
   if(!Number.isFinite(lat)||!Number.isFinite(lng)) return;
-  const label=[h.city,h.countryCode].filter(Boolean).join(", ");
+  const label=[h.city,h.stateCode,h.countryCode].filter(Boolean).join(", ");
   search.value=label;
   suggestions.hidden=true;
   userMoving=false;
   map.flyTo({center:[lng,lat],zoom:8.5,duration:600});
-  await loadArea(lat,lng,h.city||label,{fit:false,radius:45,city:h.city||"",countryCode:h.countryCode||""});
+  await loadArea(lat,lng,h.city||label,{
+    fit:false,
+    radius:Math.max(5,Number(h.radiusKm)||(Number(h.tier)===2?45:60)),
+    city:h.city||"",
+    countryCode:h.countryCode||"",
+    stateCode:h.stateCode||""
+  });
 }
 function addHotspotSuggestion(h){
   const b=document.createElement("button"); b.className="suggestion suggestion-location"; b.type="button";
   const cp=document.createElement("span"); cp.className="suggestion-copy";
   const title=document.createElement("span"); title.className="suggestion-title";
-  title.textContent=[h.city,h.countryCode].filter(Boolean).join(", ");
+  title.textContent=[h.city,h.stateCode,h.countryCode].filter(Boolean).join(", ");
   const kind=document.createElement("span"); kind.className="suggestion-kind";
   kind.textContent=Number(h.count||0)+" upcoming concerts";
   cp.append(title,kind); b.appendChild(cp);
@@ -1476,6 +1526,8 @@ mapArtistBtn.addEventListener("click",showArtistContext);
 mapAllBtn.addEventListener("click",showAllConcertsInMapArea);
 
 function resetMapFilters(){
+  areaRequestSeq++;
+  popularRequestSeq++;
   hidePendingAreaSearch();
   closePopup();
   clearArtistContext();
@@ -1523,6 +1575,7 @@ search.addEventListener("input",()=>{
   suggestTimer=setTimeout(async()=>{
     const localArtists=localArtistMatches(q);
     const localHubs=localHotspotMatches(q);
+    if(localArtists.length || localHubs.length) renderSuggestions([],localArtists,localHubs);
     const artistWork=q.length>=3 && localArtists.length<4 ? searchArtists(q) : Promise.resolve([]);
     const [placesResult,artistsResult]=await Promise.allSettled([geocode(q,true),artistWork]);
     if(seq!==suggestSeq || search.value.trim()!==q) return;
