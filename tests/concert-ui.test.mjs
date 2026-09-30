@@ -314,10 +314,11 @@ test("new search input aborts obsolete geocoding while keeping local matches imm
   assert.match(app,/externalSignal\.addEventListener\("abort",abort/);
 });
 
-test("coordinate-less real concerts stay off the map but keep a Ticketmaster click target",()=>{
+test("coordinate-less real concerts are repaired for the map and never become surprise external clicks",()=>{
   assert.match(app,/function toGeoJSON\(events\)[\s\S]*Number\.isFinite\(lat\)&&Number\.isFinite\(lng\)/);
+  assert.match(app,/async function hydrateArtistMapCoordinates\(events\)/);
   assert.match(app,/if\(validMapEvents\(\[e\]\)\.length\)/);
-  assert.match(app,/window\.open\(e\.url,\"_blank\",\"noopener\"\)/);
+  assert.doesNotMatch(app,/window\.open\(e\.url,\"_blank\",\"noopener\"\)/);
   assert.match(app,/return !mappable \|\| distanceKm/);
 });
 
