@@ -169,16 +169,16 @@ test("map mode toggle has no duplicate outer capsule and no resting compositor t
 
 
 test("map interface pills stay on the normal text raster in their resting state",()=>{
-  assert.match(app,/\.action\{width:160px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1\}/);
-  assert.match(app,/\.radius-trigger\{[^}]*border:0;line-height:1/);
-  assert.match(app,/\.radius-option:hover\{background:var\(--bg2\)\}/);
-  assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*will-change:transform/);
-  assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*backface-visibility:hidden/);
-  assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*transform:translateZ/);
+  assert.equal(app.includes(".action{"),false);
+  assert.equal(app.includes(".radius-trigger{"),false);
+  assert.equal(app.includes(".radius-option{"),false);
+  assert.doesNotMatch(app,/\.search-area-btn,\.side-tab\{[^}]*will-change:transform/);
+  assert.doesNotMatch(app,/\.search-area-btn,\.side-tab\{[^}]*backface-visibility:hidden/);
+  assert.doesNotMatch(app,/\.search-area-btn,\.side-tab\{[^}]*transform:translateZ/);
+  assert.doesNotMatch(app,/\.map-mode-btn\{[^}]*will-change:transform/);
 });
 
-
-test("inactive map toggles use the radius-style gray hover highlight",()=>{
+test("inactive map toggles use the shared gray hover highlight",()=>{
   assert.match(app,/\.side-tab:hover:not\(\.active\)\{background:var\(--bg2\);color:var\(--text\)\}/);
   assert.match(app,/\.map-mode-btn\{[^}]*background-color:transparent/);
   assert.match(app,/\.map-mode-btn:hover:not\(\.active\)\{background-color:var\(--bg2\);color:var\(--text\)\}/);
