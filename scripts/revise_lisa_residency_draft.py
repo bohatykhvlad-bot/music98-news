@@ -10,26 +10,32 @@ import post as runner
 POST_ID = "lisa26vegas"
 # run-marker
 PHOTO_API = "https://music98.news/api/photo"
-PHOTO_URL = "https://jp.kith.com/cdn/shop/files/16_8fb06779-b440-460a-aeb1-449e2c474c4d.jpg?v=1771350968&width=1920"
-PHOTO_REFERER = "https://jp.kith.com/blogs/discover/lisa-for-kith-women-spring-2026-campaign-1"
-PHOTO_CREDIT = "Sahra Zadat"
-PHOTO_CREDIT_URL = "https://www.sahrazadat.com/"
+PHOTO_DRIVE_ID = "160RQh2FktfRxnIpZ_mkZ2GRdpKstyvtr"
+PHOTO_SOURCE_PAGE = "https://www.speakoutsam.com/samsdiary/2026/9/5/lisa-releases-new-single-and-video-sawadika"
+PHOTO_CREDIT = "LLOUD"
+PHOTO_CREDIT_URL = "https://www.lloud.co/"
 
 EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes."""
 
-BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes. The residency will now run November 12 through 14 and return for a second three-show stretch from November 27 through 29.
+BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes. The residency now opens a day earlier than first announced and closes a day later, turning each of the two Las Vegas weekends into a three-show run.
 
-The added performances extend each of the two previously announced weekends by one night. General sale for the new dates began September 30, while the four original shows remain unchanged. Caesars is billing VIVA LA LISA as the first Las Vegas residency by a K-pop artist.
+The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. The four dates announced in March remain in place. General sale for the two added performances began September 30 through Ticketmaster. Caesars Entertainment says the run makes LISA the first K-pop artist to hold a Las Vegas residency.
 
-[tickets:__TICKET__]
+The Colosseum is a 4,300-seat theater inside Caesars Palace, so VIVA LA LISA remains a relatively compact residency compared with an arena tour. The original four performances were announced in March and sold out in less than 10 minutes. The September expansion adds one Thursday show to the first weekend and one Sunday show to the second without moving the production to a larger venue.
 
-The announcement comes less than a month before LISA releases *PRESS PLAY* on October 23 through LLOUD Co. and RCA Records. The six-track EP follows *Alter Ego* and is led by "SaWaDiKa." Its release puts the new project three weeks ahead of the first Las Vegas show.
+The new dates arrive as LISA is preparing *PRESS PLAY*, a six-track EP due October 23 through LLOUD Co. and RCA Records. Its lead single, "SaWaDiKa," was produced by Thom Bridges and Ojivolta. The music video was directed by Bang Jae Yeob and filmed around Bangkok. Caesars says the clip drew 70.8 million views in its first 24 hours.
 
 [youtube:FMX98ROVRCE]
 
-"SaWaDiKa" was filmed in Bangkok and became the first release from *PRESS PLAY*. Caesars says the video drew 70.8 million views in its first 24 hours. LISA later performed the song at the 2026 MTV Video Music Awards, where "Dream feat. Kentaro Sakaguchi" won Best Pop.
+LISA gave "SaWaDiKa" its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, "Dream feat. Kentaro Sakaguchi" won Best Pop. The residency therefore arrives after a stretch of solo releases that began with *Alter Ego* in 2025 and continues with *PRESS PLAY* in October. Caesars' original residency announcement also noted that *Alter Ego* reached No. 1 on the Top Album Sales chart and No. 7 on the Billboard 200.
 
-VIVA LA LISA remains a limited run at The Colosseum rather than a tour extension. November 12 now opens the first weekend and November 29 closes the second, with three performances scheduled on each weekend. No additional venues or cities were announced with the two new dates."""
+The Las Vegas run follows LISA's recent work both as a solo artist and with BLACKPINK. The March residency announcement came after BLACKPINK's sold-out DEADLINE World Tour, while the September update tied the added shows directly to the *PRESS PLAY* rollout. No additional cities or venues were included in the announcement.
+
+[tickets:__TICKET__]
+
+VIVA LA LISA is now scheduled for six nights at The Colosseum at Caesars Palace, with three shows in mid-November and three over Thanksgiving weekend. November 12 and 29 are the only newly added dates; November 13, 14, 27 and 28 remain the four performances that sold out earlier in the year."""
+
+AI_STYLE_FLAGS = ("marks a new chapter","comes at a time","not only","rather than simply","serves as a","underscores","showcases","the announcement lands")
 
 def is_lisa_residency(p):
     artist = str(p.get("artist") or "").strip().upper()
@@ -37,26 +43,26 @@ def is_lisa_residency(p):
     return artist == "LISA" and ("VIVA LA LISA" in text or "LAS VEGAS RESIDENCY" in text)
 
 def get_photo():
-    req = urllib.request.Request(PHOTO_URL, headers={
-        "User-Agent": runner.UA,
-        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-        "Referer": PHOTO_REFERER,
-    })
-    with urllib.request.urlopen(req, timeout=60) as r:
-        raw = r.read()
+    import gdown, tempfile
+    with tempfile.TemporaryDirectory() as td:
+        path = str(Path(td) / "LISA_SaWaDiKa_SingleCover.jpg")
+        got = gdown.download(id=PHOTO_DRIVE_ID, output=path, quiet=True)
+        if not got or not Path(path).exists():
+            raise RuntimeError("official SaWaDiKa hi-res download failed")
+        raw = Path(path).read_bytes()
     with Image.open(io.BytesIO(raw)) as src:
-        print("PHOTO_SOURCE", src.size, src.format, len(raw))
-        if max(src.size) < 1920:
-            raise RuntimeError(f"press photo too small: {src.size}")
+        print("PHOTO_SOURCE", src.size, src.format, len(raw), PHOTO_SOURCE_PAGE)
+        if max(src.size) < 2500:
+            raise RuntimeError(f"official SaWaDiKa artwork below hi-res target: {src.size}")
         im = src.convert("RGB")
-        if max(im.size) > 3200:
-            k = 3200 / max(im.size)
+        if max(im.size) > 3600:
+            k = 3600 / max(im.size)
             im = im.resize((round(im.width*k), round(im.height*k)), Image.Resampling.LANCZOS)
         buf = io.BytesIO()
-        im.save(buf, "JPEG", quality=90, optimize=True, progressive=True)
+        im.save(buf, "JPEG", quality=92, optimize=True, progressive=True)
         raw = buf.getvalue()
     out = runner.http(PHOTO_API, runner.desk_key(), {
-        "name": "lisa-kith-spring-2026-sahra-zadat.jpg",
+        "name": "lisa-sawadika-official-hires-2026.jpg",
         "data": "data:image/jpeg;base64," + base64.b64encode(raw).decode(),
     }, method="POST")
     if not out.get("ok"):
@@ -81,6 +87,11 @@ def main():
 
     photo_url = get_photo()
     body = BODY_TEMPLATE.replace("__TICKET__", ticket)
+    low = body.lower()
+    bad = [x for x in AI_STYLE_FLAGS if x in low]
+    print("AI_STYLE_SCAN", bad)
+    if bad:
+        raise RuntimeError(f"AI-style phrase(s) remain: {bad}")
 
     def mutate(posts):
         p = runner.find_post(posts, POST_ID)
@@ -99,10 +110,10 @@ def main():
             "src": photo_url,
             "credit": PHOTO_CREDIT,
             "creditUrl": PHOTO_CREDIT_URL,
-            "pos": "50% 28%",
+            "pos": "50% 36%",
             "zoom": 1,
             "cardX": .50,
-            "cardY": .30,
+            "cardY": .36,
             "cardZoom": 1,
         }
         return copy.deepcopy(p)
