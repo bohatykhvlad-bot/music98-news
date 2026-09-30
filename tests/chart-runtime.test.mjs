@@ -37,3 +37,17 @@ test("exact Apple IDs may restore complete feature credits only when merge ident
   assert.match(top50,/appleCandidateCompatible\(t\.title, t\.artist, item\)/);
   assert.match(top50,/await enrichArtByIds\(tracks, coverStats\);\/\* URL мог появиться/);
 });
+
+
+test("artwork registry refreshes inside long-lived Worker isolates",()=>{
+  assert.match(top50,/const COVER_SEED_TTL_MS = 30 \* 1000/);
+  assert.match(top50,/now - COVER_SEED_AT < COVER_SEED_TTL_MS/);
+  assert.match(top50,/COVER_SEED_AT = now/);
+  assert.doesNotMatch(top50,/async function coverSeed\(env, origin\) \{\n  if \(COVER_SEED\) return COVER_SEED;/);
+});
+
+test("Top 50 decorated responses are never edge-cached across artwork deployments",()=>{
+  assert.match(top50,/"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"/);
+  assert.match(top50,/"Cloudflare-CDN-Cache-Control": "no-store"/);
+  assert.doesNotMatch(top50,/s-maxage=3600/);
+});

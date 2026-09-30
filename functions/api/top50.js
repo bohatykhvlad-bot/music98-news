@@ -68,13 +68,23 @@ async function readSeed(env, origin, file) {
   try { return await getJson(String(origin || "") + path); } catch { return null; }
 }
 let COVER_SEED = null;
+let COVER_SEED_AT = 0;
 let NAME_SEED = null;
 let LOUDNESS_SEED = null;
+const COVER_SEED_TTL_MS = 30 * 1000;
 async function coverSeed(env, origin) {
-  if (COVER_SEED) return COVER_SEED;
+  const now = Date.now();
+  if (COVER_SEED && now - COVER_SEED_AT < COVER_SEED_TTL_MS) return COVER_SEED;
   const v = await readSeed(env, origin, "covers.json");
-  if (v && typeof v === "object" && Object.keys(v).length) COVER_SEED = v;
-  return v && typeof v === "object" ? v : {};
+  if (v && typeof v === "object" && Object.keys(v).length) {
+    COVER_SEED = v;
+    COVER_SEED_AT = now;
+    return COVER_SEED;
+  }
+  /* Keep the last verified registry on a transient asset read failure, but
+     never pin it for the lifetime of the Worker isolate. Artwork data is
+     deployed independently from the chart KV and must become visible quickly. */
+  return COVER_SEED || {};
 }
 async function nameSeed(env, origin) {
   if (NAME_SEED) return NAME_SEED;
@@ -777,7 +787,14 @@ function top50Response(payload) {
   return new Response(JSON.stringify(payload), {
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=300",
+      /* The ranking itself lives in KV, but artwork is a separately deployed
+         verified registry. Edge-caching the decorated response for an hour
+         made repaired covers stay missing after the registry had been fixed. */
+      "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+      "CDN-Cache-Control": "no-store",
+      "Cloudflare-CDN-Cache-Control": "no-store",
+      "Pragma": "no-cache",
+      "Expires": "0",
     },
   });
 }
