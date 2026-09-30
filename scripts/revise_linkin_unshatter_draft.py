@@ -8,7 +8,7 @@ import post as runner
 
 POST_ID = "auleon930r1"
 
-BODY = '''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a live record drawn from the concert featured in the band's new *UNSHATTER* film. Released September 25 through Warner Records, the album combines *FROM ZERO* material with songs from earlier albums.
+BODY = '''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a live record drawn from the concert featured in the band's new *UNSHATTER* film. Released September 25 through Warner Records, the album combines *FROM ZERO* material with songs from earlier releases.
 
 The soundtrack centers on the São Paulo performance featured in the film. Its 16 full songs place newer tracks including "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown" alongside "Somewhere I Belong," "The Catalyst," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint" and "Papercut." "Bleed It Out" closes the set.
 
