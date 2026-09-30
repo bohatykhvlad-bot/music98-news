@@ -348,3 +348,15 @@ test("artist events recover missing city coordinates for map markers and never a
 test("failed area loads clear stale event markers",()=>{
   assert.match(app,/catch\(err\)\{[\s\S]*nearbyEvents=\[\];[\s\S]*nearbyTotal=0;[\s\S]*setEventData\(\[\],0\)/);
 });
+
+
+test("Ticketmaster disclosure is aligned to the numeric rank glyph column",()=>{
+  assert.match(app,/\.disclosure\{margin-top:8px;padding:10px 4px 2px 17px;/);
+  assert.match(app,/\.tour-row\{[\s\S]*grid-template-columns:24px 48px minmax\(0,1fr\) 18px;[\s\S]*padding:7px 8px/);
+});
+
+test("expanded artist view shows one summary line, not a duplicate subtitle",()=>{
+  assert.doesNotMatch(app,/sideSub\.textContent="Upcoming concerts for "/);
+  assert.match(app,/sideSub\.textContent="";[\s\S]*setStatus\(result\.partial/);
+  assert.match(app,/events\.length\+" upcoming concerts · "\+item\.name/);
+});
