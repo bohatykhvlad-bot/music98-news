@@ -9,9 +9,9 @@ import post as runner
 POST_ID = "auleon930r1"
 # Final reviewed revision.
 
-EXCERPT = r'''The new live set pairs *FROM ZERO* material with "Numb," "In the End," "Faint" and other catalog staples from the band's São Paulo show.'''
+EXCERPT = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*.'''
 
-BODY = r'''LINKIN PARK have released a new live album from the São Paulo concert featured in their *UNSHATTER* film. Out September 25 through Warner Records, it mixes songs from *FROM ZERO* with material from across the band's catalog.
+BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. It mixes *FROM ZERO* songs with earlier material, giving the soundtrack a set list that spans several phases of LINKIN PARK's catalog.
 
 The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The live version of "Faint" was released ahead of the album with an official video from the same concert.
 
@@ -23,9 +23,7 @@ The older selections cover several parts of the band's catalog. "Somewhere I Bel
 
 The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums. The São Paulo set places the new lineup's material beside songs from earlier records instead of separating the two parts of the catalog.
 
-The physical editions use different track configurations. The CD has 20 tracks, including four short intro and interlude pieces placed between the 16 full performances. "Inception" opens the disc, "Creation" follows "The Emptiness Machine," "Break Collapse" comes before "Lost," and "Resolution" appears before "Papercut." The CD comes in a gatefold softpak with a 12-panel accordion booklet.
-
-The two-LP edition removes those four short pieces and keeps the 16 complete performances. It is housed in a gatefold jacket with a 12-by-24-inch insert. Both physical versions end with "Heavy Is the Crown" followed by "Bleed It Out."'''
+The physical editions use different track configurations. The CD has 20 tracks, including four short intro and interlude pieces placed between the 16 full performances. "Inception" opens the disc, "Creation" follows "The Emptiness Machine," "Break Collapse" comes before "Lost," and "Resolution" appears before "Papercut." The CD comes in a gatefold softpak with a 12-panel accordion booklet. The two-LP edition removes those four short pieces and keeps the 16 complete performances in a gatefold jacket with a 12-by-24-inch insert. Both physical versions end with "Heavy Is the Crown" followed by "Bleed It Out."'''
 
 def main():
     runner.load_env()
