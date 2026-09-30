@@ -24,18 +24,53 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 let hotspots=[];
 
 const compactWorldView=window.matchMedia("(max-width:700px)").matches;
-const map = new mapboxgl.Map({
-  container:root.querySelector("#map"),
-  style:"mapbox://styles/mapbox/light-v11",
-  projection:"mercator",
-  center:compactWorldView ? [5,18] : [8,27],
-  zoom:compactWorldView ? 0 : 1.55,
-  renderWorldCopies:false,
-  attributionControl:true
-});
-try{map.dragRotate.disable();}catch(e){}
-try{map.touchZoomRotate.disableRotation();}catch(e){}
-map.addControl(new mapboxgl.NavigationControl({showCompass:false}),"bottom-right");
+function createMapFallback(container){
+  const sources=new Map();
+  const noop=()=>{};
+  const fallback={
+    __fallback:true,
+    dragRotate:{disable:noop},
+    touchZoomRotate:{disableRotation:noop},
+    addControl:noop,resize:noop,flyTo:noop,easeTo:noop,fitBounds:noop,
+    addLayer:noop,setLayoutProperty:noop,setPaintProperty:noop,setLayerZoomRange:noop,
+    addImage:noop,hasImage:()=>false,getLayer:()=>null,getStyle:()=>({layers:[]}),
+    getZoom:()=>0,getCenter:()=>({lat:0,lng:0}),
+    project:()=>({x:0,y:0}),unproject:()=>({lat:0,lng:0}),
+    queryRenderedFeatures:()=>[],
+    getCanvas:()=>({style:{}}),
+    getContainer:()=>container,
+    addSource:(id)=>{
+      if(!sources.has(id)) sources.set(id,{setData:noop,getClusterExpansionZoom:async()=>0});
+    },
+    getSource:id=>sources.get(id)||null,
+    on:(event,layerOrHandler,maybeHandler)=>{
+      const handler=typeof layerOrHandler==="function" ? layerOrHandler : maybeHandler;
+      if(event==="load" && typeof handler==="function") queueMicrotask(handler);
+      return fallback;
+    }
+  };
+  return fallback;
+}
+let map;
+let mapInitError=null;
+try{
+  map=new mapboxgl.Map({
+    container:root.querySelector("#map"),
+    style:"mapbox://styles/mapbox/light-v11",
+    projection:"mercator",
+    center:compactWorldView ? [5,18] : [8,27],
+    zoom:compactWorldView ? 0 : 1.55,
+    renderWorldCopies:false,
+    attributionControl:true
+  });
+  try{map.dragRotate.disable();}catch(e){}
+  try{map.touchZoomRotate.disableRotation();}catch(e){}
+  map.addControl(new mapboxgl.NavigationControl({showCompass:false}),"bottom-right");
+}catch(err){
+  mapInitError=err;
+  console.error("Concert map unavailable",err);
+  map=createMapFallback(root.querySelector("#map"));
+}
 
 const $ = (s)=>root.querySelector(s);
 const toursEl=$("#tours"), sideEmpty=$("#sideEmpty");
