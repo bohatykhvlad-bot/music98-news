@@ -8,19 +8,19 @@ import post as runner
 
 POST_ID = "auleon930r1"
 
-BODY = '''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a live record drawn from the São Paulo concert featured in the band's new *UNSHATTER* film. Released September 25 through Warner Records, it pairs songs from *FROM ZERO* with material from across the band's catalog.
+BODY = '''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a live record drawn from the concert featured in the band's new *UNSHATTER* film. Released September 25 through Warner Records, the album combines *FROM ZERO* material with songs from earlier records.
 
-The soundtrack is built around the São Paulo performance featured in the film. Its 16 full songs move between newer tracks including "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown" and older material including "Somewhere I Belong," "The Catalyst," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint" and "Papercut." "Bleed It Out" closes the set.
+The soundtrack centers on the São Paulo performance featured in the film. Its 16 full songs move between newer tracks including "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown" and older material including "Somewhere I Belong," "The Catalyst," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint" and "Papercut." "Bleed It Out" closes the set.
 
 [youtube:zNYsw-cW8v8]
 
 The CD expands that sequence to 20 tracks with four short pieces placed between the performances. They are "Inception / Intro," "Creation / Interlude," "Break Collapse / Interlude" and "Resolution / Intro." The 2LP tracklist keeps the 16 full songs and omits those four pieces. The CD comes in a gatefold softpak with a 12-panel accordion booklet. The Citrus 2LP is housed in a gatefold jacket with a 12-by-24-inch insert.
 
-*UNSHATTER* traces the band's return from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The film combines archive footage, performances and interviews with the band and fans, covering the period in which Emily Armstrong and Colin Brittain joined LINKIN PARK after the group's seven-year hiatus.
+*UNSHATTER* traces the band's return from private studio sessions in 2022 through the making and release of *FROM ZERO* and the album-release show in Brazil. The film combines archive footage, performances and interviews with the band and fans, covering the period in which Emily Armstrong and Colin Brittain joined LINKIN PARK after the group's seven-year hiatus.
 
-The official store says the soundtrack also includes live recordings that are not heard in the film. The documentary follows the band's return and the making of *FROM ZERO*, while the soundtrack keeps its focus on the São Paulo concert.'''
+The band's official store says some live recordings on the soundtrack are not heard in the film. *UNSHATTER* opened in theaters worldwide on September 30 for a limited run.'''
 
-EXCERPT = "LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a live album drawn from the São Paulo concert featured in the band's new *UNSHATTER* film."
+EXCERPT = "LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a live record drawn from the concert featured in the band's new *UNSHATTER* film."
 
 def main():
     runner.load_env()
