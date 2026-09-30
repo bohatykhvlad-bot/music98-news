@@ -102,7 +102,7 @@ def html_bytes(url):
 
 def lp_photo():
     try:
-        return lp_photo()
+        return upload("linkin-park-unshatter-jimmy-fontaine.jpg",get(LP_PHOTO,"https://press.warnerrecords.com/linkinpark"))
     except Exception as direct:
         print("WARNER_DIRECT_BLOCKED",repr(direct))
     for page_url in LP_MIRRORS:
@@ -172,7 +172,7 @@ def main():
       "title":"UNSHATTER Film Soundtrack (Live in São Paulo)",
       "excerpt":"LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a 20-track live companion to the band's new documentary.",
       "body":LP_BODY,"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":upload("linkin-park-unshatter-jimmy-fontaine.jpg",get(LP_PHOTO,"https://press.warnerrecords.com/linkinpark")),"credit":"Jimmy Fontaine","creditUrl":"https://press.warnerrecords.com/linkinpark","pos":"50% 48%","zoom":1,"cardX":.5,"cardY":.48,"cardZoom":1.22}
+      "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://press.warnerrecords.com/linkinpark","pos":"50% 48%","zoom":1,"cardX":.5,"cardY":.48,"cardZoom":1.22}
     }
     write(LP_ID,lp)
     remove_leon()
