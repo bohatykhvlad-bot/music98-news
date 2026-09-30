@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 
 PHOTO_API="https://music98.news/api/photo"
+# Final pair sources rechecked 2026-09-30.
 LISA_ID="lisa26vegas"
 LP_ID="auleon930r1"
 OLD_LEON_ID="auleon930r1"
