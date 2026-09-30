@@ -1246,3 +1246,53 @@ test("market scan keeps internal accept/reject audit out of public API", async()
     assert.equal("coverageAudit" in data,false);
   }finally{globalThis.fetch=oldFetch;}
 });
+
+
+test("interactive events keep one primary ticket and exclude non-live rows", async()=>{
+  const kv=memoryKv(),oldFetch=globalThis.fetch,oldCaches=globalThis.caches;
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  const venue={name:"Columbiahalle",city:{name:"Berlin"},country:{name:"Germany",countryCode:"DE"},location:{latitude:"52.4849",longitude:"13.3917"}};
+  const attraction={id:"tove",name:"Tove Lo",images:[{url:"https://img.test/artist-small.jpg",width:305,height:225,ratio:"4_3",fallback:false}]};
+  const mk=(id,name,url,status="onsale",v=venue)=>({
+    id,name,url,test:false,dates:{status:{code:status},start:{localDate:"2026-11-14",localTime:"20:00:00"}},
+    images:[{url:"https://img.test/event-large.jpg",width:2048,height:1152,ratio:"16_9",fallback:false}],
+    _embedded:{attractions:[attraction],venues:[v]}
+  });
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(!u.pathname.endsWith("/events.json")) return new Response("not found",{status:404});
+    const rows=[
+      mk("std","Tove Lo","https://tickets.test/standard"),
+      mk("vip","Tove Lo - Signed First Entry Package","https://tickets.test/vip"),
+      mk("qa","QA Festival DO NOT PURCHASE","https://tickets.test/qa"),
+      mk("cancel","Cancelled Artist","https://tickets.test/cancel","cancelled"),
+      mk("post","Postponed Artist","https://tickets.test/post","postponed"),
+      mk("resched","Rescheduled Artist","https://tickets.test/rescheduled","rescheduled"),
+      mk("venue-test","QA Testing","https://tickets.test/venue-test","onsale",{...venue,name:"Ticketmaster"})
+    ];
+    return new Response(JSON.stringify({_embedded:{events:rows},page:{size:200,totalElements:rows.length,totalPages:1,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+  };
+  try{
+    const response=await onRequestGet({request:new Request("https://music98.news/api/concerts?city=Berlin&countryCode=DE"),env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}});
+    assert.equal(response.status,200);
+    const data=await response.json();
+    assert.equal(data.events.length,1);
+    const event=data.events[0];
+    assert.equal(event.artist,"Tove Lo");
+    assert.equal(event.url,"https://tickets.test/standard");
+    assert.equal(event.artistImage,"https://img.test/artist-small.jpg");
+    assert.equal(event.image,"https://img.test/event-large.jpg");
+    assert.equal(event.ticketOptions.length,2);
+    assert.ok(event.ticketOptions.some(x=>x.url==="https://tickets.test/vip"));
+  }finally{
+    globalThis.fetch=oldFetch;
+    globalThis.caches=oldCaches;
+  }
+});
+
+test("concert cache version bypasses event payloads created before hygiene filtering", async()=>{
+  const fs=await import("node:fs");
+  const src=fs.readFileSync(new URL("../functions/api/concerts.js",import.meta.url),"utf8");
+  assert.match(src,/__cachev","concerts-global-v21"/);
+  assert.match(src,/sanitizeNormalizedEvents\(prewarmed\.events\)/);
+});
