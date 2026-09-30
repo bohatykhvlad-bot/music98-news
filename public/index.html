@@ -116,7 +116,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
    envelope is symmetric 11/11 and 19/18): cap-height words concentrate mass
    above the midline, so the eye wants a hair more air on top. Nudge the text
    node itself down half a pixel - layout, capsule and hit-area untouched: */
-.nav-btn{position:relative;top:.5px}
+.nav-btn{position:relative;top:0}
 /* optical, mechanism not numbers: trim-both cap alphabetic shrinks the text
    box to the real ink (cap top .. baseline) so flex centering centers the
    LETTERS on every OS/rasterizer - owner measured ink 1.1px high on Windows.
@@ -3818,6 +3818,6 @@ const initialCleanPath=location.pathname.replace(/\/+$/,"")||"/";
 if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260930-26" defer></script>
+<script src="/concerts-app.js?v=20260930-27" defer></script>
 </body>
 </html>
