@@ -1542,3 +1542,128 @@ test("real Ticketmaster event without venue coordinates remains a valid upcoming
   }
 });
 
+
+
+test("Popular uses real event payloads even when attraction upcomingEvents is zero", async () => {
+  const kv=memoryKv();
+  const rows=Array.from({length:35},(_,i)=>{
+    const name=i===3?"The Weeknd":"Artist "+(i+1);
+    return "<tr><td>"+(i+1)+"</td><td>"+name+"</td><td>"+(120000000-i*1000)+"</td></tr>";
+  }).join("");
+  const oldFetch=globalThis.fetch;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net") return new Response("<table>"+rows+"</table>",{status:200});
+    if(u.pathname.endsWith("/attractions.json")){
+      const name=u.searchParams.get("keyword")||"";
+      const key=normTestName(name);
+      const id=key==="the weeknd"?"weeknd":"id-"+key.replace(/\s+/g,"-");
+      return new Response(JSON.stringify({_embedded:{attractions:[{
+        id,name,images:[],classifications:[{segment:{name:"Music"}}],upcomingEvents:{_total:0}
+      }]}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    if(u.pathname.endsWith("/events.json")){
+      const attractionId=u.searchParams.get("attractionId")||"";
+      const keyword=u.searchParams.get("keyword")||"";
+      const isWeeknd=attractionId==="weeknd" || normTestName(keyword)==="the weeknd";
+      let artistName,artistId;
+      if(isWeeknd){ artistName="The Weeknd"; artistId="weeknd"; }
+      else if(attractionId.startsWith("id-")){
+        artistName=attractionId.slice(3).split("-").map(x=>x[0]?.toUpperCase()+x.slice(1)).join(" ");
+        artistId=attractionId;
+      }else{
+        artistName=keyword; artistId="kw-"+normTestName(keyword).replace(/\s+/g,"-");
+      }
+      return new Response(JSON.stringify({_embedded:{events:[{
+        id:"event-"+artistId,name:artistName+" Live",url:"https://example.com/"+artistId,
+        dates:{start:{dateTime:"2026-12-01T20:00:00Z",localDate:"2026-12-01",localTime:"20:00:00"}},
+        _embedded:{attractions:[{id:artistId,name:artistName,images:[]}],venues:[{id:"v",name:"Venue",city:{name:isWeeknd?"Singapore":"Paris"},country:{countryCode:isWeeknd?"SG":"FR"}}]},
+        images:[]
+      }]},page:{totalElements:1,totalPages:1,size:200,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+  try{
+    const env={TICKETMASTER_API_KEY:"test",DESK:kv};
+    for(let i=0;i<4;i++) await refreshPopularSnapshot(env,i===0);
+    const raw=kv.raw("concert-popular:v4")||kv.raw("concert-popular:v4:state");
+    const parsed=JSON.parse(raw);
+    const list=parsed.artists||parsed.found||[];
+    const weeknd=list.find(x=>x.name==="The Weeknd");
+    assert.ok(weeknd);
+    assert.equal(weeknd.id,"weeknd");
+    assert.equal(weeknd.eventConfirmed,true);
+    assert.equal(weeknd.shows,1);
+  }finally{globalThis.fetch=oldFetch;}
+});
+
+test("Popular tries duplicate exact attraction identities before rejecting a ranked artist", async () => {
+  const kv=memoryKv(),oldFetch=globalThis.fetch;
+  let eventCalls=[];
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net"){
+      const rows=Array.from({length:35},(_,i)=>"<tr><td>"+(i+1)+"</td><td>Artist "+(i+1)+"</td><td>"+(100000000-i)+"</td></tr>").join("");
+      return new Response("<table>"+rows+"</table>",{status:200});
+    }
+    if(u.pathname.endsWith("/attractions.json")){
+      const name=u.searchParams.get("keyword")||"";
+      const n=Number(name.replace(/[^0-9]/g,""))||1;
+      const attractions=n===1?[
+        {id:"stale-1",name,images:[],classifications:[{segment:{name:"Music"}}],upcomingEvents:{_total:10}},
+        {id:"live-1",name,images:[],classifications:[{segment:{name:"Music"}}],upcomingEvents:{_total:0}}
+      ]:[{id:"artist-"+n,name,images:[],classifications:[{segment:{name:"Music"}}]}];
+      return new Response(JSON.stringify({_embedded:{attractions}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    if(u.pathname.endsWith("/events.json")){
+      const id=u.searchParams.get("attractionId")||"";
+      eventCalls.push(id||("keyword:"+u.searchParams.get("keyword")));
+      if(id==="stale-1") return new Response(JSON.stringify({page:{totalElements:0,totalPages:0,size:200,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+      const n=Number(id.replace(/[^0-9]/g,""))||1;
+      const artistName=id==="live-1"?"Artist 1":"Artist "+n;
+      return new Response(JSON.stringify({_embedded:{events:[{
+        id:"event-"+id,name:artistName+" Live",url:"https://example.com/"+id,
+        dates:{start:{dateTime:"2026-12-01T20:00:00Z",localDate:"2026-12-01",localTime:"20:00:00"}},
+        _embedded:{attractions:[{id,name:artistName,images:[]}],venues:[{id:"v",name:"Venue",city:{name:"Paris"},country:{countryCode:"FR"}}]},images:[]
+      }]},page:{totalElements:1,totalPages:1,size:200,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+  try{
+    await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv},true);
+    const state=JSON.parse(kv.raw("concert-popular:v4:state"));
+    const first=state.found.find(x=>x.name==="Artist 1");
+    assert.ok(first);
+    assert.equal(first.id,"live-1");
+    assert.ok(eventCalls.includes("stale-1"));
+    assert.ok(eventCalls.includes("live-1"));
+  }finally{globalThis.fetch=oldFetch;}
+});
+
+test("public Popular rejects snapshots built by an old validation algorithm", async () => {
+  const kv=memoryKv();
+  const artists=Array.from({length:30},(_,i)=>({id:"a"+i,name:"Artist "+i,rank:i+1,popularityRank:i+1,shows:1,eventConfirmed:true}));
+  await kv.put("concert-popular:v4",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-cache-v1",
+    builtAt:new Date().toISOString(),artists,eligibility:"ticketmaster_event_payload_gt_0",targetCount:30
+  }));
+  const response=await onRequestGet({
+    request:new Request("https://music98.news/api/concerts?mode=popular&v=popular-v10"),
+    env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}
+  });
+  const data=await response.json();
+  assert.equal(data.algorithm,"rank-ordered-event-query-v2");
+  assert.equal(data.warming,true);
+  assert.deepEqual(data.artists,[]);
+});
+
+test("date-only normalized events expire by local date fallback", async () => {
+  const fs=await import("node:fs");
+  const src=fs.readFileSync(new URL("../functions/api/concerts.js",import.meta.url),"utf8");
+  assert.match(src,/const date=String\(e\?\.date\|\|""\)\.trim\(\)/);
+  assert.match(src,/return date>=today/);
+});
+
+function normTestName(s){
+  return String(s||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/&/g,"and").replace(/[^a-z0-9]+/gi," ").trim().toLowerCase();
+}

@@ -156,12 +156,14 @@ test("Popular warming state polls only the precomputed KV snapshot",()=>{
   assert.match(app,/function schedulePopularWarmRetry\(\)/);
   assert.match(app,/loadPopular\(true\)/);
   assert.match(app,/if\(data\?\.warming\) schedulePopularWarmRetry\(\)/);
+  assert.match(app,/POPULAR_ALGORITHM="rank-ordered-event-query-v2"/);
+  assert.match(app,/mode:"popular",v:"popular-v10"/);
 });
 
 
 test("map mode toggle has no duplicate outer capsule and no resting compositor transform",()=>{
   assert.match(app,/\.map-mode-switch\{[^}]*border:0;[^}]*background:transparent;box-shadow:none/);
-  assert.match(app,/\.map-mode-btn\{[^}]*border:1px solid var\(--line\);[^}]*background-color:transparent/);
+  assert.match(app,/\.map-mode-btn\{[^}]*border:1px solid var\(--line\);[^}]*background-color:#fff/);
   assert.match(app,/\.map-mode-btn\.active\{background-color:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
   assert.match(app,/\.map-mode-btn:active\{transform:none\}/);
   assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab,\.map-mode-btn\{/);
@@ -180,7 +182,7 @@ test("map interface pills stay on the normal text raster in their resting state"
 
 test("inactive map toggles use the shared gray hover highlight",()=>{
   assert.match(app,/\.side-tab:hover:not\(\.active\)\{background:var\(--bg2\);color:var\(--text\)\}/);
-  assert.match(app,/\.map-mode-btn\{[^}]*background-color:transparent/);
+  assert.match(app,/\.map-mode-btn\{[^}]*background-color:#fff/);
   assert.match(app,/\.map-mode-btn:hover:not\(\.active\)\{background-color:var\(--bg2\);color:var\(--text\)\}/);
   assert.match(app,/\.side-tab\.active\{background:var\(--accent\);color:#03282b\}/);
   assert.match(app,/\.map-mode-btn\.active\{background-color:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);

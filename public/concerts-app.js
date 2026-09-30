@@ -1174,12 +1174,14 @@ function mergeHotspots(rows){
   return [...byKey.values()].sort((a,b)=>Number(b.count||0)-Number(a.count||0)||String(a.city||"").localeCompare(String(b.city||"")));
 }
 
-const POPULAR_CACHE_KEY="music98:concert-popular:v9";
+const POPULAR_ALGORITHM="rank-ordered-event-query-v2";
+const POPULAR_CACHE_KEY="music98:concert-popular:v10";
 function readPopularCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(POPULAR_CACHE_KEY)||"null");
     const age=Date.now()-(Date.parse(cached?.builtAt||0)||0);
     if(cached?.version==="popular-v4" &&
+       cached?.algorithm===POPULAR_ALGORITHM &&
        cached?.eligibility==="ticketmaster_event_payload_gt_0" &&
        Array.isArray(cached.artists) &&
        cached.artists.length>=30 &&
@@ -1191,6 +1193,7 @@ function readPopularCache(){
 function writePopularCache(data){
   if(data?.stale ||
      data?.version!=="popular-v4" ||
+     data?.algorithm!==POPULAR_ALGORITHM ||
      data?.eligibility!=="ticketmaster_event_payload_gt_0" ||
      !Array.isArray(data.artists) ||
      data.artists.length<30 ||
@@ -1271,8 +1274,8 @@ async function loadPopular(force=false){
   }
 
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v9"});
-    if(Array.isArray(data.artists) && data.artists.length>=30){
+    const data=await getPayload({mode:"popular",v:"popular-v10"});
+    if(data?.algorithm===POPULAR_ALGORITHM && Array.isArray(data.artists) && data.artists.length>=30){
       popularArtists=data.artists.slice(0,30);
     }
     popularEvents=[];

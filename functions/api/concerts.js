@@ -303,10 +303,16 @@ function normalizedEventIsBlocked(e) {
 }
 function normalizedEventIsUpcoming(e,now=Date.now()) {
   const dateTime=String(e?.dateTime||"").trim();
-  if(!dateTime) return true;
-  const start=Date.parse(dateTime);
-  if(!Number.isFinite(start)) return true;
-  return start>=now;
+  if(dateTime){
+    const start=Date.parse(dateTime);
+    if(Number.isFinite(start)) return start>=now;
+  }
+  const date=String(e?.date||"").trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(date)){
+    const today=new Date(now).toISOString().slice(0,10);
+    return date>=today;
+  }
+  return true;
 }
 function sanitizeNormalizedEvents(events) {
   const now=Date.now();
@@ -624,8 +630,38 @@ function attractionIsMusic(attraction){
   if(!classifications.length) return true;
   return classifications.some(x=>normName(x?.segment?.name)==="music");
 }
+async function popularValidationEventsForAttraction(env, attractionId) {
+  const eventsUrl = baseEventUrl(env.TICKETMASTER_API_KEY);
+  eventsUrl.searchParams.set("attractionId", String(attractionId));
+  eventsUrl.searchParams.set("size", "200");
+  eventsUrl.searchParams.set("sort", "date,asc");
+  eventsUrl.searchParams.set("locale", "en-us,en,*");
+  const eventsRaw = await tmJson(eventsUrl, env, "scheduled");
+  const events = eventsRaw?._embedded?.events || [];
+  const rawTotal = Number(eventsRaw?.page?.totalElements ?? events.length) || 0;
+  return {eventsRaw,rawTotal,normalizedEvents:normalizeEvents(events)};
+}
+
+async function popularValidationKeywordFallback(env,name,wanted){
+  const eventsUrl=baseEventUrl(env.TICKETMASTER_API_KEY);
+  eventsUrl.searchParams.set("keyword",name);
+  eventsUrl.searchParams.set("size","200");
+  eventsUrl.searchParams.set("sort","date,asc");
+  eventsUrl.searchParams.set("locale","en-us,en,*");
+  const eventsRaw=await tmJson(eventsUrl,env,"scheduled");
+  const rawEvents=eventsRaw?._embedded?.events||[];
+  const matchingRaw=rawEvents.filter(e=>
+    (Array.isArray(e?._embedded?.attractions)?e._embedded.attractions:[])
+      .some(a=>normName(a?.name)===wanted)
+  );
+  const normalizedEvents=normalizeEvents(matchingRaw);
+  const exactEventAttraction=matchingRaw
+    .flatMap(e=>Array.isArray(e?._embedded?.attractions)?e._embedded.attractions:[])
+    .find(a=>normName(a?.name)===wanted);
+  return {eventsRaw,rawTotal:normalizedEvents.length,normalizedEvents,exactEventAttraction};
+}
+
 async function validatePopularArtist(env, name, popularityRank, listeners) {
-  // First resolve the exact Ticketmaster attraction identity.
   const tm = new URL(TM_ATTRACTIONS_ROOT);
   tm.searchParams.set("apikey", env.TICKETMASTER_API_KEY);
   tm.searchParams.set("keyword", name);
@@ -635,49 +671,60 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
   const raw = await tmJson(tm, env, "scheduled");
   const wanted = normName(name);
   const attractions = raw?._embedded?.attractions || [];
-  const exact = attractions.find(a=>
-    normName(a?.name)===wanted &&
-    attractionIsMusic(a) &&
-    attractionUpcomingTotal(a)>0
-  );
-  if(!exact?.id) return null;
+  const exactMatches = attractions
+    .filter(a=>normName(a?.name)===wanted && attractionIsMusic(a) && a?.id)
+    .sort((a,b)=>attractionUpcomingTotal(b)-attractionUpcomingTotal(a));
 
-  // Do not trust attraction.upcomingEvents by itself: Ticketmaster can expose
-  // a positive counter while the actual Discovery events endpoint has no
-  // currently returned event for that attraction. The public Top 30 must only
-  // contain artists for whom a real upcoming event payload exists.
-  const eventsUrl = baseEventUrl(env.TICKETMASTER_API_KEY);
-  eventsUrl.searchParams.set("attractionId", String(exact.id));
-  // Fetch a useful first page while validating. This is the same Ticketmaster
-  // request we already spend for validation, but it also seeds the click cache
-  // so opening a Popular artist does not immediately need another live request.
-  eventsUrl.searchParams.set("size", "200");
-  eventsUrl.searchParams.set("sort", "date,asc");
-  eventsUrl.searchParams.set("locale", "en-us,en,*");
-  const eventsRaw = await tmJson(eventsUrl, env, "scheduled");
-  const events = eventsRaw?._embedded?.events || [];
-  const rawTotal = Number(eventsRaw?.page?.totalElements ?? events.length) || 0;
-  const normalizedEvents=normalizeEvents(events);
-  if(!normalizedEvents.length) return null;
+  let exact=null;
+  let eventsRaw=null;
+  let normalizedEvents=[];
+  let rawTotal=0;
+  let evidence="";
+
+  for(const candidate of exactMatches.slice(0,3)){
+    const result=await popularValidationEventsForAttraction(env,candidate.id);
+    if(!result.normalizedEvents.length) continue;
+    exact=candidate;
+    eventsRaw=result.eventsRaw;
+    normalizedEvents=result.normalizedEvents;
+    rawTotal=result.rawTotal;
+    evidence="popular_validation_attraction_events";
+    break;
+  }
+
+  if(!normalizedEvents.length){
+    const fallback=await popularValidationKeywordFallback(env,name,wanted);
+    if(fallback.normalizedEvents.length && fallback.exactEventAttraction?.id){
+      exact=fallback.exactEventAttraction;
+      eventsRaw=fallback.eventsRaw;
+      normalizedEvents=fallback.normalizedEvents;
+      rawTotal=fallback.rawTotal;
+      evidence="popular_validation_keyword_events";
+    }
+  }
+
+  if(!exact?.id || !normalizedEvents.length) return null;
 
   const first=normalizedEvents[0];
   const builtAt=new Date().toISOString();
   await kvPutJson(env,popularTourCacheKey(exact.id),{
     ok:true,
     events:normalizedEvents,
-    page:eventsRaw?.page||{size:normalizedEvents.length,totalElements:rawTotal,totalPages:1,number:0},
-    partial:normalizedEvents.length<rawTotal,
+    page:evidence==="popular_validation_keyword_events"
+      ? {size:normalizedEvents.length,totalElements:normalizedEvents.length,totalPages:1,number:0}
+      : (eventsRaw?.page||{size:normalizedEvents.length,totalElements:rawTotal,totalPages:1,number:0}),
+    partial:evidence==="popular_validation_keyword_events" ? false : normalizedEvents.length<rawTotal,
     pagesFetched:1,
     query:{attractionId:String(exact.id)},
     builtAt,
     artistId:String(exact.id),
-    evidence:"popular_validation_first_page"
+    evidence
   },{expirationTtl:36*60*60}).catch(()=>{});
 
   return {
     id:String(exact.id),
     name:String(exact.name||name),
-    image:bestArtistImage(exact.images),
+    image:bestArtistImage(exact.images) || String(first?.artistImage||first?.image||""),
     popularityRank,
     listeners,
     shows:normalizedEvents.length,
@@ -719,7 +766,7 @@ async function kvDelete(env,key){
   try{await env.DESK.delete(key);}catch(e){}
 }
 
-const POPULAR_BUILD_ALGORITHM="rank-ordered-cache-v1";
+const POPULAR_BUILD_ALGORITHM="rank-ordered-event-query-v2";
 function newPopularBuildState(ranking,now=Date.now()){
   return {
     version:"popular-v4",
@@ -1341,6 +1388,7 @@ async function popularSnapshotPayload(env) {
     : [];
 
   const published=snapshot?.version==="popular-v4" &&
+    snapshot?.algorithm===POPULAR_BUILD_ALGORITHM &&
     snapshot?.eligibility==="ticketmaster_event_payload_gt_0"
       ? strict(snapshot.artists)
       : [];
@@ -1362,10 +1410,11 @@ async function popularSnapshotPayload(env) {
     };
   }
 
-  const validated=state?.version==="popular-v4" ? strict(state.found).length : 0;
+  const validated=state?.version==="popular-v4" && state?.algorithm===POPULAR_BUILD_ALGORITHM ? strict(state.found).length : 0;
   return {
     ok:true,mode:"popular",version:"popular-v4",builtAt:"",
     artists:[],source:"scheduled",ranking:"Spotify monthly listeners",
+    algorithm:POPULAR_BUILD_ALGORITHM,
     eligibility:"ticketmaster_event_payload_gt_0",
     targetCount:POPULAR_LIMIT,validatedCount:validated,stale:false,warming:true
   };

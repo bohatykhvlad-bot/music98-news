@@ -79,7 +79,7 @@ jobs:
           for attempt in range(12):
               try:
                   markets=get("markets","concert-markets-v7")
-                  popular=get("popular","popular-v9")
+                  popular=get("popular","popular-v10")
                   countries={str(x.get("countryCode","")).upper() for x in markets.get("markets",[])}
                   world_ok=(
                       markets.get("version")=="concert-markets-v4"
@@ -89,7 +89,8 @@ jobs:
                   )
                   artists=popular.get("artists") or []
                   popular_ok=(
-                      len(artists)==30
+                      popular.get("algorithm")=="rank-ordered-event-query-v2"
+                      and len(artists)==30
                       and all(a.get("eventConfirmed") is True and int(a.get("shows") or 0)>0 for a in artists)
                   )
                   last={
@@ -99,6 +100,8 @@ jobs:
                       "countries":sorted(countries),
                       "popularCount":len(artists),
                       "popularWarming":popular.get("warming"),
+                      "popularAlgorithm":popular.get("algorithm"),
+                      "popularNames":[a.get("name") for a in artists],
                   }
                   print("LIVE_CHECK",json.dumps(last,ensure_ascii=False))
                   if world_ok and popular_ok:

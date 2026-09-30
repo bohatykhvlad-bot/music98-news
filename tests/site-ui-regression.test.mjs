@@ -13,7 +13,8 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/Math\.round\(advance\/2-inkCenter\)/);
   assert.match(page,/@media \(hover:hover\) and \(pointer:fine\)\{[\s\S]*?\.nav-btn:hover:not\(\.active\)\{background:var\(--bg2\);color:var\(--text\)\}/);
   assert.doesNotMatch(page,/\.nav-btn:active\{[^}]*transform:/);
-  assert.match(page,/\.nav-btn\{position:relative;top:\.5px\}/);
+  assert.match(page,/\.nav\{[^}]*height:40px;[^}]*padding:3px/);
+  assert.match(page,/\.nav-btn\{position:relative;top:0\}/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav-btn\{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0\}/);
 });
@@ -34,7 +35,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260930-26/);
+  assert.match(page,/concerts-app\.js\?v=20260930-30/);
 });
 
 
