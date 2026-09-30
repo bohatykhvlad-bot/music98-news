@@ -160,6 +160,8 @@ VERIFIED_DATES = {
     "october 23": "LISA EP 'PRESS PLAY', 23.10.2026",
     "november": "LISA residency at Caesars Palace, November 2026",
     "november 12": "Newly added VIVA LA LISA show at The Colosseum at Caesars Palace, 12.11.2026 (Caesars Entertainment 29.09.2026)",
+    "november 13": "Original VIVA LA LISA show at The Colosseum at Caesars Palace, 13.11.2026 (Caesars Entertainment 30.03.2026)",
+    "november 27": "Original VIVA LA LISA show at The Colosseum at Caesars Palace, 27.11.2026 (Caesars Entertainment 30.03.2026)",
     "november 29": "Newly added VIVA LA LISA show at The Colosseum at Caesars Palace, 29.11.2026 (Caesars Entertainment 29.09.2026)",
     "september 25": "Taylor Swift 'Patient Zero' single out 25.09.2026 (Republic; AP/Variety/JustJared); "
                      "pre-order open 24h, three collector's edition CDs with double-sided covers (People)",
