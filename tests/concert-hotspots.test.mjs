@@ -1240,6 +1240,7 @@ test("market scan keeps internal accept/reject audit out of public API", async()
     assert.ok(state.coverageAudit.some(x=>x.label==="AU-Brisbane"&&x.reason==="missing_candidate_seed"));
     assert.ok(state.coverageAudit.some(x=>x.label==="AU-Perth"&&x.reason==="missing_candidate_seed"));
     assert.ok(state.coverageAudit.some(x=>x.label==="CA-AB"&&x.reason==="missing_candidate_seed"));
+    assert.ok(state.coverageAudit.some(x=>x.label==="CA-ON"&&x.reason==="candidate_present_without_state_code"));
     const response=await onRequestGet({request:new Request("https://music98.news/api/concerts?mode=markets"),env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}});
     const data=await response.json();
     assert.equal("audit" in data,false);
