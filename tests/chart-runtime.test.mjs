@@ -20,3 +20,20 @@ test("server Apple fallback keeps lead artist and never retries title-only",()=>
   assert.match(top50,/extra = await grab\(t\.title, lead\)/);
   assert.doesNotMatch(top50,/grab\(t\.title, ""\)/);
 });
+
+
+test("current-day cached chart self-heals missing artwork without changing ranking",()=>{
+  assert.match(top50,/async function healMissingArtwork\(env, tracks, origin\)/);
+  assert.match(top50,/await enrichArtByIds\(tracks\)/);
+  assert.match(top50,/const stillMissing = tracks\.filter\(\(t\) => !t\.art\)/);
+  assert.match(top50,/await enrichApple\(stillMissing\)/);
+  assert.match(top50,/runtimeFilled: healed\.filled/);
+  assert.doesNotMatch(top50,/healMissingArtwork[\s\S]{0,900}sort\(/);
+});
+
+test("exact Apple IDs may restore complete feature credits only when merge identity is unchanged",()=>{
+  assert.match(top50,/function applyAppleCanonicalIdentity\(track, title, artist\)/);
+  assert.match(top50,/mergeKey\(nextTitle, nextArtist\) !== mergeKey\(track\.title, track\.artist\)/);
+  assert.match(top50,/appleCandidateCompatible\(t\.title, t\.artist, item\)/);
+  assert.match(top50,/await enrichArtByIds\(tracks, coverStats\);\/\* URL мог появиться/);
+});
