@@ -21,19 +21,19 @@ BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Pa
 
 The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added performances began September 30 through Ticketmaster, while the four dates announced in March remain in place. Caesars Entertainment says the run makes LISA the first K-pop artist to hold a Las Vegas residency.
 
-The Colosseum is a 4,300-seat theater inside Caesars Palace. Keeping the production there means the expansion adds capacity by extending both weekends instead of moving the residency into a larger room. The first weekend gains a Thursday performance, while the second gains a Sunday date.
+The Colosseum is a 4,300-seat theater inside Caesars Palace. The added dates keep the same venue and production instead of moving the residency into a larger room.
 
 The additional shows arrive ahead of *PRESS PLAY*, LISA's six-track EP due October 23 through LLOUD Co. and RCA Records. Its lead single, "SaWaDiKa," was produced by Thom Bridges and Ojivolta. The video was directed by Bang Jae Yeob and filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours.
 
 [youtube:FMX98ROVRCE]
 
-LISA gave "SaWaDiKa" its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, "Dream feat. Kentaro Sakaguchi" won Best Pop. The timing places the Las Vegas shows less than a month after *PRESS PLAY*, giving the residency a fresh set of solo material alongside songs released during the *Alter Ego* period.
+LISA gave "SaWaDiKa" its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, "Dream feat. Kentaro Sakaguchi" won Best Pop. The residency begins three weeks after *PRESS PLAY* is released, so the EP will already be available before the first Las Vegas performance.
 
 Her first solo album, *Alter Ego*, reached No. 1 on the Top Album Sales chart and No. 7 on the Billboard 200, figures cited by Caesars when the residency was announced in March. That announcement also followed BLACKPINK's sold-out DEADLINE World Tour. The September update keeps the residency in Las Vegas and does not add any other cities or venues.
 
 [tickets:__TICKET__]
 
-The first weekend now runs Thursday through Saturday, and the second runs Friday through Sunday. All six performances remain at the same theater, with the two extra nights extending the original schedule rather than changing the format of VIVA LA LISA."""
+The final schedule spans six nights across two November weekends, all at the same theater. The September 29 update did not add another city or venue. VIVA LA LISA remains a Las Vegas residency, not a tour extension."""
 
 AI_STYLE_FLAGS = ("marks a new chapter","comes at a time","not only","rather than simply","serves as a","underscores","showcases","the announcement lands")
 
