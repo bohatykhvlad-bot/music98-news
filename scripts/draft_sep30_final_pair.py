@@ -13,6 +13,7 @@ LP_ID="auleon930r1"
 OLD_LEON_ID="auleon930r1"
 LISA_PHOTO="https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/styles/artist_detail/public/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg?itok=IxzVedtC"
+LISA_FILESTACK_ORIGINAL="https://cdn.filestackcontent.com/R6COV2mESXGIYm9c5pBc"
 LISA_MIRRORS=[
     "https://ca.rollingstone.com/music/lisa-sawadika-single-press-play-ep/",
     "https://www.bandwagon.asia/articles/blackpink-s-lisa-returns-to-bangkok-for-vibrant-sawadika-music-video-watch",
@@ -101,6 +102,14 @@ def lisa_photo():
         return upload("lisa-sawadika-yeyoung-choi.jpg",get(LISA_PHOTO,"https://www.sonymusic.es/actualidad/lisa-sawadika-nuevo-single-adelanto-ep-press-play/"))
     except Exception as direct:
         print("LISA_SONY_DIRECT_BLOCKED",repr(direct))
+    try:
+        raw=get(LISA_FILESTACK_ORIGINAL,"https://www.bandwagon.asia/")
+        with Image.open(io.BytesIO(raw)) as probe:
+            print("LISA_FILESTACK_QC",probe.size,probe.format)
+            if max(probe.size)>=1920:
+                return upload("lisa-sawadika-yeyoung-choi.jpg",raw)
+    except Exception as e:
+        print("LISA_FILESTACK_FAIL",repr(e))
     for page_url in LISA_MIRRORS:
         try:
             page=html_bytes(page_url).decode("utf-8","replace")
