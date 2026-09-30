@@ -13,7 +13,8 @@ LP_ID="auleon930r1"
 OLD_LEON_ID="auleon930r1"
 LISA_PHOTO="https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/styles/artist_detail/public/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg?itok=IxzVedtC"
-LISA_MIRROR_PAGE="https://deepcut.gr/lisa-sawadika/91638/"\nLP_MIRRORS=["https://www.visions.de/news/linkin-park-eroeffnungsauftritt-beim-uefa-champions-league-finale/","https://www.musikexpress.de/linkin-park-neue-single-unshatter-ist-da-3013217/"]
+LISA_MIRROR_PAGE="https://deepcut.gr/lisa-sawadika/91638/"
+LP_MIRRORS=["https://www.visions.de/news/linkin-park-eroeffnungsauftritt-beim-uefa-champions-league-finale/","https://www.musikexpress.de/linkin-park-neue-single-unshatter-ist-da-3013217/"]
 
 LISA_BODY='''LISA has added two shows to VIVA LA LISA at The Colosseum at Caesars Palace, taking the November residency from four dates to six. The new performances are November 12 and 29. They join the previously announced shows on November 13, 14, 27 and 28. Caesars says the original four dates sold out in under 10 minutes.
 
