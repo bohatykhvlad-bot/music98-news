@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import base64, copy, io, json, sys, time, urllib.request, http.cookiejar
+import base64, copy, io, json, sys, time, urllib.request, http.cookiejar, re, html
 from pathlib import Path
 from PIL import Image
 import gdown
@@ -13,6 +13,7 @@ LP_ID="aulp930r1"
 OLD_LEON_ID="auleon930r1"
 LISA_PHOTO="https://s202.q4cdn.com/508919455/files/content_files/Static_Social-Instagram_1080x1080_Lisa_2026_Regional_TheColosseumatCaesarsPalace_1101_V2-20-41-27.jpg"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/styles/artist_detail/public/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg?itok=IxzVedtC"
+LP_MIRRORS=["https://www.visions.de/news/linkin-park-eroeffnungsauftritt-beim-uefa-champions-league-finale/","https://www.musikexpress.de/linkin-park-neue-single-unshatter-ist-da-3013217/"]
 
 LISA_BODY='''LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six. The new performances are scheduled for November 12 and 29, joining previously announced shows on November 13, 14, 27 and 28. Caesars says the original four dates sold out in under 10 minutes, and general sale for the two added performances begins September 30.
 
@@ -94,6 +95,33 @@ def upload(name, raw, min_px=1920):
 
 def lisa_photo():
     return upload("lisa-viva-la-lisa-caesars-2026.jpg",get(LISA_PHOTO,"https://newsroom.caesars.com/"),1080)
+
+def html_bytes(url):
+    req=urllib.request.Request(url,headers={"User-Agent":runner.UA,"Accept":"text/html,application/xhtml+xml"})
+    with urllib.request.urlopen(req,timeout=45) as r: return r.read()
+
+def lp_photo():
+    try:
+        return lp_photo()
+    except Exception as direct:
+        print("WARNER_DIRECT_BLOCKED",repr(direct))
+    for page_url in LP_MIRRORS:
+        try:
+            page=html_bytes(page_url).decode("utf-8","replace")
+            m=re.search(r'<meta[^>]+(?:property|name)=["\']og:image["\'][^>]+content=["\']([^"\']+)',page,re.I)
+            if not m:
+                m=re.search(r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\']og:image["\']',page,re.I)
+            if not m: continue
+            img=html.unescape(m.group(1))
+            raw=get(img,page_url)
+            with Image.open(io.BytesIO(raw)) as probe:
+                print("LP_MIRROR_QC",page_url,img,probe.size,probe.format)
+                if max(probe.size)<1920:
+                    continue
+            return upload("linkin-park-unshatter-jimmy-fontaine.jpg",raw)
+        except Exception as e:
+            print("LP_MIRROR_FAIL",page_url,repr(e))
+    raise RuntimeError("no >=1920 Jimmy Fontaine press mirror available")
 
 def ticket_url():
     d=json.loads(get("https://music98.news/api/concerts?artist=LISA&nocache="+str(time.time_ns())))
