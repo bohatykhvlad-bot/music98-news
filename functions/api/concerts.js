@@ -271,8 +271,29 @@ function collapseDuplicateEvents(events) {
   }
   return order.map(key=>byKey.get(key));
 }
+function normalizedEventIsBlocked(e) {
+  const status=String(e?.status||"").trim().toLowerCase();
+  if(["cancelled","canceled","postponed","rescheduled"].includes(status)) return true;
+  const name=String(e?.name||"");
+  const venue=String(e?.venue||"");
+  const qaText=name.toLowerCase();
+  return /do\s+not\s+purchase/i.test(qaText) ||
+    /\bqa\b[^\n]{0,40}\b(?:test|testing|festival)\b/i.test(qaText) ||
+    /\b(?:test|testing)\b[^\n]{0,30}\b(?:event|festival)\b/i.test(qaText) ||
+    venue.trim().toLowerCase()==="ticketmaster";
+}
+function sanitizeNormalizedEvents(events) {
+  return collapseDuplicateEvents((Array.isArray(events)?events:[])
+    .filter(e=>e && !normalizedEventIsBlocked(e))
+    .map(e=>({
+      ...e,
+      ticketOptions:Array.isArray(e.ticketOptions)&&e.ticketOptions.length
+        ? e.ticketOptions
+        : (e.url?[{url:String(e.url),name:String(e.name||"Ticket"),eventId:String(e.id||"")}]:[])
+    })));
+}
 function normalizeEvents(events) {
-  return collapseDuplicateEvents((Array.isArray(events)?events:[]).map(normalizeEvent).filter(Boolean));
+  return sanitizeNormalizedEvents((Array.isArray(events)?events:[]).map(normalizeEvent).filter(Boolean));
 }
 
 function upcomingIso() {
@@ -684,7 +705,7 @@ async function cachedPopularEventEvidence(env,existing){
     await kvGetJson(env,popularTourCacheKey(artist.id))
   ]));
   for(const [artist,payload] of tourRows){
-    const events=Array.isArray(payload?.events)?payload.events:[];
+    const events=sanitizeNormalizedEvents(payload?.events);
     if(!prewarmFresh(payload) || !events.length) continue;
     const first=events[0]||{};
     put(artist.name,{
@@ -704,7 +725,7 @@ async function cachedPopularEventEvidence(env,existing){
   ]));
   const capitalCounts=new Map();
   for(const [,payload] of capitalPayloads){
-    const events=Array.isArray(payload?.events)?payload.events:[];
+    const events=sanitizeNormalizedEvents(payload?.events);
     if(!prewarmFresh(payload) || !events.length) continue;
     for(const ev of events){
       const name=String(ev?.artist||"").trim();
@@ -1645,7 +1666,7 @@ function snapCoord(value, step) {
 function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,stateCode,radius}) {
   const out = new URL(requestUrl);
   out.search = "";
-  out.searchParams.set("__cachev","concerts-global-v20");
+  out.searchParams.set("__cachev","concerts-global-v21");
 
   if(mode==="artist-search"){
     out.searchParams.set("mode","artist-search");
@@ -1731,13 +1752,15 @@ export async function onRequestGet({ request, env, waitUntil }) {
   if(attractionId){
     const prewarmed=await kvGetJson(env,popularTourCacheKey(attractionId));
     if(prewarmFresh(prewarmed)){
-      return json(prewarmed,200,{"Cache-Control":"public, max-age=600, s-maxage=3600"});
+      const events=sanitizeNormalizedEvents(prewarmed.events);
+      return json({...prewarmed,events},200,{"Cache-Control":"public, max-age=600, s-maxage=3600"});
     }
   }
   if(city && countryCode){
     const prewarmed=await kvGetJson(env,capitalEventCacheKey(city,countryCode));
     if(prewarmFresh(prewarmed)){
-      return json(prewarmed,200,{"Cache-Control":"public, max-age=600, s-maxage=3600"});
+      const events=sanitizeNormalizedEvents(prewarmed.events);
+      return json({...prewarmed,events},200,{"Cache-Control":"public, max-age=600, s-maxage=3600"});
     }
   }
 
