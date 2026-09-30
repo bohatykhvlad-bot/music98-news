@@ -45,11 +45,23 @@ def digest(x):
     return hashlib.sha256(json.dumps(x,ensure_ascii=False,sort_keys=True,separators=(",",":")).encode()).hexdigest()
 
 def upload_bytes(name, raw):
-    with Image.open(io.BytesIO(raw)) as im:
+    with Image.open(io.BytesIO(raw)) as src:
+        size=src.size
+        fmt=src.format
+        if max(size)<1920:
+            raise RuntimeError(f"{name} below 1920px floor: {size}")
+        im=src.convert("RGB")
+        # Keep the official hi-res source for QC, but upload a delivery JPEG that
+        # stays below the Desk endpoint payload ceiling.
+        if max(im.size)>3200:
+            scale=3200/max(im.size)
+            im=im.resize((round(im.width*scale),round(im.height*scale)),Image.Resampling.LANCZOS)
+        outbuf=io.BytesIO()
+        im.save(outbuf,"JPEG",quality=86,optimize=True,progressive=True)
+        raw=outbuf.getvalue()
         size=im.size
-        fmt=im.format
-    if max(size)<1920:
-        raise RuntimeError(f"{name} below 1920px floor: {size}")
+    if len(raw)>2_700_000:
+        raise RuntimeError(f"{name} compressed upload still too large: {len(raw)}")
     payload={"name":name,"data":"data:image/jpeg;base64,"+base64.b64encode(raw).decode("ascii")}
     out=runner.http(PHOTO_API,runner.desk_key(),payload,method="POST")
     if not out.get("ok") or not out.get("url"):
