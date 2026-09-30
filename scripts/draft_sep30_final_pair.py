@@ -12,7 +12,7 @@ LISA_ID="lisa26vegas"
 LP_ID="aulp930r1"
 OLD_LEON_ID="auleon930r1"
 LISA_PHOTO="https://s202.q4cdn.com/508919455/files/content_files/Static_Social-Instagram_1080x1080_Lisa_2026_Regional_TheColosseumatCaesarsPalace_1101_V2-20-41-27.jpg"
-LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg"
+LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/styles/artist_detail/public/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg?itok=IxzVedtC"
 
 LISA_BODY='''LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six. The new performances are scheduled for November 12 and 29, joining previously announced shows on November 13, 14, 27 and 28. Caesars says the original four dates sold out in under 10 minutes, and general sale for the two added performances begins September 30.
 
