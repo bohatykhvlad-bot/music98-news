@@ -117,6 +117,16 @@ async function applyCovers(env, tracks, origin) {
 }
 /* Остальные обложки добираем одним batch-запросом Apple по track id из ссылки:
    это ровно тот релиз, который мы показываем и на который ведёт кнопка. */
+function applyAppleCanonicalIdentity(track, title, artist) {
+  const nextTitle = String(title || track.title || "").trim();
+  const nextArtist = String(artist || track.artist || "").trim();
+  if (!nextTitle || !nextArtist) return false;
+  if (mergeKey(nextTitle, nextArtist) !== mergeKey(track.title, track.artist)) return false;
+  track.title = nextTitle;
+  track.artist = nextArtist;
+  return true;
+}
+
 async function enrichArtByIds(tracks, stats) {
   const want = [];
   for (const t of tracks) {
@@ -141,13 +151,15 @@ async function enrichArtByIds(tracks, stats) {
   }
   for (const [t, id] of want) {
     const item = found.get(id);
-    if (item && appleCandidateCompatible(t.title, t.artist, item)) {
-      const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
-      if (art) {
-        t.art = art;
-        if (stats) stats.filled += 1;
-      }
+    if (!item || !appleCandidateCompatible(t.title, t.artist, item)) continue;
+    if (!applyAppleCanonicalIdentity(t, item.trackName, item.artistName)) continue;
+    const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
+    if (art && isAppleArt(art)) {
+      t.art = art;
+      if (stats) stats.filled += 1;
     }
+    if (!isApplePreview(t.prev) && isApplePreview(item.previewUrl)) t.prev = item.previewUrl;
+    if (!t.year && item.releaseDate) t.year = String(item.releaseDate).slice(0, 4);
   }
 }
 
@@ -683,8 +695,9 @@ export async function buildTop50(origin, env) {
   await seedBaked(origin || "", tracks);
   await applyCovers(env, tracks, origin);  /* засев -> память -> сборка -> Deezer -> пусто */
   await enrichArtByIds(tracks, coverStats); /* точный релиз по Apple-ID из ссылки */
-  await enrichApple(tracks);               /* добор ссылки/превью/года, если Apple ответил */
-  await applyCovers(env, tracks, origin);  /* запомнить найденное */
+  await enrichApple(tracks);               /* добор Apple URL/preview + safe exact artwork */
+  await enrichArtByIds(tracks, coverStats);/* URL мог появиться только на предыдущем шаге */
+  await applyCovers(env, tracks, origin);  /* registry wins; exact Apple art is a safe bridge */
   await applyLoudness(env, tracks, origin);
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
@@ -694,7 +707,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v32",
+    rev: "feat-v33",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
@@ -722,6 +735,8 @@ async function itunesLookup(title, artist) {
   const track = String(hit.trackId || "");
   const url = album && track ? `https://music.apple.com/us/album/${album}?i=${track}` : (hit.trackViewUrl || "");
   return {
+    title: String(hit.trackName || ""),
+    artist: String(hit.artistName || ""),
     url,
     art: String(hit.artworkUrl100 || "").replace("100x100bb", "600x600bb"),
     prev: hit.previewUrl || "",
@@ -731,18 +746,21 @@ async function itunesLookup(title, artist) {
 
 async function enrichApple(tracks) {
   await Promise.all(tracks.map(async (t) => {
-    /* ссылка и 30-секундное превью нужны всегда; обложку Apple больше не даёт */
-    if (t.url && isApplePreview(t.prev)) return;
+    if (t.url && isApplePreview(t.prev) && t.art) return;
     const grab = (title, artist) => Promise.race([
       itunesLookup(title, artist),
       new Promise((_, reject) => setTimeout(() => reject(new Error("itunes-timeout")), 6000)),
     ]);
     try {
-      let extra = await grab(t.title, t.artist);
+      const exact = await grab(t.title, t.artist);
+      if (exact.art && isAppleArt(exact.art) &&
+          applyAppleCanonicalIdentity(t, exact.title, exact.artist) &&
+          !t.art) {
+        t.art = exact.art;
+      }
+      let extra = exact;
       const incomplete = !(extra.prev && isApplePreview(extra.prev)) || !extra.url;
       if (incomplete) {
-        /* Second chance keeps the lead artist. Title-only fallback can match a
-           cover/live/tribute release by somebody else. */
         const lead = leadArtistName(t.artist);
         if (lead && lead !== String(t.artist || "").trim()) {
           try { extra = await grab(t.title, lead); } catch {}
@@ -794,11 +812,26 @@ async function lastGood(env) {
 /* The baked fallback file was written when covers still came from any source; run it
    through the same Apple-only cover pass before serving, so a failed rebuild cannot
    put Deezer sleeves (or a different picture) on the page. */
+async function healMissingArtwork(env, tracks, origin) {
+  const before = (tracks || []).filter((t) => !t.art).length;
+  if (!before) return { before: 0, after: 0, filled: 0 };
+  await enrichArtByIds(tracks);
+  const stillMissing = tracks.filter((t) => !t.art);
+  if (stillMissing.length) {
+    await enrichApple(stillMissing);
+    await enrichArtByIds(stillMissing);
+  }
+  await applyCovers(env, tracks, origin);
+  const after = tracks.filter((t) => !t.art).length;
+  return { before, after, filled: Math.max(0, before - after) };
+}
+
 async function bakedWithCovers(env, baked, origin) {
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) {
     try {
       await applyNames(env, baked.tracks, origin);
       await applyCovers(env, baked.tracks, origin);
+      await healMissingArtwork(env, baked.tracks, origin);
       await applyLoudness(env, baked.tracks, origin);
     } catch {}
   }
@@ -808,11 +841,15 @@ async function bakedWithCovers(env, baked, origin) {
 async function decorateCachedTop50(env, payload, origin) {
   if (payload && Array.isArray(payload.tracks) && payload.tracks.length) {
     try {
-      // Metadata/artwork refresh is deliberately display-only: rank, order,
-      // movement and tenure stay byte-for-byte as stored in the chart payload.
       await applyNames(env, payload.tracks, origin);
       await applyCovers(env, payload.tracks, origin);
+      const healed = await healMissingArtwork(env, payload.tracks, origin);
       await applyLoudness(env, payload.tracks, origin);
+      payload.covers = {
+        ...(payload.covers || {}),
+        missing: healed.after,
+        runtimeFilled: healed.filled,
+      };
     } catch {}
   }
   return payload;
