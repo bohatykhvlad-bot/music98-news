@@ -1271,23 +1271,50 @@ async function loadArea(lat,lng,label,opts={}){
   }
 }
 
-function requestLocation(){
+async function requestLocation(){
   areaRequestSeq++;
   popularRequestSeq++;
   clearArtistContext();
+  hidePendingAreaSearch();
   setMode("nearby");
+
   if(!navigator.geolocation){
-    setStatus("Location is not available in this browser.");
+    sideSub.textContent="Location is not available in this browser. Search for a city instead.";
     return;
   }
-  setStatus("Getting your location...");
+
+  sideSub.textContent="Getting your location...";
+
+  /* On mobile, a previously denied permission no longer opens the browser
+     prompt. Detect that state when the Permissions API is available so Near
+     me never feels dead; prompt-state still falls through to geolocation,
+     which is what triggers the native permission sheet. */
+  try{
+    if(navigator.permissions?.query){
+      const permission=await navigator.permissions.query({name:"geolocation"});
+      if(permission.state==="denied"){
+        sideSub.textContent="Location access is blocked. Enable Location for music98.news in your browser settings, then tap Near me again.";
+        return;
+      }
+    }
+  }catch(_){ /* Safari/older browsers: let geolocation handle permission. */ }
+
   navigator.geolocation.getCurrentPosition(
     p=>{
+      sideSub.textContent="Loading concerts near you...";
       userMoving=false;
       map.flyTo({center:[p.coords.longitude,p.coords.latitude],zoom:9,duration:650});
-      loadArea(p.coords.latitude,p.coords.longitude,"Near you",{fit:false});
+      loadArea(p.coords.latitude,p.coords.longitude,"Near you",{fit:false,force:true});
     },
-    ()=>setStatus("Location permission was not granted. Search for a city instead."),
+    err=>{
+      if(err?.code===1){
+        sideSub.textContent="Location access was denied. Enable Location for music98.news in your browser settings, then tap Near me again.";
+      }else if(err?.code===3){
+        sideSub.textContent="Location request timed out. Tap Near me to try again.";
+      }else{
+        sideSub.textContent="Could not get your location. Check Location Services and try again.";
+      }
+    },
     {enableHighAccuracy:false,timeout:12000,maximumAge:600000}
   );
 }
@@ -1407,18 +1434,7 @@ function renderSuggestions(places,artists,hubs=[]){
   suggestions.hidden=!suggestions.childElementCount;
 }
 
-nearTab.addEventListener("click",()=>{
-  if(lastArea){
-    clearArtistContext();
-    setMode("nearby");
-    sideSub.textContent="Artists with the most upcoming events in this area.";
-    renderArtists(groupedNearby(nearbyEvents),"nearby");
-    setEventData(nearbyEvents,nearbyTotal);
-    restoreModeMap();
-  }else{
-    requestLocation();
-  }
-});
+nearTab.addEventListener("click",requestLocation);
 popularTab.addEventListener("click",()=>loadPopular());
 mapArtistBtn.addEventListener("click",showArtistContext);
 mapAllBtn.addEventListener("click",showAllConcertsInMapArea);

@@ -228,3 +228,13 @@ test("popup uses event image and exposes merged alternate ticket links",()=>{
   assert.match(app,/Array\.isArray\(e\.ticketOptions\)/);
   assert.match(app,/alt\.className="ticket-alt"/);
 });
+
+test("Near me always requests current geolocation and surfaces blocked permission",()=>{
+  assert.match(app,/nearTab\.addEventListener\("click",requestLocation\)/);
+  assert.match(app,/navigator\.permissions\?\.query/);
+  assert.match(app,/permission\.state==="denied"/);
+  assert.match(app,/Location access is blocked/);
+  assert.match(app,/navigator\.geolocation\.getCurrentPosition/);
+  assert.match(app,/loadArea\(p\.coords\.latitude,p\.coords\.longitude,"Near you",\{fit:false,force:true\}\)/);
+  assert.doesNotMatch(app,/nearTab\.addEventListener\("click",\(\)=>\{[\s\S]*if\(lastArea\)/);
+});
