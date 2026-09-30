@@ -193,10 +193,17 @@ function bestArtistImage(images) {
   return pool[0]?.url || "";
 }
 
+function packageLikeScore(value) {
+  const text=String(value||"").toLowerCase();
+  return /\b(vip|package|premium|first entry|fast track|meet\s*(?:&|and)\s*greet|platinum|hospitality|soundcheck|early entry|upgrade|merch(?:andise)?)\b/.test(text) ? 10 : 0;
+}
 function normalizeEvent(e) {
   const venue = e?._embedded?.venues?.[0] || {};
   const attractions = Array.isArray(e?._embedded?.attractions) ? e._embedded.attractions : [];
-  const attraction = attractions[0] || {};
+  let attraction = attractions[0] || {};
+  if(packageLikeScore(attraction?.name)>0){
+    attraction=attractions.find(a=>packageLikeScore(a?.name)===0) || attraction;
+  }
   const status=String(e?.dates?.status?.code||"").trim().toLowerCase();
   if(["cancelled","canceled","postponed","rescheduled"].includes(status)) return null;
   const rawName=String(e?.name||"").trim();
@@ -226,6 +233,7 @@ function normalizeEvent(e) {
     dateTime: String(e?.dates?.start?.dateTime || ""),
     timezone: String(e?.dates?.timezone || venue?.timezone || ""),
     status,
+    venueId: String(venue.id || ""),
     venue: String(venue.name || ""),
     city: String(venue?.city?.name || ""),
     state: String(venue?.state?.name || venue?.state?.stateCode || ""),
@@ -240,14 +248,19 @@ function normalizeEvent(e) {
 
 function eventCollapseKey(e) {
   const clean=v=>String(v||"").toLowerCase().replace(/\s+/g," ").trim();
-  const artist=clean(e?.artist||e?.name),venue=clean(e?.venue),city=clean(e?.city);
+  const artist=clean(e?.artist||e?.name);
+  const venueId=clean(e?.venueId);
+  const venue=venueId ? "id:"+venueId : clean(e?.venue);
+  const city=clean(e?.city);
   const date=clean(e?.date),time=clean(String(e?.time||"").slice(0,5));
   if(!artist || !venue || !date) return "id:"+String(e?.id||"");
   return [artist,venue,city,date,time].join("|");
 }
 function packageEventPenalty(e) {
-  const text=(String(e?.name||"")+" "+String(e?.ticketOptions?.[0]?.name||"")).toLowerCase();
-  return /\b(vip|package|premium|first entry|meet\s*(?:&|and)\s*greet|platinum|hospitality|soundcheck|early entry|signed)\b/.test(text)?10:0;
+  return Math.max(
+    packageLikeScore(e?.name),
+    packageLikeScore(e?.ticketOptions?.[0]?.name)
+  );
 }
 function mergeTicketOptions(...groups) {
   const seen=new Set(),out=[];
@@ -1118,11 +1131,12 @@ async function capitalHubSnapshot(env, force=false){
 }
 
 async function marketSeedResult(env,seed){
+  const searchRadius=seed.kind==="state_capital" ? 45 : 60;
   const tm=baseEventUrl(env.TICKETMASTER_API_KEY);
   tm.searchParams.set("size","1");
   tm.searchParams.set("sort","date,asc");
   tm.searchParams.set("geoPoint",geohash(Number(seed.lat),Number(seed.lng),8));
-  tm.searchParams.set("radius",seed.kind==="state_capital" ? "45" : "60");
+  tm.searchParams.set("radius",String(searchRadius));
   tm.searchParams.set("unit","km");
   tm.searchParams.set("countryCode",seed.countryCode);
   if(seed.stateCode) tm.searchParams.set("stateCode",seed.stateCode);
@@ -1139,6 +1153,7 @@ async function marketSeedResult(env,seed){
     lat:Number(seed.lat),
     lng:Number(seed.lng),
     count:total,
+    radiusKm:searchRadius,
     firstDate:String(first?.dates?.start?.localDate||""),
     verified:true,
     pinned:1,

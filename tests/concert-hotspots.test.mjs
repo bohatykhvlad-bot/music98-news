@@ -1425,3 +1425,54 @@ test("city cache key distinguishes stateCode and Ticketmaster duplicate calls co
   }
 });
 
+test("package-first Ticketmaster entries collapse into the real artist show", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  const oldCaches=globalThis.caches;
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      const baseVenue={id:"venue-1",name:"O2 arena",city:{name:"Prague"},country:{name:"Czechia",countryCode:"CZ"},location:{latitude:"50.104",longitude:"14.493"}};
+      return new Response(JSON.stringify({
+        _embedded:{events:[
+          {
+            id:"regular",name:"Pitbull Live",url:"https://tickets.example/regular",
+            dates:{start:{dateTime:"2026-12-01T19:00:00Z",localDate:"2026-12-01",localTime:"20:00:00"}},
+            _embedded:{attractions:[{id:"pitbull",name:"Pitbull",images:[]}],venues:[baseVenue]},images:[]
+          },
+          {
+            id:"fast",name:"Fast Track - O2 arena",url:"https://tickets.example/fast",
+            dates:{start:{dateTime:"2026-12-01T19:00:00Z",localDate:"2026-12-01",localTime:"20:00:00"}},
+            _embedded:{attractions:[{id:"fast-track",name:"Fast Track - O2 arena",images:[]},{id:"pitbull",name:"Pitbull",images:[]}],venues:[baseVenue]},images:[]
+          }
+        ]},
+        page:{size:200,totalElements:2,totalPages:1,number:0}
+      }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?city=Prague&countryCode=CZ"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    const data=await response.json();
+    assert.equal(data.events.length,1);
+    assert.equal(data.events[0].artist,"Pitbull");
+    assert.equal(data.events[0].venueId,"venue-1");
+    assert.equal(data.events[0].url,"https://tickets.example/regular");
+    assert.equal(data.events[0].ticketOptions.some(x=>x.url==="https://tickets.example/fast"),true);
+  }finally{
+    globalThis.fetch=oldFetch;
+    globalThis.caches=oldCaches;
+  }
+});
+
+test("verified market rows publish the radius used for Ticketmaster validation", async () => {
+  const source=await import("node:fs/promises").then(fs=>fs.readFile(new URL("../functions/api/concerts.js",import.meta.url),"utf8"));
+  assert.match(source,/const searchRadius=seed\.kind===\"state_capital\" \? 45 : 60/);
+  assert.match(source,/radiusKm:searchRadius/);
+});
+
