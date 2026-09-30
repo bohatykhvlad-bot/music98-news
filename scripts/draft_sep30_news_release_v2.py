@@ -14,14 +14,14 @@ LEON_ID="auleon930r1"
 LISA_ID="lisa26vegas"
 
 LEON_TITLE="Happiness Anytime"
-LEON_EXCERPT="Leon Bridges has released *Happiness Anytime*, a 12-song album produced by J Lloyd-Watson and Lydia Kitto of Jungle that pushes his soul sound toward warmer, rhythm-first territory."
-LEON_BODY=r'''Leon Bridges has released *Happiness Anytime*, a 12-song album produced by J Lloyd-Watson and Lydia Kitto of Jungle. Released through Columbia Records on September 25, the record follows *Leon* and moves Bridges back toward the warmth of his early soul records while keeping the looser rhythmic instincts he explored with Khruangbin. The album is concise - 12 tracks in under half an hour - and built around movement rather than long-form arrangements, with Bridges' voice remaining the constant as the production shifts through soul, funk, Afrobeat and Caribbean-leaning grooves.
+LEON_EXCERPT="Leon Bridges has released *Happiness Anytime*, a 12-song album produced by J Lloyd-Watson and Lydia Kitto of Jungle."
+LEON_BODY=r'''Leon Bridges has released *Happiness Anytime*, a 12-song album produced by J Lloyd-Watson and Lydia Kitto of Jungle. Released through Columbia Records on September 25, the album follows *Leon* and moves Bridges back toward the warmth of his early soul work while keeping the looser rhythmic instincts he explored alongside Khruangbin. The album is concise - 12 tracks in under half an hour - and built around movement rather than long-form arrangements, with Bridges' voice remaining the constant as the production shifts through soul, funk, Afrobeat and Caribbean-leaning grooves.
 
-The collaboration with Lloyd-Watson and Kitto shapes the entire record rather than appearing as a one-off pairing. Columbia introduced the project with four songs in July - "Light the Way," "Tears of Joy," "Illusion" and "Your Love Is Electric" - before another four-song drop in August added "Talk It Over," the title track, "All Day, All Night" with Lydia Kitto and "Fly Baby." "Watch You Dance" arrived just before the album, leaving the full release to complete the sequence with "The Way It Goes," "Take My Hand" and "Please Don't Say Goodbye."
+The collaboration with Lloyd-Watson and Kitto shapes the entire record rather than appearing as a one-off pairing. Columbia introduced four songs in July: "Light the Way," "Tears of Joy," "Illusion" and "Your Love Is Electric." A second four-song set followed in August, adding "Talk It Over," the title track, "All Day, All Night" featuring Lydia Kitto and "Fly Baby." "Watch You Dance" arrived shortly before the album, leaving the full release to complete the sequence with "The Way It Goes," "Take My Hand" and "Please Don't Say Goodbye."
 
 [apple:album:6789289866]
 
-That rollout makes *Happiness Anytime* feel less like a single release-day reveal and more like a record assembled in public. Nearly the entire first two-thirds of the track list was available before September 25, but the final album gives those songs a clear pacing and context. "Light the Way" opens with one of the set's brighter grooves, while the closing stretch slows the pulse without abandoning the rhythmic focus that runs through the project. Bridges does not treat the album as a return to the exact sound of *Coming Home*; instead, he uses that record's warmth as a base for a broader palette.
+That release sequence makes *Happiness Anytime* feel less like a single release-day reveal and more like a record assembled in public. Nearly the entire first two-thirds of the track list was available before September 25, but the final album gives those songs a clear pacing and context. "Light the Way" opens with one of the set's brighter grooves, while the closing stretch slows the pulse without abandoning the rhythmic focus that runs through the project. Bridges does not treat the album as a return to the exact sound of *Coming Home*; instead, he uses that record's warmth as a base for a broader palette.
 
 The official campaign has matched that emphasis on immediacy. Bridges previewed the material through pop-up performances in Paris, Cannes, Los Angeles, Montreux, London, Chicago and Montreal, and performed a medley from the album on *The Tonight Show*. The project also arrives with a strong visual identity photographed by Joshua Kissi, continuing the polished, fashion-forward presentation that has become part of Bridges' work alongside the music. *Happiness Anytime* is his fifth full-length album and one of the week's most substantial major-label R&B releases: compact, collaborative and deliberately centered on groove.'''
 
@@ -123,7 +123,7 @@ def main():
       "title":LEON_TITLE,"excerpt":LEON_EXCERPT,"body":LEON_BODY,"date":"2026-09-30",
       "status":"draft","pinned":False,
       "cover":{"kind":"img","src":leon_src,"credit":"Joshua Kissi",
-               "creditUrl":"https://www.sonymusic.ca/press_release/leon-bridges-releases-four-songs",
+               "creditUrl":"https://www.joshuakissi.com/",
                "pos":"50% 44%","zoom":1,"lockX":0.50,"cardX":0.50,"cardY":0.43,"cardZoom":1.35}
     }
     write_one(LEON_ID,leon)
