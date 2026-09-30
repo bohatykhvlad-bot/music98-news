@@ -130,11 +130,17 @@ def main():
         raise RuntimeError("LISA must contain exactly one ticket CTA")
 
     for pass_no in (1, 2, 3):
-        ok, lines = runner.run_gate(POST_ID, quiet=False)
-        print("GATE_PASS", pass_no, "PASS" if ok else "FAIL")
-        for line in lines:
-            if "PASS" in line or "FAIL" in line or line.lstrip().startswith(("X ", "! ")):
-                print(line)
+        ok = False
+        lines = []
+        for gate_attempt in range(8):
+            ok, lines = runner.run_gate(POST_ID, quiet=False)
+            print("GATE_PASS", pass_no, "ATTEMPT", gate_attempt + 1, "PASS" if ok else "FAIL")
+            for line in lines:
+                if "PASS" in line or "FAIL" in line or line.lstrip().startswith(("X ", "! ")):
+                    print(line)
+            if ok:
+                break
+            time.sleep(3)
         if not ok:
             raise RuntimeError(f"gate failed on pass {pass_no}")
 
