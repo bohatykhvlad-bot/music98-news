@@ -29,11 +29,11 @@ By the time the residency opens in November, *PRESS PLAY* will have been out for
 
 The Vegas run follows another unusually active stretch. BLACKPINK completed the DEADLINE World Tour, while LISA continued building a separate solo schedule across music and screen work. Her documentary *Always Lalisa*, directed by Sue Kim, premiered at the Toronto International Film Festival and is also headed to cinemas worldwide in October. That places the film, the EP and the residency within a compact fall campaign.
 
-Demand for VIVA LA LISA was clear before rehearsals began: the initial four-show allocation disappeared almost immediately, and Caesars added capacity without changing the venue or limited-run format. The residency now stands at six performances across the same two weekends.'''
+Demand for VIVA LA LISA was clear immediately: the initial four-show allocation disappeared almost at once, and Caesars added capacity without changing the venue or limited-run format. The residency now stands at six performances across the same two weekends.'''
 
 LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a 20-track live companion to the band's new documentary. The Warner Records release arrived September 25 and captures the *FROM ZERO* release concert in São Paulo, while its track list reaches across several periods of the band's catalog. Rather than presenting only the material created for the comeback, the set places newer recordings beside songs that have been central to LINKIN PARK's live shows for years.
 
-The sequence includes "Somewhere I Belong," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint," "Papercut" and "Bleed It Out," alongside newer tracks such as "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown." Four short intro or interlude pieces bring the digital edition to 20 tracks. Mike Shinoda and Emily Armstrong share the vocal center of the performance, and the set documents the live version of LINKIN PARK that introduced *FROM ZERO* material alongside the band's older catalog.
+The sequence includes "Somewhere I Belong," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint," "Papercut" and "Bleed It Out," alongside newer tracks such as "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown." The 20-track sequence also includes four short intro or interlude pieces. Mike Shinoda and Emily Armstrong share the vocal center of the performance, and the set documents the live version of LINKIN PARK that introduced *FROM ZERO* material alongside the band's older catalog.
 
 The soundtrack is tied directly to *UNSHATTER*. According to the band's official store, the film follows LINKIN PARK from private studio sessions in 2022 through the creation and release of *FROM ZERO* and the São Paulo concert. It combines archive material, newer interviews and footage from the band's return to the stage. The soundtrack also includes live recordings that are not heard in the film, so it works as more than an audio transcription of the documentary.
 
@@ -41,7 +41,7 @@ The soundtrack is tied directly to *UNSHATTER*. According to the band's official
 
 [youtube:zNYsw-cW8v8]
 
-The physical editions follow the same concert-document approach. The CD comes in a gatefold softpak with a 12-panel accordion booklet, while the double-vinyl edition is pressed on Citrus vinyl in a gatefold jacket with a large insert. Both formats use the São Paulo performance as the center of the package rather than presenting *UNSHATTER* as a conventional greatest-hits collection.
+The physical editions follow the same concert-document approach. The CD comes in a gatefold softpak with a 12-panel accordion booklet, while the double-vinyl edition is pressed on Citrus vinyl in a gatefold jacket with a 12-by-24-inch insert. Both formats use the São Paulo performance as the center of the package rather than presenting *UNSHATTER* as a conventional greatest-hits collection.
 
 That makes the release useful in two ways: it documents LINKIN PARK's present lineup in a major live setting, and it gives the documentary its own standalone concert record. For listeners following the *FROM ZERO* era, *UNSHATTER Film Soundtrack (Live in São Paulo)* is a substantial companion release rather than a small collection of bonus tracks.'''
 
@@ -170,7 +170,7 @@ def main():
       "title":"UNSHATTER Film Soundtrack (Live in São Paulo)",
       "excerpt":"LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a 20-track live companion to the band's new documentary.",
       "body":LP_BODY,"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://www.jimmyfontaine.com/","pos":"50% 48%","zoom":1,"cardX":.5,"cardY":.48,"cardZoom":1.22}
+      "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://www.jimmyfontaine.com/","pos":"50% 50%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
     }
     write(LP_ID,lp)
 
