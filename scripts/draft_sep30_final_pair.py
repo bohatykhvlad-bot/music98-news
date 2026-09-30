@@ -21,31 +21,29 @@ The residency remains concentrated across two weekends rather than becoming a lo
 
 [tickets:__TICKET__]
 
-The announcement lands in the middle of LISA's current solo campaign. "SaWaDiKa," released through LLOUD Co. and RCA Records, is the first single from her seven-song EP *PRESS PLAY*, due October 23. The video was filmed in Bangkok and, according to Caesars, drew 70.8 million views in its first 24 hours. The official clip puts LISA's Thai roots at the center of the campaign rather than treating them as background to a generic pop release.
-
-LISA also brought "SaWaDiKa" to the 2026 MTV Video Music Awards for its first televised performance. At the same VMAs, "Dream" won Best Pop. LLOUD's official short film for "Dream," starring LISA and Kentaro Sakaguchi, is included below as the article's single media block.
+The announcement lands in the middle of LISA's current solo campaign. "SaWaDiKa," released through LLOUD Co. and RCA Records, is the first single from her seven-song EP *PRESS PLAY*, due October 23. The video was filmed in Bangkok and, according to Caesars, drew 70.8 million views in its first 24 hours. The official clip puts LISA's Thai roots at the center of the campaign rather than treating them as background to a generic pop release. LISA also brought "SaWaDiKa" to the 2026 MTV Video Music Awards for its first televised performance. At the same VMAs, "Dream" won Best Pop. LLOUD's official short film for "Dream," starring LISA and Kentaro Sakaguchi, is included below as the article's single media block.
 
 [youtube:FMX98ROVRCE]
 
-By the time the residency opens in November, *PRESS PLAY* will have been out for several weeks, giving the show new material alongside songs from *Alter Ego*, her 2025 debut solo album.
+By the time the residency opens in November, *PRESS PLAY* will have been out for several weeks, giving the show new material alongside songs from *Alter Ego*, her 2025 debut solo album. That gives VIVA LA LISA a different musical context from the four-date version first announced earlier in the year.
 
 The Vegas run follows another unusually active stretch. BLACKPINK completed the DEADLINE World Tour, while LISA continued building a separate solo schedule across music and screen work. Her documentary *Always Lalisa*, directed by Sue Kim, premiered at the Toronto International Film Festival and is also headed to cinemas worldwide in October. That places the film, the EP and the residency within a compact fall campaign.
 
-The demand around VIVA LA LISA is unusually easy to measure: four announced shows sold out in under 10 minutes, then two more were added before opening night without changing the venue or limited-run format. The November 12 and 29 additions bring the residency to six performances in total.'''
+Demand for VIVA LA LISA was clear before rehearsals began: the initial four-show allocation disappeared almost immediately, and Caesars added capacity without changing the venue or limited-run format. The residency now stands at six performances across the same two weekends.'''
 
-LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a 20-track live companion to the band's new documentary. The Warner Records release arrived September 25, five days before *UNSHATTER* opens in theaters worldwide for a limited run. The album captures the band's November 2024 *FROM ZERO* release show in São Paulo and stretches across material from multiple eras of the catalog.
+LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a 20-track live companion to the band's new documentary. The Warner Records release arrived September 25 and captures the *FROM ZERO* release concert in São Paulo, while its track list reaches across several periods of the band's catalog. Rather than presenting only the material created for the comeback, the set places newer recordings beside songs that have been central to LINKIN PARK's live shows for years.
 
-The soundtrack is built around the current LINKIN PARK lineup with Mike Shinoda and Emily Armstrong sharing the vocal center of the set. Its sequence moves between *FROM ZERO* material and established songs including "Somewhere I Belong," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint," "Papercut" and "Bleed It Out." Newer songs such as "The Emptiness Machine," "Two Faced" and "Heavy Is the Crown" sit beside them rather than being isolated in a separate section.
+The sequence includes "Somewhere I Belong," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint," "Papercut" and "Bleed It Out," alongside newer tracks such as "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown." Three short intro or interlude pieces bring the digital edition to 20 tracks. Mike Shinoda and Emily Armstrong share the vocal center of the performance, with Colin Brittain, Brad Delson, Dave Farrell and Joe Hahn completing the current lineup represented by the project.
 
-[apple:album:6794460856]
+The soundtrack is tied directly to *UNSHATTER*. According to the band's official store, the film follows LINKIN PARK from private studio sessions in 2022 through the creation and release of *FROM ZERO* and the São Paulo concert. It combines archive material, newer interviews and footage from the band's return to the stage. The soundtrack also includes live recordings that are not heard in the film, so it works as more than an audio transcription of the documentary.
 
-That structure mirrors the film's larger subject. Directed by Joe Hahn, *UNSHATTER* follows the group from private studio sessions in 2022 through the process that led to the band's return, the arrival of Armstrong and drummer-producer Colin Brittain, the *FROM ZERO* album and the São Paulo performance. The documentary combines new interviews, studio footage, archive material and concert sequences rather than functioning as a conventional tour film.
+"Faint" was one of the performances released ahead of the full soundtrack. The official live video keeps the scale of the São Paulo show visible while showing how the current lineup handles one of the band's best-known songs.
 
 [youtube:zNYsw-cW8v8]
 
-The São Paulo recordings give the soundtrack a specific role inside that story. They document the point where songs created during LINKIN PARK's restart met a full live audience, while older material was being performed by a changed lineup. "Faint," one of the performances released ahead of the film, makes that contrast especially direct: the arrangement keeps the song's familiar shape while the vocal handoff reflects the band's current configuration.
+The physical editions follow the same concert-document approach. The CD comes in a gatefold softpak with a 12-panel accordion booklet, while the double-vinyl edition is pressed on Citrus vinyl in a gatefold jacket with a large insert. Both formats use the São Paulo performance as the center of the package rather than presenting *UNSHATTER* as a conventional greatest-hits collection.
 
-The physical editions extend the release beyond streaming, with CD and double-vinyl versions offered through the band's official store. The soundtrack arrives as both a standalone live record and a companion piece to a documentary about how LINKIN PARK rebuilt its working identity after a long hiatus.'''
+That makes the release useful in two ways: it documents LINKIN PARK's present lineup in a major live setting, and it gives the documentary its own standalone concert record. For listeners following the *FROM ZERO* era, *UNSHATTER Film Soundtrack (Live in São Paulo)* is a substantial companion release rather than a small collection of bonus tracks.'''
 
 def get(url, referer=""):
     jar=http.cookiejar.CookieJar()
@@ -172,7 +170,7 @@ def main():
       "title":"UNSHATTER Film Soundtrack (Live in São Paulo)",
       "excerpt":"LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a 20-track live companion to the band's new documentary.",
       "body":LP_BODY,"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://press.warnerrecords.com/linkinpark","pos":"50% 48%","zoom":1,"cardX":.5,"cardY":.48,"cardZoom":1.22}
+      "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://www.jimmyfontaine.com/","pos":"50% 48%","zoom":1,"cardX":.5,"cardY":.48,"cardZoom":1.22}
     }
     write(LP_ID,lp)
 
