@@ -49,7 +49,7 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/131.0 Safari/537.36")
 MONTHS = ("january february march april may june july august september "
           "october november december")
-MEDIA_RE = re.compile(r"\[(youtube|apple|tiktok|instagram)[^\]]*\]", re.I)
+MEDIA_RE = re.compile(r"\[(youtube|apple|tiktok|instagram|tickets)[^\]]*\]", re.I)
 MEDIA_ID_RE = re.compile(r"\[(youtube|apple|tiktok|instagram)\s*:\s*([^\]]+)\]", re.I)
 
 
