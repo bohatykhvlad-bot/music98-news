@@ -81,10 +81,10 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 
 test("same-day chart cache is an instant paint and always revalidates",()=>{
-  assert.match(page,/const DAILYKEY = "music98news_daily_v38"/);
+  assert.match(page,/const DAILYKEY = "music98news_daily_v39"/);
   assert.match(page,/const hasFreshCache=!!\(cached/);
   assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
-  assert.match(page,/rev=38/);
+  assert.match(page,/rev=39/);
 });
 
 

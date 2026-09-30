@@ -207,6 +207,8 @@ for(let i=0;i<tracks.length;i++){
   const mk=mergeKey(t.title,t.artist); if(meta?.raw)names[mk]=appleRecord(meta.raw); else if(oldNames[mk])names[mk]=oldNames[mk];
   console.log("ARTWORK",JSON.stringify({rank:i+1,title:t.title,artist:t.artist,provider:entry.provider,release:entry.releaseTitle,class:entry.releaseClass,confidence:entry.confidence,consensus:entry.consensus,art:entry.art}));
 }
+// A single catalog-index lag must never discard artwork already verified for
+// the other current rows; unresolved identities stay explicit in the audit.
 if(unresolved.length){
   console.warn("ARTWORK_UNRESOLVED_SUMMARY",JSON.stringify(unresolved));
   console.warn(`ARTWORK_PARTIAL: ${unresolved.length}/${tracks.length} rows remain unresolved; publishing only verified rows`);
