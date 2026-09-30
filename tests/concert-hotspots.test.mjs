@@ -488,7 +488,7 @@ test("public Popular read serves only a complete Top 30 and spends no Ticketmast
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
     ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",builtAt:new Date().toISOString(),
-    eligibility:"ticketmaster_event_payload_gt_0",artists,targetCount:30
+    source:"spotify_monthly_listeners",eligibility:"ticketmaster_event_payload_gt_0",artists,targetCount:30
   }));
   const oldFetch=globalThis.fetch;
   let externalCalls=0;
