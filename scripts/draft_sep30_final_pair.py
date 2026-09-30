@@ -39,7 +39,7 @@ The "SaWaDiKa" video was directed by Bang Jae Yeob and filmed in Bangkok. LISA m
 
 The added shows do not change the venue or the two-weekend format. November 12 now opens the first weekend and November 29 closes the second, while the four original dates remain unchanged. VIVA LA LISA remains a limited six-show run at The Colosseum, with three performances on each weekend.'''
 
-LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album that accompanies the band's new *UNSHATTER* film. The soundtrack arrived September 25 through Warner Records and documents the São Paulo concert tied to the *FROM ZERO* release period.
+LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album that accompanies the band's new *UNSHATTER* film. The soundtrack arrived September 25 through Warner Records and documents the São Paulo concert tied to the *FROM ZERO* release period. It is also available digitally alongside the physical editions.
 
 The CD contains 20 tracks. Four are brief pieces called "Inception," "Creation," "Break Collapse" and "Resolution." That leaves 16 full songs. The two-LP edition drops those four pieces and carries only the full performances. The set includes "Somewhere I Belong," "The Catalyst," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint" and "Papercut." *FROM ZERO* material appears throughout the same show, including "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown." "Bleed It Out" closes the record.
 
