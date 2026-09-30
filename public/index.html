@@ -3324,7 +3324,9 @@ return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" 
     if(album) return appleEmbed(album[1]);
     const song = t.match(/^\[apple:song:(\d+):(\d+)\]$/i);
     if(song) return appleEmbed(song[1], song[2]);
-    const tickets = t.match(/^\[tickets:(https?:\/\/[^\]]+)\]$/i);\n    if(tickets) return `<div class="article-ticket"><a href="${esc(tickets[1])}" target="_blank" rel="sponsored noopener noreferrer" data-pill-press><span>Buy Tickets</span></a></div>`;\n    const yt = t.match(/^\[youtube:([A-Za-z0-9_-]{11})(?::(\d+))?\]$/i);
+    const tickets = t.match(/^\[tickets:(https?:\/\/[^\]]+)\]$/i);
+    if(tickets) return `<div class="article-ticket"><a href="${esc(tickets[1])}" target="_blank" rel="sponsored noopener noreferrer" data-pill-press><span>Buy Tickets</span></a></div>`;
+    const yt = t.match(/^\[youtube:([A-Za-z0-9_-]{11})(?::(\d+))?\]$/i);
     if(yt) return youtubeEmbed(yt[1], yt[2] ? +yt[2] : 0);
     const ttNew = t.match(/^\[tiktok:(\d{6,25})(?:\|([^|]*)(?:\|([^|]*))?)?\]$/i);
     if(ttNew) return tiktokEmbed(ttNew[1], ttNew[2]||"", ttNew[3]||"");
