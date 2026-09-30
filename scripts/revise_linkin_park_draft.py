@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 
 POST_ID = "auleon930r1"
+# Final reviewed revision.
 
 EXCERPT = """The new live set pairs *FROM ZERO* material with "Numb," "In the End," "Faint" and other catalog staples from the band's São Paulo show."""
 
