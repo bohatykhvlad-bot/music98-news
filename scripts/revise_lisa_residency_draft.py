@@ -10,10 +10,10 @@ import post as runner
 POST_ID = "lisa26vegas"
 # run-marker-final
 PHOTO_API = "https://music98.news/api/photo"
-PHOTO_DRIVE_ID = "160RQh2FktfRxnIpZ_mkZ2GRdpKstyvtr"
-PHOTO_SOURCE_PAGE = "https://www.speakoutsam.com/samsdiary/2026/9/5/lisa-releases-new-single-and-video-sawadika"
-PHOTO_CREDIT = "LLOUD"
-PHOTO_CREDIT_URL = "https://www.lloud.co/"
+PHOTO_URL = "https://cdn-p.smehost.net/sites/6dc1d53d1d7f4d7fac4636569eacd797/wp-content/uploads/2026/07/always-lalisa-lisa-first-official-image-scaled.png"
+PHOTO_SOURCE_PAGE = "https://www.sonymusic.com/sonymusic/sony-music-visions-documentary-following-global-superstar-lisa-to-world-premiere-at-the-2026-toronto-international-film-festival/"
+PHOTO_CREDIT = "Sony Music Vision"
+PHOTO_CREDIT_URL = PHOTO_SOURCE_PAGE
 
 EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes."""
 
@@ -41,26 +41,26 @@ def is_lisa_residency(p):
     return artist == "LISA" and ("VIVA LA LISA" in text or "LAS VEGAS RESIDENCY" in text)
 
 def get_photo():
-    import gdown, tempfile
-    with tempfile.TemporaryDirectory() as td:
-        path = str(Path(td) / "LISA_SaWaDiKa_SingleCover.jpg")
-        got = gdown.download(id=PHOTO_DRIVE_ID, output=path, quiet=True)
-        if not got or not Path(path).exists():
-            raise RuntimeError("official SaWaDiKa hi-res download failed")
-        raw = Path(path).read_bytes()
+    req = urllib.request.Request(PHOTO_URL, headers={
+        "User-Agent": runner.UA,
+        "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+        "Referer": PHOTO_SOURCE_PAGE,
+    })
+    with urllib.request.urlopen(req, timeout=60) as r:
+        raw = r.read()
     with Image.open(io.BytesIO(raw)) as src:
         print("PHOTO_SOURCE", src.size, src.format, len(raw), PHOTO_SOURCE_PAGE)
         if max(src.size) < 2500:
-            raise RuntimeError(f"official SaWaDiKa artwork below hi-res target: {src.size}")
+            raise RuntimeError(f"official Sony press image below hi-res target: {src.size}")
         im = src.convert("RGB")
-        if max(im.size) > 3600:
-            k = 3600 / max(im.size)
+        if max(im.size) > 3200:
+            k = 3200 / max(im.size)
             im = im.resize((round(im.width*k), round(im.height*k)), Image.Resampling.LANCZOS)
         buf = io.BytesIO()
         im.save(buf, "JPEG", quality=92, optimize=True, progressive=True)
         raw = buf.getvalue()
     out = runner.http(PHOTO_API, runner.desk_key(), {
-        "name": "lisa-sawadika-official-hires-2026.jpg",
+        "name": "lisa-sony-music-vision-2026.jpg",
         "data": "data:image/jpeg;base64," + base64.b64encode(raw).decode(),
     }, method="POST")
     if not out.get("ok"):
@@ -108,10 +108,10 @@ def main():
             "src": photo_url,
             "credit": PHOTO_CREDIT,
             "creditUrl": PHOTO_CREDIT_URL,
-            "pos": "50% 36%",
+            "pos": "50% 44%",
             "zoom": 1,
             "cardX": .50,
-            "cardY": .36,
+            "cardY": .44,
             "cardZoom": 1,
         }
         return copy.deepcopy(p)
