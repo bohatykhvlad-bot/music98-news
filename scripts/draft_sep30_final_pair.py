@@ -13,7 +13,7 @@ LISA_ID="lisa26vegas"
 LP_ID="auleon930r1"
 OLD_LEON_ID="auleon930r1"
 LISA_PHOTO="https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg"
-LISA_FUR_URL="https://s1.ticketm.net/dam/a/b6e/7eaa3ca1-d027-492e-a3bb-87f718f4db6e_TABLET_LANDSCAPE_LARGE_16_9.jpg"
+LISA_FUR_URL="https://images.squarespace-cdn.com/content/v1/65bcd87d5d1be54f8cb487b6/32e9b7e0-5fed-4dc1-bf5f-498570e95af1/Lead%2BPress%2BAE.jpg"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/styles/artist_detail/public/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg?itok=IxzVedtC"
 LISA_FILESTACK_ORIGINAL="https://cdn.filestackcontent.com/R6COV2mESXGIYm9c5pBc"
 LISA_MIRRORS=[
@@ -98,12 +98,12 @@ def upload(name, raw, min_px=1920):
     return out["url"]
 
 def lisa_photo():
-    raw=get(LISA_FUR_URL,"https://www.livenation.com/event/1Ad0Z_6Gkmx6wSv/viva-la-lisa")
+    raw=get(LISA_FUR_URL,"https://thestardustmag.com/music/lisa-alter-ego")
     with Image.open(io.BytesIO(raw)) as probe:
         print("LISA_FUR_QC",probe.size,probe.format)
         if max(probe.size)<1920:
-            raise RuntimeError("LISA Live Nation VIVA LA LISA promo below 1920px")
-    return upload("lisa-viva-la-lisa-live-nation-2026.jpg",raw)
+            raise RuntimeError("LISA Wontae Go press photo below 1920px")
+    return upload("lisa-alter-ego-wontae-go.jpg",raw)
 
 def html_bytes(url):
     req=urllib.request.Request(url,headers={"User-Agent":runner.UA,"Accept":"text/html,application/xhtml+xml"})
@@ -197,7 +197,7 @@ def main():
       "title":"LISA Adds Two Shows to Her Sold-Out Las Vegas Residency",
       "excerpt":"LISA has added two shows to VIVA LA LISA at The Colosseum at Caesars Palace, taking the November residency from four dates to six.",
       "body":LISA_BODY.replace("__TICKET__",ticket_url()),"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lisa_photo(),"credit":"LLOUD","creditUrl":"https://www.lloud.co/","pos":"50% 46%","zoom":1,"cardX":.50,"cardY":.45,"cardZoom":1}
+      "cover":{"kind":"img","src":lisa_photo(),"credit":"Wontae Go","creditUrl":"https://www.instagram.com/gowontae/","pos":"50% 34%","zoom":1,"cardX":.50,"cardY":.30,"cardZoom":1}
     }
     write(LISA_ID,lisa)
     lp={
