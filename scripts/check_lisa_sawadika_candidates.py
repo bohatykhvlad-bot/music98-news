@@ -41,3 +41,15 @@ for name,url,ref in CANDS3:
         print(name, im.size, im.format, len(raw))
     except Exception as e:
         print(name,"ERR",repr(e))
+
+CANDS4=[
+ ("sony_vision_lisa","https://cdn-p.smehost.net/sites/6dc1d53d1d7f4d7fac4636569eacd797/wp-content/uploads/2026/07/always-lalisa-lisa-first-official-image-scaled.png","https://www.sonymusic.com/"),
+]
+for name,url,ref in CANDS4:
+    try:
+        req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Referer":ref})
+        raw=urllib.request.urlopen(req,timeout=45).read()
+        im=Image.open(io.BytesIO(raw))
+        print(name, im.size, im.format, len(raw))
+    except Exception as e:
+        print(name,"ERR",repr(e))
