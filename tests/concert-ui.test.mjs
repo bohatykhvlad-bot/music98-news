@@ -297,3 +297,16 @@ test("partial area loads are labeled instead of looking complete",()=>{
   assert.match(app,/loaded concerts of/);
 });
 
+test("map failure offers an explicit retry without replacing fallback controls",()=>{
+  assert.ok(app.includes("Retry map"));
+  assert.match(app,/querySelector\("#mapRetry"\)\?\.addEventListener\("click",\(\)=>location\.reload\(\)\)/);
+  assert.ok(app.includes("mapFallbackText"));
+});
+
+test("new search input aborts obsolete geocoding while keeping local matches immediate",()=>{
+  assert.match(app,/let suggestGeocodeAbort=null/);
+  assert.match(app,/suggestGeocodeAbort\?\.abort\(\)/);
+  assert.match(app,/geocode\(q,true,geocodeAbort\.signal\)/);
+  assert.match(app,/externalSignal\.addEventListener\("abort",abort/);
+});
+
