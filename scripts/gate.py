@@ -909,6 +909,11 @@ def check_post(p, strict):
     for i, q in enumerate(paras):
         if not is_media(q):
             continue
+        # A ticket CTA is intentionally allowed immediately before the closing
+        # paragraph. It is an action after the story has made its case, not
+        # editorial media that needs two paragraphs of prose beneath it.
+        if q.strip().lower().startswith("[tickets:"):
+            continue
         after = len(paras) - 1 - i
         if after < 2:
             (warns if len(prose_of(body).split()) > 900 else fails).append(
