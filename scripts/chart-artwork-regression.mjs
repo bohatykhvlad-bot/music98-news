@@ -36,7 +36,7 @@ assert.equal(selectArtworkCandidate(bby,[single,album]).selected.provider,"apple
 
 const source=fs.readFileSync(new URL("./build-covers.mjs",import.meta.url),"utf8");
 assert.match(source,/APPLE_FEED/);
-assert.match(source,/feedDirect:true/, "official Apple chart feed must cover lookup-index lag"); assert.match(source,/api\.deezer\.com/); assert.match(source,/currentAppleCandidate/); assert.match(source,/ARTWORK_UNRESOLVED/);
+assert.match(source,/feedDirect:true/, "official Apple chart feed must cover lookup-index lag"); assert.match(source,/api\.deezer\.com/); assert.match(source,/currentAppleCandidate/); assert.match(source,/appleCandidateCompatible/); assert.match(source,/originalIdentity/); assert.match(source,/ARTWORK_UNRESOLVED/);
 assert.match(source,/runtimeBridge:true/, "new Apple chart rows may bridge catalog indexing lag without a point fix");
 assert.doesNotMatch(source,/DIRECT_COLLECTION|animal\\\|katseye|billiejean\\\|michaeljackson|boston\\\|stellalefty/);
 const corrections=JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json",import.meta.url),"utf8"));
@@ -49,6 +49,8 @@ try{
       assert.notEqual(e.releaseClass,"generic",key); assert.notEqual(e.releaseClass,"derivative",key);
       assert.match(e.art,/^https:\/\/(?:[^/]*mzstatic\.com|[^/]*dzcdn\.net)\//i,key);
     }
+    const unresolved=Array.isArray(audit.unresolved)?audit.unresolved:[];
+    assert.equal(Object.keys(audit.entries||{}).length+unresolved.length,audit.rows,"every chart row must be verified or explicitly unresolved");
   }
 }catch{}
 console.log("chart artwork regression: PASS");
