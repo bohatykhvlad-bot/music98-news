@@ -34,7 +34,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260930-18/);
+  assert.match(page,/concerts-app\.js\?v=20260930-19/);
 });
 
 
@@ -117,4 +117,9 @@ test("Load More only fills cyan on hover and has no press animation",()=>{
   assert.match(page,/\.loadmore-btn:hover::before\{background:var\(--accent\);border-color:var\(--accent\)\}/);
   assert.match(page,/\.loadmore-btn:active\{transform:none\}/);
   assert.doesNotMatch(page,/\.loadmore-btn:active\{transform:scale/);
+});
+
+test("SPA /concerts uses concerts-specific document metadata",()=>{
+  assert.match(page,/const CONCERTS_PAGE_META=\{[\s\S]*title:"Concerts Near You - music98\.news"[\s\S]*canonical:"https:\/\/music98\.news\/concerts"/);
+  assert.match(page,/activeTab = t;\n  syncSectionMeta\(t\);/);
 });

@@ -2922,6 +2922,34 @@ function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHint
 /* ============ tabs & search events ============ */
 const TAB_PATHS={news:"/",releases:"/releases",charts:"/chart",concerts:"/concerts"};
 function tabPath(t){ return TAB_PATHS[t]||"/"; }
+const DEFAULT_PAGE_META={
+  title:"music98.news — Music News, Releases & Charts",
+  description:"music98.news — music news, new releases and a weekly Top 50.",
+  ogTitle:"music98.news — Music News, Releases & Charts",
+  ogDescription:"Music news, new releases and a weekly Top 50.",
+  ogUrl:"https://music98.news/",
+  canonical:"https://music98.news/"
+};
+const CONCERTS_PAGE_META={
+  title:"Concerts Near You - music98.news",
+  description:"Find concerts around the world, explore tour dates on an interactive map and buy tickets.",
+  ogTitle:"Concerts Near You - music98.news",
+  ogDescription:"Find concerts around the world, explore tour dates and buy tickets.",
+  ogUrl:"https://music98.news/concerts",
+  canonical:"https://music98.news/concerts"
+};
+function syncSectionMeta(tab){
+  const m=tab==="concerts"?CONCERTS_PAGE_META:DEFAULT_PAGE_META;
+  document.title=m.title;
+  const set=(sel,value,attr="content")=>{const el=document.querySelector(sel);if(el)el.setAttribute(attr,value);};
+  set('meta[name="description"]',m.description);
+  set('meta[property="og:title"]',m.ogTitle);
+  set('meta[property="og:description"]',m.ogDescription);
+  set('meta[property="og:url"]',m.ogUrl);
+  set('meta[name="twitter:title"]',m.ogTitle);
+  set('meta[name="twitter:description"]',m.ogDescription);
+  set('link[rel="canonical"]',m.canonical,"href");
+}
 function goTab(t,replace=false){
   setTab(t);
   const to=tabPath(t);
@@ -2948,6 +2976,7 @@ function setTab(t){
     try{ history.replaceState(null, "", "/"); }catch(e){}
   }
   activeTab = t;
+  syncSectionMeta(t);
   $$("#nav .nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.tab===t));
   $$(".tab").forEach(s=>{
     const on = s.id==="tab-"+t;
@@ -3787,6 +3816,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260930-18" defer></script>
+<script src="/concerts-app.js?v=20260930-19" defer></script>
 </body>
 </html>

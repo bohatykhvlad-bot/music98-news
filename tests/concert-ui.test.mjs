@@ -212,3 +212,19 @@ test("direct /concerts is worker-first, no-store and rewrites index metadata wit
   assert.match(headers,/\/concerts\n  Cache-Control: no-store/);
   assert.ok(legacy.includes("Concerts Near You - music98.news"));
 });
+
+
+test("mobile initial map opens at world overview while desktop camera stays unchanged",()=>{
+  assert.match(app,/const compactWorldView=window\.matchMedia\("\(max-width:700px\)"\)\.matches/);
+  assert.match(app,/center:compactWorldView \? \[5,18\] : \[8,27\]/);
+  assert.match(app,/zoom:compactWorldView \? 0 : 1\.55/);
+});
+test("Belfast is not mapped to the dead ND pseudo-country",()=>{
+  assert.doesNotMatch(app,/ND:\["belfast"\]/);
+});
+test("popup uses artistImage and exposes merged alternate ticket links",()=>{
+  assert.match(app,/const popupImage=String\(e\.artistImage\|\|""\)/);
+  assert.doesNotMatch(app,/img\.className="pop-img"; img\.src=e\.image/);
+  assert.match(app,/Array\.isArray\(e\.ticketOptions\)/);
+  assert.match(app,/alt\.className="ticket-alt"/);
+});
