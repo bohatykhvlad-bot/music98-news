@@ -17,21 +17,19 @@ PHOTO_CREDIT_URL = "https://www.sahrazadat.com/"
 
 EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes."""
 
-BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes. The residency now opens on November 12 and runs for three nights before returning for another three-show stretch from November 27 through 29.
+BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes. The residency will now run November 12 through 14 and return for a second three-show stretch from November 27 through 29.
 
-The two new dates keep the residency at the same venue and extend each weekend by one performance. General sale for November 12 and 29 began September 30. Caesars is billing the run as the first Las Vegas residency by a K-pop artist.
+The added performances extend each of the two previously announced weekends by one night. General sale for the new dates began September 30, while the four original shows remain unchanged. Caesars is billing VIVA LA LISA as the first Las Vegas residency by a K-pop artist.
 
 [tickets:__TICKET__]
 
-The announcement lands less than a month before LISA releases *PRESS PLAY* on October 23 through LLOUD Co. and RCA Records. The six-track EP follows *Alter Ego* and is led by "SaWaDiKa." Caesars included the new single in its residency announcement, tying the November shows to the next phase of LISA's solo material rather than simply extending the earlier *Alter Ego* cycle.
+The announcement comes less than a month before LISA releases *PRESS PLAY* on October 23 through LLOUD Co. and RCA Records. The six-track EP follows *Alter Ego* and is led by "SaWaDiKa." Its release puts the new project three weeks ahead of the first Las Vegas show.
 
-"SaWaDiKa" was filmed in Bangkok and became LISA's first release from *PRESS PLAY*. She later performed the song at the 2026 MTV Video Music Awards, where "Dream feat. Kentaro Sakaguchi" won Best Pop. The residency will therefore begin after *PRESS PLAY* is already out, giving the new material a place in the same release window as the six Las Vegas dates.
+"SaWaDiKa" was filmed in Bangkok and became the first release from *PRESS PLAY*. Caesars says the video drew 70.8 million views in its first 24 hours. LISA later performed the song at the 2026 MTV Video Music Awards, where "Dream feat. Kentaro Sakaguchi" won Best Pop.
 
 [youtube:FMX98ROVRCE]
 
-All six performances are scheduled for The Colosseum, with shows on November 12, 13, 14, 27, 28 and 29. The venue lists a capacity of roughly 4,300, making VIVA LA LISA a compact residency rather than an arena run. The first four dates remain unchanged, while the added Thursday and Sunday shows bookend the two original weekends.
-
-The Las Vegas dates arrive during a busy fall for LISA. Her documentary *Always Lalisa* premiered at the Toronto International Film Festival in September and is set for a worldwide cinema release on October 12. *PRESS PLAY* follows eleven days later, before the residency begins in November. That sequence puts the documentary, the EP and VIVA LA LISA within the same two-month stretch without changing the six-show scope of the residency."""
+VIVA LA LISA remains a limited run at The Colosseum rather than a tour extension. November 12 now opens the first weekend and November 29 closes the second, with three performances scheduled on each weekend. No additional venues or cities were announced with the two new dates."""
 
 def is_lisa_residency(p):
     artist = str(p.get("artist") or "").strip().upper()
@@ -101,10 +99,10 @@ def main():
             "src": photo_url,
             "credit": PHOTO_CREDIT,
             "creditUrl": PHOTO_CREDIT_URL,
-            "pos": "50% 50%",
+            "pos": "50% 28%",
             "zoom": 1,
             "cardX": .50,
-            "cardY": .50,
+            "cardY": .30,
             "cardZoom": 1,
         }
         return copy.deepcopy(p)
