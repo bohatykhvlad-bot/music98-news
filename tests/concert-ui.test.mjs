@@ -229,12 +229,20 @@ test("popup uses event image and exposes merged alternate ticket links",()=>{
   assert.match(app,/alt\.className="ticket-alt"/);
 });
 
-test("Near me always requests current geolocation and surfaces blocked permission",()=>{
+test("concert controls keep only search and Popular/Near me",()=>{
+  assert.doesNotMatch(app,/id=\\"locateBtn\\"/);
+  assert.doesNotMatch(app,/id=\\"radiusMenu\\"/);
+  assert.match(app,/id=\\"popularTab\\"[^>]*>Popular<\\/button>\\n        <button class=\\"side-tab\\" id=\\"nearTab\\"/);
+  assert.match(app,/\.side-tabs\{[\s\S]*pointer-events:auto/);
+  assert.match(app,/\.side-tab\{[\s\S]*display:inline-flex;align-items:center;justify-content:center[\s\S]*text-box:trim-both cap alphabetic/);
+});
+
+test("Near me uses resilient current-position fallbacks",()=>{
   assert.match(app,/nearTab\.addEventListener\("click",requestLocation\)/);
-  assert.match(app,/navigator\.permissions\?\.query/);
-  assert.match(app,/permission\.state==="denied"/);
-  assert.match(app,/Location access is blocked/);
-  assert.match(app,/navigator\.geolocation\.getCurrentPosition/);
-  assert.match(app,/loadArea\(p\.coords\.latitude,p\.coords\.longitude,"Near you",\{fit:false,force:true\}\)/);
-  assert.doesNotMatch(app,/nearTab\.addEventListener\("click",\(\)=>\{[\s\S]*if\(lastArea\)/);
+  assert.match(app,/window\.isSecureContext/);
+  assert.match(app,/enableHighAccuracy:false,timeout:12000,maximumAge:120000/);
+  assert.match(app,/enableHighAccuracy:true,timeout:18000,maximumAge:0/);
+  assert.match(app,/navigator\.geolocation\.watchPosition/);
+  assert.match(app,/DEFAULT_RADIUS_KM=100/);
+  assert.doesNotMatch(app,/navigator\.permissions/);
 });
