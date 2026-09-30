@@ -878,7 +878,13 @@ function renderEventList(box,events){
       const city=document.createElement("span"); city.className="event-city"; city.textContent=[e.city,e.countryCode].filter(Boolean).join(", ")||"Venue TBA";
       const venue=document.createElement("span"); venue.className="event-venue"; venue.textContent=e.venue||e.name||"";
       p.append(city,venue); b.append(d,img,p);
-      b.addEventListener("click",()=>focusEventOnMap(e));
+      b.addEventListener("click",()=>{
+        if(validMapEvents([e]).length){
+          focusEventOnMap(e);
+        }else if(e.url){
+          window.open(e.url,"_blank","noopener");
+        }
+      });
       if(more) box.insertBefore(b,more); else box.appendChild(b);
     }
     shown=next;
@@ -985,7 +991,13 @@ async function loadArtistArea(lat,lng,label,radius){
     if(requestId!==areaRequestSeq || !artistContext || artistKey(artistContext.item)!==contextKey || activeMode!=="artist-area") return;
     let events=stabilizeArtistCoordinates(data.events||[]);
     const maxDistance=searchRadius*1.35+18;
-    events=events.filter(e=>distanceKm(lat,lng,Number(e.lat),Number(e.lng))<=maxDistance);
+    events=events.filter(e=>{
+      const elat=Number(e?.lat),elng=Number(e?.lng);
+      const mappable=Number.isFinite(elat)&&Number.isFinite(elng)&&
+        elat>=-90&&elat<=90&&elng>=-180&&elng<=180&&
+        !(Math.abs(elat)<1e-7&&Math.abs(elng)<1e-7);
+      return !mappable || distanceKm(lat,lng,elat,elng)<=maxDistance;
+    });
     const total=Number(data.page?.totalElements ?? events.length) || events.length;
     artistContext.areaEvents=events;
     artistContext.areaTotal=total;

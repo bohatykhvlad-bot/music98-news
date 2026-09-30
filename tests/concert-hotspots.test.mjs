@@ -1501,3 +1501,44 @@ test("verified market rows publish the radius used for Ticketmaster validation",
   assert.match(source,/radiusKm:searchRadius/);
 });
 
+test("real Ticketmaster event without venue coordinates remains a valid upcoming concert", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  const oldCaches=globalThis.caches;
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      return new Response(JSON.stringify({
+        _embedded:{events:[{
+          id:"coordless",name:"Artist Live",url:"https://example.com/coordless",
+          dates:{start:{dateTime:"2026-12-10T12:00:00Z",localDate:"2026-12-10",localTime:"20:00:00"}},
+          _embedded:{
+            attractions:[{id:"artist",name:"Artist",images:[]}],
+            venues:[{id:"venue",name:"National Stadium",city:{name:"Singapore"},country:{name:"Singapore",countryCode:"SG"}}]
+          },
+          images:[]
+        }]},
+        page:{totalElements:1,totalPages:1,size:200,number:0}
+      }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?attractionId=artist"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    const data=await response.json();
+    assert.equal(data.events.length,1);
+    assert.equal(data.events[0].id,"coordless");
+    assert.equal(data.events[0].lat,null);
+    assert.equal(data.events[0].lng,null);
+    assert.equal(data.events[0].url,"https://example.com/coordless");
+  }finally{
+    globalThis.fetch=oldFetch;
+    globalThis.caches=oldCaches;
+  }
+});
+

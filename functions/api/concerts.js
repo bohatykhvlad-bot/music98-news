@@ -215,9 +215,13 @@ function normalizeEvent(e) {
     /\b(?:test|testing)\b[^\n]{0,30}\b(?:event|festival)\b/i.test(qaText) ||
     venueName.toLowerCase()==="ticketmaster";
   if(testEvent) return null;
-  const lat = finite(venue?.location?.latitude);
-  const lng = finite(venue?.location?.longitude);
-  if (lat == null || lng == null || lat < -90 || lat > 90 || lng < -180 || lng > 180 || (Math.abs(lat) < 1e-7 && Math.abs(lng) < 1e-7)) return null;
+  const rawLat = finite(venue?.location?.latitude);
+  const rawLng = finite(venue?.location?.longitude);
+  const hasValidCoords = rawLat != null && rawLng != null &&
+    rawLat >= -90 && rawLat <= 90 && rawLng >= -180 && rawLng <= 180 &&
+    !(Math.abs(rawLat) < 1e-7 && Math.abs(rawLng) < 1e-7);
+  const lat = hasValidCoords ? rawLat : null;
+  const lng = hasValidCoords ? rawLng : null;
   return {
     id: String(e.id || ""),
     name: String(e.name || attraction.name || "Concert"),

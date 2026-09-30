@@ -310,3 +310,10 @@ test("new search input aborts obsolete geocoding while keeping local matches imm
   assert.match(app,/externalSignal\.addEventListener\("abort",abort/);
 });
 
+test("coordinate-less real concerts stay off the map but keep a Ticketmaster click target",()=>{
+  assert.match(app,/function toGeoJSON\(events\)[\s\S]*Number\.isFinite\(lat\)&&Number\.isFinite\(lng\)/);
+  assert.match(app,/if\(validMapEvents\(\[e\]\)\.length\)/);
+  assert.match(app,/window\.open\(e\.url,\"_blank\",\"noopener\"\)/);
+  assert.match(app,/return !mappable \|\| distanceKm/);
+});
+
