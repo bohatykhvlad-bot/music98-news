@@ -49,6 +49,13 @@ test("footer social icons stay in one row",()=>{
   assert.match(page,/grid-template-columns:minmax\(320px,1fr\) 150px 180px 198px/);
 });
 
+test("mobile footer uses the free second column and social glyphs are optically centered",()=>{
+  assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.foot-in\{grid-template-columns:minmax\(0,1fr\) minmax\(0,1fr\);column-gap:28px;row-gap:30px;padding:32px 16px 36px\}/);
+  assert.match(page,/\.foot-in>\.foot-col:first-child\{grid-column:1\/-1\}/);
+  assert.match(page,/\.foot-in>\.social\{grid-column:1\/-1\}/);
+  assert.match(page,/\.social a\[title="TikTok"\] svg\{transform:translate\(1px,-1px\)\}/);
+});
+
 test("footer social pills fill cyan only on hover",()=>{
   assert.match(page,/\.social a\{[^}]*background:var\(--card\);[^}]*transform:none;[^}]*transition:background \.16s ease,border-color \.16s ease,color \.16s ease/);
   assert.match(page,/\.social a:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);

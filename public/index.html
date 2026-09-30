@@ -516,6 +516,7 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .social a:hover{background:var(--accent);border-color:var(--accent);color:#03282b}
 .social a:active{transform:none}
 .social svg{width:18px;height:18px}
+.social a[title="TikTok"] svg{transform:translate(1px,-1px)}
 .foot-col .copy{margin:16px 0 0;color:var(--muted2);font-size:14px;line-height:1.55}
 
 /* ---------- article modal ---------- */
@@ -722,7 +723,9 @@ textarea{resize:vertical;min-height:64px}
   .search.on input{border:1px solid var(--accent);box-shadow:0 0 0 1.5px var(--accent)}
   input,textarea,select{font-size:16px}
   .search-hints{padding:0 16px 10px;row-gap:6px}
-  .foot-in{grid-template-columns:1fr;padding:32px 16px 36px}
+  .foot-in{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;row-gap:30px;padding:32px 16px 36px}
+  .foot-in>.foot-col:first-child{grid-column:1/-1}
+  .foot-in>.social{grid-column:1/-1}
   .tab{padding-top:14px}
   .tab.rise{animation:none}
   .hd{margin-bottom:18px}
