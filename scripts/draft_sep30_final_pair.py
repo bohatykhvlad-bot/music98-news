@@ -13,7 +13,7 @@ LISA_ID="lisa26vegas"
 LP_ID="auleon930r1"
 OLD_LEON_ID="auleon930r1"
 LISA_PHOTO="https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg"
-LISA_FUR_URL="https://media.vogue.com.tw/photos/69fc2dabd626f4ff11eaf44c/master/w_2560,c_limit/BFA_54140_7894895.JPG"
+LISA_FUR_URL="https://s1.ticketm.net/dam/a/b6e/7eaa3ca1-d027-492e-a3bb-87f718f4db6e_TABLET_LANDSCAPE_LARGE_16_9.jpg"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/styles/artist_detail/public/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg?itok=IxzVedtC"
 LISA_FILESTACK_ORIGINAL="https://cdn.filestackcontent.com/R6COV2mESXGIYm9c5pBc"
 LISA_MIRRORS=[
@@ -98,12 +98,12 @@ def upload(name, raw, min_px=1920):
     return out["url"]
 
 def lisa_photo():
-    raw=get(LISA_FUR_URL,"https://www.vogue.com.tw/galerie/gq-met-gala-after-party-2026")
+    raw=get(LISA_FUR_URL,"https://www.livenation.com/event/1Ad0Z_6Gkmx6wSv/viva-la-lisa")
     with Image.open(io.BytesIO(raw)) as probe:
         print("LISA_FUR_QC",probe.size,probe.format)
         if max(probe.size)<1920:
-            raise RuntimeError("LISA Zach Hilty image below 1920px")
-    return upload("lisa-met-gala-afterparty-zach-hilty.jpg",raw)
+            raise RuntimeError("LISA Live Nation VIVA LA LISA promo below 1920px")
+    return upload("lisa-viva-la-lisa-live-nation-2026.jpg",raw)
 
 def html_bytes(url):
     req=urllib.request.Request(url,headers={"User-Agent":runner.UA,"Accept":"text/html,application/xhtml+xml"})
@@ -197,7 +197,7 @@ def main():
       "title":"LISA Adds Two Shows to Her Sold-Out Las Vegas Residency",
       "excerpt":"LISA has added two shows to VIVA LA LISA at The Colosseum at Caesars Palace, taking the November residency from four dates to six.",
       "body":LISA_BODY.replace("__TICKET__",ticket_url()),"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lisa_photo(),"credit":"Zach Hilty","creditUrl":"https://www.zachhiltyphoto.com/info","pos":"50% 39%","zoom":1,"cardX":.50,"cardY":.37,"cardZoom":1}
+      "cover":{"kind":"img","src":lisa_photo(),"credit":"Live Nation","creditUrl":"https://www.livenation.com/event/1Ad0Z_6Gkmx6wSv/viva-la-lisa","pos":"50% 46%","zoom":1,"cardX":.50,"cardY":.45,"cardZoom":1}
     }
     write(LISA_ID,lisa)
     lp={
