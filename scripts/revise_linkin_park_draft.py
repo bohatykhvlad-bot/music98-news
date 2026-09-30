@@ -11,19 +11,21 @@ POST_ID = "auleon930r1"
 
 EXCERPT = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*.'''
 
-BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. It mixes *FROM ZERO* songs with earlier material, giving the soundtrack a set list that spans several phases of LINKIN PARK's catalog.
+BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. It pairs songs from *FROM ZERO* with material from earlier LINKIN PARK records.
 
-The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The recording preserves the São Paulo running order, opening with "Somewhere I Belong" and closing with "Bleed It Out." Songs from *FROM ZERO* are spread through the set rather than grouped into a separate section. The live version of "Faint" was released ahead of the album with an official video from the same concert.
+The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The recording follows the concert sequence from "Somewhere I Belong" through the closing "Bleed It Out," with the *FROM ZERO* songs spread across the set.
+
+The older selections cover several periods in the band's catalog. "Somewhere I Belong," "Faint" and "Numb" come from *Meteora*. "What I've Done" and "Leave Out All the Rest" represent *Minutes to Midnight*, while "The Catalyst" and "Waiting for the End" come from *A Thousand Suns*. The live version of "Faint" was issued ahead of the album with an official video from the same São Paulo performance.
 
 [youtube:zNYsw-cW8v8]
 
-The older selections cover several parts of the band's catalog. "Somewhere I Belong," "Faint" and "Numb" come from *Meteora*, while "What I've Done" and "Leave Out All the Rest" represent *Minutes to Midnight*. "The Catalyst" and "Waiting for the End" come from *A Thousand Suns*. The newer songs are drawn from *FROM ZERO*.
+*UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The band's official store says the film combines archive footage, sold-out live performances and interviews with band members and fans. The soundtrack also includes live recordings that are not heard in the documentary.
 
-*UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo show. The band's official store says the film combines archive footage, performances from sold-out concerts and interviews with band members and fans. The soundtrack also contains live recordings that do not appear in the documentary.
+The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums. São Paulo was one of the first major shows from that period, with the new lineup performing recent material and long-established songs in the same set.
 
-The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums.
+The physical editions use different track configurations. The CD has 20 tracks, including four short pieces placed between the 16 full performances. "Inception" opens the disc, "Creation" follows "The Emptiness Machine," "Break Collapse" comes before "Lost," and "Resolution" appears before "Papercut." The CD comes in a gatefold softpak with a 12-panel accordion booklet. The two-LP edition leaves out those four pieces and carries the 16 complete performances in a gatefold jacket with a 12-by-24-inch insert.'''
 
-The physical editions use different track configurations. The CD has 20 tracks, including four short intro and interlude pieces placed between the 16 full performances. "Inception" opens the disc, "Creation" follows "The Emptiness Machine," "Break Collapse" comes before "Lost," and "Resolution" appears before "Papercut." The CD comes in a gatefold softpak with a 12-panel accordion booklet. The two-LP edition removes those four short pieces and keeps the 16 complete performances in a gatefold jacket with a 12-by-24-inch insert. Both physical versions end with "Heavy Is the Crown" followed by "Bleed It Out."'''
+AI_STYLE_FLAGS = ("marks a new chapter","comes at a time","not only","rather than simply","serves as a","underscores","showcases")
 
 def main():
     runner.load_env()
@@ -36,6 +38,12 @@ def main():
         p["excerpt"] = EXCERPT
         p["body"] = BODY
         return copy.deepcopy(p)
+
+    low = BODY.lower()
+    bad = [x for x in AI_STYLE_FLAGS if x in low]
+    print("AI_STYLE_SCAN", bad)
+    if bad:
+        raise RuntimeError(f"AI-style phrase(s) remain: {bad}")
 
     runner.guarded_write(mutate)
 
