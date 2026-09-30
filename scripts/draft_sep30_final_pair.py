@@ -65,7 +65,18 @@ def get(url, referer=""):
     }
     if referer: headers["Referer"]=referer
     req=urllib.request.Request(url,headers=headers)
-    with opener.open(req,timeout=60) as r: return r.read()
+    try:
+        with opener.open(req,timeout=60) as r: return r.read()
+    except Exception:
+        if "press.warnerrecords.com" in url and referer:
+            try:
+                page=opener.open(urllib.request.Request(referer,headers={"User-Agent":runner.UA}),timeout=30).read().decode("utf-8","replace")
+                key="Linkin_Park_2_20_2535788"
+                at=page.find(key)
+                if at>=0: print("WARNER_HTML",page[max(0,at-1200):at+1800].replace("\n"," "))
+            except Exception as dbg:
+                print("WARNER_DEBUG_ERROR",repr(dbg))
+        raise
 
 def upload(name, raw, min_px=1920):
     with Image.open(io.BytesIO(raw)) as src:
