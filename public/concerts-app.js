@@ -1704,7 +1704,15 @@ function resizeMapStable(){
   }catch(e){}
 }
 
+let concertDataBooted=false;
+function bootConcertData(){
+  if(concertDataBooted) return;
+  concertDataBooted=true;
+  loadMarkets();
+  loadPopular();
+}
 map.on("load",()=>{
+  if(!map.__fallback) mapFallback.hidden=true;
   resizeMapStable();
   addTopographicRelief();
   addLayers();
@@ -1712,14 +1720,26 @@ map.on("load",()=>{
   if(hubs) hubs.setData(hubsGeoJSON());
   applyMapMode();
   bindNativeZoomOutReset();
-  loadMarkets();
-  loadPopular();
+  bootConcertData();
   queuePillInkCenter();
   if(document.fonts?.ready) document.fonts.ready.then(queuePillInkCenter).catch(()=>{});
   requestAnimationFrame(resizeMapStable);
   setTimeout(resizeMapStable,90);
   setTimeout(resizeMapStable,320);
 });
+bootConcertData();
+if(mapInitError){
+  mapFallback.hidden=false;
+  mapFallback.textContent="The map is unavailable in this browser, but search and concert lists still work.";
+}else{
+  setTimeout(()=>{
+    const ready=typeof map.loaded==="function" ? map.loaded() : false;
+    if(!ready){
+      mapFallback.hidden=false;
+      mapFallback.textContent="The map is taking longer to load. Search and concert lists are still available.";
+    }
+  },8000);
+}
 
 host._concertMap = map;
 host.resizeConcertMap = ()=>{
@@ -1770,8 +1790,16 @@ class Music98Concerts extends HTMLElement{
       this._started=true;
       ensureMapbox().then(()=>initConcerts(this.shadowRoot,this)).catch(err=>{
         console.error(err);
-        const st=this.shadowRoot.querySelector("#status");
-        if(st) st.textContent="Could not load the concert map.";
+        const mapFallback=this.shadowRoot.querySelector("#mapFallback");
+        const sideEmpty=this.shadowRoot.querySelector("#sideEmpty");
+        if(mapFallback){
+          mapFallback.hidden=false;
+          mapFallback.textContent="Could not load the map library. Reload the page to try again.";
+        }
+        if(sideEmpty){
+          sideEmpty.hidden=false;
+          sideEmpty.textContent="Concert tools could not start because the map library failed to load.";
+        }
       });
     };
 
