@@ -681,7 +681,7 @@ textarea{resize:vertical;min-height:64px}
   .search{width:170px}
 }
 @media (hover:hover) and (pointer:fine){
-  .nav-btn:hover{color:var(--text)}
+  .nav-btn:hover:not(.active){background:var(--bg2);color:var(--text)}
   .chart-row:hover{background:var(--card2)}
   .rplay:hover{color:#03282b;transform:scale(1.07)}
   .card:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
@@ -3784,6 +3784,6 @@ S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refres
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260930-15" defer></script>
+<script src="/concerts-app.js?v=20260930-16" defer></script>
 </body>
 </html>
