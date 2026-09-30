@@ -11,7 +11,7 @@ POST_ID = "auleon930r1"
 
 EXCERPT = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*.'''
 
-BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. The album places *FROM ZERO* material alongside songs recorded across earlier LINKIN PARK eras, using the running order heard at the show rather than reorganizing the performance for the soundtrack.
+BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. The soundtrack keeps the concert running order and places *FROM ZERO* songs alongside material from earlier LINKIN PARK albums.
 
 The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The recording follows the concert sequence from "Somewhere I Belong" through the closing "Bleed It Out," with the *FROM ZERO* songs spread across the set.
 
@@ -21,7 +21,7 @@ The older selections cover several periods in the band's catalog. "Somewhere I B
 
 *UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The band's official store says the film combines archive footage, sold-out live performances and interviews with band members and fans. The soundtrack also includes live recordings that are not heard in the documentary.
 
-The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums. São Paulo was one of the first major shows from that period, with the new lineup performing recent material and long-established songs in the same set.
+The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums. The São Paulo recording documents that lineup onstage with both the new material and the band's older songs.
 
 The physical editions use different track configurations. The CD has 20 tracks, including four short pieces placed between the 16 full performances. "Inception" opens the disc, "Creation" follows "The Emptiness Machine," "Break Collapse" comes before "Lost," and "Resolution" appears before "Papercut." The CD comes in a gatefold softpak with a 12-panel accordion booklet. The two-LP edition leaves out those four pieces and carries the 16 complete performances in a gatefold jacket with a 12-by-24-inch insert.'''
 
