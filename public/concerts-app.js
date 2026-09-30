@@ -990,7 +990,9 @@ async function loadArtistArea(lat,lng,label,radius){
     artistContext.areaTotal=total;
     artistContext.areaCenter={lat,lng,radius:searchRadius};
     setEventData(events,total);
-    setStatus(data.partial && total>events.length\n      ? "Showing "+events.length+" loaded concerts of "+total+" Ticketmaster results."\n      : "");
+    setStatus(data.partial && total>events.length
+      ? "Showing "+events.length+" loaded concerts of "+total+" Ticketmaster results."
+      : "");
   }catch(err){
     if(requestId!==areaRequestSeq) return;
     console.error(err);
