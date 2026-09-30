@@ -15,3 +15,16 @@ for name,url,ref in CANDS:
         print(name, im.size, im.format, len(raw))
     except Exception as e:
         print(name,"ERR",repr(e))
+
+CANDS2=[
+ ("sony_preview","https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207-396.jpg","https://www.sonymusic.es/"),
+ ("sony_original","https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg","https://www.sonymusic.es/"),
+]
+for name,url,ref in CANDS2:
+    try:
+        req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Referer":ref})
+        raw=urllib.request.urlopen(req,timeout=45).read()
+        im=Image.open(io.BytesIO(raw))
+        print(name, im.size, im.format, len(raw))
+    except Exception as e:
+        print(name,"ERR",repr(e))
