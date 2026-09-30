@@ -287,3 +287,16 @@ test("local search suggestions render before remote requests finish",()=>{
   assert.match(app,/setTimeout\(\(\)=>controller\.abort\(\),15000\)/);
 });
 
+test("map failure cannot block Popular/data boot",()=>{
+  assert.match(app,/function createMapFallback\(container\)/);
+  assert.match(app,/function bootConcertData\(\)/);
+  assert.match(app,/bootConcertData\(\);/);
+  assert.match(app,/id=\\\"mapFallback\\\" role=\\\"status\\\"/);
+  assert.doesNotMatch(app,/querySelector\(\"#status\"\)/);
+});
+
+test("partial area loads are labeled instead of looking complete",()=>{
+  assert.match(app,/data\.partial && total>events\.length/);
+  assert.match(app,/loaded concerts of/);
+});
+
