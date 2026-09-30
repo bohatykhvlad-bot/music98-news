@@ -125,3 +125,10 @@ test("SPA /concerts uses concerts-specific document metadata",()=>{
   assert.match(page,/const CONCERTS_PAGE_META=\{[\s\S]*title:"Concerts Near You - music98\.news"[\s\S]*canonical:"https:\/\/music98\.news\/concerts"/);
   assert.match(page,/activeTab = t;\n  syncSectionMeta\(t\);/);
 });
+
+
+test("search mode removes the empty hero spacer and Facebook glyph is optically centered",()=>{
+  assert.match(page,/body\.searching #heroSlot:empty\{min-height:0\}/);
+  assert.match(page,/\.social a\[title="Facebook"\] svg\{transform:translateY\(-1px\)\}/);
+  assert.match(page,/#heroSlot:empty\{min-height:300px\}/);
+});
