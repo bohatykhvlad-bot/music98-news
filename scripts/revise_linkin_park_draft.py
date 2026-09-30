@@ -13,7 +13,7 @@ EXCERPT = r'''The band's new live set, released September 25 through Warner Reco
 
 BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. It mixes *FROM ZERO* songs with earlier material, giving the soundtrack a set list that spans several phases of LINKIN PARK's catalog.
 
-The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The live version of "Faint" was released ahead of the album with an official video from the same concert.
+The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The recording preserves the São Paulo running order, opening with "Somewhere I Belong" and closing with "Bleed It Out." Songs from *FROM ZERO* are spread through the set rather than grouped into a separate section. The live version of "Faint" was released ahead of the album with an official video from the same concert.
 
 [youtube:zNYsw-cW8v8]
 
@@ -21,7 +21,7 @@ The older selections cover several parts of the band's catalog. "Somewhere I Bel
 
 *UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo show. The band's official store says the film combines archive footage, performances from sold-out concerts and interviews with band members and fans. The soundtrack also contains live recordings that do not appear in the documentary.
 
-The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums. The São Paulo set places the new lineup's material beside songs from earlier records instead of separating the two parts of the catalog.
+The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums.
 
 The physical editions use different track configurations. The CD has 20 tracks, including four short intro and interlude pieces placed between the 16 full performances. "Inception" opens the disc, "Creation" follows "The Emptiness Machine," "Break Collapse" comes before "Lost," and "Resolution" appears before "Papercut." The CD comes in a gatefold softpak with a 12-panel accordion booklet. The two-LP edition removes those four short pieces and keeps the 16 complete performances in a gatefold jacket with a 12-by-24-inch insert. Both physical versions end with "Heavy Is the Crown" followed by "Bleed It Out."'''
 
