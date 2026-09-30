@@ -169,6 +169,6 @@ test("same-day chart cache never preserves rows with missing artwork",()=>{
 
 test("article ticket carrier keeps executable line breaks",()=>{
   assert.equal(page.includes('$/i);\\n    if(tickets)'), false);
-  assert.match(page,/const tickets = t\\.match/);
-  assert.match(page,/if\\(tickets\\) return/);
+  assert.equal(page.includes('const tickets = t.match('), true);
+  assert.equal(page.includes('if(tickets) return'), true);
 });
