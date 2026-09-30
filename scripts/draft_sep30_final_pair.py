@@ -22,13 +22,11 @@ The residency remains concentrated across two weekends rather than becoming a lo
 
 The announcement lands in the middle of LISA's current solo campaign. "SaWaDiKa," released through LLOUD Co. and RCA Records, is the first single from her seven-song EP *PRESS PLAY*, due October 23. The video was filmed in Bangkok and, according to Caesars, drew 70.8 million views in its first 24 hours. The official clip puts LISA's Thai roots at the center of the campaign rather than treating them as background to a generic pop release.
 
-[youtube:FyS5dAywkEo]
+LISA also brought "SaWaDiKa" to the 2026 MTV Video Music Awards for its first televised performance. At the same VMAs, "Dream" won Best Pop. LLOUD's official short film for "Dream," starring LISA and Kentaro Sakaguchi, is included below as the article's single media block.
 
-LISA also brought "SaWaDiKa" to the 2026 MTV Video Music Awards for its first televised performance. The same song is available through the official Apple Music release below.
+[youtube:FMX98ROVRCE]
 
-[apple:song:6804002989:6804002992]
-
-At the same VMAs, "Dream" won Best Pop. By the time the residency opens in November, *PRESS PLAY* will have been out for several weeks, giving the show new material alongside songs from *Alter Ego*, her 2025 debut solo album.
+By the time the residency opens in November, *PRESS PLAY* will have been out for several weeks, giving the show new material alongside songs from *Alter Ego*, her 2025 debut solo album.
 
 The Vegas run follows another unusually active stretch. BLACKPINK completed the DEADLINE World Tour, while LISA continued building a separate solo schedule across music and screen work. Her documentary *Always Lalisa*, directed by Sue Kim, premiered at the Toronto International Film Festival and is also headed to cinemas worldwide in October. That places the film, the EP and the residency within a compact fall campaign.
 
