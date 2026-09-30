@@ -28,17 +28,15 @@ The residency will still run across two weekends. LISA now plays November 12 thr
 
 [tickets:__TICKET__]
 
-The extra dates arrive as LISA begins the campaign for *PRESS PLAY*, her new EP due October 23 through LLOUD Co. and RCA Records. Its first single, "SaWaDiKa," was released on September 4. Produced by Thom Bridges and Ojivolta, the song takes its name from the Thai greeting for "hello."
+The extra dates arrive as LISA begins the campaign for *PRESS PLAY*, her new EP due October 23 through LLOUD Co. and RCA Records. Its first single, "SaWaDiKa," was released on September 4. Produced by Thom Bridges and Ojivolta, the song takes its name from the Thai greeting for "hello." Sony's store lists *PRESS PLAY* as a six-track EP, with "SaWaDiKa" followed by five titles that have not yet been revealed.
 
-The "SaWaDiKa" video was directed by Bang Jae Yeob and filmed in Bangkok. LISA moves through several locations in the city, with Thai references built into the sets, styling and choreography. Caesars says the video drew 70.8 million views in its first 24 hours. LISA then performed the song at the 2026 MTV Video Music Awards.
-
-At the same VMAs, "Dream feat. Kentaro Sakaguchi" won Best Pop. LLOUD later released an official short film for the song starring LISA and Sakaguchi.
+The "SaWaDiKa" video was directed by Bang Jae Yeob and filmed in Bangkok. LISA moves through several locations in the city, with Thai references built into the sets, styling and choreography. Caesars says the video drew 70.8 million views in its first 24 hours, and LISA later performed the song at the 2026 MTV Video Music Awards. At the same show, "Dream feat. Kentaro Sakaguchi" won Best Pop. "Dream" appeared on *Alter Ego*, and LLOUD later released an official short film for the song starring LISA and Sakaguchi.
 
 [youtube:FMX98ROVRCE]
 
-*PRESS PLAY* arrives 20 days before the first Las Vegas show, so the EP will already be out when VIVA LA LISA opens. The November booking remains a limited run at one venue rather than a longer Las Vegas season.
+*PRESS PLAY* arrives 20 days before the first Las Vegas show, so the EP will already be out when VIVA LA LISA opens. When Caesars first announced the residency in March, it followed LISA's 2025 album *Alter Ego*, which debuted at No. 1 on Billboard's Top Album Sales chart and No. 7 on the Billboard 200. The new EP now sits directly between that album cycle and the November residency.
 
-The two added shows sit at opposite ends of the schedule. November 12 now opens the first weekend and November 29 closes the second, while the four original dates remain unchanged. The final run is three consecutive nights from November 12 through 14 and another three from November 27 through 29.'''
+The added shows do not change the venue or the two-weekend format. November 12 now opens the first weekend and November 29 closes the second, while the four original dates remain unchanged. VIVA LA LISA remains a limited six-show run at The Colosseum, with three performances on each weekend.'''
 
 LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album that accompanies the band's new *UNSHATTER* film. The soundtrack arrived September 25 through Warner Records and documents the São Paulo concert tied to the *FROM ZERO* release period.
 
