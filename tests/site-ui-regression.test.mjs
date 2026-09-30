@@ -165,3 +165,9 @@ test("same-day chart cache never preserves rows with missing artwork",()=>{
   assert.match(page,/if\(!tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)\) throw 0;/);
   assert.match(page,/\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=40"/);
 });
+
+
+test("article ticket carrier keeps executable line breaks",()=>{
+  assert.doesNotMatch(page,/const tickets = t\\.match\\([^\n]+\\\\n\\s*if\\(tickets\\)/);
+  assert.match(page,/const tickets = t\\.match\\([^\n]+\n\\s*if\\(tickets\\) return/);
+});
