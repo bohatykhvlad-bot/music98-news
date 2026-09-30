@@ -142,7 +142,7 @@ REFERENT = re.compile(
 VERIFIED_DATES = {
     "october 9": "Dominic Fike 'How To Quit Smoking' album release date, 09.10.2026 (Apple Music / Columbia Records)",
     "september 29": "Dominic Fike Comedy Tragedy Parody show at The Wiltern, Los Angeles, 29.09.2026 (dominicfike.com / Ticketmaster)",
-    "september 30": "Dominic Fike Comedy Tragedy Parody show at The Wiltern, Los Angeles, 30.09.2026 (dominicfike.com / Ticketmaster)",
+    "september 30": "Dominic Fike Comedy Tragedy Parody show at The Wiltern, Los Angeles, 30.09.2026 (dominicfike.com / Ticketmaster); LISA added-show general on-sale, 30.09.2026 (Caesars Entertainment 29.09.2026)",
     "september 23": "Taylor Swift announced The Life of a Showgirl: The Encore on 23.09.2026 (Pitchfork/NME)",
     "october 3": "The Life of a Showgirl released on 03.10.2025 (Variety)",
     "2016": "debut, SQUARE ONE, 08.08.2016 (YG); first music show win 21.08.2016 (Inkigayo)",
@@ -159,6 +159,8 @@ VERIFIED_DATES = {
     "october 30": "Fallen Angel physical edition with three extra tracks, 30.10.2026",
     "october 23": "LISA EP 'PRESS PLAY', 23.10.2026",
     "november": "LISA residency at Caesars Palace, November 2026",
+    "november 12": "Newly added VIVA LA LISA show at The Colosseum at Caesars Palace, 12.11.2026 (Caesars Entertainment 29.09.2026)",
+    "november 29": "Newly added VIVA LA LISA show at The Colosseum at Caesars Palace, 29.11.2026 (Caesars Entertainment 29.09.2026)",
     "september 25": "Taylor Swift 'Patient Zero' single out 25.09.2026 (Republic; AP/Variety/JustJared); "
                      "pre-order open 24h, three collector's edition CDs with double-sided covers (People)",
     "october 13": "Patient Zero collector CD singles ship 13.10.2026 (themusicuniverse)",
