@@ -7,7 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import dns from "node:dns";
-import { artworkKey, mergeKey, normTitle, primaryArtist, stripParen } from "../functions/lib/chart-identity.js";
+import { appleCandidateCompatible, artworkKey, mergeKey, normTitle, primaryArtist, stripParen } from "../functions/lib/chart-identity.js";
 import { candidateCompatible, classifyCandidate, normalizedRelease, rankArtworkCandidates, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
 dns.setDefaultResultOrder("ipv4first");
 
@@ -90,7 +90,15 @@ async function currentAppleCandidate(track){
     const d=await json(`https://itunes.apple.com/lookup?id=${encodeURIComponent(id)}&entity=song&country=US`,2);
     const raw=(d?.results||[]).find(x=>String(x?.trackId||"")===String(id));
     const c=appleCandidate(raw,"apple-chart",{chartUrl:String(track?.url||"")});
-    return c&&candidateCompatible(track,c)?c:null;
+    if(!c) return null;
+    if(candidateCompatible(track,c)) return c;
+    if(raw && appleCandidateCompatible(track.title,track.artist,raw) &&
+       mergeKey(raw.trackName,raw.artistName)===mergeKey(track.title,track.artist)){
+      track.title=String(raw.trackName||track.title);
+      track.artist=String(raw.artistName||track.artist);
+      return candidateCompatible(track,c)?c:null;
+    }
+    return null;
   }catch{
     return null;
   }
@@ -157,7 +165,7 @@ const oldAudit=readAudit(), oldNames=readNames(), covers={}, auditEntries={}, na
 const mergeCounts=new Map(); for(const t of tracks){const k=mergeKey(t.title,t.artist);mergeCounts.set(k,(mergeCounts.get(k)||0)+1);}
 
 for(let i=0;i<tracks.length;i++){
-  const t=tracks[i], identity=artworkKey(t.title,t.artist);
+  const t=tracks[i], originalIdentity=artworkKey(t.title,t.artist);
   const feedMatches=feed.filter(c=>candidateCompatible(t,c));
   let candidates=[...feedMatches];
   const cleanFeed=feedMatches.map(c=>({c,cls:classifyCandidate(t,c)})).filter(x=>x.cls==="album"||x.cls==="dedicated");
@@ -167,6 +175,7 @@ for(let i=0;i<tracks.length;i++){
     try{candidates.push(...await searchApple(t));}catch(e){console.log("ARTWORK_AUDIT apple-search fail",i+1,t.artist,"-",t.title,String(e.message||e));}
     try{candidates.push(...await searchDeezer(t));}catch(e){console.log("ARTWORK_AUDIT deezer fail",i+1,t.artist,"-",t.title,String(e.message||e));}
   }
+  const identity=artworkKey(t.title,t.artist);
   const dedup=new Map(); for(const c of candidates){const k=[c.provider,c.id,c.collectionId,c.art].join("|");if(!dedup.has(k))dedup.set(k,c);} candidates=[...dedup.values()];
   let ranked=rankArtworkCandidates(t,candidates);
   let selected=ranked[0]||null;
@@ -187,7 +196,9 @@ for(let i=0;i<tracks.length;i++){
     if(!strong&&!sameRelease&&Number(prev.confidence||0)>chosen.confidence) chosen={...prev,provider:"previous-audit",score:Number(prev.score||0),confidence:Number(prev.confidence||92),releaseClass:prev.releaseClass||"album"};
   }
   if(!chosen?.art){unresolved.push({rank:i+1,title:t.title,artist:t.artist,candidates:ranked.slice(0,4).map(publicCandidate)});console.log("ARTWORK_UNRESOLVED",i+1,t.artist,"-",t.title);continue;}
-  covers[identity]=chosen.art; const legacy=mergeKey(t.title,t.artist); if((mergeCounts.get(legacy)||0)===1)covers[legacy]=chosen.art;
+  covers[identity]=chosen.art;
+  if(originalIdentity!==identity) covers[originalIdentity]=chosen.art;
+  const legacy=mergeKey(t.title,t.artist); if((mergeCounts.get(legacy)||0)===1)covers[legacy]=chosen.art;
   sourceCounts[chosen.provider]=(sourceCounts[chosen.provider]||0)+1;
   const entry={identity,title:t.title,artist:t.artist,art:chosen.art,provider:chosen.provider,releaseTitle:String(chosen.releaseTitle||""),releaseArtist:String(chosen.releaseArtist||""),releaseDate:String(chosen.releaseDate||""),releaseClass:String(chosen.releaseClass||""),url:String(chosen.url||""),collectionId:String(chosen.collectionId||""),trackId:String(chosen.id||""),confidence:Number(chosen.confidence||0),score:Number(chosen.score||0),consensus:Number(chosen.consensus||0),verified:true,checkedAt:new Date().toISOString(),alternatives:ranked.slice(0,5).map(publicCandidate)};
   auditEntries[identity]=entry;
@@ -196,7 +207,10 @@ for(let i=0;i<tracks.length;i++){
   const mk=mergeKey(t.title,t.artist); if(meta?.raw)names[mk]=appleRecord(meta.raw); else if(oldNames[mk])names[mk]=oldNames[mk];
   console.log("ARTWORK",JSON.stringify({rank:i+1,title:t.title,artist:t.artist,provider:entry.provider,release:entry.releaseTitle,class:entry.releaseClass,confidence:entry.confidence,consensus:entry.consensus,art:entry.art}));
 }
-if(unresolved.length){console.error("ARTWORK_UNRESOLVED_SUMMARY",JSON.stringify(unresolved));throw new Error(`artwork audit unresolved ${unresolved.length}/${tracks.length}; refusing to publish guesses`);}
+if(unresolved.length){
+  console.warn("ARTWORK_UNRESOLVED_SUMMARY",JSON.stringify(unresolved));
+  console.warn(`ARTWORK_PARTIAL: ${unresolved.length}/${tracks.length} rows remain unresolved; publishing only verified rows`);
+}
 for(const [k,e] of Object.entries(auditEntries)){
   if(["generic","derivative"].includes(e.releaseClass))throw new Error("unsafe artwork published: "+k);
   if(!/^https:\/\/(?:[^/]*mzstatic\.com|[^/]*dzcdn\.net)\//i.test(e.art))throw new Error("untrusted artwork host: "+k+" "+e.art);
@@ -206,6 +220,6 @@ const sortedAudit=Object.fromEntries(Object.entries(auditEntries).sort(([a],[b])
 const sortedNames=Object.fromEntries(Object.entries(names).sort(([a],[b])=>a.localeCompare(b)));
 fs.mkdirSync(path.dirname(OUT),{recursive:true});
 fs.writeFileSync(OUT,JSON.stringify(sortedCovers,null,2)+"\n");
-fs.writeFileSync(OUT_AUDIT,JSON.stringify({schema:2,updatedAt:new Date().toISOString(),chartUpdated:String(chart.updated||""),chartRev:String(chart.rev||""),rows:tracks.length,sourceCounts,entries:sortedAudit},null,2)+"\n");
+fs.writeFileSync(OUT_AUDIT,JSON.stringify({schema:2,updatedAt:new Date().toISOString(),chartUpdated:String(chart.updated||""),chartRev:String(chart.rev||""),rows:tracks.length,verified:Object.keys(sortedAudit).length,unresolved,sourceCounts,entries:sortedAudit},null,2)+"\n");
 fs.writeFileSync(OUT_NAMES,JSON.stringify(sortedNames,null,2)+"\n");
-console.log("ARTWORK_AUDIT_SUMMARY",JSON.stringify({rows:tracks.length,verified:Object.keys(sortedAudit).length,sourceCounts,covers:Object.keys(sortedCovers).length}));
+console.log("ARTWORK_AUDIT_SUMMARY",JSON.stringify({rows:tracks.length,verified:Object.keys(sortedAudit).length,unresolved:unresolved.length,sourceCounts,covers:Object.keys(sortedCovers).length}));
