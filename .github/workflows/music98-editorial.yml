@@ -175,6 +175,11 @@ jobs:
         run: |
           python -m pip install --quiet Pillow gdown
           python scripts/revise_lisa_residency_draft.py
+      - name: Inspect SaWaDiKa photo candidates
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[lisa-photo-check]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/check_lisa_sawadika_candidates.py
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
