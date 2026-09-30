@@ -11,39 +11,39 @@ PHOTO_API="https://music98.news/api/photo"
 LISA_ID="lisa26vegas"
 LP_ID="auleon930r1"
 OLD_LEON_ID="auleon930r1"
-LISA_PHOTO="https://s202.q4cdn.com/508919455/files/content_files/Static_Social-Instagram_1080x1080_Lisa_2026_Regional_TheColosseumatCaesarsPalace_1101_V2-20-41-27.jpg"
+LISA_PHOTO="https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/styles/artist_detail/public/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg?itok=IxzVedtC"
-LP_MIRRORS=["https://www.visions.de/news/linkin-park-eroeffnungsauftritt-beim-uefa-champions-league-finale/","https://www.musikexpress.de/linkin-park-neue-single-unshatter-ist-da-3013217/"]
+LISA_MIRROR_PAGE="https://deepcut.gr/lisa-sawadika/91638/"\nLP_MIRRORS=["https://www.visions.de/news/linkin-park-eroeffnungsauftritt-beim-uefa-champions-league-finale/","https://www.musikexpress.de/linkin-park-neue-single-unshatter-ist-da-3013217/"]
 
-LISA_BODY='''LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six. The new performances are scheduled for November 12 and 29, joining previously announced shows on November 13, 14, 27 and 28. Caesars says the original four dates sold out in under 10 minutes, and general sale for the two added performances begins September 30.
+LISA_BODY='''LISA has added two shows to VIVA LA LISA at The Colosseum at Caesars Palace, taking the November residency from four dates to six. The new performances are November 12 and 29. They join the previously announced shows on November 13, 14, 27 and 28. Caesars says the original four dates sold out in under 10 minutes.
 
-The residency remains concentrated across two weekends rather than becoming a longer Vegas season. The complete schedule is November 12-14 and November 27-29, all at the 4,300-seat Colosseum. Caesars is billing VIVA LA LISA as the first Las Vegas residency by a K-pop artist. The two additions preserve the original structure: one extra performance now opens the first weekend, while another closes the second.
+The residency will still run across two weekends. LISA now plays November 12 through 14, then returns for November 27 through 29. All six shows are at the 4,300-seat Colosseum. General sale for the added dates begins September 30. Caesars is billing VIVA LA LISA as the first Las Vegas residency by a K-pop artist.
 
 [tickets:__TICKET__]
 
-The announcement lands in the middle of LISA's current solo campaign. "SaWaDiKa," released through LLOUD Co. and RCA Records, is the first single from her seven-song EP *PRESS PLAY*, due October 23. The video was filmed in Bangkok and, according to Caesars, drew 70.8 million views in its first 24 hours. The official clip puts LISA's Thai roots at the center of the campaign rather than treating them as background to a generic pop release. LISA also brought "SaWaDiKa" to the 2026 MTV Video Music Awards for its first televised performance. At the same VMAs, "Dream" won Best Pop. LLOUD's official short film for "Dream," starring LISA and Kentaro Sakaguchi, is included below as the article's single media block.
+The new dates arrive while LISA is promoting *PRESS PLAY*, her six-track EP due October 23 through LLOUD Co. and RCA Records. Its first single, "SaWaDiKa," was released in September. The video was directed by Bang Jae Yeob and filmed in Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA also performed the song at the 2026 MTV Video Music Awards.
+
+"Dream" gives the article a second piece of current solo context without repeating the same song in two formats. The track won Best Pop at the 2026 VMAs, and LLOUD released an official short film starring LISA and Kentaro Sakaguchi. That video is included below as the post's only media block.
 
 [youtube:FMX98ROVRCE]
 
-By the time the residency opens in November, *PRESS PLAY* will have been out for several weeks, giving the show new material alongside songs from *Alter Ego*, her 2025 debut solo album. That gives VIVA LA LISA a different musical context from the four-date version first announced earlier in the year.
+*PRESS PLAY* is scheduled for October 23, less than three weeks before the first Las Vegas show. That means the residency will open after the EP is already out, rather than relying only on material from *Alter Ego* and earlier solo releases. The added dates also leave the format unchanged. VIVA LA LISA remains a limited six-show run in one venue, spread over two November weekends.
 
-The Vegas run follows another unusually active stretch. BLACKPINK completed the DEADLINE World Tour, while LISA continued building a separate solo schedule across music and screen work. Her documentary *Always Lalisa*, directed by Sue Kim, premiered at the Toronto International Film Festival and is also headed to cinemas worldwide in October. That places the film, the EP and the residency within a compact fall campaign.
+The expansion is straightforward. Four shows sold out, two more were added, and the venue stayed the same. For fans trying to see the residency, the new inventory is concentrated at the beginning and end of the run, on November 12 and 29.'''
 
-Demand for VIVA LA LISA was clear immediately: the initial four-show allocation disappeared almost at once, and Caesars added capacity without changing the venue or limited-run format. The residency now stands at six performances across the same two weekends.'''
+LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album that accompanies the band's new *UNSHATTER* film. The soundtrack arrived September 25 through Warner Records and documents the São Paulo concert connected to the *FROM ZERO* release period.
 
-LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a 20-track live companion to the band's new documentary. The Warner Records release arrived September 25 and captures the *FROM ZERO* release concert in São Paulo, while its track list reaches across several periods of the band's catalog. Rather than presenting only the material created for the comeback, the set places newer recordings beside songs that have been central to LINKIN PARK's live shows for years.
+The CD and digital edition run to 20 tracks. Four of those are short intro or interlude pieces, leaving 16 full performances. The vinyl edition lists those 16 songs without the four interludes. The set moves from "Somewhere I Belong" and "Waiting for the End" to newer material including "The Emptiness Machine," "Casualty," "Two Faced" and "Heavy Is the Crown." It closes with "Bleed It Out."
 
-The sequence includes "Somewhere I Belong," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint," "Papercut" and "Bleed It Out," alongside newer tracks such as "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown." The 20-track sequence also includes four short intro or interlude pieces. Mike Shinoda and Emily Armstrong share the vocal center of the performance, and the set documents the live version of LINKIN PARK that introduced *FROM ZERO* material alongside the band's older catalog.
+According to the band's official store, *UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The film combines archive material, live footage and interviews with band members and fans. The soundtrack also includes recordings that are not heard in the film.
 
-The soundtrack is tied directly to *UNSHATTER*. According to the band's official store, the film follows LINKIN PARK from private studio sessions in 2022 through the creation and release of *FROM ZERO* and the São Paulo concert. It combines archive material, newer interviews and footage from the band's return to the stage. The soundtrack also includes live recordings that are not heard in the film, so it works as more than an audio transcription of the documentary.
-
-"Faint" was one of the performances released ahead of the full soundtrack. The official live video keeps the scale of the São Paulo show visible while showing how the current lineup handles one of the band's best-known songs.
+"Faint" was released ahead of the full soundtrack with an official live video from São Paulo. It is one of the clearest examples of what this release is for. The performance keeps the song in its familiar live arrangement while documenting the current lineup in front of the Brazilian crowd.
 
 [youtube:zNYsw-cW8v8]
 
-The physical editions follow the same concert-document approach. The CD comes in a gatefold softpak with a 12-panel accordion booklet, while the double-vinyl edition is pressed on Citrus vinyl in a gatefold jacket with a 12-by-24-inch insert. Both formats use the São Paulo performance as the center of the package rather than presenting *UNSHATTER* as a conventional greatest-hits collection.
+The physical editions keep the focus on the concert. The CD comes in a gatefold softpak with a 12-panel accordion booklet. The two-LP Citrus vinyl edition comes in a gatefold jacket with a 12-by-24-inch insert. Warner also lists other vinyl variants through the official LINKIN PARK store.
 
-That makes the release useful in two ways: it documents LINKIN PARK's present lineup in a major live setting, and it gives the documentary its own standalone concert record. For listeners following the *FROM ZERO* era, *UNSHATTER Film Soundtrack (Live in São Paulo)* is a substantial companion release rather than a small collection of bonus tracks.'''
+The release is more specific than a general live compilation. Every full song comes from the São Paulo show, and the track list deliberately mixes *FROM ZERO* material with older staples. For listeners following the band's return, it puts the same performance documented in *UNSHATTER* into a standalone album rather than reducing the project to clips from the film.'''
 
 def get(url, referer=""):
     jar=http.cookiejar.CookieJar()
@@ -92,7 +92,23 @@ def upload(name, raw, min_px=1920):
     return out["url"]
 
 def lisa_photo():
-    return upload("lisa-viva-la-lisa-caesars-2026.jpg",get(LISA_PHOTO,"https://newsroom.caesars.com/"),1080)
+    try:
+        return upload("lisa-sawadika-wontae-go.jpg",get(LISA_PHOTO,"https://www.sonymusic.es/actualidad/lisa-sawadika-nuevo-single-adelanto-ep-press-play/"))
+    except Exception as direct:
+        print("LISA_SONY_DIRECT_BLOCKED",repr(direct))
+    page=html_bytes(LISA_MIRROR_PAGE).decode("utf-8","replace")
+    m=re.search(r'<meta[^>]+(?:property|name)=["\\']og:image["\\'][^>]+content=["\\']([^"\\']+)',page,re.I)
+    if not m:
+        m=re.search(r'<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:property|name)=["\\']og:image["\\']',page,re.I)
+    if not m:
+        raise RuntimeError("LISA promo mirror has no og:image")
+    img=html.unescape(m.group(1))
+    raw=get(img,LISA_MIRROR_PAGE)
+    with Image.open(io.BytesIO(raw)) as probe:
+        print("LISA_MIRROR_QC",img,probe.size,probe.format)
+        if max(probe.size)<1920:
+            raise RuntimeError("LISA Wontae Go mirror below 1920")
+    return upload("lisa-sawadika-wontae-go.jpg",raw)
 
 def html_bytes(url):
     req=urllib.request.Request(url,headers={"User-Agent":runner.UA,"Accept":"text/html,application/xhtml+xml"})
@@ -162,7 +178,7 @@ def main():
       "title":"LISA Adds Two Shows to Her Sold-Out Las Vegas Residency",
       "excerpt":"LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six.",
       "body":LISA_BODY.replace("__TICKET__",ticket_url()),"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lisa_photo(),"credit":"Caesars Entertainment","creditUrl":"https://newsroom.caesars.com/","pos":"50% 38%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
+      "cover":{"kind":"img","src":lisa_photo(),"credit":"Wontae Go","creditUrl":"https://www.lloud.co/","pos":"50% 44%","zoom":1,"cardX":.5,"cardY":.44,"cardZoom":1.15}
     }
     write(LISA_ID,lisa)
     lp={
