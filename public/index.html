@@ -3812,6 +3812,10 @@ window.addEventListener("pageshow", e=>{ if(e.persisted) loadPublishedDesk(); })
 })();
 S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refreshDailyTop50();
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
+/* Concerts does not depend on editorial desk data. Apply its direct route
+   immediately so a slow /api/desk can never leave the News tab visible first. */
+const initialCleanPath=location.pathname.replace(/\/+$/,"")||"/";
+if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();
 loadPublishedDesk();
 </script>
 <script src="/concerts-app.js?v=20260930-22" defer></script>

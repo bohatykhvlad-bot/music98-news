@@ -140,3 +140,11 @@ test("mobile cards keep desktop title-teaser spacing and equalize only whole-car
   assert.doesNotMatch(page,/h\.style\.minHeight\s*=\s*maxH/);
   assert.doesNotMatch(page,/p\.style\.minHeight\s*=\s*maxP/);
 });
+
+test("direct Concerts route is applied before editorial desk fetch finishes",()=>{
+  const routeAt=page.lastIndexOf('if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();');
+  const deskAt=page.lastIndexOf("loadPublishedDesk();");
+  assert.ok(routeAt>=0);
+  assert.ok(deskAt>routeAt);
+});
+
