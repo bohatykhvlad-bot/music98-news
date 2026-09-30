@@ -20,15 +20,17 @@ The residency remains concentrated across two weekends rather than becoming a lo
 
 [tickets:__TICKET__]
 
-The announcement lands in the middle of LISA's current solo campaign. "SaWaDiKa," released through LLOUD Co. and RCA Records, is the first single from her seven-song EP *PRESS PLAY*, due October 23. The video was filmed in Bangkok and, according to Caesars, drew 70.8 million views in its first 24 hours. The official clip puts LISA's Thai roots at the center of the rollout rather than treating them as background to a generic pop campaign.
+The announcement lands in the middle of LISA's current solo campaign. "SaWaDiKa," released through LLOUD Co. and RCA Records, is the first single from her seven-song EP *PRESS PLAY*, due October 23. The video was filmed in Bangkok and, according to Caesars, drew 70.8 million views in its first 24 hours. The official clip puts LISA's Thai roots at the center of the campaign rather than treating them as background to a generic pop release.
 
 [youtube:FyS5dAywkEo]
 
+LISA also brought "SaWaDiKa" to the 2026 MTV Video Music Awards for its first televised performance. The same song is available through the official Apple Music release below.
+
 [apple:song:6804002989:6804002992]
 
-LISA also brought "SaWaDiKa" to the 2026 MTV Video Music Awards for its first televised performance. The same night, "Dream" won Best Pop. By the time the residency opens in November, *PRESS PLAY* will have been out for several weeks, giving the show new material alongside songs from *Alter Ego*, her 2025 debut solo album.
+At the same VMAs, "Dream" won Best Pop. By the time the residency opens in November, *PRESS PLAY* will have been out for several weeks, giving the show new material alongside songs from *Alter Ego*, her 2025 debut solo album.
 
-The Vegas run follows another unusually active stretch. BLACKPINK completed the DEADLINE World Tour, while LISA continued building a separate solo schedule across music and screen work. Her documentary *Always Lalisa*, directed by Sue Kim, premiered at the Toronto International Film Festival and is set for a worldwide cinema release on October 12. That places the film, the EP and the residency within a compact fall campaign.
+The Vegas run follows another unusually active stretch. BLACKPINK completed the DEADLINE World Tour, while LISA continued building a separate solo schedule across music and screen work. Her documentary *Always Lalisa*, directed by Sue Kim, premiered at the Toronto International Film Festival and is also headed to cinemas worldwide in October. That places the film, the EP and the residency within a compact fall campaign.
 
 The demand around VIVA LA LISA is unusually easy to measure: four announced shows sold out in under 10 minutes, then two more were added before opening night without changing the venue or limited-run format. The November 12 and 29 additions bring the residency to six performances in total.'''
 
@@ -110,7 +112,7 @@ def main():
       "title":"LISA Adds Two Shows to Her Sold-Out Las Vegas Residency",
       "excerpt":"LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six.",
       "body":LISA_BODY.replace("__TICKET__",ticket_url()),"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lisa_photo(),"credit":"Caesars Entertainment / LLOUD","creditUrl":"https://newsroom.caesars.com/press-releases/press-release-details/2026/LISA-ADDS-TWO-NEW-DATES-TO-HER-SOLD-OUT-LAS-VEGAS-RESIDENCY-DUE-TO-OVERWHEMING-DEMAND-VIVA-LA-LISA-AT-THE-COLOSSEUM-AT-CAESARS-PALACE--NOV-12-13-14-27-28--29-2026--2026-eGkXjvCgqE/default.aspx","pos":"50% 38%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
+      "cover":{"kind":"img","src":lisa_photo(),"credit":"Caesars Entertainment and LLOUD","creditUrl":"https://newsroom.caesars.com/press-releases/press-release-details/2026/LISA-ADDS-TWO-NEW-DATES-TO-HER-SOLD-OUT-LAS-VEGAS-RESIDENCY-DUE-TO-OVERWHEMING-DEMAND-VIVA-LA-LISA-AT-THE-COLOSSEUM-AT-CAESARS-PALACE--NOV-12-13-14-27-28--29-2026--2026-eGkXjvCgqE/default.aspx","pos":"50% 38%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
     }
     write(LISA_ID,lisa)
     lp={
