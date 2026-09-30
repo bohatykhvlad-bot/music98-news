@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 
 POST_ID = "lisa26vegas"
-# run-marker
+# run-marker-final
 PHOTO_API = "https://music98.news/api/photo"
 PHOTO_DRIVE_ID = "160RQh2FktfRxnIpZ_mkZ2GRdpKstyvtr"
 PHOTO_SOURCE_PAGE = "https://www.speakoutsam.com/samsdiary/2026/9/5/lisa-releases-new-single-and-video-sawadika"
