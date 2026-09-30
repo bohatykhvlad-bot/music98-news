@@ -11,7 +11,7 @@ PHOTO_API="https://music98.news/api/photo"
 LISA_ID="lisa26vegas"
 LP_ID="aulp930r1"
 OLD_LEON_ID="auleon930r1"
-LISA_DRIVE_ID="1-msTZxTeQcqqm_Fz4JTVkJ58hXcazu5z"
+LISA_PHOTO="https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg"
 
 LISA_BODY='''LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six. The new performances are scheduled for November 12 and 29, joining previously announced shows on November 13, 14, 27 and 28. Caesars says the original four dates sold out in under 10 minutes, and general sale for the two added performances begins September 30.
@@ -65,9 +65,7 @@ def upload(name, raw):
     return out["url"]
 
 def lisa_photo():
-    p="/tmp/lisa-caesars-hires"
-    if not gdown.download(id=LISA_DRIVE_ID,output=p,quiet=True): raise RuntimeError("LISA hi-res download failed")
-    return upload("lisa-viva-la-lisa-caesars-2026.jpg",Path(p).read_bytes())
+    return upload("lisa-sawadika-2026-sony.jpg",get(LISA_PHOTO))
 
 def ticket_url():
     d=json.loads(get("https://music98.news/api/concerts?artist=LISA&nocache="+str(time.time_ns())))
@@ -110,7 +108,7 @@ def main():
       "title":"LISA Adds Two Shows to Her Sold-Out Las Vegas Residency",
       "excerpt":"LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six.",
       "body":LISA_BODY.replace("__TICKET__",ticket_url()),"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lisa_photo(),"credit":"Caesars Entertainment / LLOUD","creditUrl":"https://newsroom.caesars.com/","pos":"50% 38%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
+      "cover":{"kind":"img","src":lisa_photo(),"credit":"Sony Music","creditUrl":"https://www.sonymusic.es/actualidad/lisa-sawadika-nuevo-single-adelanto-ep-press-play/","pos":"50% 46%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
     }
     write(LISA_ID,lisa)
     lp={
