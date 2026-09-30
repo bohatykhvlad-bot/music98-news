@@ -25,9 +25,9 @@ The added performances extend each of the two previously announced weekends by o
 
 The announcement comes less than a month before LISA releases *PRESS PLAY* on October 23 through LLOUD Co. and RCA Records. The six-track EP follows *Alter Ego* and is led by "SaWaDiKa." Its release puts the new project three weeks ahead of the first Las Vegas show.
 
-"SaWaDiKa" was filmed in Bangkok and became the first release from *PRESS PLAY*. Caesars says the video drew 70.8 million views in its first 24 hours. LISA later performed the song at the 2026 MTV Video Music Awards, where "Dream feat. Kentaro Sakaguchi" won Best Pop.
-
 [youtube:FMX98ROVRCE]
+
+"SaWaDiKa" was filmed in Bangkok and became the first release from *PRESS PLAY*. Caesars says the video drew 70.8 million views in its first 24 hours. LISA later performed the song at the 2026 MTV Video Music Awards, where "Dream feat. Kentaro Sakaguchi" won Best Pop.
 
 VIVA LA LISA remains a limited run at The Colosseum rather than a tour extension. November 12 now opens the first weekend and November 29 closes the second, with three performances scheduled on each weekend. No additional venues or cities were announced with the two new dates."""
 
