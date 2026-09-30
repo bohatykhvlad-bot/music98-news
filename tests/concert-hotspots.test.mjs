@@ -623,8 +623,17 @@ test("daily Popular builder produces 30 eligible artists in source-rank order", 
         return new Response(JSON.stringify({page:{totalElements:0,totalPages:0,size:1,number:0}}),
           {status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
       }
+      const day=String((n%28)+1).padStart(2,"0");
       return new Response(JSON.stringify({
-        _embedded:{events:[{id:"event-"+n,dates:{start:{localDate:"2026-11-"+String((n%28)+1).padStart(2,"0")}}}]},
+        _embedded:{events:[{
+          id:"event-"+n,name:"Artist "+n+" Live",url:"https://example.com/event-"+n,
+          dates:{start:{dateTime:"2026-11-"+day+"T20:00:00Z",localDate:"2026-11-"+day,localTime:"20:00:00"}},
+          _embedded:{
+            attractions:[{id:"artist-"+n,name:"Artist "+n,images:[]}],
+            venues:[{id:"venue-"+n,name:"Venue",city:{name:"Paris"},country:{name:"France",countryCode:"FR"},location:{latitude:"48.8566",longitude:"2.3522"}}]
+          },
+          images:[]
+        }]},
         page:{totalElements:3,totalPages:3,size:1,number:0}
       }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
     }
@@ -675,7 +684,7 @@ test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30"
     firstDate:""
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-cache-v1",
     builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",
     ranking:"Spotify monthly listeners",
@@ -716,7 +725,15 @@ test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30"
       const id=u.searchParams.get("attractionId")||"";
       const n=Number(id.replace(/[^0-9]/g,""))||1;
       return new Response(JSON.stringify({
-        _embedded:{events:[{id:"event-"+n,dates:{start:{localDate:"2026-12-01"}}}]},
+        _embedded:{events:[{
+          id:"event-"+n,name:"Artist "+n+" Live",url:"https://example.com/event-"+n,
+          dates:{start:{dateTime:"2026-12-01T20:00:00Z",localDate:"2026-12-01",localTime:"20:00:00"}},
+          _embedded:{
+            attractions:[{id:"artist-"+n,name:"Artist "+n,images:[]}],
+            venues:[{id:"venue-"+n,name:"Venue",city:{name:"Paris"},country:{name:"France",countryCode:"FR"},location:{latitude:"48.8566",longitude:"2.3522"}}]
+          },
+          images:[]
+        }]},
         page:{totalElements:3,totalPages:3,size:1,number:0}
       }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
     }
@@ -983,7 +1000,15 @@ test("incomplete validated Popular rebuild never publishes a 29-row snapshot", a
       const id=u.searchParams.get("attractionId")||"";
       const n=Number(id.replace(/[^0-9]/g,""))||1;
       if(n===30) return new Response(JSON.stringify({page:{totalElements:0,totalPages:0,size:1,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
-      return new Response(JSON.stringify({_embedded:{events:[{id:"atomic-event-"+n,dates:{start:{localDate:"2026-12-01"}}}]},page:{totalElements:2,totalPages:2,size:1,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+      return new Response(JSON.stringify({_embedded:{events:[{
+        id:"atomic-event-"+n,name:"Atomic Artist "+n+" Live",url:"https://example.com/atomic-"+n,
+        dates:{start:{dateTime:"2026-12-01T20:00:00Z",localDate:"2026-12-01",localTime:"20:00:00"}},
+        _embedded:{
+          attractions:[{id:"atomic-"+n,name:"Atomic Artist "+n,images:[]}],
+          venues:[{id:"atomic-venue-"+n,name:"Venue",city:{name:"Paris"},country:{name:"France",countryCode:"FR"},location:{latitude:"48.8566",longitude:"2.3522"}}]
+        },
+        images:[]
+      }]},page:{totalElements:2,totalPages:2,size:1,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
     }
     return new Response("not found",{status:404});
   };
@@ -1000,7 +1025,7 @@ test("incomplete validated Popular rebuild never publishes a 29-row snapshot", a
 });
 
 
-test("legacy exhausted 27-row Popular state expands to the new candidate depth and reaches 30", async () => {
+test("current exhausted 27-row Popular state expands to the new candidate depth and reaches 30", async () => {
   const kv=memoryKv();
   const found=Array.from({length:27},(_,i)=>({
     id:"artist-"+(i+1),name:"Artist "+(i+1),image:"",
@@ -1011,13 +1036,13 @@ test("legacy exhausted 27-row Popular state expands to the new candidate depth a
     name:"Artist "+(i+1),rank:i+1,listeners:100000000-i*1000
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",builtAt:new Date().toISOString(),
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-cache-v1",builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
     eligibility:"ticketmaster_event_payload_gt_0",candidateCount:30,
     eligibleCount:27,targetCount:30,artists:found
   }));
   await kv.put("concert-popular:v4:state",JSON.stringify({
-    version:"popular-v4",startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+    version:"popular-v4",algorithm:"rank-ordered-cache-v1",startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
     candidates:oldCandidates,index:30,found:found.map(x=>({...x})),errors:0
   }));
@@ -1294,7 +1319,7 @@ test("interactive events keep one primary ticket and exclude non-live rows", asy
 test("concert cache version bypasses event payloads created before hygiene filtering", async()=>{
   const fs=await import("node:fs");
   const src=fs.readFileSync(new URL("../functions/api/concerts.js",import.meta.url),"utf8");
-  assert.match(src,/__cachev","concerts-global-v21"/);
+  assert.match(src,/__cachev","concerts-global-v22"/);
   assert.match(src,/sanitizeNormalizedEvents\(prewarmed\.events\)/);
 });
 
