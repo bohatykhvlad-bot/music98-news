@@ -162,7 +162,7 @@ def main():
       "title":"LISA Adds Two Shows to Her Sold-Out Las Vegas Residency",
       "excerpt":"LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six.",
       "body":LISA_BODY.replace("__TICKET__",ticket_url()),"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lisa_photo(),"credit":"Caesars Entertainment and LLOUD","creditUrl":"https://newsroom.caesars.com/press-releases/press-release-details/2026/LISA-ADDS-TWO-NEW-DATES-TO-HER-SOLD-OUT-LAS-VEGAS-RESIDENCY-DUE-TO-OVERWHEMING-DEMAND-VIVA-LA-LISA-AT-THE-COLOSSEUM-AT-CAESARS-PALACE--NOV-12-13-14-27-28--29-2026--2026-eGkXjvCgqE/default.aspx","pos":"50% 38%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
+      "cover":{"kind":"img","src":lisa_photo(),"credit":"Caesars Entertainment","creditUrl":"https://newsroom.caesars.com/","pos":"50% 38%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
     }
     write(LISA_ID,lisa)
     lp={
