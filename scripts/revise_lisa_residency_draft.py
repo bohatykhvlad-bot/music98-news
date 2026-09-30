@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 
 POST_ID = "lisa26vegas"
+# run-marker
 PHOTO_API = "https://music98.news/api/photo"
 PHOTO_URL = "https://jp.kith.com/cdn/shop/files/16_8fb06779-b440-460a-aeb1-449e2c474c4d.jpg?v=1771350968&width=1920"
 PHOTO_REFERER = "https://jp.kith.com/blogs/discover/lisa-for-kith-women-spring-2026-campaign-1"
