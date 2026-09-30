@@ -9,7 +9,7 @@ import post as runner
 
 PHOTO_API="https://music98.news/api/photo"
 LISA_ID="lisa26vegas"
-LP_ID="aulp930r1"
+LP_ID="auleon930r1"
 OLD_LEON_ID="auleon930r1"
 LISA_PHOTO="https://s202.q4cdn.com/508919455/files/content_files/Static_Social-Instagram_1080x1080_Lisa_2026_Regional_TheColosseumatCaesarsPalace_1101_V2-20-41-27.jpg"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/styles/artist_detail/public/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg?itok=IxzVedtC"
@@ -175,6 +175,5 @@ def main():
       "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://press.warnerrecords.com/linkinpark","pos":"50% 48%","zoom":1,"cardX":.5,"cardY":.48,"cardZoom":1.22}
     }
     write(LP_ID,lp)
-    remove_leon()
 
 if __name__=="__main__": main()
