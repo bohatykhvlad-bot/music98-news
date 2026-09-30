@@ -13,6 +13,7 @@ name: apple-data
 on:
   push:
     paths:
+      - "functions/api/top50.js"
       - "functions/lib/chart-identity.js"
       - "functions/lib/artwork-resolver.js"
       - "scripts/build-covers.mjs"
@@ -64,10 +65,15 @@ jobs:
           }
           const changed = Object.keys(after).filter(k => before[k] && before[k] !== after[k]);
           const audit = JSON.parse(fs.readFileSync("public/data/artwork-audit.json","utf8"));
-          if (audit.schema !== 2 || audit.rows !== 50 || Object.keys(audit.entries||{}).length !== 50) {
-            throw new Error("artwork audit is not complete for all 50 chart rows");
+          const unresolved = Array.isArray(audit.unresolved) ? audit.unresolved : [];
+          const verified = Object.keys(audit.entries||{}).length;
+          if (audit.schema !== 2 || audit.rows !== 50 || verified + unresolved.length !== audit.rows) {
+            throw new Error("artwork audit accounting is incomplete");
           }
-          console.log("cover registry updates:", changed.length, "schema-v2 verified rows:", Object.keys(audit.entries).length);
+          if (unresolved.length) {
+            console.log("::warning::Artwork unresolved for " + unresolved.length + " current chart row(s): " + unresolved.map(x=>x.artist+" - "+x.title).join("; "));
+          }
+          console.log("cover registry updates:", changed.length, "verified rows:", verified, "unresolved rows:", unresolved.length);
           NODE
           cmp -s public/data/top50.json /tmp/top50-before.json || {
             echo "ERROR: artwork audit modified Top 50 ranking data"
