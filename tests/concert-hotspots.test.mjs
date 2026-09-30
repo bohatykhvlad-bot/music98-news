@@ -1648,7 +1648,7 @@ test("public Popular rejects snapshots built by an old validation algorithm", as
     builtAt:new Date().toISOString(),artists,eligibility:"ticketmaster_event_payload_gt_0",targetCount:30
   }));
   const response=await onRequestGet({
-    request:new Request("https://music98.news/api/concerts?mode=popular&v=popular-v10"),
+    request:new Request("https://music98.news/api/concerts?mode=popular&v=popular-v11"),
     env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}
   });
   const data=await response.json();
@@ -1667,3 +1667,45 @@ test("date-only normalized events expire by local date fallback", async () => {
 function normTestName(s){
   return String(s||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/&/g,"and").replace(/[^a-z0-9]+/gi," ").trim().toLowerCase();
 }
+
+
+test("Popular never publishes a hard-coded ranking when live Spotify ranking is unavailable", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  let tmCalls=0;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net") return new Response("unavailable",{status:503});
+    if(u.hostname==="app.ticketmaster.com"){ tmCalls++; return new Response("unexpected",{status:500}); }
+    return new Response("not found",{status:404});
+  };
+  try{
+    const result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv},true);
+    assert.equal(result.retry,true);
+    assert.equal(result.keptExisting,false);
+    assert.equal(result.reason,"popular_ranking_source_unavailable");
+    assert.equal(result.artists,0);
+    assert.equal(kv.raw("concert-popular:v4"),null);
+    assert.equal(kv.raw("concert-popular:v4:state"),null);
+    assert.equal(tmCalls,0);
+  }finally{globalThis.fetch=oldFetch;}
+});
+
+test("public Popular rejects a complete current-algorithm snapshot from a non-live ranking source", async () => {
+  const kv=memoryKv();
+  const artists=Array.from({length:30},(_,i)=>({
+    id:"f"+i,name:"Fallback "+i,rank:i+1,popularityRank:i+1,shows:1,eventConfirmed:true
+  }));
+  await kv.put("concert-popular:v4",JSON.stringify({
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",
+    builtAt:new Date().toISOString(),source:"spotify_monthly_unavailable",
+    artists,eligibility:"ticketmaster_event_payload_gt_0",targetCount:30
+  }));
+  const response=await onRequestGet({
+    request:new Request("https://music98.news/api/concerts?mode=popular&v=popular-v11"),
+    env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}
+  });
+  const data=await response.json();
+  assert.equal(data.warming,true);
+  assert.deepEqual(data.artists,[]);
+});

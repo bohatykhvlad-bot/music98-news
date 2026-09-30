@@ -23,7 +23,7 @@ jobs:
           python - <<'PY'
           import json, time, urllib.request
 
-          url="https://music98.news/api/concerts?mode=popular&v=popular-v10&contractcheck="+str(int(time.time()*1000))
+          url="https://music98.news/api/concerts?mode=popular&v=popular-v11&contractcheck="+str(int(time.time()*1000))
           req=urllib.request.Request(url,headers={
               "User-Agent":"music98-popular-contract/1.0",
               "Cache-Control":"no-cache",
@@ -36,6 +36,7 @@ jobs:
           names=[str(a.get("name","")) for a in artists]
           summary={
               "algorithm":data.get("algorithm"),
+              "source":data.get("source"),
               "warming":data.get("warming"),
               "count":len(artists),
               "validatedCount":data.get("validatedCount"),
@@ -44,6 +45,7 @@ jobs:
           }
           print("POPULAR_CONTRACT",json.dumps(summary,ensure_ascii=False))
           assert data.get("algorithm")=="rank-ordered-event-query-v2", summary
+          assert data.get("source")=="spotify_monthly_listeners", summary
           assert len(artists)==30, summary
           assert "The Weeknd" in names, summary
           assert all(a.get("eventConfirmed") is True and int(a.get("shows") or 0)>0 for a in artists), summary
@@ -114,7 +116,7 @@ jobs:
           for attempt in range(12):
               try:
                   markets=get("markets","concert-markets-v7")
-                  popular=get("popular","popular-v10")
+                  popular=get("popular","popular-v11")
                   countries={str(x.get("countryCode","")).upper() for x in markets.get("markets",[])}
                   world_ok=(
                       markets.get("version")=="concert-markets-v4"
@@ -125,6 +127,7 @@ jobs:
                   artists=popular.get("artists") or []
                   popular_ok=(
                       popular.get("algorithm")=="rank-ordered-event-query-v2"
+                      and popular.get("source")=="spotify_monthly_listeners"
                       and len(artists)==30
                       and all(a.get("eventConfirmed") is True and int(a.get("shows") or 0)>0 for a in artists)
                   )
@@ -136,6 +139,7 @@ jobs:
                       "popularCount":len(artists),
                       "popularWarming":popular.get("warming"),
                       "popularAlgorithm":popular.get("algorithm"),
+                      "popularSource":popular.get("source"),
                       "popularNames":[a.get("name") for a in artists],
                   }
                   print("LIVE_CHECK",json.dumps(last,ensure_ascii=False))

@@ -121,16 +121,6 @@ function appendMarketAudit(state,seed,entry){
   return record;
 }
 
-const KWORB_FALLBACK = [
-  "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
-  "Bad Bunny","Ariana Grande","Shakira","Katy Perry","Michael Jackson","David Guetta","Maroon 5","Ed Sheeran",
-  "Pitbull","Billie Eilish","Dua Lipa","Calvin Harris","Eminem","J Balvin","Kanye West","Kendrick Lamar",
-  "Post Malone","Sia","KAROL G","Olivia Rodrigo","SZA","Black Eyed Peas","Beyoncé","Lana Del Rey",
-  "Daddy Yankee","Harry Styles","Miley Cyrus","Tame Impala","Travis Scott","Sean Paul","Adele","Justin Timberlake",
-  "Shawn Mendes","Linkin Park","Chris Brown","Marshmello","Ellie Goulding","Arctic Monkeys","Zara Larsson",
-  "Shreya Ghoshal","Doja Cat","Halsey","Sabrina Carpenter","Alicia Keys","Rauw Alejandro","Madonna","Sam Smith",
-  "Elton John","sombr","Arijit Singh","Ozuna","JAŸ-Z"
-]
 
 function json(data, status = 200, extra = {}) {
   const headers = new Headers({
@@ -596,9 +586,9 @@ async function kworbArtists() {
     artists.sort((a,b)=>a.rank-b.rank);
     return artists.length >= POPULAR_LIMIT
       ? { artists, source: "spotify_monthly_listeners" }
-      : { artists: KWORB_FALLBACK.map((name,i)=>({name,rank:i+1,listeners:0})), source: "spotify_monthly_fallback" };
+      : { artists: [], source: "spotify_monthly_unavailable" };
   } catch {
-    return { artists: KWORB_FALLBACK.map((name,i)=>({name,rank:i+1,listeners:0})), source: "spotify_monthly_fallback" };
+    return { artists: [], source: "spotify_monthly_unavailable" };
   }
 }
 
@@ -861,6 +851,7 @@ export async function refreshPopularSnapshot(env, force = false) {
 
   if(!force && !state && existing?.version==="popular-v4" &&
      existing?.algorithm===POPULAR_BUILD_ALGORITHM &&
+     existing?.source==="spotify_monthly_listeners" &&
      existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
      existing?.artists?.length>=POPULAR_LIMIT &&
      existing.artists.every(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0) &&
@@ -872,17 +863,18 @@ export async function refreshPopularSnapshot(env, force = false) {
      state.algorithm!==POPULAR_BUILD_ALGORITHM ||
      !Array.isArray(state.candidates) || !Array.isArray(state.found)){
     const ranking=await kworbArtists();
-    if(existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
-       existing?.artists?.length>=20 &&
-       existing?.source==="spotify_monthly_listeners" &&
-       ranking.source!=="spotify_monthly_listeners"){
-      // Do not continue an old half-built ranking after a failed daily kickoff.
-      // Next cron will try the real source again from a clean state.
+    if(ranking.source!=="spotify_monthly_listeners"){
+      // Never publish or continue from a hard-coded/stale popularity ranking.
+      // Keep a previously published real Spotify snapshot if one exists and
+      // retry the live ranking source on the next scheduled pass.
       await kvDelete(env,POPULAR_STATE_KEY);
+      const keptExisting=existing?.source==="spotify_monthly_listeners" &&
+        existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
+        Array.isArray(existing?.artists) && existing.artists.length>=POPULAR_LIMIT;
       return {
-        ok:false,retry:true,keptExisting:true,
+        ok:false,retry:true,keptExisting,
         reason:"popular_ranking_source_unavailable",
-        artists:existing.artists.length
+        artists:keptExisting ? existing.artists.length : 0
       };
     }
     state=newPopularBuildState(ranking);
@@ -1389,6 +1381,7 @@ async function popularSnapshotPayload(env) {
 
   const published=snapshot?.version==="popular-v4" &&
     snapshot?.algorithm===POPULAR_BUILD_ALGORITHM &&
+    snapshot?.source==="spotify_monthly_listeners" &&
     snapshot?.eligibility==="ticketmaster_event_payload_gt_0"
       ? strict(snapshot.artists)
       : [];

@@ -35,12 +35,13 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
 });
 
 test("Popular UI renders strict confirmed cache immediately without an explanatory banner",()=>{
-  assert.match(app,/music98:concert-popular:v10/);
+  assert.match(app,/music98:concert-popular:v11/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
   assert.match(app,/ticketmaster_event_payload_gt_0/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/mode:"popular",v:"popular-v10"/);
+  assert.match(app,/mode:"popular",v:"popular-v11"/);
   assert.match(app,/cached\?\.algorithm===POPULAR_ALGORITHM/);
+  assert.match(app,/cached\?\.source==="spotify_monthly_listeners"/);
   assert.match(app,/sideSub\.textContent="";/);
   assert.doesNotMatch(app,/Popular artists with confirmed upcoming Ticketmaster shows\./);
 });
@@ -158,7 +159,7 @@ test("Popular warming state polls only the precomputed KV snapshot",()=>{
   assert.match(app,/loadPopular\(true\)/);
   assert.match(app,/if\(data\?\.warming\) schedulePopularWarmRetry\(\)/);
   assert.match(app,/POPULAR_ALGORITHM="rank-ordered-event-query-v2"/);
-  assert.match(app,/mode:"popular",v:"popular-v10"/);
+  assert.match(app,/mode:"popular",v:"popular-v11"/);
 });
 
 
