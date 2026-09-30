@@ -113,7 +113,7 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/@media\(hover:hover\) and \(pointer:fine\)\{\.nav-btn:hover:not\(\.active\)\{background:var\(--bg2\);color:var\(--text\)\}\}/);
   assert.doesNotMatch(app,/\.nav-btn:active\{[^}]*transform:/);
   assert.match(app,/\.nav-btn\{width:100%;[^}]*transition:\.18s;[^}]*top:\.5px/);
-  assert.match(app,/@media\(max-width:700px\)\{[\s\S]*?\.nav-btn\{flex:1;height:40px;padding:0 8px;font-size:13px;justify-content:center;top:0\}/);
+  assert.match(app,/@media\(max-width:700px\)\{[\s\S]*?\.nav-btn\{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0\}/);
 });
 
 test("artist subtitle shares the exact left edge with artist name",()=>{
@@ -188,4 +188,11 @@ test("inactive map toggles use the radius-style gray hover highlight",()=>{
   assert.match(app,/\.map-mode-btn:hover:not\(\.active\)\{background-color:var\(--bg2\);color:var\(--text\)\}/);
   assert.match(app,/\.side-tab\.active\{background:var\(--accent\);color:#03282b\}/);
   assert.match(app,/\.map-mode-btn\.active\{background-color:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
+});
+
+
+test("mobile Search this area stays at the top right and clears artist mode tabs",()=>{
+  assert.match(app,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{left:auto;right:10px;top:10px;bottom:auto;margin-inline:0;height:40px\}/);
+  assert.match(app,/\.map-shell\.artist-context \.search-area-btn\{top:60px\}/);
+  assert.doesNotMatch(app,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{bottom:60px/);
 });
