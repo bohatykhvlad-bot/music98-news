@@ -163,7 +163,7 @@ test("Popular warming state polls only the precomputed KV snapshot",()=>{
 
 test("map mode toggle has no duplicate outer capsule and no resting compositor transform",()=>{
   assert.match(app,/\.map-mode-switch\{[^}]*border:0;[^}]*background:transparent;box-shadow:none/);
-  assert.match(app,/\.map-mode-btn\{[^}]*border:1px solid var\(--line\);[^}]*background-color:var\(--bg2\)/);
+  assert.match(app,/\.map-mode-btn\{[^}]*border:1px solid var\(--line\);[^}]*background-color:transparent/);
   assert.match(app,/\.map-mode-btn\.active\{background-color:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
   assert.match(app,/\.map-mode-btn:active\{transform:none\}/);
   assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab,\.map-mode-btn\{/);
