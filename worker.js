@@ -148,6 +148,42 @@ async function proxyAppleGw(request, rawPath) {
   return new Response(upstream.body, { status: upstream.status, headers: out });
 }
 
+function rewriteConcertsShellMeta(html) {
+  let out=String(html||"");
+  out=out.replace(/<title>[\s\S]*?<\/title>/i,"<title>Concerts Near You - music98.news</title>");
+  out=out.replace(/<meta name="description" content="[^"]*">/i,'<meta name="description" content="Find concerts around the world, explore tour dates on an interactive map and buy tickets.">');
+  out=out.replace(/<meta property="og:title" content="[^"]*">/i,'<meta property="og:title" content="Concerts Near You - music98.news">');
+  out=out.replace(/<meta property="og:description" content="[^"]*">/i,'<meta property="og:description" content="Find concerts around the world, explore tour dates and buy tickets.">');
+  out=out.replace(/<meta property="og:url" content="[^"]*">/i,'<meta property="og:url" content="https://music98.news/concerts">');
+  out=out.replace(/<meta name="twitter:title" content="[^"]*">/i,'<meta name="twitter:title" content="Concerts Near You - music98.news">');
+  out=out.replace(/<meta name="twitter:description" content="[^"]*">/i,'<meta name="twitter:description" content="Find concerts around the world, explore tour dates and buy tickets.">');
+  out=out.replace(/<link rel="canonical" href="[^"]*">/i,'<link rel="canonical" href="https://music98.news/concerts">');
+  return out;
+}
+
+function noStoreHeaders(input) {
+  const headers=new Headers(input);
+  headers.set("Cache-Control","no-store, no-cache, must-revalidate, max-age=0");
+  headers.set("CDN-Cache-Control","no-store");
+  headers.set("Cloudflare-CDN-Cache-Control","no-store");
+  headers.set("Pragma","no-cache");
+  headers.set("Expires","0");
+  return headers;
+}
+
+async function serveConcertsShell(request, env) {
+  const u=new URL("/index.html",request.url);
+  const assetRequest=new Request(u.toString(),{method:"GET",headers:request.headers});
+  const res=await env.ASSETS.fetch(assetRequest);
+  const headers=noStoreHeaders(res.headers);
+  headers.set("X-M98-Concerts-Shell","index");
+  if(request.method==="HEAD"){
+    return new Response(null,{status:res.status,statusText:res.statusText,headers});
+  }
+  const html=rewriteConcertsShellMeta(await res.text());
+  return new Response(html,{status:res.status,statusText:res.statusText,headers});
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -181,7 +217,10 @@ export default {
     if (path === "/news" && (request.method === "GET" || request.method === "HEAD")) {
       return Response.redirect(new URL("/", request.url), 301);
     }
-    if (/^\/(?:releases|chart|charts|concerts)\/?$/.test(path) &&
+    if (path === "/concerts" && (request.method === "GET" || request.method === "HEAD")) {
+      return serveConcertsShell(request, env);
+    }
+    if (/^\/(?:releases|chart|charts)\/?$/.test(path) &&
         (request.method === "GET" || request.method === "HEAD")) {
       const u = new URL(request.url);
       const res = await env.ASSETS.fetch(new Request(u.origin + "/index.html", request));

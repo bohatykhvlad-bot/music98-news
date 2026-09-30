@@ -196,3 +196,19 @@ test("mobile Search this area stays at the top right and clears artist mode tabs
   assert.match(app,/\.map-shell\.artist-context \.search-area-btn\{top:60px\}/);
   assert.doesNotMatch(app,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{bottom:60px/);
 });
+
+
+test("direct /concerts is worker-first, no-store and rewrites index metadata without deleting legacy asset", async()=>{
+  const fs=await import("node:fs");
+  const worker=fs.readFileSync(new URL("../worker.js",import.meta.url),"utf8");
+  const wrangler=fs.readFileSync(new URL("../wrangler.toml",import.meta.url),"utf8");
+  const headers=fs.readFileSync(new URL("../public/_headers",import.meta.url),"utf8");
+  const legacy=fs.readFileSync(new URL("../public/concerts.html",import.meta.url),"utf8");
+  assert.match(wrangler,/run_worker_first = \[[^\]]*"\/concerts"[^\]]*"\/concerts-app\.js"/);
+  assert.match(worker,/path === "\/concerts"[\s\S]*serveConcertsShell\(request, env\)/);
+  assert.match(worker,/X-M98-Concerts-Shell","index"/);
+  assert.match(worker,/Concerts Near You - music98\.news/);
+  assert.match(worker,/https:\/\/music98\.news\/concerts/);
+  assert.match(headers,/\/concerts\n  Cache-Control: no-store/);
+  assert.ok(legacy.includes("Concerts Near You - music98.news"));
+});
