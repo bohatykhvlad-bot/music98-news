@@ -98,13 +98,15 @@ function mapMarketSeedKey(seed){
 }
 function marketCoverageAudit(){
   return MARKET_AUDIT_COVERAGE_TARGETS.map(target=>{
-    const exact=MAP_MARKET_SEEDS.find(seed=>
+    const samePlace=seed=>
       String(seed.city||"").toLowerCase()===String(target.city||"").toLowerCase() &&
-      String(seed.countryCode||"").toUpperCase()===String(target.countryCode||"").toUpperCase() &&
-      (!target.stateCode || String(seed.stateCode||"").toUpperCase()===String(target.stateCode||"").toUpperCase())
-    );
-    return {...target,candidate:!!exact,candidateCity:exact?.city||"",candidateStateCode:exact?.stateCode||"",
-      reason:exact?"candidate_present":"missing_candidate_seed"};
+      String(seed.countryCode||"").toUpperCase()===String(target.countryCode||"").toUpperCase();
+    const exactState=MAP_MARKET_SEEDS.find(seed=>samePlace(seed) &&
+      (!target.stateCode || String(seed.stateCode||"").toUpperCase()===String(target.stateCode||"").toUpperCase()));
+    const cityCandidate=exactState||MAP_MARKET_SEEDS.find(samePlace);
+    const stateTagged=!!exactState;
+    return {...target,candidate:!!cityCandidate,candidateCity:cityCandidate?.city||"",candidateStateCode:cityCandidate?.stateCode||"",
+      reason:!cityCandidate?"missing_candidate_seed":(stateTagged?"candidate_present":"candidate_present_without_state_code")};
   });
 }
 function appendMarketAudit(state,seed,entry){
