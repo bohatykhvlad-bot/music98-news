@@ -10,19 +10,19 @@ POST_ID = "auleon930r1"
 
 EXCERPT = """The new live set pairs FROM ZERO material with "Numb," "In the End," "Faint" and other catalog staples from the band's São Paulo show."""
 
-BODY = """LINKIN PARK have released a new live album drawn from the São Paulo concert featured in their *UNSHATTER* film. Out September 25 through Warner Records, the set brings songs from *FROM ZERO* into the same running order as material from across the band's catalog.
+BODY = """LINKIN PARK have released a new live album from the São Paulo concert featured in their *UNSHATTER* film. Out September 25 through Warner Records, it mixes songs from *FROM ZERO* with material from across the band's catalog.
 
 The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The live version of "Faint" was released ahead of the album with an official video from the same concert.
 
 [youtube:zNYsw-cW8v8]
 
-*UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo show. The band's official store says the film combines archive footage, performances from sold-out concerts and interviews with band members and fans. It also says the soundtrack contains live recordings that do not appear in the documentary.
+*UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo show. The band's official store says the film combines archive footage, performances from sold-out concerts and interviews with band members and fans. The soundtrack also contains live recordings that do not appear in the documentary.
 
-The film covers the period after the band's seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums. The São Paulo set captures that lineup during the *FROM ZERO* era and reflects the transition directly. Songs from *FROM ZERO* sit alongside material from *Meteora*, *Minutes to Midnight* and *A Thousand Suns*, rather than being presented as a separate section of the show.
+The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums. The São Paulo set places songs from *FROM ZERO* beside material from *Meteora*, *Minutes to Midnight* and *A Thousand Suns*. Older songs and newer tracks alternate through the show instead of being split into separate blocks.
 
-The physical editions use different track configurations. The CD has 20 entries, with four short pieces titled "Inception," "Creation," "Break Collapse" and "Resolution" placed between the 16 full performances. It comes in a gatefold softpak with a 12-panel accordion booklet. The two-LP edition omits those four pieces and keeps the 16 complete songs, housed in a gatefold jacket with a 12-by-24-inch insert.
+The physical editions use different track configurations. The CD has 20 entries, with four short pieces placed between the 16 full performances. "Inception" opens the disc, "Creation" follows "The Emptiness Machine," "Break Collapse" comes before "Lost," and "Resolution" appears before "Papercut." The CD comes in a gatefold softpak with a 12-panel accordion booklet.
 
-The album preserves the concert sequence from "Somewhere I Belong" through "Bleed It Out," with the newer material distributed across the set instead of grouped together. That same São Paulo performance is the concert portion at the center of *UNSHATTER*, while the soundtrack carries additional live material beyond what is heard in the film."""
+The two-LP edition removes those four short pieces and keeps the 16 complete performances. It is housed in a gatefold jacket with a 12-by-24-inch insert. Both physical versions end with "Heavy Is the Crown" followed by "Bleed It Out.""""
 
 def main():
     runner.load_env()
