@@ -154,8 +154,32 @@ def write(pid, rec):
         if p and (p.get("status") or "live")!="draft": raise RuntimeError("non-draft "+pid)
         if p is None: posts.insert(0,copy.deepcopy(rec)); return posts[0]
         p.clear(); p.update(copy.deepcopy(rec)); return p
-    p=runner.guarded_write(mutate)
-    ok,lines=runner.run_gate(pid,quiet=False)
+    runner.guarded_write(mutate)
+
+    # Cloudflare KV can be briefly eventually consistent across edges. Do not
+    # gate an older draft after a successful write; wait until the exact body,
+    # excerpt and credit from this run are observable.
+    p=None
+    for attempt in range(12):
+        desk=runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()),runner.desk_key())
+        p=next((x for x in desk.get("posts",[]) if str(x.get("id"))==pid),None)
+        if (p and p.get("body")==rec.get("body")
+                and p.get("excerpt")==rec.get("excerpt")
+                and (p.get("cover") or {}).get("credit")==((rec.get("cover") or {}).get("credit"))
+                and p.get("status")=="draft"):
+            break
+        print("DESK_PROPAGATION_WAIT",pid,attempt+1)
+        time.sleep(2)
+    else:
+        raise RuntimeError("updated draft did not propagate: "+pid)
+
+    ok=False
+    lines=[]
+    for gate_attempt in range(6):
+        ok,lines=runner.run_gate(pid,quiet=False)
+        if ok: break
+        print("GATE_PROPAGATION_RETRY",pid,gate_attempt+1)
+        time.sleep(2)
     for line in lines:
         if "PASS" in line or "FAIL" in line or line.lstrip().startswith(("X ","! ")): print(line)
     if not ok: raise RuntimeError("gate failed "+pid)
@@ -191,7 +215,7 @@ def main():
 
     # Final deterministic QA after both writes. This is separate from the
     # editorial read: it catches state/media/link regressions before review.
-    final={str(p.get("id")):p for p in runner.desk_read()["posts"]}
+    final={str(p.get("id")):p for p in runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()),runner.desk_key())["posts"]}
     lisa_now=final.get(LISA_ID)
     lp_now=final.get(LP_ID)
     if not lisa_now or not lp_now:
