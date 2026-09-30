@@ -81,6 +81,7 @@ jobs:
                   assert '<link rel="canonical" href="https://music98.news/concerts">' in html
                   direct_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',html)
                   assert direct_src
+                  assert direct_src.group(1)=="/concerts-app.js?v=20260930-32"
                   _,_,home=get("https://music98.news/")
                   home_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',home)
                   assert home_src and direct_src.group(1)==home_src.group(1)
@@ -295,6 +296,58 @@ jobs:
           results.push(await openCase({name:"home-click-desktop",width:1440,height:1000,fromHome:true}));
           results.push(await openCase({name:"direct-mobile-390",width:390,height:844}));
           results.push(await openCase({name:"home-click-mobile-390",width:390,height:844,fromHome:true}));
+
+          async function openWeekndMarkerCase(){
+            const t=await newTarget(),c=new CDP(t.webSocketDebuggerUrl);
+            await c.send("Page.enable");
+            await c.send("Runtime.enable");
+            await c.send("Network.enable");
+            await c.send("Network.setCacheDisabled",{cacheDisabled:true});
+            await c.send("Emulation.setDeviceMetricsOverride",{width:1440,height:1000,deviceScaleFactor:1,mobile:false,screenWidth:1440,screenHeight:1000});
+            await c.send("Page.navigate",{url:"https://music98.news/concerts"});
+            await waitConcerts(c);
+            const listDeadline=Date.now()+30000;
+            let clicked=false;
+            while(Date.now()<listDeadline){
+              clicked=await evaluate(c,`(()=>{
+                const root=document.querySelector("music98-concerts")?.shadowRoot;
+                if(!root) return false;
+                const card=[...root.querySelectorAll(".tour-card")].find(el=>el.querySelector(".tour-name")?.textContent?.trim()==="The Weeknd");
+                if(!card) return false;
+                card.querySelector(".tour-row")?.click();
+                return true;
+              })()`).catch(()=>false);
+              if(clicked) break;
+              await sleep(500);
+            }
+            if(!clicked) throw new Error("The Weeknd row not found");
+            const markerDeadline=Date.now()+30000;
+            let markerState=null;
+            while(Date.now()<markerDeadline){
+              markerState=await evaluate(c,`(()=>{
+                const host=document.querySelector("music98-concerts");
+                const map=host?._concertMap;
+                const root=host?.shadowRoot;
+                const d=map?.getSource("artist-events")?._data;
+                const features=Array.isArray(d?.features)?d.features:[];
+                return {
+                  featureCount:features.length,
+                  coordinates:features.map(f=>f.geometry?.coordinates),
+                  subtitle:root?.querySelector("#sideSub")?.textContent||"",
+                  status:root?.querySelector("#sideStatus")?.textContent||""
+                };
+              })()`).catch(()=>null);
+              if((markerState?.featureCount||0)>0) break;
+              await sleep(500);
+            }
+            await shot(c,"concert-acceptance/weeknd-marker.png");
+            c.close();
+            if(!markerState || markerState.featureCount<1) throw new Error("The Weeknd marker was not drawn: "+JSON.stringify(markerState));
+            return markerState;
+          }
+
+          const weekndMarker=await openWeekndMarkerCase();
+          results.push({name:"weeknd-marker",marker:weekndMarker});
 
           const directD=results[0].initial,clickD=results[1].initial;
           const directM=results[2].initial,clickM=results[3].initial;

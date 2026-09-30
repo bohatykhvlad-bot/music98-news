@@ -35,7 +35,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle version is bumped after the static-map UI change",()=>{
-  assert.match(page,/concerts-app\.js\?v=20260930-31/);
+  assert.match(page,/concerts-app\.js\?v=20260930-32/);
 });
 
 
@@ -149,3 +149,12 @@ test("direct Concerts route is applied before editorial desk fetch finishes",()=
   assert.ok(deskAt>routeAt);
 });
 
+
+
+test("site text stays off persistent compositor transforms and whole-button filters",()=>{
+  assert.doesNotMatch(page,/nav\.style\.transform/);
+  assert.doesNotMatch(page,/translateX\(" \+ snapCur/);
+  assert.match(page,/nav\.style\.left=/);
+  assert.match(page,/Math\.round\(x\*dpr\)\/dpr-x/);
+  assert.doesNotMatch(page,/\.btn\.primary:hover\{filter:/);
+});

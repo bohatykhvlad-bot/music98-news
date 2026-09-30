@@ -321,3 +321,29 @@ test("coordinate-less real concerts stay off the map but keep a Ticketmaster cli
   assert.match(app,/return !mappable \|\| distanceKm/);
 });
 
+
+
+test("Search this area uses cyan hover fill and never transforms its text",()=>{
+  assert.match(app,/\.search-area-btn:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
+  assert.match(app,/\.search-area-btn\{[^}]*text-indent:var\(--ink-x,0px\);transform:none;transition:background \.18s ease,border-color \.18s ease,color \.18s ease/);
+  assert.doesNotMatch(app,/\.search-area-btn\{[^}]*transition:transform/);
+  assert.match(app,/\.side-tab,\.map-mode-btn,\.search-area-btn,\.tour-more,\.buy-label/);
+});
+
+test("Near me clears Popular rows before requesting location and stays empty on denial",()=>{
+  assert.match(app,/async function requestLocation\(\)[\s\S]*nearbyEvents=\[\];[\s\S]*toursEl\.textContent="";[\s\S]*sideEmpty\.textContent="Getting your location\.\.\.";[\s\S]*setEventData\(\[\],0\)/);
+  assert.match(app,/if\(!position\)\{[\s\S]*sideEmpty\.textContent="Location unavailable\.";[\s\S]*setEventData\(\[\],0\)/);
+});
+
+test("artist events recover missing city coordinates for map markers and never auto-open Ticketmaster",()=>{
+  assert.match(app,/async function hydrateArtistMapCoordinates\(events\)/);
+  assert.match(app,/hotspotPointForEvent\(sample\) \|\| artistLocationCache\.get\(key\)/);
+  assert.match(app,/await geocode\(query,false\)/);
+  assert.match(app,/events=await hydrateArtistMapCoordinates\(events\)/);
+  assert.doesNotMatch(app,/window\.open\(e\.url/);
+  assert.match(app,/setStatus\("Map location is unavailable for this venue\."\)/);
+});
+
+test("failed area loads clear stale event markers",()=>{
+  assert.match(app,/catch\(err\)\{[\s\S]*nearbyEvents=\[\];[\s\S]*nearbyTotal=0;[\s\S]*setEventData\(\[\],0\)/);
+});

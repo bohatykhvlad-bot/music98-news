@@ -497,7 +497,7 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .btn{border:1px solid var(--line);background:var(--bg2);border-radius:999px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:.18s;white-space:nowrap}
 .btn:hover{border-color:var(--accent-dim);color:var(--acc2)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#03282b}
-.btn.primary:hover{filter:brightness(1.1);color:#03282b}
+.btn.primary:hover{color:#03282b}
 .btn.danger{color:var(--red);border-color:rgba(255,92,92,.35)}
 .btn.danger:hover{border-color:var(--red)}
 .btn.small{padding:7px 14px;font-size:12.5px}
@@ -3796,19 +3796,23 @@ window.addEventListener("resize", ()=>{
   _rsRaf = requestAnimationFrame(()=>{ _rsRaf = 0; document.querySelectorAll("img.js-cover").forEach(fitCover); });
 });
 window.addEventListener("pageshow", e=>{ if(e.persisted) loadPublishedDesk(); });
-/* snap the nav pill container to whole device pixels at load & resize: at odd
-   window widths the glass capsule landed on half-pixels, its 1px border smeared
-   over 2 physical px and read as "pills drift up/right" - rounding the grid
-   position kills the smear (owner report) */
+/* Snap the nav capsule to physical pixels without transforming the element.
+   A persistent transform can rasterize the whole nav (including text) into a
+   compositor layer. Relative layout offset keeps glyphs on the normal text raster. */
 (function(){
-  const nav = document.querySelector(".nav");
+  const nav=document.querySelector(".nav");
   if(!nav) return;
-  let snapCur = 0;
-  const snap = ()=>{ const x = nav.getBoundingClientRect().left; const fix = Math.round(x) - x; if(Math.abs(fix) < 0.01){ return; } snapCur += fix; nav.style.transform = "translateX(" + snapCur.toFixed(2) + "px)"; };
+  nav.style.position="relative";
+  const snap=()=>{
+    nav.style.left="0px";
+    const x=nav.getBoundingClientRect().left;
+    const dpr=Math.max(1,Number(window.devicePixelRatio)||1);
+    const fix=Math.round(x*dpr)/dpr-x;
+    nav.style.left=Math.abs(fix)<.001 ? "0px" : fix.toFixed(3)+"px";
+  };
   snap();
-  window.addEventListener("resize", ()=>requestAnimationFrame(snap));
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>snap());   /* late logo font shifts the grid */
-  setTimeout(snap, 1200);
+  window.addEventListener("resize",()=>requestAnimationFrame(snap));
+  if(document.fonts?.ready) document.fonts.ready.then(snap).catch(()=>{});
 })();
 S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refreshDailyTop50();
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
@@ -3818,6 +3822,6 @@ const initialCleanPath=location.pathname.replace(/\/+$/,"")||"/";
 if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260930-31" defer></script>
+<script src="/concerts-app.js?v=20260930-32" defer></script>
 </body>
 </html>
