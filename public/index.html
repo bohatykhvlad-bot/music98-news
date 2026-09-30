@@ -122,7 +122,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
    LETTERS on every OS/rasterizer - owner measured ink 1.1px high on Windows.
    Browsers without text-box fall back to normal centering (already even). */
 .nav-btn:hover{color:var(--text)}
-.nav-btn.active{background:var(--accent);color:#03282b}
+.nav-btn.active{background:var(--accent);color:#03282b}\n@media (min-width:701px){.nav-btn.active{top:-1px}}
 .top-actions{display:flex;align-items:center;gap:10px;justify-self:end}
 .search{position:relative;width:230px;height:40px}
 .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--muted2);pointer-events:none}
@@ -3818,6 +3818,6 @@ const initialCleanPath=location.pathname.replace(/\/+$/,"")||"/";
 if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20260930-27" defer></script>
+<script src="/concerts-app.js?v=20260930-28" defer></script>
 </body>
 </html>
