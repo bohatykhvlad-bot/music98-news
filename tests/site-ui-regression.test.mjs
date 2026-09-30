@@ -132,3 +132,11 @@ test("search mode removes the empty hero spacer and Facebook glyph is optically 
   assert.match(page,/\.social a\[title="Facebook"\] svg\{transform:translateY\(-1px\)\}/);
   assert.match(page,/#heroSlot:empty\{min-height:300px\}/);
 });
+
+test("mobile cards keep desktop title-teaser spacing and equalize only whole-card height",()=>{
+  assert.match(page,/\.card \.body\{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1\}/);
+  assert.match(page,/\.meta\{margin-top:auto;/);
+  assert.match(page,/c\.style\.minHeight=maxCard\+"px"/);
+  assert.doesNotMatch(page,/h\.style\.minHeight\s*=\s*maxH/);
+  assert.doesNotMatch(page,/p\.style\.minHeight\s*=\s*maxP/);
+});

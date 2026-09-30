@@ -265,12 +265,9 @@ main{position:relative;z-index:1}
      (330 vs 374) and read as "shifted left". Stack needs no tails: zero
      horizontal padding. Vertical pair (padding 12 / margin -12) stays. */
   .rail{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr;overflow-x:visible;gap:14px;padding:12px 0}
-  /* full titles (owner: no ellipsis) - heights are equalized in JS after
-     render: every card's title/teaser block gets the tallest sibling's
-     height as min-height, so cards align without cutting any text */
-  /* teaser always fits (owner: "чтобы влезал анонс"): no clamp on p.
-     Real teasers are written to similar length, so with the 2-line title
-     clamp heights stay visually even without cutting text. */
+  /* Keep the same internal text flow as desktop: title -> fixed 8px gap ->
+     teaser, while the date stays bottom-aligned by .meta{margin-top:auto}.
+     JS equalizes only the whole card height, never title/teaser boxes. */
 }
 .rail-btn{position:absolute;top:calc(50% - 78px);z-index:5;width:38px;height:156px;border-radius:999px;border:1px solid rgba(255,255,255,.8);background:rgba(255,255,255,.72);backdrop-filter:blur(12px) saturate(180%);-webkit-backdrop-filter:blur(12px) saturate(180%);box-shadow:0 4px 18px rgba(15,60,64,.10);display:grid;place-items:center;cursor:pointer;color:var(--muted);-webkit-tap-highlight-color:transparent;touch-action:none;transition:opacity .5s ease}
 /* visibility model (owner spec): the next pill is ALWAYS on screen (it anchors
@@ -2332,59 +2329,58 @@ function chartMatches(r){
 
 /* ============ render ============ */
 const RAIL_PAGE = 4;   /* cards per batch on mobile Load More (owner: 4, matches the desktop first screen) */
-/* mobile-only: equalize card text blocks per batch. Titles render in full
-   (no clamp); the tallest title/teaser in the batch sets a min-height for
-   all, so cards share one silhouette without hiding any text. */
+/* mobile-only: keep the desktop card flow and equalize only the OUTER
+   card height. Never give h3/p synthetic heights: that creates invisible
+   blank bands between title, teaser and date on short-copy cards. */
 function equalizeCards(gridSel){
   const grid = $(gridSel);
   if(!grid) return;
-  /* owner (2026-09-24): equalize across BOTH tabs on the phone - news and
-     releases cards must share one silhouette; per-tab maxima left releases
-     ~41px shorter and the tabs read as different card heights. The desktop
-     branch below stays a no-op (media query). */
   const cards = [...document.querySelectorAll("#newsGrid .card, #relGrid .card")];
-  if(!window.matchMedia("(max-width: 640px)").matches || !cards.length){
-    cards.forEach(c=>{ const h=c.querySelector("h3"), p=c.querySelector("p"); if(h) h.style.minHeight=""; if(p) p.style.minHeight=""; });
-    return;
-  }
-  cards.forEach(c=>{ const h=c.querySelector("h3"), p=c.querySelector("p"); if(h) h.style.minHeight=""; if(p) p.style.minHeight=""; });
-  /* hidden-tab cards read 0 via offsetHeight (display:none), so the visible
-     tab would always win the max and heights would ping-pong between tabs.
-     Measure hidden text in an offscreen scribe with the shared phone column
-     width instead - both tabs then land on one silhouette. */
-  const probe = document.createElement("div");
-  probe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;";
-  document.body.appendChild(probe);
-  const refCard = cards.find(c=>c.offsetParent) || cards[0];
-  const refH = refCard && refCard.querySelector("h3");
-  const colW = refH ? refH.clientWidth : 0;
-  const natH = el => {
-    if(!el) return 0;
-    if(el.offsetParent) return el.offsetHeight;
-    if(!colW) return 0;
-    const m = document.createElement(el.tagName);
-    const cs = getComputedStyle(el);
-    m.style.font = cs.font; m.style.letterSpacing = cs.letterSpacing;
-    m.style.lineHeight = cs.lineHeight; m.style.width = colW+"px"; m.style.margin = "0";
-    m.textContent = el.textContent;
-    probe.appendChild(m);
-    const h = m.offsetHeight;
-    m.remove();
-    return h;
-  };
-  let maxH = 0, maxP = 0;
+
+  /* Clear both the current whole-card equalizer and the legacy per-text
+     equalizer so resize/tab changes always start from natural content flow. */
   cards.forEach(c=>{
-    maxH = Math.max(maxH, natH(c.querySelector("h3")));
-    maxP = Math.max(maxP, natH(c.querySelector("p")));
+    c.style.minHeight="";
+    const h=c.querySelector("h3"), p=c.querySelector("p");
+    if(h) h.style.minHeight="";
+    if(p) p.style.minHeight="";
+  });
+
+  if(!window.matchMedia("(max-width: 640px)").matches || !cards.length) return;
+
+  /* Mobile cards stack in separate rows, unlike the desktop rail where grid
+     stretching naturally gives siblings one row height. Recreate that desktop
+     behavior by measuring natural full-card heights and applying only the
+     tallest one as min-height. The body then keeps gap:8px and meta:auto. */
+  const refCard = cards.find(c=>c.offsetParent) || cards[0];
+  const cardW = refCard ? refCard.getBoundingClientRect().width : 0;
+  if(!cardW) return;
+
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:absolute;left:-9999px;top:0;width:"+cardW+"px;visibility:hidden;pointer-events:none;";
+  document.body.appendChild(probe);
+
+  let maxCard = 0;
+  cards.forEach(c=>{
+    let natural = 0;
+    if(c.offsetParent){
+      natural = c.getBoundingClientRect().height;
+    }else{
+      const clone = c.cloneNode(true);
+      clone.style.minHeight="";
+      clone.style.width=cardW+"px";
+      clone.style.margin="0";
+      clone.querySelectorAll("h3,p").forEach(el=>{ el.style.minHeight=""; });
+      probe.appendChild(clone);
+      natural = clone.getBoundingClientRect().height;
+      clone.remove();
+    }
+    maxCard = Math.max(maxCard, Math.ceil(natural));
   });
   probe.remove();
-  cards.forEach(c=>{
-    const h = c.querySelector("h3"), p = c.querySelector("p");
-    if(h && maxH) h.style.minHeight = maxH+"px";
-    if(p && maxP) p.style.minHeight = maxP+"px";
-  });
-}
-window.addEventListener("load", ()=>{ equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
+
+  if(maxCard) cards.forEach(c=>{ c.style.minHeight=maxCard+"px"; });
+}window.addEventListener("load", ()=>{ equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
 function renderNews(){
   const posts = data.posts.filter(p=>p.type==="news" && matches(p)).sort(byFresh);
   /* searching: NO hero - every match renders as a card in the rail (owner:
