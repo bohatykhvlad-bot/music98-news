@@ -222,9 +222,9 @@ test("mobile initial map opens at world overview while desktop camera stays unch
 test("Belfast is not mapped to the dead ND pseudo-country",()=>{
   assert.doesNotMatch(app,/ND:\["belfast"\]/);
 });
-test("popup uses artistImage and exposes merged alternate ticket links",()=>{
-  assert.match(app,/const popupImage=String\(e\.artistImage\|\|""\)/);
-  assert.doesNotMatch(app,/img\.className="pop-img"; img\.src=e\.image/);
+test("popup uses event image and exposes merged alternate ticket links",()=>{
+  assert.match(app,/if\(e\.image\)\{[\s\S]*img\.className="pop-img"; img\.src=e\.image/);
+  assert.doesNotMatch(app,/const popupImage=String\(e\.artistImage/);
   assert.match(app,/Array\.isArray\(e\.ticketOptions\)/);
   assert.match(app,/alt\.className="ticket-alt"/);
 });

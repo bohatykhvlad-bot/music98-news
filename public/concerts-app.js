@@ -546,10 +546,9 @@ function handleHubClick(e){
 
 function popupContent(e){
   const root=document.createElement("div");
-  const popupImage=String(e.artistImage||"");
-  if(popupImage){
+  if(e.image){
     const img=document.createElement("img");
-    img.className="pop-img"; img.src=popupImage; img.alt=""; img.loading="eager"; img.decoding="async"; img.width=286; img.height=142;
+    img.className="pop-img"; img.src=e.image; img.alt=""; img.loading="eager"; img.decoding="async"; img.width=286; img.height=142;
     root.appendChild(img);
   }
   const body=document.createElement("div"); body.className="pop-body";
