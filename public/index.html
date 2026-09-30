@@ -512,8 +512,9 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .flink{display:block;width:max-content;max-width:100%;color:var(--muted);text-decoration:none;font-size:14px;line-height:1.55;padding:5px 0;transition:.15s;white-space:nowrap}
 .flink:hover{color:var(--acc2)}
 .social .icons{display:grid;grid-template-columns:repeat(4,42px);gap:10px;width:198px;max-width:100%;align-items:center;justify-items:center}
-.social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--acc2);text-decoration:none}
-.social a:active{border-color:var(--accent)}
+.social a{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--acc2);text-decoration:none;transform:none;transition:background .16s ease,border-color .16s ease,color .16s ease}
+.social a:hover{background:var(--accent);border-color:var(--accent);color:#03282b}
+.social a:active{transform:none}
 .social svg{width:18px;height:18px}
 .foot-col .copy{margin:16px 0 0;color:var(--muted2);font-size:14px;line-height:1.55}
 

@@ -47,6 +47,13 @@ test("footer social icons stay in one row",()=>{
   assert.match(page,/grid-template-columns:minmax\(320px,1fr\) 150px 180px 198px/);
 });
 
+test("footer social pills fill cyan only on hover",()=>{
+  assert.match(page,/\.social a\{[^}]*background:var\(--card\);[^}]*transform:none;[^}]*transition:background \.16s ease,border-color \.16s ease,color \.16s ease/);
+  assert.match(page,/\.social a:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
+  assert.match(page,/\.social a:active\{transform:none\}/);
+  assert.doesNotMatch(page,/\.social a:active\{border-color:var\(--accent\)\}/);
+});
+
 
 test("verified server artwork is enforced at final row render",()=>{
   assert.match(page,/const verifiedArt = String\(r\.art\|\|""\)/);
