@@ -53,15 +53,14 @@ test("map uses only the daily verified market snapshot",()=>{
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
 
-test("map has no custom minus or floating status and native zoom-out resets filters",()=>{
-  assert.doesNotMatch(app,/id=\\"resetMapBtn\\"/);
-  assert.doesNotMatch(app,/id=\\"status\\"/);
-  assert.match(app,/function setStatus\(\)\{ \/\* no floating map status UI \*\/ \}/);
+test("map has no custom minus or floating map status and native zoom-out resets filters",()=>{
+  assert.equal(app.includes("resetMapBtn"),false);
+  assert.equal(app.includes("map-status"),false);
+  assert.match(app,/function setStatus\(message\)\{ sideStatus\.textContent=/);
   assert.match(app,/\.mapboxgl-ctrl-zoom-out/);
   assert.match(app,/btn\.addEventListener\("click",resetMapFilters\)/);
-  assert.match(app,/radiusEl\.value="100"/);
+  assert.equal(app.includes("radiusEl"),false);
 });
-
 test("map shell has no gray shadow gap and canvas fills it",()=>{
   assert.match(app,/\.map-shell\{[^}]*background:#fff;box-shadow:none/);
   assert.match(app,/#map \.mapboxgl-canvas\{[^}]*width:100%!important;height:100%!important/);
@@ -80,7 +79,8 @@ test("Buy Tickets uses the shared site press binder",()=>{
 
 
 test("concert snapshot requests bypass browser cache and Popular never renders a partial list",()=>{
-  assert.match(app,/fetch\(u,\{cache:"no-store",headers:\{"Accept":"application\/json","Cache-Control":"no-cache"\}\}\)/);
+  assert.match(app,/cache:"no-store"/);
+  assert.match(app,/signal:controller\.signal/);
   assert.match(app,/cached\.artists\.length>=30/);
   assert.match(app,/Array\.isArray\(data\.artists\) && data\.artists\.length>=30/);
   assert.match(app,/popularArtists=data\.artists\.slice\(0,30\)/);
