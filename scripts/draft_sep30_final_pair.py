@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import base64, copy, io, json, sys, time, urllib.request
+import base64, copy, io, json, sys, time, urllib.request, http.cookiejar
 from pathlib import Path
 from PIL import Image
 import gdown
@@ -47,10 +47,25 @@ The São Paulo recordings give the soundtrack a specific role inside that story.
 The physical editions extend the release beyond streaming, with CD and double-vinyl versions offered through the band's official store. The soundtrack arrives as both a standalone live record and a companion piece to a documentary about how LINKIN PARK rebuilt its working identity after a long hiatus.'''
 
 def get(url, referer=""):
-    headers={"User-Agent":runner.UA}
+    jar=http.cookiejar.CookieJar()
+    opener=urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
+    if referer:
+        try:
+            opener.open(urllib.request.Request(referer,headers={
+                "User-Agent":runner.UA,
+                "Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language":"en-US,en;q=0.9",
+            }),timeout=30).read(1024)
+        except Exception:
+            pass
+    headers={
+        "User-Agent":runner.UA,
+        "Accept":"image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+        "Accept-Language":"en-US,en;q=0.9",
+    }
     if referer: headers["Referer"]=referer
     req=urllib.request.Request(url,headers=headers)
-    with urllib.request.urlopen(req,timeout=60) as r: return r.read()
+    with opener.open(req,timeout=60) as r: return r.read()
 
 def upload(name, raw, min_px=1920):
     with Image.open(io.BytesIO(raw)) as src:
