@@ -98,9 +98,9 @@ def lisa_photo():
     except Exception as direct:
         print("LISA_SONY_DIRECT_BLOCKED",repr(direct))
     page=html_bytes(LISA_MIRROR_PAGE).decode("utf-8","replace")
-    m=re.search(r'<meta[^>]+(?:property|name)=["\\']og:image["\\'][^>]+content=["\\']([^"\\']+)',page,re.I)
+    m=re.search(r"""<meta[^>]+(?:property|name)=["']og:image["'][^>]+content=["']([^"']+)""",page,re.I)
     if not m:
-        m=re.search(r'<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:property|name)=["\\']og:image["\\']',page,re.I)
+        m=re.search(r"""<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']og:image["']""",page,re.I)
     if not m:
         raise RuntimeError("LISA promo mirror has no og:image")
     img=html.unescape(m.group(1))
