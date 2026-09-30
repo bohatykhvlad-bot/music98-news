@@ -33,8 +33,8 @@ def main():
         p = next((x for x in posts if str(x.get("id")) == POST_ID), None)
         if not p:
             raise RuntimeError("draft not found")
-        if (p.get("status") or "live") != "draft":
-            raise RuntimeError("post is not draft")
+        if (p.get("status") or "live") != "live":
+            raise RuntimeError("post is not live")
         p["excerpt"] = EXCERPT
         p["body"] = BODY
         return copy.deepcopy(p)
@@ -45,7 +45,7 @@ def main():
     for attempt in range(12):
         desk = runner.http(runner.DESK_API + "?nocache=" + str(time.time_ns()), runner.desk_key())
         p = next((x for x in desk.get("posts", []) if str(x.get("id")) == POST_ID), None)
-        if p and p.get("excerpt") == EXCERPT and p.get("body") == BODY and p.get("status") == "draft":
+        if p and p.get("excerpt") == EXCERPT and p.get("body") == BODY and p.get("status") == "live":
             break
         time.sleep(2)
     else:
@@ -59,6 +59,7 @@ def main():
                 print(line)
         if not ok:
             raise RuntimeError(f"gate failed on pass {pass_no}")
+    runner.cmd_verify(POST_ID)
 
 if __name__ == "__main__":
     main()
