@@ -11,7 +11,7 @@ PHOTO_API="https://music98.news/api/photo"
 LISA_ID="lisa26vegas"
 LP_ID="aulp930r1"
 OLD_LEON_ID="auleon930r1"
-LISA_PHOTO="https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg"
+LISA_PHOTO="https://s202.q4cdn.com/508919455/files/content_files/Static_Social-Instagram_1080x1080_Lisa_2026_Regional_TheColosseumatCaesarsPalace_1101_V2-20-41-27.jpg"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg"
 
 LISA_BODY='''LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six. The new performances are scheduled for November 12 and 29, joining previously announced shows on November 13, 14, 27 and 28. Caesars says the original four dates sold out in under 10 minutes, and general sale for the two added performances begins September 30.
@@ -52,9 +52,9 @@ def get(url, referer=""):
     req=urllib.request.Request(url,headers=headers)
     with urllib.request.urlopen(req,timeout=60) as r: return r.read()
 
-def upload(name, raw):
+def upload(name, raw, min_px=1920):
     with Image.open(io.BytesIO(raw)) as src:
-        if max(src.size)<1920: raise RuntimeError(f"{name} too small: {src.size}")
+        if max(src.size)<min_px: raise RuntimeError(f"{name} too small: {src.size}")
         im=src.convert("RGB")
         if max(im.size)>3200:
             k=3200/max(im.size)
@@ -67,7 +67,7 @@ def upload(name, raw):
     return out["url"]
 
 def lisa_photo():
-    return upload("lisa-sawadika-2026-sony.jpg",get(LISA_PHOTO,"https://www.sonymusic.es/actualidad/lisa-sawadika-nuevo-single-adelanto-ep-press-play/"))
+    return upload("lisa-viva-la-lisa-caesars-2026.jpg",get(LISA_PHOTO,"https://newsroom.caesars.com/"),1080)
 
 def ticket_url():
     d=json.loads(get("https://music98.news/api/concerts?artist=LISA&nocache="+str(time.time_ns())))
@@ -110,7 +110,7 @@ def main():
       "title":"LISA Adds Two Shows to Her Sold-Out Las Vegas Residency",
       "excerpt":"LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six.",
       "body":LISA_BODY.replace("__TICKET__",ticket_url()),"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lisa_photo(),"credit":"Sony Music","creditUrl":"https://www.sonymusic.es/actualidad/lisa-sawadika-nuevo-single-adelanto-ep-press-play/","pos":"50% 46%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
+      "cover":{"kind":"img","src":lisa_photo(),"credit":"Caesars Entertainment / LLOUD","creditUrl":"https://newsroom.caesars.com/press-releases/press-release-details/2026/LISA-ADDS-TWO-NEW-DATES-TO-HER-SOLD-OUT-LAS-VEGAS-RESIDENCY-DUE-TO-OVERWHEMING-DEMAND-VIVA-LA-LISA-AT-THE-COLOSSEUM-AT-CAESARS-PALACE--NOV-12-13-14-27-28--29-2026--2026-eGkXjvCgqE/default.aspx","pos":"50% 38%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
     }
     write(LISA_ID,lisa)
     lp={
