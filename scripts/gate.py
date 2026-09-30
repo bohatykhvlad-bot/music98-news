@@ -531,7 +531,7 @@ def paragraphs(body):
 
 def is_media(t):
     t = t.strip()
-    return bool(re.match(r"^\[(?:photo|youtube|apple|tiktok|ig):[^\]]*\]$", t, re.I))
+    return bool(re.match(r"^\[(?:photo|youtube|apple|tiktok|ig|tickets):[^\]]*\]$", t, re.I))
 
 
 def is_awards_marker(t):
