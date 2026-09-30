@@ -161,6 +161,9 @@ jobs:
         run: |
           python -m pip install --quiet Pillow gdown
           python scripts/draft_sep30_final_pair.py
+      - name: Revise LINKIN PARK Unshatter draft
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[lp-unshatter-revise]') }}
+        run: python scripts/revise_linkin_unshatter_draft.py
       - name: Gate requested post
         if: ${{ inputs.post_id != '' }}
         run: python scripts/post.py gate "${{ inputs.post_id }}"
