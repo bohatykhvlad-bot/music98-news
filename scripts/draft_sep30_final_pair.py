@@ -11,7 +11,7 @@ PHOTO_API="https://music98.news/api/photo"
 LISA_ID="lisa26vegas"
 LP_ID="auleon930r1"
 OLD_LEON_ID="auleon930r1"
-LISA_PHOTO="https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg"
+LISA_PHOTO="https://cdn-p.smehost.net/sites/5b3bac59eb36401694af3a241173447f/wp-content/uploads/2026/09/lisa-foto-de-promocion-de-su-nuevo-single-sawadika-1788514207.jpg"\nLISA_FUR_URL="https://media.vogue.com.tw/photos/69fc2dabd626f4ff11eaf44c/master/w_2560,c_limit/BFA_54140_7894895.JPG"
 LP_PHOTO="https://press.warnerrecords.com/sites/g/files/g2000014901/files/styles/artist_detail/public/2025-12/Linkin_Park_2_20_2535788%20M1A%20copy%20%281%29%20%281%29.jpg?itok=IxzVedtC"
 LISA_FILESTACK_ORIGINAL="https://cdn.filestackcontent.com/R6COV2mESXGIYm9c5pBc"
 LISA_MIRRORS=[
@@ -27,29 +27,33 @@ The residency will still run across two weekends. LISA now plays November 12 thr
 
 [tickets:__TICKET__]
 
-The new dates arrive while LISA is promoting *PRESS PLAY*, her six-track EP due October 23 through LLOUD Co. and RCA Records. Its first single, "SaWaDiKa," was released in September. The video was directed by Bang Jae Yeob and filmed in Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA also performed the song at the 2026 MTV Video Music Awards.
+The extra dates arrive as LISA begins the campaign for *PRESS PLAY*, her new EP due October 23 through LLOUD Co. and RCA Records. Its first single, "SaWaDiKa," was released on September 4. Produced by Thom Bridges and Ojivolta, the song takes its name from the Thai greeting for "hello" and puts LISA back over a harder hip-hop beat after the wider pop palette of *Alter Ego*.
 
-At the 2026 VMAs, LISA also won Best Pop for "Dream feat. Kentaro Sakaguchi." LLOUD's official short film for the song stars LISA and Sakaguchi and is included below.
+The "SaWaDiKa" video was directed by Bang Jae Yeob and filmed in Bangkok. LISA moves through several locations in the city, with Thai references built into the sets, styling and choreography. Caesars says the video drew 70.8 million views in its first 24 hours. LISA then performed the song at the 2026 MTV Video Music Awards.
+
+The same VMAs also gave LISA another solo win when "Dream feat. Kentaro Sakaguchi" took Best Pop. LLOUD later released an official short film for the song starring LISA and Sakaguchi. That is the only video included in this post.
 
 [youtube:FMX98ROVRCE]
 
-*PRESS PLAY* is scheduled for October 23, 20 days before the first Las Vegas show. The release date puts new solo music immediately before the residency. The added dates do not change the format of VIVA LA LISA, which remains a six-show run at one venue across two November weekends.
+*PRESS PLAY* arrives 20 days before the first Las Vegas show. That timing gives the residency new material almost immediately before opening night, while songs from *Alter Ego* remain part of LISA's existing solo catalog. The November booking is still a limited run at one venue, not a longer Las Vegas season.
 
-The two new shows sit at opposite ends of the schedule. November 12 now opens the first weekend and November 29 closes the second, while the four original dates remain unchanged.'''
+The two added shows sit at opposite ends of the schedule. November 12 now opens the first weekend and November 29 closes the second, while the four original dates remain unchanged. The final run is three consecutive nights from November 12 through 14 and another three from November 27 through 29.'''
 
-LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album that accompanies the band's new *UNSHATTER* film. The soundtrack arrived September 25 through Warner Records and documents the São Paulo concert connected to the *FROM ZERO* release period.
+LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album that accompanies the band's new *UNSHATTER* film. The soundtrack arrived September 25 through Warner Records and documents the São Paulo concert tied to the *FROM ZERO* release period.
 
-The CD and digital edition run to 20 tracks. Four of those are short intro or interlude pieces, leaving 16 full performances. The vinyl edition lists those 16 songs without the four interludes. The set moves from "Somewhere I Belong" and "Waiting for the End" to newer material including "The Emptiness Machine," "Casualty," "Two Faced" and "Heavy Is the Crown." It closes with "Bleed It Out."
+The CD contains 20 tracks. Four are short intro or interlude pieces, leaving 16 full performances. The two-LP edition presents those 16 songs without the four interludes. The set moves from "Somewhere I Belong" and "The Catalyst" through "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint" and "Papercut." Songs from *FROM ZERO*, including "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown," are mixed into the same show. "Bleed It Out" closes the record.
 
-According to the band's official store, *UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The film combines archive material, live footage and interviews with band members and fans. The soundtrack also includes recordings that are not heard in the film.
+According to the band's official store, *UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The film uses rare vault footage, performances from sold-out shows and interviews with band members and fans. It also covers the period in which Emily Armstrong and Colin Brittain joined the group after its seven-year hiatus.
 
-The live version of "Faint" arrived ahead of the full soundtrack with an official video from São Paulo. The clip puts the current lineup on one of the band's best-known songs and gives a direct preview of the concert captured for the project.
+The soundtrack is not simply the film audio lifted onto a record. LINKIN PARK's store says it contains live recordings that are not heard in the documentary, so the album keeps more of the São Paulo show than appears onscreen. That distinction is useful because the film and soundtrack cover the same period without being identical versions of the same material.
+
+The live version of "Faint" arrived ahead of the soundtrack with an official video from São Paulo. The clip shows the current lineup performing one of the band's best-known songs in the same concert setting used throughout the release.
 
 [youtube:zNYsw-cW8v8]
 
-The CD is packaged in a gatefold softpak with a 12-panel accordion booklet. The two-LP Citrus vinyl edition comes in a gatefold jacket with a 12-by-24-inch insert. Other vinyl variants are also listed through the official LINKIN PARK store.
+The physical editions differ slightly. The CD comes in a gatefold softpak with a 12-panel accordion booklet and keeps all 20 tracks, including the four short interludes. The two-LP Citrus vinyl edition is housed in a gatefold jacket with a 12-by-24-inch insert and carries the 16 full songs. Warner also offers other vinyl variants through the official LINKIN PARK store.
 
-All 16 full performances come from the same São Paulo concert, with *FROM ZERO* songs placed alongside older material. The soundtrack therefore preserves one show as a complete audio release instead of assembling recordings from different tours or venues.'''
+All 16 full performances come from the same São Paulo concert. The result is a single-show live album rather than a compilation assembled from different tours or venues. Its sequence places *FROM ZERO* songs alongside older catalog staples and gives the performance documented in *UNSHATTER* a separate audio release.'''
 
 def get(url, referer=""):
     jar=http.cookiejar.CookieJar()
@@ -98,36 +102,12 @@ def upload(name, raw, min_px=1920):
     return out["url"]
 
 def lisa_photo():
-    try:
-        return upload("lisa-sawadika-yeyoung-choi.jpg",get(LISA_PHOTO,"https://www.sonymusic.es/actualidad/lisa-sawadika-nuevo-single-adelanto-ep-press-play/"))
-    except Exception as direct:
-        print("LISA_SONY_DIRECT_BLOCKED",repr(direct))
-    try:
-        raw=get(LISA_FILESTACK_ORIGINAL,"https://www.bandwagon.asia/")
-        with Image.open(io.BytesIO(raw)) as probe:
-            print("LISA_FILESTACK_QC",probe.size,probe.format)
-            if max(probe.size)>=1920:
-                return upload("lisa-sawadika-yeyoung-choi.jpg",raw)
-    except Exception as e:
-        print("LISA_FILESTACK_FAIL",repr(e))
-    for page_url in LISA_MIRRORS:
-        try:
-            page=html_bytes(page_url).decode("utf-8","replace")
-            m=re.search(r"""<meta[^>]+(?:property|name)=["']og:image["'][^>]+content=["']([^"']+)""",page,re.I)
-            if not m:
-                m=re.search(r"""<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["']og:image["']""",page,re.I)
-            if not m:
-                continue
-            img=html.unescape(m.group(1))
-            raw=get(img,page_url)
-            with Image.open(io.BytesIO(raw)) as probe:
-                print("LISA_MIRROR_QC",page_url,img,probe.size,probe.format)
-                if max(probe.size)<1920:
-                    continue
-            return upload("lisa-sawadika-yeyoung-choi.jpg",raw)
-        except Exception as e:
-            print("LISA_MIRROR_FAIL",page_url,repr(e))
-    raise RuntimeError("no >=1920 Yeyoung Choi press mirror available")
+    raw=get(LISA_FUR_URL,"https://www.vogue.com.tw/galerie/gq-met-gala-after-party-2026")
+    with Image.open(io.BytesIO(raw)) as probe:
+        print("LISA_FUR_QC",probe.size,probe.format)
+        if max(probe.size)<1920:
+            raise RuntimeError("LISA Zach Hilty image below 1920px")
+    return upload("lisa-met-gala-afterparty-zach-hilty.jpg",raw)
 
 def html_bytes(url):
     req=urllib.request.Request(url,headers={"User-Agent":runner.UA,"Accept":"text/html,application/xhtml+xml"})
@@ -195,17 +175,17 @@ def main():
     lisa={
       "id":LISA_ID,"type":"news","tag":"News","artist":"LISA",
       "title":"LISA Adds Two Shows to Her Sold-Out Las Vegas Residency",
-      "excerpt":"LISA has added two shows to her sold-out VIVA LA LISA residency at The Colosseum at Caesars Palace, expanding the November run from four dates to six.",
+      "excerpt":"LISA has added two shows to VIVA LA LISA at The Colosseum at Caesars Palace, taking the November residency from four dates to six.",
       "body":LISA_BODY.replace("__TICKET__",ticket_url()),"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lisa_photo(),"credit":"Yeyoung Choi","creditUrl":"https://www.instagram.com/yeng__p/","pos":"50% 44%","zoom":1,"cardX":.5,"cardY":.44,"cardZoom":1.15}
+      "cover":{"kind":"img","src":lisa_photo(),"credit":"Zach Hilty","creditUrl":"https://www.zachhiltyphoto.com/info","pos":"50% 39%","zoom":1,"cardX":.50,"cardY":.37,"cardZoom":1}
     }
     write(LISA_ID,lisa)
     lp={
       "id":LP_ID,"type":"release","tag":"New Release","artist":"LINKIN PARK",
       "title":"UNSHATTER Film Soundtrack (Live in São Paulo)",
-      "excerpt":"LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a 20-track live companion to the band's new documentary.",
+      "excerpt":"LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album that accompanies the band's new *UNSHATTER* film.",
       "body":LP_BODY,"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://www.jimmyfontaine.com/","pos":"50% 50%","zoom":1,"cardX":.5,"cardY":.5,"cardZoom":1}
+      "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://www.jimmyfontaine.com/","pos":"50% 50%","zoom":1,"cardX":.47,"cardY":.50,"cardZoom":1}
     }
     write(LP_ID,lp)
 
