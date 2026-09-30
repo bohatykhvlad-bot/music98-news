@@ -179,6 +179,7 @@ VERIFIED_DATES = {
 
     "september 19": "Bass Persuades chart week predictions 40-45K (HITSDD/chartdata)",
     "september 3": "'Bass Persuades' title track + Mert Alas video 03.09.2026",
+    "september 4": "LISA 'SaWaDiKa' released 04.09.2026 through LLOUD Co. / RCA Records (Sony Music Spain)",
     "september 8": "BbY WOW first hit No.1 on Billboard Global 200 (chart week of 12.09)",
     "august 7": "KAROL G 'NO ME ARREPIENTO DE SENTIR TANTO' album out 07.08.2026 (Bichota)",
     "october 16": "Miley Hollywood Bowl night one, 16.10.2026 (Atlantic announcement)",
