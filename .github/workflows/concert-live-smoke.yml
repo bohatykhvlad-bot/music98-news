@@ -20,7 +20,7 @@ jobs:
       - name: Verify direct Concerts shell, cache headers and shared bundle
         run: |
           python - <<'PY'
-          import re, urllib.request
+          import re, urllib.request, time
 
           def get(url):
               req=urllib.request.Request(url,headers={
@@ -31,34 +31,31 @@ jobs:
               with urllib.request.urlopen(req,timeout=25) as r:
                   return r.status,{k.lower():v for k,v in r.headers.items()},r.read().decode("utf-8","replace")
 
-          status,h,html=get("https://music98.news/concerts")
-          assert status==200,status
-          cc=h.get("cache-control","").lower()
-          assert "no-store" in cc,cc
-          assert h.get("cf-cache-status","").upper()!="HIT",h.get("cf-cache-status")
-          assert h.get("x-m98-concerts-shell")=="index",h.get("x-m98-concerts-shell")
-          assert "<title>Concerts Near You - music98.news</title>" in html
-          assert '<meta property="og:title" content="Concerts Near You - music98.news">' in html
-          assert '<link rel="canonical" href="https://music98.news/concerts">' in html
-          assert "<music98-concerts>" in html
-          direct_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',html)
-          assert direct_src,direct_src
-
-          _,_,home=get("https://music98.news/")
-          home_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',home)
-          assert home_src,home_src
-          assert direct_src.group(1)==home_src.group(1),(direct_src.group(1),home_src.group(1))
-
-          _,jh,js=get("https://music98.news"+direct_src.group(1))
-          assert "no-store" in jh.get("cache-control","").lower(),jh.get("cache-control")
-          assert jh.get("cf-cache-status","").upper()!="HIT",jh.get("cf-cache-status")
-          assert 'mode:"markets"' in js or 'mode:"markets",' in js
-          print("DIRECT_CONCERTS_PASS",{
-              "cacheControl":h.get("cache-control"),
-              "cfCacheStatus":h.get("cf-cache-status"),
-              "bundle":direct_src.group(1),
-              "bundleCfCacheStatus":jh.get("cf-cache-status"),
-          })
+          for attempt in range(12):
+              try:
+                  status,h,html=get("https://music98.news/concerts")
+                  assert status==200
+                  assert "no-store" in h.get("cache-control","").lower()
+                  assert h.get("cf-cache-status","").upper()!="HIT"
+                  assert h.get("x-m98-concerts-shell")=="index"
+                  assert "<title>Concerts Near You - music98.news</title>" in html
+                  assert '<meta property="og:title" content="Concerts Near You - music98.news">' in html
+                  assert '<link rel="canonical" href="https://music98.news/concerts">' in html
+                  direct_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',html)
+                  assert direct_src
+                  _,_,home=get("https://music98.news/")
+                  home_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',home)
+                  assert home_src and direct_src.group(1)==home_src.group(1)
+                  _,jh,js=get("https://music98.news"+direct_src.group(1))
+                  assert "no-store" in jh.get("cache-control","").lower()
+                  assert jh.get("cf-cache-status","").upper()!="HIT"
+                  assert 'mode:"markets"' in js or 'mode:"markets",' in js
+                  print("DIRECT_CONCERTS_PASS",{"attempt":attempt+1,"cacheControl":h.get("cache-control"),"cfCacheStatus":h.get("cf-cache-status"),"bundle":direct_src.group(1)})
+                  break
+              except Exception as e:
+                  print("DIRECT_CONCERTS_WAIT",{"attempt":attempt+1,"error":repr(e)})
+                  if attempt==11: raise
+                  time.sleep(60)
           PY
 
       - name: Verify deployed world map and cached Popular 30

@@ -42,6 +42,23 @@ const MAP_MARKET_SNAPSHOT_KEY = "concert-markets:v4:snapshot";
 const MAP_MARKET_LEGACY_SNAPSHOT_KEY = "concert-markets:v3:snapshot";
 const MAP_MARKET_LEGACY2_SNAPSHOT_KEY = "concert-markets:v2:snapshot";
 const MAP_MARKET_BATCH_SIZE = 20;
+const MARKET_AUDIT_COVERAGE_TARGETS = [
+  {label:"US-AK",city:"Juneau",countryCode:"US",stateCode:"AK"},
+  {label:"US-SD",city:"Pierre",countryCode:"US",stateCode:"SD"},
+  {label:"US-VT",city:"Montpelier",countryCode:"US",stateCode:"VT"},
+  {label:"AU-Brisbane",city:"Brisbane",countryCode:"AU",stateCode:""},
+  {label:"AU-Perth",city:"Perth",countryCode:"AU",stateCode:""},
+  {label:"CA-BC",city:"Victoria",countryCode:"CA",stateCode:"BC"},
+  {label:"CA-AB",city:"Edmonton",countryCode:"CA",stateCode:"AB"},
+  {label:"CA-SK",city:"Regina",countryCode:"CA",stateCode:"SK"},
+  {label:"CA-MB",city:"Winnipeg",countryCode:"CA",stateCode:"MB"},
+  {label:"CA-ON",city:"Toronto",countryCode:"CA",stateCode:"ON"},
+  {label:"CA-QC",city:"Quebec City",countryCode:"CA",stateCode:"QC"},
+  {label:"CA-NB",city:"Fredericton",countryCode:"CA",stateCode:"NB"},
+  {label:"CA-NS",city:"Halifax",countryCode:"CA",stateCode:"NS"},
+  {label:"CA-PE",city:"Charlottetown",countryCode:"CA",stateCode:"PE"},
+  {label:"CA-NL",city:"St. John's",countryCode:"CA",stateCode:"NL"},
+];
 
 /* The source list is intentionally human-readable and grouped, but a batch must
    not scan Europe for hours before touching the rest of the world. Build a
@@ -76,6 +93,31 @@ function orderedMapMarketSeeds(){
   return out;
 }
 const ORDERED_MAP_MARKET_SEEDS=orderedMapMarketSeeds();
+function mapMarketSeedKey(seed){
+  return [String(seed?.city||"").toLowerCase(),String(seed?.stateCode||"").toUpperCase(),String(seed?.countryCode||"").toUpperCase()].join("|");
+}
+function marketCoverageAudit(){
+  return MARKET_AUDIT_COVERAGE_TARGETS.map(target=>{
+    const exact=MAP_MARKET_SEEDS.find(seed=>
+      String(seed.city||"").toLowerCase()===String(target.city||"").toLowerCase() &&
+      String(seed.countryCode||"").toUpperCase()===String(target.countryCode||"").toUpperCase() &&
+      (!target.stateCode || String(seed.stateCode||"").toUpperCase()===String(target.stateCode||"").toUpperCase())
+    );
+    return {...target,candidate:!!exact,candidateCity:exact?.city||"",candidateStateCode:exact?.stateCode||"",
+      reason:exact?"candidate_present":"missing_candidate_seed"};
+  });
+}
+function appendMarketAudit(state,seed,entry){
+  if(!Array.isArray(state.audit)) state.audit=[];
+  const key=mapMarketSeedKey(seed);
+  state.audit=state.audit.filter(row=>row.key!==key);
+  const record={key,city:String(seed?.city||""),stateCode:String(seed?.stateCode||""),
+    countryCode:String(seed?.countryCode||""),kind:String(seed?.kind||""),
+    checkedAt:new Date().toISOString(),...entry};
+  state.audit.push(record);
+  try{console.info("concert-market-audit",JSON.stringify(record));}catch(e){}
+  return record;
+}
 
 const KWORB_FALLBACK = [
   "Bruno Mars","Rihanna","Justin Bieber","The Weeknd","Taylor Swift","Lady Gaga","Drake","Coldplay",
@@ -153,6 +195,17 @@ function normalizeEvent(e) {
   const venue = e?._embedded?.venues?.[0] || {};
   const attractions = Array.isArray(e?._embedded?.attractions) ? e._embedded.attractions : [];
   const attraction = attractions[0] || {};
+  const status=String(e?.dates?.status?.code||"").trim().toLowerCase();
+  if(["cancelled","canceled","postponed","rescheduled"].includes(status)) return null;
+  const rawName=String(e?.name||"").trim();
+  const venueName=String(venue?.name||"").trim();
+  const qaText=(rawName+" "+String(e?.info||"")+" "+String(e?.pleaseNote||"")).toLowerCase();
+  const testEvent=e?.test===true ||
+    /do\s+not\s+purchase/i.test(qaText) ||
+    /\bqa\b[^\n]{0,40}\b(?:test|testing|festival)\b/i.test(qaText) ||
+    /\b(?:test|testing)\b[^\n]{0,30}\b(?:event|festival)\b/i.test(qaText) ||
+    venueName.toLowerCase()==="ticketmaster";
+  if(testEvent) return null;
   const lat = finite(venue?.location?.latitude);
   const lng = finite(venue?.location?.longitude);
   if (lat == null || lng == null || lat < -90 || lat > 90 || lng < -180 || lng > 180 || (Math.abs(lat) < 1e-7 && Math.abs(lng) < 1e-7)) return null;
@@ -163,13 +216,14 @@ function normalizeEvent(e) {
     attractionId: String(attraction.id || ""),
     attractionIds: attractions.map(a => String(a?.id || "")).filter(Boolean),
     url: String(e.url || ""),
+    ticketOptions: e.url ? [{url:String(e.url),name:String(e.name||"Ticket"),eventId:String(e.id||"")}] : [],
     image: bestImage(e.images),
     artistImage: bestArtistImage(attraction.images) || bestImage(e.images),
     date: String(e?.dates?.start?.localDate || ""),
     time: String(e?.dates?.start?.localTime || ""),
     dateTime: String(e?.dates?.start?.dateTime || ""),
     timezone: String(e?.dates?.timezone || venue?.timezone || ""),
-    status: String(e?.dates?.status?.code || ""),
+    status,
     venue: String(venue.name || ""),
     city: String(venue?.city?.name || ""),
     state: String(venue?.state?.name || venue?.state?.stateCode || ""),
@@ -180,6 +234,45 @@ function normalizeEvent(e) {
     onSaleStart: String(e?.sales?.public?.startDateTime || ""),
     onSaleEnd: String(e?.sales?.public?.endDateTime || ""),
   };
+}
+
+function eventCollapseKey(e) {
+  const clean=v=>String(v||"").toLowerCase().replace(/\s+/g," ").trim();
+  const artist=clean(e?.artist||e?.name),venue=clean(e?.venue),city=clean(e?.city);
+  const date=clean(e?.date),time=clean(String(e?.time||"").slice(0,5));
+  if(!artist || !venue || !date) return "id:"+String(e?.id||"");
+  return [artist,venue,city,date,time].join("|");
+}
+function packageEventPenalty(e) {
+  const text=(String(e?.name||"")+" "+String(e?.ticketOptions?.[0]?.name||"")).toLowerCase();
+  return /\b(vip|package|premium|first entry|meet\s*(?:&|and)\s*greet|platinum|hospitality|soundcheck|early entry|signed)\b/.test(text)?10:0;
+}
+function mergeTicketOptions(...groups) {
+  const seen=new Set(),out=[];
+  for(const group of groups) for(const opt of Array.isArray(group)?group:[]){
+    const url=String(opt?.url||"").trim();
+    if(!url || seen.has(url)) continue;
+    seen.add(url); out.push({url,name:String(opt?.name||"Ticket"),eventId:String(opt?.eventId||"")});
+  }
+  return out;
+}
+function collapseDuplicateEvents(events) {
+  const order=[],byKey=new Map();
+  for(const ev of events||[]){
+    const key=eventCollapseKey(ev);
+    if(!byKey.has(key)){byKey.set(key,ev);order.push(key);continue;}
+    const prev=byKey.get(key);
+    const preferNew=packageEventPenalty(ev)<packageEventPenalty(prev);
+    const primary=preferNew?ev:prev,secondary=preferNew?prev:ev;
+    primary.ticketOptions=mergeTicketOptions(primary.ticketOptions,secondary.ticketOptions);
+    if(!primary.url && primary.ticketOptions[0]?.url) primary.url=primary.ticketOptions[0].url;
+    primary.duplicateCount=Number(prev?.duplicateCount||1)+1;
+    byKey.set(key,primary);
+  }
+  return order.map(key=>byKey.get(key));
+}
+function normalizeEvents(events) {
+  return collapseDuplicateEvents((Array.isArray(events)?events:[]).map(normalizeEvent).filter(Boolean));
 }
 
 function upcomingIso() {
@@ -498,7 +591,7 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
   const first = events[0];
   if(total<=0 || !first?.id) return null;
 
-  const normalizedEvents=events.map(normalizeEvent).filter(Boolean);
+  const normalizedEvents=normalizeEvents(events);
   if(normalizedEvents.length){
     const builtAt=new Date().toISOString();
     await kvPutJson(env,popularTourCacheKey(exact.id),{
@@ -851,7 +944,7 @@ async function scheduledEventPayload(env,params){
     tm.searchParams.set("countryCode",params.countryCode);
   }
   const merged=await tmEventPages(tm,env,5,"scheduled");
-  const events=merged.events.map(normalizeEvent).filter(Boolean);
+  const events=normalizeEvents(merged.events);
   return {
     ok:true,
     events,
@@ -1003,16 +1096,14 @@ export async function refreshMapMarketSnapshot(env, force=false){
   const cycle=new Date().toISOString().slice(0,10);
   let state=await kvGetJson(env,MAP_MARKET_STATE_KEY);
   if(force || !state || state.version!==MAP_MARKET_VERSION || state.cycle!==cycle){
-    state={
-      version:MAP_MARKET_VERSION,
-      cycle,
-      index:0,
-      markets:[],
-      updatedAt:new Date().toISOString(),
-    };
+    state={version:MAP_MARKET_VERSION,cycle,index:0,markets:[],audit:[],coverageAudit:marketCoverageAudit(),updatedAt:new Date().toISOString()};
+  }else if(state.complete && (!Array.isArray(state.audit) || state.audit.length<ORDERED_MAP_MARKET_SEEDS.length)){
+    state={...state,index:0,complete:false,audit:[],coverageAudit:marketCoverageAudit(),updatedAt:new Date().toISOString()};
   }else if(state.complete){
     return {ok:true,complete:true,fresh:true,index:state.index,total:ORDERED_MAP_MARKET_SEEDS.length,processed:0,found:Array.isArray(state.markets)?state.markets.length:0};
   }
+  if(!Array.isArray(state.audit)) state.audit=[];
+  if(!Array.isArray(state.coverageAudit)) state.coverageAudit=marketCoverageAudit();
 
   const seen=new Map(
     (Array.isArray(state.markets)?state.markets:[])
@@ -1025,9 +1116,13 @@ export async function refreshMapMarketSnapshot(env, force=false){
     processed++;
     try{
       const row=await marketSeedResult(env,seed);
+      const key=mapMarketSeedKey(seed);
       if(row){
-        const key=String(row.city).toLowerCase()+"|"+String(row.stateCode||"").toUpperCase()+"|"+String(row.countryCode||"").toUpperCase();
         seen.set(key,row);
+        appendMarketAudit(state,seed,{outcome:"included",reason:"upcoming_events",count:Number(row.count||0)});
+      }else{
+        seen.delete(key);
+        appendMarketAudit(state,seed,{outcome:"excluded",reason:"no_upcoming_events",count:0});
       }
     }catch(err){
       if(isTransientTicketmasterError(err)){
@@ -1037,7 +1132,8 @@ export async function refreshMapMarketSnapshot(env, force=false){
         await kvPutJson(env,MAP_MARKET_STATE_KEY,state,{expirationTtl:3*24*60*60});
         return {ok:false,retry:true,status:Number(err?.status||0),index:state.index,processed,found:state.markets.length};
       }
-      // Unsupported/invalid market: skip it and continue.
+      seen.delete(mapMarketSeedKey(seed));
+      appendMarketAudit(state,seed,{outcome:"excluded",reason:"ticketmaster_error",status:Number(err?.status||0),detail:String(err?.detail||err?.message||"").slice(0,160)});
     }
   }
 
@@ -1698,7 +1794,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
     }
 
     const merged = await tmEventPages(tm, env, 5);
-    const events = merged.events.map(normalizeEvent).filter(Boolean);
+    const events = normalizeEvents(merged.events);
     const payload = {
       ok: true,
       events,

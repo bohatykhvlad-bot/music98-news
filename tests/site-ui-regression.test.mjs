@@ -71,9 +71,11 @@ test("verified server artwork is enforced at final row render",()=>{
 });
 
 test("clean Chart and Concerts routes are no-store",()=>{
-  assert.match(worker,/\^\\\/\(\?:releases\|chart\|charts\|concerts\)/);
-  assert.match(worker,/headers\.set\("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0"\)/);
+  assert.match(worker,/path === "\/concerts"[\s\S]*serveConcertsShell\(request, env\)/);
+  assert.match(worker,/\^\\\/\(\?:releases\|chart\|charts\)/);
+  assert.match(worker,/no-store, no-cache, must-revalidate, max-age=0/);
   assert.match(worker,/Cloudflare-CDN-Cache-Control/);
+  assert.match(worker,/X-M98-Concerts-Shell/);
 });
 
 

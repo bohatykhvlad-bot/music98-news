@@ -1208,3 +1208,41 @@ test("daily Popular and map snapshots are built by cron, never by visitors", asy
   const api = fs.readFileSync(new URL("../functions/api/concerts.js", import.meta.url), "utf8");
   assert.match(api,/const MAP_MARKET_VERSION = "concert-markets-v4"/);
 });
+
+
+test("event pipeline filters QA/status noise and collapses package duplicates", async()=>{
+  const fs=await import("node:fs");
+  const src=fs.readFileSync(new URL("../functions/api/concerts.js",import.meta.url),"utf8");
+  assert.match(src,/\["cancelled","canceled","postponed","rescheduled"\]\.includes\(status\)/);
+  assert.match(src,/do\\s\+not\\s\+purchase/);
+  assert.match(src,/venueName\.toLowerCase\(\)==="ticketmaster"/);
+  assert.match(src,/function collapseDuplicateEvents\(events\)/);
+  assert.match(src,/function packageEventPenalty\(e\)/);
+  assert.match(src,/ticketOptions:/);
+});
+test("market scan keeps internal accept/reject audit out of public API", async()=>{
+  const kv=memoryKv(),oldFetch=globalThis.fetch;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(!u.pathname.endsWith("/events.json")) return new Response("not found",{status:404});
+    const hasShows=u.searchParams.get("countryCode")==="GB";
+    return new Response(JSON.stringify(hasShows?{_embedded:{events:[{id:"gb",dates:{start:{localDate:"2026-10-10"}}}]},page:{totalElements:2,totalPages:1,size:1,number:0}}:{page:{totalElements:0,totalPages:0,size:1,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+  };
+  try{
+    await refreshMapMarketSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv},true);
+    const state=JSON.parse(kv.raw("concert-markets:v4:state"));
+    assert.equal(state.audit.length,20);
+    assert.ok(state.audit.some(x=>x.reason==="upcoming_events"));
+    assert.ok(state.audit.some(x=>x.reason==="no_upcoming_events"));
+    assert.ok(state.coverageAudit.some(x=>x.label==="US-AK"&&x.candidate));
+    assert.ok(state.coverageAudit.some(x=>x.label==="US-SD"&&x.candidate));
+    assert.ok(state.coverageAudit.some(x=>x.label==="US-VT"&&x.candidate));
+    assert.ok(state.coverageAudit.some(x=>x.label==="AU-Brisbane"&&x.reason==="missing_candidate_seed"));
+    assert.ok(state.coverageAudit.some(x=>x.label==="AU-Perth"&&x.reason==="missing_candidate_seed"));
+    assert.ok(state.coverageAudit.some(x=>x.label==="CA-AB"&&x.reason==="missing_candidate_seed"));
+    const response=await onRequestGet({request:new Request("https://music98.news/api/concerts?mode=markets"),env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}});
+    const data=await response.json();
+    assert.equal("audit" in data,false);
+    assert.equal("coverageAudit" in data,false);
+  }finally{globalThis.fetch=oldFetch;}
+});
