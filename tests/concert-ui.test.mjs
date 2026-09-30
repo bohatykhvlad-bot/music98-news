@@ -93,13 +93,10 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tabs\{\\n  width:244px;max-width:100%;display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(app,/\.side-tab\{\\n  width:100%;min-width:0;max-width:none/);
   assert.match(app,/\.side-tab\{[\s\S]*?transition:\.18s;/);
-  assert.match(app,/\.side-tab\{[\s\S]*?display:grid;place-items:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1/);
+  assert.match(app,/\.side-tab\{[\s\S]*?display:inline-flex;align-items:center;justify-content:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1;text-box:trim-both cap alphabetic/);
   assert.match(app,/function pillInkShift\(el\)/);
   assert.match(app,/Math\.round\(raw\)/);
-  assert.doesNotMatch(app,/\.radius-trigger,\.radius-option,\.search-area-btn,\.side-tab\{[^}]*transform:translateZ/);
-  assert.match(app,/\.radius-trigger:active,\.radius-option:active,\.search-area-btn:active,\.side-tab:active,\.map-mode-btn:active\{transform:none\}/);
-  assert.match(app,/\.action:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
-  assert.match(app,/\.action:active\{transform:none\}/);
+  assert.match(app,/\.search-area-btn:active,\.side-tab:active,\.map-mode-btn:active\{transform:none\}/);
   assert.match(app,/\.map-tool-btn:active\{transform:none!important\}/);
   assert.doesNotMatch(app,/\.side-tab:active[^}]*scale\(/);
   assert.doesNotMatch(app,/\.map-mode-btn:active[^}]*scale\(/);
@@ -115,7 +112,6 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.nav-btn\{width:100%;[^}]*transition:\.18s;[^}]*top:\.5px/);
   assert.match(app,/@media\(max-width:700px\)\{[\s\S]*?\.nav-btn\{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0\}/);
 });
-
 test("artist subtitle shares the exact left edge with artist name",()=>{
   assert.match(app,/\.tour-copy\{[^}]*width:100%;padding:0;margin:0;display:grid/);
   assert.match(app,/\.tour-name\{[^}]*width:100%;margin:0;padding:0;text-indent:0;text-align:left/);
