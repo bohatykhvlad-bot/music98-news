@@ -7,7 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import dns from "node:dns";
-import { appleCandidateCompatible, artworkKey, mergeKey, normTitle, primaryArtist, stripParen } from "../functions/lib/chart-identity.js";
+import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen } from "../functions/lib/chart-identity.js";
 import { candidateCompatible, classifyCandidate, normalizedRelease, rankArtworkCandidates, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
 dns.setDefaultResultOrder("ipv4first");
 
@@ -129,6 +129,59 @@ async function searchDeezer(track){
   }
   return candidates;
 }
+
+async function recoverMissingCreditsByConsensus(track){
+  // Only used after the strict resolver found nothing. A provider may omit a
+  // featured artist from the live chart row; recover that credit only when
+  // Apple and Deezer independently agree on the same full track credit.
+  const appleLoose=[], deezerLoose=[];
+  const terms=[`${stripParen(track.title)} ${track.artist}`,`${track.artist} ${stripParen(track.title)}`];
+  for(const term0 of [...new Set(terms)]){
+    try{
+      const d=await json(`https://itunes.apple.com/search?term=${encodeURIComponent(term0.trim())}&entity=song&limit=200&country=US`,2);
+      for(const raw of d.results||[]){
+        if(!appleCandidateCompatible(track.title,track.artist,raw)) continue;
+        const c=appleCandidate(raw,"apple-credit-recovery");
+        if(c?.art && mergeKey(c.trackTitle,c.artist)===mergeKey(track.title,track.artist)) appleLoose.push(c);
+      }
+    }catch{}
+    if(appleLoose.length>=12) break;
+  }
+
+  try{
+    const d=await json(`https://api.deezer.com/search/track?q=${encodeURIComponent(stripParen(track.title)+" "+track.artist)}&limit=50`,2);
+    const rows=(d?.data||[]).filter(x=>normTitle(x.title_short||x.title)===normTitle(track.title)).slice(0,12);
+    const albumCache=new Map();
+    for(const item of rows){
+      let full=item; try{ full=await json(`https://api.deezer.com/track/${item.id}`,2); }catch{}
+      const aid=String(full?.album?.id||item?.album?.id||""); if(!aid) continue;
+      let album=albumCache.get(aid);
+      if(!album){ try{ album=await json(`https://api.deezer.com/album/${aid}`,2); }catch{ album=full?.album||item?.album||{}; } albumCache.set(aid,album); }
+      const c=deezerCandidate(full,album);
+      if(c?.art && mergeKey(c.trackTitle,c.artist)===mergeKey(track.title,track.artist)) deezerLoose.push(c);
+    }
+  }catch{}
+
+  const groups=new Map();
+  for(const c of [...appleLoose,...deezerLoose]){
+    const sig=artworkCreditSignature(c.trackTitle,c.artist);
+    if(!sig) continue;
+    const g=groups.get(sig)||{candidates:[],families:new Set()};
+    g.candidates.push(c);
+    g.families.add(String(c.provider).startsWith("apple")?"apple":"deezer");
+    groups.set(sig,g);
+  }
+  const agreed=[...groups.values()]
+    .filter(g=>g.families.size>=2)
+    .sort((a,b)=>b.candidates.length-a.candidates.length);
+  if(!agreed.length) return [];
+
+  const group=agreed[0];
+  const canonical=group.candidates.find(c=>String(c.provider).startsWith("apple"))||group.candidates[0];
+  track.title=String(canonical.trackTitle||track.title);
+  track.artist=String(canonical.artist||track.artist);
+  return group.candidates.filter(c=>candidateCompatible(track,c));
+}
 function readAudit(){ try{const j=JSON.parse(fs.readFileSync(OUT_AUDIT,"utf8"));return j?.entries&&typeof j.entries==="object"?j.entries:{};}catch{return {};}}
 function readNames(){ try{const j=JSON.parse(fs.readFileSync(OUT_NAMES,"utf8"));return j&&typeof j==="object"?j:{};}catch{return {};}}
 function safePrevious(track,p){
@@ -175,11 +228,21 @@ for(let i=0;i<tracks.length;i++){
     try{candidates.push(...await searchApple(t));}catch(e){console.log("ARTWORK_AUDIT apple-search fail",i+1,t.artist,"-",t.title,String(e.message||e));}
     try{candidates.push(...await searchDeezer(t));}catch(e){console.log("ARTWORK_AUDIT deezer fail",i+1,t.artist,"-",t.title,String(e.message||e));}
   }
-  const identity=artworkKey(t.title,t.artist);
-  const dedup=new Map(); for(const c of candidates){const k=[c.provider,c.id,c.collectionId,c.art].join("|");if(!dedup.has(k))dedup.set(k,c);} candidates=[...dedup.values()];
+  let identity=artworkKey(t.title,t.artist);
+  let dedup=new Map(); for(const c of candidates){const k=[c.provider,c.id,c.collectionId,c.art].join("|");if(!dedup.has(k))dedup.set(k,c);} candidates=[...dedup.values()];
   let ranked=rankArtworkCandidates(t,candidates);
+  if(!ranked.length){
+    const recovered=await recoverMissingCreditsByConsensus(t);
+    if(recovered.length){
+      candidates.push(...recovered);
+      dedup=new Map(); for(const c of candidates){const k=[c.provider,c.id,c.collectionId,c.art].join("|");if(!dedup.has(k))dedup.set(k,c);} candidates=[...dedup.values()];
+      ranked=rankArtworkCandidates(t,candidates);
+    }
+  }
+  const identityAfterRecovery=artworkKey(t.title,t.artist);
+  identity=identityAfterRecovery;
   let selected=ranked[0]||null;
-  const prev=safePrevious(t,oldAudit[identity]);
+  const prev=safePrevious(t,oldAudit[identityAfterRecovery]);
   if(!selected && !prev){
     const runtime=runtimeAppleCandidate(t);
     if(runtime && candidateCompatible(t,runtime)){

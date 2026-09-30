@@ -38,6 +38,9 @@ const source=fs.readFileSync(new URL("./build-covers.mjs",import.meta.url),"utf8
 assert.match(source,/APPLE_FEED/);
 assert.match(source,/feedDirect:true/, "official Apple chart feed must cover lookup-index lag"); assert.match(source,/api\.deezer\.com/); assert.match(source,/currentAppleCandidate/); assert.match(source,/appleCandidateCompatible/); assert.match(source,/originalIdentity/); assert.match(source,/ARTWORK_UNRESOLVED/);
 assert.match(source,/runtimeBridge:true/, "new Apple chart rows may bridge catalog indexing lag without a point fix");
+assert.match(source,/recoverMissingCreditsByConsensus/);
+assert.match(source,/families\.size>=2/, "missing collaborator recovery requires independent Apple + Deezer agreement");
+assert.match(source,/identityAfterRecovery/, "recovered full credit must become the canonical artwork identity");
 assert.doesNotMatch(source,/DIRECT_COLLECTION|animal\\\|katseye|billiejean\\\|michaeljackson|boston\\\|stellalefty/);
 const corrections=JSON.parse(fs.readFileSync(new URL("../public/data/cover-corrections.json",import.meta.url),"utf8"));
 assert.deepEqual(corrections,{});
