@@ -541,6 +541,12 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 #articlePage .ameta{color:var(--muted2);font-size:13.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #articlePage .atext{margin-top:18px;font-size:16.5px;line-height:1.7;color:var(--body-text)}
 #articlePage .atext p{margin:0 0 16px}
+.article-ticket{margin:4px 0 20px;display:flex;justify-content:flex-start}
+.article-ticket a{position:relative;isolation:isolate;display:inline-grid;place-items:center;min-width:126px;height:40px;padding:0 18px;border-radius:999px;color:var(--text);text-decoration:none;font-weight:700;font-size:14px;line-height:1;-webkit-tap-highlight-color:transparent}
+.article-ticket a::before{content:"";position:absolute;z-index:-1;inset:0;border:1px solid var(--line);border-radius:999px;background:#fff;transition:background .14s ease,border-color .14s ease,transform .10s ease}
+.article-ticket a:hover::before{background:var(--accent);border-color:var(--accent)}
+.article-ticket a.press::before,.article-ticket a:active::before{transform:scale(.96)}
+.article-ticket a span{transform:none;text-rendering:geometricPrecision;-webkit-font-smoothing:antialiased}
 .aembed{margin:6px auto 16px;max-width:660px;background:transparent;border-radius:12px;overflow:visible}
 .aembed iframe{width:100%;max-width:660px;border:0;border-radius:12px;overflow:hidden;background:transparent;display:block}
 /* Apple's song embed paints a dead strip inside the iframe at the bottom
@@ -3318,7 +3324,7 @@ return `<figure class="abody-pic"><span class="abody-box"><img class="js-cover" 
     if(album) return appleEmbed(album[1]);
     const song = t.match(/^\[apple:song:(\d+):(\d+)\]$/i);
     if(song) return appleEmbed(song[1], song[2]);
-    const yt = t.match(/^\[youtube:([A-Za-z0-9_-]{11})(?::(\d+))?\]$/i);
+    const tickets = t.match(/^\[tickets:(https?:\/\/[^\]]+)\]$/i);\n    if(tickets) return `<div class="article-ticket"><a href="${esc(tickets[1])}" target="_blank" rel="sponsored noopener noreferrer" data-pill-press><span>Buy Tickets</span></a></div>`;\n    const yt = t.match(/^\[youtube:([A-Za-z0-9_-]{11})(?::(\d+))?\]$/i);
     if(yt) return youtubeEmbed(yt[1], yt[2] ? +yt[2] : 0);
     const ttNew = t.match(/^\[tiktok:(\d{6,25})(?:\|([^|]*)(?:\|([^|]*))?)?\]$/i);
     if(ttNew) return tiktokEmbed(ttNew[1], ttNew[2]||"", ttNew[3]||"");
@@ -3352,6 +3358,7 @@ function showArticle(p){
     ${relatedHTML(p)}`;
   jumpY(0);
   bindCovers(page);
+  page.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
   parkAppleEmbeds(page);
   $("#aback").addEventListener("click", e=>{ e.preventDefault(); closeArticle(); });
 }
