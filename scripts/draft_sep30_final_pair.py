@@ -27,15 +27,15 @@ The residency will still run across two weekends. LISA now plays November 12 thr
 
 [tickets:__TICKET__]
 
-The extra dates arrive as LISA begins the campaign for *PRESS PLAY*, her new EP due October 23 through LLOUD Co. and RCA Records. Its first single, "SaWaDiKa," was released on September 4. Produced by Thom Bridges and Ojivolta, the song takes its name from the Thai greeting for "hello" and puts LISA back over a harder hip-hop beat after the wider pop palette of *Alter Ego*.
+The extra dates arrive as LISA begins the campaign for *PRESS PLAY*, her new EP due October 23 through LLOUD Co. and RCA Records. Its first single, "SaWaDiKa," was released on September 4. Produced by Thom Bridges and Ojivolta, the song takes its name from the Thai greeting for "hello."
 
 The "SaWaDiKa" video was directed by Bang Jae Yeob and filmed in Bangkok. LISA moves through several locations in the city, with Thai references built into the sets, styling and choreography. Caesars says the video drew 70.8 million views in its first 24 hours. LISA then performed the song at the 2026 MTV Video Music Awards.
 
-The same VMAs also gave LISA another solo win when "Dream feat. Kentaro Sakaguchi" took Best Pop. LLOUD later released an official short film for the song starring LISA and Sakaguchi. That is the only video included in this post.
+At the same VMAs, "Dream feat. Kentaro Sakaguchi" won Best Pop. LLOUD later released an official short film for the song starring LISA and Sakaguchi.
 
 [youtube:FMX98ROVRCE]
 
-*PRESS PLAY* arrives 20 days before the first Las Vegas show. That timing gives the residency new material almost immediately before opening night, while songs from *Alter Ego* remain part of LISA's existing solo catalog. The November booking is still a limited run at one venue, not a longer Las Vegas season.
+*PRESS PLAY* arrives 20 days before the first Las Vegas show, so the EP will already be out when VIVA LA LISA opens. The November booking remains a limited run at one venue rather than a longer Las Vegas season.
 
 The two added shows sit at opposite ends of the schedule. November 12 now opens the first weekend and November 29 closes the second, while the four original dates remain unchanged. The final run is three consecutive nights from November 12 through 14 and another three from November 27 through 29.'''
 
@@ -45,7 +45,7 @@ The CD contains 20 tracks. Four are short intro or interlude pieces, leaving 16 
 
 According to the band's official store, *UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The film uses rare vault footage, performances from sold-out shows and interviews with band members and fans. It also covers the period in which Emily Armstrong and Colin Brittain joined the group after its seven-year hiatus.
 
-The soundtrack is not simply the film audio lifted onto a record. LINKIN PARK's store says it contains live recordings that are not heard in the documentary, so the album keeps more of the São Paulo show than appears onscreen. That distinction is useful because the film and soundtrack cover the same period without being identical versions of the same material.
+LINKIN PARK's store says the soundtrack contains live recordings that are not heard in the documentary. The film and album cover the same period, but the soundtrack keeps more of the São Paulo show than appears onscreen.
 
 The live version of "Faint" arrived ahead of the soundtrack with an official video from São Paulo. The clip shows the current lineup performing one of the band's best-known songs in the same concert setting used throughout the release.
 
@@ -53,7 +53,7 @@ The live version of "Faint" arrived ahead of the soundtrack with an official vid
 
 The physical editions differ slightly. The CD comes in a gatefold softpak with a 12-panel accordion booklet and keeps all 20 tracks, including the four short interludes. The two-LP Citrus vinyl edition is housed in a gatefold jacket with a 12-by-24-inch insert and carries the 16 full songs. Warner also offers other vinyl variants through the official LINKIN PARK store.
 
-All 16 full performances come from the same São Paulo concert. The result is a single-show live album rather than a compilation assembled from different tours or venues. Its sequence places *FROM ZERO* songs alongside older catalog staples and gives the performance documented in *UNSHATTER* a separate audio release.'''
+All 16 full performances come from the same São Paulo concert, not from different tours or venues. The sequence places *FROM ZERO* songs alongside older catalog staples and gives the performance documented in *UNSHATTER* a separate audio release.'''
 
 def get(url, referer=""):
     jar=http.cookiejar.CookieJar()
@@ -185,7 +185,7 @@ def main():
       "title":"UNSHATTER Film Soundtrack (Live in São Paulo)",
       "excerpt":"LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album that accompanies the band's new *UNSHATTER* film.",
       "body":LP_BODY,"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://www.jimmyfontaine.com/","pos":"50% 50%","zoom":1,"cardX":.47,"cardY":.50,"cardZoom":1}
+      "cover":{"kind":"img","src":lp_photo(),"credit":"Jimmy Fontaine","creditUrl":"https://www.jimmyfontaine.com/","pos":"50% 50%","zoom":1,"cardX":.40,"cardY":.50,"cardZoom":1}
     }
     write(LP_ID,lp)
 
