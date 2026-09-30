@@ -29,11 +29,9 @@ The additional shows arrive ahead of *PRESS PLAY*, LISA's six-track EP due Octob
 
 LISA gave "SaWaDiKa" its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, "Dream feat. Kentaro Sakaguchi" won Best Pop. The residency begins three weeks after *PRESS PLAY* is released, so the EP will already be available before the first Las Vegas performance.
 
-Her first solo album, *Alter Ego*, reached No. 1 on the Top Album Sales chart and No. 7 on the Billboard 200, figures cited by Caesars when the residency was announced in March. That announcement also followed BLACKPINK's sold-out DEADLINE World Tour. The September update keeps the residency in Las Vegas and does not add any other cities or venues.
-
 [tickets:__TICKET__]
 
-The final schedule spans six nights across two November weekends, all at the same theater. The September 29 update did not add another city or venue. VIVA LA LISA remains a Las Vegas residency, not a tour extension."""
+Her first solo album, *Alter Ego*, reached No. 1 on the Top Album Sales chart and No. 7 on the Billboard 200, figures cited by Caesars when the residency was announced in March. That announcement also followed BLACKPINK's sold-out DEADLINE World Tour."""
 
 AI_STYLE_FLAGS = ("marks a new chapter","comes at a time","not only","rather than simply","serves as a","underscores","showcases","the announcement lands")
 
