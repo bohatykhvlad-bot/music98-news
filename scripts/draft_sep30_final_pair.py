@@ -31,7 +31,7 @@ The residency will still run across two weekends. LISA now plays November 12 thr
 
 The extra dates arrive as LISA begins the campaign for *PRESS PLAY*, her new EP due October 23 through LLOUD Co. and RCA Records. Its first single, "SaWaDiKa," was released on September 4. Produced by Thom Bridges and Ojivolta, the song takes its name from the Thai greeting for "hello." Sony's store lists *PRESS PLAY* as a six-track EP, with "SaWaDiKa" followed by five titles that have not yet been revealed.
 
-The "SaWaDiKa" video was directed by Bang Jae Yeob and filmed in Bangkok. LISA moves through several locations in the city, with Thai references built into the sets, styling and choreography. Caesars says the video drew 70.8 million views in its first 24 hours, and LISA later performed the song at the 2026 MTV Video Music Awards. At the same show, "Dream feat. Kentaro Sakaguchi" won Best Pop. "Dream" appeared on *Alter Ego*, and LLOUD later released an official short film for the song starring LISA and Sakaguchi.
+The "SaWaDiKa" video was directed by Bang Jae Yeob and filmed in Bangkok. LISA moves through several locations in the city, with Thai references built into the sets, styling and choreography. Caesars says it drew 70.8 million views in its first 24 hours, and LISA later performed the song at the 2026 MTV Video Music Awards. At the same show, "Dream feat. Kentaro Sakaguchi" won Best Pop. "Dream" appeared on *Alter Ego*, and LLOUD later released an official short film for the song starring LISA and Sakaguchi.
 
 [youtube:FMX98ROVRCE]
 
@@ -41,19 +41,13 @@ The added shows do not change the venue or the two-weekend format. November 12 n
 
 LP_BODY='''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album that accompanies the band's new *UNSHATTER* film. The soundtrack arrived September 25 through Warner Records and documents the São Paulo concert tied to the *FROM ZERO* release period.
 
-The CD contains 20 tracks. Four are short intro or interlude pieces, leaving 16 full performances. The two-LP edition presents those 16 songs without the four interludes. The set moves from "Somewhere I Belong" and "The Catalyst" through "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint" and "Papercut." Songs from *FROM ZERO*, including "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown," are mixed into the same show. "Bleed It Out" closes the record.
+The CD contains 20 tracks. Four are short intro or interlude pieces, leaving 16 full performances. The two-LP edition presents those 16 songs without the interludes. The set includes "Somewhere I Belong," "The Catalyst," "Waiting for the End," "What I've Done," "Numb," "In the End," "Faint" and "Papercut." *FROM ZERO* material appears throughout the same show, including "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown." "Bleed It Out" closes the record.
 
-According to the band's official store, *UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The film uses rare vault footage, performances from sold-out shows and interviews with band members and fans. It also covers the period in which Emily Armstrong and Colin Brittain joined the group after its seven-year hiatus.
-
-LINKIN PARK's store says the soundtrack contains live recordings that are not heard in the documentary. The film and album cover the same period, but the soundtrack keeps more of the São Paulo show than appears onscreen.
-
-The live version of "Faint" arrived ahead of the soundtrack with an official video from São Paulo. The clip shows the current lineup performing one of the band's best-known songs in the same concert setting used throughout the release.
+According to the band's official store, *UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The film uses rare vault footage, performances from sold-out shows and interviews with band members and fans. It also covers the period in which Emily Armstrong and Colin Brittain joined the group after its seven-year hiatus. The store says the soundtrack contains live recordings that are not heard in the documentary, so the album keeps more of the São Paulo show than appears onscreen. The live version of "Faint" arrived ahead of the soundtrack with an official video from the same concert.
 
 [youtube:zNYsw-cW8v8]
 
-The physical editions differ slightly. The CD comes in a gatefold softpak with a 12-panel accordion booklet and keeps all 20 tracks, including the four short interludes. The two-LP Citrus vinyl edition is housed in a gatefold jacket with a 12-by-24-inch insert and carries the 16 full songs. Warner also offers other vinyl variants through the official LINKIN PARK store.
-
-All 16 full performances come from the same São Paulo concert, not from different tours or venues. The sequence places *FROM ZERO* songs alongside older catalog staples and gives the performance documented in *UNSHATTER* a separate audio release.'''
+The physical editions differ slightly. The CD comes in a gatefold softpak with a 12-panel accordion booklet and keeps all 20 tracks, including the four short interludes. The two-LP Citrus vinyl edition is housed in a gatefold jacket with a 12-by-24-inch insert and carries the 16 full songs. Other vinyl variants are also available through the official LINKIN PARK store. All 16 full performances come from the same São Paulo concert rather than different tours or venues, with *FROM ZERO* songs placed alongside older catalog staples.'''
 
 def get(url, referer=""):
     jar=http.cookiejar.CookieJar()
