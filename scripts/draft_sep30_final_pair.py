@@ -174,4 +174,36 @@ def main():
     }
     write(LP_ID,lp)
 
+    # Final deterministic QA after both writes. This is separate from the
+    # editorial read: it catches state/media/link regressions before review.
+    final={str(p.get("id")):p for p in runner.desk_read()["posts"]}
+    lisa_now=final.get(LISA_ID)
+    lp_now=final.get(LP_ID)
+    if not lisa_now or not lp_now:
+        raise RuntimeError("final pair missing from Desk")
+    if lisa_now.get("status")!="draft" or lp_now.get("status")!="draft":
+        raise RuntimeError("final pair must remain draft")
+    if lisa_now.get("artist")!="LISA" or lp_now.get("artist")!="LINKIN PARK":
+        raise RuntimeError("final pair artist mismatch")
+    lisa_body=str(lisa_now.get("body") or "")
+    lp_body=str(lp_now.get("body") or "")
+    if lisa_body.count("[youtube:")!=1 or "[youtube:FMX98ROVRCE]" not in lisa_body or "[apple:" in lisa_body:
+        raise RuntimeError("LISA media contract failed")
+    if lp_body.count("[youtube:")!=1 or "[youtube:zNYsw-cW8v8]" not in lp_body or "[apple:" in lp_body:
+        raise RuntimeError("LINKIN PARK media contract failed")
+    if "ticketmaster.evyy.net/c/4932692/" not in lisa_body:
+        raise RuntimeError("LISA affiliate ticket link missing")
+    if len(lisa_body.split())<380 or len(lp_body.split())<350:
+        raise RuntimeError("final pair below editorial length floor")
+    for pass_no in (1,2,3):
+        for pid in (LISA_ID,LP_ID):
+            ok, lines=runner.run_gate(pid,quiet=True)
+            print("QA_GATE",pass_no,pid,"PASS" if ok else "FAIL")
+            for line in lines:
+                if "PASS" in line or "FAIL" in line or line.lstrip().startswith(("X ","! ")):
+                    print(line)
+            if not ok:
+                raise RuntimeError(f"QA gate pass {pass_no} failed for {pid}")
+    print("FINAL_PAIR_OK",LISA_ID,len(lisa_body.split()),LP_ID,len(lp_body.split()))
+
 if __name__=="__main__": main()
