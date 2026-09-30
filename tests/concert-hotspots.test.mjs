@@ -487,7 +487,7 @@ test("public Popular read serves only a complete Top 30 and spends no Ticketmast
     id:"a"+(i+1),name:"Artist "+(i+1),image:"",rank:i+1,popularityRank:i+1,shows:2,eventConfirmed:true
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",builtAt:new Date().toISOString(),
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",builtAt:new Date().toISOString(),
     eligibility:"ticketmaster_event_payload_gt_0",artists,targetCount:30
   }));
   const oldFetch=globalThis.fetch;
@@ -657,7 +657,7 @@ test("daily Popular builder produces 30 eligible artists in source-rank order", 
     assert.equal(snap.artists[0].name,"Artist 3");
     assert.equal(snap.artists[29].name,"Artist 32");
     assert.equal(kworbCalls,1);
-    assert.equal(ticketmasterCalls,64);
+    assert.equal(ticketmasterCalls,66);
 
     // A fresh daily snapshot must not hit either source again.
     const before=ticketmasterCalls;
@@ -684,7 +684,7 @@ test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30"
     firstDate:""
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-cache-v1",
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",
     builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",
     ranking:"Spotify monthly listeners",
@@ -772,11 +772,11 @@ test("public Popular keeps in-progress validated artists private until Top 30 is
     id:"artist-"+(i+1),name:"Artist "+(i+1),rank:i+1,popularityRank:i+1,shows:3,eventConfirmed:true
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",builtAt:new Date().toISOString(),
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",eligibility:"ticketmaster_event_payload_gt_0",artists:snapshotArtists,targetCount:30
   }));
   await kv.put("concert-popular:v4:state",JSON.stringify({
-    version:"popular-v4",source:"spotify_monthly_listeners",
+    version:"popular-v4",algorithm:"rank-ordered-event-query-v2",source:"spotify_monthly_listeners",
     candidates:[],index:12,found:stateArtists,errors:0
   }));
 
@@ -1036,13 +1036,13 @@ test("current exhausted 27-row Popular state expands to the new candidate depth 
     name:"Artist "+(i+1),rank:i+1,listeners:100000000-i*1000
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-cache-v1",builtAt:new Date().toISOString(),
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
     eligibility:"ticketmaster_event_payload_gt_0",candidateCount:30,
     eligibleCount:27,targetCount:30,artists:found
   }));
   await kv.put("concert-popular:v4:state",JSON.stringify({
-    version:"popular-v4",algorithm:"rank-ordered-cache-v1",startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+    version:"popular-v4",algorithm:"rank-ordered-event-query-v2",startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
     candidates:oldCandidates,index:30,found:found.map(x=>({...x})),errors:0
   }));
@@ -1099,7 +1099,7 @@ test("current exhausted 27-row Popular state expands to the new candidate depth 
     assert.equal(snap.artists[29].name,"Artist 33");
 
     const seeded=JSON.parse(kv.raw("concert-popular:v4:tour:artist-31"));
-    assert.equal(seeded.evidence,"popular_validation_first_page");
+    assert.equal(seeded.evidence,"popular_validation_attraction_events");
     assert.equal(seeded.events.length,1);
     assert.equal(seeded.events[0].artist,"Artist 31");
   }finally{

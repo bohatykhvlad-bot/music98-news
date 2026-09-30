@@ -35,11 +35,12 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
 });
 
 test("Popular UI renders strict confirmed cache immediately without an explanatory banner",()=>{
-  assert.match(app,/music98:concert-popular:v9/);
+  assert.match(app,/music98:concert-popular:v10/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
   assert.match(app,/ticketmaster_event_payload_gt_0/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/mode:"popular",v:"popular-v9"/);
+  assert.match(app,/mode:"popular",v:"popular-v10"/);
+  assert.match(app,/cached\?\.algorithm===POPULAR_ALGORITHM/);
   assert.match(app,/sideSub\.textContent="";/);
   assert.doesNotMatch(app,/Popular artists with confirmed upcoming Ticketmaster shows\./);
 });
