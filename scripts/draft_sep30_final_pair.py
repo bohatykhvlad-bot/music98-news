@@ -46,8 +46,10 @@ The São Paulo recordings give the soundtrack a specific role inside that story.
 
 The physical editions extend the release beyond streaming, with CD and double-vinyl versions offered through the band's official store. The soundtrack arrives as both a standalone live record and a companion piece to a documentary about how LINKIN PARK rebuilt its working identity after a long hiatus.'''
 
-def get(url):
-    req=urllib.request.Request(url,headers={"User-Agent":runner.UA})
+def get(url, referer=""):
+    headers={"User-Agent":runner.UA}
+    if referer: headers["Referer"]=referer
+    req=urllib.request.Request(url,headers=headers)
     with urllib.request.urlopen(req,timeout=60) as r: return r.read()
 
 def upload(name, raw):
@@ -65,7 +67,7 @@ def upload(name, raw):
     return out["url"]
 
 def lisa_photo():
-    return upload("lisa-sawadika-2026-sony.jpg",get(LISA_PHOTO))
+    return upload("lisa-sawadika-2026-sony.jpg",get(LISA_PHOTO,"https://www.sonymusic.es/actualidad/lisa-sawadika-nuevo-single-adelanto-ep-press-play/"))
 
 def ticket_url():
     d=json.loads(get("https://music98.news/api/concerts?artist=LISA&nocache="+str(time.time_ns())))
@@ -116,7 +118,7 @@ def main():
       "title":"UNSHATTER Film Soundtrack (Live in São Paulo)",
       "excerpt":"LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, a 20-track live companion to the band's new documentary.",
       "body":LP_BODY,"date":"2026-09-30","status":"draft","pinned":False,
-      "cover":{"kind":"img","src":upload("linkin-park-unshatter-jimmy-fontaine.jpg",get(LP_PHOTO)),"credit":"Jimmy Fontaine","creditUrl":"https://press.warnerrecords.com/linkinpark","pos":"50% 48%","zoom":1,"cardX":.5,"cardY":.48,"cardZoom":1.22}
+      "cover":{"kind":"img","src":upload("linkin-park-unshatter-jimmy-fontaine.jpg",get(LP_PHOTO,"https://press.warnerrecords.com/linkinpark")),"credit":"Jimmy Fontaine","creditUrl":"https://press.warnerrecords.com/linkinpark","pos":"50% 48%","zoom":1,"cardX":.5,"cardY":.48,"cardZoom":1.22}
     }
     write(LP_ID,lp)
     remove_leon()
