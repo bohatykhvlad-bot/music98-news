@@ -47,7 +47,9 @@ According to the band's official store, *UNSHATTER* follows LINKIN PARK from pri
 
 [youtube:zNYsw-cW8v8]
 
-The physical editions differ slightly. The CD comes in a gatefold softpak with a 12-panel accordion booklet and keeps all 20 tracks, including the four short interludes. The two-LP Citrus vinyl edition is housed in a gatefold jacket with a 12-by-24-inch insert and carries the 16 full songs. Other vinyl variants are also available through the official LINKIN PARK store. All 16 full performances come from the same São Paulo concert rather than different tours or venues, with *FROM ZERO* songs placed alongside older catalog staples.'''
+The physical editions differ slightly. The CD comes in a gatefold softpak with a 12-panel accordion booklet and keeps all 20 tracks, including the four short interludes. The two-LP Citrus vinyl edition is housed in a gatefold jacket with a 12-by-24-inch insert and carries the 16 full songs. Other vinyl variants are also available through the official LINKIN PARK store.
+
+All 16 full performances come from the same São Paulo concert rather than different tours or venues. The sequence puts *FROM ZERO* songs beside older catalog staples, so the soundtrack works as a record of one specific show while still covering several eras of the band's music.'''
 
 def get(url, referer=""):
     jar=http.cookiejar.CookieJar()
