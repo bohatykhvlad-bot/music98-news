@@ -28,3 +28,16 @@ for name,url,ref in CANDS2:
         print(name, im.size, im.format, len(raw))
     except Exception as e:
         print(name,"ERR",repr(e))
+
+CANDS3=[
+ ("lloud_x_portrait","https://pbs.twimg.com/media/HRqPVOLawAAp735.jpg?format=jpg&name=orig","https://x.com/wearelloud"),
+ ("lloud_x_ring","https://pbs.twimg.com/media/HRqPVOPbcAAxywx.jpg?format=jpg&name=orig","https://x.com/wearelloud"),
+]
+for name,url,ref in CANDS3:
+    try:
+        req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Referer":ref})
+        raw=urllib.request.urlopen(req,timeout=45).read()
+        im=Image.open(io.BytesIO(raw))
+        print(name, im.size, im.format, len(raw))
+    except Exception as e:
+        print(name,"ERR",repr(e))
