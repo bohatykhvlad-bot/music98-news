@@ -4,7 +4,7 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": "2026-09-30T13:35:30.622Z"
+    "measuredAt": "2026-09-30T13:41:59.820Z"
   },
   "ahha|cardib": {
     "integratedLufs": -8.5,
@@ -180,6 +180,13 @@
     "gainDb": -5.1,
     "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/73/76/42/737642e6-c478-bed7-f11f-efee96072450/mzaf_5163950318414409594.plus.aac.p.m4a",
     "measuredAt": "2026-09-29T20:57:32.747Z"
+  },
+  "jaded|koewetzel": {
+    "integratedLufs": -7.1,
+    "truePeakDbtp": 1,
+    "gainDb": -8.9,
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/94/f7/e2/94f7e2cc-b182-cb75-7a31-7e88eee2191e/mzaf_12920756836197900992.plus.aac.p.m4a",
+    "measuredAt": "2026-09-30T13:42:00.260Z"
   },
   "janicestfu|drake": {
     "integratedLufs": -9.9,

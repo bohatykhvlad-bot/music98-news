@@ -1,24 +1,16 @@
 {
   "schema": 2,
-  "updatedAt": "2026-09-30T13:33:56.775Z",
+  "updatedAt": "2026-09-30T13:40:41.379Z",
   "chartUpdated": "2026-09-30",
   "chartRev": "feat-v32",
   "rows": 50,
-  "verified": 49,
-  "unresolved": [
-    {
-      "rank": 35,
-      "title": "Jaded",
-      "artist": "Koe Wetzel",
-      "candidates": []
-    }
-  ],
+  "verified": 50,
+  "unresolved": [],
   "sourceCounts": {
     "apple-feed": 24,
     "previous-audit": 1,
-    "apple-chart": 22,
-    "deezer": 1,
-    "apple": 1
+    "apple-chart": 24,
+    "deezer": 1
   },
   "entries": {
     "ahha|bcardi": {
@@ -38,7 +30,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:34.470Z",
+      "checkedAt": "2026-09-30T13:40:27.598Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -119,7 +111,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:40.152Z",
+      "checkedAt": "2026-09-30T13:40:30.391Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -155,7 +147,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:17.307Z",
+      "checkedAt": "2026-09-30T13:40:13.862Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -251,7 +243,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:07.135Z",
+      "checkedAt": "2026-09-30T13:40:05.543Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -347,7 +339,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:00.547Z",
+      "checkedAt": "2026-09-30T13:40:02.546Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -383,7 +375,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:37.811Z",
+      "checkedAt": "2026-09-30T13:40:29.835Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -464,7 +456,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.097Z",
+      "checkedAt": "2026-09-30T13:39:59.952Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -500,7 +492,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:50.053Z",
+      "checkedAt": "2026-09-30T13:40:35.856Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -566,7 +558,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:15.074Z",
+      "checkedAt": "2026-09-30T13:40:12.783Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -632,7 +624,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:58.179Z",
+      "checkedAt": "2026-09-30T13:40:01.278Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -668,7 +660,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.098Z",
+      "checkedAt": "2026-09-30T13:39:59.954Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -704,7 +696,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:02.316Z",
+      "checkedAt": "2026-09-30T13:40:03.569Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -740,7 +732,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.096Z",
+      "checkedAt": "2026-09-30T13:39:59.952Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -776,7 +768,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:40.151Z",
+      "checkedAt": "2026-09-30T13:40:30.390Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -812,7 +804,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:02.316Z",
+      "checkedAt": "2026-09-30T13:40:03.569Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -848,7 +840,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:02.315Z",
+      "checkedAt": "2026-09-30T13:40:03.568Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -944,7 +936,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:58.179Z",
+      "checkedAt": "2026-09-30T13:40:01.278Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -980,7 +972,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:00.545Z",
+      "checkedAt": "2026-09-30T13:40:02.545Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1046,7 +1038,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:00.546Z",
+      "checkedAt": "2026-09-30T13:40:02.546Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1082,7 +1074,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:10.431Z",
+      "checkedAt": "2026-09-30T13:40:08.287Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1118,7 +1110,7 @@
       "score": 850,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:15.876Z",
+      "checkedAt": "2026-09-30T13:40:13.288Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1214,7 +1206,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.101Z",
+      "checkedAt": "2026-09-30T13:39:59.955Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1250,7 +1242,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:41.265Z",
+      "checkedAt": "2026-09-30T13:40:30.885Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1346,7 +1338,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.103Z",
+      "checkedAt": "2026-09-30T13:39:59.959Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1382,7 +1374,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:05.774Z",
+      "checkedAt": "2026-09-30T13:40:04.849Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1446,6 +1438,72 @@
         }
       ]
     },
+    "jaded|ellakoelangleywetzel": {
+      "identity": "jaded|ellakoelangleywetzel",
+      "title": "Jaded",
+      "artist": "Koe Wetzel & Ella Langley",
+      "art": "https://cdn-images.dzcdn.net/images/cover/04e9b4edc5c20eac15d3f1edb0b6c18c/1000x1000-000000-80-0-0.jpg",
+      "provider": "deezer",
+      "releaseTitle": "Jaded",
+      "releaseArtist": "Koe Wetzel",
+      "releaseDate": "2026-08-07",
+      "releaseClass": "dedicated",
+      "url": "https://www.deezer.com/track/4203392972",
+      "collectionId": "1046393742",
+      "trackId": "4203392972",
+      "confidence": 98,
+      "score": 910,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-09-30T13:40:20.784Z",
+      "alternatives": [
+        {
+          "provider": "deezer",
+          "id": "4203392972",
+          "collectionId": "1046393742",
+          "releaseTitle": "Jaded",
+          "releaseArtist": "Koe Wetzel",
+          "releaseDate": "2026-08-07",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/04e9b4edc5c20eac15d3f1edb0b6c18c/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4203392972",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple-credit-recovery",
+          "id": "6798042825",
+          "collectionId": "6798042820",
+          "releaseTitle": "Jaded - Single",
+          "releaseArtist": "Koe Wetzel & Ella Langley",
+          "releaseDate": "2026-06-12T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple-credit-recovery",
+          "id": "6801235870",
+          "collectionId": "6801235413",
+          "releaseTitle": "The Night Champion",
+          "releaseArtist": "Koe Wetzel",
+          "releaseDate": "2026-06-12T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b7/97/c1/b797c1fb-2e88-00a8-cf99-74af3ef13b6f/196874698624.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6801235413?i=6801235870",
+          "score": 510,
+          "confidence": 88,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
     "janicestfu|drake": {
       "identity": "janicestfu|drake",
       "title": "Janice STFU",
@@ -1463,7 +1521,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.097Z",
+      "checkedAt": "2026-09-30T13:39:59.953Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1499,7 +1557,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:58.178Z",
+      "checkedAt": "2026-09-30T13:40:01.277Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1519,7 +1577,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:10.430Z",
+      "checkedAt": "2026-09-30T13:40:08.286Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1585,7 +1643,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:20.003Z",
+      "checkedAt": "2026-09-30T13:40:16.386Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1666,7 +1724,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.102Z",
+      "checkedAt": "2026-09-30T13:39:59.958Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1702,7 +1760,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:25.521Z",
+      "checkedAt": "2026-09-30T13:40:19.573Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1798,7 +1856,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:44.138Z",
+      "checkedAt": "2026-09-30T13:40:32.400Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1864,7 +1922,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.101Z",
+      "checkedAt": "2026-09-30T13:39:59.955Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1900,7 +1958,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:58.179Z",
+      "checkedAt": "2026-09-30T13:40:01.278Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1936,7 +1994,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:07.136Z",
+      "checkedAt": "2026-09-30T13:40:05.544Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1972,7 +2030,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:51.482Z",
+      "checkedAt": "2026-09-30T13:40:36.283Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2038,7 +2096,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:40.150Z",
+      "checkedAt": "2026-09-30T13:40:30.390Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2104,7 +2162,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:21.355Z",
+      "checkedAt": "2026-09-30T13:40:16.938Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2158,7 +2216,7 @@
       "title": "Should I Stay or Should I Go",
       "artist": "The Clash",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/4a/b7/da/4ab7da8e-6102-4754-bfb6-e564ac5bd5ab/886449757473.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "Combat Rock + The People's Hall (Special Edition)",
       "releaseArtist": "The Clash",
       "releaseDate": "1982-05-14T12:00:00Z",
@@ -2166,12 +2224,27 @@
       "url": "https://music.apple.com/us/album/1614928044?i=1614928396",
       "collectionId": "1614928044",
       "trackId": "1614928396",
-      "confidence": 94,
-      "score": 755,
+      "confidence": 96,
+      "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:56.772Z",
+      "checkedAt": "2026-09-30T13:40:41.377Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1614928396",
+          "collectionId": "1614928044",
+          "releaseTitle": "Combat Rock + The People's Hall (Special Edition)",
+          "releaseArtist": "The Clash",
+          "releaseDate": "1982-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/4a/b7/da/4ab7da8e-6102-4754-bfb6-e564ac5bd5ab/886449757473.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1614928044?i=1614928396",
+          "score": 880,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        },
         {
           "provider": "apple",
           "id": "1614928396",
@@ -2231,21 +2304,6 @@
           "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 1982
-        },
-        {
-          "provider": "apple",
-          "id": "860955289",
-          "collectionId": "860952484",
-          "releaseTitle": "Combat Rock",
-          "releaseArtist": "The Clash",
-          "releaseDate": "1982-05-14T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music2/v4/c7/ed/07/c7ed07cc-41fe-c9cc-c67e-d64b3c29fb31/G010002823016L_F_001.jpeg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/860952484?i=860955289",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
         }
       ]
     },
@@ -2266,7 +2324,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:07.963Z",
+      "checkedAt": "2026-09-30T13:40:06.037Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2347,7 +2405,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.102Z",
+      "checkedAt": "2026-09-30T13:39:59.958Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2383,7 +2441,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:42.631Z",
+      "checkedAt": "2026-09-30T13:40:31.664Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2464,7 +2522,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:40.152Z",
+      "checkedAt": "2026-09-30T13:40:30.391Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2500,7 +2558,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:32:57.107Z",
+      "checkedAt": "2026-09-30T13:39:59.960Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2536,7 +2594,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:15.074Z",
+      "checkedAt": "2026-09-30T13:40:12.784Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2572,7 +2630,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:47.930Z",
+      "checkedAt": "2026-09-30T13:40:34.021Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2655,21 +2713,36 @@
       "identity": "thinkasyoudrunk|greenriley",
       "title": "Think As You Drunk",
       "artist": "Riley Green",
-      "art": "https://cdn-images.dzcdn.net/images/cover/f60fbc8095587535e45c27151413b26e/1000x1000-000000-80-0-0.jpg",
-      "provider": "deezer",
-      "releaseTitle": "Think As You Drunk",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "That's Just Me",
       "releaseArtist": "Riley Green",
-      "releaseDate": "2026-05-28",
-      "releaseClass": "dedicated",
-      "url": "https://www.deezer.com/track/4039612441",
-      "collectionId": "989245831",
-      "trackId": "4039612441",
-      "confidence": 91,
-      "score": 670,
+      "releaseDate": "2026-05-28T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+      "collectionId": "6770725355",
+      "trackId": "6770725979",
+      "confidence": 96,
+      "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:28.649Z",
+      "checkedAt": "2026-09-30T13:40:22.612Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6770725979",
+          "collectionId": "6770725355",
+          "releaseTitle": "That's Just Me",
+          "releaseArtist": "Riley Green",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
         {
           "provider": "deezer",
           "id": "4039612441",
@@ -2734,7 +2807,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:22.210Z",
+      "checkedAt": "2026-09-30T13:40:17.477Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2815,7 +2888,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-09-30T13:33:47.930Z",
+      "checkedAt": "2026-09-30T13:40:34.022Z",
       "alternatives": [
         {
           "provider": "apple-feed",
