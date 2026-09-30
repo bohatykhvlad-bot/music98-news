@@ -284,9 +284,17 @@ function normalizedEventIsBlocked(e) {
     /\b(?:test|testing)\b[^\n]{0,30}\b(?:event|festival)\b/i.test(qaText) ||
     venue.trim().toLowerCase()==="ticketmaster";
 }
+function normalizedEventIsUpcoming(e,now=Date.now()) {
+  const dateTime=String(e?.dateTime||"").trim();
+  if(!dateTime) return true;
+  const start=Date.parse(dateTime);
+  if(!Number.isFinite(start)) return true;
+  return start>=now;
+}
 function sanitizeNormalizedEvents(events) {
+  const now=Date.now();
   return collapseDuplicateEvents((Array.isArray(events)?events:[])
-    .filter(e=>e && !normalizedEventIsBlocked(e))
+    .filter(e=>e && !normalizedEventIsBlocked(e) && normalizedEventIsUpcoming(e,now))
     .map(e=>({
       ...e,
       ticketOptions:Array.isArray(e.ticketOptions)&&e.ticketOptions.length
@@ -321,6 +329,7 @@ const TM_ORIGIN_INTERACTIVE_RESERVE = 1000;
 const TM_ORIGIN_SCHEDULED_RESERVE = 500;
 let tmSharedLastFetchAt = 0;
 let tmGate = Promise.resolve();
+const tmOriginInflight = new Map();
 /* Free Workers KV allows only 1,000 writes/day. The old quota guard wrote
    1-3 KV keys for EVERY Ticketmaster origin call, so background map refreshes
    could burn the entire free allowance even with very little site traffic.
@@ -405,6 +414,11 @@ async function reserveTicketmasterCall(env, scope="interactive") {
 }
 
 async function tmJson(url, env, scope="interactive") {
+  const requestUrl=url.toString();
+  const inflightKey=scope+"|"+requestUrl;
+  const existing=tmOriginInflight.get(inflightKey);
+  if(existing) return existing;
+
   const run = tmGate.catch(()=>{}).then(async()=>{
     await reserveTicketmasterCall(env,scope);
     const configuredInterval=Number(env?.TICKETMASTER_MIN_INTERVAL_MS);
@@ -414,14 +428,24 @@ async function tmJson(url, env, scope="interactive") {
     const wait=Math.max(0,minInterval-(Date.now()-tmSharedLastFetchAt));
     if(wait) await new Promise(resolve=>setTimeout(resolve,wait));
 
+    const configuredTimeout=Number(env?.TICKETMASTER_FETCH_TIMEOUT_MS);
+    const timeoutMs=Number.isFinite(configuredTimeout) && configuredTimeout>=1000
+      ? Math.min(30000,Math.floor(configuredTimeout))
+      : 12000;
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),timeoutMs);
+
     let res;
     try {
-      res = await fetch(url.toString(), {
+      res = await fetch(requestUrl, {
         headers: { "Accept":"application/json", "User-Agent":"music98.news/1.0" },
+        signal:controller.signal,
       });
       tmSharedLastFetchAt=Date.now();
     } catch {
       throw Object.assign(new Error("ticketmaster_unavailable"), { status:502 });
+    } finally {
+      clearTimeout(timer);
     }
 
     // Ticketmaster exposes authoritative quota state in response headers.
@@ -459,10 +483,15 @@ async function tmJson(url, env, scope="interactive") {
     }
     return res.json();
   });
-  tmGate=run.catch(()=>{});
-  return run;
-}
 
+  tmOriginInflight.set(inflightKey,run);
+  tmGate=run.catch(()=>{});
+  try{
+    return await run;
+  }finally{
+    if(tmOriginInflight.get(inflightKey)===run) tmOriginInflight.delete(inflightKey);
+  }
+}
 async function tmEventPages(url, env, maxPages = 5, scope = "interactive") {
   const first = await tmJson(url, env, scope);
   const totalPages = Math.max(1, Number(first?.page?.totalPages || 1));
@@ -610,25 +639,23 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
   eventsUrl.searchParams.set("locale", "en-us,en,*");
   const eventsRaw = await tmJson(eventsUrl, env, "scheduled");
   const events = eventsRaw?._embedded?.events || [];
-  const total = Number(eventsRaw?.page?.totalElements ?? events.length) || 0;
-  const first = events[0];
-  if(total<=0 || !first?.id) return null;
-
+  const rawTotal = Number(eventsRaw?.page?.totalElements ?? events.length) || 0;
   const normalizedEvents=normalizeEvents(events);
-  if(normalizedEvents.length){
-    const builtAt=new Date().toISOString();
-    await kvPutJson(env,popularTourCacheKey(exact.id),{
-      ok:true,
-      events:normalizedEvents,
-      page:eventsRaw?.page||{size:normalizedEvents.length,totalElements:total,totalPages:1,number:0},
-      partial:normalizedEvents.length<total,
-      pagesFetched:1,
-      query:{attractionId:String(exact.id)},
-      builtAt,
-      artistId:String(exact.id),
-      evidence:"popular_validation_first_page"
-    },{expirationTtl:36*60*60}).catch(()=>{});
-  }
+  if(!normalizedEvents.length) return null;
+
+  const first=normalizedEvents[0];
+  const builtAt=new Date().toISOString();
+  await kvPutJson(env,popularTourCacheKey(exact.id),{
+    ok:true,
+    events:normalizedEvents,
+    page:eventsRaw?.page||{size:normalizedEvents.length,totalElements:rawTotal,totalPages:1,number:0},
+    partial:normalizedEvents.length<rawTotal,
+    pagesFetched:1,
+    query:{attractionId:String(exact.id)},
+    builtAt,
+    artistId:String(exact.id),
+    evidence:"popular_validation_first_page"
+  },{expirationTtl:36*60*60}).catch(()=>{});
 
   return {
     id:String(exact.id),
@@ -636,8 +663,8 @@ async function validatePopularArtist(env, name, popularityRank, listeners) {
     image:bestArtistImage(exact.images),
     popularityRank,
     listeners,
-    shows:total,
-    firstDate:String(first?.dates?.start?.localDate||""),
+    shows:normalizedEvents.length,
+    firstDate:String(first?.date||""),
     eventConfirmed:true,
   };
 }
@@ -675,9 +702,11 @@ async function kvDelete(env,key){
   try{await env.DESK.delete(key);}catch(e){}
 }
 
+const POPULAR_BUILD_ALGORITHM="rank-ordered-cache-v1";
 function newPopularBuildState(ranking,now=Date.now()){
   return {
     version:"popular-v4",
+    algorithm:POPULAR_BUILD_ALGORITHM,
     startedAt:new Date(now).toISOString(),
     updatedAt:new Date(now).toISOString(),
     source:ranking.source,
@@ -714,7 +743,7 @@ async function cachedPopularEventEvidence(env,existing){
       id:String(artist.id),
       name:String(artist.name),
       image:String(artist.image||first.artistImage||first.image||""),
-      shows:Math.max(events.length,Number(payload?.page?.totalElements||0)),
+      shows:events.length,
       firstDate:String(first.date||""),
       eventConfirmed:true,
       evidence:"ticketmaster_cached_tour",
@@ -767,6 +796,7 @@ export async function refreshPopularSnapshot(env, force = false) {
   const age = Date.now() - (Date.parse(existing?.builtAt || 0) || 0);
 
   if(!force && !state && existing?.version==="popular-v4" &&
+     existing?.algorithm===POPULAR_BUILD_ALGORITHM &&
      existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
      existing?.artists?.length>=POPULAR_LIMIT &&
      existing.artists.every(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0) &&
@@ -775,6 +805,7 @@ export async function refreshPopularSnapshot(env, force = false) {
   }
 
   if(force || !state || state.version!=="popular-v4" ||
+     state.algorithm!==POPULAR_BUILD_ALGORITHM ||
      !Array.isArray(state.candidates) || !Array.isArray(state.found)){
     const ranking=await kworbArtists();
     if(existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
@@ -800,6 +831,7 @@ export async function refreshPopularSnapshot(env, force = false) {
        existing?.version==="popular-v4" &&
        existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
        existing?.source===ranking.source &&
+       existing?.algorithm===POPULAR_BUILD_ALGORITHM &&
        Array.isArray(existing?.artists) &&
        existing.artists.length>0 &&
        existing.artists.length<POPULAR_LIMIT &&
@@ -833,22 +865,10 @@ export async function refreshPopularSnapshot(env, force = false) {
     }
   }
 
-  // Reuse recent real Ticketmaster event payloads before spending origin
-  // quota. This is stricter than attraction.upcomingEvents and lets a rebuild
-  // recover safely even while the Ticketmaster reserve guard is active.
+  // Reuse recent real Ticketmaster event payloads only when the ranked
+  // candidate reaches the cursor. Pre-filling all cached artists can let lower
+  // ranks fill Top 30 before higher-ranked candidates are checked.
   const cachedEvidence=await cachedPopularEventEvidence(env,existing);
-  for(const candidate of state.candidates){
-    const evidence=cachedEvidence.get(normName(candidate?.name));
-    if(!evidence) continue;
-    if(state.found.some(x=>String(x?.id||"")===String(evidence.id) || normName(x?.name)===normName(candidate.name))) continue;
-    state.found.push({
-      ...evidence,
-      name:String(evidence.name||candidate.name),
-      popularityRank:Number(candidate.rank||999999),
-      listeners:Number(candidate.listeners||0),
-      eventConfirmed:true,
-    });
-  }
 
   let processed=0;
   while(state.index<state.candidates.length &&
@@ -856,10 +876,21 @@ export async function refreshPopularSnapshot(env, force = false) {
         processed<POPULAR_BATCH_SIZE){
     const candidate=state.candidates[state.index++];
 
-    // Cached real-event evidence is already strict enough. Walk past confirmed
-    // candidates without spending another Ticketmaster call; the small batch
-    // budget is reserved only for artists that still need validation.
     if(state.found.some(x=>normName(x?.name)===normName(candidate.name))) continue;
+
+    const evidence=cachedEvidence.get(normName(candidate?.name));
+    if(evidence){
+      if(!state.found.some(x=>String(x?.id||"")===String(evidence.id))){
+        state.found.push({
+          ...evidence,
+          name:String(evidence.name||candidate.name),
+          popularityRank:Number(candidate.rank||999999),
+          listeners:Number(candidate.listeners||0),
+          eventConfirmed:true,
+        });
+      }
+      continue;
+    }
 
     processed++;
     try{
@@ -924,6 +955,7 @@ export async function refreshPopularSnapshot(env, force = false) {
 
   const snapshot={
     ok:true,mode:"popular",version:"popular-v4",
+    algorithm:POPULAR_BUILD_ALGORITHM,
     builtAt:new Date().toISOString(),
     artists,
     source:state.source,
@@ -1000,7 +1032,8 @@ export async function refreshPopularTourSnapshots(env,budget=4){
     const cached=await kvGetJson(env,key);
     // A fresh validation-seeded tour cache is just as useful as a later
     // prewarm. Skipping it must not consume the one-origin-call cron budget.
-    if(prewarmFresh(cached) && Array.isArray(cached?.events) && cached.events.length) continue;
+    const cachedEvents=sanitizeNormalizedEvents(cached?.events);
+    if(prewarmFresh(cached) && cachedEvents.length) continue;
     processed++;
     try{
       const payload=await scheduledEventPayload(env,{attractionId:artist.id});
@@ -1668,7 +1701,7 @@ function snapCoord(value, step) {
 function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,stateCode,radius}) {
   const out = new URL(requestUrl);
   out.search = "";
-  out.searchParams.set("__cachev","concerts-global-v21");
+  out.searchParams.set("__cachev","concerts-global-v22");
 
   if(mode==="artist-search"){
     out.searchParams.set("mode","artist-search");
@@ -1686,6 +1719,7 @@ function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionI
   if(city){
     out.searchParams.set("city",String(city).trim().toLowerCase());
     if(countryCode) out.searchParams.set("countryCode",String(countryCode).trim().toUpperCase());
+    if(stateCode) out.searchParams.set("stateCode",String(stateCode).trim().toUpperCase());
     return out;
   }
 
@@ -1755,7 +1789,9 @@ export async function onRequestGet({ request, env, waitUntil }) {
     const prewarmed=await kvGetJson(env,popularTourCacheKey(attractionId));
     if(prewarmFresh(prewarmed)){
       const events=sanitizeNormalizedEvents(prewarmed.events);
-      return json({...prewarmed,events},200,{"Cache-Control":"public, max-age=600, s-maxage=3600"});
+      if(events.length){
+        return json({...prewarmed,events},200,{"Cache-Control":"public, max-age=600, s-maxage=3600"});
+      }
     }
   }
   if(city && countryCode){

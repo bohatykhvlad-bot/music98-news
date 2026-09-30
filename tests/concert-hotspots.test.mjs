@@ -1297,3 +1297,131 @@ test("concert cache version bypasses event payloads created before hygiene filte
   assert.match(src,/__cachev","concerts-global-v21"/);
   assert.match(src,/sanitizeNormalizedEvents\(prewarmed\.events\)/);
 });
+
+test("Popular validation requires a usable normalized event, not raw totalElements", async () => {
+  const kv=memoryKv();
+  const rows=Array.from({length:40},(_,i)=>
+    "<tr><td>"+(i+1)+"</td><td>Artist "+(i+1)+"</td><td>"+(100000000-i*1000)+"</td></tr>"
+  ).join("");
+  const oldFetch=globalThis.fetch;
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="kworb.net") return new Response("<table>"+rows+"</table>",{status:200});
+    if(u.pathname.endsWith("/attractions.json")){
+      const name=u.searchParams.get("keyword")||"";
+      const n=Number(name.replace(/[^0-9]/g,""))||1;
+      return new Response(JSON.stringify({_embedded:{attractions:[{
+        id:"artist-"+n,name,images:[],classifications:[{segment:{name:"Music"}}],upcomingEvents:{_total:2}
+      }]},page:{totalElements:1,totalPages:1,size:50,number:0}}),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    if(u.pathname.endsWith("/events.json")){
+      const id=u.searchParams.get("attractionId")||"";
+      const n=Number(id.replace(/[^0-9]/g,""))||1;
+      if(n===1){
+        return new Response(JSON.stringify({
+          _embedded:{events:[{
+            id:"bad-1",name:"Canceled show",dates:{status:{code:"cancelled"},start:{dateTime:"2026-12-01T20:00:00Z",localDate:"2026-12-01"}},
+            _embedded:{attractions:[{id:"artist-1",name:"Artist 1"}],venues:[{id:"v1",name:"Venue",city:{name:"Paris"},country:{countryCode:"FR"},location:{latitude:"48.8",longitude:"2.3"}}]}
+          }]},
+          page:{totalElements:2,totalPages:1,size:200,number:0}
+        }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+      }
+      return new Response(JSON.stringify({
+        _embedded:{events:[{
+          id:"event-"+n,name:"Artist "+n+" Live",url:"https://example.com/"+n,
+          dates:{start:{dateTime:"2026-12-01T20:00:00Z",localDate:"2026-12-01",localTime:"20:00:00"}},
+          _embedded:{attractions:[{id:"artist-"+n,name:"Artist "+n,images:[]}],venues:[{id:"v"+n,name:"Venue",city:{name:"Paris"},country:{countryCode:"FR"},location:{latitude:"48.8",longitude:"2.3"}}]},
+          images:[]
+        }]},
+        page:{totalElements:1,totalPages:1,size:200,number:0}
+      }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+  try{
+    let result;
+    for(let i=0;i<5;i++) result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv});
+    const stateRaw=kv.raw("concert-popular:v4:state");
+    const snapRaw=kv.raw("concert-popular:v4");
+    const rowsFound=snapRaw ? JSON.parse(snapRaw).artists : JSON.parse(stateRaw).found;
+    assert.equal(rowsFound.some(x=>x.name==="Artist 1"),false);
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
+
+test("expired prewarmed artist event is ignored and live Ticketmaster is queried", async () => {
+  const kv=memoryKv();
+  await kv.put("concert-popular:v4:tour:artist-1",JSON.stringify({
+    ok:true,builtAt:new Date().toISOString(),
+    events:[{id:"past",artist:"Artist One",attractionId:"artist-1",name:"Old",date:"2026-09-29",dateTime:"2026-09-29T20:00:00Z",lat:48.8,lng:2.3}],
+    page:{totalElements:1}
+  }));
+  const oldFetch=globalThis.fetch;
+  const oldCaches=globalThis.caches;
+  let calls=0;
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      calls++;
+      return new Response(JSON.stringify({
+        _embedded:{events:[{
+          id:"future",name:"Future",url:"https://example.com/future",
+          dates:{start:{dateTime:"2026-12-01T20:00:00Z",localDate:"2026-12-01",localTime:"20:00:00"}},
+          _embedded:{attractions:[{id:"artist-1",name:"Artist One",images:[]}],venues:[{id:"v1",name:"Venue",city:{name:"Paris"},country:{countryCode:"FR"},location:{latitude:"48.8",longitude:"2.3"}}]},
+          images:[]
+        }]},
+        page:{totalElements:1,totalPages:1,size:200,number:0}
+      }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+    }
+    return new Response("not found",{status:404});
+  };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?attractionId=artist-1"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},
+      waitUntil:()=>{}
+    });
+    const data=await response.json();
+    assert.equal(calls,1);
+    assert.equal(data.events[0].id,"future");
+  }finally{
+    globalThis.fetch=oldFetch;
+    globalThis.caches=oldCaches;
+  }
+});
+
+test("city cache key distinguishes stateCode and Ticketmaster duplicate calls coalesce", async () => {
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch;
+  const oldCaches=globalThis.caches;
+  const urls=[];
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  globalThis.fetch=async input=>{
+    const u=new URL(String(input));
+    if(u.hostname==="app.ticketmaster.com" && u.pathname.endsWith("/events.json")){
+      urls.push(u.toString());
+      await new Promise(r=>setTimeout(r,10));
+      return new Response(JSON.stringify({_embedded:{events:[]},page:{totalElements:0,totalPages:1,size:200,number:0}}),{
+        status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}
+      });
+    }
+    return new Response("not found",{status:404});
+  };
+  try{
+    const env={TICKETMASTER_API_KEY:"test",DESK:kv};
+    const req=()=>onRequestGet({request:new Request("https://music98.news/api/concerts?city=Springfield&countryCode=US&stateCode=IL"),env,waitUntil:()=>{}});
+    await Promise.all([req(),req(),req()]);
+    assert.equal(urls.length,1);
+
+    await onRequestGet({request:new Request("https://music98.news/api/concerts?city=Springfield&countryCode=US&stateCode=MA"),env,waitUntil:()=>{}});
+    assert.equal(urls.length,2);
+    assert.match(urls[0],/stateCode=IL/);
+    assert.match(urls[1],/stateCode=MA/);
+  }finally{
+    globalThis.fetch=oldFetch;
+    globalThis.caches=oldCaches;
+  }
+});
+
