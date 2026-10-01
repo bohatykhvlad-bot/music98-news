@@ -19,11 +19,11 @@ The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.
 
 [apple:song:6807119565:6807119568]
 
-The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. Its first single, *SaWaDiKa*, takes her back to Bangkok for a video built around the city, with Thai references running through its locations, styling and choreography. Caesars says the video drew 70.8 million views in its first 24 hours.
+The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* opened the rollout, with its video filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA then gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop, making LISA the first K-pop artist to win the category, according to Caesars.
 
 [youtube:FMX98ROVRCE]
 
-LISA brought *SaWaDiKa* to the 2026 MTV Video Music Awards for its first televised performance. The same night, *Dream feat. Kentaro Sakaguchi* won Best Pop, making LISA the first K-pop artist to win the category, according to Caesars. Released as an official short film from *Alter Ego*, *Dream* stars LISA opposite Japanese actor Kentaro Sakaguchi and unfolds as a bittersweet relationship story rather than a performance video. The VMA win brought the year-old visual back into focus just as LISA began the rollout for *PRESS PLAY* and prepared for the Las Vegas shows.
+*Dream* was released in August 2025 as an official short film from *Alter Ego*. LISA stars opposite Kentaro Sakaguchi in a story built around a past relationship and the memories that remain after it ends. MTV also nominated the film for Best Cinematography and Best Editing. Its Best Pop win came 26 days before *PRESS PLAY* and 46 days before the first Las Vegas show.
 
 [tickets:__TICKET__]
 
