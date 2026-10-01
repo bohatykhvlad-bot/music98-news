@@ -7,7 +7,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 import gate
 
-# Draft-only creator for the Ella Langley Choosin Texas feature.\nPOST_ID = "ellatexas26"
+# Draft-only creator for the Ella Langley Choosin Texas feature.
+POST_ID = "ellatexas26"
 TITLE = 'How Ella Langley\'s "Choosin\' Texas" Became a Country Crossover Phenomenon'
 EXCERPT = 'Ella Langley\'s "Choosin\' Texas" sounds unmistakably country at a moment when the song is sitting at the center of American pop.'
 BODY = r'''Ella Langley's "Choosin' Texas" sounds unmistakably country at a moment when the song is sitting at the center of American pop. It is built from familiar country materials: a love triangle, a place name, a wounded narrator who already knows how the story ends and enough steel-guitar ache to make the answer feel inevitable. Yet the song did not stay inside the country format. It moved through radio, streaming and social media at the same time, then settled at No. 1 on the Billboard Hot 100 for 23 weeks, the longest run at the top in the chart's history. The striking part is not that a country artist crossed over. It is that Langley did it with a song that never sounds embarrassed about being country.
