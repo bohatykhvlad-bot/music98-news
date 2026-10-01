@@ -57,6 +57,9 @@ jobs:
           name: lisa-cover-qc
           path: lisa-cover-qc/
           if-no-files-found: error
+      - name: Draft Ella Choosin Texas longread text
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[draft-ella-longread-text]') }}
+        run: python scripts/draft_ella_choosin_texas_longread.py
       - name: Stage Ella longread visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-longread-qc]') }}
         run: |
