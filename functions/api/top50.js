@@ -6,7 +6,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v32";
+const TOP50_KV = "top50v33";
 const SOURCES = ["A", "S", "D", "B", "Y"];
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
@@ -313,7 +313,75 @@ function normalizeEver(old) {
   return out;
 }
 
-async function applyTenure(env, tracks, diag) {
+/* Durable recovery snapshot.
+   The live tenure registry is kept in KV, but KV is not allowed to be the only
+   copy of chart age/movement state. On 2026-10-01 the registry disappeared and
+   the first rebuild treated the entire Top 50 as day one. A checked-in snapshot
+   from the previous healthy day gives us an independent recovery source. */
+function tenureBackupState(snapshot) {
+  if (!snapshot || !Array.isArray(snapshot.tracks) || snapshot.tracks.length < 10) return null;
+  const snapshotWeek = Number(snapshot.week);
+  if (!Number.isFinite(snapshotWeek)) return null;
+  const keys = [];
+  const seen = {};
+  const firstDay = {};
+  const ever = {};
+  snapshot.tracks.forEach((track, i) => {
+    const key = tenureKey(track && track.title, track && track.artist);
+    if (!key || seen[key]) return;
+    const weeks = Math.max(1, Number(track && track.weeks) || 1);
+    keys.push(key);
+    seen[key] = {
+      weeks,
+      lastPos: Math.max(0, (Number(track && track.rank) || (i + 1)) - 1),
+      lastWeek: snapshotWeek,
+      delta: String(track && track.delta != null ? track.delta : "0"),
+    };
+    firstDay[key] = Math.max(0, snapshotWeek - (weeks - 1));
+    ever[key] = true;
+  });
+  return { week: snapshotWeek, keys, seen, firstDay, ever };
+}
+
+async function tenureRecoverySnapshot(env, origin, week) {
+  let raw = null;
+  try { raw = await readSeed(env, origin, "chart-tenure-backup.json"); } catch {}
+  if (!raw || typeof raw !== "object") return { prior: null, same: null };
+  const candidates = [raw.current, raw.previous, raw]
+    .map(tenureBackupState)
+    .filter(Boolean);
+  return {
+    prior: candidates.find((x) => x.week === week - 1) || null,
+    same: candidates.find((x) => x.week === week) || null,
+  };
+}
+
+function tenureResetEvidence(tracks, ten, seen, firstDay, prior) {
+  if (!prior) return { repair: false, overlap: 0, broken: 0 };
+  const currentKeys = (tracks || []).map((t) => tenureKey(t.title, t.artist));
+  const overlap = currentKeys.filter((k) => prior.seen[k]);
+  const established = overlap.filter((k) => Number(prior.seen[k] && prior.seen[k].weeks) >= 2);
+  const broken = established.filter((k) => {
+    const fd = Number(firstDay[k]);
+    const recWeeks = Number(seen[k] && seen[k].weeks);
+    return !Number.isFinite(fd) || fd > prior.firstDay[k] || (Number.isFinite(recWeeks) && recWeeks <= 1);
+  });
+  const hasReference = !!(
+    (Array.isArray(ten && ten.keys) && ten.keys.length) ||
+    (Array.isArray(ten && ten.today) && ten.today.length)
+  );
+  const massReset = established.length >= 10 && broken.length >= Math.ceil(established.length * 0.5);
+  return {
+    repair: !hasReference || massReset,
+    overlap: overlap.length,
+    established: established.length,
+    broken: broken.length,
+    massReset,
+    missingReference: !hasReference,
+  };
+}
+
+async function applyTenure(env, tracks, diag, origin) {
   const week = chartWeek();
   let ten = { launch: "2026-09-17", epoch: "daily", week: -1, keys: [], seen: {} };
   let firstDay = {};
@@ -326,6 +394,51 @@ async function applyTenure(env, tracks, diag) {
     everStored = await env.DESK.get(EVER_KV, { type: "json" });
   }
 
+  let seen = rekeySeen(ten);
+  for (const [k, rec] of Object.entries(seen)) {
+    if (firstDay[k] != null) continue;
+    const w = Number(rec && rec.weeks) || 1;
+    const at = Number(rec && rec.lastWeek);
+    firstDay[k] = Math.max(0, (Number.isFinite(at) ? at : week) - (w - 1));
+  }
+
+  const recovery = await tenureRecoverySnapshot(env, origin, week);
+  const evidence = tenureResetEvidence(tracks, ten, seen, firstDay, recovery.prior);
+  if (evidence.repair && recovery.prior) {
+    const prior = recovery.prior;
+    const mergedSeen = { ...seen };
+    for (const [k, rec] of Object.entries(prior.seen)) {
+      const old = mergedSeen[k];
+      if (!old || (Number(old.weeks) || 0) < (Number(rec.weeks) || 0)) {
+        mergedSeen[k] = { ...rec };
+      }
+    }
+    for (const [k, day] of Object.entries(prior.firstDay)) {
+      const old = Number(firstDay[k]);
+      firstDay[k] = Number.isFinite(old) ? Math.min(old, day) : day;
+    }
+    ten = {
+      launch: "2026-09-17",
+      epoch: "daily",
+      week: prior.week,
+      keys: [...prior.keys],
+      today: [...prior.keys],
+      seen: mergedSeen,
+    };
+    seen = mergedSeen;
+    if (diag) {
+      diag.recoveryApplied = true;
+      diag.recoverySource = "repo-snapshot";
+      diag.recoveryWeek = prior.week;
+      diag.recoveryEvidence = evidence;
+    }
+  } else if (diag) {
+    diag.recoveryApplied = false;
+    diag.recoverySource = recovery.prior ? "not-needed" : "unavailable";
+    diag.recoveryWeek = recovery.prior ? recovery.prior.week : null;
+    diag.recoveryEvidence = evidence;
+  }
+
   const sameDay = ten.week === week;
   const hasToday = Array.isArray(ten.today) && ten.today.length > 0;
   const refRaw = sameDay
@@ -336,8 +449,10 @@ async function applyTenure(env, tracks, diag) {
     return cut < 0 ? k : (isVersionedMergeKey(k) ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1)));
   });
 
-  const seen = rekeySeen(ten);
   let ever = normalizeEver(everStored);
+  if (recovery.prior) {
+    for (const k of Object.keys(recovery.prior.ever)) ever[k] = true;
+  }
   let everMigrated = !!everStored && Object.keys(ever).length > 0;
 
   if (!everMigrated) {
@@ -347,13 +462,6 @@ async function applyTenure(env, tracks, diag) {
       : order.length;
     for (const k of order.slice(0, count)) ever[k] = true;
     everMigrated = true;
-  }
-
-  for (const [k, rec] of Object.entries(seen)) {
-    if (firstDay[k] != null) continue;
-    const w = Number(rec && rec.weeks) || 1;
-    const at = Number(rec && rec.lastWeek);
-    firstDay[k] = Math.max(0, (Number.isFinite(at) ? at : week) - (w - 1));
   }
 
   const first = !prevKeys.length;
@@ -717,7 +825,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "feat-v33",
+    rev: "tenure-recovery-v33",
     sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
@@ -886,7 +994,7 @@ export async function onRequestGet({ env, request }) {
   try {
     const payload = await withTimeout(buildTop50(origin, env), 14000);
     const memory = {};
-    payload.tracks = await applyTenure(env, payload.tracks, memory);
+    payload.tracks = await applyTenure(env, payload.tracks, memory, origin);
     payload.memory = memory;
     payload.arrows = arrowCheck(payload.tracks);
     if (env && env.DESK && payload.tracks && payload.tracks.length) {
