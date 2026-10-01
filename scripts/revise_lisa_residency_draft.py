@@ -37,7 +37,7 @@ LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk wor
 
 [youtube:FMX98ROVRCE]
 
-"Dream" first appeared on LISA's debut full-length album, *Alter Ego*, and later received an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a bittersweet story about two people looking back on a relationship they can no longer return to. Written and directed by OJun Kwon, the film moves through quiet, cinematic scenes rather than treating the song as a conventional performance video. It was released through LISA's LLOUD channel in August 2025, several months after *Alter Ego*.
+"Dream" first appeared on LISA's debut full-length album, *Alter Ego*, and later received an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a bittersweet story about two people looking back on a relationship they can no longer return to. Written and directed by OJun Kwon, the film moves through quiet, cinematic scenes rather than treating the song as a conventional performance video. It was released through LISA's LLOUD channel later that year, several months after *Alter Ego*.
 
 [tickets:__TICKET__]
 
