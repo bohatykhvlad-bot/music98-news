@@ -56,15 +56,22 @@ def media_layout(body):
 def main():
     runner.load_env(); runner.desk_read=fresh_read; gate.KEY=runner.desk_key()
     current=runner.find_post(fresh_read()["posts"],POST_ID)
-    ticket=ticket_from(current.get("body") or "")
-    expected=EXPECTED_TEMPLATE.replace("__TICKET__",ticket)
-    body=BODY_TEMPLATE.replace("__TICKET__",ticket)
-    if current.get("status")!="live" or current.get("body")!=expected or current.get("excerpt")!=EXPECTED_EXCERPT:
-        raise RuntimeError("live LISA changed; refusing overwrite")
-    protected={k:copy.deepcopy(v) for k,v in current.items() if k not in {"body","excerpt"}}
-    if len(gate.paragraphs(body))!=len(gate.paragraphs(expected)) or media_layout(body)!=media_layout(expected):
+    if current.get("status")!="live":
+        raise RuntimeError("LISA is not live; refusing overwrite")
+    old='At the same ceremony, "Dream" won Best Pop, making LISA the first K-pop artist to win the category.'
+    new='At the same ceremony, "Dream" won Best Pop, making LISA the first K-pop solo artist to win the category.'
+    current_body=current.get("body") or ""
+    if new in current_body:
+        print("ALREADY_CORRECT")
+        runner.cmd_verify(POST_ID)
+        return
+    if old not in current_body:
+        raise RuntimeError("target LISA VMA sentence changed; refusing overwrite")
+    body=current_body.replace(old,new,1)
+    protected={k:copy.deepcopy(v) for k,v in current.items() if k!="body"}
+    if len(gate.paragraphs(body))!=len(gate.paragraphs(current_body)) or media_layout(body)!=media_layout(current_body):
         raise RuntimeError("layout changed")
-    candidate=copy.deepcopy(current); candidate["body"]=body; candidate["excerpt"]=NEW_EXCERPT
+    candidate=copy.deepcopy(current); candidate["body"]=body
     gate.CHECK_IDS=True
     fails,warns,info=gate.check_post(candidate,strict=True)
     print("PREWRITE_GATE","FAIL" if fails else "PASS")
@@ -73,21 +80,20 @@ def main():
         print("PREWRITE_FAILURES",json.dumps(fails,ensure_ascii=True)); raise RuntimeError("gate failed")
     def mutate(posts):
         p=runner.find_post(posts,POST_ID)
-        if p.get("body")!=expected or p.get("excerpt")!=EXPECTED_EXCERPT or {k:v for k,v in p.items() if k not in {"body","excerpt"}}!=protected:
+        if p.get("body")!=current_body or {k:v for k,v in p.items() if k!="body"}!=protected:
             raise RuntimeError("LISA changed during write")
         p["body"]=body
-        p["excerpt"]=NEW_EXCERPT
         return copy.deepcopy(p)
     saved=runner.guarded_write(mutate)
     for _ in range(20):
-        if saved.get("body")==body and saved.get("excerpt")==NEW_EXCERPT: break
+        if saved.get("body")==body: break
         time.sleep(2); saved=runner.find_post(fresh_read()["posts"],POST_ID)
-    if saved.get("body")!=body or saved.get("excerpt")!=NEW_EXCERPT: raise RuntimeError("LISA did not propagate")
+    if saved.get("body")!=body: raise RuntimeError("LISA did not propagate")
     for n in (1,2,3):
         ok,lines=runner.run_gate(POST_ID,quiet=False); print("POSTWRITE_GATE_PASS",n,"PASS" if ok else "FAIL")
         if not ok: raise RuntimeError("postwrite failed")
     runner.cmd_verify(POST_ID)
-    print("WORDS",len(gate.prose_of(expected).split()),"->",len(gate.prose_of(body).split()))
+    print("WORDS",len(gate.prose_of(current_body).split()),"->",len(gate.prose_of(body).split()))
     print("LAYOUT_PRESERVED",len(gate.paragraphs(body)),media_layout(body))
     print("DONE_LISA_FINAL_PROOF")
 
