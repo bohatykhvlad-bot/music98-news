@@ -147,12 +147,15 @@ def main():
         if not ok:
             raise RuntimeError(f"gate failed on pass {pass_no}")
 
-    public = runner.http(runner.DESK_API)["posts"]
-    live = next((x for x in public if str(x.get("id")) == POST_ID), None)
-    if not live or (live.get("status") or "live") != "live":
-        raise RuntimeError("LISA post is not public after revision")
-    if live.get("body") != body:
-        raise RuntimeError("public LISA body does not match revised body")
+    live = None
+    for attempt in range(20):
+        public = runner.http(runner.DESK_API + "?nocache=" + str(time.time_ns()))["posts"]
+        live = next((x for x in public if str(x.get("id")) == POST_ID), None)
+        if live and (live.get("status") or "live") == "live" and live.get("body") == body:
+            break
+        time.sleep(2)
+    else:
+        raise RuntimeError("public LISA body did not refresh to the revised version")
 
     print("FINAL_STATUS", live.get("status"), live.get("publishAt"), live.get("date"))
     print("FINAL_COVER", (live.get("cover") or {}).get("src"), (live.get("cover") or {}).get("credit"))
