@@ -7,7 +7,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 import gate
 
-POST_ID = "auleon930r1"\n# apply-final-review-20261001
+POST_ID = "auleon930r1"
+# apply-final-review-20261001-v2
 EXPECTED_EXCERPT = r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary.'''
 EXPECTED_BODY = r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. Released September 25 through Warner Records, it captures the concert featured throughout the film. The album presents the performance as a complete live release, while the documentary uses selected moments from the show alongside studio footage and interviews.
 
