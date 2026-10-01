@@ -505,6 +505,13 @@ body.editmode .card .tag{top:auto;bottom:10px}
 /* ---------- footer ---------- */
 footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .foot-in{max-width:1180px;margin:0 auto;padding:40px 20px 44px;display:grid;grid-template-columns:minmax(280px,340px) 140px 160px 198px;column-gap:0;row-gap:30px;align-items:start;justify-content:space-between}
+@media (min-width:901px){
+  .foot-in{grid-template-columns:minmax(280px,340px) minmax(48px,1fr) 140px 36px 160px minmax(48px,1fr) 198px;justify-content:stretch}
+  .foot-in>.foot-col:nth-child(1){grid-column:1}
+  .foot-in>.foot-col:nth-child(2){grid-column:3}
+  .foot-in>.foot-col:nth-child(3){grid-column:5}
+  .foot-in>.foot-col:nth-child(4){grid-column:7}
+}
 .foot-col h3{margin:0 0 14px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
 .foot-col p{margin:0;color:var(--muted);font-size:14px;line-height:1.55;max-width:340px}
 .flink{display:block;width:max-content;max-width:100%;color:var(--muted);text-decoration:none;font-size:14px;line-height:1.55;padding:5px 0;transition:.15s;white-space:nowrap}
