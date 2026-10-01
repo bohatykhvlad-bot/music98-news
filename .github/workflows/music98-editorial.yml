@@ -190,7 +190,7 @@ jobs:
         run: |
           python -m pip install --quiet Pillow gdown
           python scripts/revise_lisa_residency_draft.py
-      - name: Create Ella Choosin Texas feature draft
+      - name: Create Ella Langley Choosin Texas feature draft
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[create-ella-texas-feature]') }}
         run: python scripts/create_ella_choosin_texas_feature.py
       - name: Pin LISA live post
