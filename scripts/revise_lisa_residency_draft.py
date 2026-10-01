@@ -11,25 +11,25 @@ import post as runner
 
 POST_ID = "lisa26vegas"
 # final-reader-pass-v2
-TITLE = "LISA Adds Two Shows After Her Las Vegas Residency Sells Out"
+TITLE = "LISA Adds Two Las Vegas Shows After First Four Dates Sell Out"
 
-EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes."""
+EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes."""
 
-BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes. The residency now opens a day earlier than first announced and closes a day later, turning each of the two Las Vegas weekends into a three-night run.
+BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes. The residency now opens a day earlier than first announced and closes a day later, turning both Las Vegas weekends into three-night runs.
 
-The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added performances began September 30 through Ticketmaster, while the four dates announced in March remain in place. Caesars Entertainment bills VIVA LA LISA as the first Las Vegas residency by a K-pop artist. The Colosseum is a 4,300-seat theater inside Caesars Palace, and the two added dates extend each of the original weekends by one night without changing venues.
+The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added shows began September 30 through Ticketmaster, while the four dates announced in March remain unchanged. Caesars Entertainment says VIVA LA LISA is the first Las Vegas residency by a K-pop artist. All six shows will take place at the 4,300-seat Colosseum at Caesars Palace.
 
 [apple:song:6807119565:6807119568]
 
-The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, with its video filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA then gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. Caesars says the win made LISA the first K-pop artist to take the category.
+The residency follows *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, and its video was filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop.
 
 [youtube:FMX98ROVRCE]
 
-*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Kentaro Sakaguchi in a story about a past relationship and the memories left behind. MTV also nominated the film for Best Cinematography and Best Editing. Its Best Pop win at the VMAs gave the *Alter Ego* chapter one more major moment before LISA moved on to *PRESS PLAY* and the Las Vegas residency.
+*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story that looks back on a relationship after it has ended. At the VMAs, the video was also nominated for Best K-Pop, Best Cinematography and Best Editing.
 
 [tickets:__TICKET__]
 
-Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows the year LISA stepped away from BLACKPINK, pursued her solo career, moved into acting and built her own company before returning to the group. It opens in cinemas worldwide on October 12, including IMAX, and will be available on YouTube Premium later."""
+Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows a year in which LISA stepped away from BLACKPINK, focused on her solo career, moved into acting and built her own brand before returning to the group. It opens in cinemas worldwide, including IMAX theaters, on October 12 and will be available on YouTube Premium later."""
 
 AI_STYLE_FLAGS = (
     "marks a new chapter",
@@ -77,6 +77,7 @@ def main():
         "publishAt": current.get("publishAt"),
         "date": current.get("date"),
         "cover": copy.deepcopy(current.get("cover")),
+        "pinned": current.get("pinned"),
     }
 
     m = re.search(r"(?im)^\s*\[tickets:(https?://[^\]]+)\]\s*$", str(current.get("body") or ""))
