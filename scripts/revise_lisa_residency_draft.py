@@ -19,11 +19,11 @@ The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.
 
 [apple:song:6807119565:6807119568]
 
-The Las Vegas dates come after *PRESS PLAY*, LISA's new EP, due October 23 through LLOUD Co. and RCA Records. "SaWaDiKa" is the first single. Thom Bridges and Ojivolta produced the track, while Bang Jae Yeob directed the video, filmed around Bangkok. Caesars says the video drew 70.8 million views in its first 24 hours.
+The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. Its first single, *SaWaDiKa*, takes her back to Bangkok for a video built around the city, with Thai references running through its locations, styling and choreography. Caesars says the video drew 70.8 million views in its first 24 hours.
 
 [youtube:FMX98ROVRCE]
 
-LISA first performed *SaWaDiKa* on television at the 2026 MTV Video Music Awards. Her video *Dream feat. Kentaro Sakaguchi* won Best Pop at the same ceremony. By the time the Las Vegas run begins, *PRESS PLAY* will have been out for almost three weeks, putting the residency close to the EP's release.
+LISA brought *SaWaDiKa* to the 2026 MTV Video Music Awards for its first televised performance. The same night, *Dream feat. Kentaro Sakaguchi* won Best Pop, making LISA the first K-pop artist to win the category, according to Caesars. Released as an official short film from *Alter Ego*, *Dream* stars LISA opposite Japanese actor Kentaro Sakaguchi and unfolds as a bittersweet relationship story rather than a performance video. The VMA win brought the year-old visual back into focus just as LISA began the rollout for *PRESS PLAY* and prepared for the Las Vegas shows.
 
 [tickets:__TICKET__]
 
@@ -102,7 +102,7 @@ def main():
     second_para = body.split("\n\n")[1]
     apple_pos = body.index("[apple:song:6807119565:6807119568]")
     second_end = body.index(second_para) + len(second_para)
-    third_start = body.index("The Las Vegas dates come after")
+    third_start = body.index("The residency arrives soon after")
     if not (second_end < apple_pos < third_start):
         raise RuntimeError("Apple Music block is not between paragraphs 2 and 3")
 
