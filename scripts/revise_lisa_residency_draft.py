@@ -31,7 +31,7 @@ LISA performed *SaWaDiKa* at the 2026 MTV Video Music Awards. At the same ceremo
 
 [tickets:__TICKET__]
 
-LISA's fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows a year in which LISA stepped away from BLACKPINK, focused on her solo career, moved into acting and built her own brand before returning to the group. It opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later.""""""
+LISA's fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows a year in which LISA stepped away from BLACKPINK, focused on her solo career, moved into acting and built her own brand before returning to the group. It opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later."""
 
 AI_STYLE_FLAGS = (
     "marks a new chapter",
