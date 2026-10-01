@@ -946,3 +946,11 @@ Conflict precedent (recorded): pass 4 fan wants era-accurate fresh photo, pass 1
 \n- OWNER STYLE RULE (28.09.2026): for artist names/credits and release-title casing, Apple Music/iTunes is the default naming authority. Preserve Apple punctuation, capitalization and collaborator separators exactly unless a stronger owner instruction overrides it. Example: `John Legend & Pharrell Williams`, not comma-separated or rewritten from a video title.\n
 
 OWNER EDITORIAL RULE (28.09.2026): sources are for backstage fact-checking, not for routine name-dropping in published copy. Do not write constructions such as "press materials say", "Apple Music lists", "Ticketmaster describes", "the official site says", "according to [source]", or "label-supplied YouTube credits" when the verified fact can be stated directly. Name a source in body copy only when the source itself is part of the news, attribution is materially necessary, or the owner explicitly asks for it.
+
+
+### 01.10.2026 — ТОЧЕЧНАЯ ВЫЧИТКА LIVE LISA И LINKIN PARK
+
+- Владелец уточнил область правки: исправлять и улучшать существующий текст косметически, без переписывания с нуля и без изменения структуры. Сохранять количество и порядок абзацев, медиа-маркеры и их позиции, обложки и ручные кропы, пины и слот публикации.
+- Существующую карточку песни у LISA не удалять и не двигать. Прямая команда владельца: «Нет песня там где надо не трогай».
+- После исправления выполнить три отдельных чтения: редактор журнала, читатель журнала, проверка шаблонных ИИ-оборотов. Затем push и проверка точного текста в лайве. Проверка ИИ-оборотов — редакторская оценка языка, не детектор происхождения текста.
+- Урок LISA: повтор расписания заменён подтверждённой датой анонса; название песни не оформляется как альбом; песня и её фильм разделены по смыслу; сольная работа не должна читаться как уход из BLACKPINK; ограниченный кинопрокат и последующий стриминг сформулированы точно. Структура сохранена.

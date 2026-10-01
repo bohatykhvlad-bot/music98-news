@@ -1,182 +1,125 @@
 #!/usr/bin/env python3
+"""Apply the owner's cosmetic proofreading corrections to the existing live LISA post.
+
+Executed by the existing music98 editorial runner. Authentication stays in its
+pre-existing GitHub Actions secret. This script never extracts or prints a key.
+"""
 from __future__ import annotations
 import copy
-import re
+import hashlib
+import json
 import sys
 import time
 from pathlib import Path
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
+import gate
 
 POST_ID = "lisa26vegas"
-# final-reader-pass-v2
-TITLE = "LISA Adds Two Las Vegas Shows After First Four Dates Sell Out"
+EXPECTED_BODY_SHA256 = "fd34dd9609942c5d64ed9763188beabc7e4ccda378d2f84e5a4c84639361b57c"
+REPLACEMENTS = [['The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.', 'The two additional dates were announced September 29, following the sellout of the original four shows.'], ['*SaWaDiKa*', '"SaWaDiKa"'], ['Its name comes from the Thai greeting', "The song's title comes from the Thai greeting"], ['moving through locations around the city with Thai references woven into the sets, styling and choreography.', 'with references to Thai culture in the sets, styling and choreography.'], ['At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop.', 'At the same ceremony, the video for "Dream" won Best Pop.'], ['*Dream* was released as an official short film from *Alter Ego*.', 'The official short film for "Dream" was released after the song appeared on LISA\'s debut full-length album, *Alter Ego*.'], ['in a story centered on a past relationship and the memories that remain after it ends.', 'in a story about love, loss and the memories of a relationship.'], ['The film gives the song a narrative treatment rather than presenting it as a performance video, with LISA and Sakaguchi carrying the story on screen.', "The short film was directed by Ojun Kwon and released on LISA's LLOUD channel, with Sakaguchi playing her love interest."], ['The film follows a year in which LISA stepped away from BLACKPINK, focused on her solo career, moved into acting and built her own brand before returning to the group.', 'The film follows a year of solo work between BLACKPINK commitments, as LISA records her debut album, moves into acting and builds her own brand while preparing to return to the group.'], ['It opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later.', 'It opens for a limited run in cinemas worldwide on October 12, including IMAX screenings. A global streaming release on YouTube Premium will follow.'], ['"SaWaDiKa", released September 4', '"SaWaDiKa," released September 4']]
 
-EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes."""
 
-BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
+def fresh_read():
+    return runner.http(runner.DESK_API + "?nocache=" + str(time.time_ns()), runner.desk_key())
 
-The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. Tickets for the two added shows went on sale September 30 through Ticketmaster, while the four dates announced in March remain unchanged. VIVA LA LISA is the first Las Vegas residency by a K-pop artist. All six performances will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace.
 
-[apple:song:6807119565:6807119568]
+def media_layout(body):
+    return [(i, q) for i, q in enumerate(gate.paragraphs(body)) if gate.is_media(q)]
 
-The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. *SaWaDiKa*, released September 4, is the first song from the project. The official tracklist currently shows it followed by five tracks whose titles have not yet been revealed. Its name comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, moving through locations around the city with Thai references woven into the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
 
-LISA performed *SaWaDiKa* at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. The video was also nominated for Best K-Pop, while its cinematography and editing received separate nominations.
+def edited_body(body):
+    if hashlib.sha256(body.encode("utf-8")).hexdigest() != EXPECTED_BODY_SHA256:
+        raise RuntimeError("Live text changed after review; refusing to overwrite it")
+    original = body
+    for old, new in REPLACEMENTS:
+        if old not in body:
+            raise RuntimeError("Reviewed fragment missing")
+        body = body.replace(old, new)
+    if len(gate.paragraphs(body)) != len(gate.paragraphs(original)):
+        raise RuntimeError("Paragraph structure changed")
+    if media_layout(body) != media_layout(original):
+        raise RuntimeError("Media or its position changed")
+    return body
 
-[youtube:FMX98ROVRCE]
-
-*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story centered on a past relationship and the memories that remain after it ends. The film gives the song a narrative treatment rather than presenting it as a performance video, with LISA and Sakaguchi carrying the story on screen.
-
-[tickets:__TICKET__]
-
-LISA's fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows a year in which LISA stepped away from BLACKPINK, focused on her solo career, moved into acting and built her own brand before returning to the group. It opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later."""
-
-AI_STYLE_FLAGS = (
-    "marks a new chapter",
-    "comes at a time",
-    "not only",
-    "rather than simply",
-    "serves as a",
-    "underscores",
-    "showcases",
-    "the announcement lands",
-    "in a move that",
-    "signals a",
-    "cementing",
-    "further solidifies",
-    "setting the stage",
-    "against the backdrop",
-    "in the wake of",
-    "at a time when",
-    "a testament to",
-    "pivotal year",
-    "beyond the residency",
-    "caesars says",
-    "caesars reports",
-    "according to caesars",
-)
-
-def style_scan(text: str):
-    low = text.lower()
-    flags = [x for x in AI_STYLE_FLAGS if x in low]
-    # Also catch a few common synthetic-news constructions without scoring prose.
-    patterns = {
-        "summary_throat_clear": r"(?i)\b(?:overall|ultimately|all in all),",
-        "double_transition": r"(?i)\b(?:meanwhile|additionally|furthermore),\s+(?:meanwhile|additionally|furthermore),",
-        "generic_significance": r"(?i)\b(?:highlights|reflects|demonstrates)\s+(?:the|a)\s+(?:growing|broader|continued)\b",
-    }
-    flags.extend(name for name, pat in patterns.items() if re.search(pat, text))
-    return flags
 
 def main():
     runner.load_env()
-    before = runner.desk_read()["posts"]
-    current = runner.find_post(before, POST_ID)
-    if (current.get("status") or "live") != "live":
-        raise RuntimeError(f"{POST_ID} is not live; refusing to change publication state")
+    runner.desk_read = fresh_read
+    gate.KEY = runner.desk_key()
+    before = fresh_read()
+    current = runner.find_post(before["posts"], POST_ID)
+    if current.get("status") != "live":
+        raise RuntimeError("Target is not live")
+    body = edited_body(current.get("body") or "")
+    candidate = copy.deepcopy(current)
+    candidate["body"] = body
+    protected = {k: copy.deepcopy(v) for k, v in current.items() if k != "body"}
 
-    preserved = {
-        "status": current.get("status"),
-        "publishAt": current.get("publishAt"),
-        "date": current.get("date"),
-        "cover": copy.deepcopy(current.get("cover")),
-        "pinned": current.get("pinned"),
-    }
+    # Existing deterministic gate, on the exact proposed text, BEFORE any write.
+    gate.CHECK_IDS = True
+    fails, warns, info = gate.check_post(candidate, strict=True)
+    print("PREWRITE_GATE", "FAIL" if fails else "PASS")
+    print("PREWRITE_WARNINGS", json.dumps(warns, ensure_ascii=True))
+    for code, message in info:
+        if code in {"youtube", "apple", "cover", "cover-image", "length", "state"}:
+            print("CHECK", code, message)
+    if fails:
+        print("PREWRITE_FAILURES", json.dumps(fails, ensure_ascii=True))
+        raise RuntimeError("Candidate failed the editorial gate")
+    if len(gate.prose_of(body).split()) < len(gate.prose_of(current["body"]).split()):
+        raise RuntimeError("Cosmetic review must not reduce prose volume")
 
-    m = re.search(r"(?im)^\s*\[tickets:(https?://[^\]]+)\]\s*$", str(current.get("body") or ""))
-    if not m:
-        raise RuntimeError("existing affiliate ticket CTA not found")
-    ticket = m.group(1)
-    from urllib.parse import urlparse, parse_qs
-    parsed_ticket = urlparse(ticket)
-    q = parse_qs(parsed_ticket.query)
-    print("TICKET_HOST", parsed_ticket.netloc)
-    for key in ("u", "url", "destination", "dest"):
-        if q.get(key):
-            print("TICKET_DESTINATION", q[key][0])
-            break
-    body = BODY_TEMPLATE.replace("__TICKET__", ticket)
-
-    bad = style_scan(body)
-    print("AI_STYLE_SCAN", bad)
-    if bad:
-        raise RuntimeError(f"AI-style phrase(s) remain: {bad}")
-
-    if "[apple:song:6807119565:6807119568]" not in body:
-        raise RuntimeError("SaWaDiKa Apple Music block missing")
-    second_para = body.split("\n\n")[1]
-    apple_pos = body.index("[apple:song:6807119565:6807119568]")
-    second_end = body.index(second_para) + len(second_para)
-    third_start = body.index("The residency begins less than three weeks after")
-    if not (second_end < apple_pos < third_start):
-        raise RuntimeError("Apple Music block is not between paragraphs 2 and 3")
+    backup_dir = Path(".editorial-backups")
+    backup_dir.mkdir(exist_ok=True)
+    (backup_dir / (POST_ID + "-" + str(time.time_ns()) + ".json")).write_text(
+        json.dumps(before, ensure_ascii=True), encoding="ascii")
 
     def mutate(posts):
         p = runner.find_post(posts, POST_ID)
-        if (p.get("status") or "live") != "live":
-            raise RuntimeError("LISA status changed during guarded write")
-        p["title"] = TITLE
-        p["excerpt"] = EXCERPT
-        p["body"] = body
-        # Deliberately do not touch cover, date, publishAt or status.
+        if p.get("status") != "live":
+            raise RuntimeError("Publication state changed")
+        if {k: v for k, v in p.items() if k != "body"} != protected:
+            raise RuntimeError("Protected fields changed after review")
+        p["body"] = edited_body(p.get("body") or "")
         return copy.deepcopy(p)
 
-    runner.guarded_write(mutate)
-
-    for attempt in range(12):
-        desk = runner.http(runner.DESK_API + "?nocache=" + str(time.time_ns()), runner.desk_key())
-        p = next((x for x in desk.get("posts", []) if str(x.get("id")) == POST_ID), None)
-        if p and p.get("body") == body and p.get("excerpt") == EXCERPT:
+    saved = runner.guarded_write(mutate)
+    for attempt in range(20):
+        if saved.get("body") == body:
             break
         time.sleep(2)
-    else:
-        raise RuntimeError("LISA live revision did not propagate")
-
-    for key, old in preserved.items():
-        if p.get(key) != old:
-            raise RuntimeError(f"protected field changed: {key}")
-    print("PRESERVED", {k: True for k in preserved})
-
-    media = {
-        "apple": len(re.findall(r"(?im)^\s*\[apple:", body)),
-        "youtube": len(re.findall(r"(?im)^\s*\[youtube:", body)),
-        "tickets": len(re.findall(r"(?im)^\s*\[tickets:", body)),
-    }
-    print("MEDIA_COUNTS", media)
-    if media != {"apple": 1, "youtube": 1, "tickets": 1}:
-        raise RuntimeError(f"unexpected media counts: {media}")
+        saved = runner.find_post(fresh_read()["posts"], POST_ID)
+    if saved.get("body") != body:
+        raise RuntimeError("Saved body differs from reviewed body")
+    if {k: v for k, v in saved.items() if k != "body"} != protected:
+        raise RuntimeError("Protected fields changed on save")
 
     for pass_no in (1, 2, 3):
-        ok = False
-        lines = []
-        for gate_attempt in range(8):
-            ok, lines = runner.run_gate(POST_ID, quiet=False)
-            print("GATE_PASS", pass_no, "ATTEMPT", gate_attempt + 1, "PASS" if ok else "FAIL")
-            for line in lines:
-                if "PASS" in line or "FAIL" in line or line.lstrip().startswith(("X ", "! ")):
-                    print(line)
-            if ok:
-                break
-            time.sleep(3)
+        ok, lines = runner.run_gate(POST_ID, quiet=False)
+        print("POSTWRITE_GATE_PASS", pass_no, "PASS" if ok else "FAIL")
+        for line in lines:
+            if "PASS" in line or "FAIL" in line or line.lstrip().startswith(("X ", "! ")):
+                print(line)
         if not ok:
-            raise RuntimeError(f"gate failed on pass {pass_no}")
+            raise RuntimeError("Live post failed the gate")
 
     live = None
     for attempt in range(20):
         public = runner.http(runner.DESK_API + "?nocache=" + str(time.time_ns()))["posts"]
-        live = next((x for x in public if str(x.get("id")) == POST_ID), None)
-        if live and (live.get("status") or "live") == "live" and live.get("body") == body:
+        live = next((x for x in public if x.get("id") == POST_ID), None)
+        if live and live.get("body") == body:
             break
         time.sleep(2)
     else:
-        raise RuntimeError("public LISA body did not refresh to the revised version")
+        raise RuntimeError("Public post has not updated")
+    if {k: v for k, v in live.items() if k != "body"} != protected:
+        raise RuntimeError("Public protected fields changed")
+    print("WORDS", len(gate.prose_of(current["body"]).split()), "->", len(gate.prose_of(body).split()))
+    print("LAYOUT_PRESERVED", len(gate.paragraphs(body)), media_layout(body))
+    print("ALL_NON_BODY_FIELDS_PRESERVED", True)
+    print("DONE_COSMETIC_LIVE_REVIEW", POST_ID)
 
-    print("FINAL_STATUS", live.get("status"), live.get("publishAt"), live.get("date"))
-    print("FINAL_COVER", (live.get("cover") or {}).get("src"), (live.get("cover") or {}).get("credit"))
-    print("FINAL_IMAX_LINE", "It will play in cinemas worldwide, with some screenings in IMAX, before streaming globally on YouTube Premium.")
-    print("DONE_LIVE_REVISION")
 
 if __name__ == "__main__":
     main()
