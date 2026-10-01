@@ -21,7 +21,7 @@ The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.
 
 [apple:song:6807119565:6807119568]
 
-The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, with its video filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA then gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. Caesars says the Best Pop award was another first for a K-pop artist.
+The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, with its video filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA then gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. Caesars says the win made LISA the first K-pop artist to take the category.
 
 [youtube:FMX98ROVRCE]
 
