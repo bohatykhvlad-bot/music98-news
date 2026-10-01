@@ -7,20 +7,7 @@ import post as runner
 import gate
 
 POST_ID="auleon930r1"
-EXPECTED_BODY=r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. Released September 25 through Warner Records, it comes from the *FROM ZERO* album-release concert at Allianz Parque in São Paulo, Brazil. The same show provides most of the live footage in *UNSHATTER*, which moves between the concert, studio sessions and interviews. The soundtrack takes a different approach, staying with the performance rather than following the film's broader narrative.
-
-The São Paulo set moves back and forth between *FROM ZERO* and earlier LINKIN PARK material. "The Emptiness Machine," "Heavy Is the Crown" and other songs from the new record are heard alongside "Somewhere I Belong," "Numb," "In the End" and "Faint." "Faint" was released ahead of the soundtrack with an official live video from the same night, showing Emily Armstrong and the current lineup performing one of the band's long-standing live staples before the full album arrived.
-
-[youtube:zNYsw-cW8v8]
-
-Several performances omitted from *UNSHATTER* are preserved on the soundtrack, giving listeners a fuller record of the show. Armstrong and drummer Colin Brittain are also heard on songs recorded long before they joined, so the album is not limited to material written for *FROM ZERO*.
-
-*UNSHATTER* begins with private studio sessions from 2022 and follows the band through the writing and release of *FROM ZERO* and the return to live shows. Rare archive footage, sold-out performances and interviews with the band and fans cover the years after LINKIN PARK's seven-year hiatus. The film also documents the arrival of Armstrong on vocals and Brittain on drums, tracing how the lineup took shape as the band returned to the stage.
-
-Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. Its live centerpiece is the São Paulo concert held on the day *FROM ZERO* was released. The documentary reaches that night after tracing the studio sessions and the band's return, making the concert the endpoint of the story rather than the whole film.
-
-The physical editions use slightly different track lists. The 20-track CD includes 16 complete performances plus four short intro or interlude pieces, while the two-LP edition contains only the 16 full songs. Packaging differs too. The disc comes in a gatefold softpak with a 12-panel accordion booklet, and the vinyl editions use gatefold jackets with a 12-by-24-inch insert. Both formats were released September 25 alongside the digital soundtrack.'''
-BODY=r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. The album arrived September 25 through Warner Records and comes from the *FROM ZERO* album-release concert at Allianz Parque in São Paulo, Brazil. The same show provides most of the live footage in *UNSHATTER*, which moves between the concert, studio sessions and interviews. The soundtrack takes a different approach, staying with the performance rather than following the film's broader narrative.
+EXPECTED_BODY=r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. The album arrived September 25 through Warner Records and comes from the *FROM ZERO* album-release concert at Allianz Parque in São Paulo, Brazil. The same show provides most of the live footage in *UNSHATTER*, which moves between the concert, studio sessions and interviews. The soundtrack takes a different approach, staying with the performance rather than following the film's broader narrative.
 
 The São Paulo set moves back and forth between *FROM ZERO* and earlier LINKIN PARK material. "The Emptiness Machine," "Heavy Is the Crown" and other songs from the new record are heard alongside "Somewhere I Belong," "Numb," "In the End" and "Faint." "Faint" was released ahead of the soundtrack with an official video from the same night, showing Emily Armstrong and the current lineup performing one of the band's long-standing staples.
 
@@ -33,6 +20,19 @@ Several performances omitted from *UNSHATTER* are preserved on the soundtrack, g
 Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. Its live centerpiece is the São Paulo concert held on the day *FROM ZERO* was released. The documentary uses that night as the endpoint of the story rather than the whole film.
 
 The physical editions use slightly different track lists. The 20-track CD includes 16 complete performances plus four short intro or interlude pieces, while the two-LP edition contains only the 16 full songs. Packaging differs too. The disc comes in a gatefold softpak with a 12-panel accordion booklet, and the vinyl editions use gatefold jackets with a 12-by-24-inch insert. Both formats were released September 25 alongside the digital soundtrack.'''
+BODY=r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. The album arrived September 25 through Warner Records and comes from the *FROM ZERO* album-release concert at Allianz Parque in São Paulo, Brazil. The same show provides most of the live footage in *UNSHATTER*, which moves between the concert, studio sessions and interviews. The soundtrack takes a different approach, staying with the performance rather than following the film's broader narrative.
+
+The São Paulo set moves back and forth between *FROM ZERO* and earlier LINKIN PARK material. "The Emptiness Machine," "Heavy Is the Crown" and other songs from the new record are heard alongside "Somewhere I Belong," "Numb," "In the End" and "Faint." "Faint" was released ahead of the soundtrack with an official video from the same night, showing Emily Armstrong and the current lineup performing one of the band's long-standing staples.
+
+[youtube:zNYsw-cW8v8]
+
+Several performances omitted from *UNSHATTER* are preserved on the soundtrack, giving listeners a fuller record of the show. Armstrong and drummer Colin Brittain also perform songs that LINKIN PARK originally recorded years before either joined the band, so the album is not limited to material written for *FROM ZERO*.
+
+*UNSHATTER* begins with private studio sessions from 2022 and follows the band through the writing and release of *FROM ZERO*. The film uses rare archive footage, performances from sold-out shows and interviews with the band and fans to cover the years after LINKIN PARK's seven-year hiatus. The film also documents the arrival of Armstrong on vocals and Brittain on drums, tracing how the lineup moved from those early sessions to the stage.
+
+Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. Its live centerpiece is the São Paulo concert held on the day *FROM ZERO* was released. The documentary uses that night as the endpoint of the story rather than the whole film.
+
+The physical editions use slightly different track lists. The 20-track CD includes 16 complete performances plus four short intro or interlude pieces, while the two-LP edition contains only the 16 full songs. The packaging also differs, with a gatefold softpak and 12-panel accordion booklet for the disc and gatefold jackets with a 12-by-24-inch insert for the vinyl editions. Both formats were released September 25 alongside the digital soundtrack.'''
 
 def fresh_read():
     return runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()),runner.desk_key())
