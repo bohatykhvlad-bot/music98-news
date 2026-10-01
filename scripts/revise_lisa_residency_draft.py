@@ -102,7 +102,7 @@ def main():
     second_para = body.split("\n\n")[1]
     apple_pos = body.index("[apple:song:6807119565:6807119568]")
     second_end = body.index(second_para) + len(second_para)
-    third_start = body.index("The Las Vegas dates come just after")
+    third_start = body.index("The Las Vegas dates come after")
     if not (second_end < apple_pos < third_start):
         raise RuntimeError("Apple Music block is not between paragraphs 2 and 3")
 
