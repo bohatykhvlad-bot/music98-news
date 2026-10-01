@@ -7,6 +7,8 @@ import post as runner
 import gate
 
 POST_ID="lisa26vegas"
+EXPECTED_EXCERPT="LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes."
+NEW_EXCERPT="LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes, according to Caesars Entertainment."
 EXPECTED_TEMPLATE=r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
 The residency was announced in March. Tickets for the added dates went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at the 4,300-seat Colosseum inside Caesars Palace.
@@ -57,12 +59,12 @@ def main():
     ticket=ticket_from(current.get("body") or "")
     expected=EXPECTED_TEMPLATE.replace("__TICKET__",ticket)
     body=BODY_TEMPLATE.replace("__TICKET__",ticket)
-    if current.get("status")!="live" or current.get("body")!=expected:
+    if current.get("status")!="live" or current.get("body")!=expected or current.get("excerpt")!=EXPECTED_EXCERPT:
         raise RuntimeError("live LISA changed; refusing overwrite")
-    protected={k:copy.deepcopy(v) for k,v in current.items() if k!="body"}
+    protected={k:copy.deepcopy(v) for k,v in current.items() if k not in {"body","excerpt"}}
     if len(gate.paragraphs(body))!=len(gate.paragraphs(expected)) or media_layout(body)!=media_layout(expected):
         raise RuntimeError("layout changed")
-    candidate=copy.deepcopy(current); candidate["body"]=body
+    candidate=copy.deepcopy(current); candidate["body"]=body; candidate["excerpt"]=NEW_EXCERPT
     gate.CHECK_IDS=True
     fails,warns,info=gate.check_post(candidate,strict=True)
     print("PREWRITE_GATE","FAIL" if fails else "PASS")
@@ -71,14 +73,16 @@ def main():
         print("PREWRITE_FAILURES",json.dumps(fails,ensure_ascii=True)); raise RuntimeError("gate failed")
     def mutate(posts):
         p=runner.find_post(posts,POST_ID)
-        if p.get("body")!=expected or {k:v for k,v in p.items() if k!="body"}!=protected:
+        if p.get("body")!=expected or p.get("excerpt")!=EXPECTED_EXCERPT or {k:v for k,v in p.items() if k not in {"body","excerpt"}}!=protected:
             raise RuntimeError("LISA changed during write")
-        p["body"]=body; return copy.deepcopy(p)
+        p["body"]=body
+        p["excerpt"]=NEW_EXCERPT
+        return copy.deepcopy(p)
     saved=runner.guarded_write(mutate)
     for _ in range(20):
-        if saved.get("body")==body: break
+        if saved.get("body")==body and saved.get("excerpt")==NEW_EXCERPT: break
         time.sleep(2); saved=runner.find_post(fresh_read()["posts"],POST_ID)
-    if saved.get("body")!=body: raise RuntimeError("LISA did not propagate")
+    if saved.get("body")!=body or saved.get("excerpt")!=NEW_EXCERPT: raise RuntimeError("LISA did not propagate")
     for n in (1,2,3):
         ok,lines=runner.run_gate(POST_ID,quiet=False); print("POSTWRITE_GATE_PASS",n,"PASS" if ok else "FAIL")
         if not ok: raise RuntimeError("postwrite failed")
