@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 
 POST_ID = "lisa26vegas"
+# final-reader-pass-v2
 TITLE = "LISA Adds Two Shows After Her Las Vegas Residency Sells Out"
 
 EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes."""
