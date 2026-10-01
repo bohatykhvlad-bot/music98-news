@@ -60,7 +60,11 @@ for page in [
         html=urllib.request.urlopen(req,timeout=60).read().decode("utf-8","ignore")
         urls=sorted(set(re.findall(r"https?://[^\\\"'<> ]+?\\.(?:jpg|jpeg|png|webp)(?:\\?[^\\\"'<> ]*)?",html,re.I)))
         print("PAGE",page)
+        rels=sorted(set(re.findall(r'[^"\\'<> ]+?\\.(?:jpg|jpeg|png|webp)(?:\\?[^"\\'<> ]*)?',html,re.I)))
         for u in urls:
             print("IMGURL",u.replace("&amp;","&"))
+        for u in rels:
+            if "wp-content" in u or "/images/" in u:
+                print("IMGREL",u.replace("&amp;","&"))
     except Exception as e:
         print("PAGEERR",page,repr(e))
