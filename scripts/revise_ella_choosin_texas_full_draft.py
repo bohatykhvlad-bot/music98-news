@@ -8,6 +8,7 @@ import post as runner
 import gate
 import draft_ella_choosin_texas_longread as source
 
+# Full draft revision: copy, media spacing, cover and inline photo.
 POST_ID = source.POST_ID
 TITLE = source.TITLE
 EXPECTED_BODY = source.BODY
