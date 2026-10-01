@@ -2231,7 +2231,7 @@ function refreshDailyTop50(){
   // Always revalidate so an updated chart cannot stay frozen until tomorrow.
   const grab = u => fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
   /* ?d + rev bust both browser and edge copies after chart/cache fixes. */
-  grab("/api/top50?d=" + todayUTC() + "&rev=41").catch(()=> grab("/data/top50.json?rev=40")).then(j=>{
+  grab("/api/top50?d=" + todayUTC() + "&rev=41").catch(()=> grab("/data/top50.json?rev=41")).then(j=>{
     const tracks = (j && j.tracks) || [];
     if(tracks.length < 10) throw 0;
     /* Never poison the same-day browser cache with placeholder artwork.
