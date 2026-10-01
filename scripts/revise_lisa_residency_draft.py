@@ -9,23 +9,6 @@ import gate
 POST_ID="lisa26vegas"
 EXPECTED_TEMPLATE=r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
-The residency was first announced in March with four dates, and the September 29 expansion added one show to each weekend. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace. The added dates keep the run within the same two November weekends, expanding each weekend from two shows to three rather than stretching the residency across a longer period.
-
-[apple:song:6807119565:6807119568]
-
-The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. "SaWaDiKa," released September 4, is the first song from the project. The official tracklist currently shows it followed by five tracks whose titles have not yet been revealed. The song's title comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, with references to Thai culture in the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
-
-LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, the video for "Dream" won Best Pop, making LISA the first K-pop artist to win the category. The video was also nominated for Best K-Pop, while its cinematography and editing received separate nominations.
-
-[youtube:FMX98ROVRCE]
-
-"Dream" first appeared on LISA's debut full-length album, *Alter Ego*, and later received an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a bittersweet story about two people looking back on a relationship they can no longer return to. Written and directed by OJun Kwon, the film moves through quiet, cinematic scenes rather than treating the song as a conventional performance video. It was officially released through LISA's LLOUD channel later that same year, several months after *Alter Ego*.
-
-[tickets:__TICKET__]
-
-LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film follows a year in which her solo work moves to the foreground between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, the growth of LLOUD and preparations for her 2025 Coachella solo set. It also looks at the pressure of building a solo career and a public identity outside the group while keeping the return to BLACKPINK in view. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement. It will then stream globally and exclusively on YouTube Premium later in 2026.'''
-BODY_TEMPLATE=r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
-
 The residency was first announced in March with four dates, and the September 29 expansion added one show to each weekend. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace. The expansion keeps the residency concentrated in the same two November weekends, with all six performances remaining at The Colosseum.
 
 [apple:song:6807119565:6807119568]
@@ -41,6 +24,23 @@ LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk wor
 [tickets:__TICKET__]
 
 LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film follows a year of solo work between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, the development of LLOUD and preparations for her 2025 Coachella solo set. It also follows how that solo work develops alongside plans for LISA's return to BLACKPINK. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement. It will then stream globally and exclusively on YouTube Premium later in 2026.'''
+BODY_TEMPLATE=r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
+
+The residency was first announced in March with four dates, and the September 29 expansion added one show to each weekend. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at the 4,300-seat Colosseum inside Caesars Palace. The theater setting keeps the run on a smaller scale than an arena show while giving LISA six performances in the same room.
+
+[apple:song:6807119565:6807119568]
+
+The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. "SaWaDiKa," released September 4, is the first song from the project. The official tracklist currently shows it followed by five tracks whose titles have not yet been revealed. The song's title comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, with references to Thai culture in the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
+
+LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, "Dream" won Best Pop, making LISA the first K-pop artist to win the category. It was also nominated for Best K-Pop, with separate nominations for cinematography and editing.
+
+[youtube:FMX98ROVRCE]
+
+"Dream" first appeared on LISA's debut full-length album, *Alter Ego*, and later received an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story about a relationship remembered after it has ended. Written and directed by OJun Kwon, the film moves through fragments of that relationship, using memory and absence as its narrative instead of a conventional performance setup. It was released through LISA's LLOUD channel several months after *Alter Ego*.
+
+[tickets:__TICKET__]
+
+LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film covers a year of solo work between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, building LLOUD and preparations for her 2025 Coachella solo set. It also follows how those projects developed while LISA prepared to return to BLACKPINK. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement. It will then stream globally and exclusively on YouTube Premium later in 2026.'''
 
 def fresh_read():
     return runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()), runner.desk_key())
