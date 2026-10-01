@@ -11,19 +11,19 @@ POST_ID = "auleon930r1"
 
 EXCERPT = r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary.'''
 
-BODY = r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. The record arrived September 25 through Warner Records and captures the São Paulo concert at the center of the film.
+BODY = r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. The record arrived September 25 through Warner Records and captures the São Paulo concert that runs through the film. Instead of presenting the movie as a separate project, the soundtrack gives the live performance its own full release and keeps the focus on the band onstage.
 
-The São Paulo set mixes *FROM ZERO* songs with material from across the band's catalog. Recent tracks such as "The Emptiness Machine," "Two Faced" and "Heavy Is the Crown" sit alongside "Numb," "In the End," "Papercut" and other older material. "Faint" was released ahead of the soundtrack with an official live video from the same São Paulo performance.
+The São Paulo set mixes *FROM ZERO* songs with material from across the band's catalog. "The Emptiness Machine," "Two Faced" and "Heavy Is the Crown" appear alongside older staples including "Numb," "In the End" and "Papercut." The live version of "Faint" was released ahead of the soundtrack with an official video from the same performance, giving the album an early look at how the current lineup handles one of the band's best-known songs.
 
 [youtube:zNYsw-cW8v8]
 
-The soundtrack is also more than an audio copy of the documentary. Several live recordings included on the album are not heard in *UNSHATTER*, so the release preserves more of the São Paulo show than the film itself. The result is a fuller version of the concert than viewers hear in the documentary.
+The soundtrack also contains more live material than the documentary itself. Several recordings on the album are not heard in *UNSHATTER*, so listeners get a broader version of the São Paulo show than viewers do in the film. That difference matters because the concert is not just background footage: it documents Emily Armstrong and Colin Brittain performing with the band across both the new material and songs from earlier LINKIN PARK albums.
 
-*UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the band's return to the stage. Archive footage, sold-out performances and interviews with the band and fans are used to trace the years leading up to the comeback, including the arrival of Emily Armstrong on vocals and Colin Brittain on drums after the group's seven-year hiatus.
+*UNSHATTER* follows the group from private studio sessions in 2022 through the making and release of *FROM ZERO* and the return to live shows. The film uses archive footage, sold-out performances and interviews with the band and fans to cover the period after LINKIN PARK's seven-year hiatus. It also shows the transition into the current lineup, with Armstrong on vocals and Brittain on drums as the band begins performing the new record in front of audiences.
 
-Directed by Joe Hahn, the film opened in theaters worldwide on September 30 for a limited run. The São Paulo concert gives the film its main live centerpiece, with the new songs and older catalog performed by the current lineup.
+Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. The São Paulo concert provides the film's main live section, while the studio material and interviews give context to the years that led to it. The result is less a concert film than a documentary built around the band's return, with the soundtrack preserving the performance side in greater detail.
 
-The physical editions use slightly different track lists. The CD has 20 tracks, adding four short pieces between the 16 full performances, while the two-LP edition carries the 16 complete songs without those interludes. The CD comes with a 12-panel accordion booklet, and the vinyl edition includes a 12-by-24-inch insert.'''
+The physical editions use slightly different track lists. The CD has 20 tracks, with four short pieces placed between the 16 full performances. The two-LP edition keeps the 16 complete songs and leaves those interludes out. The CD comes in a gatefold softpak with a 12-panel accordion booklet, while the vinyl edition is housed in a gatefold jacket with a 12-by-24-inch insert.'''
 
 AI_STYLE_FLAGS = ("marks a new chapter","comes at a time","not only","rather than simply","serves as a","underscores","showcases","official store says","the band's official store says")
 
