@@ -1,47 +1,77 @@
 #!/usr/bin/env python3
-"""Apply the owner's cosmetic proofreading corrections to the existing live LISA post.
+"""Final cosmetic proofread of the existing live LISA post.
 
-Executed by the existing music98 editorial runner. Authentication stays in its
-pre-existing GitHub Actions secret. This script never extracts or prints a key.
+Preserves the owner's media order, song card, ticket CTA, cover/crop, pin and
+publication slot. Only the reviewed body copy changes.
 """
 from __future__ import annotations
 import copy
-import hashlib
 import json
+import re
 import sys
 import time
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 import gate
 
 POST_ID = "lisa26vegas"
-EXPECTED_BODY_SHA256 = "fd34dd9609942c5d64ed9763188beabc7e4ccda378d2f84e5a4c84639361b57c"
-REPLACEMENTS = [['The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.', 'The two additional dates were announced September 29, following the sellout of the original four shows.'], ['*SaWaDiKa*', '"SaWaDiKa"'], ['Its name comes from the Thai greeting', "The song's title comes from the Thai greeting"], ['moving through locations around the city with Thai references woven into the sets, styling and choreography.', 'with references to Thai culture in the sets, styling and choreography.'], ['At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop.', 'At the same ceremony, the video for "Dream" won Best Pop.'], ['*Dream* was released as an official short film from *Alter Ego*.', 'The official short film for "Dream" was released after the song appeared on LISA\'s debut full-length album, *Alter Ego*.'], ['in a story centered on a past relationship and the memories that remain after it ends.', 'in a story about love, loss and the memories of a relationship.'], ['The film gives the song a narrative treatment rather than presenting it as a performance video, with LISA and Sakaguchi carrying the story on screen.', "The short film was directed by Ojun Kwon and released on LISA's LLOUD channel, with Sakaguchi playing her love interest."], ['The film follows a year in which LISA stepped away from BLACKPINK, focused on her solo career, moved into acting and built her own brand before returning to the group.', 'The film follows a year of solo work between BLACKPINK commitments, as LISA records her debut album, moves into acting and builds her own brand while preparing to return to the group.'], ['It opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later.', 'It opens for a limited run in cinemas worldwide on October 12, including IMAX screenings. A global streaming release on YouTube Premium will follow.'], ['"SaWaDiKa", released September 4', '"SaWaDiKa," released September 4']]
+EXPECTED_TEMPLATE = r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
+The two additional dates were announced September 29, following the sellout of the original four shows. Tickets for the two added shows went on sale September 30 through Ticketmaster, while the four dates announced in March remain unchanged. VIVA LA LISA is the first Las Vegas residency by a K-pop artist. All six performances will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace.
+
+[apple:song:6807119565:6807119568]
+
+The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. "SaWaDiKa," released September 4, is the first song from the project. The official tracklist currently shows it followed by five tracks whose titles have not yet been revealed. The song's title comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, with references to Thai culture in the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
+
+LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, the video for "Dream" won Best Pop. The video was also nominated for Best K-Pop, while its cinematography and editing received separate nominations.
+
+[youtube:FMX98ROVRCE]
+
+The official short film for "Dream" was released after the song appeared on LISA's debut full-length album, *Alter Ego*. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story about love, loss and the memories of a relationship. The short film was directed by Ojun Kwon and released on LISA's LLOUD channel, with Sakaguchi playing her love interest.
+
+[tickets:__TICKET__]
+
+LISA's fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows a year of solo work between BLACKPINK commitments, as LISA records her debut album, moves into acting and builds her own brand while preparing to return to the group. It opens for a limited run in cinemas worldwide on October 12, including IMAX screenings. A global streaming release on YouTube Premium will follow.'''
+BODY_TEMPLATE = r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
+
+The residency was first announced in March with four dates, and the September 29 expansion added one show to each weekend. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace.
+
+[apple:song:6807119565:6807119568]
+
+The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. "SaWaDiKa," released September 4, is the first song from the project. The official tracklist currently shows it followed by five tracks whose titles have not yet been revealed. The song's title comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, with references to Thai culture in the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
+
+LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, the video for "Dream" won Best Pop. The video was also nominated for Best K-Pop, while its cinematography and editing received separate nominations.
+
+[youtube:FMX98ROVRCE]
+
+"Dream" first appeared on LISA's debut full-length album, *Alter Ego*, and later received an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story about love, loss and the memories of a relationship. The short film was directed by Ojun Kwon and released on LISA's LLOUD channel, with Sakaguchi playing her love interest.
+
+[tickets:__TICKET__]
+
+LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film follows a year of solo work between BLACKPINK commitments, including recording and releasing *Alter Ego*, making her acting debut in *The White Lotus* and preparing for her 2025 Coachella solo set. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement. It will then stream globally and exclusively on YouTube Premium later in 2026.'''
+
+AI_STYLE_FLAGS = (
+    "marks a new chapter","comes at a time","not only","rather than simply",
+    "serves as a","underscores","showcases","the announcement lands",
+    "in a move that","signals a","cementing","further solidifies",
+    "setting the stage","against the backdrop","in the wake of",
+    "at a time when","a testament to","pivotal year","beyond the residency",
+    "according to caesars","caesars says","press materials say"
+)
 
 def fresh_read():
     return runner.http(runner.DESK_API + "?nocache=" + str(time.time_ns()), runner.desk_key())
 
+def ticket_from(body):
+    m = re.search(r"(?im)^\s*\[tickets:(https?://[^\]]+)\]\s*$", body or "")
+    if not m:
+        raise RuntimeError("Existing LISA ticket CTA not found")
+    return m.group(1)
 
 def media_layout(body):
     return [(i, q) for i, q in enumerate(gate.paragraphs(body)) if gate.is_media(q)]
-
-
-def edited_body(body):
-    if hashlib.sha256(body.encode("utf-8")).hexdigest() != EXPECTED_BODY_SHA256:
-        raise RuntimeError("Live text changed after review; refusing to overwrite it")
-    original = body
-    for old, new in REPLACEMENTS:
-        if old not in body:
-            raise RuntimeError("Reviewed fragment missing")
-        body = body.replace(old, new)
-    if len(gate.paragraphs(body)) != len(gate.paragraphs(original)):
-        raise RuntimeError("Paragraph structure changed")
-    if media_layout(body) != media_layout(original):
-        raise RuntimeError("Media or its position changed")
-    return body
-
 
 def main():
     runner.load_env()
@@ -50,50 +80,60 @@ def main():
     before = fresh_read()
     current = runner.find_post(before["posts"], POST_ID)
     if current.get("status") != "live":
-        raise RuntimeError("Target is not live")
-    body = edited_body(current.get("body") or "")
+        raise RuntimeError("LISA target is not live")
+
+    ticket = ticket_from(current.get("body") or "")
+    expected = EXPECTED_TEMPLATE.replace("__TICKET__", ticket)
+    body = BODY_TEMPLATE.replace("__TICKET__", ticket)
+    if current.get("body") != expected:
+        raise RuntimeError("Live LISA copy changed after review; refusing to overwrite it")
+
+    protected = {k: copy.deepcopy(v) for k, v in current.items() if k != "body"}
     candidate = copy.deepcopy(current)
     candidate["body"] = body
-    protected = {k: copy.deepcopy(v) for k, v in current.items() if k != "body"}
 
-    # Existing deterministic gate, on the exact proposed text, BEFORE any write.
+    bad = [x for x in AI_STYLE_FLAGS if x in body.lower()]
+    print("AI_STYLE_SCAN", bad)
+    if bad:
+        raise RuntimeError(f"AI-style phrase(s) remain: {bad}")
+
+    if len(gate.paragraphs(body)) != len(gate.paragraphs(expected)):
+        raise RuntimeError("LISA paragraph structure changed")
+    if media_layout(body) != media_layout(expected):
+        raise RuntimeError("LISA media or media position changed")
+    if len(gate.prose_of(body).split()) < len(gate.prose_of(expected).split()):
+        raise RuntimeError("LISA proofread unexpectedly reduced prose volume")
+
     gate.CHECK_IDS = True
     fails, warns, info = gate.check_post(candidate, strict=True)
     print("PREWRITE_GATE", "FAIL" if fails else "PASS")
     print("PREWRITE_WARNINGS", json.dumps(warns, ensure_ascii=True))
-    for code, message in info:
-        if code in {"youtube", "apple", "cover", "cover-image", "length", "state"}:
-            print("CHECK", code, message)
     if fails:
         print("PREWRITE_FAILURES", json.dumps(fails, ensure_ascii=True))
-        raise RuntimeError("Candidate failed the editorial gate")
-    if len(gate.prose_of(body).split()) < len(gate.prose_of(current["body"]).split()):
-        raise RuntimeError("Cosmetic review must not reduce prose volume")
-
-    backup_dir = Path(".editorial-backups")
-    backup_dir.mkdir(exist_ok=True)
-    (backup_dir / (POST_ID + "-" + str(time.time_ns()) + ".json")).write_text(
-        json.dumps(before, ensure_ascii=True), encoding="ascii")
+        raise RuntimeError("LISA candidate failed editorial gate")
 
     def mutate(posts):
         p = runner.find_post(posts, POST_ID)
         if p.get("status") != "live":
-            raise RuntimeError("Publication state changed")
+            raise RuntimeError("LISA publication state changed")
+        live_ticket = ticket_from(p.get("body") or "")
+        if live_ticket != ticket or p.get("body") != expected:
+            raise RuntimeError("LISA live body changed during guarded write")
         if {k: v for k, v in p.items() if k != "body"} != protected:
-            raise RuntimeError("Protected fields changed after review")
-        p["body"] = edited_body(p.get("body") or "")
+            raise RuntimeError("Protected LISA fields changed")
+        p["body"] = body
         return copy.deepcopy(p)
 
     saved = runner.guarded_write(mutate)
-    for attempt in range(20):
+    for _ in range(20):
         if saved.get("body") == body:
             break
         time.sleep(2)
         saved = runner.find_post(fresh_read()["posts"], POST_ID)
     if saved.get("body") != body:
-        raise RuntimeError("Saved body differs from reviewed body")
+        raise RuntimeError("LISA revision did not propagate")
     if {k: v for k, v in saved.items() if k != "body"} != protected:
-        raise RuntimeError("Protected fields changed on save")
+        raise RuntimeError("Protected LISA fields changed on save")
 
     for pass_no in (1, 2, 3):
         ok, lines = runner.run_gate(POST_ID, quiet=False)
@@ -102,24 +142,16 @@ def main():
             if "PASS" in line or "FAIL" in line or line.lstrip().startswith(("X ", "! ")):
                 print(line)
         if not ok:
-            raise RuntimeError("Live post failed the gate")
+            raise RuntimeError("Live LISA post failed gate")
 
-    live = None
-    for attempt in range(20):
-        public = runner.http(runner.DESK_API + "?nocache=" + str(time.time_ns()))["posts"]
-        live = next((x for x in public if x.get("id") == POST_ID), None)
-        if live and live.get("body") == body:
-            break
-        time.sleep(2)
-    else:
-        raise RuntimeError("Public post has not updated")
+    runner.cmd_verify(POST_ID)
+    live = runner.find_post(fresh_read()["posts"], POST_ID)
     if {k: v for k, v in live.items() if k != "body"} != protected:
-        raise RuntimeError("Public protected fields changed")
-    print("WORDS", len(gate.prose_of(current["body"]).split()), "->", len(gate.prose_of(body).split()))
+        raise RuntimeError("Public LISA protected fields changed")
+    print("WORDS", len(gate.prose_of(expected).split()), "->", len(gate.prose_of(body).split()))
     print("LAYOUT_PRESERVED", len(gate.paragraphs(body)), media_layout(body))
-    print("ALL_NON_BODY_FIELDS_PRESERVED", True)
-    print("DONE_COSMETIC_LIVE_REVIEW", POST_ID)
-
+    print("IMAX_WORDING", "in IMAX and cinemas worldwide")
+    print("DONE_LISA_REVIEW")
 
 if __name__ == "__main__":
     main()
