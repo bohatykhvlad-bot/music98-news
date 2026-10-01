@@ -21,7 +21,7 @@ The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.
 
 [apple:song:6807119565:6807119568]
 
-The Las Vegas shows follow the release of *PRESS PLAY*, LISA's new EP, out October 23. *SaWaDiKa* was the first song released from the project, with a video filmed around Bangkok. LISA performed it at the 2026 MTV Video Music Awards, where *Dream feat. Kentaro Sakaguchi* won Best Pop. She became the first K-pop artist to win Best Pop.
+The Las Vegas shows follow the release of *PRESS PLAY*, LISA's new EP, out October 23. *SaWaDiKa* was the first song released from the project, with a video filmed around Bangkok that drew 70.8 million views in its first 24 hours. LISA performed it at the 2026 MTV Video Music Awards, where *Dream feat. Kentaro Sakaguchi* won Best Pop. She became the first K-pop artist to win Best Pop.
 
 [youtube:FMX98ROVRCE]
 
