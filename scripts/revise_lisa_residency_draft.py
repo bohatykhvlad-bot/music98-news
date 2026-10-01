@@ -23,14 +23,14 @@ LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk wor
 
 [tickets:__TICKET__]
 
-LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film covers a year of solo work between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, building LLOUD and preparations for her 2025 Coachella solo set. It also places those projects alongside LISA's preparations to return to BLACKPINK. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement. It will then stream globally and exclusively on YouTube Premium later in 2026.'''
+LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film covers a year of solo work between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, building LLOUD and preparations for her 2025 Coachella solo set. It also places those projects alongside LISA's preparations to return to BLACKPINK. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement before streaming globally and exclusively on YouTube Premium later in 2026.'''
 BODY_TEMPLATE=r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
 The residency was first announced in March. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at the 4,300-seat Colosseum inside Caesars Palace.
 
 [apple:song:6807119565:6807119568]
 
-The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. "SaWaDiKa," released September 4, is the first song from the project. The official tracklist currently shows it followed by five tracks whose titles have not yet been revealed. The song's title comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, with references to Thai culture in the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
+The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. "SaWaDiKa," released September 4, is the first song from the project. The official tracklist currently shows it followed by five tracks whose titles have not yet been revealed. The song's title comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, with references to Thai culture in the sets, styling and choreography. It drew 70.8 million views in its first 24 hours.
 
 LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, "Dream" won Best Pop, making LISA the first K-pop artist to win the category. It was also nominated for Best K-Pop, with separate nominations for cinematography and editing.
 
@@ -40,7 +40,7 @@ LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk wor
 
 [tickets:__TICKET__]
 
-LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film covers a year of solo work between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, building LLOUD and preparations for her 2025 Coachella solo set. It also places those projects alongside LISA's preparations to return to BLACKPINK. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement before streaming globally and exclusively on YouTube Premium later in 2026.'''
+LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film covers a year of solo work between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, the development of LLOUD and her 2025 Coachella solo set. It also places those projects alongside LISA's eventual return to BLACKPINK. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement before streaming globally and exclusively on YouTube Premium later in 2026.'''
 
 def fresh_read():
     return runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()), runner.desk_key())
