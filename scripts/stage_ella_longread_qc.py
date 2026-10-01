@@ -13,6 +13,9 @@ CANDIDATES=[
     ("sony-dandelion-10","https://cdn-p.smehost.net/sites/a6700d2fbaf642099802a57af8b10fe6/wp-content/uploads/2026/04/download-10.png"),
     ("sony-dandelion-11","https://cdn-p.smehost.net/sites/a6700d2fbaf642099802a57af8b10fe6/wp-content/uploads/2026/04/download-11.png"),
     ("sony-press","https://cdn-p.smehost.net/sites/a6700d2fbaf642099802a57af8b10fe6/wp-content/uploads/2025/06/EL3.png"),
+    ("sony-press-landscape","https://cdn-p.smehost.net/sites/a6700d2fbaf642099802a57af8b10fe6/wp-content/uploads/2025/06/Ella-Langley.png"),
+    ("sony-press-el2","https://cdn-p.smehost.net/sites/a6700d2fbaf642099802a57af8b10fe6/wp-content/uploads/2025/06/EL2.jpg"),
+    ("sony-dandelion-9","https://cdn-p.smehost.net/sites/a6700d2fbaf642099802a57af8b10fe6/wp-content/uploads/2026/04/download-9.png"),
     ("you-look-like-video","https://i.ytimg.com/vi/Dm2TSMerGPQ/maxresdefault.jpg"),
     ("werent-for-wind-video","https://i.ytimg.com/vi/U4NPZi2b0aQ/maxresdefault.jpg"),
 ]
