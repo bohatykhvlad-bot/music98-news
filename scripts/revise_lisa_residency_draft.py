@@ -17,11 +17,11 @@ EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace t
 
 BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new shows on November 12 and 29 open the first weekend a day earlier and close the second a day later, turning both weekends into three-night runs.
 
-The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added shows began September 30 through Ticketmaster, while the four dates announced in March remain unchanged. Caesars Entertainment says VIVA LA LISA is the first Las Vegas residency by a K-pop artist. The Colosseum seats 4,300 and will host all six shows.
+The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added shows began September 30 through Ticketmaster, while the four dates announced in March remain unchanged. VIVA LA LISA is the first Las Vegas residency by a K-pop artist. The Colosseum seats 4,300 and will host all six shows.
 
 [apple:song:6807119565:6807119568]
 
-The residency follows *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, and its video was filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop.
+The residency follows *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, and its video was filmed around Bangkok. The video drew 70.8 million views in its first 24 hours. LISA gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop.
 
 [youtube:FMX98ROVRCE]
 
@@ -51,6 +51,9 @@ AI_STYLE_FLAGS = (
     "a testament to",
     "pivotal year",
     "beyond the residency",
+    "caesars says",
+    "caesars reports",
+    "according to caesars",
 )
 
 def style_scan(text: str):
