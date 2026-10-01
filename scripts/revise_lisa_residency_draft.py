@@ -16,19 +16,19 @@ EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace t
 
 BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes. The residency now opens a day earlier than first announced and closes a day later, turning each of the two Las Vegas weekends into a three-night run.
 
-The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added performances began September 30 through Ticketmaster, while the four dates announced in March remain in place. Caesars Entertainment says the run makes LISA the first K-pop artist to hold a Las Vegas residency. The Colosseum is a 4,300-seat theater inside Caesars Palace, and the two added dates extend each of the original weekends by one night without changing venues.
+The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added performances began September 30 through Ticketmaster, while the four dates announced in March remain in place. Caesars Entertainment bills VIVA LA LISA as the first Las Vegas residency by a K-pop artist. The Colosseum is a 4,300-seat theater inside Caesars Palace, and the two added dates extend each of the original weekends by one night without changing venues.
 
 [apple:song:6807119565:6807119568]
 
-The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, with its video filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA then gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. Caesars says the award made LISA the first K-pop artist to win the category.
+The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, with its video filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA then gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. Caesars says the Best Pop award was another first for a K-pop artist.
 
 [youtube:FMX98ROVRCE]
 
-*Dream* was released in August 2025 as an official short film from *Alter Ego*. LISA stars opposite Kentaro Sakaguchi in a story built around a past relationship and the memories that remain after it ends. MTV also nominated the film for Best Cinematography and Best Editing. Its Best Pop win came 26 days before *PRESS PLAY* and 46 days before the first Las Vegas show.
+*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Kentaro Sakaguchi in a story built around a past relationship and the memories that remain after it ends. MTV also nominated the film for Best Cinematography and Best Editing. Its Best Pop win came 26 days before *PRESS PLAY* and 46 days before the first Las Vegas show.
 
 [tickets:__TICKET__]
 
-Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows the year LISA stepped away from BLACKPINK, pursued her solo career, moved into acting and built her own company before returning to the group. It opens in cinemas worldwide on October 12, with some screenings in IMAX, and will stream globally on YouTube Premium later this year."""
+Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows the year LISA stepped away from BLACKPINK, pursued her solo career, moved into acting and built her own company before returning to the group. It opens in cinemas worldwide on October 12, with some screenings in IMAX, before moving to YouTube Premium."""
 
 AI_STYLE_FLAGS = (
     "marks a new chapter",
