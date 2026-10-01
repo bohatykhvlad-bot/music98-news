@@ -19,11 +19,11 @@ The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.
 
 [apple:song:6807119565:6807119568]
 
-The Las Vegas dates come just after *PRESS PLAY*, LISA's new EP, due October 23 through LLOUD Co. and RCA Records. "SaWaDiKa" is the first single. Thom Bridges and Ojivolta produced the track, while Bang Jae Yeob directed the video, filmed around Bangkok. Caesars says the video drew 70.8 million views in its first 24 hours.
+The Las Vegas dates come after *PRESS PLAY*, LISA's new EP, due October 23 through LLOUD Co. and RCA Records. "SaWaDiKa" is the first single. Thom Bridges and Ojivolta produced the track, while Bang Jae Yeob directed the video, filmed around Bangkok. Caesars says the video drew 70.8 million views in its first 24 hours.
 
 [youtube:FMX98ROVRCE]
 
-LISA first performed "SaWaDiKa" on television at the 2026 MTV Video Music Awards, where "Dream feat. Kentaro Sakaguchi" won Best Pop. By the time the Las Vegas run begins, *PRESS PLAY* will have been out for almost three weeks.
+LISA first performed *SaWaDiKa* on television at the 2026 MTV Video Music Awards. Her video *Dream feat. Kentaro Sakaguchi* won Best Pop at the same ceremony. By the time the Las Vegas run begins, *PRESS PLAY* will have been out for almost three weeks, putting the residency close to the EP's release.
 
 [tickets:__TICKET__]
 
@@ -82,6 +82,14 @@ def main():
     if not m:
         raise RuntimeError("existing affiliate ticket CTA not found")
     ticket = m.group(1)
+    from urllib.parse import urlparse, parse_qs
+    parsed_ticket = urlparse(ticket)
+    q = parse_qs(parsed_ticket.query)
+    print("TICKET_HOST", parsed_ticket.netloc)
+    for key in ("u", "url", "destination", "dest"):
+        if q.get(key):
+            print("TICKET_DESTINATION", q[key][0])
+            break
     body = BODY_TEMPLATE.replace("__TICKET__", ticket)
 
     bad = style_scan(body)
