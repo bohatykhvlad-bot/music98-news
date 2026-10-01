@@ -25,7 +25,7 @@ The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *S
 
 [youtube:FMX98ROVRCE]
 
-*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Kentaro Sakaguchi in a story built around a past relationship and the memories that remain after it ends. MTV also nominated the film for Best Cinematography and Best Editing. Its Best Pop win came 26 days before *PRESS PLAY* and 46 days before the first Las Vegas show.
+*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Kentaro Sakaguchi in a story about a past relationship and the memories left behind. MTV also nominated the film for Best Cinematography and Best Editing. Its Best Pop win at the VMAs gave the *Alter Ego* chapter one more major moment before LISA moved on to *PRESS PLAY* and the Las Vegas residency.
 
 [tickets:__TICKET__]
 
