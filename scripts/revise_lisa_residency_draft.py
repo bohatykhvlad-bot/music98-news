@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import post as runner
 
 POST_ID = "lisa26vegas"
+TITLE = "LISA Adds Two Shows After Her Las Vegas Residency Sells Out"
 
 EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes."""
 
@@ -19,7 +20,7 @@ The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.
 
 [apple:song:6807119565:6807119568]
 
-The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* opened the rollout, with its video filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA then gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop, making LISA the first K-pop artist to win the category, according to Caesars.
+The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, with its video filmed around Bangkok. Caesars says it drew 70.8 million views in its first 24 hours. LISA then gave the song its first televised performance at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. Caesars says the award made LISA the first K-pop artist to win the category.
 
 [youtube:FMX98ROVRCE]
 
@@ -27,7 +28,7 @@ The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *S
 
 [tickets:__TICKET__]
 
-Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. Sony Music Vision says the film follows LISA through a year of solo work, acting and building her own company before returning to BLACKPINK. It will play in cinemas worldwide, with some screenings in IMAX, before streaming globally on YouTube Premium."""
+Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows the year LISA stepped away from BLACKPINK, pursued her solo career, moved into acting and built her own company before returning to the group. It opens in cinemas worldwide on October 12, with some screenings in IMAX, and will stream globally on YouTube Premium later this year."""
 
 AI_STYLE_FLAGS = (
     "marks a new chapter",
@@ -75,7 +76,6 @@ def main():
         "publishAt": current.get("publishAt"),
         "date": current.get("date"),
         "cover": copy.deepcopy(current.get("cover")),
-        "title": current.get("title"),
     }
 
     m = re.search(r"(?im)^\s*\[tickets:(https?://[^\]]+)\]\s*$", str(current.get("body") or ""))
@@ -110,9 +110,10 @@ def main():
         p = runner.find_post(posts, POST_ID)
         if (p.get("status") or "live") != "live":
             raise RuntimeError("LISA status changed during guarded write")
+        p["title"] = TITLE
         p["excerpt"] = EXCERPT
         p["body"] = body
-        # Deliberately do not touch title, cover, date, publishAt or status.
+        # Deliberately do not touch cover, date, publishAt or status.
         return copy.deepcopy(p)
 
     runner.guarded_write(mutate)
