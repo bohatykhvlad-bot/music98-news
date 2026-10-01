@@ -63,6 +63,9 @@ jobs:
       - name: Revise Ella Choosin Texas full draft
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[revise-ella-longread-full]') }}
         run: python scripts/revise_ella_choosin_texas_full_draft.py
+      - name: Polish Ella Choosin Texas draft
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[polish-ella-longread-final]') }}
+        run: python scripts/polish_ella_choosin_texas_draft.py
       - name: Stage Ella longread visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-longread-qc]') }}
         run: |
