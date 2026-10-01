@@ -15,9 +15,9 @@ TITLE = "LISA Adds Two Las Vegas Shows After First Four Dates Sell Out"
 
 EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes."""
 
-BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows, adding November 12 and 29 after the original four dates sold out in under 10 minutes. The residency now opens a day earlier than first announced and closes a day later, turning both Las Vegas weekends into three-night runs.
+BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new shows on November 12 and 29 open the first weekend a day earlier and close the second a day later, turning both weekends into three-night runs.
 
-The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added shows began September 30 through Ticketmaster, while the four dates announced in March remain unchanged. Caesars Entertainment says VIVA LA LISA is the first Las Vegas residency by a K-pop artist. All six shows will take place at the 4,300-seat Colosseum at Caesars Palace.
+The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added shows began September 30 through Ticketmaster, while the four dates announced in March remain unchanged. Caesars Entertainment says VIVA LA LISA is the first Las Vegas residency by a K-pop artist. The Colosseum seats 4,300 and will host all six shows.
 
 [apple:song:6807119565:6807119568]
 
@@ -25,7 +25,7 @@ The residency follows *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* wa
 
 [youtube:FMX98ROVRCE]
 
-*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story that looks back on a relationship after it has ended. At the VMAs, the video was also nominated for Best K-Pop, Best Cinematography and Best Editing.
+*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story about memories of a past relationship. MTV also nominated the video for Best K-Pop, while its cinematography and editing received separate nominations.
 
 [tickets:__TICKET__]
 
