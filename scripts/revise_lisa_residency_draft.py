@@ -29,7 +29,7 @@ The residency arrives soon after *PRESS PLAY*, LISA's new EP, due October 23. *S
 
 [tickets:__TICKET__]
 
-Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows the year LISA stepped away from BLACKPINK, pursued her solo career, moved into acting and built her own company before returning to the group. It opens in cinemas worldwide on October 12, with some screenings in IMAX, before moving to YouTube Premium."""
+Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows the year LISA stepped away from BLACKPINK, pursued her solo career, moved into acting and built her own company before returning to the group. It opens in cinemas worldwide on October 12, including IMAX, before moving to YouTube Premium."""
 
 AI_STYLE_FLAGS = (
     "marks a new chapter",
