@@ -45,9 +45,9 @@ test("Subscribe press cannot resize the email row",()=>{
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.sub-in \.btn\{flex:0 0 126px;width:126px;min-width:126px/);
 });
 
-test("footer social icons stay in one row",()=>{
+test("footer social icons stay in one row and desktop columns stay balanced",()=>{
   assert.match(page,/\.social \.icons\{display:grid;grid-template-columns:repeat\(4,42px\);gap:10px;width:198px/);
-  assert.match(page,/grid-template-columns:minmax\(320px,1fr\) 150px 180px 198px/);
+  assert.match(page,/@media \(min-width:901px\)[\s\S]*?grid-template-columns:minmax\(280px,340px\) minmax\(48px,1fr\) 140px 36px 160px minmax\(48px,1fr\) 198px/);
 });
 
 test("mobile footer uses the free second column and social glyphs are optically centered",()=>{
