@@ -14,7 +14,7 @@ on:
   push:
     paths:
       - "functions/api/top50.js"
-      - "scripts/snapshot-live-chart.mjs"
+      - "scripts/snapshot-live-chart.mjs"\n      - "scripts/audit-live-chart.mjs"
       - ".github/workflows/apple-data.yml"
       - "functions/lib/chart-identity.js"
       - "functions/lib/artwork-resolver.js"
