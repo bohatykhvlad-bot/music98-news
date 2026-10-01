@@ -19,14 +19,14 @@ Several performances omitted from *UNSHATTER* are preserved on the soundtrack, w
 
 Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. Its live centerpiece is the São Paulo concert held on the day *FROM ZERO* was released. The film builds toward that night rather than treating the concert as its entire subject.
 
-The CD comes in a gatefold softpak with a 12-panel accordion booklet, while the two-LP edition uses a gatefold jacket with a 12-by-24-inch insert. Both formats were released September 25 alongside the digital soundtrack.'''
+The CD comes in a gatefold softpak with a 12-panel accordion booklet, while the two-LP edition spreads the concert across four sides in a gatefold jacket with a 12-by-24-inch insert. Both physical formats were released September 25 alongside the digital soundtrack.'''
 BODY=r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. The album arrived September 25 through Warner Records and draws from the *FROM ZERO* album-release concert at Allianz Parque in São Paulo, Brazil. The same show provides most of the live footage in *UNSHATTER*, which moves between the concert, studio sessions and interviews. The soundtrack takes a different approach, staying with the performance rather than following the film's broader narrative.
 
 The São Paulo set moves back and forth between *FROM ZERO* and earlier LINKIN PARK material. "The Emptiness Machine," "Heavy Is the Crown" and other songs from the new record are heard alongside "Somewhere I Belong," "Numb," "In the End" and "Faint." "Faint" was released ahead of the soundtrack with an official video from the same night, showing Emily Armstrong and the current lineup performing one of the band's long-standing staples.
 
 [youtube:zNYsw-cW8v8]
 
-Several performances omitted from *UNSHATTER* are preserved on the soundtrack, which collects 16 complete songs from the São Paulo concert. The digital and two-LP editions keep those 16 performances, while the CD adds four short intro or interlude pieces around them.
+Several performances omitted from *UNSHATTER* are preserved on the soundtrack. The digital and CD editions also include short intro and interlude pieces that are not listed on the two-LP edition.
 
 *UNSHATTER* begins with private studio sessions from 2022 and follows the band through the writing and release of *FROM ZERO*. The documentary draws on rare archive footage, performances from sold-out shows and interviews with the band and fans to trace the years leading up to LINKIN PARK's return. It also covers the arrival of Armstrong on vocals and Brittain on drums, showing how the lineup moved from those early sessions to the stage.
 
