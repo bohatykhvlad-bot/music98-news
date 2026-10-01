@@ -81,7 +81,7 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 
 test("same-day chart cache is an instant paint and always revalidates",()=>{
-  assert.match(page,/const DAILYKEY = "music98news_daily_v40"/);
+  assert.match(page,/const DAILYKEY = "music98news_daily_v41"/);
   assert.match(page,/const hasFreshCache=!!\(cached/);
   assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
   assert.match(page,/rev=40/);
@@ -163,7 +163,7 @@ test("site text stays off persistent compositor transforms and whole-button filt
 test("same-day chart cache never preserves rows with missing artwork",()=>{
   assert.match(page,/cached\.tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)/);
   assert.match(page,/if\(!tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)\) throw 0;/);
-  assert.match(page,/\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=40"/);
+  assert.match(page,/\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=41"/);
 });
 
 
