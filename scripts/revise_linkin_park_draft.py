@@ -11,9 +11,9 @@ POST_ID = "auleon930r1"
 
 EXCERPT = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*.'''
 
-BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. Recorded at the *FROM ZERO* album-release show in November 2024, the soundtrack keeps the concert running order and places the newer songs alongside material from earlier LINKIN PARK albums.
+BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. Recorded at the band's *FROM ZERO* album-release show, the soundtrack keeps the concert running order and places the newer songs alongside material from earlier LINKIN PARK albums.
 
-The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The recording follows the set from "Somewhere I Belong" through the closing "Bleed It Out," with the *FROM ZERO* songs spread across the show.
+The soundtrack contains 16 full performances. *FROM ZERO* is represented by "The Emptiness Machine," "Casualty," "Two Faced," "Over Each Other" and "Heavy Is the Crown." The rest of the set includes "Somewhere I Belong," "The Catalyst," "Waiting for the End," "Lost," "What I've Done," "Leave Out All the Rest," "Numb," "In the End," "Faint" and "Papercut," with "Bleed It Out" closing the show.
 
 The older selections cover several periods in the band's catalog. "Somewhere I Belong," "Faint" and "Numb" come from *Meteora*. "What I've Done" and "Leave Out All the Rest" represent *Minutes to Midnight*, while "The Catalyst" and "Waiting for the End" come from *A Thousand Suns*. The live version of "Faint" was released ahead of the album with an official video from the same São Paulo performance.
 
