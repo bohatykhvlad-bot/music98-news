@@ -11,25 +11,25 @@ import post as runner
 
 POST_ID = "lisa26vegas"
 # final-reader-pass-v2
-TITLE = "LISA Adds Two Las Vegas Shows After First Four Sell Out"
+TITLE = "LISA Adds Two Las Vegas Shows After First Four Dates Sell Out"
 
-EXCERPT = """LISA has added two more VIVA LA LISA shows at The Colosseum at Caesars Palace after the original four dates sold out in under 10 minutes."""
+EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes."""
 
-BODY_TEMPLATE = """LISA has added two more VIVA LA LISA shows at The Colosseum at Caesars Palace after the original four dates sold out in under 10 minutes. The new dates are November 12 and 29, bringing the residency to six shows.
+BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new shows on November 12 and 29 open the first weekend a day earlier and close the second a day later, turning both weekends into three-night runs.
 
-The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. Tickets for the two added shows went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist.
+The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added shows began September 30 through Ticketmaster, while the four dates announced in March remain unchanged. VIVA LA LISA is the first Las Vegas residency by a K-pop artist. The Colosseum seats 4,300 and will host all six shows.
 
 [apple:song:6807119565:6807119568]
 
-The Las Vegas shows follow the release of *PRESS PLAY*, LISA's new EP, out October 23. *SaWaDiKa* was the first song released from the project, with a video filmed around Bangkok that drew 70.8 million views in its first 24 hours. LISA performed it at the 2026 MTV Video Music Awards, where *Dream feat. Kentaro Sakaguchi* won Best Pop. She became the first K-pop artist to win Best Pop.
+The residency follows *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, and its video was filmed around Bangkok. The video drew 70.8 million views in its first 24 hours. LISA performed the song at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop.
 
 [youtube:FMX98ROVRCE]
 
-*Dream* is a short film from *Alter Ego*, starring LISA opposite Japanese actor Kentaro Sakaguchi. The story looks back on a past relationship and the memories that remain. It was also nominated for Best K-Pop at the VMAs, with additional nominations for cinematography and editing.
+*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story about memories of a past relationship. MTV also nominated the video for Best K-Pop, while its cinematography and editing received separate nominations.
 
 [tickets:__TICKET__]
 
-LISA's documentary *Always Lalisa*, directed by Sue Kim, premiered at the Toronto International Film Festival. It follows a year of solo work, acting and building her own brand before she returned to BLACKPINK. The film opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later."""
+Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows a year in which LISA stepped away from BLACKPINK, focused on her solo career, moved into acting and built her own brand before returning to the group. It opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later."""
 
 AI_STYLE_FLAGS = (
     "marks a new chapter",
@@ -107,7 +107,7 @@ def main():
     second_para = body.split("\n\n")[1]
     apple_pos = body.index("[apple:song:6807119565:6807119568]")
     second_end = body.index(second_para) + len(second_para)
-    third_start = body.index("The Las Vegas shows follow")
+    third_start = body.index("The residency follows")
     if not (second_end < apple_pos < third_start):
         raise RuntimeError("Apple Music block is not between paragraphs 2 and 3")
 
