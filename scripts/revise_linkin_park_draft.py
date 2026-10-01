@@ -11,21 +11,21 @@ POST_ID = "auleon930r1"
 
 EXCERPT = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*.'''
 
-BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. The soundtrack keeps the concert running order and places *FROM ZERO* songs alongside material from earlier LINKIN PARK albums.
+BODY = r'''The band's new live set, released September 25 through Warner Records, captures the São Paulo concert featured in *UNSHATTER*. Recorded at the *FROM ZERO* album-release show in November 2024, the soundtrack keeps the concert running order and places the newer songs alongside material from earlier LINKIN PARK albums.
 
-The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The recording follows the concert sequence from "Somewhere I Belong" through the closing "Bleed It Out," with the *FROM ZERO* songs spread across the set.
+The 16 full performances include "Somewhere I Belong," "The Emptiness Machine," "The Catalyst," "Waiting for the End," "Casualty," "Two Faced," "Lost," "What I've Done," "Leave Out All the Rest," "Over Each Other," "Numb," "In the End," "Faint," "Papercut," "Heavy Is the Crown" and "Bleed It Out." The recording follows the set from "Somewhere I Belong" through the closing "Bleed It Out," with the *FROM ZERO* songs spread across the show.
 
-The older selections cover several periods in the band's catalog. "Somewhere I Belong," "Faint" and "Numb" come from *Meteora*. "What I've Done" and "Leave Out All the Rest" represent *Minutes to Midnight*, while "The Catalyst" and "Waiting for the End" come from *A Thousand Suns*. The live version of "Faint" was issued ahead of the album with an official video from the same São Paulo performance.
+The older selections cover several periods in the band's catalog. "Somewhere I Belong," "Faint" and "Numb" come from *Meteora*. "What I've Done" and "Leave Out All the Rest" represent *Minutes to Midnight*, while "The Catalyst" and "Waiting for the End" come from *A Thousand Suns*. The live version of "Faint" was released ahead of the album with an official video from the same São Paulo performance.
 
 [youtube:zNYsw-cW8v8]
 
-*UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The band's official store says the film combines archive footage, sold-out live performances and interviews with band members and fans. The soundtrack also includes live recordings that are not heard in the documentary.
+*UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the São Paulo concert. The film combines archive footage, performances from sold-out shows and interviews with the band and fans. The soundtrack also includes live recordings that do not appear in the documentary.
 
-The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums. The São Paulo recording documents that lineup onstage with both the new material and the band's older songs.
+The film covers the band's return after a seven-year hiatus and the arrival of Emily Armstrong on vocals and Colin Brittain on drums. Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. The São Paulo recording captures the new lineup onstage with both *FROM ZERO* material and songs from across the band's catalog.
 
 The physical editions use different track configurations. The CD has 20 tracks, including four short pieces placed between the 16 full performances. "Inception" opens the disc, "Creation" follows "The Emptiness Machine," "Break Collapse" comes before "Lost," and "Resolution" appears before "Papercut." The CD comes in a gatefold softpak with a 12-panel accordion booklet. The two-LP edition leaves out those four pieces and carries the 16 complete performances in a gatefold jacket with a 12-by-24-inch insert.'''
 
-AI_STYLE_FLAGS = ("marks a new chapter","comes at a time","not only","rather than simply","serves as a","underscores","showcases")
+AI_STYLE_FLAGS = ("marks a new chapter","comes at a time","not only","rather than simply","serves as a","underscores","showcases","official store says","the band's official store says")
 
 def main():
     runner.load_env()
