@@ -48,3 +48,19 @@ for name,im in thumbs:
     y+=430
 sheet.save(OUT/"contact-sheet.jpg",quality=92)
 print("DONE",OUT)
+
+import re
+for page in [
+    "https://www.sonymusic.ca/press_release/ella-langley-unveils-highly-anticipated-sophomore-album-dandelion",
+    "https://www.sonymusic.ca/press_release/ella-langley-returns-with-dynamic-and-soaring-new-single-never-met-anyone-like-you-feat-hardy",
+    "https://www.ellalangley.com/",
+]:
+    try:
+        req=urllib.request.Request(page,headers={"User-Agent":"Mozilla/5.0"})
+        html=urllib.request.urlopen(req,timeout=60).read().decode("utf-8","ignore")
+        urls=sorted(set(re.findall(r'https?://[^"\\'<> ]+?\\.(?:jpg|jpeg|png|webp)(?:\\?[^"\\'<> ]*)?',html,re.I)))
+        print("PAGE",page)
+        for u in urls:
+            print("IMGURL",u.replace("&amp;","&"))
+    except Exception as e:
+        print("PAGEERR",page,repr(e))
