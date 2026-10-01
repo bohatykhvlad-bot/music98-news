@@ -27,15 +27,15 @@ The São Paulo set moves back and forth between *FROM ZERO* and earlier LINKIN P
 
 [youtube:zNYsw-cW8v8]
 
-The soundtrack includes more of the concert than *UNSHATTER* does. Several performances on the album are absent from the documentary, so the audio release preserves a larger part of the São Paulo show. Armstrong and drummer Colin Brittain are heard across the band's catalog, not only on the songs created with them for *FROM ZERO*. The album lets those performances run as a set, while the documentary uses only the songs it needs for the story.
+The soundtrack includes more of the concert than *UNSHATTER* does. Several performances on the album are absent from the documentary, so the audio release preserves a larger part of the São Paulo show. Armstrong and drummer Colin Brittain are heard across the band's catalog, including songs recorded long before they joined. The album lets those performances run as a set, while the documentary uses only the songs it needs for the story.
 
-*UNSHATTER* begins with private studio sessions from 2022 and follows the band through the writing and release of *FROM ZERO* and the return to live shows. Rare archive footage, sold-out performances and interviews with the band and fans fill in the years after LINKIN PARK's seven-year hiatus. The film also covers the arrival of Armstrong on vocals and Brittain on drums, following the lineup from those early sessions to the stage. The scale of the São Paulo show makes that transition visible.
+*UNSHATTER* begins with private studio sessions from 2022 and follows the band through the writing and release of *FROM ZERO* and the return to live shows. Rare archive footage, sold-out performances and interviews with the band and fans fill in the years after LINKIN PARK's seven-year hiatus. The film also covers the arrival of Armstrong on vocals and Brittain on drums, following the lineup from those early sessions to the stage. By the time the film reaches São Paulo, those early sessions have become a stadium show.
 
 Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. Its live centerpiece is the São Paulo show held on the day *FROM ZERO* was released. The documentary reaches that concert after tracing the studio sessions and the band's return. The soundtrack does the opposite: it removes that documentary structure and keeps the focus on the performance, including songs that were left out of the final film.
 
 The physical editions use slightly different track lists. The CD has 20 tracks: 16 complete performances plus four short intro or interlude pieces. The two-LP edition keeps the 16 full songs and leaves those shorter pieces out. The CD comes in a gatefold softpak with a 12-panel accordion booklet, while the vinyl editions use gatefold jackets with a 12-by-24-inch insert. Both formats were released September 25 alongside the digital soundtrack.'''
 AI_STYLE_FLAGS = (
-    "marks a new chapter","comes at a time","not only","rather than simply",
+    "marks a new chapter","comes at a time","rather than simply",
     "serves as a","underscores","showcases","fuller live document",
     "keeping the concert tied","setting the stage","a testament to",
     "in the wake of","against the backdrop"
