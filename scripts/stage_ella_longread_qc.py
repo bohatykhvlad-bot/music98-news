@@ -58,7 +58,7 @@ for page in [
     try:
         req=urllib.request.Request(page,headers={"User-Agent":"Mozilla/5.0"})
         html=urllib.request.urlopen(req,timeout=60).read().decode("utf-8","ignore")
-        urls=sorted(set(re.findall(r'https?://[^"\\'<> ]+?\\.(?:jpg|jpeg|png|webp)(?:\\?[^"\\'<> ]*)?',html,re.I)))
+        urls=sorted(set(re.findall(r"https?://[^\\\"'<> ]+?\\.(?:jpg|jpeg|png|webp)(?:\\?[^\\\"'<> ]*)?",html,re.I)))
         print("PAGE",page)
         for u in urls:
             print("IMGURL",u.replace("&amp;","&"))
