@@ -17,6 +17,7 @@ import post as runner
 import gate
 
 POST_ID = "lisa26vegas"
+# apply-final-lisa-review-20261001
 EXPECTED_TEMPLATE = r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
 The two additional dates were announced September 29, following the sellout of the original four shows. Tickets for the two added shows went on sale September 30 through Ticketmaster, while the four dates announced in March remain unchanged. VIVA LA LISA is the first Las Vegas residency by a K-pop artist. All six performances will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace.
