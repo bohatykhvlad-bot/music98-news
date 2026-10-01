@@ -9,7 +9,7 @@ import gate
 POST_ID="lisa26vegas"
 EXPECTED_TEMPLATE=r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
-The residency was first announced in March. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at the 4,300-seat Colosseum inside Caesars Palace. The theater setting keeps the run on a smaller scale than an arena show while giving LISA six performances in the same room.
+The residency was first announced in March. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at the 4,300-seat Colosseum inside Caesars Palace.
 
 [apple:song:6807119565:6807119568]
 
@@ -40,7 +40,7 @@ LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk wor
 
 [tickets:__TICKET__]
 
-LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film covers a year of solo work between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, building LLOUD and preparations for her 2025 Coachella solo set. It also places those projects alongside LISA's preparations to return to BLACKPINK. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement. It will then stream globally and exclusively on YouTube Premium later in 2026.'''
+LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film covers a year of solo work between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, building LLOUD and preparations for her 2025 Coachella solo set. It also places those projects alongside LISA's preparations to return to BLACKPINK. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement before streaming globally and exclusively on YouTube Premium later in 2026.'''
 
 def fresh_read():
     return runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()), runner.desk_key())
