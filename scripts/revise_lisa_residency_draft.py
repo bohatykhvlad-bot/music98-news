@@ -21,15 +21,15 @@ The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.
 
 [apple:song:6807119565:6807119568]
 
-The Las Vegas shows follow the release of *PRESS PLAY*, LISA's new EP, out October 23. *SaWaDiKa* was the first song released from the project, with a video filmed around Bangkok. LISA performed it at the 2026 MTV Video Music Awards, where *Dream feat. Kentaro Sakaguchi* won Best Pop. The win made LISA the first K-pop artist to take the category.
+The Las Vegas shows follow the release of *PRESS PLAY*, LISA's new EP, out October 23. *SaWaDiKa* was the first song released from the project, with a video filmed around Bangkok. LISA performed it at the 2026 MTV Video Music Awards, where *Dream feat. Kentaro Sakaguchi* won Best Pop. She became the first K-pop artist to win Best Pop.
 
 [youtube:FMX98ROVRCE]
 
-*Dream* is a short film from *Alter Ego*, starring LISA opposite Japanese actor Kentaro Sakaguchi. The story looks back on a past relationship and the memories that remain. It was also nominated for Best K-Pop, Best Cinematography and Best Editing at the VMAs.
+*Dream* is a short film from *Alter Ego*, starring LISA opposite Japanese actor Kentaro Sakaguchi. The story looks back on a past relationship and the memories that remain. It was also nominated for Best K-Pop at the VMAs, with additional nominations for cinematography and editing.
 
 [tickets:__TICKET__]
 
-Her fall also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows LISA through a year of solo work, acting and building her own brand before returning to BLACKPINK. It opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later."""
+LISA's documentary *Always Lalisa*, directed by Sue Kim, premiered at the Toronto International Film Festival. It follows a year of solo work, acting and building her own brand before she returned to BLACKPINK. The film opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later."""
 
 AI_STYLE_FLAGS = (
     "marks a new chapter",
