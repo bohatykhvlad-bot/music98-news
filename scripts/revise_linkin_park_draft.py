@@ -13,17 +13,17 @@ EXCERPT = r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São
 
 BODY = r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. The record arrived September 25 through Warner Records and captures the São Paulo concert at the center of the film.
 
-The show brings the *FROM ZERO* era together with songs from across the band's catalog rather than treating the new lineup as a separate chapter. Recent tracks such as "The Emptiness Machine," "Two Faced" and "Heavy Is the Crown" sit alongside "Numb," "In the End," "Papercut" and other older material. "Faint" was released ahead of the soundtrack with an official live video from the same São Paulo performance.
+The São Paulo set mixes *FROM ZERO* songs with material from across the band's catalog. Recent tracks such as "The Emptiness Machine," "Two Faced" and "Heavy Is the Crown" sit alongside "Numb," "In the End," "Papercut" and other older material. "Faint" was released ahead of the soundtrack with an official live video from the same São Paulo performance.
 
 [youtube:zNYsw-cW8v8]
 
-The soundtrack is also more than an audio copy of the documentary. Several live recordings included on the album are not heard in *UNSHATTER*, so the release preserves more of the São Paulo show than the film itself. That makes the album a companion to the movie rather than simply its audio track, with the concert able to stand on its own from beginning to end.
+The soundtrack is also more than an audio copy of the documentary. Several live recordings included on the album are not heard in *UNSHATTER*, so the release preserves more of the São Paulo show than the film itself. The result is a fuller version of the concert than viewers hear in the documentary.
 
 *UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the band's return to the stage. Archive footage, sold-out performances and interviews with the band and fans are used to trace the years leading up to the comeback, including the arrival of Emily Armstrong on vocals and Colin Brittain on drums after the group's seven-year hiatus.
 
-Directed by Joe Hahn, the film opened in theaters worldwide on September 30 for a limited run. The São Paulo concert becomes the point where the documentary's studio footage and the band's return to live performance meet, with the new songs and older catalog sharing the same stage.
+Directed by Joe Hahn, the film opened in theaters worldwide on September 30 for a limited run. The São Paulo concert gives the film its main live centerpiece, with the new songs and older catalog performed by the current lineup.
 
-The physical editions keep the differences simple. The CD has 20 tracks, adding four short pieces between the 16 full performances, while the two-LP edition carries the 16 complete songs without those interludes. The CD comes with a 12-panel accordion booklet, and the vinyl edition includes a 12-by-24-inch insert.'''
+The physical editions use slightly different track lists. The CD has 20 tracks, adding four short pieces between the 16 full performances, while the two-LP edition carries the 16 complete songs without those interludes. The CD comes with a 12-panel accordion booklet, and the vinyl edition includes a 12-by-24-inch insert.'''
 
 AI_STYLE_FLAGS = ("marks a new chapter","comes at a time","not only","rather than simply","serves as a","underscores","showcases","official store says","the band's official store says")
 
