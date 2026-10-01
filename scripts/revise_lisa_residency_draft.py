@@ -9,9 +9,9 @@ import gate
 POST_ID="lisa26vegas"
 EXPECTED_EXCERPT="LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes."
 NEW_EXCERPT="LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes, according to Caesars Entertainment."
-EXPECTED_TEMPLATE=r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
+EXPECTED_TEMPLATE=r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes, according to Caesars Entertainment. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
-The residency was announced in March. Tickets for the added dates went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at the 4,300-seat Colosseum inside Caesars Palace.
+The residency was announced in March. Tickets for the added dates went on sale September 30 through Ticketmaster. Caesars also describes VIVA LA LISA as the first Las Vegas residency by a K-pop artist, and all six shows will take place at the 4,300-seat Colosseum inside Caesars Palace.
 
 [apple:song:6807119565:6807119568]
 
@@ -21,7 +21,7 @@ LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk wor
 
 [youtube:FMX98ROVRCE]
 
-"Dream" appeared on LISA's debut full-length album, *Alter Ego*, and was later accompanied by an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story about two people looking back on a relationship that has ended. Written and directed by OJun Kwon, the film moves through fragments of their past instead of using a conventional performance setup. It was released through LISA's LLOUD channel several months after *Alter Ego*.
+"Dream" appeared on LISA's debut full-length album, *Alter Ego*, and was later accompanied by an official short film starring LISA and Japanese actor Kentaro Sakaguchi. The story follows LISA as she revisits memories of a former partner after his death. Written and directed by OJun Kwon, the film moves through those memories instead of using a conventional performance setup. It was released through LISA's LLOUD channel several months after *Alter Ego*.
 
 [tickets:__TICKET__]
 
@@ -34,7 +34,7 @@ The residency was announced in March. Tickets for the added dates went on sale S
 
 The six-show run begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. "SaWaDiKa," released September 4, introduced the project. The official tracklist includes five more songs, but their titles have not yet been revealed. The song's title comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, with references to Thai culture in the sets, styling and choreography. It drew 70.8 million views in its first 24 hours.
 
-LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, "Dream" won Best Pop, making LISA the first K-pop artist to win the category. It was also nominated for Best K-Pop, with separate nominations for cinematography and editing.
+LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, "Dream" won Best Pop, making LISA the first K-pop solo artist to win the category. It was also nominated for Best K-Pop, with separate nominations for cinematography and editing.
 
 [youtube:FMX98ROVRCE]
 
