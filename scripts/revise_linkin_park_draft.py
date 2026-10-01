@@ -37,7 +37,21 @@ The soundtrack extends the concert beyond what viewers hear in *UNSHATTER*. Seve
 Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. The film builds toward the São Paulo concert recorded on the day *FROM ZERO* was released, connecting the private sessions seen earlier in the documentary with the band's return in front of a full audience. The soundtrack stays with that performance for longer, preserving material the film leaves outside its final cut while keeping the concert tied to the same point in the band's comeback.
 
 The physical editions use slightly different track lists. The CD has 20 tracks, adding four short intro or interlude pieces around the 16 full performances, while the two-LP edition keeps only those 16 complete songs across four sides. The CD comes in a gatefold softpak with a 12-panel accordion booklet. The vinyl editions use gatefold jackets and include a 12-by-24-inch insert, keeping the main difference between the formats in the extra short pieces included on the CD. Both formats were released for the soundtrack's September 25 launch.'''
-RELEASE_TYPE = "Live album"
+EXCERPT = EXPECTED_EXCERPT
+BODY = r'''LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. The album arrived September 25 through Warner Records and draws from the band's *FROM ZERO* album-release show at Allianz Parque in São Paulo. The concert also supplies the documentary's main live footage. While *UNSHATTER* cuts between the concert, studio sessions and interviews, the soundtrack gives that performance more room and includes live recordings that are not heard in the finished film.
+
+The São Paulo set moves between *FROM ZERO* and earlier LINKIN PARK material throughout the night. "The Emptiness Machine," "Two Faced" and "Heavy Is the Crown" sit alongside "Somewhere I Belong," "Numb," "In the End," "Faint" and "Papercut," so the current lineup is heard across both the comeback record and songs from earlier eras. "Faint" was released ahead of the soundtrack with an official live video taken from the same performance, giving a direct preview of the show captured for the film and album.
+
+[youtube:zNYsw-cW8v8]
+
+The soundtrack extends the concert beyond what viewers hear in *UNSHATTER*. Several performances included on the album do not appear in the documentary, so the audio release preserves a broader section of the São Paulo show than the film does. That also gives Emily Armstrong and Colin Brittain a fuller live document with the band, moving from *FROM ZERO* material into songs recorded long before they joined and showing the current lineup move between both eras in the same concert.
+
+*UNSHATTER* follows LINKIN PARK from private studio sessions in 2022 through the making and release of *FROM ZERO* and the return to live shows. Rare archive footage, performances from sold-out concerts and interviews with the band and fans cover the years after the group's seven-year hiatus and the process of starting again with new music. The film also follows the arrival of Emily Armstrong on vocals and Colin Brittain on drums as those early sessions develop into the lineup that eventually takes the new record onstage.
+
+Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. The film builds toward the São Paulo concert recorded on the day *FROM ZERO* was released, connecting the private sessions seen earlier in the documentary with the band's return in front of a full audience. The soundtrack stays with that performance for longer, preserving material the film leaves outside its final cut while keeping the concert tied to the same point in the band's comeback.
+
+The physical editions use slightly different track lists. The CD has 20 tracks, adding four short intro or interlude pieces around the 16 full performances, while the two-LP edition keeps only those 16 complete songs across four sides. The CD comes in a gatefold softpak with a 12-panel accordion booklet. The vinyl editions use gatefold jackets and include a 12-by-24-inch insert, keeping the main difference between the formats in the extra short pieces included on the CD. Both formats were released for the soundtrack's September 25 launch.'''
+RELEASE_TYPE = "Album"
 
 AI_STYLE_FLAGS = (
     "marks a new chapter","comes at a time","not only","rather than simply",
