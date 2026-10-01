@@ -21,9 +21,9 @@ The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29.
 
 [apple:song:6807119565:6807119568]
 
-The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. *SaWaDiKa*, released September 4, is the first song from the project and the only title currently revealed on the official tracklist. Its name comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, moving through locations around the city with Thai references woven into the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
+The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. *SaWaDiKa*, released September 4, is the first song from the project. The official tracklist currently shows it followed by five tracks whose titles have not yet been revealed. Its name comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, moving through locations around the city with Thai references woven into the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
 
-LISA performed *SaWaDiKa* at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. The video was also nominated for Best K-Pop, while its cinematography and editing received separate nominations.
+LISA performed *SaWaDiKa* at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. The video was also nominated for Best K-Pop, while its cinematography and editing received separate nominations.
 
 [youtube:FMX98ROVRCE]
 
