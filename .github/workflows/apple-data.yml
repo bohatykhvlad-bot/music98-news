@@ -13,7 +13,7 @@ name: apple-data
 on:
   push:
     paths:
-      - "functions/api/top50.js"
+      - "functions/api/top50.js"\n      - "scripts/snapshot-live-chart.mjs"\n      - ".github/workflows/apple-data.yml"
       - "functions/lib/chart-identity.js"
       - "functions/lib/artwork-resolver.js"
       - "scripts/build-covers.mjs"
@@ -46,6 +46,22 @@ jobs:
           cp public/index.html /tmp/index-before.html
       - name: Проверить live tenure
         run: node scripts/audit-live-chart.mjs
+      - name: Сохранить здоровый tenure snapshot
+        run: |
+          node scripts/snapshot-live-chart.mjs
+          if git diff --quiet -- public/data/chart-tenure-backup.json; then
+            echo "tenure snapshot без изменений"
+          else
+            git config user.name "music98 chart tenure bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add public/data/chart-tenure-backup.json
+            git commit -m "chart: snapshot healthy live tenure"
+            git push || {
+              echo "main успел измениться — ребейзим tenure snapshot и повторяем push"
+              git pull --rebase origin main
+              git push
+            }
+          fi
       - name: Проверить resolver до сетевого аудита
         run: node scripts/chart-artwork-regression.mjs
       - name: Собрать и перепроверить artwork registry
