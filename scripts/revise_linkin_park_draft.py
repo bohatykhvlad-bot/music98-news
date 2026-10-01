@@ -13,7 +13,7 @@ The São Paulo set moves back and forth between *FROM ZERO* and earlier LINKIN P
 
 [youtube:zNYsw-cW8v8]
 
-Several performances omitted from *UNSHATTER* are preserved on the soundtrack, so the album captures more of the São Paulo set than viewers hear in the documentary.
+Several performances omitted from *UNSHATTER* are preserved on the soundtrack, so the album captures more of the concert than viewers hear in the documentary.
 
 *UNSHATTER* begins with private studio sessions from 2022 and follows the band through the writing and release of *FROM ZERO*. The documentary draws on rare archive footage, performances from sold-out shows and interviews with the band and fans to trace the years leading up to LINKIN PARK's return. It also covers the arrival of Armstrong on vocals and Brittain on drums, showing how the lineup moved from those early sessions to the stage.
 
@@ -26,13 +26,13 @@ The São Paulo set moves back and forth between *FROM ZERO* and earlier LINKIN P
 
 [youtube:zNYsw-cW8v8]
 
-Several performances omitted from *UNSHATTER* are preserved on the soundtrack, so the album captures more of the concert than viewers hear in the documentary.
+Several performances omitted from *UNSHATTER* are preserved on the soundtrack, which collects 16 complete songs from the São Paulo concert. The digital and two-LP editions keep those 16 performances, while the CD adds four short intro or interlude pieces around them.
 
 *UNSHATTER* begins with private studio sessions from 2022 and follows the band through the writing and release of *FROM ZERO*. The documentary draws on rare archive footage, performances from sold-out shows and interviews with the band and fans to trace the years leading up to LINKIN PARK's return. It also covers the arrival of Armstrong on vocals and Brittain on drums, showing how the lineup moved from those early sessions to the stage.
 
 Directed by Joe Hahn, *UNSHATTER* opened in theaters worldwide on September 30 for a limited run. Its live centerpiece is the São Paulo concert held on the day *FROM ZERO* was released. The film builds toward that night rather than treating the concert as its entire subject.
 
-The physical editions use slightly different track lists and packaging. The 20-track CD includes 16 complete performances plus four short intro or interlude pieces and comes in a gatefold softpak with a 12-panel accordion booklet. The two-LP edition contains the 16 full songs and uses gatefold jackets with a 12-by-24-inch insert. Both formats were released September 25 alongside the digital soundtrack.'''
+The CD comes in a gatefold softpak with a 12-panel accordion booklet, while the two-LP edition uses a gatefold jacket with a 12-by-24-inch insert. Both formats were released September 25 alongside the digital soundtrack.'''
 
 def fresh_read():
     return runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()),runner.desk_key())
