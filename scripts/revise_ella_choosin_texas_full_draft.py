@@ -81,12 +81,28 @@ def build_body():
 
     origin = p[1]
 
-    writing = p[2].replace(
+    writing = p[2]
+    writing = writing.replace(
+        'Langley answered with a phrase that immediately sounded like a song, "She\'s from Texas, I can tell."',
+        'Langley answered with a phrase the room immediately recognized as a hook, "She\'s from Texas, I can tell."'
+    )
+    writing = writing.replace(
+        "They make the breakup feel physical, as if the relationship is being measured in roads, rooms and state lines.",
+        "They make the breakup feel physical, measuring the relationship in roads, rooms and state lines."
+    )
+    writing = writing.replace(
         "The central idea is specific enough to be unmistakably country, but the feeling underneath it is broader.",
         "The country details are specific, but the feeling underneath them is broader."
     )
+    writing = writing.replace(
+        "Langley told Rolling Stone that people can relate to wanting something that does not want them back, whether that is a relationship, a job or something else.",
+        "Langley told Rolling Stone the feeling can apply to wanting something that does not want you back, whether it is a relationship, a job or something else."
+    )
 
-    roots = p[3]
+    roots = p[3].replace(
+        "There is also a reason the song feels connected to older country writing without sounding like a period piece.",
+        "There is also a reason the song feels connected to older country writing without turning into a period piece."
+    )
     roots = roots.replace(
         ' On *Dandelion*, that confidence is even clearer. The album opens and closes with "Froggy Went A Courtin\'," one of the first songs she remembers singing with her grandfather, then moves into modern country that is comfortable with pop melody while keeping its older roots in view.',
         ""
@@ -97,11 +113,19 @@ def build_body():
         'She helped write "Choosin\' Texas," sings background vocals on the recording and later co-produced *Dandelion* with Langley.'
     )
 
-    video = p[5]
+    video = p[5].replace(
+        "The setting matters as much as the casting. Couples two-step beneath the lights, rodeo figures and Texas musicians fill the room, and the bar feels busy enough to make the jealousy believable.",
+        "The setting matters too. Couples two-step beneath the lights, rodeo figures and Texas musicians fill the room, and the crowd makes the jealousy believable."
+    )
 
-    live = p[6].replace(
+    live = p[6]
+    live = live.replace(
         "At Billboard Women in Music, Langley performed it in a more stripped-down setting and the writing still carried the room. ",
         ""
+    )
+    live = live.replace(
+        "At CMA Fest, it arrives as a full-scale country singalong, with the crowd answering the hook as if the song has been around for years.",
+        "At CMA Fest, it arrives as a full-scale country singalong, with the crowd answering the hook without hesitation."
     )
 
     chart = p[7]
@@ -119,9 +143,16 @@ def build_body():
         'Shaboozey\'s "A Bar Song (Tipsy)" turned a country-rap blend into a huge pop hit,'
     )
 
-    post = p[9]
+    post = p[9].replace(
+        "That kind of crossover once looked like two separate radio worlds briefly sharing a record.",
+        "That kind of crossover once meant two separate radio worlds briefly sharing a record."
+    )
 
     culture = p[10]
+    culture = culture.replace(
+        "Western boots and hats have moved through mainstream fashion, line-dance nights have spread well beyond Nashville, and major festivals have made rodeo and honky-tonk imagery familiar to audiences who may not follow country radio.",
+        "Western boots and hats now move through mainstream fashion, while line-dance nights have spread well beyond Nashville. Major festivals also make rodeo and honky-tonk imagery familiar to audiences who may not follow country radio."
+    )
 
     lineage = p[11]
 
@@ -143,6 +174,7 @@ def build_body():
         "[photo:%s|Caylee Robillard|https://www.cayleerobillard.com|50%% 45%%|1]" % BODY_PHOTO_PATH,
         roots,
         miranda,
+        "[youtube:Dm2TSMerGPQ]",
         country,
         post,
         "[youtube:4QIZE708gJ4]",
