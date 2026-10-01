@@ -34,12 +34,12 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/14/4b/6a/144b6aa7-a2af-41a7-fd2f-8e8aac953c41/mzaf_15506372320552650974.plus.aac.p.m4a",
     "year": "2026"
   },
-  "backtofriends|sombr": {
-    "title": "back to friends",
-    "artist": "sombr",
-    "url": "https://music.apple.com/us/album/1786481196?i=1786481197",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d7/63/7d/d7637dec-cf2d-1455-3398-f1a6340359d0/mzaf_88927986796632454.plus.aac.p.m4a",
-    "year": "2024"
+  "badtimes|imaelangel": {
+    "title": "Bad Times",
+    "artist": "Imael Angel",
+    "url": "https://music.apple.com/us/album/1890718114?i=1890718115",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4e/55/ca/4e55ca42-78bd-fa3e-175a-8a89ebbd8143/mzaf_5073687979000968235.plus.aac.p.m4a",
+    "year": "2026"
   },
   "bbywow|karolg": {
     "title": "BbY WOW",
@@ -55,13 +55,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/b4/da/eab4da01-c422-c640-1ac3-97d746c5871c/mzaf_12363686639555987211.plus.aac.p.m4a",
     "year": "2012"
   },
-  "bebyyou|lukecombs": {
-    "title": "Be By You",
-    "artist": "Luke Combs",
-    "url": "https://music.apple.com/us/album/1862634688?i=1862634805",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a1/3a/eb/a13aeb88-1a04-0f07-c062-02f1b18b8392/mzaf_7787513642053136740.plus.aac.p.m4a",
-    "year": "2026"
-  },
   "beenbynow|morganwallen": {
     "title": "Been By Now",
     "artist": "Morgan Wallen",
@@ -75,6 +68,13 @@
     "url": "https://music.apple.com/us/album/1869436835?i=1869436845",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c8/7c/d4/c87cd4df-1197-1d1d-a07c-c5139d59a58f/mzaf_8671653320488087674.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "billiejean|michaeljackson": {
+    "title": "Billie Jean",
+    "artist": "Michael Jackson",
+    "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/6f/e6/1f6fe6c2-15b6-ed27-5c5f-0e63273cf167/mzaf_12076627970141246810.plus.aac.p.m4a",
+    "year": "1982"
   },
   "boston|stellalefty": {
     "title": "Boston",
@@ -174,13 +174,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/73/76/42/737642e6-c478-bed7-f11f-efee96072450/mzaf_5163950318414409594.plus.aac.p.m4a",
     "year": "2026"
   },
-  "jaded|koewetzel": {
-    "title": "Jaded",
-    "artist": "Koe Wetzel & Ella Langley",
-    "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/94/f7/e2/94f7e2cc-b182-cb75-7a31-7e88eee2191e/mzaf_12920756836197900992.plus.aac.p.m4a",
-    "year": "2026"
-  },
   "janicestfu|drake": {
     "title": "Janice STFU",
     "artist": "Drake",
@@ -202,13 +195,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/96/3c/93/963c93ce-93b1-40c6-ed8d-04bb8cc27c82/mzaf_4401986005887392953.plus.aac.p.m4a",
     "year": "2025"
   },
-  "lovinglifeagain|ellalangley": {
-    "title": "Loving Life Again",
-    "artist": "Ella Langley",
-    "url": "https://music.apple.com/us/album/1869436835?i=1869436847",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cd/f7/c9/cdf7c910-e4c6-9828-c83a-9e7a215bb70c/mzaf_1496635585165093785.plus.aac.p.m4a",
-    "year": "2026"
-  },
   "manineed|oliviadean": {
     "title": "Man I Need",
     "artist": "Olivia Dean",
@@ -228,6 +214,13 @@
     "artist": "pupsies",
     "url": "https://music.apple.com/us/album/1895959918?i=6765465347",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/43/06/4f/43064fd1-7e64-a917-7734-a91f12df53fb/mzaf_9705965089268547948.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "movintothesun|hugel": {
+    "title": "Movin' To The Sun",
+    "artist": "HUGEL, Imael Angel & Ultra Naté",
+    "url": "https://music.apple.com/us/album/6769069923?i=6769070199",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a9/d2/09/a9d209b4-55a5-67e8-2e15-949cb00e716d/mzaf_11935934741751979581.plus.aac.p.m4a",
     "year": "2026"
   },
   "nicolekidman|adla": {
@@ -272,12 +265,19 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/48/89/4d/48894def-36b6-0085-9184-b28a200cf47a/mzaf_6109765307626823795.plus.aac.p.m4a",
     "year": "2026"
   },
-  "shouldistayorshouldigo|theclash": {
-    "title": "Should I Stay or Should I Go",
-    "artist": "The Clash",
-    "url": "https://music.apple.com/us/album/1614928044?i=1614928396",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/b4/66/89/b4668981-e7f9-bba4-23ac-bb7d6e37658b/mzaf_14323259742024890093.plus.aac.p.m4a",
-    "year": "1982"
+  "september|earth": {
+    "title": "September",
+    "artist": "Earth, Wind & Fire",
+    "url": "https://music.apple.com/us/album/1456445670?i=1456446747",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/78/d4/95/78d49529-bd72-c490-5392-3a7f3d24755b/mzaf_6924139238970009441.plus.aac.p.m4a",
+    "year": "1978"
+  },
+  "skyfall|adele": {
+    "title": "Skyfall",
+    "artist": "Adele",
+    "url": "https://music.apple.com/us/album/566322358?i=566322365",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/6c/48/0e/6c480edc-89f5-a9cf-b309-63c5237efe92/mzaf_3142604484249449871.plus.aac.p.m4a",
+    "year": "2012"
   },
   "soeasy|oliviadean": {
     "title": "So Easy (To Fall In Love)",
@@ -300,13 +300,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/89/dd/38/89dd38a1-9e5d-f924-41a1-585f67870ca7/mzaf_17506666060631337235.plus.aac.p.m4a",
     "year": "2018"
   },
-  "takemeback|codyjohnson": {
-    "title": "Take Me Back (Leave Me There)",
-    "artist": "Cody Johnson",
-    "url": "https://music.apple.com/us/album/1892465981?i=1892466278",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fc/0d/8c/fc0d8c07-03be-570d-752f-edd0428d0af6/mzaf_6546538705895556196.plus.aac.p.m4a",
-    "year": "2026"
-  },
   "thecure|oliviarodrigo": {
     "title": "the cure",
     "artist": "Olivia Rodrigo",
@@ -327,13 +320,6 @@
     "url": "https://music.apple.com/us/album/716084282?i=716084847",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c1/65/e0/c165e08a-84ab-a71a-f212-f686ebe868f8/mzaf_10188871424072181738.plus.aac.p.m4a",
     "year": "2010"
-  },
-  "thinkasyoudrunk|rileygreen": {
-    "title": "Think As You Drunk",
-    "artist": "Riley Green",
-    "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5d/69/c3/5d69c3c4-41a0-de72-8000-7a02b3f23efa/mzaf_3384433737540977086.plus.aac.p.m4a",
-    "year": "2026"
   },
   "whatyouneed|tems": {
     "title": "What You Need",
