@@ -10,21 +10,21 @@ import gate
 POST_ID = "lisa26vegas"
 EXPECTED_TEMPLATE = r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
-The residency was first announced in March with four dates, and the September 29 expansion added one show to each weekend. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace.
+The residency was first announced in March with four dates, and the September 29 expansion added one show to each weekend. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace. The added dates keep the run within the same two November weekends, expanding each weekend from two shows to three rather than stretching the residency across a longer period.
 
 [apple:song:6807119565:6807119568]
 
 The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. "SaWaDiKa," released September 4, is the first song from the project. The official tracklist currently shows it followed by five tracks whose titles have not yet been revealed. The song's title comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, with references to Thai culture in the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
 
-LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, the video for "Dream" won Best Pop. The video was also nominated for Best K-Pop, while its cinematography and editing received separate nominations.
+LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk worked into the staging as another nod to Thailand. At the same ceremony, the video for "Dream" won Best Pop, making LISA the first K-pop artist to win the category. The video was also nominated for Best K-Pop, while its cinematography and editing received separate nominations.
 
 [youtube:FMX98ROVRCE]
 
-"Dream" first appeared on LISA's debut full-length album, *Alter Ego*, and later received an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story about love, loss and the memories of a relationship. The short film was directed by Ojun Kwon and released on LISA's LLOUD channel, with Sakaguchi playing her love interest.
+"Dream" first appeared on LISA's debut full-length album, *Alter Ego*, and later received an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a bittersweet story about two people looking back on a relationship they can no longer return to. Written and directed by OJun Kwon, the film moves through quiet, cinematic scenes rather than treating the song as a conventional performance video. It was released through LISA's LLOUD channel later that year, several months after *Alter Ego*.
 
 [tickets:__TICKET__]
 
-LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film follows a year of solo work between BLACKPINK commitments, including recording and releasing *Alter Ego*, making her acting debut in *The White Lotus* and preparing for her 2025 Coachella solo set. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement. It will then stream globally and exclusively on YouTube Premium later in 2026.'''
+LISA's fall schedule also includes *Always Lalisa*, the feature documentary directed by Sue Kim that premiered at the Toronto International Film Festival in September. The film follows a year in which her solo work moves to the foreground between BLACKPINK commitments, including the release of *Alter Ego*, her acting debut in *The White Lotus*, the growth of LLOUD and preparations for her 2025 Coachella solo set. It also looks at the pressure of building a solo career and a public identity outside the group while keeping the return to BLACKPINK in view. Beginning October 12, *Always Lalisa* will play in IMAX and cinemas worldwide for a limited engagement. It will then stream globally and exclusively on YouTube Premium later in 2026.'''
 BODY_TEMPLATE = r'''LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
 The residency was first announced in March with four dates, and the September 29 expansion added one show to each weekend. Tickets for the two new performances went on sale September 30 through Ticketmaster. VIVA LA LISA is the first Las Vegas residency by a K-pop artist, and all six shows will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace. The added dates keep the run within the same two November weekends, expanding each weekend from two shows to three rather than stretching the residency across a longer period.
@@ -37,7 +37,7 @@ LISA performed "SaWaDiKa" at the 2026 MTV Video Music Awards, with a tuk-tuk wor
 
 [youtube:FMX98ROVRCE]
 
-"Dream" first appeared on LISA's debut full-length album, *Alter Ego*, and later received an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a bittersweet story about two people looking back on a relationship they can no longer return to. Written and directed by OJun Kwon, the film moves through quiet, cinematic scenes rather than treating the song as a conventional performance video. It was released through LISA's LLOUD channel later that year, several months after *Alter Ego*.
+"Dream" first appeared on LISA's debut full-length album, *Alter Ego*, and later received an official short film. LISA stars opposite Japanese actor Kentaro Sakaguchi in a bittersweet story about two people looking back on a relationship they can no longer return to. Written and directed by OJun Kwon, the film moves through quiet, cinematic scenes rather than treating the song as a conventional performance video. It was officially released through LISA's LLOUD channel later that same year, several months after *Alter Ego*.
 
 [tickets:__TICKET__]
 
@@ -93,8 +93,8 @@ def main():
         raise RuntimeError("Media layout changed")
     old_words = len(gate.prose_of(expected).split())
     new_words = len(gate.prose_of(body).split())
-    if not (old_words + 90 <= new_words <= old_words + 110):
-        raise RuntimeError(f"Expected about +100 words, got {old_words} -> {new_words}")
+    if not (old_words + 2 <= new_words <= old_words + 2):
+        raise RuntimeError(f"Expected exactly +2 finishing words, got {old_words} -> {new_words}")
 
     gate.CHECK_IDS = True
     fails, warns, info = gate.check_post(candidate, strict=True)
@@ -131,7 +131,7 @@ def main():
     runner.cmd_verify(POST_ID)
     print("WORDS", old_words, "->", new_words)
     print("LAYOUT_PRESERVED", len(gate.paragraphs(body)), media_layout(body))
-    print("DONE_LISA_PLUS_100")
+    print("DONE_LISA_PLUS_100_EXACT")
 
 if __name__ == "__main__":
     main()
