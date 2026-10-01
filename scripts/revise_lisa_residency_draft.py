@@ -15,21 +15,23 @@ TITLE = "LISA Adds Two Las Vegas Shows After First Four Dates Sell Out"
 
 EXCERPT = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes."""
 
-BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new shows on November 12 and 29 open the first weekend a day earlier and close the second a day later, turning both weekends into three-night runs.
+BODY_TEMPLATE = """LISA has expanded VIVA LA LISA at The Colosseum at Caesars Palace to six shows after the original four dates sold out in under 10 minutes. The new performances are November 12 and 29, joining the previously announced November 13, 14, 27 and 28 dates. That gives each of the two Las Vegas weekends three shows instead of two.
 
-The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. General sale for the two added shows began September 30 through Ticketmaster, while the four dates announced in March remain unchanged. VIVA LA LISA is the first Las Vegas residency by a K-pop artist. The Colosseum seats 4,300 and will host all six shows.
+The full schedule is November 12, 13 and 14, followed by November 27, 28 and 29. Tickets for the two added shows went on sale September 30 through Ticketmaster, while the four dates announced in March remain unchanged. VIVA LA LISA is the first Las Vegas residency by a K-pop artist. All six performances will take place at The Colosseum, the 4,300-seat theater inside Caesars Palace.
 
 [apple:song:6807119565:6807119568]
 
-The residency follows *PRESS PLAY*, LISA's new EP, due October 23. *SaWaDiKa* was the first song released from the EP, and its video was filmed around Bangkok. The video drew 70.8 million views in its first 24 hours. LISA performed the song at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop.
+The residency begins less than three weeks after *PRESS PLAY*, LISA's new six-track EP, arrives on October 23. *SaWaDiKa*, released September 4, is the first song from the project and the only title currently revealed on the official tracklist. Its name comes from the Thai greeting for "hello," and the video takes LISA back to Bangkok, moving through locations around the city with Thai references woven into the sets, styling and choreography. The video drew 70.8 million views in its first 24 hours.
+
+LISA performed *SaWaDiKa* at the 2026 MTV Video Music Awards. At the same ceremony, *Dream feat. Kentaro Sakaguchi* won Best Pop. The video was also nominated for Best K-Pop, while its cinematography and editing received separate nominations.
 
 [youtube:FMX98ROVRCE]
 
-*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story about memories of a past relationship. MTV also nominated the video for Best K-Pop, while its cinematography and editing received separate nominations.
+*Dream* was released as an official short film from *Alter Ego*. LISA stars opposite Japanese actor Kentaro Sakaguchi in a story centered on a past relationship and the memories that remain after it ends. The film gives the song a narrative treatment rather than presenting it as a performance video, with LISA and Sakaguchi carrying the story on screen.
 
 [tickets:__TICKET__]
 
-Her fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows a year in which LISA stepped away from BLACKPINK, focused on her solo career, moved into acting and built her own brand before returning to the group. It opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later."""
+LISA's fall schedule also includes *Always Lalisa*, a documentary directed by Sue Kim that premiered at the Toronto International Film Festival. The film follows a year in which LISA stepped away from BLACKPINK, focused on her solo career, moved into acting and built her own brand before returning to the group. It opens in cinemas worldwide, including IMAX, on October 12 and will be available on YouTube Premium later.""""""
 
 AI_STYLE_FLAGS = (
     "marks a new chapter",
@@ -107,7 +109,7 @@ def main():
     second_para = body.split("\n\n")[1]
     apple_pos = body.index("[apple:song:6807119565:6807119568]")
     second_end = body.index(second_para) + len(second_para)
-    third_start = body.index("The residency follows")
+    third_start = body.index("The residency begins less than three weeks after")
     if not (second_end < apple_pos < third_start):
         raise RuntimeError("Apple Music block is not between paragraphs 2 and 3")
 
