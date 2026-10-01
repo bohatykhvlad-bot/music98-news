@@ -13,7 +13,7 @@ The São Paulo set moves back and forth between *FROM ZERO* and earlier LINKIN P
 
 [youtube:zNYsw-cW8v8]
 
-Several performances omitted from *UNSHATTER* are preserved on the soundtrack, so the album captures more of the São Paulo set than viewers hear in the documentary.
+Several performances omitted from *UNSHATTER* are preserved on the soundtrack, so the album captures more of the concert than viewers hear in the documentary.
 
 *UNSHATTER* begins with private studio sessions from 2022 and follows the band through the writing and release of *FROM ZERO*. The documentary draws on rare archive footage, performances from sold-out shows and interviews with the band and fans to trace the years after LINKIN PARK's seven-year hiatus. It also covers the arrival of Armstrong on vocals and Brittain on drums, showing how the lineup moved from those early sessions to the stage.
 
