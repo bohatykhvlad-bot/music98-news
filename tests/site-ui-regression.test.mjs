@@ -84,7 +84,7 @@ test("same-day chart cache is an instant paint and always revalidates",()=>{
   assert.match(page,/const DAILYKEY = "music98news_daily_v41"/);
   assert.match(page,/const hasFreshCache=!!\(cached/);
   assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
-  assert.match(page,/rev=40/);
+  assert.match(page,/rev=41/);
 });
 
 
