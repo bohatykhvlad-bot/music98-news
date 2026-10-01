@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import io, os, urllib.request
+import io, urllib.request
 from pathlib import Path
+from html.parser import HTMLParser
+from urllib.parse import urljoin
 from PIL import Image, ImageOps, ImageDraw
 
 OUT=Path("ella-longread-qc")
@@ -13,8 +15,10 @@ CANDIDATES=[
     ("werent-for-wind-video","https://i.ytimg.com/vi/U4NPZi2b0aQ/maxresdefault.jpg"),
 ]
 
-def fetch(url):
-    req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Referer":"https://www.youtube.com/"})
+def fetch(url, referer=None):
+    headers={"User-Agent":"Mozilla/5.0"}
+    if referer: headers["Referer"]=referer
+    req=urllib.request.Request(url,headers=headers)
     with urllib.request.urlopen(req,timeout=60) as r:
         return r.read()
 
@@ -30,7 +34,7 @@ def crop169(im):
 
 thumbs=[]
 for name,url in CANDIDATES:
-    raw=fetch(url)
+    raw=fetch(url,"https://www.youtube.com/" if "ytimg" in url else None)
     im=Image.open(io.BytesIO(raw))
     print("CANDIDATE",name,im.size,im.format,len(raw),url)
     ext=".png" if im.format=="PNG" else ".jpg"
@@ -43,28 +47,38 @@ sheet=Image.new("RGB",(680,430*len(thumbs)),"white")
 draw=ImageDraw.Draw(sheet)
 y=0
 for name,im in thumbs:
-    sheet.paste(im,(20,y+40))
-    draw.text((20,y+12),name,fill="black")
-    y+=430
+    sheet.paste(im,(20,y+40)); draw.text((20,y+12),name,fill="black"); y+=430
 sheet.save(OUT/"contact-sheet.jpg",quality=92)
-print("DONE",OUT)
 
-import re
-for page in [
-    "https://www.sonymusic.ca/press_release/ella-langley-unveils-highly-anticipated-sophomore-album-dandelion",
-    "https://www.sonymusic.ca/press_release/ella-langley-returns-with-dynamic-and-soaring-new-single-never-met-anyone-like-you-feat-hardy",
-    "https://www.ellalangley.com/",
-]:
+class ImgParser(HTMLParser):
+    def __init__(self,base):
+        super().__init__(); self.base=base; self.urls=[]
+    def handle_starttag(self,tag,attrs):
+        if tag.lower()!="img": return
+        d=dict(attrs)
+        for key in ("src","data-src","data-lazy-src"):
+            v=d.get(key)
+            if v: self.urls.append(urljoin(self.base,v))
+        for key in ("srcset","data-srcset"):
+            v=d.get(key)
+            if v:
+                for part in v.split(","):
+                    u=part.strip().split(" ")[0]
+                    if u: self.urls.append(urljoin(self.base,u))
+
+PAGES=[
+ "https://www.sonymusic.ca/press_release/ella-langley-unveils-highly-anticipated-sophomore-album-dandelion",
+ "https://www.sonymusic.ca/press_release/ella-langley-returns-with-dynamic-and-soaring-new-single-never-met-anyone-like-you-feat-hardy",
+ "https://www.ellalangley.com/",
+]
+for page in PAGES:
     try:
-        req=urllib.request.Request(page,headers={"User-Agent":"Mozilla/5.0"})
-        html=urllib.request.urlopen(req,timeout=60).read().decode("utf-8","ignore")
-        urls=sorted(set(re.findall(r"https?://[^\\\"'<> ]+?\\.(?:jpg|jpeg|png|webp)(?:\\?[^\\\"'<> ]*)?",html,re.I)))
+        html=fetch(page).decode("utf-8","ignore")
+        p=ImgParser(page); p.feed(html)
         print("PAGE",page)
-        rels=sorted(set(re.findall(r'[^"\\'<> ]+?\\.(?:jpg|jpeg|png|webp)(?:\\?[^"\\'<> ]*)?',html,re.I)))
-        for u in urls:
-            print("IMGURL",u.replace("&amp;","&"))
-        for u in rels:
-            if "wp-content" in u or "/images/" in u:
-                print("IMGREL",u.replace("&amp;","&"))
+        for u in sorted(set(p.urls)):
+            if any(x in u.lower() for x in (".jpg",".jpeg",".png",".webp")):
+                print("IMGURL",u)
     except Exception as e:
         print("PAGEERR",page,repr(e))
+print("DONE",OUT)
