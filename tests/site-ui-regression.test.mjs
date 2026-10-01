@@ -172,3 +172,11 @@ test("article ticket carrier keeps executable line breaks",()=>{
   assert.equal(page.includes('const tickets = t.match('), true);
   assert.equal(page.includes('if(tickets) return'), true);
 });
+
+
+test("Buy Tickets only changes on hover and has no press animation",()=>{
+  assert.match(page,/\.article-ticket a:hover::before\{background:var\(--accent\);border-color:var\(--accent\)\}/);
+  assert.equal(page.includes('rel="sponsored noopener noreferrer" data-pill-press><span>Buy Tickets</span>'), false);
+  assert.doesNotMatch(page,/\.article-ticket a\.press::before/);
+  assert.doesNotMatch(page,/\.article-ticket a:active::before/);
+});
