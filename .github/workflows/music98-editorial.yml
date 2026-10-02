@@ -112,6 +112,11 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_verify_deployed_portrait_css.py
+      - name: Inspect 2026 Ella Auburn fan gallery originals
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-fan-gallery-qc]') }}
+        run: |
+          python -m pip install --quiet requests
+          python scripts/ella_auburn_fan_primary_images_qc.py
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
