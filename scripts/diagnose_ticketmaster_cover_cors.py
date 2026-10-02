@@ -25,15 +25,19 @@ for url in ["https://music98.news/","https://music98.news/concerts"]:
    print("LIVE_SHELL_VERSION",url,"http",resp.status,"cache",resp.headers.get("Cache-Control"),"cf",resp.headers.get("Cf-Cache-Status"),"script_fragment",repr(text[max(0,spot-60):spot+70]) if spot>=0 else "not-present",flush=True)
  except Exception as e:print("LIVE_SHELL_ERROR",url,str(e)[:130],flush=True)
 
-url="https://music98.news/concerts-app.js?v=20261002-03"
+url="https://music98.news/concerts-app.js?v=20261002-04"
 try:
  req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Cache-Control":"no-cache"})
  with urllib.request.urlopen(req,timeout=20) as resp:
   script=resp.read().decode("utf-8","replace")
   checks={
-   "pop720":'applyConcertArt(img,e.image||e.artistImage||"/logo.png",720)' in script,
-   "artist256":'applyConcertArt(img,item.image||"/logo.png",256)' in script,
-   "browser_two_pass":'function browserResampleConcertArt(img,side)' in script,
+   "original_source_only":'function originalConcertImage(original)' in script,
+   "icon_600":'icon:"width=600,height=600,fit=scale-down,quality=85,format=auto"' in script,
+   "event_1280x720":'event:"width=1280,height=720,fit=scale-down,quality=85,format=auto"' in script,
+   "browser_two_pass":'function browserResampleConcertArt(img,preset)' in script and 'ctx.imageSmoothingQuality="high"' in script,
+   "no_drag":'img.draggable=false' in script and 'addEventListener("dragstart"' not in script,
+   "native_original_click":'full.href=eventImageUrl;' in script,
+   "no_zoom_cursor":"cursor:zoom-in" not in script,
    "no_alternate_cover":"compactSameConcertImage" not in script,
    "no_duplicate_ticket_link":".ticket-alt" not in script,
    "nearby_thirty":".slice(0,30)" in script,
@@ -72,7 +76,7 @@ try:
   except Exception as direct:
    print("TICKETMASTER_DIRECT_ORIGIN","ERROR",type(direct).__name__,str(direct)[:110],flush=True)
   from urllib.parse import quote
-  target="https://music98.news/cdn-cgi/image/width=256,height=256,fit=scale-down,quality=85,format=auto/"+source
+  target="https://music98.news/cdn-cgi/image/width=600,height=600,fit=scale-down,quality=85,format=auto/"+source
   try:
    req=urllib.request.Request(target,headers={"User-Agent":"Mozilla/5.0","Accept":"image/webp,image/png,image/jpeg,image/*"})
    with urllib.request.urlopen(req,timeout=28) as r:
