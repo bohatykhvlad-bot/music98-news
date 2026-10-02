@@ -636,7 +636,7 @@ function browserResampleConcertArt(img,side){
       if(square<1) return;
       const popup=img.classList.contains("pop-thumb");
       const sx=Math.max(0,(img.naturalWidth-crop)/2);
-      const sy=Math.max(0,(img.naturalHeight-crop)*(popup?.18:.5));
+      const sy=Math.max(0,(img.naturalHeight-crop)*(popup ? 0.18 : 0.5));
       const pre=document.createElement("canvas"); pre.width=square;pre.height=square;
       const prectx=pre.getContext("2d",{alpha:false});
       if(!prectx)return;
