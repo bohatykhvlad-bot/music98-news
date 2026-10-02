@@ -59,6 +59,11 @@ jobs:
           git config user.email "editorial@music98.news"
           git add .editorial/ella-andrew-own-2026-guitar-qc.b64 .editorial/ella-andrew-own-2026-guitar-qc.json
           git diff --cached --quiet || (git commit -m "Stage photographer-original 2026 Ella guitar photo comparisons" && git push)
+      - name: Save verified Andrew guitar performance photo in Ella draft
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-verified-guitar]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/save_ella_andrew_2026_guitar.py --save
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
