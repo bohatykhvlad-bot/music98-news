@@ -532,3 +532,49 @@ test("image transform support is checked once and failure preserves both origina
   assert.equal(later.src,second);
   assert.equal(probes,1);
 });
+
+
+test("successful image transformation changes both squares to derived URLs and keeps original as fallback",async()=>{
+  const {runInNewContext}=await import("node:vm");
+  const from=app.indexOf("let concertArtResizeSupported=null;");
+  const to=app.indexOf("\nfunction popupContent(e){",from);
+  let checks=0;
+  const client=runInNewContext(
+    app.slice(from,to)+"\n({applyConcertArt})",
+    {URL,window:{location:{origin:"https://music98.news"}},fetch:async()=>{
+      checks++;
+      return {
+        ok:true,
+        headers:{get:key=>({
+          "cf-resized":"internal=ok",
+          "content-type":"image/webp"
+        })[key.toLowerCase()]||null},
+        blob:async()=>({size:25000})
+      };
+    }}
+  );
+  const img=()=>{
+    let src="";
+    return {
+      isConnected:true,onerror:null,
+      getAttribute:key=>key==="src"?src:null,
+      set src(value){src=value;},
+      get src(){return src;}
+    };
+  };
+  const popup=img(),artist=img();
+  const eventCover="https://s1.ticketm.net/dam/a/abc/THE-ORIGINAL-EVENT.jpg";
+  const artistCover="https://s1.ticketm.net/dam/a/def/THE-ORIGINAL-ARTIST.jpg";
+  client.applyConcertArt(popup,eventCover,720);
+  client.applyConcertArt(artist,artistCover,256);
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(checks,1);
+  assert.ok(popup.src.startsWith("https://music98.news/cdn-cgi/image/width=720,"));
+  assert.ok(artist.src.startsWith("https://music98.news/cdn-cgi/image/width=256,"));
+  assert.ok(popup.src.endsWith(eventCover));
+  assert.ok(artist.src.endsWith(artistCover));
+  popup.onerror();
+  assert.equal(popup.src,eventCover);
+  artist.onerror();
+  assert.equal(artist.src,artistCover);
+});
