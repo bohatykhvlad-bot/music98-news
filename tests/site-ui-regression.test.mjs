@@ -189,3 +189,16 @@ test("Buy Tickets only changes on hover and has no press animation",()=>{
   assert.doesNotMatch(page,/\.article-ticket a\.press::before/);
   assert.doesNotMatch(page,/\.article-ticket a:active::before/);
 });
+
+
+test("mobile chart reclaims arrow space without shrinking artwork or playback",()=>{
+  const mobile=page.slice(page.indexOf("@media (max-width:640px){\\n  .wrap"),page.indexOf("</style>"));
+  const row=mobile.match(/  \\.chart-row\\{[\\s\\S]*?\\n  \\}/)?.[0]||"";
+  assert.match(row,/grid-template-columns:56px 44px minmax\\(0,1fr\\) 36px;/);
+  assert.match(row,/gap:6px 8px;/);
+  assert.match(row,/padding:12px 17px 12px 12px;/);
+  assert.match(mobile,/\\.delta\\.reentry\\{height:20px;min-width:56px;padding:0 5px;font-size:8px;/);
+  assert.match(mobile,/\\.artwrap\\{grid-area:art;width:44px;height:44px;/);
+  assert.match(mobile,/\\.rplay\\{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px\\}/);
+  assert.match(page,/\\.chart-row\\{--pw:40px;--pexp:0px;display:grid;grid-template-columns:82px 56px/);
+});

@@ -761,19 +761,21 @@ textarea{resize:vertical;min-height:64px}
   .chart-row{
     --pw:auto;
     display:grid;
-    grid-template-columns:68px 44px minmax(0,1fr) 36px;
+    /* Reclaim 12px from movement labels and 2px per inter-column gap.
+       Keep 44px artwork and 36px play controls at their existing sizes. */
+    grid-template-columns:56px 44px minmax(0,1fr) 36px;
     grid-template-areas:
       "delta art names play"
       ". week week week"
       ". extra extra extra";
-    gap:6px 10px;
-    padding:12px 14px;
+    gap:6px 8px;
+    padding:12px 17px 12px 12px;
     align-items:center;
     transition:background .15s ease;
   }
   .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0;max-width:100%;overflow:hidden}
   .delta.new{height:20px;padding:0 calc(9px - .03em) 0 9px;font-size:8.5px;letter-spacing:.03em;line-height:1;box-sizing:border-box}
-  .delta.reentry{height:20px;min-width:68px;padding:0 calc(9px - .03em) 0 9px;font-size:8.5px;letter-spacing:.03em;line-height:1;box-sizing:border-box;overflow:visible;white-space:nowrap}
+  .delta.reentry{height:20px;min-width:56px;padding:0 5px;font-size:8px;letter-spacing:.02em;line-height:1;box-sizing:border-box;overflow:visible;white-space:nowrap}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
   .delta.new,.delta.reentry{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
