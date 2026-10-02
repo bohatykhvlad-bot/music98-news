@@ -81,6 +81,11 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_correct_color_photo_attribution_final.py --save
+      - name: Inspect native concert photo originals
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-native-photo-audit]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_find_original_live_guitar.py
       - name: Audit original Ella portrait ICC profile
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-icc-audit]') }}
         run: |
