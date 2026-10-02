@@ -1,8 +1,8 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-02T08:46:09.613Z",
+  "updatedAt": "2026-10-02T09:11:07.924Z",
   "chartUpdated": "2026-10-02",
-  "chartRev": "all-five-sources-v35-spotify50",
+  "chartRev": "verified-spotify-v36",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
@@ -29,7 +29,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:53.935Z",
+      "checkedAt": "2026-10-02T09:10:44.285Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -110,7 +110,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:54.576Z",
+      "checkedAt": "2026-10-02T09:10:45.719Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -146,7 +146,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:49.418Z",
+      "checkedAt": "2026-10-02T09:10:40.876Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -242,7 +242,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:40.343Z",
+      "checkedAt": "2026-10-02T09:10:26.976Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -338,7 +338,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:47.347Z",
+      "checkedAt": "2026-10-02T09:10:38.791Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -374,7 +374,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:46:05.811Z",
+      "checkedAt": "2026-10-02T09:11:05.217Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -455,7 +455,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:31.407Z",
+      "checkedAt": "2026-10-02T09:10:13.296Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -491,7 +491,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:46:04.520Z",
+      "checkedAt": "2026-10-02T09:11:02.871Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -557,7 +557,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:47.346Z",
+      "checkedAt": "2026-10-02T09:10:38.791Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -623,7 +623,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:34.257Z",
+      "checkedAt": "2026-10-02T09:10:18.735Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -659,7 +659,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:31.409Z",
+      "checkedAt": "2026-10-02T09:10:13.299Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -695,7 +695,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:40.345Z",
+      "checkedAt": "2026-10-02T09:10:26.977Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -731,7 +731,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:31.408Z",
+      "checkedAt": "2026-10-02T09:10:13.297Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -767,7 +767,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:54.576Z",
+      "checkedAt": "2026-10-02T09:10:45.718Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -803,7 +803,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:49.419Z",
+      "checkedAt": "2026-10-02T09:10:40.877Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -839,7 +839,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:32.828Z",
+      "checkedAt": "2026-10-02T09:10:15.661Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -935,7 +935,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:37.451Z",
+      "checkedAt": "2026-10-02T09:10:23.715Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -971,7 +971,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:39.251Z",
+      "checkedAt": "2026-10-02T09:10:25.104Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1037,7 +1037,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:42.668Z",
+      "checkedAt": "2026-10-02T09:10:31.982Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1073,7 +1073,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:47.346Z",
+      "checkedAt": "2026-10-02T09:10:38.791Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1109,7 +1109,7 @@
       "score": 850,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:50.097Z",
+      "checkedAt": "2026-10-02T09:10:41.439Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1205,7 +1205,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:50.098Z",
+      "checkedAt": "2026-10-02T09:10:41.441Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1241,7 +1241,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:31.411Z",
+      "checkedAt": "2026-10-02T09:10:13.300Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1277,7 +1277,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:55.201Z",
+      "checkedAt": "2026-10-02T09:10:46.806Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1373,7 +1373,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:34.256Z",
+      "checkedAt": "2026-10-02T09:10:18.735Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1409,7 +1409,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:42.667Z",
+      "checkedAt": "2026-10-02T09:10:31.981Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1490,7 +1490,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:50.099Z",
+      "checkedAt": "2026-10-02T09:10:41.441Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1526,7 +1526,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:32.831Z",
+      "checkedAt": "2026-10-02T09:10:15.663Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1562,7 +1562,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:34.255Z",
+      "checkedAt": "2026-10-02T09:10:18.734Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1582,7 +1582,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:41.401Z",
+      "checkedAt": "2026-10-02T09:10:28.915Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1648,7 +1648,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:48.779Z",
+      "checkedAt": "2026-10-02T09:10:39.871Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1729,7 +1729,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:32.829Z",
+      "checkedAt": "2026-10-02T09:10:15.662Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1765,7 +1765,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:37.450Z",
+      "checkedAt": "2026-10-02T09:10:23.714Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1861,7 +1861,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:58.141Z",
+      "checkedAt": "2026-10-02T09:10:53.715Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1927,7 +1927,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:31.411Z",
+      "checkedAt": "2026-10-02T09:10:13.301Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1963,7 +1963,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:37.450Z",
+      "checkedAt": "2026-10-02T09:10:23.715Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1999,7 +1999,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:47.347Z",
+      "checkedAt": "2026-10-02T09:10:38.792Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2035,7 +2035,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:46:05.188Z",
+      "checkedAt": "2026-10-02T09:11:03.674Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2101,7 +2101,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:55.972Z",
+      "checkedAt": "2026-10-02T09:10:49.268Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2167,7 +2167,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:54.575Z",
+      "checkedAt": "2026-10-02T09:10:45.718Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2233,7 +2233,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:46:09.611Z",
+      "checkedAt": "2026-10-02T09:11:07.922Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2299,7 +2299,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:43.411Z",
+      "checkedAt": "2026-10-02T09:10:34.666Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2380,7 +2380,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:46:00.433Z",
+      "checkedAt": "2026-10-02T09:10:55.958Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2476,7 +2476,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:31.409Z",
+      "checkedAt": "2026-10-02T09:10:13.298Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2512,7 +2512,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:57.120Z",
+      "checkedAt": "2026-10-02T09:10:52.442Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2593,7 +2593,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:34.257Z",
+      "checkedAt": "2026-10-02T09:10:18.737Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2629,7 +2629,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:50.097Z",
+      "checkedAt": "2026-10-02T09:10:41.440Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2665,7 +2665,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T08:46:02.486Z",
+      "checkedAt": "2026-10-02T09:10:59.345Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2761,7 +2761,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:45:50.098Z",
+      "checkedAt": "2026-10-02T09:10:41.441Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2797,7 +2797,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T08:46:02.486Z",
+      "checkedAt": "2026-10-02T09:10:59.345Z",
       "alternatives": [
         {
           "provider": "apple-feed",

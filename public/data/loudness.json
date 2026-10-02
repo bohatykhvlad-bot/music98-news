@@ -4,7 +4,7 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": "2026-10-02T08:46:39.053Z"
+    "measuredAt": "2026-10-02T09:11:47.718Z"
   },
   "ahha|cardib": {
     "integratedLufs": -8.5,
