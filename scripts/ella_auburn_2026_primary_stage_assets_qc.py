@@ -14,4 +14,10 @@ for u in URLS:
   matches=sorted(set(re.findall(r'[^"<>\\s]{0,120}(?:jpg|jpeg|png|webp)[^"<>\\s]{0,60}',data,re.I)))
   print("PAGE",u,"CHARS",len(data),"ALL_IMAGE_URLS",json.dumps(urls[:80])[:13000],flush=True)
   print("IMAGE_MATCHES",json.dumps(matches[:25])[:4000],flush=True)
+
+  for word in ("Welcome Home Ella Langley", "photoGallery", "galleryId", "ella langley", "Zach Bland", "neville arena", "PHOTO_GALLERIES"):
+   at=data.lower().find(word.lower())
+   if at>=0:print("CONTEXT",word,repr(data[max(0,at-400):at+1400])[:1800],flush=True)
+  candidates=re.findall(r'https?[^\\s"<>]{20,260}',data)
+  print("CANDIDATE_HOSTS",repr([v for v in candidates if any(w in v.lower() for w in ('ella','gallery','photos','galleries'))][:40])[:9500],flush=True)
  except Exception as e:print("FAILED",u,str(e)[:150],flush=True)
