@@ -6,7 +6,7 @@ import { adminOk, json, readDesk, writeDesk } from "../lib/store.js";
    The desk entry keeps only the URL reference ("photos/<name>"). */
 
 const MAX_NAME = 80;
-const MAX_BYTES = 3_000_000; // ~3MB binary; admin already compresses to ~700KB
+const MAX_BYTES = 10_000_000; // Accept original JPEG/PNG/WebP, no implicit downscaling or cropping.
 const OK_TYPE = /^image\/(jpeg|png|webp)$/i;
 
 function safeName(raw) {
