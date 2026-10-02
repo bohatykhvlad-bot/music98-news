@@ -35,7 +35,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle serves the browser-only concert photo update",()=>{
-  assert.match(page,/concerts-app\\.js\\?v=20261002-06/);
+  assert.ok(page.includes("concerts-app.js?v=20261002-06"));
 });
 
 
