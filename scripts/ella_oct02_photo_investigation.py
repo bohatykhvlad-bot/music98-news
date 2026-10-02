@@ -11,6 +11,7 @@ URLS={
 "hits-wide-original":"https://res.cloudinary.com/hits-photos-archive/image/upload/v1769533762/MAIN_PRESS_WIDE_USE_IMAGE_1_DIGITAL_RGB_a73yrl.jpg",
 "billboard-caylee-raw":"https://media.zenfs.com/en/billboard_547/80f5cb3c59c106a6caf51f7d27dfe52d",
 "post-wallen-official":"https://cdn.sanity.io/images/o6uq28nb/production/cf9de2550ea73af087764ff9572973a0e65f33a2-1350x1687.jpg",
+"post-wallen-box-original":"https://app.box.com/index.php?rm=box_download_shared_file&shared_name=im7ys9giua9fklfrbh2b6zz37kwrni4o&file_id=f_1525974462869",
 "post-wallen-truck":"https://images.squarespace-cdn.com/content/v1/5c6d8645aadd344a28004478/6ab46bba-8353-4276-9dc9-b94ac6b4b2e7/PostMalonenuevo2.jpg?format=original",
 }
 def get(u):
@@ -27,6 +28,9 @@ for k,u in URLS.items():
    nw=int(h*16/9);temp=temp.crop(((w-nw)//2,0,(w+nw)//2,h))
   else:
    nh=int(w*9/16);temp=temp.crop((0,int(h*.35),w,min(h,int(h*.35)+nh))) if h>=nh+int(h*.35) else ImageOps.fit(temp,(960,540))
+  if k.startswith("post-wallen") and im.width>1000 and im.height>1400:
+   source=ImageOps.exif_transpose(im).convert("RGB")
+   temp=source.crop((0,230,source.width,230+int(source.width*9/16)))
   thumbs.append((k,temp.resize((640,360))))
  except Exception as e:print("PHOTO_ERROR",k,str(e)[:300],flush=True)
 for p in ["https://morganwallen.com/post-malone-morgan-wallen-release-i-had-some-help/","https://www.sonymusic.ca/press_release/ella-langley-unveils-highly-anticipated-sophomore-album-dandelion"]:
