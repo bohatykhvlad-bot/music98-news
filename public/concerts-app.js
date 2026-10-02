@@ -691,7 +691,9 @@ function popupContent(e){
   const date=document.createElement("div"); date.className="pop-meta"; date.textContent=fmtDate(e)+(e.time?" · "+e.time.slice(0,5):"");
   const place=document.createElement("div"); place.className="pop-meta"; place.textContent=placeLine(e);
   main.append(title,date,place);
-  // Presentation-only photo: no link, hover zoom or native dragging.\n  grid.append(img,main);\n  body.appendChild(grid);
+  // Presentation-only photo: no link, hover zoom or native dragging.
+  grid.append(img,main);
+  body.appendChild(grid);
 
   if(e.url){
     const actions=document.createElement("div"); actions.className="pop-actions";
