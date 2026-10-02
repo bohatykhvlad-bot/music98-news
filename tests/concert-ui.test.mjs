@@ -231,11 +231,15 @@ test("mobile initial map opens at world overview while desktop camera stays unch
 test("Belfast is not mapped to the dead ND pseudo-country",()=>{
   assert.doesNotMatch(app,/ND:\["belfast"\]/);
 });
-test("popup uses event image and exposes merged alternate ticket links",()=>{
-  assert.match(app,/img\.src=e\.image\|\|e\.artistImage\|\|"\/logo.png"/);
-  assert.doesNotMatch(app,/const popupImage=String\(e\.artistImage/);
-  assert.match(app,/Array\.isArray\(e\.ticketOptions\)/);
-  assert.match(app,/alt\.className="ticket-alt"/);
+test("popup retains the exact event artwork and has only Buy Tickets",()=>{
+  const section=app.slice(app.indexOf("function popupContent(e){"),app.indexOf("\nfunction eventsAtSameVenue("));
+  assert.match(section,/img\.src=e\.popupImage\|\|e\.image\|\|e\.artistImage\|\|"\/logo.png"/);
+  assert.match(section,/if\(e\.popupImage && img\.src===e\.popupImage/);
+  assert.match(section,/label\.textContent="Buy Tickets"/);
+  assert.doesNotMatch(section,/ticketOptions|ticket-alt|alternatives\.forEach/);
+  const encoded=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
+  const css=JSON.parse(encoded[1]);
+  assert.doesNotMatch(css,/\.ticket-alt/);
 });
 
 test("concert controls keep only search and Popular/Near me",()=>{
@@ -415,7 +419,7 @@ test("single-event popup follows content height without dead space and centers B
   assert.match(single,/actions\.className="pop-actions"/);
   assert.match(single,/body\.appendChild\(actions\)/);
   assert.doesNotMatch(single,/main\.appendChild\(actions\)/);
-  assert.match(single,/Array\.isArray\(e\.ticketOptions\)/);
+  assert.doesNotMatch(single,/ticketOptions|ticket-alt/);
   assert.match(venue,/root\.appendChild\(body\)/);
   assert.doesNotMatch(venue,/pop-card|pop-grid/);
 
