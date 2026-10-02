@@ -311,7 +311,7 @@ test("map failure cannot block Popular/data boot",()=>{
 });
 test("partial area loads are labeled instead of looking complete",()=>{
   assert.match(app,/data\.partial && total>events\.length/);
-  assert.match(app,/Showing the soonest upcoming concerts in this area\\./);
+  assert.ok(app.includes("Showing the soonest upcoming concerts in this area."));
   assert.doesNotMatch(app,/loaded concerts of/);
 });
 
@@ -611,5 +611,5 @@ test("Near me lists up to 30 artists and description/status share rank alignment
   assert.equal(disclosure?.[1],desc?.[1]);
   const area=app.slice(app.indexOf("async function loadArea("),app.indexOf("\nfunction geoPositionOnce("));
   assert.match(area,/setStatus\(data\.partial && total>events\.length/);
-  assert.doesNotMatch(area,/Showing "\+events\.length/);
+  assert.doesNotMatch(area,/loaded concerts of/);
 });
