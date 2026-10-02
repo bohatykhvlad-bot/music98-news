@@ -555,8 +555,8 @@ test("gray concert artist header never changes dimensions between hover and expa
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   assert.match(css,/--event-radius:14px/);
   assert.match(css,/\.tour-card\{[^}]*border:0;border-radius:var\(--event-radius\);overflow:hidden;background:transparent/);
-  assert.match(css,/\.tour-card\{[^}]*transition:box-shadow \.2s ease/);
-  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:var\(--shadow\)/);
+  assert.doesNotMatch(css,/\.tour-card\{[^}]*transition:box-shadow/);
+  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:none/);
   assert.match(css,/\.tour-row\{\s*width:100%;height:70px;min-height:70px;display:grid;/);
   assert.match(css,/\.tour-row\{[^}]*border:0;background:transparent;border-radius:var\(--event-radius\);padding:7px 8px/);
   assert.match(css,/@media\(max-width:640px\)\{[^}]*\.tour-row\{height:62px;min-height:62px;grid-template-columns:24px 44px/);
