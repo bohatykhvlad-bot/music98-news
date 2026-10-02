@@ -360,3 +360,25 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
   assert.match(app,/sideSub\.textContent="";[\s\S]*setStatus\(result\.partial/);
   assert.match(app,/events\.length\+" upcoming concerts · "\+item\.name/);
 });
+
+test("concert artist artwork matches chart dimensions and expanded accent border",()=>{
+  const chart=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
+  const encoded=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
+  assert.ok(encoded,"concert styles must remain available");
+  const css=JSON.parse(encoded[1]);
+
+  assert.match(chart,/\.artwrap\{[^}]*width:56px;height:56px;padding:2px/);
+  assert.match(css,/\.tour-row\{[^}]*grid-template-columns:24px 56px/);
+  assert.match(css,/\.tour-art\{width:56px;height:56px;padding:2px;border-radius:12px;border:0;background:transparent/);
+  assert.match(css,/\.tour-art img\{[^}]*border-radius:10px/);
+  assert.match(chart,/\.chart-row\.playing \.artwrap\{background:var\(--accent\)/);
+  assert.match(css,/\.tour-card\.open \.tour-art\{background:var\(--accent\)\}/);
+
+  assert.match(chart,/\.artwrap\{grid-area:art;width:44px;height:44px;padding:2px/);
+  assert.match(css,/@media\(max-width:640px\)\{[^}]*\.tour-row\{grid-template-columns:24px 44px/);
+  assert.match(css,/\.tour-art\{width:44px;height:44px;border-radius:10px\}/);
+  assert.match(css,/\.tour-art img\{border-radius:8px\}/);
+
+  assert.match(app,/card\.classList\.add\("open"\)/);
+  assert.match(app,/el\.classList\.remove\("open"\)/);
+});
