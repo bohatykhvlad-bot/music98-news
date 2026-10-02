@@ -50,6 +50,15 @@ jobs:
           git config user.email "editorial@music98.news"
           git add .editorial/ella-triple-tigers-approved-2025-preview.b64
           git diff --cached --quiet || (git commit -m "Stage visual review of first-party Ella label-approved photo" && git push)
+      - name: Inspect Andrew Wendowski's original 2026 Ella guitar photographs
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-andrew-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella-andrew-2026-source-qc.py
+          git config user.name "music98 photo QC"
+          git config user.email "editorial@music98.news"
+          git add .editorial/ella-andrew-own-2026-guitar-qc.b64 .editorial/ella-andrew-own-2026-guitar-qc.json
+          git diff --cached --quiet || (git commit -m "Stage photographer-original 2026 Ella guitar photo comparisons" && git push)
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
