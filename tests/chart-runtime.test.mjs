@@ -84,3 +84,12 @@ test("ranking refuses any missing input before changing tenure",()=>{
  assert.match(top50,/const memory=\{deferPersist:true\}/);
  assert.match(top50,/const TOP50_RETRY_KV/);
 });
+
+test("only today's official Apple chart may fill a blocked origin",()=>{
+ assert.match(top50,/async function freshAppleRanking\(env,origin\)/);
+ assert.match(top50,/snap.updated!==today/);
+ assert.match(top50,/snap.source!=="official-apple-rss"/);
+ assert.match(top50,/rows.length>=SOURCE_MIN_ROWS/);
+ assert.match(top50,/if\(apple.length<SOURCE_MIN_ROWS\)/);
+ assert.match(top50,/if\(!completeChartSources\(sources\)\)/);
+});

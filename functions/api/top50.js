@@ -750,8 +750,27 @@ async function seedBaked(origin, tracks) {
   } catch {}
 }
 
+/* If Apple's live origin is blocked on Cloudflare, use ONLY today's
+   validated official RSS chart fetched from GitHub Actions. */
+async function freshAppleRanking(env,origin) {
+ const snap=await readSeed(env,origin,"apple-chart.json");
+ const today=new Date().toISOString().slice(0,10);
+ if(snap?.schema!==1||snap.updated!==today||
+    snap.source!=="official-apple-rss"||!Array.isArray(snap.tracks))return [];
+ const pos=new Set(),keys=new Set(),rows=[];
+ for(const rec of snap.tracks){
+   const n=Number(rec?.pos),title=String(rec?.title||"").trim(),
+     artist=String(rec?.artist||"").trim(),key=mergeKey(title,artist);
+   if(!title||!artist||!Number.isInteger(n)||n<1||n>SIZE||
+      pos.has(n)||keys.has(key))return [];
+   pos.add(n);keys.add(key);
+   rows.push({pos:n,title,artist,url:String(rec.url||""),
+      art:String(rec.art||""),year:String(rec.year||""),prev:""});
+ }
+ return rows.length>=SOURCE_MIN_ROWS?rows.sort((a,b)=>a.pos-b.pos):[];
+}
 export async function buildTop50(origin, env) {
-  const [apple, spotify, deezer, billboard, youtube] = await Promise.all([
+  let [apple, spotify, deezer, billboard, youtube] = await Promise.all([
     safe("A", async () => parseApple(await getJson("https://rss.applemarketingtools.com/api/v2/us/music/most-played/50/songs.json"))),
     safe("S", async () => parseSpotify(await getText("https://kworb.net/spotify/country/global_daily.html"))),
     safe("D", async () => parseDeezer(await getJson("https://api.deezer.com/chart/0/tracks?limit=50"))),
@@ -770,6 +789,11 @@ export async function buildTop50(origin, env) {
       query: JSON.stringify({ region: "global" }),
     }))),
   ]);
+  let appleOrigin="live";
+  if(apple.length<SOURCE_MIN_ROWS){
+    apple=await freshAppleRanking(env,origin);
+    appleOrigin=apple.length>=SOURCE_MIN_ROWS?"github-current-day":"unavailable";
+  }
   const sources={A:apple.length,S:spotify.length,D:deezer.length,B:billboard.length,Y:youtube.length};
   if(!completeChartSources(sources))
     throw new Error("incomplete_chart_sources:"+JSON.stringify(sources));
@@ -825,6 +849,7 @@ export async function buildTop50(origin, env) {
     week: chartWeek() + 1,
     rev: "all-five-sources-v34",
     sources,
+    sourceOrigin:{A:appleOrigin},
     complete:true,
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
