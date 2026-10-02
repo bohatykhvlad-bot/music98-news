@@ -13,6 +13,11 @@ import post as runner,gate
 ROOT=Path(__file__).resolve().parents[1]
 ID="ella26choosintexas"
 OLD=(ROOT/"scripts/ella-oct02-longread-body.txt").read_text(encoding="utf-8").strip()
+# Owner's current manual last-photo crop confirmed by authorized desk diff.
+# Preserve that edit in the exact expected prewrite snapshot; the final media
+# itself is being replaced, so this crop applies only to the stale photo.
+OLD=OLD.replace("ella-caylee-2024-cma-guitar-native-3648.jpg|Caylee Robillard|https://www.cayleerobillard.com/|50% 52%|1",
+                "ella-caylee-2024-cma-guitar-native-3648.jpg|Caylee Robillard|https://www.cayleerobillard.com/|47.7% 48.2%|1")
 NEW=(ROOT/"scripts/ella-20261002-editorial-reviewed-body.txt").read_text(encoding="utf-8").strip()
 PHOTO="ella-caylee-2024-cma-duet-landscape.jpg"
 SOURCE="https://imgix.bustle.com/uploads/image/2024/7/2/fcd53eef/dsc03118.jpg"
