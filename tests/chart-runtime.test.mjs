@@ -72,3 +72,15 @@ test("verified chart recovery rejects mass day-one resets and old launch snapsho
   assert.doesNotMatch(top50.slice(top50.indexOf("export async function onRequestGet")),
     /bakedTop50\(/);
 });
+
+test("ranking refuses any missing input before changing tenure",()=>{
+ const body=top50.slice(top50.indexOf("function completeChartSources"),top50.indexOf("function verifiedSourceSnapshot"));
+ const gate=new Function("SOURCES","SOURCE_MIN_ROWS",body+";return completeChartSources;")(["A","S","D","B","Y"],40);
+ const all={A:50,S:47,D:50,B:50,Y:50};
+ assert.equal(gate(all),true);
+ for(const k of Object.keys(all))assert.equal(gate({...all,[k]:0}),false,k);
+ assert.equal(gate({...all,A:39}),false);
+ assert.ok(top50.indexOf('if(!completeChartSources(sources))')<top50.indexOf('ingest(bucket, "A", apple)'));
+ assert.match(top50,/const memory=\{deferPersist:true\}/);
+ assert.match(top50,/const TOP50_RETRY_KV/);
+});

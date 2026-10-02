@@ -12,6 +12,8 @@ const r = await fetch(liveUrl, {
 });
 if (!r.ok) throw new Error("live top50 HTTP " + r.status);
 const j = await r.json();
+if(j.fallback || j.complete!==true || !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])>=40))
+  throw new Error("refusing to snapshot incomplete ranking");
 const tracks = Array.isArray(j.tracks) ? j.tracks : [];
 if (tracks.length !== 50) throw new Error("refusing tenure snapshot: expected 50 rows, got " + tracks.length);
 if (j.arrows && j.arrows.ok === false) throw new Error("refusing tenure snapshot: live arrow/tenure self-check failed");
@@ -66,6 +68,8 @@ const snapshot = {
   updated: String(j.updated || ""),
   week: Number.isFinite(memoryWeek) ? memoryWeek : (Number.isFinite(payloadWeek) ? payloadWeek - 1 : null),
   rev: String(j.rev || ""),
+  complete:true,
+  sources:Object.fromEntries(["A","S","D","B","Y"].map(k=>[k,Number(j.sources[k])])),
   tracks: tracks.map((t,i) => ({
     rank: Number(t.rank) || i + 1,
     title: String(t.title || ""),

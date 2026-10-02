@@ -6,8 +6,18 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v33";
+const TOP50_KV = "top50v34";
+const TOP50_RETRY_KV="top50v34:retry";
+const SOURCE_MIN_ROWS=40;
 const SOURCES = ["A", "S", "D", "B", "Y"];
+/* A source missing even once changes the scoring scale and fabricates movement. */
+function completeChartSources(s) {
+  return !!s && SOURCES.every(k=>Number(s[k])>=SOURCE_MIN_ROWS);
+}
+function verifiedSourceSnapshot(s) {
+  return !!s && s.complete===true && completeChartSources(s.sources) &&
+    Array.isArray(s.tracks) && s.tracks.length===SIZE;
+}
 const YT_CHARTS =
   "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
 
@@ -319,7 +329,7 @@ function normalizeEver(old) {
    the first rebuild treated the entire Top 50 as day one. A checked-in snapshot
    from the previous healthy day gives us an independent recovery source. */
 function tenureBackupState(snapshot) {
-  if (!snapshot || !Array.isArray(snapshot.tracks) || snapshot.tracks.length < 10) return null;
+  if (!verifiedSourceSnapshot(snapshot)) return null;
   const snapshotWeek = Number(snapshot.week);
   if (!Number.isFinite(snapshotWeek)) return null;
   const keys = [];
@@ -351,7 +361,7 @@ async function tenureRecoverySnapshot(env, origin, week) {
     .map(tenureBackupState)
     .filter(Boolean);
   return {
-    prior: candidates.find((x) => x.week === week - 1) || null,
+    prior: candidates.find((x) => x.week < week) || null,
     same: candidates.find((x) => x.week === week) || null,
   };
 }
@@ -402,42 +412,21 @@ async function applyTenure(env, tracks, diag, origin) {
     firstDay[k] = Math.max(0, (Number.isFinite(at) ? at : week) - (w - 1));
   }
 
-  const recovery = await tenureRecoverySnapshot(env, origin, week);
-  const evidence = tenureResetEvidence(tracks, ten, seen, firstDay, recovery.prior);
-  if (evidence.repair && recovery.prior) {
-    const prior = recovery.prior;
-    const mergedSeen = { ...seen };
-    for (const [k, rec] of Object.entries(prior.seen)) {
-      const old = mergedSeen[k];
-      if (!old || (Number(old.weeks) || 0) < (Number(rec.weeks) || 0)) {
-        mergedSeen[k] = { ...rec };
-      }
-    }
-    for (const [k, day] of Object.entries(prior.firstDay)) {
-      const old = Number(firstDay[k]);
-      firstDay[k] = Number.isFinite(old) ? Math.min(old, day) : day;
-    }
-    ten = {
-      launch: "2026-09-17",
-      epoch: "daily",
-      week: prior.week,
-      keys: [...prior.keys],
-      today: [...prior.keys],
-      seen: mergedSeen,
-    };
-    seen = mergedSeen;
-    if (diag) {
-      diag.recoveryApplied = true;
-      diag.recoverySource = "repo-snapshot";
-      diag.recoveryWeek = prior.week;
-      diag.recoveryEvidence = evidence;
-    }
-  } else if (diag) {
-    diag.recoveryApplied = false;
-    diag.recoverySource = recovery.prior ? "not-needed" : "unavailable";
-    diag.recoveryWeek = recovery.prior ? recovery.prior.week : null;
-    diag.recoveryEvidence = evidence;
-  }
+  const recovery=await tenureRecoverySnapshot(env,origin,week);
+  const evidence=tenureResetEvidence(tracks,ten,seen,firstDay,recovery.prior);
+  if(recovery.prior) {
+    const prior=recovery.prior;
+    /* Restore the last all-five-source chart, not the corrupted interim day. */
+    const older=Object.fromEntries(Object.entries(seen)
+      .filter(([,rec])=>Number(rec?.lastWeek)<=prior.week));
+    seen={...older,...prior.seen};
+    Object.assign(firstDay,prior.firstDay);
+    ten={launch:"2026-09-17",epoch:"daily",week:prior.week,
+      keys:[...prior.keys],today:[...prior.keys],seen};
+    if(diag)Object.assign(diag,{recoveryApplied:true,
+      recoverySource:"last-complete-chart",recoveryWeek:prior.week,recoveryEvidence:evidence});
+  } else if(diag)Object.assign(diag,{recoveryApplied:false,
+    recoverySource:"unavailable",recoveryEvidence:evidence});
 
   const sameDay = ten.week === week;
   const hasToday = Array.isArray(ten.today) && ten.today.length > 0;
@@ -493,6 +482,11 @@ async function applyTenure(env, tracks, diag, origin) {
 
     track.weeks = Math.max(1, week - firstDay[key] + 1);
     if (!first && prevPos >= 0) track.weeks = Math.max(2, track.weeks);
+    if(recovery.prior && recovery.prior.week < week-1 && prevPos>=0){
+      /* A skipped publication does not establish that a track charted that day. */
+      track.weeks=Number(recovery.prior.seen[key]?.weeks||1)+1;
+      firstDay[key]=week-track.weeks+1;
+    }
     seen[key] = { weeks: track.weeks, lastPos: i, lastWeek: week, delta: track.delta };
   });
 
@@ -531,10 +525,11 @@ async function applyTenure(env, tracks, diag, origin) {
 
   ten.week = week;
   ten.seen = seen;
-  if (env && env.DESK) {
-    await env.DESK.put(TENURE_KV, JSON.stringify(ten));
-    await env.DESK.put(FIRST_KV, JSON.stringify(firstDay));
-    await env.DESK.put(EVER_KV, JSON.stringify({ schema: 1, seen: ever }));
+  if(diag && diag.deferPersist)diag.pendingTenure={ten,firstDay,ever};
+  else if(env && env.DESK){
+    await env.DESK.put(TENURE_KV,JSON.stringify(ten));
+    await env.DESK.put(FIRST_KV,JSON.stringify(firstDay));
+    await env.DESK.put(EVER_KV,JSON.stringify({schema:1,seen:ever}));
   }
   return tracks;
 }
@@ -775,6 +770,9 @@ export async function buildTop50(origin, env) {
       query: JSON.stringify({ region: "global" }),
     }))),
   ]);
+  const sources={A:apple.length,S:spotify.length,D:deezer.length,B:billboard.length,Y:youtube.length};
+  if(!completeChartSources(sources))
+    throw new Error("incomplete_chart_sources:"+JSON.stringify(sources));
   const bucket = new Map();
   ingest(bucket, "A", apple);
   ingest(bucket, "S", spotify);
@@ -825,8 +823,9 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "tenure-recovery-v33",
-    sources: { A: apple.length, S: spotify.length, D: deezer.length, B: billboard.length, Y: youtube.length },
+    rev: "all-five-sources-v34",
+    sources,
+    complete:true,
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
       names: Object.keys(NAME_SEED || {}).length,
@@ -948,7 +947,7 @@ function cachedTenureRegressed(payload, backup) {
    recent ranking, arrow positions and cumulative day counts. */
 async function verifiedBackupTop50(env, origin, backup) {
   const snap = backup && backup.current;
-  if (!snap || !Array.isArray(snap.tracks) || snap.tracks.length !== SIZE ||
+  if (!verifiedSourceSnapshot(snap) ||
       !/^20\d{2}-\d{2}-\d{2}$/.test(String(snap.updated || ""))) return null;
   const baked = await readSeed(env, origin, "top50.json");
   const known = new Map(((baked && baked.tracks) || [])
@@ -967,7 +966,8 @@ async function verifiedBackupTop50(env, origin, backup) {
   tracks.forEach(t => { t.url = appleAff(t.url); if (!isApplePreview(t.prev)) t.prev = ""; });
   return {
     updated: snap.updated, launch:"2026-09-17", week:Number(snap.week)+1,
-    rev:"verified-backup-v34", fallback:"verified-snapshot", tracks,
+    rev:"verified-backup-v35", fallback:"verified-snapshot", complete:true,
+    sources:snap.sources, tracks,
     covers:{ missing:tracks.filter(t=>!t.art).length }
   };
 }
@@ -979,7 +979,8 @@ async function lastGood(env, backup) {
   if (!env || !env.DESK) return null;
   try {
     const v = await env.DESK.get(TOP50_KV, { type: "json" });
-    if (v && Array.isArray(v.tracks) && v.tracks.length === SIZE &&
+    if (v && v.complete===true && completeChartSources(v.sources) &&
+        Array.isArray(v.tracks) && v.tracks.length === SIZE &&
         !cachedTenureRegressed(v, backup)) return v;
   } catch {}
   return null;
@@ -1046,41 +1047,53 @@ async function bestVerifiedFallback(env, origin, backup) {
   return good ? decorateCachedTop50(env, good, origin) : null;
 }
 
-export async function onRequestGet({ env, request }) {
-  const today = new Date().toISOString().slice(0, 10);
-  const origin = new URL(request.url).origin;
-  const backup = await readSeed(env, origin, "chart-tenure-backup.json");
-  if (env && env.DESK) {
-    try {
-      const cached = await env.DESK.get(TOP50_KV, { type: "json" });
-      if (cached && cached.updated === today && Array.isArray(cached.tracks) &&
-          cached.tracks.length === SIZE && !cachedTenureRegressed(cached, backup)) {
-        return top50Response(await decorateCachedTop50(env, cached, origin));
-      }
-    } catch {}
-  }
-  try {
-    const payload = await withTimeout(buildTop50(origin, env), 14000);
-    const activeSources = Object.values(payload.sources || {})
-      .filter(n => Number(n) >= 10).length;
-    if (!Array.isArray(payload.tracks) || payload.tracks.length !== SIZE ||
-        activeSources < 2) throw new Error("incomplete chart sources");
-    const memory = {};
-    payload.tracks = await applyTenure(env, payload.tracks, memory, origin);
-    payload.memory = memory;
-    payload.arrows = arrowCheck(payload.tracks);
-    if (payload.arrows && payload.arrows.ok === false ||
-        cachedTenureRegressed(payload, backup))
-      throw new Error("chart tenure continuity failed");
-    if (env && env.DESK) {
-      try { await env.DESK.put(TOP50_KV, JSON.stringify(payload)); } catch {}
+async function fallbackOrUnavailable(env,origin,backup) {
+  const fallback=await bestVerifiedFallback(env,origin,backup);
+  if(fallback)return top50Response(fallback);
+  return new Response(JSON.stringify({error:"chart_temporarily_unavailable"}),{
+    status:503,headers:{"Content-Type":"application/json","Cache-Control":"no-store"}
+  });
+}
+export async function onRequestGet({env,request}) {
+  const today=new Date().toISOString().slice(0,10);
+  const origin=new URL(request.url).origin;
+  const backup=await readSeed(env,origin,"chart-tenure-backup.json");
+  if(env?.DESK)try{
+    const cached=await env.DESK.get(TOP50_KV,{type:"json"});
+    if(cached?.updated===today && cached.complete===true &&
+       completeChartSources(cached.sources) && cached.tracks?.length===SIZE &&
+       !cachedTenureRegressed(cached,backup))
+      return top50Response(await decorateCachedTop50(env, cached, origin));
+    if(await env.DESK.get(TOP50_RETRY_KV))
+      return fallbackOrUnavailable(env,origin,backup);
+  }catch{}
+  try{
+    const payload=await withTimeout(buildTop50(origin,env),14000);
+    if(payload.complete!==true || !completeChartSources(payload.sources) ||
+       payload.tracks?.length!==SIZE)throw new Error("incomplete_chart_sources");
+    const memory={deferPersist:true};
+    payload.tracks=await applyTenure(env,payload.tracks,memory,origin);
+    payload.arrows=arrowCheck(payload.tracks);
+    if(payload.arrows?.ok===false || cachedTenureRegressed(payload,backup))
+      throw new Error("failed_chart_tenure_checks");
+    const pending=memory.pendingTenure;
+    delete memory.pendingTenure;
+    delete memory.deferPersist;
+    payload.memory=memory;
+    if(env?.DESK && pending){
+      await env.DESK.put(TENURE_KV,JSON.stringify(pending.ten));
+      await env.DESK.put(FIRST_KV,JSON.stringify(pending.firstDay));
+      await env.DESK.put(EVER_KV,JSON.stringify({schema:1,seen:pending.ever}));
+      /* Write the public Top 50 LAST; never publish a partial-input ranking. */
+      await env.DESK.put(TOP50_KV,JSON.stringify(payload));
     }
     return top50Response(payload);
-  } catch (err) {
-    const fallback = await bestVerifiedFallback(env, origin, backup);
-    if (fallback) return top50Response(fallback);
-    return new Response(JSON.stringify({error:"chart_temporarily_unavailable"}), {
-      status:503, headers:{"Content-Type":"application/json","Cache-Control":"no-store"}
-    });
+  }catch(err){
+    if(env?.DESK)try{
+      await env.DESK.put(TOP50_RETRY_KV,JSON.stringify({
+        failedAt:new Date().toISOString(),detail:String(err?.message||"unavailable").slice(0,160)
+      }),{expirationTtl:1800});
+    }catch{}
+    return fallbackOrUnavailable(env,origin,backup);
   }
 }
