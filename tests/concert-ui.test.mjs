@@ -620,6 +620,8 @@ test("two-pass high-quality browser resampling preserves original popup crop and
   assert.doesNotMatch(css,/cursor:zoom-in/);
   const popup=app.slice(app.indexOf("function popupContent(e){"),app.indexOf("\nfunction venuePopupContent(",app.indexOf("function popupContent(e){")));
   assert.match(popup,/full\.href=eventImageUrl/);
+  assert.match(popup,/full\.draggable=false/);
+  assert.match(popup,/full\.addEventListener\("dragstart",event=>event\.preventDefault\(\)\)/);
   assert.doesNotMatch(popup,/full\.title="Open original image"/);
   const selector=app.slice(to,app.indexOf("\nfunction popupContent(e){",to));
   assert.match(selector,/browserResampleConcertArt\(img,preset\)/);
