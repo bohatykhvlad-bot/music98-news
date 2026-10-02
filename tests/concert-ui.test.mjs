@@ -492,22 +492,40 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 });
 
 
-test("Concerts sidebar shadows do not overlap the status or Ticketmaster disclosure",()=>{
+test("Concerts sidebar has symmetric shadow insets without moving the text baselines",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   const scroller=css.match(/\.tours\{[^}]*scrollbar-gutter:stable;margin:0 -(\d+)px;padding:(\d+)px (\d+)px (\d+)px (\d+)px;overscroll-behavior:contain\}/);
-  assert.ok(scroller,"scroll container needs horizontal-only overflow clearance");
-  const [sideMargin,padTop,padRight,padBottom,padLeft]=scroller.slice(1).map(Number);
-  assert.equal(padLeft,sideMargin,"artist rows retain their previous left alignment");
-  assert.equal(padRight-sideMargin,3,"right side retains the 3px scrollbar clearance");
-  assert.ok(padTop>=12 && padBottom>=18,"all sides of expanded cards retain shadow clearance");
-  assert.doesNotMatch(css,/\.tours\{[^}]*margin:-\d+px/,"scroller must not cover the upper status");
-  assert.doesNotMatch(css,/\.tours\{[^}]*margin:[^;]*-\d+px -\d+px/,"scroller must not overlap the bottom disclosure");
+  assert.ok(scroller,"scroller has a native scrollbar and matching content insets");
+  const [margin,padTop,padRight,padBottom,padLeft]=scroller.slice(1).map(Number);
+  assert.equal(margin,12);
+  assert.equal(padLeft,padRight);
+  assert.equal(padLeft,margin,"left artist and rank coordinates cannot shift");
+  assert.ok(padTop>=12 && padBottom>=18);
+  assert.doesNotMatch(css,/\.tours\{[^}]*margin:-\d+px/);
+  assert.match(css,/\.side\{[^}]*padding:13px;height:420px/);
+  assert.match(css,/\.side-sub\{[^}]*margin:0 4px 10px 17px/);
   assert.match(css,/\.side-status\{[^}]*margin:0 4px 8px 17px/);
+  assert.match(css,/\.side-empty\{[^}]*padding:12px 5px 12px 17px/);
   assert.match(css,/\.disclosure\{[^}]*margin-top:8px;padding:10px 4px 2px 17px/);
   assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:var\(--shadow\)/);
+  assert.match(css,/\.tour-events\{[^}]*padding:0 9px;background:#fff/);
+  assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*padding:2px 9px 10px/);
+  assert.match(css,/\.event-link\{[^}]*width:100%;[^}]*margin:4px 0/);
   assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.tours\{overflow:visible;margin:0;padding:0;scrollbar-gutter:auto\}/);
 });
-
+test("Concerts page retains consistent desktop and mobile alignment",()=>{
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(css,/\.layout\{display:grid;grid-template-columns:minmax\(0,1fr\) 370px;gap:16px/);
+  assert.match(css,/\.map-shell\{[^}]*height:420px;[^}]*border-radius:var\(--r\)/);
+  assert.match(css,/\.side\{[^}]*border-radius:var\(--r\)/);
+  assert.match(css,/\.side-tabs\{[^}]*align-self:center/);
+  assert.match(css,/\.map-mode-switch\{[^}]*left:14px;top:14px/);
+  assert.match(css,/@media\(max-width:900px\)\{\s*\.layout\{grid-template-columns:1fr\}/);
+  assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.wrap\{padding:18px 14px 36px\}/);
+  assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.map-mode-switch\{left:10px;top:10px/);
+  assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{left:auto;right:10px;top:10px/);
+  assert.match(css,/@media\(max-width:640px\)\{\s*\.tour-row\{height:62px;min-height:62px/);
+});
 test("gray concert artist header never changes dimensions between hover and expanded states",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   assert.match(css,/--event-radius:14px/);
