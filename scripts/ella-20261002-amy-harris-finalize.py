@@ -13,6 +13,12 @@ import post as runner, gate
 HERE=Path(__file__).resolve().parent
 POST_ID="ella26choosintexas"
 PREV=(HERE/"ella-20261002-all-originals-final-body.txt").read_text("utf8").strip()
+# Rebase on owner's verified credit-only edit in the current draft:
+# the publisher URL was removed without changing the photographer's name.
+PREV=PREV.replace(
+ "[photo:photos/ella-bluesfest-2026-miriam-visser-full-original.jpg|Miriam Visser|https://charlatan.ca/bluesfest-ella-langley-angine-de-poitrine-night-seven/|50% 50%|1]",
+ "[photo:photos/ella-bluesfest-2026-miriam-visser-full-original.jpg|Miriam Visser||50% 50%|1]"
+)
 NEW=(HERE/"ella-20261002-amy-harris-proofread-body.txt").read_text("utf8").strip()
 HERO="photos/ella-sony-standing-dandelion-2026-srgb.jpg"
 PHOTOS={
