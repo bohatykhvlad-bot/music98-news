@@ -28,9 +28,9 @@ def read_url(url):
  with urllib.request.urlopen(req,timeout=55) as r:return r.read(),r.headers.get("Content-Type","")
 def local_image(name,source,w,h):
  raw,ctype=read_url(source)
- im=Image.open(io.BytesIO(raw));im=ImageOps.exif_transpose(im)
+ im=Image.open(io.BytesIO(raw));fmt=im.format;im=ImageOps.exif_transpose(im)
  assert im.size==(w,h),(name,im.size)
- assert im.format=="JPEG", (name,im.format)
+ assert fmt=="JPEG", (name,fmt)
  if name==HERO_NAME:
   # Compress original native Sony crop source in its full unmodified resolution.
   buf=io.BytesIO();im.convert("RGB").save(buf,"JPEG",quality=87,optimize=True)
