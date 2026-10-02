@@ -1,0 +1,1 @@
+Verify Desk propagation after native Ella source photo write; read only. Existing job may have observed prior eventual-consistency read.
