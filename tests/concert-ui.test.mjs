@@ -413,12 +413,16 @@ test("single event popup uses responsive square artwork and bottom-aligned ticke
   assert.doesNotMatch(venue,/pop-card|pop-grid/);
 
   assert.match(css,/\.pop-card\{width:100%;aspect-ratio:1;background:#fff;display:flex;flex-direction:column\}/);
-  assert.match(css,/\.pop-card \.pop-grid\{display:grid;grid-template-columns:126px minmax\(0,1fr\)/);
-  assert.match(css,/\.pop-card \.pop-thumb\{[^}]*width:126px;height:126px;aspect-ratio:1;object-fit:cover;object-position:50% 18%/);
-  assert.match(css,/\.pop-card \.pop-main\{[^}]*display:flex;flex-direction:column/);
+  assert.match(css,/\.pop-card \.pop-grid\{display:grid;grid-template-columns:138px minmax\(0,1fr\)/);
+  assert.match(css,/\.pop-card \.pop-thumb\{[^}]*width:138px;height:138px;aspect-ratio:1;object-fit:cover;object-position:50% 18%/);
+  assert.match(css,/\.pop-card \.pop-body\{[^}]*justify-content:center/);
+  assert.match(css,/\.pop-card \.pop-grid\{[^}]*min-height:200px/);
+  assert.match(css,/\.pop-card \.pop-main\{[^}]*min-height:200px;display:flex;flex-direction:column/);
   assert.match(css,/\.pop-card \.pop-actions\{[^}]*justify-content:center;margin-top:auto/);
   assert.match(css,/\.pop-card \.pop-actions \.buy\{width:min\(150px,100%\);margin:0\}/);
   assert.match(css,/\.pop-card \.pop-meta \+ \.pop-meta\{margin-bottom:0\}/);
   assert.match(css,/@media\(max-width:640px\)\{[\s\S]*?\.pop-card \.pop-grid\{grid-template-columns:100px minmax\(0,1fr\)/);
+  assert.match(css,/\.pop-card \.pop-grid\{grid-template-columns:100px minmax\(0,1fr\);gap:10px;min-height:170px/);
+  assert.match(css,/\.pop-card \.pop-main\{min-height:170px\}/);
   assert.match(css,/\.mapboxgl-popup\{max-width:min\(var\(--pop-w,286px\),calc\(100vw - 44px\)\)!important/);
 });
