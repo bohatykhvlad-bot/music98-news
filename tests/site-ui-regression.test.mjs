@@ -165,7 +165,7 @@ test("site text stays off persistent compositor transforms and whole-button filt
 test("same-day chart cache never preserves rows with missing artwork",()=>{
   assert.match(page,/cached\.tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)/);
   assert.match(page,/if\(fresh && tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)\)/);
-  assert.match(page,/lsSetRaw\(DAILYKEY, JSON\.stringify\(\{date: todayUTC\(\), tracks\}\)\)/);
+  assert.match(page,/lsSetRaw\(DAILYKEY, JSON\.stringify\(\{date: todayUTC\(\), tracks, sources:j\.sources\}\)\)/);
   assert.match(page,/\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=44"/);
 });
 
