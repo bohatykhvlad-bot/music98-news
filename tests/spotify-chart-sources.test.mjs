@@ -65,9 +65,10 @@ test("Spotify source dates are checked in UTC and expire after two days",()=>{
 test("daily fallback requires verified provenance and all 50 tracks",()=>{
  const now=Date.parse("2026-10-02T16:00:00Z");
  const s={schema:1,verified:true,chartDate:"2026-09-30",provider:"kworb+musicrank",
-   mirrorMatched:50,tracks};
+   mirrorMatched:50,fingerprint:"a".repeat(64),tracks};
  assert.equal(verifiedSpotifySnapshot(s,now)?.tracks.length,50);
  assert.equal(verifiedSpotifySnapshot({...s,mirrorMatched:49},now),null);
+ assert.equal(verifiedSpotifySnapshot({...s,fingerprint:"invalid"},now),null);
  assert.equal(verifiedSpotifySnapshot({...s,tracks:tracks.slice(0,49)},now),null);
  assert.equal(verifiedSpotifySnapshot({...s,chartDate:"2026-09-29"},now),null);
  assert.equal(verifiedSpotifySnapshot({...s,provider:"musicrank-self-validated",ldConfirmed:20},now)?.tracks.length,50);

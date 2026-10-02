@@ -80,15 +80,14 @@ test("clean Chart and Concerts routes are no-store",()=>{
 });
 
 
-test("same-day chart cache is an instant paint and always revalidates",()=>{
-  assert.match(page,/const DAILYKEY = "music98news_daily_v44"/);
-  assert.match(page,/const hasFreshCache=!!\(cached/);
-  assert.match(page,/fetch\("\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=44"/);
-  assert.match(page,/cache:"no-store"/);
-  assert.doesNotMatch(page,/grab\("\/data\/top50\.json/);
-  assert.match(page,/setChartStatus\(\{\}, "loading"\)/);
+test("daily chart checks server freshness before painting browser cache",()=>{
+ assert.match(page,/const DAILYKEY = "music98news_daily_v45"/);
+ assert.match(page,/const hasFreshCache=!!\(cached/);
+ assert.match(page,/sourceDates\?\.S && cached.spotifyFingerprint/);
+ assert.doesNotMatch(page,/if\(hasFreshCache\) applyDaily\(cached.tracks, "cache"\)/);
+ assert.match(page,/fetch\("\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=45"/);
+ assert.match(page,/cache:"no-store"/);
 });
-
 
 test("chart preview uses measured attenuation-only loudness normalization",()=>{
   assert.match(page,/const CHART_FALLBACK_GAIN_DB = -8/);
@@ -162,11 +161,11 @@ test("site text stays off persistent compositor transforms and whole-button filt
 });
 
 
-test("same-day chart cache never preserves rows with missing artwork",()=>{
-  assert.match(page,/cached\.tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)/);
-  assert.match(page,/if\(fresh && tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)\)/);
-  assert.match(page,/lsSetRaw\(DAILYKEY, JSON\.stringify\(\{date: todayUTC\(\), tracks, sources:j\.sources\}\)\)/);
-  assert.match(page,/\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=44"/);
+test("daily chart caches only complete, source-stamped rows with artwork",()=>{
+ assert.match(page,/cached.tracks.every\(t=>String\(t.art\|\|""\).trim\(\)\)/);
+ assert.match(page,/if\(fresh && tracks.every\(t=>String\(t.art\|\|""\).trim\(\)\)\)/);
+ assert.match(page,/spotifyFingerprint:j.spotifyFingerprint/);
+ assert.match(page,/sourceDates:j.sourceDates/);
 });
 
 test("chart fallback never flashes the launch day and mobile hides the status caption",()=>{
@@ -206,15 +205,9 @@ test("mobile chart reclaims arrow space without shrinking artwork or playback",(
   assert.ok(page.includes(".chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:82px 56px"));
 });
 
-test("browser never caches an incomplete chart, and shows verified fallback date",()=>{
- assert.match(page,/j\.complete === true/);
- assert.match(page,/Number\(j\.sources\?\.\[k\]\)>=40/);
+test("the UI insists on all five full sources and verified Spotify metadata",()=>{
+ assert.match(page,/j.complete === true/);
+ assert.match(page,/Number\(j.sources\?\.\[k\]\)===50/);
+ assert.match(page,/!!j.sourceDates\?\.S && !!j.spotifyFingerprint/);
  assert.match(page,/Last complete chart:/);
- assert.match(page,/chartSourceNotice/);
-});
-
-test("Spotify cache is current only when all 50 ranks were parsed",()=>{
- assert.match(page,/cached.sources\?\.S === 50/);
- assert.match(page,/Number\(j.sources.S\)===50/);
- assert.match(page,/sources:j.sources/);
 });
