@@ -233,7 +233,7 @@ test("Belfast is not mapped to the dead ND pseudo-country",()=>{
 });
 test("popup retains the exact event artwork and has only Buy Tickets",()=>{
   const section=app.slice(app.indexOf("function popupContent(e){"),app.indexOf("\nfunction eventsAtSameVenue("));
-  assert.match(section,/applyConcertArt\\(img,e\\.image\\|\\|e\\.artistImage\\|\\|"\\/logo.png",720\\)/);
+  assert.ok(section.includes('applyConcertArt(img,e.image||e.artistImage||"/logo.png",720)'));
   assert.doesNotMatch(section,/popupImage/);
   assert.match(section,/label\.textContent="Buy Tickets"/);
   assert.doesNotMatch(section,/ticketOptions|ticket-alt|alternatives\.forEach/);
