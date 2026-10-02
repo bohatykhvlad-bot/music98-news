@@ -71,6 +71,16 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_oct02_photo_investigation.py
+      - name: Verify Ella corrected photo links and end layout without writing
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-color-credit-audit]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_correct_color_photo_attribution_final.py --audit
+      - name: Save Ella ICC-corrected cover and photographer credits
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-color-credit-save]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_correct_color_photo_attribution_final.py --save
       - name: Audit original Ella portrait ICC profile
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-icc-audit]') }}
         run: |
