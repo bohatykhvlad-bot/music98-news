@@ -160,7 +160,8 @@ main{position:relative;z-index:1}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
 
 /* hero — left cell matches the text column; photo fills and crops to the face */
-.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
+.hero-card{margin-bottom:18px;padding:6px;background:var(--card);border-radius:calc(var(--r) + 6px);box-shadow:var(--shadow)}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin:0;box-shadow:none;cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .hero .cover{position:relative;aspect-ratio:16/9;min-height:0;height:auto;overflow:hidden;background:var(--card2)}
 #heroSlot:empty{min-height:300px}
 .hero .cover img,.card .cover img,.article .acover img,#articlePage .acover img,.rcard .rcover img{
@@ -2539,14 +2540,16 @@ function renderNews(){
      one big photo); hero only in browse mode */
   const hero = query ? null : (posts.find(p=>p.pinned) || posts[0]), rest = posts.filter(p=>p!==hero);
   $("#heroSlot").innerHTML = hero ? `
-    <a class="hero" href="${postPath(hero)}">
-      <div class="cover">${coverImg(hero,false)}</div>
-      <div class="body">
-        <h2>${titleHTML(hero)}</h2>
-        <p>${rich(hero.excerpt||"")}</p>
-        <div class="meta"><span>${fmtDate(postDateISO(hero))}</span></div>
-      </div>
-    </a>` : "";
+    <div class="hero-card">
+      <a class="hero" href="${postPath(hero)}">
+        <div class="cover">${coverImg(hero,false)}</div>
+        <div class="body">
+          <h2>${titleHTML(hero)}</h2>
+          <p>${rich(hero.excerpt||"")}</p>
+          <div class="meta"><span>${fmtDate(postDateISO(hero))}</span></div>
+        </div>
+      </a>
+    </div>` : "";
   /* mobile (<=640px): the rail becomes a vertical column and shows one batch
      at a time; a Load More pill appends older posts. Desktop: full rail. */
   const narrow = window.matchMedia("(max-width: 640px)");
