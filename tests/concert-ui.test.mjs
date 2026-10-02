@@ -359,9 +359,17 @@ test("failed area loads clear stale event markers",()=>{
 });
 
 
-test("Ticketmaster disclosure is aligned to the numeric rank glyph column",()=>{
-  assert.match(app,/\.disclosure\{margin-top:8px;padding:10px 4px 2px 17px;/);
-  assert.match(app,/\.tour-row\{[\s\S]*grid-template-columns:24px 56px minmax\(0,1fr\) 18px;[\s\S]*padding:7px 8px/);
+test("Concert status, ranking and Ticketmaster disclosure share the left alignment",()=>{
+  const encoded=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
+  assert.ok(encoded);
+  const css=JSON.parse(encoded[1]);
+  const status=css.match(/\.side-status\{[^}]*margin:0 4px 8px (\d+)px/);
+  const disclosure=css.match(/\.disclosure\{[^}]*padding:10px 4px 2px (\d+)px/);
+  assert.ok(status && disclosure,"aligned status and disclosure CSS are required");
+  assert.equal(Number(status[1]),Number(disclosure[1]));
+  assert.equal(Number(status[1]),17);
+  assert.match(css,/\.tour-row\{[^}]*grid-template-columns:24px 56px minmax\(0,1fr\) 18px;gap:8px;align-items:center;/);
+  assert.match(css,/\.tour-rank\{font-weight:800;font-size:11\.5px/);
 });
 
 test("expanded artist view shows one summary line, not a duplicate subtitle",()=>{
