@@ -573,6 +573,18 @@ test("popup concert photograph is presentation only without links or zoom cursor
   assert.match(body,/visible\.draggable=false/);
 });
 
+test("Near me has one correctly ranked, aligned summary rather than a duplicate heading",()=>{
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.doesNotMatch(css,/\/\/ Align description/);
+  assert.match(css,/\.side-status\{font-size:13\.5px;color:var\(--muted\);margin:0 4px 8px 17px/);
+  assert.match(css,/\.disclosure\{[^}]*padding:10px 4px 2px 17px/);
+  assert.doesNotMatch(app,/Artists with the most upcoming events in this area\./);
+  assert.doesNotMatch(app,/Artists with upcoming events in /);
+  assert.match(app,/sideSub\.textContent="";\s*renderArtists\(groupedNearby\(nearbyEvents\),"nearby"\)/);
+  assert.match(app,/setStatus\(events\.length \? "Ranked by number of upcoming concerts"/);
+  assert.match(app,/setStatus\(nearbyEvents\.length \? "Ranked by number of upcoming concerts"/);
+});
+
 test("Near me lists up to 30 artists and description/status share rank alignment",()=>{
   const grouped=app.slice(app.indexOf("function groupedNearby(events){"),app.indexOf("\nfunction setTourBoxHeight("));
   assert.match(grouped,/\.sort\(\(a,b\)=>b\.count-a\.count/);
