@@ -20,4 +20,4 @@ if p:
  live=(p.get("body") or "").strip()
  print("DRAFT_STATUS",p.get("status"),"BODY_MATCHES_REPO",live==src)
  print("DRAFT_BODY_HASH",hashlib.sha256(live.encode()).hexdigest(),"REPO_BODY_HASH",hashlib.sha256(src.encode()).hexdigest())
- print("DRAFT_MEDIA",[(i,x[:110]) for i,x in enumerate(live.split("\\n\\n")) if x.startswith("[")])
+ print("DRAFT_MEDIA",[(i,x[:250]) for i,x in enumerate(live.split("\n\n")) if x.startswith("[")],flush=True)
