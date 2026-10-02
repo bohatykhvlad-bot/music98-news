@@ -524,7 +524,7 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 
 
 test("flat Concerts sidebar keeps unchanged rank and footer alignment",()=>{
-  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\.|[^"\])*");/m)[1]);
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   assert.match(css,/\.tours\{[^}]*scrollbar-gutter:stable;margin:0;padding:0 0 6px 0;overscroll-behavior:contain\}/);
   assert.doesNotMatch(css,/\.tours\{[^}]*margin:-\d+px/);
   assert.match(css,/\.side\{[^}]*padding:13px 13px 4px;height:420px/);
