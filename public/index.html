@@ -863,7 +863,9 @@ textarea{resize:vertical;min-height:64px}
   </section>
 
   <section class="tab" id="tab-charts">
-    <div class="hd"><h1 class="hd-t">Daily Top 50</h1></div>
+    <div class="hd"><h1 class="hd-t">Daily Top 50</h1>
+      <p id="chartSourceNotice" class="chart-note" hidden></p>
+    </div>
     <div class="chart-switch" id="chartSwitch" hidden></div>
     <div class="chart" id="chartList" role="list"></div>
     <p class="chart-note" id="chartStatus" hidden></p>
@@ -1265,7 +1267,7 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v42";
+const DAILYKEY = "music98news_daily_v43";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -2214,7 +2216,7 @@ function rowsFromTracks(tracks){
     weeks: t.weeks||1, delta: t.delta==null ? "0" : String(t.delta)
   }));
 }
-function applyDaily(tracks, tag){
+function applyDaily(tracks, tag, updated){
   const rows = rowsFromTracks(tracks);
   if(!rows.length) return;
   /* Movement (delta/weeks) is computed server-side in KV for the Top 50 —
@@ -2225,7 +2227,14 @@ function applyDaily(tracks, tag){
   save();
   renderCharts();
   if($("#ef_rows")) renderChartRows();
-  setChartStatus({}, tag);
+  setChartStatus({},tag);
+  const notice=$("#chartSourceNotice");
+  if(notice){
+    notice.hidden=tag!=="backup";
+    notice.textContent=tag==="backup"
+      ? "Last complete chart: "+String(updated||"previous verified day")+". Waiting for all five ranking sources."
+      : "";
+  }
 }
 function refreshDailyTop50(){
   if(S.autoChart === false){
@@ -2240,6 +2249,7 @@ function refreshDailyTop50(){
   const hasFreshCache=!!(cached && cached.date === todayUTC() && cached.tracks && cached.tracks.length === 50 && cached.tracks.every(t=>String(t.art||"").trim()));
   if(hasFreshCache) applyDaily(cached.tracks, "cache");
   else {
+    $("#chartSourceNotice").hidden=true;
     /* Never flash the 17 September baked launch chart (all rows show day one).
        An empty loading state is preferable to displaying fabricated movement. */
     autoRows = null;
@@ -2249,18 +2259,19 @@ function refreshDailyTop50(){
   }
   // A same-day local cache is only an instant paint, never the final answer.
   // The server returns the latest verified recovery snapshot if live sources fail.
-  fetch("/api/top50?d=" + todayUTC() + "&rev=42",
+  fetch("/api/top50?d=" + todayUTC() + "&rev=43",
     {cache:"no-store",headers:{"Cache-Control":"no-cache"}})
     .then(r=>{ if(!r.ok) throw 0; return r.json(); })
     .then(j=>{
       const tracks = (j && j.tracks) || [];
       if(tracks.length !== 50) throw 0;
-      const fresh = j.updated === todayUTC() && !j.fallback;
+      const fresh = j.updated === todayUTC() && !j.fallback && j.complete === true &&
+        ["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])>=40);
       /* Preserve yesterday's verified rank/tenure without calling it today's.
          Only fully decorated fresh results may be kept as today's browser cache. */
       if(fresh && tracks.every(t=>String(t.art||"").trim()))
         lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
-      applyDaily(tracks, fresh ? "live" : "backup");
+      applyDaily(tracks, fresh ? "live" : "backup", j.updated);
     })
     .catch(()=>{ if(!hasFreshCache) setChartStatus({}, "fail"); });
 }
