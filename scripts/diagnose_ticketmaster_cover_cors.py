@@ -44,3 +44,38 @@ try:
 except Exception as e:
  print("LIVE_JS_OPTIMIZER_ERROR",type(e).__name__,str(e)[:250],flush=True)
  raise
+
+# This fetch is the site's already-published, KV-cached Popular snapshot.
+# It never requests new data from Ticketmaster.
+import json,time
+popular="https://music98.news/api/concerts?mode=popular&v=popular-v11&contractcheck="+str(int(time.time()*1000))
+try:
+ req=urllib.request.Request(popular,headers={
+  "User-Agent":"music98-popular-contract/1.0","Accept":"application/json",
+  "Cache-Control":"no-cache","Pragma":"no-cache"
+ })
+ with urllib.request.urlopen(req,timeout=26) as r:
+  body=r.read();ctype=r.headers.get("Content-Type","")
+  print("POPULAR_IMAGE_SOURCE_CHECK",r.status,ctype,len(body),flush=True)
+  snapshot=json.loads(body)
+ candidates=[str(a.get("image","")) for a in snapshot.get("artists",[]) if str(a.get("image","")).startswith("https://")]
+ source=next((x for x in candidates if ".ticketm.net/" in x or ".ticketmaster.com/" in x),"")
+ if not source:
+  print("TICKETMASTER_EXTERNAL_TRANSFORM","NO_TICKETMASTER_COVER_IN_EXISTING_POPULAR_SNAPSHOT",flush=True)
+ else:
+  from urllib.parse import quote
+  target="https://music98.news/cdn-cgi/image/width=256,height=256,fit=scale-down,quality=85,format=auto/"+source
+  try:
+   req=urllib.request.Request(target,headers={"User-Agent":"Mozilla/5.0","Accept":"image/webp,image/png,image/jpeg,image/*"})
+   with urllib.request.urlopen(req,timeout=28) as r:
+    sample=r.read(48)
+    print("TICKETMASTER_EXTERNAL_TRANSFORM",r.status,
+      "content_type",r.headers.get("Content-Type"),
+      "cf_resized",r.headers.get("Cf-Resized"),
+      "sample_size",len(sample),flush=True)
+  except urllib.error.HTTPError as e:
+   detail=e.read(350).decode("utf-8","replace").replace("\\n"," ")
+   print("TICKETMASTER_EXTERNAL_TRANSFORM","HTTP_ERROR",e.code,
+    "cf_resized",e.headers.get("Cf-Resized"),"error_snippet",detail[:200],flush=True)
+except Exception as e:
+ print("TICKETMASTER_EXTERNAL_TRANSFORM","PUBLIC_SNAPSHOT_UNAVAILABLE",type(e).__name__,str(e)[:180],flush=True)
