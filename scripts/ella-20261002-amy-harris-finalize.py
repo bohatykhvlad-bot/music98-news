@@ -4,7 +4,7 @@ New Faces live guitar photo. No crops, no hidden publishing. Rights review
 required before the eventual publication of the photographer's image.
 """
 from __future__ import annotations
-import base64,copy,hashlib,io,json,sys,time,urllib.request
+import base64,copy,difflib,hashlib,io,json,sys,time,urllib.request
 from pathlib import Path
 from PIL import Image
 sys.path.insert(0,str(Path(__file__).resolve().parent))
@@ -98,6 +98,9 @@ def main():
  actual=old.get("body","").strip()
  print("DRAFT_SHA",hashlib.sha256(actual.encode()).hexdigest(),"BASE_SHA",hashlib.sha256(PREV.encode()).hexdigest(),flush=True)
  if actual not in (PREV,NEW):
+  print("CURRENT_DESK_DIFF_BEGIN",flush=True)
+  print("\\n".join(difflib.unified_diff(PREV.splitlines(),actual.splitlines(),fromfile="repo-baseline",tofile="current-desk",lineterm="")),flush=True)
+  print("CURRENT_DESK_DIFF_END",flush=True)
   raise RuntimeError("Ella draft was edited since verified snapshot. Abort without overwriting.")
  source=originals()
  if mode=="--audit":
