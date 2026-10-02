@@ -127,6 +127,16 @@ jobs:
           git add .editorial/ella-v13-2026-gallery-originals.json
           test -f .editorial/ella-v13-2026-originals-contact.b64 && git add .editorial/ella-v13-2026-originals-contact.b64 || true
           git diff --cached --quiet || (git commit -m "Review Ella Toronto stage photo original resolution" && git push)
+      - name: Verify official 2026 ACM Ella guitarist press originals
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-acm-photo-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_2026_acm_guitar_press_qc.py
+          git config user.name "music98 visual image QA"
+          git config user.email "editorial@music98.news"
+          git add .editorial/ella-2026-acm-handout-source-geometry.json
+          test -f .editorial/ella-2026-acm-handout-guitar-contact.b64 && git add .editorial/ella-2026-acm-handout-guitar-contact.b64 || true
+          git diff --cached --quiet || (git commit -m "Review 2026 official ACM performance original image dimensions" && git push)
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
