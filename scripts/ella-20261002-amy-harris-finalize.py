@@ -49,7 +49,7 @@ def read_public_photo(name):
 def confirm_layout():
  a=PREV.split("\n\n");b=NEW.split("\n\n")
  altered=[i for i,(x,y) in enumerate(zip(a,b)) if x!=y]
- assert len(a)==len(b)==31 and altered==[6,9,15,16,24,28,29,30],altered
+ assert len(a)==len(b)==31 and altered==[6,9,15,16,21,22,24,28,29,30],altered
  p=[x for x in b if not x.startswith("[")]
  m=[x for x in b if x.startswith("[")]
  assert len(p)==21 and len(m)==10
