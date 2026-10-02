@@ -524,7 +524,7 @@ test("concert artist artwork matches chart dimensions and expanded accent border
   assert.match(css,/\.tour-card\.open \.tour-art\{background:var\(--accent\)\}/);
 
   assert.match(chart,/\.artwrap\{grid-area:art;width:44px;height:44px;padding:2px/);
-  assert.match(css,/@media\(max-width:640px\)\{[^}]*\.tour-row\{grid-template-columns:24px 44px/);
+  assert.match(css,/@media\(max-width:640px\)\{[^}]*\.tour-row\{height:62px;min-height:62px;grid-template-columns:24px 44px/);
   assert.match(css,/\.tour-art\{width:44px;height:44px;border-radius:10px\}/);
   assert.match(css,/\.tour-art img\{border-radius:8px\}/);
 
