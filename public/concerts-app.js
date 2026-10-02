@@ -185,7 +185,11 @@ function shortDate(e){
 }
 function locationLine(e){
   const seen=new Set();
-  return [e.city,e.state,e.country]
+  const country=String(e.country||"").trim();
+  const displayCountry=String(e.countryCode||"").toUpperCase()==="US" ||
+    /^(?:united states(?: of america)?|u\.?s\.?a\.?)$/i.test(country)
+      ? "USA" : country;
+  return [e.city,e.state,displayCountry]
     .map(value=>String(value||"").trim().replace(/\s+/g," "))
     .filter(value=>{
       if(!value) return false;
