@@ -97,6 +97,12 @@ jobs:
       - name: Save verified LINKIN PARK editorial update
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[lp20261002-save]') }}
         run: python scripts/revise_lp_context_20261002.py --save
+      - name: Audit LINKIN PARK film-title repetition
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[lp-title-audit]') }}
+        run: python scripts/reduce_lp_unshatter_repeats_oct02.py --audit
+      - name: Save reduced LINKIN PARK title repetition
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[lp-title-save]') }}
+        run: python scripts/reduce_lp_unshatter_repeats_oct02.py --save
       - name: Read current LINKIN PARK text without changes
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[lp20261002-inspect]') }}
         run: python scripts/audit_lp_20261002_readonly.py
