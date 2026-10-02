@@ -8,9 +8,10 @@ url="https://offrecord.blog/sxsw-2026-spotify-house-at-stubbs-amphitheater/"
 x=requests.get(url,timeout=40,headers={"User-Agent":"Mozilla/5.0"})
 s=html.unescape(x.text);soup=BeautifulSoup(s,"html.parser")
 sources=[]
-for u in re.findall(r'https?[^"\'<>\\s,]{5,250}\\.(?:jpe?g|png|webp)',s,re.I):
+for u in re.findall(r'https?[^"\x27<>\\s,]{5,250}\\.(?:jpe?g|png|webp)',s,re.I):
  u=u.replace("\\/","/").split("?")[0]
  if "offrecordmedia-bucket" in u and ("Ella" in u or "Langley" in u):sources.append(u)
+print("ALL_IMAGE_DEBUG",json.dumps([(z.get("alt"),z.get("src")) for z in soup.find_all("img")][:45])[:12500],flush=True)
 print("ELLA_PHOTO_URLS",json.dumps(sorted(set(sources))[:50]),flush=True)
 out=[];meta=[]
 for i,url in enumerate(sorted(set(sources))[:20]):
