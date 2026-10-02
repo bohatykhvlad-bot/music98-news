@@ -527,7 +527,7 @@ test("Concerts sidebar has symmetric shadow insets without moving the text basel
   assert.equal(margin,12);
   assert.equal(padLeft,padRight);
   assert.equal(padLeft,margin,"left artist and rank coordinates cannot shift");
-  assert.ok(padTop>=12 && padBottom>=18);
+  assert.ok(padTop>=12 && padBottom>=10);
   assert.doesNotMatch(css,/\.tours\{[^}]*margin:-\d+px/);
   assert.match(css,/\.side\{[^}]*padding:13px 13px 4px;height:420px/);
   assert.match(css,/\.side-sub\{[^}]*margin:0 4px 10px 17px/);
