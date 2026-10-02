@@ -180,7 +180,7 @@ export function compactSameConcertImage(images, originalUrl) {
   function assetId(url) {
     try {
       const parsed=new URL(url);
-      if (!/(^|\\.)ticketm\\.(?:net|com)$/i.test(parsed.hostname)) return "";
+      if (!/(^|\.)ticketm\.(?:net|com)$/i.test(parsed.hostname)) return "";
       const filename=decodeURIComponent(parsed.pathname.split("/").pop()||"");
       return filename.match(/^([0-9a-f]{8}-[0-9a-f-]{20,})_/i)?.[1]?.toLowerCase()||"";
     } catch (_) { return ""; }
