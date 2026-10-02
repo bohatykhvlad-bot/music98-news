@@ -8,7 +8,7 @@ import post as runner
 import gate
 import revise_linkin_park_draft as prior
 ID="auleon930r1"
-EXPECTED=prior.EXPECTED_BODY
+EXPECTED=prior.BODY
 BODY="""LINKIN PARK have released *UNSHATTER Film Soundtrack (Live in São Paulo)*, the live album tied to the band's new documentary. The album arrived September 25 through Warner Records and draws from the *FROM ZERO* album-release concert at Allianz Parque in São Paulo, Brazil. The same show provides most of the live footage in *UNSHATTER*, which moves between the concert, studio sessions and interviews. The soundtrack takes a different approach, staying with the performance rather than following the film's broader narrative.
 
 The São Paulo set moves back and forth between *FROM ZERO* and earlier LINKIN PARK material. "The Emptiness Machine," "Heavy Is the Crown" and other songs from the new record are heard alongside "Somewhere I Belong," "Numb," "In the End" and "Faint." The band released a performance video for "Faint" ahead of the soundtrack, drawing directly from that night. It offers a close look at how Emily Armstrong and the current lineup approach a song that became familiar to listeners long before their return.
