@@ -11,8 +11,8 @@ import post as runner
 ID="ella26choosintexas"
 BODYFILE=Path(__file__).with_name("ella-oct02-longread-body.txt")
 PHOTO_NAME="post-malone-morgan-wallen-official-bts-2024.jpg"
-PHOTO_SOURCE="https://app.box.com/index.php?rm=box_download_shared_file&shared_name=im7ys9giua9fklfrbh2b6zz37kwrni4o&file_id=f_1525974462869"
-MEDIA="[photo:photos/"+PHOTO_NAME+"|Big Loud Records|https://bigloud.com/post-malone-morgan-wallens-i-had-some-help-makes-history/|50% 37%|1]"
+PHOTO_SOURCE="https://cdn.sanity.io/images/o6uq28nb/production/cf9de2550ea73af087764ff9572973a0e65f33a2-1350x1687.jpg"
+MEDIA="[photo:photos/"+PHOTO_NAME+"|Big Loud Records|https://bigloud.com/post-malone-morgan-wallens-i-had-some-help-makes-history/|50% 25%|1]"
 def get():
  return runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()),runner.desk_key())
 def digest(x):
@@ -26,8 +26,8 @@ def picture():
  raw,ctype=fetch_binary(PHOTO_SOURCE)
  im=Image.open(io.BytesIO(raw)); im.verify()
  im=Image.open(io.BytesIO(raw))
- assert im.width==1080 and im.height==1350 and im.format=="JPEG",(im.size,im.format)
- assert 500_000<len(raw)<2_990_000,(len(raw),ctype)
+ assert im.width==1350 and im.height==1687 and im.format=="JPEG",(im.size,im.format)
+ assert 300_000<len(raw)<2_990_000,(len(raw),ctype)
  print("OFFICIAL_PHOTO_ORIGINAL",im.size,"BYTES",len(raw),"SOURCE_BIG_LOUD_PRESS_BOX",flush=True)
  return raw
 def existing_photo_ok(path):
@@ -46,7 +46,7 @@ def upload(raw):
   raise RuntimeError("photo upload rejected: "+repr(uploaded))
  for t in range(8):
   size=existing_photo_ok("photos/"+PHOTO_NAME)
-  if size==(1080,1350):print("PHOTO_UPLOAD_VERIFIED",flush=True);return
+  if size==(1350,1687):print("PHOTO_UPLOAD_VERIFIED",flush=True);return
   time.sleep(3)
  raise RuntimeError("photo upload was not visible at the site")
 def analyze(body):
@@ -79,7 +79,7 @@ def upload_simple(name, raw, mime):
  raise RuntimeError("Uploaded photo not visible "+name)
 def ensure_ella_images():
  cover="photos/ella-choosin-texas-cover.jpg"
- body_photo="photos/ella-choosin-texas-caylee-robillard.webp"
+ body_photo="photos/ella-choosin-texas-caylee-robillard-oct02.webp"
  sz=existing_photo_ok(cover)
  if not sz:
   url="https://fortworth.culturemap.com/media-library/ella-langley.jpg?coordinates=0%2C0%2C0%2C0&height=1500&id=63691936&width=2000"
@@ -94,7 +94,7 @@ def ensure_ella_images():
   assert im.size==(1548,1024) and im.format=="JPEG"
   buf=io.BytesIO();im.save(buf,"WEBP",quality=92,method=6)
   sz=upload_simple(body_photo.split("/")[-1],buf.getvalue(),"image/webp")
- assert sz[0]>=1200,("body photo too small",sz)
+ assert sz[0]>=1500,("body photo too small",sz)
 def record(body,excerpt):
  from datetime import datetime,timezone
  now=datetime.now(timezone.utc)
@@ -121,7 +121,7 @@ def main():
  else:print("CREATING_MISSING_CANONICAL_DRAFT",ID,flush=True)
  if matches and not old:
   raise RuntimeError("Unexpected Ella draft with another id; review before creating duplicate")
- for name in ["photos/ella-choosin-texas-cover.jpg","photos/ella-choosin-texas-caylee-robillard.webp"]:
+ for name in ["photos/ella-choosin-texas-cover.jpg","photos/ella-choosin-texas-caylee-robillard-oct02.webp"]:
   print("AUDIT_PHOTO",name,existing_photo_ok(name),flush=True)
  raw=picture()
  if len(sys.argv)<2 or sys.argv[1]=="--audit":
