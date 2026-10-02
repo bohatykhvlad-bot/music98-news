@@ -619,15 +619,67 @@ function optimizedConcertImageUrl(original,size){
       ",fit=scale-down,quality=85,format=auto/"+source.href;
   }catch(_){return "";}
 }
+// If server-side transformations are unavailable, retain the exact original
+// and downsample it in two quality-controlled browser passes. A cross-origin
+// image can be drawn to a canvas for display without reading/exporting pixels.
+// This improves small-square rendering, but cannot reduce download bytes.
+function browserResampleConcertArt(img,side){
+  const render=()=>{
+    if(!img.isConnected || !img.naturalWidth || !img.naturalHeight) return;
+    const bounds=img.getBoundingClientRect();
+    const dpr=Math.max(1,Math.min(3,Number(window.devicePixelRatio)||1));
+    const display=Math.max(1,Math.round(Math.max(bounds.width,bounds.height)*dpr));
+    if(bounds.width<1 || display<1) return;
+    try{
+      const crop=Math.min(img.naturalWidth,img.naturalHeight);
+      const square=Math.min(Math.max(side,display),crop);
+      if(square<1) return;
+      const popup=img.classList.contains("pop-thumb");
+      const sx=Math.max(0,(img.naturalWidth-crop)/2);
+      const sy=Math.max(0,(img.naturalHeight-crop)*(popup?.18:.5));
+      const pre=document.createElement("canvas"); pre.width=square;pre.height=square;
+      const prectx=pre.getContext("2d",{alpha:false});
+      if(!prectx)return;
+      prectx.imageSmoothingEnabled=true;
+      prectx.imageSmoothingQuality="high";
+      prectx.drawImage(img,sx,sy,crop,crop,0,0,square,square);
+      const visible=document.createElement("canvas");
+      visible.width=display;visible.height=display;
+      visible.className=img.className;
+      visible.setAttribute("aria-hidden","true");
+      const ctx=visible.getContext("2d",{alpha:false});
+      if(!ctx)return;
+      ctx.imageSmoothingEnabled=true;
+      ctx.imageSmoothingQuality="high";
+      ctx.drawImage(pre,0,0,square,square,0,0,display,display);
+      if(!visible.className){
+        visible.style.width="100%";visible.style.height="100%";
+        visible.style.borderRadius="10px";visible.style.display="block";
+      }
+      img.replaceWith(visible);
+    }catch(_){
+      // Never break a live concert image if a browser refuses canvas drawing.
+    }
+  };
+  if(side===256 && typeof window.requestIdleCallback==="function"){
+    window.requestIdleCallback(render,{timeout:450});
+  }else{
+    requestAnimationFrame(render);
+  }
+}
 function applyConcertArt(img,original,size){
   const src=String(original||"/logo.png");
   const sized=optimizedConcertImageUrl(src,size);
+  const loadOriginal=()=>{
+    img.onload=()=>{ if(src!=="/logo.png") browserResampleConcertArt(img,size); };
+    img.src=src;
+  };
   const originalOrLogo=()=>{
-    if(img.getAttribute("src")!==src){img.onerror=originalOrLogo;img.src=src;}
-    else{img.onerror=null;img.src="/logo.png";}
+    if(img.getAttribute("src")!==src){img.onerror=originalOrLogo;loadOriginal();}
+    else{img.onerror=null;img.onload=null;img.src="/logo.png";}
   };
   if(!sized || concertArtResizeSupported===false){
-    img.onerror=originalOrLogo;img.src=src;return;
+    img.onerror=originalOrLogo;loadOriginal();return;
   }
   if(concertArtResizeSupported===true){
     img.onerror=originalOrLogo;img.src=sized;return;
@@ -651,10 +703,15 @@ function applyConcertArt(img,original,size){
         const own=item.src;
         const fallback=()=>{
           if(item.img.getAttribute("src")!==own){
-            item.img.onerror=fallback;item.img.src=own;
-          }else{item.img.onerror=null;item.img.src="/logo.png";}
+            item.img.onerror=fallback;
+            item.img.onload=()=>{if(own!=="/logo.png") browserResampleConcertArt(item.img,item.size);};
+            item.img.src=own;
+          }else{item.img.onerror=null;item.img.onload=null;item.img.src="/logo.png";}
         };
         item.img.onerror=fallback;
+        if(!supported){
+          item.img.onload=()=>{if(own!=="/logo.png") browserResampleConcertArt(item.img,item.size);};
+        }
         item.img.src=supported?optimizedConcertImageUrl(own,item.size):own;
       }
     });
