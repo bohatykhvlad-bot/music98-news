@@ -92,7 +92,7 @@ def main():
  actual=target.get("body","").strip()
  print("DESK_CURRENT",hashlib.sha256(actual.encode()).hexdigest(),"SOURCE_BASELINE",hashlib.sha256(SOURCE_TEXT.encode()).hexdigest(),flush=True)
  if actual not in (SOURCE_TEXT,new):
-  a=SOURCE_TEXT.split("\\n\\n");b=actual.split("\\n\\n")
+  a=SOURCE_TEXT.split(chr(10)*2);b=actual.split(chr(10)*2)
   print("CURRENT_DESK_BLOCKS",len(b),"EXPECTED",len(a),flush=True)
   for n in range(max(len(a),len(b))):
    x=a[n] if n<len(a) else "";y=b[n] if n<len(b) else ""
