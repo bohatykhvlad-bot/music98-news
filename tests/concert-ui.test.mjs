@@ -311,7 +311,8 @@ test("map failure cannot block Popular/data boot",()=>{
 });
 test("partial area loads are labeled instead of looking complete",()=>{
   assert.match(app,/data\.partial && total>events\.length/);
-  assert.match(app,/loaded concerts of/);
+  assert.match(app,/Showing the soonest upcoming concerts in this area\\./);
+  assert.doesNotMatch(app,/loaded concerts of/);
 });
 
 test("map failure offers an explicit retry without replacing fallback controls",()=>{
@@ -594,4 +595,21 @@ test("canvas fallback renders the same photo with two high-quality browser resiz
   const selector=app.slice(to,app.indexOf("\nfunction popupContent(e){",to));
   assert.match(selector,/browserResampleConcertArt\(img,size\)/);
   assert.match(selector,/browserResampleConcertArt\(item\.img,item\.size\)/);
+});
+
+
+test("Near me lists up to 30 artists and description/status share rank alignment",()=>{
+  const grouped=app.slice(app.indexOf("function groupedNearby(events){"),app.indexOf("\nfunction setTourBoxHeight("));
+  assert.match(grouped,/\.sort\(\(a,b\)=>b\.count-a\.count/);
+  assert.match(grouped,/\.slice\(0,30\)/);
+  const stylesheet=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  const desc=stylesheet.match(/\.side-sub\{[^}]*margin:0 4px 10px (\d+)px/);
+  const status=stylesheet.match(/\.side-status\{[^}]*margin:0 4px 8px (\d+)px/);
+  const disclosure=stylesheet.match(/\.disclosure\{[^}]*padding:10px 4px 2px (\d+)px/);
+  assert.equal(desc?.[1],"17");
+  assert.equal(status?.[1],desc?.[1]);
+  assert.equal(disclosure?.[1],desc?.[1]);
+  const area=app.slice(app.indexOf("async function loadArea("),app.indexOf("\nfunction geoPositionOnce("));
+  assert.match(area,/setStatus\(data\.partial && total>events\.length/);
+  assert.doesNotMatch(area,/Showing "\+events\.length/);
 });
