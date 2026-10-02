@@ -169,7 +169,7 @@ test("daily chart caches only complete, source-stamped rows with artwork",()=>{
 });
 
 test("chart fallback never flashes the launch day and mobile hides the status caption",()=>{
-  assert.match(page,/data\.chart = \[\];\s*renderCharts\(\);\s*setChartStatus\(\{\}, "loading"\)/);
+  assert.match(page,/data\.chart\s*=\s*\[\];\s*renderCharts\(\);\s*setChartStatus\(\{\},\s*"loading"\)/);
   assert.match(page,/#tab-charts #chartStatus\{display:none!important\}/);
   assert.doesNotMatch(page,/else applyDaily\(TOP50, "snap"\)/);
 });
