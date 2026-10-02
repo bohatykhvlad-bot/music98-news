@@ -492,19 +492,18 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 });
 
 
-test("expanded artist keeps a 14px white outer shell and a fixed gray header",()=>{
+test("artist selection stays a fixed 14px gray pill while only the separate white event panel expands",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   assert.match(css,/--event-radius:14px/);
-  assert.match(css,/\.tour-card\{[^}]*border-radius:var\(--event-radius\);overflow:hidden/);
-  assert.match(css,/\.tour-card\{[^}]*transition:border-color \.2s ease,box-shadow \.2s ease/);
-  assert.doesNotMatch(css,/\.tour-card\{[^}]*transition:background/);
-  assert.match(css,/\.tour-card\.open\{[^}]*background:#fff;border-color:var\(--line\)/);
-  assert.match(css,/\.tour-row\{[^}]*border-radius:13px;/);
+  assert.match(css,/\.tour-card\{[^}]*border:0;border-radius:0;overflow:visible;background:transparent/);
+  assert.doesNotMatch(css,/\.tour-card\.open\{[^}]*background|\.tour-card\.open\{[^}]*box-shadow/);
+  assert.match(css,/\.tour-row\{[^}]*border-radius:var\(--event-radius\)/);
   assert.match(css,/\.tour-row:hover\{background:var\(--bg2\)\}/);
-  assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\);border-radius:13px 13px 0 0\}/);
-  assert.doesNotMatch(css,/\.tour-card:hover\{background:var\(--bg2\)/);
-  assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*background:#fff/);
-  assert.match(css,/\.tour-events\{[^}]*transition:max-height \.28s cubic-bezier\(\.3,\.7,\.4,1\),opacity \.18s ease/);
+  assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\)\}/);
+  assert.doesNotMatch(css,/\.tour-card\.open \.tour-row\{[^}]*border-radius/);
+  assert.match(css,/\.tour-events\{[^}]*border-radius:var\(--event-radius\);background:#fff/);
+  assert.match(css,/\.tour-events\{[^}]*transition:max-height \.28s cubic-bezier\(\.3,\.7,\.4,1\),opacity \.18s ease,margin-top \.28s/);
+  assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*margin-top:6px;border-color:var\(--line\)/);
   assert.match(css,/\.event-link\{[^}]*border-radius:var\(--event-radius\)/);
 });
 test("concert artist artwork matches chart dimensions and expanded accent border",()=>{
