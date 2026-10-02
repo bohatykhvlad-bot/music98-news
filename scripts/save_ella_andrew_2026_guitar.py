@@ -91,7 +91,14 @@ def main():
  assert target["status"]=="draft","Never edit a published article by this script"
  actual=target.get("body","").strip()
  print("DESK_CURRENT",hashlib.sha256(actual.encode()).hexdigest(),"SOURCE_BASELINE",hashlib.sha256(SOURCE_TEXT.encode()).hexdigest(),flush=True)
- assert actual in (SOURCE_TEXT,new),"Owner made newer edits; abort instead of overwriting"
+ if actual not in (SOURCE_TEXT,new):
+  a=SOURCE_TEXT.split("\\n\\n");b=actual.split("\\n\\n")
+  print("CURRENT_DESK_BLOCKS",len(b),"EXPECTED",len(a),flush=True)
+  for n in range(max(len(a),len(b))):
+   x=a[n] if n<len(a) else "";y=b[n] if n<len(b) else ""
+   if x!=y:print("CONCURRENT_DIFF_BLOCK",n,"previous",repr(x[:460]),"current",repr(y[:460]),flush=True)
+  raise RuntimeError("Owner newer edits protected, inspect diff and rebase")
+
  src=verified_source()
  can=copy.deepcopy(target);can["body"]=new
  if mode=="--audit":
