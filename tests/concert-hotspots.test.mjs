@@ -540,6 +540,10 @@ test("exact-city user query paginates and stays scoped to that city", async () =
   const oldFetch=globalThis.fetch;
   const oldCaches=globalThis.caches;
   const seen=[];
+  /* A fixed mock date expired on 2 October and correctly got filtered out.
+     Always supply future event days: the test concerns pagination, not history. */
+  const futureDates=[1,2].map(days=>
+    new Date(Date.now()+days*86400000).toISOString().slice(0,10));
   globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
   globalThis.fetch=async input=>{
     const u=new URL(String(input));
@@ -551,7 +555,7 @@ test("exact-city user query paginates and stays scoped to that city", async () =
     const event={
       id:"e"+page,
       name:"Show "+page,
-      dates:{start:{localDate:"2026-10-0"+(page+1),localTime:"20:00:00"}},
+      dates:{start:{localDate:futureDates[page],localTime:"20:00:00"}},
       _embedded:{
         attractions:[{id:"artist",name:"Artist",images:[]}],
         venues:[{
@@ -576,9 +580,11 @@ test("exact-city user query paginates and stays scoped to that city", async () =
     assert.equal(response.status,200);
     const data=await response.json();
     assert.equal(data.events.length,2);
+    assert.deepEqual(data.events.map(e=>e.date),futureDates);
     assert.equal(data.pagesFetched,2);
     assert.equal(data.partial,false);
     assert.equal(seen.length,2);
+    assert.deepEqual(seen.map(u=>u.searchParams.get("page")||"0"),["0","1"]);
   }finally{
     globalThis.fetch=oldFetch;
     globalThis.caches=oldCaches;
