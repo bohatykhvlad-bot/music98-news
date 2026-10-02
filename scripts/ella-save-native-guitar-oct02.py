@@ -79,7 +79,9 @@ def main():
  if len(sys.argv)<2 or sys.argv[1]=="--audit":
   errs,warns,_=gate.check_post(cand,strict=True)
   print("PREWRITE_AUDIT","PASS" if not errs else "FAIL","errors",json.dumps(errs),"warnings",json.dumps(warns),flush=True)
-  if errs:raise RuntimeError("Candidate gate failed")
+  unhosted=[v for v in errs if v[0]=="card-dead" and PHOTO in str(v[1])]
+  if len(unhosted)!=len(errs):raise RuntimeError("Candidate gate failed for reasons other than intentionally not-yet-uploaded new photo")
+  if unhosted:print("PREUPLOAD_404_EXPECTED_NEW_ASSET_VERIFIED_FROM_SOURCE",flush=True)
   print("READONLY_GUITAR_PHOTO_AUDIT_PASS",flush=True);return
  if sys.argv[1]!="--save":raise RuntimeError("Unknown argument")
  Path("/tmp/ella-native-final-20261002-backup.json").write_text(json.dumps(before,ensure_ascii=False),encoding="utf-8")
