@@ -1,6 +1,8 @@
 name: apple-data
 
 # Обложки и написание (title/artist) из Apple для текущего чарта.
+# Spotify source publisher dispatches this workflow explicitly after a successful
+# GITHUB_TOKEN push: such pushes do not themselves fire dependent push workflows.
 # iTunes API из Cloudflare отвечает через раз, поэтому оба файла собираются здесь -
 # с обычного IP Apple отвечает всегда. Воркер читает их и запоминает по песне,
 # так что на сайте ничего не меняется день ото дня.

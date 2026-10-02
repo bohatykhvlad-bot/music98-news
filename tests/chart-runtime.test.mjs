@@ -102,3 +102,12 @@ test("the Worker uses tested shared parsing and rejects unverified KV cache",()=
  assert.match(top50,/const TOP50_KV = "top50v36"/);
  assert.match(top50,/TOP50_RETRY_KV="top50v36:retry"/);
 });
+
+test("verified source publisher dispatches downstream chart audit after bot commits",()=>{
+ const spotifyWorkflow=readFileSync(new URL("../.github/workflows/spotify-chart-source.yml",import.meta.url),"utf8");
+ const auditWorkflow=readFileSync(new URL("../.github/workflows/apple-data.yml",import.meta.url),"utf8");
+ assert.match(spotifyWorkflow,/actions: write/);
+ assert.match(spotifyWorkflow,/GH_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}/);
+ assert.match(spotifyWorkflow,/git push origin HEAD:main; then[\s\S]*gh workflow run apple-data\.yml --ref main/);
+ assert.match(auditWorkflow,/group: apple-data/);
+});

@@ -11,6 +11,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: spotify-chart-source
   cancel-in-progress: false
@@ -26,6 +27,8 @@ jobs:
       - name: Compare public Spotify Top 50 sources (or validate Musicrank independently)
         run: node scripts/refresh-spotify-ranking.mjs
       - name: Publish only completely validated source edition
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "music98 spotify source bot"
           git config user.email "actions@users.noreply.github.com"
@@ -37,7 +40,12 @@ jobs:
           git commit -m "chart: independently verified Spotify Top 50"
           for n in 1 2 3; do
             git pull --rebase origin main
-            if git push origin HEAD:main; then exit 0; fi
+            if git push origin HEAD:main; then
+              # GITHUB_TOKEN pushes cannot trigger downstream push workflows.
+              # workflow_dispatch is explicitly supported for this token.
+              gh workflow run apple-data.yml --ref main
+              exit 0
+            fi
             sleep 4
           done
           exit 1
