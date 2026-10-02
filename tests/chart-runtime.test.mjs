@@ -73,44 +73,32 @@ test("verified chart recovery rejects mass day-one resets and old launch snapsho
     /bakedTop50\(/);
 });
 
-test("ranking refuses any missing input before changing tenure",()=>{
- const body=top50.slice(top50.indexOf("function completeChartSources"),top50.indexOf("function verifiedSourceSnapshot"));
- const gate=new Function("SOURCES","SOURCE_MIN_ROWS",body+";return completeChartSources;")(["A","S","D","B","Y"],40);
- const all={A:50,S:47,D:50,B:50,Y:50};
- assert.equal(gate(all),true);
- for(const k of Object.keys(all))assert.equal(gate({...all,[k]:0}),false,k);
- assert.equal(gate({...all,A:39}),false);
- assert.ok(top50.indexOf('if(!completeChartSources(sources))')<top50.indexOf('ingest(bucket, "A", apple)'));
- assert.match(top50,/const memory=\{deferPersist:true\}/);
- assert.match(top50,/const TOP50_RETRY_KV/);
+test("every source must supply all 50 positions",()=>{
+  const start=top50.indexOf("function completeChartSources(s) {");
+  const end=top50.indexOf("function verifiedSourceSnapshot(s)",start);
+  const gate=new Function("SOURCES","SIZE",top50.slice(start,end)+"return completeChartSources;")(["A","S","D","B","Y"],50);
+  const complete={A:50,S:50,D:50,B:50,Y:50};
+  assert.equal(gate(complete),true);
+  for(const key of Object.keys(complete)){
+    assert.equal(gate({...complete,[key]:49}),false,key);
+    assert.equal(gate({...complete,[key]:0}),false,key);
+  }
+  assert.match(top50,/invalid_rank_or_duplicate_source_/);
+  assert.match(top50,/spotify_mirror_disagreement/);
+  assert.match(top50,/spotify_newer_chart_waiting_for_mirror/);
+  assert.match(top50,/const memory=\{deferPersist:true\}/);
 });
-
-test("only today's official Apple chart may fill a blocked origin",()=>{
+test("fresh Apple fallback also requires an intact Top 50",()=>{
  assert.match(top50,/async function freshAppleRanking\(env,origin\)/);
  assert.match(top50,/snap.updated!==today/);
  assert.match(top50,/snap.source!=="official-apple-rss"/);
- assert.match(top50,/rows.length>=SOURCE_MIN_ROWS/);
- assert.match(top50,/if\(apple.length<SOURCE_MIN_ROWS\)/);
- assert.match(top50,/if\(!completeChartSources\(sources\)\)/);
+ assert.match(top50,/rows.length===SIZE && rows.every/);
 });
-
-test("styled Kworb rows must not disappear from Spotify's Top 50",()=>{
-  const start=top50.indexOf("function parseSpotify(html) {");
-  const end=top50.indexOf("function parseYouTube(data) {",start);
-  assert.ok(start>=0&&end>start);
-  const parser=new Function("SIZE",top50.slice(start,end)+"return parseSpotify;")(50);
-  const html=Array.from({length:50},(_,i)=>{
-    const rank=i+1,open=[17,36,50].includes(rank)?'<tr class="d2">':"<tr>";
-    return open+'<td class="np">'+rank+'</td>\n<td class="np">+5</td>\n'+
-      '<td class="text mp"><div><a>Artist '+rank+'</a> - <a>Song '+rank+
-      '</a></div></td></tr>';
-  }).join("");
-  const got=parser(html);
-  assert.equal(got.length,50);
-  assert.deepEqual(got.map(x=>x.pos),Array.from({length:50},(_,i)=>i+1));
-  for(const pos of [17,36,50]) {
-    assert.equal(got[pos-1].artist,"Artist "+pos);
-    assert.equal(got[pos-1].title,"Song "+pos);
-  }
-  assert.match(top50,/if\(spotify.length!==SIZE \|\| spotify.some/);
+test("the Worker uses tested shared parsing and rejects unverified KV cache",()=>{
+ assert.match(top50,/function parseSpotify\(html\) \{ return parseKworbSpotify\(html\); \}/);
+ assert.match(top50,/const verified=verifiedSpotifySnapshot\(spotifySeed\)/);
+ assert.match(top50,/cached.sourceDates\?\.S===verified.date/);
+ assert.match(top50,/cached.spotifyFingerprint===verified.fingerprint/);
+ assert.match(top50,/const TOP50_KV = "top50v36"/);
+ assert.match(top50,/TOP50_RETRY_KV="top50v36:retry"/);
 });

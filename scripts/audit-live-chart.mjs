@@ -1,11 +1,30 @@
-const url = "https://music98.news/api/top50?audit=" + Date.now();
-const r = await fetch(url, {headers:{"user-agent":"music98-chart-audit/1.0"}});
-if (!r.ok) throw new Error("live top50 HTTP " + r.status);
-const j = await r.json();
-if(j.fallback || j.complete!==true || !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])>=40))
-  throw new Error("refusing partial or fallback chart audit: "+JSON.stringify(j.sources||{}));
-if(Number(j.sources?.S)!==50)
-  throw new Error("Live Spotify input missing ranks: "+JSON.stringify(j.sources));
+import fs from "node:fs";
+import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
+/* Production and GitHub's independent Spotify reference must match exactly.
+   Wait briefly for Workers Builds to deploy when a new snapshot is committed. */
+const mirror=JSON.parse(fs.readFileSync(new URL("../public/data/spotify-chart.json",import.meta.url),"utf8"));
+const verified=verifiedSpotifySnapshot(mirror);
+if(!verified)throw new Error("Spotify reference is missing, unverified or too old");
+let j=null,reason="";
+for(let attempt=0;attempt<5;attempt++){
+ const res=await fetch("https://music98.news/api/top50?audit="+Date.now()+"&try="+attempt,
+   {headers:{"user-agent":"music98-chart-audit/2.0","cache-control":"no-cache"}});
+ if(res.ok){
+   j=await res.json();
+   if(!j.fallback && j.complete===true &&
+     ["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])===50) &&
+     j.sourceDates?.S===verified.date && j.spotifyFingerprint===verified.fingerprint)break;
+ }
+ reason=JSON.stringify({status:res.status,updated:j?.updated,rev:j?.rev,
+  fallback:j?.fallback,sources:j?.sources,spotifyDate:j?.sourceDates?.S});
+ if(attempt<4)await new Promise(done=>setTimeout(done,14000));
+}
+if(!j || j.fallback || j.complete!==true ||
+  !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])===50) ||
+  j.sourceDates?.S!==verified.date || j.spotifyFingerprint!==verified.fingerprint)
+  throw new Error("Published chart differs from the verified source: "+reason);
+console.log("SPOTIFY_SOURCE_AUDIT",JSON.stringify({date:verified.date,provider:verified.source,
+  rows:50,fingerprint:verified.fingerprint,liveOrigin:j.sourceOrigin?.S,updated:j.updated}));
 const news = (j.tracks || []).filter(x => String(x.delta).toLowerCase() === "new");
 const olivia = (j.tracks || []).find(x => /drop dead/i.test(x.title || "") && /olivia rodrigo/i.test(x.artist || ""));
 const rankSnapshot = (j.tracks || []).map((t, i) => ({
@@ -34,7 +53,6 @@ if (j.arrows && j.arrows.ok === false) throw new Error("arrow/tenure self-check 
 /* A structurally valid arrow map can still hide a destroyed tenure registry:
    on 2026-10-01 every row became "1 day" after a rebuild. Compare against the
    last healthy repo snapshot so a mass reset can never pass CI again. */
-const fs = await import("node:fs");
 const {mergeKey} = await import("../functions/lib/chart-identity.js");
 const backup = JSON.parse(fs.readFileSync(new URL("../public/data/chart-tenure-backup.json", import.meta.url), "utf8"));
 const currentSnap = backup && backup.current;

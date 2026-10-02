@@ -12,8 +12,10 @@ name: apple-data
 
 on:
   push:
+    branches: [main]
     paths:
       - "functions/api/top50.js"
+      - "public/data/spotify-chart.json"
       - "scripts/snapshot-live-chart.mjs"
       - "scripts/audit-live-chart.mjs"
       - ".github/workflows/apple-data.yml"
@@ -31,6 +33,10 @@ on:
     # получает эпловские имена, ссылки, превью и обложки тем же утром
     - cron: "20 6 * * *"
   workflow_dispatch:
+
+concurrency:
+  group: apple-data
+  cancel-in-progress: false
 
 permissions:
   contents: write

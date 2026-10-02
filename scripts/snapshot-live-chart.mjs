@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import {mergeKey} from "../functions/lib/chart-identity.js";
+import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
 
 const OUT = new URL("../public/data/chart-tenure-backup.json", import.meta.url);
 const liveUrl = "https://music98.news/api/top50?tenureSnapshot=" + Date.now();
@@ -12,9 +13,12 @@ const r = await fetch(liveUrl, {
 });
 if (!r.ok) throw new Error("live top50 HTTP " + r.status);
 const j = await r.json();
-if(j.fallback || j.complete!==true || !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])>=40))
-  throw new Error("refusing to snapshot incomplete ranking");
-if(Number(j.sources?.S)!==50)throw new Error("refusing Spotify source with fewer than 50 rows");
+const spotifyRef=verifiedSpotifySnapshot(JSON.parse(fs.readFileSync(
+  new URL("../public/data/spotify-chart.json",import.meta.url),"utf8")));
+if(!spotifyRef || j.fallback || j.complete!==true ||
+   !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])===50) ||
+   j.sourceDates?.S!==spotifyRef.date || j.spotifyFingerprint!==spotifyRef.fingerprint)
+  throw new Error("refusing snapshot unless all five are complete and Spotify edition matches");
 const tracks = Array.isArray(j.tracks) ? j.tracks : [];
 if (tracks.length !== 50) throw new Error("refusing tenure snapshot: expected 50 rows, got " + tracks.length);
 if (j.arrows && j.arrows.ok === false) throw new Error("refusing tenure snapshot: live arrow/tenure self-check failed");
@@ -71,6 +75,9 @@ const snapshot = {
   rev: String(j.rev || ""),
   complete:true,
   sources:Object.fromEntries(["A","S","D","B","Y"].map(k=>[k,Number(j.sources[k])])),
+  sourceDates:j.sourceDates,
+  sourceOrigin:j.sourceOrigin,
+  spotifyFingerprint:j.spotifyFingerprint,
   tracks: tracks.map((t,i) => ({
     rank: Number(t.rank) || i + 1,
     title: String(t.title || ""),
