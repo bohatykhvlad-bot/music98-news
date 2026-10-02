@@ -25,28 +25,35 @@ NEW_PARA=("At the 2026 New Faces of Country Music show in Nashville, Langley clo
 "live performance that helped build her following. Rather than another carefully arranged promotional "
 "portrait, this is a working singer surrounded by her musicians. Taken in March, the picture predates "
 "her record-breaking summer and gives the story a fitting return to the stage.")
-def prepare():
- blocks=SOURCE_TEXT.split("\n\n")
- assert len(blocks)==31 and blocks[-2]==PREV_MEDIA
- assert blocks[-3].startswith("At the 2026 New Faces of Country Music show in Nashville")
- assert "Amy Harris" in blocks[-3]
+def prepare(base):
+ blocks=base.split(chr(10)*2)
+ assert len(blocks)==31, ("unexpected layout",len(blocks))
+ old_photo=blocks[-2]
+ expected=(
+  old_photo==PREV_MEDIA or
+  (old_photo.startswith("[photo:photos/ella-bluesfest-2026-miriam-visser-full-original.jpg|Miriam Visser|")
+   and old_photo.endswith("|1]"))
+ )
+ assert expected, ("Owner installed another photo; refuse silent overwrite",old_photo)
+ assert (("Amy Harris" in blocks[-3] and old_photo==PREV_MEDIA)
+         or ("Miriam Visser" in blocks[-3] and "Miriam Visser" in old_photo))
+ old_para=blocks[-3]
  blocks[-3]=NEW_PARA;blocks[-2]=MEDIA
- new="\n\n".join(blocks)
+ new=(chr(10)*2).join(blocks)
  ps=[x for x in blocks if not x.startswith("[")]
  carriers=[x for x in blocks if x.startswith("[")]
  assert len(ps)==21 and len(carriers)==10
  assert all(80<=len(x.split())<=200 for x in ps),[len(x.split()) for x in ps]
- assert len(new.split("Nashville")) == len(SOURCE_TEXT.split("Nashville"))
- assert new.count(MEDIA)==1 and PREV_MEDIA not in new
- assert new.startswith(SOURCE_TEXT.split(". ")[0]+".")
- assert len(blocks[-1].split())>=80 and blocks[-1]==SOURCE_TEXT.split("\n\n")[-1]
+ assert new.count(MEDIA)==1 and old_photo not in new
+ assert new.startswith(base.split(". ")[0]+".")
+ assert len(blocks[-1].split())>=80 and blocks[-1]==base.split(chr(10)*2)[-1]
  assert sum("[photo:" in x for x in carriers)==2
  assert not any(a.startswith("[") and b.startswith("[") for a,b in zip(blocks,blocks[1:]))
- changed=[i for i,(a,b) in enumerate(zip(SOURCE_TEXT.split("\n\n"),blocks)) if a!=b]
+ changed=[i for i,(a,b) in enumerate(zip(base.split(chr(10)*2),blocks)) if a!=b]
  assert changed==[28,29],changed
- print("PREPARED","paragraphs",len(ps),"media",len(carriers),"changed_blocks",changed,
-       "new_words",sum(len(x.split()) for x in ps),"old_words",
-       sum(len(x.split()) for x in SOURCE_TEXT.split("\n\n") if not x.startswith("[")),flush=True)
+ print("REBASE_SUCCESS","previous_concluding_photo",old_photo,
+       "unchanged_other_blocks",29,"paragraphs",len(ps),"media",len(carriers),
+       "prose_words",sum(len(x.split()) for x in ps),flush=True)
  return new
 def raw(url):
  with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Accept":"image/jpeg,*/*"}),timeout=45) as r:return r.read()
@@ -86,19 +93,16 @@ def main():
  mode=sys.argv[1] if len(sys.argv)>1 else "--audit"
  assert mode in ("--audit","--save")
  runner.load_env();gate.KEY=runner.desk_key()
- new=prepare()
  before=current();target=runner.find_post(before["posts"],ID)
  assert target["status"]=="draft","Never edit a published article by this script"
  actual=target.get("body","").strip()
- print("DESK_CURRENT",hashlib.sha256(actual.encode()).hexdigest(),"SOURCE_BASELINE",hashlib.sha256(SOURCE_TEXT.encode()).hexdigest(),flush=True)
- if actual not in (SOURCE_TEXT,new):
-  a=SOURCE_TEXT.split(chr(10)*2);b=actual.split(chr(10)*2)
-  print("CURRENT_DESK_BLOCKS",len(b),"EXPECTED",len(a),flush=True)
-  for n in range(max(len(a),len(b))):
-   x=a[n] if n<len(a) else "";y=b[n] if n<len(b) else ""
-   if x!=y:print("CONCURRENT_DIFF_BLOCK",n,"previous",repr(x[:460]),"current",repr(y[:460]),flush=True)
-  raise RuntimeError("Owner newer edits protected, inspect diff and rebase")
-
+ print("DESK_CURRENT_SHA",hashlib.sha256(actual.encode()).hexdigest(),flush=True)
+ if MEDIA in actual:
+  new=actual
+  assert len(new.split(chr(10)*2))==31
+  print("EXISTING_TARGET_IMAGE_PRESENT",flush=True)
+ else:
+  new=prepare(actual)
  src=verified_source()
  can=copy.deepcopy(target);can["body"]=new
  if mode=="--audit":
