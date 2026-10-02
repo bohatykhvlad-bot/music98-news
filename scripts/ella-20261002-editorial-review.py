@@ -4,7 +4,7 @@ Modes: --audit (read-only desk+photo QC), --save (write Ella draft only).
 Do not publish or modify unrelated posts. Runs in existing editorial GitHub Actions.
 """
 from __future__ import annotations
-import base64,copy,hashlib,io,json,sys,time,urllib.request
+import base64,copy,difflib,hashlib,io,json,sys,time,urllib.request
 from pathlib import Path
 from PIL import Image,ImageOps
 sys.path.insert(0,str(Path(__file__).resolve().parent))
@@ -101,6 +101,8 @@ def main():
  if old.get("status")!="draft":raise RuntimeError("Ella post is not a draft; stop")
  if old.get("body","").strip()!=OLD:
   print("BODY_CONFLICT_STORED_TEXT_NO_LONGER_MATCHES_MASTER",flush=True)
+  difference="\\n".join(difflib.unified_diff(OLD.splitlines(),old.get("body","").strip().splitlines(),fromfile="repo-master",tofile="current-desk",lineterm=""))
+  print("OWNER_EDITS_DIFF_BEGIN\\n"+difference+"\\nOWNER_EDITS_DIFF_END",flush=True)
   raise RuntimeError("Need fresh snapshot before editing; no overwriting owner's changes")
  raw,crop=image_source()
  preview(crop)
