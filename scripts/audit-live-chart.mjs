@@ -53,7 +53,6 @@ if (j.arrows && j.arrows.ok === false) throw new Error("arrow/tenure self-check 
 /* A structurally valid arrow map can still hide a destroyed tenure registry:
    on 2026-10-01 every row became "1 day" after a rebuild. Compare against the
    last healthy repo snapshot so a mass reset can never pass CI again. */
-const fs = await import("node:fs");
 const {mergeKey} = await import("../functions/lib/chart-identity.js");
 const backup = JSON.parse(fs.readFileSync(new URL("../public/data/chart-tenure-backup.json", import.meta.url), "utf8"));
 const currentSnap = backup && backup.current;

@@ -18,3 +18,18 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+
+  verify-spotify-live:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Independently fetch, parse and compare live Spotify Top 50
+        run: node scripts/refresh-spotify-ranking.mjs
+      - name: Validate generated source fingerprint and all ranked rows
+        run: |
+          node --input-type=module -e 'import fs from "node:fs"; import {verifiedSpotifySnapshot} from "./functions/lib/spotify-chart.js"; const j=JSON.parse(fs.readFileSync("public/data/spotify-chart.json","utf8")); const v=verifiedSpotifySnapshot(j); if(!v || v.tracks.length!==50)process.exit(1); console.log("VERIFIED_LIVE_SOURCE",j.chartDate,j.provider,j.mirrorMatched,j.fingerprint);'
