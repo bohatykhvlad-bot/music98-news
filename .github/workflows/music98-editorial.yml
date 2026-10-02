@@ -147,6 +147,15 @@ jobs:
           git add .editorial/ella-offrecord-primary-originals.json
           test -f .editorial/ella-offrecord-primary-originals.b64 && git add .editorial/ella-offrecord-primary-originals.b64 || true
           git diff --cached --quiet || (git commit -m "Stage authentic Ella SXSW photo candidates at source resolution" && git push)
+      - name: Preview distinct Ella Ryman guitarist photo without any crop
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-ryman-portrait-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_ryman_portrait_visual_qc.py
+          git config user.name "music98 photo QC"
+          git config user.email "editorial@music98.news"
+          git add .editorial/ella-ryman-2025-alternative-uncropped-preview.b64
+          git diff --cached --quiet || (git commit -m "Review alternate uncut guitarist frame" && git push)
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
