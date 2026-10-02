@@ -949,7 +949,7 @@ function cachedTenureRegressed(payload, backup) {
 async function verifiedBackupTop50(env, origin, backup) {
   const snap = backup && backup.current;
   if (!snap || !Array.isArray(snap.tracks) || snap.tracks.length !== SIZE ||
-      !/^20\\d{2}-\\d{2}-\\d{2}$/.test(String(snap.updated || ""))) return null;
+      !/^20\d{2}-\d{2}-\d{2}$/.test(String(snap.updated || ""))) return null;
   const baked = await readSeed(env, origin, "top50.json");
   const known = new Map(((baked && baked.tracks) || [])
     .map(t => [tenureKey(t.title,t.artist), t]));
