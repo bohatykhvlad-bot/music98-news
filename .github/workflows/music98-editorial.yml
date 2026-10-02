@@ -165,6 +165,16 @@ jobs:
           git config user.email "editorial@music98.news"
           git add .editorial/ella-alternate-kendall-bst-2900-preview.b64 .editorial/ella-alternate-kendall-bst-2900-meta.json
           git diff --cached --quiet || (git commit -m "Review distinctive 2900px BST Ella concert original and article crop" && git push)
+      - name: Strict no-write QC of unrepeated alternate Ella photo
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-distinct-alternate-audit]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_swap_rejected_to_distinct_bst.py --audit
+      - name: Guarded draft-only swap from rejected photo to distinct alternate
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-distinct-alternate-save]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_swap_rejected_to_distinct_bst.py --save
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
