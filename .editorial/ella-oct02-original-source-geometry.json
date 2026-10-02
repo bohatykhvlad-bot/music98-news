@@ -1,0 +1,42 @@
+[
+  {
+    "label": "hero_current_hosted",
+    "width": 2128,
+    "height": 2515,
+    "format": "JPEG",
+    "bytes": 1200937,
+    "mime": "image/jpeg",
+    "EXIF": {},
+    "url": "https://music98.news/photos/ella-sony-standing-dandelion-2026-srgb.jpg"
+  },
+  {
+    "label": "second_photo_laying_full_press_original",
+    "width": 2730,
+    "height": 3631,
+    "format": "JPEG",
+    "bytes": 2190935,
+    "mime": "image/jpeg",
+    "EXIF": {},
+    "url": "https://prowly-prod.s3.eu-west-1.amazonaws.com/uploads/landing_page_image/image/670237/c17d81243d0803daafa4cf95b07cc51c.jpg"
+  },
+  {
+    "label": "2026_bluesfest_live_guitar_original_01",
+    "width": 1920,
+    "height": 1200,
+    "format": "JPEG",
+    "bytes": 1717791,
+    "mime": "image/jpeg",
+    "EXIF": {},
+    "url": "https://charlatan.ca/wp-content/uploads/2026/07/EllaLangley_01.jpg"
+  },
+  {
+    "label": "2026_bluesfest_live_guitar_original_06",
+    "width": 1200,
+    "height": 800,
+    "format": "JPEG",
+    "bytes": 377155,
+    "mime": "image/jpeg",
+    "EXIF": {},
+    "url": "https://charlatan.ca/wp-content/uploads/2026/07/EllaLangley_06.jpg"
+  }
+]
