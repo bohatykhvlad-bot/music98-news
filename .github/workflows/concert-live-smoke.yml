@@ -81,11 +81,16 @@ jobs:
                   assert '<link rel="canonical" href="https://music98.news/concerts">' in html
                   direct_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',html)
                   assert direct_src
-                  assert direct_src.group(1)=="/concerts-app.js?v=20260930-33"
+                  assert direct_src.group(1)=="/concerts-app.js?v=20261002-01"
                   _,_,home=get("https://music98.news/")
                   home_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',home)
                   assert home_src and direct_src.group(1)==home_src.group(1)
                   _,jh,js=get("https://music98.news"+direct_src.group(1))
+                  assert 'applyConcertArt(img,e.image||e.artistImage||"/logo.png",720)' in js
+                  assert 'applyConcertArt(img,item.image||"/logo.png",256)' in js
+                  assert "popupImage" not in js
+                  assert "compactSameConcertImage" not in js
+                  assert "ticket-alt" not in js
                   assert "no-store" in jh.get("cache-control","").lower()
                   assert jh.get("cf-cache-status","").upper()!="HIT"
                   assert 'mode:"markets"' in js or 'mode:"markets",' in js
