@@ -471,162 +471,48 @@ test("location strings collapse duplicate city, region and country in both popup
 });
 
 
-test("Cloudflare presets use only original Ticketmaster image without variant substitution",async()=>{
+test("all concert thumbnails use original photo, browser smoothing and never Cloudflare",async()=>{
   const {runInNewContext}=await import("node:vm");
-  const from=app.indexOf("const CONCERT_ART_PRESETS=Object.freeze({");
-  const to=app.indexOf("\nfunction browserResampleConcertArt(",from);
-  assert.ok(from>0 && to>from);
-  const {optimizedConcertImageUrl}=runInNewContext(
-    app.slice(from,to)+"\n({optimizedConcertImageUrl})",
-    {URL,window:{location:{origin:"https://music98.news"}}}
-  );
-  const original="https://s1.ticketm.net/dam/a/abc/EXACT-ORIGINAL.jpg";
-  assert.equal(optimizedConcertImageUrl(original,"icon"),
-    "https://music98.news/cdn-cgi/image/width=600,height=600,fit=scale-down,quality=85,format=auto/"+original);
-  assert.equal(optimizedConcertImageUrl(original,"event"),
-    "https://music98.news/cdn-cgi/image/width=1280,height=720,fit=scale-down,quality=85,format=auto/"+original);
-  assert.equal(optimizedConcertImageUrl(original,256),"");
-  assert.equal(optimizedConcertImageUrl("https://untrusted.example/photo.jpg","icon"),"");
-  assert.equal(optimizedConcertImageUrl("http://s1.ticketm.net/a.jpg","event"),"");
-  assert.equal(optimizedConcertImageUrl("/logo.png","icon"),"");
+  const from=app.indexOf("function applyConcertArt(img,original,preset){");
+  const to=app.indexOf("\nfunction popupContent(e){",from);
+  assert.ok(from>0&&to>from);
+  assert.doesNotMatch(app,/cdn-cgi\/image|concertArtResizeProbe|CONCERT_ART_PRESETS|optimizedConcertImageUrl/);
+  let rendered=[];
+  const apply=runInNewContext(
+    "function browserResampleConcertArt(img,preset){ rendered.push([img,preset]); }\n"+
+    app.slice(from,to)+"\n({applyConcertArt})",
+    {rendered}
+  ).applyConcertArt;
+  let src="";
+  const el={draggable:true,onload:null,onerror:null,set src(x){src=x;},get src(){return src;}};
+  const origin="https://s1.ticketm.net/actual/full-photo.jpg";
+  apply(el,origin,"event");
+  assert.equal(el.src,origin);
+  assert.equal(el.draggable,false);
+  el.onload();
+  assert.equal(rendered.length,1);
+  assert.equal(rendered[0][1],"event");
+  assert.equal(rendered[0][0],el);
+  assert.equal(el.onload,null);
+  el.onerror();
+  assert.equal(el.src,"/logo.png");
   assert.match(app,/applyConcertArt\(img,item\.image\|\|"\/logo\.png","icon"\)/);
   assert.match(app,/applyConcertArt\(img,originalArt,"event"\)/);
-  assert.doesNotMatch(app,/compactSameConcertImage|popupImage/);
 });
 
-test("one Cloudflare probe falls back to originals while retaining local smoothing",async()=>{
-  const {runInNewContext}=await import("node:vm");
-  const from=app.indexOf("let concertArtResizeSupported=null;");
-  const to=app.indexOf("\nfunction popupContent(e){",from);
-  assert.ok(from>0 && to>from);
-  let probes=0;
-  const client=runInNewContext(
-    app.slice(from,to)+"\n({applyConcertArt})",
-    {URL,window:{location:{origin:"https://music98.news"}},fetch:async()=>{
-      probes++;
-      return {ok:false,headers:{get:()=>null}};
-    }}
-  );
-  const element=()=>{
-    let value="";
-    return {
-      isConnected:true,onerror:null,onload:null,draggable:true,
-      set src(v){value=v;},get src(){return value;}
-    };
-  };
-  const first="https://s1.ticketm.net/dam/a/x/THIS-EVENT.jpg";
-  const second="https://s1.ticketm.net/dam/a/y/ANOTHER-EVENT.jpg";
-  const images=[element(),element()];
-  client.applyConcertArt(images[0],first,"event");
-  client.applyConcertArt(images[1],second,"icon");
-  await new Promise(resolve=>setImmediate(resolve));
-  assert.equal(probes,1);
-  assert.equal(images[0].src,first);
-  assert.equal(images[1].src,second);
-  assert.equal(images[0].draggable,false);
-  assert.equal(typeof images[0].onload,"function");
-  const later=element();
-  client.applyConcertArt(later,second,"icon");
-  assert.equal(later.src,second);
-  assert.equal(probes,1);
-});
-
-test("successful Cloudflare transform uses resized source but still enables browser smoothing",async()=>{
-  const {runInNewContext}=await import("node:vm");
-  const from=app.indexOf("let concertArtResizeSupported=null;");
-  const to=app.indexOf("\nfunction popupContent(e){",from);
-  let checks=0;
-  const client=runInNewContext(
-    app.slice(from,to)+"\n({applyConcertArt})",
-    {URL,window:{location:{origin:"https://music98.news"}},fetch:async()=>{
-      checks++;
-      return {ok:true,headers:{get:key=>({
-        "cf-resized":"internal=ok","content-type":"image/webp"
-      })[key.toLowerCase()]||null}};
-    }}
-  );
-  const element=()=>{
-    let value="";
-    return {
-      isConnected:true,onerror:null,onload:null,draggable:true,
-      set src(v){value=v;},get src(){return value;}
-    };
-  };
-  const popup=element(),artist=element();
-  const eventCover="https://s1.ticketm.net/dam/a/abc/THE-ORIGINAL-EVENT.jpg";
-  const artistCover="https://s1.ticketm.net/dam/a/def/THE-ORIGINAL-ARTIST.jpg";
-  client.applyConcertArt(popup,eventCover,"event");
-  client.applyConcertArt(artist,artistCover,"icon");
-  await new Promise(resolve=>setImmediate(resolve));
-  assert.equal(checks,1);
-  assert.ok(popup.src.includes("/width=1280,height=720,"));
-  assert.ok(artist.src.includes("/width=600,height=600,"));
-  assert.ok(popup.src.endsWith(eventCover));
-  assert.ok(artist.src.endsWith(artistCover));
-  assert.equal(typeof popup.onload,"function");
-  popup.onerror();
-  assert.equal(popup.src,eventCover);
-  assert.equal(typeof popup.onload,"function");
-  artist.onerror();
-  assert.equal(artist.src,artistCover);
-});
-
-test("two-pass high-quality browser resampling preserves original popup crop and is not draggable",async()=>{
-  const {runInNewContext}=await import("node:vm");
-  const from=app.indexOf("function browserResampleConcertArt(img,preset){");
-  const to=app.indexOf("\nfunction applyConcertArt(",from);
-  assert.ok(from>=0 && to>from);
-  const drawCalls=[],contexts=[];
-  const newCanvas=()=>({
-    width:0,height:0,className:"",draggable:true,
-    setAttribute(){},
-    getContext(){
-      const ctx={
-        imageSmoothingEnabled:false,imageSmoothingQuality:"low",
-        drawImage(...args){drawCalls.push(args);}
-      };
-      contexts.push(ctx);
-      return ctx;
-    }
-  });
-  const {browserResampleConcertArt}=runInNewContext(
-    app.slice(from,to)+"\n({browserResampleConcertArt})",
-    {
-      window:{devicePixelRatio:2},
-      document:{createElement:newCanvas},
-      requestAnimationFrame:callback=>callback()
-    }
-  );
-  let result=null;
-  const img={
-    isConnected:true,naturalWidth:1600,naturalHeight:2400,className:"pop-thumb",
-    classList:{contains:name=>name==="pop-thumb"},
-    getBoundingClientRect:()=>({width:138,height:138}),
-    replaceWith:canvas=>{result=canvas;}
-  };
-  browserResampleConcertArt(img,"event");
-  assert.equal(drawCalls.length,2);
-  assert.equal(drawCalls[0][0],img);
-  assert.equal(drawCalls[0][1],0);
-  assert.equal(drawCalls[0][2],144); // Match object-position: 50% 18%.
-  assert.equal(result.width,276); // 138 CSS px at 2x DPR.
-  assert.equal(result.height,276);
-  assert.equal(result.draggable,false);
-  assert.equal(result.className,"pop-thumb concert-art-canvas");
-  assert.ok(contexts.every(c=>c.imageSmoothingEnabled&&c.imageSmoothingQuality==="high"));
-  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.tour-art \.concert-art-canvas\{width:100%;height:100%/);
-  assert.match(css,/\.pop-art-link\{[^}]*cursor:pointer/);
-  assert.doesNotMatch(css,/cursor:zoom-in/);
+test("popup concert photograph is presentation only without links or zoom cursor",()=>{
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\\\.|[^"\\\\])*");/m)[1]);
   const popup=app.slice(app.indexOf("function popupContent(e){"),app.indexOf("\nfunction venuePopupContent(",app.indexOf("function popupContent(e){")));
-  assert.match(popup,/full\.href=eventImageUrl/);
-  assert.match(popup,/full\.draggable=false/);
-  assert.match(popup,/full\.addEventListener\("dragstart",event=>event\.preventDefault\(\)\)/);
-  assert.doesNotMatch(popup,/full\.title="Open original image"/);
-  const selector=app.slice(to,app.indexOf("\nfunction popupContent(e){",to));
-  assert.match(selector,/browserResampleConcertArt\(img,preset\)/);
-  assert.match(selector,/img\.draggable=false/);
-  assert.doesNotMatch(selector,/dragstart/);
+  assert.match(popup,/grid\.append\(img,main\)/);
+  assert.doesNotMatch(popup,/full\.href|eventImageUrl|createElement\("a"\)|dragstart|pop-art-link/);
+  assert.doesNotMatch(css,/pop-art-link|cursor:zoom-in/);
+  const from=app.indexOf("function browserResampleConcertArt(");
+  const to=app.indexOf("\nfunction applyConcertArt(",from);
+  const body=app.slice(from,to);
+  assert.match(body,/prectx\.imageSmoothingQuality="high"/);
+  assert.match(body,/ctx\.imageSmoothingQuality="high"/);
+  assert.match(body,/img\.replaceWith\(visible\)/);
+  assert.match(body,/visible\.draggable=false/);
 });
 
 test("Near me lists up to 30 artists and description/status share rank alignment",()=>{
