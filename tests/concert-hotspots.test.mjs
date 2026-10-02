@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import {
   HOTSPOT_VERSION,
   HOTSPOT_THRESHOLD,
@@ -25,6 +26,7 @@ import {
   snapshotFromState,
 } from "../functions/lib/concert-hotspots.js";
 import {
+  isPlaceholderConcertArtist,
   refreshHotspotSnapshot,
   refreshPopularSnapshot,
   refreshPopularTourSnapshots,
@@ -32,6 +34,15 @@ import {
   refreshMapMarketSnapshot,
   onRequestGet
 } from "../functions/api/concerts.js";
+
+test("Ticketmaster placeholder artists are excluded before and after normalization",()=>{
+  assert.equal(isPlaceholderConcertArtist("TEST ARTIST"),true);
+  assert.equal(isPlaceholderConcertArtist(" live    music "),true);
+  assert.equal(isPlaceholderConcertArtist("Bruno Mars"),false);
+  const source=readFileSync(new URL("../functions/api/concerts.js",import.meta.url),"utf8");
+  assert.match(source,/isPlaceholderConcertArtist\(attraction\.name \|\|/);
+  assert.match(source,/return isPlaceholderConcertArtist\(e\?\.artist\) \|\|/);
+});
 
 test("hotspot threshold is 10 or more", () => {
   assert.equal(HOTSPOT_THRESHOLD, 10);

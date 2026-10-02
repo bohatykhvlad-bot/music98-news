@@ -184,6 +184,9 @@ function bestArtistImage(images) {
   return pool[0]?.url || "";
 }
 
+export function isPlaceholderConcertArtist(name) {
+  return /^(?:test artist|live music)$/i.test(String(name || "").trim().replace(/\s+/g, " "));
+}
 function packageLikeScore(value) {
   const text=String(value||"").toLowerCase();
   return /\b(vip|package|premium|first entry|fast track|meet\s*(?:&|and)\s*greet|platinum|hospitality|soundcheck|early entry|upgrade|merch(?:andise)?)\b/.test(text) ? 10 : 0;
@@ -204,7 +207,8 @@ function normalizeEvent(e) {
     /do\s+not\s+purchase/i.test(qaText) ||
     /\bqa\b[^\n]{0,40}\b(?:test|testing|festival)\b/i.test(qaText) ||
     /\b(?:test|testing)\b[^\n]{0,30}\b(?:event|festival)\b/i.test(qaText) ||
-    venueName.toLowerCase()==="ticketmaster";
+    venueName.toLowerCase()==="ticketmaster" ||
+    isPlaceholderConcertArtist(attraction.name || (!attractions.length ? rawName : ""));
   if(testEvent) return null;
   const rawLat = finite(venue?.location?.latitude);
   const rawLng = finite(venue?.location?.longitude);
@@ -287,7 +291,8 @@ function normalizedEventIsBlocked(e) {
   const name=String(e?.name||"");
   const venue=String(e?.venue||"");
   const qaText=name.toLowerCase();
-  return /do\s+not\s+purchase/i.test(qaText) ||
+  return isPlaceholderConcertArtist(e?.artist) ||
+    /do\s+not\s+purchase/i.test(qaText) ||
     /\bqa\b[^\n]{0,40}\b(?:test|testing|festival)\b/i.test(qaText) ||
     /\b(?:test|testing)\b[^\n]{0,30}\b(?:event|festival)\b/i.test(qaText) ||
     venue.trim().toLowerCase()==="ticketmaster";

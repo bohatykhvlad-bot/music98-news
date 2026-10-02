@@ -201,6 +201,14 @@ test("inactive map toggles use the shared gray hover highlight",()=>{
 });
 
 
+test("manually moving the map offers Search this area from Popular and Near me",()=>{
+  const move=app.slice(app.indexOf('map.on("moveend",()=>{'),app.indexOf('function resizeMapStable()'));
+  assert.match(move,/!\["popular","nearby","artist-area"\]\.includes\(activeMode\)/);
+  assert.match(move,/searchAreaBtn\.hidden=false/);
+  const click=app.slice(app.indexOf('searchAreaBtn.addEventListener("click",()=>{'),app.indexOf('search.addEventListener("input",()=>{'));
+  assert.match(click,/loadArea\(pending\.lat,pending\.lng,"Map area",\{fit:false,radius:pending\.radius,force:true\}\)/);
+});
+
 test("mobile Search this area stays at the top right and clears artist mode tabs",()=>{
   assert.match(app,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{left:auto;right:10px;top:10px;bottom:auto;margin-inline:0;height:40px\}/);
   assert.match(app,/\.map-shell\.artist-context \.search-area-btn\{top:60px\}/);
@@ -472,12 +480,23 @@ test("failed area loads clear stale event markers",()=>{
 });
 
 
+test("Concerts outer sidebar is flat like the map while expanded artists keep their shadow",()=>{
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(css,/\.map-shell\{[^}]*box-shadow:none/);
+  assert.match(css,/\.side\{[^}]*box-shadow:none;overflow:hidden/);
+  assert.match(css,/\.tour-card\.open\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(css,/\.disclosure\{margin:0;height:16px;padding:0 4px 0 17px;display:flex;align-items:flex-end/);
+  const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(html,/Ticketing by Ticketmaster<\/p>/);
+  assert.doesNotMatch(html,/Ticketing by Ticketmaster\./);
+});
+
 test("Concert status, ranking and Ticketmaster disclosure share the left alignment",()=>{
   const encoded=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
   assert.ok(encoded);
   const css=JSON.parse(encoded[1]);
   const status=css.match(/\.side-status\{[^}]*margin:0 4px 8px (\d+)px/);
-  const disclosure=css.match(/\.disclosure\{[^}]*padding:10px 4px 2px (\d+)px/);
+  const disclosure=css.match(/\.disclosure\{[^}]*padding:0 4px 0 (\d+)px/);
   assert.ok(status && disclosure,"aligned status and disclosure CSS are required");
   assert.equal(Number(status[1]),Number(disclosure[1]));
   assert.equal(Number(status[1]),17);
@@ -506,7 +525,7 @@ test("Concerts sidebar has symmetric shadow insets without moving the text basel
   assert.match(css,/\.side-sub\{[^}]*margin:0 4px 10px 17px/);
   assert.match(css,/\.side-status\{[^}]*margin:0 4px 8px 17px/);
   assert.match(css,/\.side-empty\{[^}]*padding:12px 5px 12px 17px/);
-  assert.match(css,/\.disclosure\{[^}]*margin-top:8px;padding:10px 4px 2px 17px/);
+  assert.match(css,/\.disclosure\{[^}]*margin:0;height:16px;padding:0 4px 0 17px/);
   assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:var\(--shadow\)/);
   assert.match(css,/\.tour-events\{[^}]*padding:0 9px;background:#fff/);
   assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*padding:2px 9px 10px/);
@@ -667,7 +686,7 @@ test("Concerts displays only one error, empty, or loading explanation with align
   assert.match(css,/\.side-sub\{[^}]*margin:0 4px 10px 17px/);
   assert.match(css,/\.side-status\{[^}]*margin:0 4px 8px 17px/);
   assert.match(css,/\.side-empty\{[^}]*padding:12px 5px 12px 17px/);
-  assert.match(css,/\.disclosure\{[^}]*padding:10px 4px 2px 17px/);
+  assert.match(css,/\.disclosure\{[^}]*padding:0 4px 0 17px/);
   assert.match(app,/function setStatus\(message\)\{ sideStatus\.textContent=[^;]*; if\(sideStatus\.textContent\) sideSub\.textContent=""; \}/);
   assert.doesNotMatch(app,/sideEmpty\.textContent="Location unavailable\."/);
   const area=app.slice(app.indexOf("async function loadArea("),app.indexOf("\nfunction geoPositionOnce("));
@@ -681,12 +700,28 @@ test("Near me has one correctly ranked, aligned summary rather than a duplicate 
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   assert.doesNotMatch(css,/\/\/ Align description/);
   assert.match(css,/\.side-status\{font-size:13\.5px;color:var\(--muted\);margin:0 4px 8px 17px/);
-  assert.match(css,/\.disclosure\{[^}]*padding:10px 4px 2px 17px/);
+  assert.match(css,/\.disclosure\{[^}]*padding:0 4px 0 17px/);
   assert.doesNotMatch(app,/Artists with the most upcoming events in this area\./);
   assert.doesNotMatch(app,/Artists with upcoming events in /);
   assert.match(app,/sideSub\.textContent="";\s*renderArtists\(groupedNearby\(nearbyEvents\),"nearby"\)/);
   assert.match(app,/setStatus\(events\.length \? "Ranked by number of upcoming concerts"/);
   assert.match(app,/setStatus\(nearbyEvents\.length \? "Ranked by number of upcoming concerts"/);
+});
+
+test("Near me never ranks placeholder attractions or puts their concerts on the map",()=>{
+  const start=app.indexOf("function isPlaceholderConcertArtist(name){");
+  const end=app.indexOf("\nfunction setTourBoxHeight(",start);
+  assert.ok(start>0 && end>start);
+  const {isPlaceholderConcertArtist,groupedNearby}=runInNewContext(app.slice(start,end)+"\n({isPlaceholderConcertArtist,groupedNearby})");
+  assert.ok(isPlaceholderConcertArtist("TEST ARTIST"));
+  assert.ok(isPlaceholderConcertArtist(" Live   Music "));
+  assert.ok(!isPlaceholderConcertArtist("Bruno Mars"));
+  const events=[{artist:"Live music",attractionId:"one",date:"2026-12-01"},
+    {artist:"Test artist",attractionId:"two",date:"2026-12-01"},
+    {artist:"Bruno Mars",attractionId:"three",date:"2026-12-01"}];
+  assert.equal(groupedNearby(events).length,1);
+  assert.equal(groupedNearby(events)[0].name,"Bruno Mars");
+  assert.match(app,/events=events\.filter\(e=>!isPlaceholderConcertArtist\(e\.artist\)/);
 });
 
 test("Near me lists up to 30 artists and description/status share rank alignment",()=>{
@@ -696,7 +731,7 @@ test("Near me lists up to 30 artists and description/status share rank alignment
   const stylesheet=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   const desc=stylesheet.match(/\.side-sub\{[^}]*margin:0 4px 10px (\d+)px/);
   const status=stylesheet.match(/\.side-status\{[^}]*margin:0 4px 8px (\d+)px/);
-  const disclosure=stylesheet.match(/\.disclosure\{[^}]*padding:10px 4px 2px (\d+)px/);
+  const disclosure=stylesheet.match(/\.disclosure\{[^}]*padding:0 4px 0 (\d+)px/);
   assert.equal(desc?.[1],"17");
   assert.equal(status?.[1],desc?.[1]);
   assert.equal(disclosure?.[1],desc?.[1]);
