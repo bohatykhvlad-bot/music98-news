@@ -1,15 +1,16 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-02T09:11:07.924Z",
+  "updatedAt": "2026-10-02T12:50:46.426Z",
   "chartUpdated": "2026-10-02",
   "chartRev": "verified-spotify-v36",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 26,
+    "apple-feed": 25,
     "apple-chart": 23,
-    "previous-audit": 1
+    "previous-audit": 1,
+    "apple": 1
   },
   "entries": {
     "ahha|bcardi": {
@@ -29,7 +30,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:44.285Z",
+      "checkedAt": "2026-10-02T12:50:26.753Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -110,7 +111,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:45.719Z",
+      "checkedAt": "2026-10-02T12:50:27.591Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -146,7 +147,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:40.876Z",
+      "checkedAt": "2026-10-02T12:50:22.299Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -242,7 +243,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:26.976Z",
+      "checkedAt": "2026-10-02T12:50:12.416Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -338,7 +339,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:38.791Z",
+      "checkedAt": "2026-10-02T12:50:20.416Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -374,7 +375,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:11:05.217Z",
+      "checkedAt": "2026-10-02T12:50:43.788Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -455,7 +456,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:13.296Z",
+      "checkedAt": "2026-10-02T12:50:00.679Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -491,7 +492,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:11:02.871Z",
+      "checkedAt": "2026-10-02T12:50:42.306Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -557,7 +558,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:38.791Z",
+      "checkedAt": "2026-10-02T12:50:20.415Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -623,7 +624,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:18.735Z",
+      "checkedAt": "2026-10-02T12:50:06.015Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -659,7 +660,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:13.299Z",
+      "checkedAt": "2026-10-02T12:50:00.682Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -695,7 +696,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:26.977Z",
+      "checkedAt": "2026-10-02T12:50:12.418Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -731,7 +732,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:13.297Z",
+      "checkedAt": "2026-10-02T12:50:00.680Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -767,7 +768,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:45.718Z",
+      "checkedAt": "2026-10-02T12:50:27.590Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -803,7 +804,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:40.877Z",
+      "checkedAt": "2026-10-02T12:50:22.300Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -839,7 +840,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:15.661Z",
+      "checkedAt": "2026-10-02T12:50:02.520Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -935,7 +936,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:23.715Z",
+      "checkedAt": "2026-10-02T12:50:08.524Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -971,7 +972,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:25.104Z",
+      "checkedAt": "2026-10-02T12:50:10.412Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1024,34 +1025,94 @@
       "identity": "dropdead|oliviarodrigo",
       "title": "drop dead",
       "artist": "Olivia Rodrigo",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
-      "releaseTitle": "you seem pretty sad for a girl so in love",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/b0/f1/1eb0f1d8-84e4-3a66-be48-133f330b0153/26UMGIM21837.rgb.jpg/600x600bb.jpg",
+      "provider": "apple",
+      "releaseTitle": "drop dead (singalong pack) - Single",
       "releaseArtist": "Olivia Rodrigo",
-      "releaseDate": "2026-04-16T07:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1889992111?i=1889992113",
-      "collectionId": "1889992111",
-      "trackId": "1889992113",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
+      "releaseDate": "2026-04-16T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/1894362510?i=1894362511",
+      "collectionId": "1894362510",
+      "trackId": "1894362511",
+      "confidence": 98,
+      "score": 965,
+      "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:31.982Z",
+      "checkedAt": "2026-10-02T12:50:17.358Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
-          "id": "1889992113",
-          "collectionId": "1889992111",
-          "releaseTitle": "you seem pretty sad for a girl so in love",
+          "provider": "apple",
+          "id": "1894362511",
+          "collectionId": "1894362510",
+          "releaseTitle": "drop dead (singalong pack) - Single",
           "releaseArtist": "Olivia Rodrigo",
-          "releaseDate": "2026-04-16T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1889992111?i=1889992113",
-          "score": 1270,
-          "confidence": 99,
-          "consensus": 1,
+          "releaseDate": "2026-04-16T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/b0/f1/1eb0f1d8-84e4-3a66-be48-133f330b0153/26UMGIM21837.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1894362510?i=1894362511",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1894362512",
+          "collectionId": "1894362510",
+          "releaseTitle": "drop dead (singalong pack) - Single",
+          "releaseArtist": "Olivia Rodrigo",
+          "releaseDate": "2026-04-17T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/b0/f1/1eb0f1d8-84e4-3a66-be48-133f330b0153/26UMGIM21837.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1894362510?i=1894362512",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6762380193",
+          "collectionId": "1893996068",
+          "releaseTitle": "drop dead - Single",
+          "releaseArtist": "Olivia Rodrigo",
+          "releaseDate": "2026-04-16T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/36/57/6b/36576b81-785b-d02c-00ed-d7362fec7688/26UMGIM21837.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1893996068?i=6762380193",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6762687190",
+          "collectionId": "1894963246",
+          "releaseTitle": "drop dead (itunes limited cover) - Single",
+          "releaseArtist": "Olivia Rodrigo",
+          "releaseDate": "2026-04-16T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/9d/2d/b0/9d2db0d2-3656-6cf4-7c4c-21901f3d12f6/26UMGIM48177.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1894963246?i=6762687190",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6762909196",
+          "collectionId": "1895071887",
+          "releaseTitle": "drop dead (you know all the words - isolated vocals) - Single",
+          "releaseArtist": "Olivia Rodrigo",
+          "releaseDate": "2026-04-16T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/98/1e/26/981e2682-a303-70b5-8d1c-b6c0459d2af1/26UMGIM48939.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1895071887?i=6762909196",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
           "earliestReleaseYear": 2026
         }
       ]
@@ -1073,7 +1134,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:38.791Z",
+      "checkedAt": "2026-10-02T12:50:20.416Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1109,7 +1170,7 @@
       "score": 850,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:41.439Z",
+      "checkedAt": "2026-10-02T12:50:23.604Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1205,7 +1266,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:41.441Z",
+      "checkedAt": "2026-10-02T12:50:23.606Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1241,7 +1302,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:13.300Z",
+      "checkedAt": "2026-10-02T12:50:00.683Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1277,7 +1338,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:46.806Z",
+      "checkedAt": "2026-10-02T12:50:29.640Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1373,7 +1434,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:18.735Z",
+      "checkedAt": "2026-10-02T12:50:06.015Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1409,7 +1470,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:31.981Z",
+      "checkedAt": "2026-10-02T12:50:15.054Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1490,7 +1551,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:41.441Z",
+      "checkedAt": "2026-10-02T12:50:23.606Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1526,7 +1587,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:15.663Z",
+      "checkedAt": "2026-10-02T12:50:02.523Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1562,7 +1623,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:18.734Z",
+      "checkedAt": "2026-10-02T12:50:06.014Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1582,7 +1643,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:28.915Z",
+      "checkedAt": "2026-10-02T12:50:13.389Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1648,7 +1709,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:39.871Z",
+      "checkedAt": "2026-10-02T12:50:21.627Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1729,7 +1790,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:15.662Z",
+      "checkedAt": "2026-10-02T12:50:02.522Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1765,7 +1826,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:23.714Z",
+      "checkedAt": "2026-10-02T12:50:08.523Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1861,7 +1922,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:53.715Z",
+      "checkedAt": "2026-10-02T12:50:33.501Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1927,7 +1988,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:13.301Z",
+      "checkedAt": "2026-10-02T12:50:00.684Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1963,7 +2024,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:23.715Z",
+      "checkedAt": "2026-10-02T12:50:08.524Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1999,7 +2060,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:38.792Z",
+      "checkedAt": "2026-10-02T12:50:20.417Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2035,7 +2096,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:11:03.674Z",
+      "checkedAt": "2026-10-02T12:50:43.240Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2101,7 +2162,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:49.268Z",
+      "checkedAt": "2026-10-02T12:50:30.255Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2167,7 +2228,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:45.718Z",
+      "checkedAt": "2026-10-02T12:50:27.590Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2233,7 +2294,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:11:07.922Z",
+      "checkedAt": "2026-10-02T12:50:46.423Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2299,7 +2360,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:34.666Z",
+      "checkedAt": "2026-10-02T12:50:17.908Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2380,7 +2441,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:55.958Z",
+      "checkedAt": "2026-10-02T12:50:35.169Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2476,7 +2537,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:13.298Z",
+      "checkedAt": "2026-10-02T12:50:00.681Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2512,7 +2573,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:52.442Z",
+      "checkedAt": "2026-10-02T12:50:32.194Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2593,7 +2654,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:18.737Z",
+      "checkedAt": "2026-10-02T12:50:06.015Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2629,7 +2690,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:41.440Z",
+      "checkedAt": "2026-10-02T12:50:23.605Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2665,7 +2726,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:59.345Z",
+      "checkedAt": "2026-10-02T12:50:38.389Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2761,7 +2822,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:41.441Z",
+      "checkedAt": "2026-10-02T12:50:23.605Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2797,7 +2858,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T09:10:59.345Z",
+      "checkedAt": "2026-10-02T12:50:38.390Z",
       "alternatives": [
         {
           "provider": "apple-feed",
