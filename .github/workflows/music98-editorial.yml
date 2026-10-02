@@ -84,6 +84,11 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_correct_color_photo_attribution_final.py --save
+      - name: Review Caylee original live electric guitar Ella photo before draft substitution
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-caylee-live-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella-caylee-live-option-qc.py
       - name: Inspect Keylee Baque and Andrew Wendowski 2026 original Ella photos
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-indie2026-qc]') }}
         run: |
