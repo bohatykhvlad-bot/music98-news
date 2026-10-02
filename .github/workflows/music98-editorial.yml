@@ -117,6 +117,16 @@ jobs:
         run: |
           python -m pip install --quiet requests
           python scripts/ella_auburn_fan_primary_images_qc.py
+      - name: Inspect V13 2026 Ella Toronto concert photo originals
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-v13-photos-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow beautifulsoup4 requests
+          python scripts/ella_v13_2026_photo_qc.py
+          git config user.name "music98 editorial photo QC"
+          git config user.email "editorial@music98.news"
+          git add .editorial/ella-v13-2026-gallery-originals.json
+          test -f .editorial/ella-v13-2026-originals-contact.b64 && git add .editorial/ella-v13-2026-originals-contact.b64 || true
+          git diff --cached --quiet || (git commit -m "Review Ella Toronto stage photo original resolution" && git push)
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
