@@ -492,6 +492,20 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 });
 
 
+test("sidebar Concerts cards show the entire news-style shadow without moving list rows",()=>{
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  const scroller=css.match(/\.tours\{[^}]*scrollbar-gutter:stable;margin:-(\d+)px -(\d+)px -(\d+)px;padding:(\d+)px (\d+)px (\d+)px (\d+)px;overscroll-behavior:contain\}/);
+  assert.ok(scroller,"scroll container must reserve shadow room on all four sides");
+  const [top,left,bottom,padTop,padRight,padBottom,padLeft]=scroller.slice(1).map(Number);
+  assert.equal(padTop,top,"top shadow clearance does not shift the first row");
+  assert.equal(padLeft,left,"left shadow clearance does not shift artist ranks");
+  assert.equal(padRight-left,3,"right clearance preserves the original 3px alignment");
+  assert.equal(padBottom,bottom,"bottom shadow clearance retains the disclosure layout");
+  assert.ok(left>=12 && top>=12 && bottom>=18,"visible shadow gutter is required");
+  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:var\(--shadow\)/);
+  assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.tours\{overflow:visible;margin:0;padding:0;scrollbar-gutter:auto\}/);
+});
+
 test("gray concert artist header never changes dimensions between hover and expanded states",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   assert.match(css,/--event-radius:14px/);
