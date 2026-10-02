@@ -81,6 +81,16 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_correct_color_photo_attribution_final.py --save
+      - name: Audit Ella native guitar photo and source-corrected prose
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-native-final-audit]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella-save-native-guitar-oct02.py --audit
+      - name: Save native concert photo to existing Ella Draft
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-native-final-save]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella-save-native-guitar-oct02.py --save
       - name: Inspect native concert photo originals
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-native-photo-audit]') }}
         run: |
