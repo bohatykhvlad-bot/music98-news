@@ -198,10 +198,14 @@ test("mobile chart reclaims arrow space without shrinking artwork or playback",(
     "grid-template-columns:56px 44px minmax(0,1fr) 36px;",
     "gap:6px 8px;",
     "padding:12px 17px 12px 12px;",
-    ".delta.reentry{height:20px;min-width:56px;padding:0 5px;font-size:8px;",
+    ".delta.reentry{height:auto;min-width:0;padding:0;font-size:9px;",
     ".artwrap{grid-area:art;width:44px;height:44px;",
     ".rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}"
   ])assert.ok(mobile.includes(value),value);
+  assert.match(page,/\\.delta\\.new,\\.delta\\.reentry\\{color:var\\(--text\\);background:transparent;border:0;border-radius:0/);
+  assert.doesNotMatch(page,/\\.delta\\.new,\\.delta\\.reentry\\{background:var\\(--text\\);color:#fff/);
+  assert.ok(mobile.includes(".delta.new{height:auto;min-width:0;padding:0;font-size:10px;"));
+  assert.doesNotMatch(mobile,/\\.delta\\.new,\\.delta\\.reentry\\{background:var\\(--text\\);color:#fff/);
   assert.ok(page.includes(".chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:82px 56px"));
   /* Week text starts exactly at the visible image's padded inset. */
   assert.ok(mobile.includes(".weeks{grid-area:week;text-align:left;justify-self:start;"));
