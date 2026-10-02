@@ -35,7 +35,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle serves complete mobile and desktop map concert popups",()=>{
-  assert.ok(page.includes("concerts-app.js?v=20261003-02"));
+  assert.ok(page.includes("concerts-app.js?v=20261003-03"));
 });
 
 

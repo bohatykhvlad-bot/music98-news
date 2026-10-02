@@ -338,11 +338,55 @@ test("venue popup groups strict venue identity, never coordinate proximity",()=>
   assert.doesNotMatch(app,/sameCoords=.*0\.0008/);
 });
 
-test("visible event markers zoom before popup and stale click timers cannot reopen old context",()=>{
-  assert.match(app,/function focusEventGroupOnMap\(events\)/);
-  assert.match(app,/POPUP_CITY_MIN_ZOOM\+\.1/);
-  assert.match(app,/activeMode!==modeAtClick \|\| areaRequestSeq!==contextAtClick/);
+test("visible concert clicks retain existing zoom and reject stale low-zoom callbacks",()=>{
+  const source=app.slice(app.indexOf("function focusEventGroupOnMap(events){"),app.indexOf("\nfunction stabilizeArtistCoordinates(",app.indexOf("function focusEventGroupOnMap(events){")));
+  const events=[{lat:29.42,lng:-98.49}];
+  const actions=[];
+  const runAtZoom=(zoom,mode="nearby")=>{
+    const calls=[];
+    const ctx={
+      map:{getZoom:()=>zoom,easeTo:opts=>calls.push({type:"move",opts})},
+      POPUP_CITY_MIN_ZOOM:6.2,activeMode:mode,areaRequestSeq:7,userMoving:false,
+      showPopup:e=>calls.push({type:"show",event:e}),
+      showVenuePopup:e=>calls.push({type:"venue",events:e}),
+      setTimeout:fn=>calls.push({type:"scheduled",fn})
+    };
+    const fn=runInNewContext(source+"\nfocusEventGroupOnMap",ctx);
+    fn(events);
+    return {calls,ctx};
+  };
+  const close=runAtZoom(12.4);
+  assert.deepEqual(close.calls.map(c=>c.type),["show"],"high zoom cannot recenter or zoom out");
+  const far=runAtZoom(4);
+  assert.equal(far.calls[0].opts.zoom,6.3);
+  far.calls[1].fn();
+  assert.deepEqual(far.calls.map(c=>c.type),["move","scheduled","show"]);
+  const stale=runAtZoom(4);
+  stale.ctx.areaRequestSeq=8;
+  stale.calls[1].fn();
+  assert.equal(stale.calls.length,2,"old callback must not reopen a popup");
   assert.match(app,/focusEventGroupOnMap\(group\)/);
+  assert.match(app,/b\.addEventListener\("click",\(\)=>focusEventOnMap\(ev\)\)/);
+});
+
+test("map popup stays above the desktop Search this area pill with a 14px gap",()=>{
+  const source=app.slice(app.indexOf("function popupPanShift("),app.indexOf("\nfunction ensurePopupFullyVisible("));
+  const shift=runInNewContext(source+"\npopupPanShift");
+  const map={left:0,right:800,top:0,bottom:420,width:800,height:420};
+  const pill={left:320,right:480,top:368,bottom:404,width:160,height:36};
+  const popup={left:260,right:600,top:142,bottom:420,width:340,height:278};
+  const p=shift(map,popup,pill);
+  assert.equal(p.shiftY,368-14-420);
+  assert.equal(popup.bottom+p.shiftY, pill.top-14);
+  assert.equal(p.shiftX,-30,"nearly centered popup aligns to pill without zoom");
+  const unclipped=shift(map,{left:330,right:670,top:30,bottom:310,width:340,height:280},pill);
+  assert.equal(unclipped.shiftY,0,"already visible popups should not pan");
+  const phoneMap={left:0,right:390,top:0,bottom:360,width:390,height:360};
+  const phonePill={left:240,right:380,top:10,bottom:50,width:140,height:40};
+  const phonePopup={left:100,right:380,top:10,bottom:250,width:280,height:240};
+  const mobile=shift(phoneMap,phonePopup,phonePill);
+  assert.equal(phonePopup.top+mobile.shiftY,64,"mobile popup clears the top-right pill");
+  assert.match(app,/map\.easeTo\(\{center:newCenter,duration:280\}\)/,"visibility pan never changes zoom");
 });
 
 test("artist dates have TTL, partial-result feedback and stale-response guard",()=>{
@@ -409,9 +453,9 @@ test("Search this area uses cyan hover fill and never transforms its text",()=>{
   assert.match(app,/\.side-tab,\.map-mode-btn,\.search-area-btn,\.tour-more,\.buy-label/);
 });
 
-test("Near me clears Popular rows before requesting location and stays empty on denial",()=>{
+test("Near me clears Popular rows and shows one status when location is denied",()=>{
   assert.match(app,/async function requestLocation\(\)[\s\S]*nearbyEvents=\[\];[\s\S]*toursEl\.textContent="";[\s\S]*sideEmpty\.textContent="Getting your location\.\.\.";[\s\S]*setEventData\(\[\],0\)/);
-  assert.match(app,/if\(!position\)\{[\s\S]*sideEmpty\.textContent="Location unavailable\.";[\s\S]*setEventData\(\[\],0\)/);
+  assert.match(app,/if\(!position\)\{[\s\S]*sideSub\.textContent=locationErrorText\(lastError\);[\s\S]*sideEmpty\.hidden=true;[\s\S]*setEventData\(\[\],0\)/);
 });
 
 test("artist events recover missing city coordinates for map markers and never auto-open Ticketmaster",()=>{
@@ -571,6 +615,21 @@ test("popup concert photograph is presentation only without links or zoom cursor
   assert.match(body,/ctx\.imageSmoothingQuality="high"/);
   assert.match(body,/img\.replaceWith\(visible\)/);
   assert.match(body,/visible\.draggable=false/);
+});
+
+test("Concerts displays only one error, empty, or loading explanation with aligned text",()=>{
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(css,/\.side-sub\{[^}]*margin:0 4px 10px 17px/);
+  assert.match(css,/\.side-status\{[^}]*margin:0 4px 8px 17px/);
+  assert.match(css,/\.side-empty\{[^}]*padding:12px 5px 12px 17px/);
+  assert.match(css,/\.disclosure\{[^}]*padding:10px 4px 2px 17px/);
+  assert.match(app,/function setStatus\(message\)\{ sideStatus\.textContent=[^;]*; if\(sideStatus\.textContent\) sideSub\.textContent=""; \}/);
+  assert.doesNotMatch(app,/sideEmpty\.textContent="Location unavailable\."/);
+  const area=app.slice(app.indexOf("async function loadArea("),app.indexOf("\nfunction geoPositionOnce("));
+  assert.match(area,/sideEmpty\.hidden=true;[\s\S]*setStatus\("Loading concerts\.\.\."\)/);
+  assert.match(area,/setStatus\(events\.length \? "Ranked by number of upcoming concerts" : ""\)/);
+  assert.match(area,/catch\(err\)\{[\s\S]*sideEmpty\.hidden=true;[\s\S]*setStatus\(err\.message/);
+  assert.doesNotMatch(app,/No Ticketmaster concerts found ·/);
 });
 
 test("Near me has one correctly ranked, aligned summary rather than a duplicate heading",()=>{
