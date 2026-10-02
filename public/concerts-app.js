@@ -186,7 +186,7 @@ function shortDate(e){
 function locationLine(e){
   const seen=new Set();
   return [e.city,e.state,e.country]
-    .map(value=>String(value||"").trim().replace(/\\s+/g," "))
+    .map(value=>String(value||"").trim().replace(/\s+/g," "))
     .filter(value=>{
       if(!value) return false;
       const key=value.toLocaleLowerCase("en");
