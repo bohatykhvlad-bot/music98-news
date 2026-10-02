@@ -578,3 +578,20 @@ test("successful image transformation changes both squares to derived URLs and k
   artist.onerror();
   assert.equal(artist.src,artistCover);
 });
+
+
+test("canvas fallback renders the same photo with two high-quality browser resize passes",()=>{
+  const from=app.indexOf("function browserResampleConcertArt(img,side){");
+  const to=app.indexOf("\nfunction applyConcertArt(",from);
+  assert.ok(from>=0 && to>from);
+  const fallback=app.slice(from,to);
+  assert.match(fallback,/Math\.min\(img\.naturalWidth,img\.naturalHeight\)/);
+  assert.match(fallback,/prectx\.imageSmoothingQuality="high"/);
+  assert.match(fallback,/ctx\.imageSmoothingQuality="high"/);
+  assert.match(fallback,/prectx\.drawImage\(img,sx,sy,crop,crop,0,0,square,square\)/);
+  assert.match(fallback,/ctx\.drawImage\(pre,0,0,square,square,0,0,display,display\)/);
+  assert.match(fallback,/img\.replaceWith\(visible\)/);
+  const selector=app.slice(to,app.indexOf("\nfunction popupContent(e){",to));
+  assert.match(selector,/browserResampleConcertArt\(img,size\)/);
+  assert.match(selector,/browserResampleConcertArt\(item\.img,item\.size\)/);
+});
