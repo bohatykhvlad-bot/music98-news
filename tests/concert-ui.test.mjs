@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { runInNewContext } from "node:vm";
 
 const app=readFileSync(new URL("../public/concerts-app.js",import.meta.url),"utf8");
 
@@ -241,6 +242,68 @@ test("popup retains the exact event artwork and has only Buy Tickets",()=>{
   const encoded=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
   const css=JSON.parse(encoded[1]);
   assert.doesNotMatch(css,/\.ticket-alt/);
+});
+
+test("concert popup dynamically assembles full photo and event details, including mobile",()=>{
+  // Execute the real popup factory, not just a source-code substring check.
+  // The previous regression left escaped \\n in a // comment, swallowing
+  // grid.append(img,main) and body.appendChild(grid) while text tests passed.
+  const start=app.indexOf("function popupContent(e){");
+  const end=app.indexOf("\nfunction eventsAtSameVenue(",start);
+  assert.ok(start>=0&&end>start);
+  const factory=app.slice(start,end);
+  assert.match(factory,/\/\/ Presentation-only photo:[^\n]*\n\s+grid\.append\(img,main\);\n\s+body\.appendChild\(grid\);/);
+  const constructed=[];
+  const doc={createElement(tag){
+    const node={tag,className:"",children:[],dataset:{},textContent:"",
+      append(...children){this.children.push(...children);},
+      appendChild(child){this.children.push(child);return child;}};
+    constructed.push(node);return node;
+  }};
+  const artCalls=[];
+  const fn=runInNewContext(factory+"\npopupContent",{
+    document:doc,
+    applyConcertArt:(img,original,preset)=>artCalls.push({img,original,preset}),
+    fmtDate:()=>"24 Oct 2026",
+    placeLine:()=>"Austin · Texas · USA",
+    queuePillInkCenter:()=>{},
+    window:{music98PillPress:null}
+  });
+  for(const url of ["https://tickets.example/event",null]){
+    const before=artCalls.length;
+    const result=fn({artist:"Formula 1",image:"https://photos.example/original.jpg",url,time:"08:00"});
+    assert.equal(result.className,"pop-card");
+    assert.equal(result.children.length,1);
+    const body=result.children[0];
+    assert.equal(body.className,"pop-body");
+    assert.equal(body.children.length,url?2:1);
+    const grid=body.children[0];
+    assert.equal(grid.className,"pop-grid");
+    assert.equal(grid.children.length,2);
+    const [img,main]=grid.children;
+    assert.equal(img.className,"pop-thumb");
+    assert.equal(img.width,138);
+    assert.equal(img.height,138);
+    assert.equal(main.className,"pop-main");
+    assert.deepEqual(main.children.map(c=>c.className),["pop-title","pop-meta","pop-meta"]);
+    assert.deepEqual(main.children.map(c=>c.textContent),["Formula 1","24 Oct 2026 · 08:00","Austin · Texas · USA"]);
+    assert.equal(artCalls.length,before+1);
+    assert.equal(artCalls[before].preset,"event");
+    assert.equal(artCalls[before].original,"https://photos.example/original.jpg");
+    if(url){
+      const actions=body.children[1];
+      assert.equal(actions.className,"pop-actions");
+      assert.equal(actions.children[0].className,"buy");
+      assert.equal(actions.children[0].href,url);
+      assert.equal(actions.children[0].children[0].textContent,"Buy Tickets");
+    }
+  }
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(css,/\.pop-card \.pop-grid\{display:grid;grid-template-columns:138px minmax\(0,1fr\)/);
+  assert.match(css,/\.pop-card \.pop-thumb\{display:block;width:138px;height:138px;aspect-ratio:1/);
+  assert.match(css,/@media\(max-width:640px\)\{\s*\.pop-card \.pop-body\{padding:12px 12px 14px\}\s*\.pop-card \.pop-grid\{grid-template-columns:100px minmax\(0,1fr\)/);
+  assert.match(css,/\.pop-card \.pop-thumb\{width:100px;height:100px;border-radius:10px\}/);
+  assert.match(app,/singleEvent\?\(window\.matchMedia\("\(max-width:700px\)"\)\.matches\?"300px":"340px"\)/);
 });
 
 test("concert controls keep only search and Popular/Near me",()=>{
