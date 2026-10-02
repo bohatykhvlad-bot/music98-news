@@ -68,12 +68,13 @@ test("map has no custom minus or floating map status and native zoom-out resets 
   assert.match(app,/btn\.addEventListener\("click",resetMapFilters\)/);
   assert.equal(app.includes("radiusEl"),false);
 });
-test("map stays flat inside its separate elevated outer card",()=>{
+test("map stays flat inside the one shared Concerts card",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.panel-card\{[^}]*padding:6px;background:#fff;[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(css,/\.concerts-card\{[^}]*padding:16px;background:#fff;[^}]*box-shadow:var\(--shadow\)/);
   assert.match(css,/\.map-shell\{[^}]*background:#fff;box-shadow:none/);
-  assert.match(html,/<div class="panel-card">\s*<section class="map-shell"/);
+  assert.match(html,/<div class="concerts-card">\s*<div class="controls">/);
+  assert.match(html,/<div class="layout">\s*<section class="map-shell"/);
   assert.match(css,/#map\{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#fff\}/);
   assert.match(css,/#map \.mapboxgl-canvas\{[^}]*inset:0!important;[^}]*width:100%!important;height:100%!important/);
 });
@@ -487,15 +488,18 @@ test("failed area loads clear stale event markers",()=>{
 });
 
 
-test("map and sidebar are flat 2D surfaces on separate elevated cards",()=>{
+test("map and sidebar remain flat inside one elevated white card",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.panel-card\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(css,/\.concerts-card\{[^}]*box-shadow:var\(--shadow\)/);
   assert.match(css,/\.map-shell\{[^}]*box-shadow:none/);
   assert.match(css,/\.side\{[^}]*box-shadow:none;overflow:hidden/);
-  assert.equal((html.match(/class="panel-card"/g)||[]).length,2);
-  assert.match(html,/<div class="panel-card">\s*<aside class="side">/);
-  assert.match(css,/\.tour-card\.open\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.equal((html.match(/class="concerts-card"/g)||[]).length,1);
+  assert.doesNotMatch(html,/class="panel-card"/);
+  assert.match(html,/<\/section>\s*<aside class="side">/);
+  assert.match(css,/\.map-shell\{[^}]*border:0/);
+  assert.match(css,/\.side\{border:0/);
+  assert.match(css,/\.tour-card\.open\{[^}]*box-shadow:none/);
   assert.match(css,/\.disclosure\{margin:0;height:12px;padding:0 4px 0 17px;display:flex;align-items:flex-end[^}]*top:2px/);
 });
 
@@ -519,26 +523,20 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 });
 
 
-test("Concerts sidebar has symmetric shadow insets without moving the text baselines",()=>{
+test("flat Concerts sidebar keeps unchanged rank and footer alignment",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  const scroller=css.match(/\.tours\{[^}]*scrollbar-gutter:stable;margin:0 -(\d+)px;padding:(\d+)px (\d+)px (\d+)px (\d+)px;overscroll-behavior:contain\}/);
-  assert.ok(scroller,"scroller has a native scrollbar and matching content insets");
-  const [margin,padTop,padRight,padBottom,padLeft]=scroller.slice(1).map(Number);
-  assert.equal(margin,12);
-  assert.equal(padLeft,padRight);
-  assert.equal(padLeft,margin,"left artist and rank coordinates cannot shift");
-  assert.ok(padTop>=12 && padBottom>=10);
-  assert.doesNotMatch(css,/\.tours\{[^}]*margin:-\d+px/);
-  assert.match(css,/\.side\{[^}]*padding:13px 13px 4px;height:420px/);
-  assert.match(css,/\.side-sub\{[^}]*margin:0 4px 10px 17px/);
-  assert.match(css,/\.side-status\{[^}]*margin:0 4px 8px 17px/);
-  assert.match(css,/\.side-empty\{[^}]*padding:12px 5px 12px 17px/);
-  assert.match(css,/\.disclosure\{[^}]*margin:0;height:12px;padding:0 4px 0 17px/);
-  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:var\(--shadow\)/);
-  assert.match(css,/\.tour-events\{[^}]*padding:0 9px;background:#fff/);
-  assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*padding:2px 9px 10px/);
-  assert.match(css,/\.event-link\{[^}]*width:100%;[^}]*margin:4px 0/);
-  assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.tours\{overflow:visible;margin:0;padding:0;scrollbar-gutter:auto\}/);
+  assert.match(css,/\\.tours\\{[^}]*scrollbar-gutter:stable;margin:0;padding:0 0 6px 0;overscroll-behavior:contain\\}/);
+  assert.doesNotMatch(css,/\\.tours\\{[^}]*margin:-\\d+px/);
+  assert.match(css,/\\.side\\{[^}]*padding:13px 13px 4px;height:420px/);
+  assert.match(css,/\\.side-sub\\{[^}]*margin:0 4px 10px 17px/);
+  assert.match(css,/\\.side-status\\{[^}]*margin:0 4px 8px 17px/);
+  assert.match(css,/\\.side-empty\\{[^}]*padding:12px 5px 12px 17px/);
+  assert.match(css,/\\.disclosure\\{[^}]*margin:0;height:12px;padding:0 4px 0 17px/);
+  assert.match(css,/\\.tour-card\\.open\\{\\s*background:#fff;box-shadow:none/);
+  assert.match(css,/\\.tour-events\\{[^}]*padding:0 9px;background:#fff/);
+  assert.match(css,/\\.tour-card\\.open \\.tour-events\\{[^}]*padding:2px 9px 10px/);
+  assert.match(css,/\\.event-link\\{[^}]*width:100%;[^}]*margin:4px 0/);
+  assert.match(css,/@media\\(max-width:700px\\)\\{[\\s\\S]*?\\.tours\\{overflow:visible;margin:0;padding:0;scrollbar-gutter:auto\\}/);
 });
 test("Concerts page retains consistent desktop and mobile alignment",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
