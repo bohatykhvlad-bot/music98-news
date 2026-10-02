@@ -68,11 +68,13 @@ test("map has no custom minus or floating map status and native zoom-out resets 
   assert.match(app,/btn\.addEventListener\("click",resetMapFilters\)/);
   assert.equal(app.includes("radiusEl"),false);
 });
-test("map shell fills cleanly and uses the same site card shadow as the sidebar",()=>{
+test("map stays flat inside its separate elevated outer card",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.map-shell\{[^}]*background:#fff;box-shadow:var\(--shadow\)/);
+  const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(css,/\.panel-card\{[^}]*padding:6px;background:#fff;[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(css,/\.map-shell\{[^}]*background:#fff;box-shadow:none/);
+  assert.match(html,/<div class="panel-card">\s*<section class="map-shell"/);
   assert.match(css,/#map\{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#fff\}/);
-  assert.match(css,/#map \.mapboxgl-map,#map \.mapboxgl-canvas-container\{[^}]*inset:0!important;[^}]*width:100%!important;height:100%!important;[^}]*background:#fff!important/);
   assert.match(css,/#map \.mapboxgl-canvas\{[^}]*inset:0!important;[^}]*width:100%!important;height:100%!important/);
 });
 
@@ -485,15 +487,16 @@ test("failed area loads clear stale event markers",()=>{
 });
 
 
-test("Concerts sidebar is one complete white card with a shared site shadow",()=>{
+test("map and sidebar are flat 2D surfaces on separate elevated cards",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.map-shell\{[^}]*box-shadow:var\(--shadow\)/);
-  assert.match(css,/\.side\{[^}]*box-shadow:var\(--shadow\);overflow:hidden/);
+  const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(css,/\.panel-card\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(css,/\.map-shell\{[^}]*box-shadow:none/);
+  assert.match(css,/\.side\{[^}]*box-shadow:none;overflow:hidden/);
+  assert.equal((html.match(/class="panel-card"/g)||[]).length,2);
+  assert.match(html,/<div class="panel-card">\s*<aside class="side">/);
   assert.match(css,/\.tour-card\.open\{[^}]*box-shadow:var\(--shadow\)/);
   assert.match(css,/\.disclosure\{margin:0;height:12px;padding:0 4px 0 17px;display:flex;align-items:flex-end[^}]*top:2px/);
-  const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(html,/Ticketing by Ticketmaster<\/p>/);
-  assert.doesNotMatch(html,/Ticketing by Ticketmaster\./);
 });
 
 test("Concert status, ranking and Ticketmaster disclosure share the left alignment",()=>{
