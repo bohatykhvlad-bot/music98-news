@@ -67,6 +67,15 @@ jobs:
       - name: Correct Ella Andrew photographer credit to own portfolio
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-fix-personal-credit]') }}
         run: python scripts/fix_ella_andrew_portfolio_credit.py
+      - name: QC original full-resolution Ella acoustic photo at actual article crop
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-hires-acoustic-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_caylee_hires_acoustic_crop_qc.py
+          git config user.name "music98 photo QA"
+          git config user.email "editorial@music98.news"
+          git add .editorial/ella-caylee-2024-acoustic-hires-crop-check.b64 .editorial/ella-caylee-2024-acoustic-hires-crop-check.json
+          git diff --cached --quiet || (git commit -m "Inspect original 20MP Ella live acoustic guitar source in article crop" && git push)
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
