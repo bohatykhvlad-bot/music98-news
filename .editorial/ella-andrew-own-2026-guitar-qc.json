@@ -1,0 +1,38 @@
+[
+  {
+    "name": "photographer_own_1",
+    "source": "https://musicmayhemmagazine.com/wp-content/uploads/2026/03/Ella-Langley-Photo-by-Andrew-Wendowski.jpg",
+    "size": [
+      1200,
+      800
+    ],
+    "bytes": 72764
+  },
+  {
+    "name": "photographer_own_2",
+    "source": "https://musicmayhemmagazine.com/wp-content/uploads/2026/03/Ella-Langley-Photo-by-Andrew-Wendowski-2.jpg",
+    "size": [
+      1200,
+      800
+    ],
+    "bytes": 69515
+  },
+  {
+    "name": "country_now_2026_4",
+    "source": "https://countrynow.com/wp-content/uploads/2026/03/Ella-Langley-Photo-by-Andrew-Wendowski-4.jpg",
+    "size": [
+      1200,
+      800
+    ],
+    "bytes": 76927
+  },
+  {
+    "name": "country_now_2026_5",
+    "source": "https://countrynow.com/wp-content/uploads/2026/03/Ella-Langley-Photo-by-Andrew-Wendowski-5.jpg",
+    "size": [
+      1200,
+      800
+    ],
+    "bytes": 76579
+  }
+]
