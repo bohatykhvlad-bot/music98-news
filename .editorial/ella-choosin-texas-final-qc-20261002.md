@@ -1,3 +1,18 @@
+# UPDATE — high-resolution, personally credited guitarist portrait saved to current Ella Draft (2026-10-02)
+
+**This section supersedes all earlier "current draft image" and "publication hold" reports below.**
+- Existing target `ella26choosintexas` remains **Draft**, not published.
+- Verified native original 3648 × 5472 (20 megapixels), JPEG 2,450,861 bytes, SHA-256 `c7c02d6e553619b7aaf9da52800a06d47a1ff73c9147d8eaae1482f7d9505e43`.
+- New hosted untouched ORIGINAL: https://music98.news/photos/ella-caylee-cma-2024-acoustic-native.jpg (byte-for-byte verified against photographer's original file).
+- Photographer: **Caylee Robillard**. **Photo credit URL** is her **personal portfolio**, https://www.cayleerobillard.com/ , not the host publisher or a photo aggregator.
+- Provenance: genuine CMA Fest **2024** tour-performance photography from the first-person artist weekend diary https://www.elitedaily.com/entertainment/ella-langley-weekend-in-the-life-cma-fest-2024 ; original full-frame JPEG https://imgix.bustle.com/uploads/image/2024/7/1/06d98009/2i0a5096-2.jpg . **Do not describe this photo as 2026.**
+- Rationale: verified free-access authentic 2026 stage images with a guitar available from Andrew Wendowski only had **1200×800 px**, well below user image-quality requirement. Other 2026 pro stage originals at 3000–8000px were Getty rights-managed and not cleared. This 2024 tour photographer's source meets resolution and subject criterion; chronology is explicitly addressed in adjacent text.
+- The source is native portrait 2:3. An *image-specific* CSS rule in `public/index.html` uses `.abody-pic:has(img[src*="ella-caylee-cma-2024-acoustic-native.jpg"])` with max-width 450px and portrait 2:3 box, so **both face and acoustic guitar are visible** without crop/upscale. Generic 16:9 layout of all other media is unchanged. Native original file remains full-frame.
+- Exactly article blocks `28` (preceding paragraph contextualizing **2024 CMA Fest**) and `29` (last photo reference) were replaced. The final text paragraph and the other 29 body blocks, cover metadata and every other post were preserved. New reference: `[photo:photos/ella-caylee-cma-2024-acoustic-native.jpg|Caylee Robillard|https://www.cayleerobillard.com/|50% 50%|1]`.
+- GitHub Actions strict read-only audit: https://github.com/bohatykhvlad-bot/music98-news/actions/runs/37061184661 **success**. Guarded final save https://github.com/bohatykhvlad-bot/music98-news/actions/runs/37061245628 **success**: image uploaded and byte hash confirmed, strict article gates **3/3 passed**, fresh Desk body **3 consecutive confirmed** after eventually consistent caching, draft confirmed **not visible publicly**. GitHub site-code `checks` passed on portrait CSS commit `de3a79f3da997ac39954cebf429e2ee2b1c238c7` and latest commit.
+- **Copyright:** photographer identification and public download do **not** automatically mean republishing permission. This picture is staged in private Draft only; obtain authorization from Caylee or official PR rights before live publishing.
+
+---
 # Final update — genuine 2026 guitar performance photograph now saved to Draft (2026-10-02)
 
 **This verified outcome supersedes older pending-image notes below.** Ella's existing unpublished article `ella26choosintexas` now has a genuine photograph of her on stage with her acoustic guitar, captured in March 2026 by **Andrew Wendowski** at CRS New Faces of Country Music. This exact file came from the photographer's own editorial photography site, Music Mayhem, not a Getty thumbnail or unattributed syndication:
