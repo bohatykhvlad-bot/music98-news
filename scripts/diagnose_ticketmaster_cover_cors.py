@@ -25,7 +25,7 @@ for url in ["https://music98.news/","https://music98.news/concerts"]:
    print("LIVE_SHELL_VERSION",url,"http",resp.status,"cache",resp.headers.get("Cache-Control"),"cf",resp.headers.get("Cf-Cache-Status"),"script_fragment",repr(text[max(0,spot-60):spot+70]) if spot>=0 else "not-present",flush=True)
  except Exception as e:print("LIVE_SHELL_ERROR",url,str(e)[:130],flush=True)
 
-url="https://music98.news/concerts-app.js?v=20261002-02"
+url="https://music98.news/concerts-app.js?v=20261002-03"
 try:
  req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Cache-Control":"no-cache"})
  with urllib.request.urlopen(req,timeout=20) as resp:
@@ -35,7 +35,9 @@ try:
    "artist256":'applyConcertArt(img,item.image||"/logo.png",256)' in script,
    "browser_two_pass":'function browserResampleConcertArt(img,side)' in script,
    "no_alternate_cover":"compactSameConcertImage" not in script,
-   "no_duplicate_ticket_link":".ticket-alt" not in script
+   "no_duplicate_ticket_link":".ticket-alt" not in script,
+   "nearby_thirty":".slice(0,30)" in script,
+   "nearby_date_notice":"Showing the soonest upcoming concerts in this area." in script
   }
   print("LIVE_JS_OPTIMIZER",resp.status,"cache",resp.headers.get("Cache-Control"),"cf",resp.headers.get("Cf-Cache-Status"),"checks",checks,flush=True)
   assert all(checks.values()),"Deployed JS differs from latest inspected candidate"
