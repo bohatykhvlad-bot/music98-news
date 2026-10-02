@@ -1,0 +1,19 @@
+name: diagnose-spotify-parser
+on:
+  push:
+    paths:
+      - ".github/workflows/diagnose-spotify-parser.yml"
+      - "scripts/diagnose-spotify-parser.mjs"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Identify missing Spotify source rows
+        run: node scripts/diagnose-spotify-parser.mjs
