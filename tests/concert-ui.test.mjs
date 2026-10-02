@@ -28,10 +28,10 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
   assert.match(app,/const POPUP_CITY_MIN_ZOOM=6\.2/);
   assert.doesNotMatch(app,/function popupLerp/);
   assert.doesNotMatch(app,/const t=Math\.max\(0,Math\.min\(1,\(z-2\.3\)/);
-  assert.match(app,/const width=singleEvent\?"392px":"286px"/);
+  assert.match(app,/const width=singleEvent\?"340px":"286px"/);
   assert.match(app,/popup\.setMaxWidth\(width\)/);
   assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:"286px",focusAfterOpen:false\}\)/);
-  assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:"392px",focusAfterOpen:false\}\)/);
+  assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:"340px",focusAfterOpen:false\}\)/);
   assert.match(app,/map\.on\("zoom",\(\)=>\{\n  applyMapMode\(\);\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\)\{ closePopup\(\); return; \}/);
   assert.match(app,/function showPopup\(e\)\{\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
   assert.match(app,/function showVenuePopup\(events\)\{\n  if\(!events\?\.length \|\| map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
@@ -406,14 +406,17 @@ test("single event popup uses responsive square artwork and bottom-aligned ticke
   assert.match(single,/grid\.append\(img,main\)/);
   assert.match(single,/body\.appendChild\(grid\)/);
   assert.match(single,/actions\.className="pop-actions"/);
-  assert.match(single,/body\.appendChild\(actions\)/);
+  assert.match(single,/main\.appendChild\(actions\)/);
   assert.match(single,/Array\.isArray\(e\.ticketOptions\)/);
   assert.match(venue,/root\.appendChild\(body\)/);
   assert.doesNotMatch(venue,/pop-card|pop-grid/);
 
-  assert.match(css,/\.pop-card \.pop-grid\{display:grid;grid-template-columns:108px minmax\(0,1fr\)/);
-  assert.match(css,/\.pop-card \.pop-thumb\{[^}]*width:108px;height:108px;aspect-ratio:1;object-fit:cover;object-position:50% 18%/);
-  assert.match(css,/\.pop-card \.pop-actions\{[^}]*justify-content:center/);
-  assert.match(css,/@media\(max-width:640px\)\{[\s\S]*?\.pop-card \.pop-grid\{grid-template-columns:88px minmax\(0,1fr\)/);
+  assert.match(css,/\.pop-card\{width:100%;aspect-ratio:1;background:#fff;display:flex;flex-direction:column\}/);
+  assert.match(css,/\.pop-card \.pop-grid\{display:grid;grid-template-columns:126px minmax\(0,1fr\)/);
+  assert.match(css,/\.pop-card \.pop-thumb\{[^}]*width:126px;height:126px;aspect-ratio:1;object-fit:cover;object-position:50% 18%/);
+  assert.match(css,/\.pop-card \.pop-main\{[^}]*display:flex;flex-direction:column/);
+  assert.match(css,/\.pop-card \.pop-actions\{[^}]*justify-content:center;margin-top:auto/);
+  assert.match(css,/\.pop-card \.pop-actions \.buy\{width:min\(150px,100%\);margin:0\}/);
+  assert.match(css,/@media\(max-width:640px\)\{[\s\S]*?\.pop-card \.pop-grid\{grid-template-columns:100px minmax\(0,1fr\)/);
   assert.match(css,/\.mapboxgl-popup\{max-width:min\(var\(--pop-w,286px\),calc\(100vw - 44px\)\)!important/);
 });
