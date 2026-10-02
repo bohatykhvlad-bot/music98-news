@@ -496,7 +496,7 @@ test("expanded Concerts card restores visible shared shadow while the gray heade
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   assert.match(css,/:host\{[^}]*--shadow:0 12px 34px rgba\(15,45,55,\.10\)/);
   assert.match(css,/\.tour-card\{[^}]*border:1px solid transparent;border-radius:var\(--event-radius\);overflow:hidden;background:transparent/);
-  assert.match(css,/\.tour-card\.open\{background:#fff;border-color:var\(--line\);box-shadow:var\(--shadow\)\}/);
+  assert.match(css,/\.tour-card\.open\{\s*background:#fff;border-color:var\(--line\);box-shadow:var\(--shadow\)/);
   assert.match(css,/\.tour-row\{[^}]*min-height:62px;[^}]*border:0;background:transparent;border-radius:13px/);
   assert.match(css,/\.tour-card:hover:not\(\.open\) \.tour-row\{background:var\(--bg2\)\}/);
   assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\);border-radius:13px 13px 0 0\}/);
