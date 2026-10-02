@@ -84,6 +84,16 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_correct_color_photo_attribution_final.py --save
+      - name: Audit native full-frame Ella photos against latest existing draft
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-originals-audit]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella-20261002-uncropped-originals.py --audit
+      - name: Save all Ella original photos only in verified existing draft
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-originals-save]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella-20261002-uncropped-originals.py --save
       - name: Audit full-frame originals before changing Ella article photos
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-full-original-audit]') }}
         run: |
