@@ -192,7 +192,7 @@ test("Buy Tickets only changes on hover and has no press animation",()=>{
 
 
 test("mobile chart reclaims arrow space without shrinking artwork or playback",()=>{
-  const start=page.indexOf("  .chart-row{\\n    --pw:auto;");
+  const start=page.lastIndexOf("  .chart-row{",page.indexOf("--pw:auto;"));
   assert.ok(start>0,"mobile chart rule missing");
   const mobile=page.slice(start,page.indexOf("  .crow .weeks-in",start));
   for(const value of [
