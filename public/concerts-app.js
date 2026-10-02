@@ -604,6 +604,62 @@ function handleHubClick(e){
   });
 }
 
+// Optimize only the ORIGINAL selected Ticketmaster photo through this site's
+// Cloudflare image cache. No alternate Ticketmaster thumbnail is substituted,
+// and no extra Ticketmaster API calls or image-handling Worker routes are used.
+let concertArtResizeSupported=null;
+let concertArtResizeProbe=null;
+const concertArtPending=[];
+function optimizedConcertImageUrl(original,size){
+  if(!original || ![256,720].includes(size)) return "";
+  try{
+    const source=new URL(String(original));
+    if(source.protocol!=="https:" || !/(^|\.)ticketm(?:aster)?\.(?:net|com)$/i.test(source.hostname)) return "";
+    return window.location.origin+"/cdn-cgi/image/width="+size+",height="+size+
+      ",fit=scale-down,quality=85,format=auto/"+source.href;
+  }catch(_){return "";}
+}
+function applyConcertArt(img,original,size){
+  const src=String(original||"/logo.png");
+  const sized=optimizedConcertImageUrl(src,size);
+  const originalOrLogo=()=>{
+    if(img.getAttribute("src")!==src){img.onerror=originalOrLogo;img.src=src;}
+    else{img.onerror=null;img.src="/logo.png";}
+  };
+  if(!sized || concertArtResizeSupported===false){
+    img.onerror=originalOrLogo;img.src=src;return;
+  }
+  if(concertArtResizeSupported===true){
+    img.onerror=originalOrLogo;img.src=sized;return;
+  }
+  // A single probe prevents dozens of failed image requests if a site has
+  // not enabled Cloudflare Transformations. Pending images keep their neutral
+  // CSS background rather than eagerly downloading oversized originals.
+  concertArtPending.push({img,src,size});
+  if(concertArtResizeProbe) return;
+  concertArtResizeProbe=fetch(sized,{cache:"force-cache"})
+    .then(async response=>{
+      const status=response.headers.get("cf-resized")||"";
+      if(!response.ok || !status || /err=/i.test(status) ||
+        !(response.headers.get("content-type")||"").startsWith("image/")) return false;
+      const blob=await response.blob();
+      return blob.size>0;
+    }).catch(()=>false).then(supported=>{
+      concertArtResizeSupported=supported;
+      for(const item of concertArtPending.splice(0)){
+        if(!item.img.isConnected) continue;
+        const own=item.src;
+        const fallback=()=>{
+          if(item.img.getAttribute("src")!==own){
+            item.img.onerror=fallback;item.img.src=own;
+          }else{item.img.onerror=null;item.img.src="/logo.png";}
+        };
+        item.img.onerror=fallback;
+        item.img.src=supported?optimizedConcertImageUrl(own,item.size):own;
+      }
+    });
+}
+
 function popupContent(e){
   const root=document.createElement("div"); root.className="pop-card";
   const body=document.createElement("div"); body.className="pop-body";
@@ -611,20 +667,11 @@ function popupContent(e){
 
   const img=document.createElement("img");
   img.className="pop-thumb";
-  // Preserve this event's cover. Its compact URL is accepted only if the
-  // backend verified that it is another size of this exact same image.
-  img.src=e.popupImage||e.image||e.artistImage||"/logo.png";
   img.alt="";
   img.loading="eager";
   img.decoding="async";
   img.width=138; img.height=138;
-  img.addEventListener("error",()=>{
-    if(e.popupImage && img.src===e.popupImage && e.image && e.image!==e.popupImage){
-      img.src=e.image;
-    }else if(!img.src.endsWith("/logo.png")){
-      img.src="/logo.png";
-    }
-  });
+  applyConcertArt(img,e.image||e.artistImage||"/logo.png",720);
 
   const main=document.createElement("div"); main.className="pop-main";
   const title=document.createElement("div"); title.className="pop-title"; title.textContent=e.artist||e.name||"Artist";
@@ -677,8 +724,8 @@ function venuePopupContent(events){
   events.forEach(ev=>{
     const b=document.createElement("button"); b.type="button"; b.className="venue-event";
     const d=document.createElement("span"); d.className="venue-event-date"; d.textContent=shortDate(ev);
-    const img=document.createElement("img"); img.className="venue-event-art"; img.src=ev.artistImage||ev.image||"/logo.png"; img.alt=""; img.loading="lazy";
-    img.addEventListener("error",()=>{img.src="/logo.png";},{once:true});
+    const img=document.createElement("img"); img.className="venue-event-art"; img.alt=""; img.loading="lazy";
+    applyConcertArt(img,ev.artistImage||ev.image||"/logo.png",256);
     const cp=document.createElement("span"); cp.className="venue-event-copy";
     const n=document.createElement("span"); n.className="venue-event-name"; n.textContent=ev.artist||ev.name;
     const tm=document.createElement("span"); tm.className="venue-event-time"; tm.textContent=ev.time?ev.time.slice(0,5):"";
@@ -960,9 +1007,9 @@ function renderEventList(box,events){
       const e=sorted[i];
       const b=document.createElement("button"); b.type="button"; b.className="event-link";
       const d=document.createElement("span"); d.className="event-date"; d.textContent=shortDate(e);
-      const img=document.createElement("img"); img.className="event-art"; img.src=e.artistImage||e.image||"/logo.png"; img.alt=""; img.loading="lazy";
-      img.addEventListener("error",()=>{img.src="/logo.png";},{once:true});
-      const p=document.createElement("span"); p.className="event-place";
+      const img=document.createElement("img"); img.className="event-art"; img.alt=""; img.loading="lazy";
+      applyConcertArt(img,e.artistImage||e.image||"/logo.png",256);
+        const p=document.createElement("span"); p.className="event-place";
       const city=document.createElement("span"); city.className="event-city"; city.textContent=[e.city,e.countryCode].filter(Boolean).join(", ")||"Venue TBA";
       const venue=document.createElement("span"); venue.className="event-venue"; venue.textContent=e.venue||e.name||"";
       p.append(city,venue); b.append(d,img,p);
@@ -1185,8 +1232,8 @@ function renderArtists(items,mode){
     const rank=document.createElement("span"); rank.className="tour-rank"; rank.textContent=String(item.rank||index+1);
 
     const art=document.createElement("span"); art.className="tour-art";
-    const img=document.createElement("img"); img.src=item.image||"/logo.png"; img.alt=""; img.loading="lazy";
-    img.addEventListener("error",()=>{ img.src="/logo.png"; },{once:true});
+    const img=document.createElement("img"); img.alt=""; img.loading="lazy";
+    applyConcertArt(img,item.image||"/logo.png",256);
     art.appendChild(img);
 
     const copy=document.createElement("span"); copy.className="tour-copy";
@@ -1669,8 +1716,8 @@ function addHotspotSuggestion(h){
 
 function addArtistSuggestion(item){
   const b=document.createElement("button"); b.className="suggestion"; b.type="button";
-  const img=document.createElement("img"); img.className="suggestion-art"; img.src=item.image||"/logo.png"; img.alt="";
-  img.addEventListener("error",()=>{img.src="/logo.png";},{once:true});
+  const img=document.createElement("img"); img.className="suggestion-art"; img.alt="";
+  applyConcertArt(img,item.image||"/logo.png",256);
   const cp=document.createElement("span"); cp.className="suggestion-copy";
   const title=document.createElement("span"); title.className="suggestion-title"; title.textContent=item.name||"Artist";
   const kind=document.createElement("span"); kind.className="suggestion-kind"; kind.textContent="Artist";
