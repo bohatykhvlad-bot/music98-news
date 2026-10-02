@@ -81,10 +81,12 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 
 test("same-day chart cache is an instant paint and always revalidates",()=>{
-  assert.match(page,/const DAILYKEY = "music98news_daily_v41"/);
+  assert.match(page,/const DAILYKEY = "music98news_daily_v42"/);
   assert.match(page,/const hasFreshCache=!!\(cached/);
-  assert.match(page,/fetch\(u,\{cache:"no-store",headers:\{"Cache-Control":"no-cache"\}\}\)/);
-  assert.match(page,/rev=41/);
+  assert.match(page,/fetch\("\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=42"/);
+  assert.match(page,/cache:"no-store"/);
+  assert.doesNotMatch(page,/grab\("\/data\/top50\.json/);
+  assert.match(page,/setChartStatus\(\{\}, "loading"\)/);
 });
 
 
@@ -162,8 +164,15 @@ test("site text stays off persistent compositor transforms and whole-button filt
 
 test("same-day chart cache never preserves rows with missing artwork",()=>{
   assert.match(page,/cached\.tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)/);
-  assert.match(page,/if\(!tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)\) throw 0;/);
-  assert.match(page,/\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=41"/);
+  assert.match(page,/if\(fresh && tracks\.every\(t=>String\(t\.art\|\|""\)\.trim\(\)\)\)/);
+  assert.match(page,/lsSetRaw\(DAILYKEY, JSON\.stringify\(\{date: todayUTC\(\), tracks\}\)\)/);
+  assert.match(page,/\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=42"/);
+});
+
+test("chart fallback never flashes the launch day and mobile hides the status caption",()=>{
+  assert.match(page,/data\.chart = \[\];\s*renderCharts\(\);\s*setChartStatus\(\{\}, "loading"\)/);
+  assert.match(page,/#tab-charts #chartStatus\{display:none!important\}/);
+  assert.doesNotMatch(page,/else applyDaily\(TOP50, "snap"\)/);
 });
 
 

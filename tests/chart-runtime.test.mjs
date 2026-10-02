@@ -51,3 +51,24 @@ test("Top 50 decorated responses are never edge-cached across artwork deployment
   assert.match(top50,/"Cloudflare-CDN-Cache-Control": "no-store"/);
   assert.doesNotMatch(top50,/s-maxage=3600/);
 });
+
+test("verified chart recovery rejects mass day-one resets and old launch snapshots",()=>{
+  const begin=top50.indexOf("function cachedTenureRegressed(payload, backup)");
+  const end=top50.indexOf("/* This checked-in snapshot", begin);
+  assert.ok(begin>=0 && end>begin);
+  const source=top50.slice(begin,end);
+  const guard=new Function("tenureKey",source+";return cachedTenureRegressed;")(
+    (title,artist)=>String(title).toLowerCase()+"|"+String(artist).toLowerCase());
+  const yesterday=Array.from({length:30},(_,i)=>({
+    title:"Song "+i,artist:"Artist",rank:i+1,weeks:7
+  }));
+  const backup={current:{updated:"2026-10-01",tracks:yesterday}};
+  const broken={updated:"2026-10-02",tracks:yesterday.map(t=>({...t,weeks:1}))};
+  const healthy={updated:"2026-10-02",tracks:yesterday.map(t=>({...t,weeks:8}))};
+  assert.equal(guard(broken,backup),true);
+  assert.equal(guard(healthy,backup),false);
+  assert.equal(guard({...healthy,updated:"2026-09-17"},backup),true);
+  assert.match(top50,/async function verifiedBackupTop50\(env, origin, backup\)/);
+  assert.doesNotMatch(top50.slice(top50.indexOf("export async function onRequestGet")),
+    /bakedTop50\(/);
+});
