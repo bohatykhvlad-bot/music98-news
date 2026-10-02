@@ -14,35 +14,12 @@ URL="https://guitargirlmag.com/featured/sxsw-2026-day-3-photos/"
 UA="Mozilla/5.0 (photo author attribution / music98.news research)"
 def fetch(url):
  with urlopen(Request(url,headers={"User-Agent":UA,"Accept":"text/html,image/jpeg,image/webp,*/*"}),timeout=30) as response:return response.read(),response.headers.get("Content-Type","")
-html,ct=fetch(URL)
-soup=BeautifulSoup(html,"html.parser")
-h=soup.find(string=lambda t:t and "Ella Langley @ Stubb" in t)
-if not h:raise RuntimeError("Ella 2026 album not found in gallery")
-container=h.parent
-print("ELLA_HEADING_HTML",str(container)[:300],flush=True)
-els=[]
-# Inspect HTML from specific heading to next artist heading; use DOM order
-for tag in container.find_all_next(limit=450):
- text=tag.get_text(" ",strip=True)[:140] if tag.name in ("h2","h3") else ""
- if "Lindsay Ell @ TEN" in text:break
- if tag.name=="img":
-  meta={"alt":tag.get("alt"),"src":tag.get("src"),"data-src":tag.get("data-src"),"srcset":str(tag.get("srcset",""))[:600],"data-srcset":str(tag.get("data-srcset",""))[:600]}
-  if meta not in els:els.append(meta)
-print("ELLA_GALLERY_IMG_TAGS",json.dumps(els,ensure_ascii=False)[:14000],flush=True)
-# gallery is plugin: source URLs may be in script JSON rather than img tags
-segment=str(container.find_parent("div") or soup)
-urls=re.findall(r'https?:[^\s"\\]+?\.(?:jpg|jpeg|png|webp)(?:\?[^\s"\\]*)?',segment,re.I)
-urls=[x.replace("&amp;","&").replace("\/","/") for x in urls]
-urls=[x for x in urls if any(q in x.lower() for q in ("ella","stauffer","sxsw","ggm-wp","guitargirlmag"))]
-dedup=list(dict.fromkeys(urls))[:38]
-print("PAGE_ELLA_CANDIDATE_URLS",len(dedup),json.dumps(dedup,ensure_ascii=False)[:18000],flush=True)
-sources=[]
-for el in els:
- for u in [el.get("data-src"),el.get("src"),(el.get("srcset") or "").split(",")[-1].strip().split(" ")[0]]:
-  if u and u.startswith(("http","/")) and not u.startswith("data:") and not any(q in u.lower() for q in ("avatar","logo","adserver")):
-   sources.append(urljoin(URL,u))
-sources+=dedup
-sources=list(dict.fromkeys(sources))[:36]
+# The gallery's first photograph is credited to Kirk Stauffer, and its source
+# image naming scheme is deterministic. Inspect all available originals.
+# Source proof: https://guitargirlmag.com/featured/sxsw-2026-day-3-photos/
+prefix="https://ggm-wp.nyc3.digitaloceanspaces.com/uploads/2026/04/sxsw-2026-day3-ella-langley-stubbs-austin-"
+sources=[prefix+f"{i:02d}.jpg" for i in range(1,13)]
+print("PHOTOGRAPHER_2026_GALLERY",len(sources),URL,flush=True)
 records=[];views=[]
 for u in sources:
  try:
