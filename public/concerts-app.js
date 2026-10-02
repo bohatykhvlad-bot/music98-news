@@ -1551,7 +1551,7 @@ async function loadArea(lat,lng,label,opts={}){
       ? "Artists with upcoming events in "+label+"."
       : "Artists with the most upcoming events in this area.";
     setStatus(data.partial && total>events.length
-      ? "Showing "+events.length+" loaded concerts of "+total+" Ticketmaster results."
+      ? "Showing the soonest upcoming concerts in this area."
       : "");
   }catch(err){
     if(requestId!==areaRequestSeq) return;
