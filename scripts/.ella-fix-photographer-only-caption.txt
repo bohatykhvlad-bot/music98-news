@@ -1,0 +1,1 @@
+Remove magazine link for current photo; caption name of photographer Miriam Visser only, preserve body and crop; draft only.
