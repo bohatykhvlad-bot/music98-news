@@ -168,44 +168,6 @@ function bestImage(images) {
   return pool[0]?.url || "";
 }
 
-/**
- * Select a smaller Ticketmaster rendition of the EXACT cover selected for
- * this event. Ticketmaster image lists can contain unrelated artist/event
- * artwork: never pick another image solely because its dimensions are nicer.
- * A shared asset UUID and unchanged aspect ratio are required.
- * Does not resize via Worker or make additional API/CDN requests.
- */
-export function compactSameConcertImage(images, originalUrl) {
-  if (!originalUrl || !Array.isArray(images)) return originalUrl || "";
-  function assetId(url) {
-    try {
-      const parsed=new URL(url);
-      if (!/(^|\.)ticketm\.(?:net|com)$/i.test(parsed.hostname)) return "";
-      const filename=decodeURIComponent(parsed.pathname.split("/").pop()||"");
-      return filename.match(/^([0-9a-f]{8}-[0-9a-f-]{20,})_/i)?.[1]?.toLowerCase()||"";
-    } catch (_) { return ""; }
-  }
-  const id=assetId(originalUrl);
-  const original=images.find(x=>x?.url===originalUrl);
-  // When source identity/geometry is unknown, leave the actual cover intact.
-  if (!id || !original || !Number(original.width) || !Number(original.height)) return originalUrl;
-  const aspect=Number(original.width)/Number(original.height);
-  const variants=images.filter(x=>{
-    const w=Number(x?.width),h=Number(x?.height);
-    return x?.url && assetId(x.url)===id && w>=1 && h>=1 &&
-      Math.abs(w/h-aspect)/aspect<.035 && Math.min(w,h)>=340;
-  });
-  if (!variants.length) return originalUrl;
-  const target=720;
-  variants.sort((a,b)=>{
-    const penalty=x=>Math.abs(Math.log(Math.max(Number(x.width),Number(x.height))/target));
-    return penalty(a)-penalty(b);
-  });
-  const candidate=variants[0];
-  // If the nearest candidate is bigger than the original, keep the original.
-  return Math.max(candidate.width,candidate.height) <=
-    Math.max(original.width,original.height) ? candidate.url : originalUrl;
-}
 
 function bestArtistImage(images) {
   const list = Array.isArray(images) ? images.filter(x => x && x.url) : [];
@@ -260,7 +222,6 @@ function normalizeEvent(e) {
     url: String(e.url || ""),
     ticketOptions: e.url ? [{url:String(e.url),name:String(e.name||"Ticket"),eventId:String(e.id||"")}] : [],
     image: bestImage(e.images),
-    popupImage: compactSameConcertImage(e.images,bestImage(e.images)),
     artistImage: bestArtistImage(attraction.images) || bestImage(e.images),
     date: String(e?.dates?.start?.localDate || ""),
     time: String(e?.dates?.start?.localTime || ""),
