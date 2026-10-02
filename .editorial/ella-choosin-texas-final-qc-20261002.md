@@ -1,3 +1,22 @@
+# LATEST DESK STATE — PREVIOUSLY REJECTED IMAGE REMOVED (October 2, 2026)
+
+**Status: existing Ella longread Draft, unpublished.** The photograph the owner had already rejected, `ella-caylee-cma-2024-acoustic-native.jpg`, was removed from the article and was NOT re-used. A completely different, photographically verified live guitar shot now fills its concluding photo position:
+
+- Current hosted **source-identical** image: https://music98.news/photos/ella-bst-2024-kendall-vowels-original-2900.jpg
+- Unmodified press-provided original: https://cdn.sanity.io/images/o6uq28nb/production/259331ea649293476d99429d614607c27da55c62-2900x1936.jpg
+- Photographer: Kendall Vowels, confirmed by editorial press attribution ("courtesy Outside Organisation"): https://holler.country/news/breaking/ella-langley-joins-riley-green-to-perform-viral-duet-you-look-like-you-love-me-at-bst-hyde-park-2024/
+- Credit uses her personal Instagram https://www.instagram.com/kendallvowels/ ; username is indexed under Kendall Vowels, but direct Instagram public scraper blocks independent direct-page inspection. Verify the handle with photographer before final publication.
+- Event: BST Hyde Park, London **2024**; DO NOT present it as 2026.
+- Native pixels **2900 × 1936 JPEG**; 364,704 original bytes; SHA256 **4960e2cbf6cff89a41581eab06ccc71d2a4561e3a058088084bc048628add2ba**.
+- Full source and 3 actual landscape 16:9 crops were **reviewed visually**: `.editorial/ella-alternate-kendall-bst-2900-preview.b64`. Ella's full face and guitar fit the image. There is no image upload crop, fake upscaling, or reused earlier rejected frame.
+- Only final photo body block 29 and corresponding factual event paragraph block 28 changed; body remains 21 substantial paragraphs and 10 carriers. All other posts and all post fields were verified untouched.
+- Read-only strict audit: https://github.com/bohatykhvlad-bot/music98-news/actions/runs/37063769340 **PASS**.
+- Authenticated guarded draft save: https://github.com/bohatykhvlad-bot/music98-news/actions/runs/37063816259 **SUCCESS**; 3 fresh stable Desk readbacks, 3/3 editorial gates, not publicly published.
+- Unused former portrait-specific CSS (which had been added for the rejected shot) deleted from `public/index.html` in commit `2dcb6ccab8b17208d6a62d5f9a5d8d785f8f5d6c`.
+- **Remaining requirements:** The user prefers a *different genuine 2026* high-resolution guitarist photo. Searches found valid such professional frames on Getty, but they are licensed, not free press releases; Sony 2026 available first-party portraits have no guitar; photographer-produced independent 2026 guitar coverage publicly available at 1200x800 is below image quality target. Do not label the 2024 BST source as 2026, and do not silently revert to rejected photos. Confirm press handout reuse permission, and verify the photographer's Instagram handle before *publishing*.
+
+---
+
 # UPDATE — high-resolution, personally credited guitarist portrait saved to current Ella Draft (2026-10-02)
 
 **This section supersedes all earlier "current draft image" and "publication hold" reports below.**
