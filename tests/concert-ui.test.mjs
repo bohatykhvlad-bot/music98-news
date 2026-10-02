@@ -492,12 +492,18 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 });
 
 
-test("expanded artist header corners match the outer card without white crescents",()=>{
+test("outer artist card owns the 14px rounded highlight on hover and open",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.tour-card\{[^}]*border-radius:24px;overflow:hidden/);
+  assert.match(css,/--event-radius:14px/);
+  assert.match(css,/\.tour-card\{[^}]*border-radius:var\(--event-radius\);overflow:hidden/);
+  assert.match(css,/\.tour-card:hover\{background:var\(--bg2\)\}/);
   assert.match(css,/\.tour-card\.open\{[^}]*background:var\(--bg2\)/);
-  assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\);border-radius:23px 23px 0 0\}/);
+  assert.match(css,/\.tour-row\{[^}]*border-radius:0;/);
+  assert.match(css,/\.tour-card\.open \.tour-row\{background:transparent\}/);
+  assert.doesNotMatch(css,/\.tour-row:hover\{background:var\(--bg2\)/);
+  assert.doesNotMatch(css,/\.tour-card\.open \.tour-row\{[^}]*border-radius/);
   assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*background:#fff/);
+  assert.match(css,/\.event-link\{[^}]*border-radius:var\(--event-radius\)/);
 });
 test("concert artist artwork matches chart dimensions and expanded accent border",()=>{
   const chart=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
