@@ -103,6 +103,7 @@ export function verifiedSpotifySnapshot(s,now=Date.now()){
  if(s.provider==="kworb+musicrank"&&s.mirrorMatched!==SPOTIFY_TOP_SIZE)return null;
  if(s.provider==="musicrank-self-validated"&&Number(s.ldConfirmed)<20)return null;
  if(!["kworb+musicrank","musicrank-self-validated"].includes(s.provider))return null;
- try{return {date:s.chartDate,source:s.provider,tracks:validatedSpotifyRows(s.tracks)};}
+ if(!/^[a-f0-9]{64}$/.test(String(s.fingerprint||"")))return null;
+ try{return {date:s.chartDate,source:s.provider,fingerprint:s.fingerprint,tracks:validatedSpotifyRows(s.tracks)};}
  catch{return null;}
 }

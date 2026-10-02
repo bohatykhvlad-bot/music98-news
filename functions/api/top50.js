@@ -1,4 +1,5 @@
 import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
+import {compareSpotifyRankings,parseKworbSpotify,spotifyDateCurrent,verifiedSpotifySnapshot} from "../lib/spotify-chart.js";
 
 const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
@@ -6,13 +7,13 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v35";
-const TOP50_RETRY_KV="top50v34:retry";
-const SOURCE_MIN_ROWS=40;
+const TOP50_KV = "top50v36";
+const TOP50_RETRY_KV="top50v36:retry";
+const SOURCE_MIN_ROWS=50;
 const SOURCES = ["A", "S", "D", "B", "Y"];
 /* A source missing even once changes the scoring scale and fabricates movement. */
 function completeChartSources(s) {
-  return !!s && SOURCES.every(k=>Number(s[k])>=SOURCE_MIN_ROWS);
+  return !!s && SOURCES.every(k=>Number(s[k])===SIZE);
 }
 function verifiedSourceSnapshot(s) {
   return !!s && s.complete===true && completeChartSources(s.sources) &&
@@ -622,29 +623,8 @@ function parseDeezer(data) {
   })).filter((r) => r.title && r.artist);
 }
 
-function parseSpotify(html) {
-  const rows = [];
-  /* Styled Kworb rows (<tr class="d2">) are regular ranked entries too. */
-  const re = /<tr\b[^>]*>\s*<td class="np">(\d+)<\/td>\s*<td class="np">[^<]*<\/td>\s*<td class="text mp"><div>(.*?)<\/div><\/td>/gs;
-  let m;
-  while ((m = re.exec(html))) {
-    const pos = Number(m[1]);
-    if (pos > SIZE) continue;
-    const text = m[2].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
-    const cut = text.indexOf(" - ");
-    if (cut < 0) continue;
-    rows.push({
-      pos,
-      title: text.slice(cut + 3).trim(),
-      artist: text.slice(0, cut).trim(),
-      url: "",
-      art: "",
-      year: "",
-      prev: "",
-    });
-  }
-  return rows.sort((a, b) => a.pos - b.pos).slice(0, SIZE);
-}
+/* All HTML structure, highlighted rows and the source date are parsed in one tested module. */
+function parseSpotify(html) { return parseKworbSpotify(html); }
 
 function parseYouTube(data) {
   const content =
@@ -768,9 +748,10 @@ async function freshAppleRanking(env,origin) {
    rows.push({pos:n,title,artist,url:String(rec.url||""),
       art:String(rec.art||""),year:String(rec.year||""),prev:""});
  }
- return rows.length>=SOURCE_MIN_ROWS?rows.sort((a,b)=>a.pos-b.pos):[];
+ return rows.length===SIZE && rows.every((r,i)=>r.pos===i+1)
+    ? rows.sort((a,b)=>a.pos-b.pos) : [];
 }
-export async function buildTop50(origin, env) {
+export async function buildTop50(origin, env, spotifySeed) {
   let [apple, spotify, deezer, billboard, youtube] = await Promise.all([
     safe("A", async () => parseApple(await getJson("https://rss.applemarketingtools.com/api/v2/us/music/most-played/50/songs.json"))),
     safe("S", async () => parseSpotify(await getText("https://kworb.net/spotify/country/global_daily.html"))),
@@ -793,17 +774,36 @@ export async function buildTop50(origin, env) {
   let appleOrigin="live";
   if(apple.length<SOURCE_MIN_ROWS){
     apple=await freshAppleRanking(env,origin);
-    appleOrigin=apple.length>=SOURCE_MIN_ROWS?"github-current-day":"unavailable";
+    appleOrigin=apple.length===SIZE?"github-current-day":"unavailable";
   }
-  /* Missing/malformed Spotify positions must never distort the combined score. */
-  if(spotify.length!==SIZE || spotify.some((row,i)=>row.pos!==i+1))
-    throw new Error("spotify_incomplete_top50:"+JSON.stringify({
-      parsed:spotify.length,missing:Array.from({length:SIZE},(_,i)=>i+1)
-        .filter(n=>!spotify.some(row=>row.pos===n))
-    }));
+  const independent=verifiedSpotifySnapshot(spotifySeed ||
+    await readSeed(env,origin,"spotify-chart.json"));
+  if(!independent)throw new Error("spotify_independent_verification_missing_or_stale");
+  let spotifyOrigin=independent.source+"-snapshot";
+  if(spotify && !Array.isArray(spotify) && spotify.tracks){
+    if(!spotifyDateCurrent(spotify.date))throw new Error("spotify_kworb_date_stale");
+    if(spotify.date>independent.date)throw new Error("spotify_newer_chart_waiting_for_mirror");
+    if(spotify.date===independent.date){
+      const comparison=compareSpotifyRankings(spotify,independent);
+      if(!comparison.ok)throw new Error("spotify_mirror_disagreement:"+comparison.mismatchPositions.join(","));
+      spotify=spotify.tracks;
+      spotifyOrigin="kworb-crosschecked-"+independent.source;
+    }else spotify=independent.tracks;
+  }else spotify=independent.tracks;
   const sources={A:apple.length,S:spotify.length,D:deezer.length,B:billboard.length,Y:youtube.length};
   if(!completeChartSources(sources))
     throw new Error("incomplete_chart_sources:"+JSON.stringify(sources));
+  /* Each platform must contribute ranks 1 through 50, without duplicate
+     song identities. A source that looks like 50 rows may still skip a rank. */
+  for(const [label,rows] of [["A",apple],["S",spotify],["D",deezer],["B",billboard],["Y",youtube]]){
+    const identities=new Set();
+    for(let i=0;i<SIZE;i++){
+      const row=rows[i],identity=mergeKey(row?.title,row?.artist);
+      if(Number(row?.pos)!==i+1||!identity||identities.has(identity))
+        throw new Error("invalid_rank_or_duplicate_source_"+label+"_at_"+(i+1));
+      identities.add(identity);
+    }
+  }
   const bucket = new Map();
   ingest(bucket, "A", apple);
   ingest(bucket, "S", spotify);
@@ -854,9 +854,11 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "all-five-sources-v35-spotify50",
+    rev: "verified-spotify-v36",
     sources,
-    sourceOrigin:{A:appleOrigin},
+    sourceOrigin:{A:appleOrigin,S:spotifyOrigin},
+    sourceDates:{S:independent.date},
+    spotifyFingerprint:independent.fingerprint,
     complete:true,
     seed: {
       covers: Object.keys(COVER_SEED || {}).length,
@@ -998,8 +1000,9 @@ async function verifiedBackupTop50(env, origin, backup) {
   tracks.forEach(t => { t.url = appleAff(t.url); if (!isApplePreview(t.prev)) t.prev = ""; });
   return {
     updated: snap.updated, launch:"2026-09-17", week:Number(snap.week)+1,
-    rev:"verified-backup-v35", fallback:"verified-snapshot", complete:true,
-    sources:snap.sources, tracks,
+    rev:"verified-backup-v36", fallback:"verified-snapshot", complete:true,
+    sources:snap.sources, sourceDates:snap.sourceDates||{},
+    sourceOrigin:snap.sourceOrigin||{}, tracks,
     covers:{ missing:tracks.filter(t=>!t.art).length }
   };
 }
@@ -1089,18 +1092,26 @@ async function fallbackOrUnavailable(env,origin,backup) {
 export async function onRequestGet({env,request}) {
   const today=new Date().toISOString().slice(0,10);
   const origin=new URL(request.url).origin;
-  const backup=await readSeed(env,origin,"chart-tenure-backup.json");
+  const [backup,spotifySeed]=await Promise.all([
+    readSeed(env,origin,"chart-tenure-backup.json"),
+    readSeed(env,origin,"spotify-chart.json")
+  ]);
+  const verified=verifiedSpotifySnapshot(spotifySeed);
+  if(!verified)return fallbackOrUnavailable(env,origin,backup);
   if(env?.DESK)try{
     const cached=await env.DESK.get(TOP50_KV,{type:"json"});
     if(cached?.updated===today && cached.complete===true &&
        completeChartSources(cached.sources) && cached.tracks?.length===SIZE &&
+       cached.sourceDates?.S===verified.date &&
+       cached.spotifyFingerprint===verified.fingerprint &&
        !cachedTenureRegressed(cached,backup))
       return top50Response(await decorateCachedTop50(env, cached, origin));
-    if(await env.DESK.get(TOP50_RETRY_KV))
+    const retry=await env.DESK.get(TOP50_RETRY_KV,{type:"json"});
+    if(retry?.fingerprint===verified.fingerprint)
       return fallbackOrUnavailable(env,origin,backup);
   }catch{}
   try{
-    const payload=await withTimeout(buildTop50(origin,env),14000);
+    const payload=await withTimeout(buildTop50(origin,env,spotifySeed),14000);
     if(payload.complete!==true || !completeChartSources(payload.sources) ||
        payload.tracks?.length!==SIZE)throw new Error("incomplete_chart_sources");
     const memory={deferPersist:true};
@@ -1123,7 +1134,8 @@ export async function onRequestGet({env,request}) {
   }catch(err){
     if(env?.DESK)try{
       await env.DESK.put(TOP50_RETRY_KV,JSON.stringify({
-        failedAt:new Date().toISOString(),detail:String(err?.message||"unavailable").slice(0,160)
+        failedAt:new Date().toISOString(),fingerprint:verified.fingerprint,
+        detail:String(err?.message||"unavailable").slice(0,160)
       }),{expirationTtl:1800});
     }catch{}
     return fallbackOrUnavailable(env,origin,backup);
