@@ -85,6 +85,9 @@ jobs:
           git config user.email "editorial@music98.news"
           git add .editorial/ella-2026-musicrow-press-originals-qc.b64 .editorial/ella-2026-musicrow-press-originals-qc.json
           git diff --cached --quiet || (git commit -m "Inspect largest 2026 Ella artist press original photos" && git push)
+      - name: Inspect Auburn first-party 2026 Ella concert images
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-auburn-photos-qc]') }}
+        run: python scripts/ella_auburn_2026_primary_stage_assets_qc.py
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
