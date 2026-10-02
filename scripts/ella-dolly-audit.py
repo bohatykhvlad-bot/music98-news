@@ -21,3 +21,17 @@ if p:
  print("DRAFT_STATUS",p.get("status"),"BODY_MATCHES_REPO",live==src)
  print("DRAFT_BODY_HASH",hashlib.sha256(live.encode()).hexdigest(),"REPO_BODY_HASH",hashlib.sha256(src.encode()).hexdigest())
  print("DRAFT_MEDIA",[(i,x[:250]) for i,x in enumerate(live.split("\n\n")) if x.startswith("[")],flush=True)
+ if live!=src or p.get("status")!="draft":raise RuntimeError("Current draft does not match reviewed native-photo master")
+ assert p.get("cover",{}).get("credit")=="Caylee Robillard"
+ assert p.get("cover",{}).get("creditUrl")=="https://www.cayleerobillard.com/"
+ assert "ella-caylee-2024-cma-guitar-native-3648.jpg" in live
+ assert "ella-crs2026-guitar-amy-harris.jpg" not in live
+ assert len([x for x in live.split("\\n\\n") if "Nashville" in x])==2
+ for k in range(1,4):
+  ok,lines=post.run_gate("ella26choosintexas",quiet=True)
+  print("FINAL_EDITORIAL_GATE",k,"PASS" if ok else "FAIL","RELEVANT",json.dumps([v for v in lines if "PASS" in v or "FAIL" in v or "media-late" in v]),flush=True)
+  if not ok:raise RuntimeError("Current saved native-photo draft gate failed")
+ public=post.http(post.DESK_API+"?fresh="+str(time.time_ns()))
+ assert not any(str(x.get("id"))=="ella26choosintexas" for x in public.get("posts",[]))
+ print("FINAL_NATIVE_ELLA_DRAFT_VALIDATED",len(live.split()),"WORDS","TWO_NASHVILLE",True,"GUITAR_PHOTOGRAPH",True,"PUBLIC",False,flush=True)
+
