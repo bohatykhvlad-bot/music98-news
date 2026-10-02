@@ -2541,12 +2541,12 @@ function renderNews(){
   const hero = query ? null : (posts.find(p=>p.pinned) || posts[0]), rest = posts.filter(p=>p!==hero);
   $("#heroSlot").innerHTML = hero ? `
     <a class="hero" href="${postPath(hero)}">
-        <div class="cover">${coverImg(hero,false)}</div>
-        <div class="body">
-          <h2>${titleHTML(hero)}</h2>
-          <p>${rich(hero.excerpt||"")}</p>
-          <div class="meta"><span>${fmtDate(postDateISO(hero))}</span></div>
-        </div>
+      <div class="cover">${coverImg(hero,false)}</div>
+      <div class="body">
+        <h2>${titleHTML(hero)}</h2>
+        <p>${rich(hero.excerpt||"")}</p>
+        <div class="meta"><span>${fmtDate(postDateISO(hero))}</span></div>
+      </div>
     </a>` : "";
   /* mobile (<=640px): the rail becomes a vertical column and shows one batch
      at a time; a Load More pill appends older posts. Desktop: full rail. */
