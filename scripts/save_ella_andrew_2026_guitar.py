@@ -141,8 +141,15 @@ def main():
   ok,lines=runner.run_gate(ID,quiet=True)
   print("POSTWRITE_EDITORIAL_GATE",n+1,"PASS" if ok else "FAIL",json.dumps(lines[-8:]),flush=True)
   assert ok
- final=runner.find_post(current()["posts"],ID)
- assert final["status"]=="draft" and final["body"].strip()==new
+ stable=0
+ for attempt in range(16):
+  final=runner.find_post(current()["posts"],ID)
+  present=(final.get("status")=="draft" and final.get("body","").strip()==new)
+  print("FINAL_FRESH_DESK_READ",attempt+1,"DRAFT",final.get("status"),"NEW_IMAGE",MEDIA in final.get("body",""),"EXACT_TARGET_BODY",present,flush=True)
+  stable=stable+1 if present else 0
+  if stable>=3:break
+  time.sleep(1)
+ else:raise RuntimeError("Three stable consecutive fresh Desk readbacks not achieved")
  assert hosted() and hashlib.sha256(hosted()).digest()==hashlib.sha256(src).digest()
  public=runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()))
  assert not any(str(p.get("id"))==ID for p in public.get("posts",[]))
