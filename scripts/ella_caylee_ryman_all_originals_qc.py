@@ -21,7 +21,7 @@ for url in urls[:35]:
   key=url.rsplit("/",1)[-1]
   print("ORIGINAL",key,im.size,len(b),flush=True)
   records.append({"file":key,"url":url,"size":im.size,"bytes":len(b)})
-  if im.size[0]<1500 or im.size[1]<1000:continue
+  if im.size[0]<1400 or im.size[1]<1000:continue
   img=ImageOps.exif_transpose(im).convert("RGB")
   thumb=ImageOps.fit(img,(900,506),Image.Resampling.LANCZOS,centering=(.5,.48))
   out.append((key,thumb))
