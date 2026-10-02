@@ -28,7 +28,10 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
   assert.match(app,/const POPUP_CITY_MIN_ZOOM=6\.2/);
   assert.doesNotMatch(app,/function popupLerp/);
   assert.doesNotMatch(app,/const t=Math\.max\(0,Math\.min\(1,\(z-2\.3\)/);
-  assert.match(app,/popup\.setMaxWidth\("286px"\)/);
+  assert.match(app,/const width=singleEvent\?"392px":"286px"/);
+  assert.match(app,/popup\.setMaxWidth\(width\)/);
+  assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:"286px",focusAfterOpen:false\}\)/);
+  assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:"392px",focusAfterOpen:false\}\)/);
   assert.match(app,/map\.on\("zoom",\(\)=>\{\n  applyMapMode\(\);\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\)\{ closePopup\(\); return; \}/);
   assert.match(app,/function showPopup\(e\)\{\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
   assert.match(app,/function showVenuePopup\(events\)\{\n  if\(!events\?\.length \|\| map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
@@ -228,7 +231,7 @@ test("Belfast is not mapped to the dead ND pseudo-country",()=>{
   assert.doesNotMatch(app,/ND:\["belfast"\]/);
 });
 test("popup uses event image and exposes merged alternate ticket links",()=>{
-  assert.match(app,/if\(e\.image\)\{[\s\S]*img\.className="pop-img"; img\.src=e\.image/);
+  assert.match(app,/img\.src=e\.image\|\|e\.artistImage\|\|"\/logo.png"/);
   assert.doesNotMatch(app,/const popupImage=String\(e\.artistImage/);
   assert.match(app,/Array\.isArray\(e\.ticketOptions\)/);
   assert.match(app,/alt\.className="ticket-alt"/);
@@ -386,4 +389,31 @@ test("concert artist artwork matches chart dimensions and expanded accent border
 
   assert.match(app,/card\.classList\.add\("open"\)/);
   assert.match(app,/el\.classList\.remove\("open"\)/);
+});
+
+
+test("single event popup uses responsive square artwork and bottom-aligned ticket action",()=>{
+  const encoded=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
+  assert.ok(encoded,"concert stylesheet is available");
+  const css=JSON.parse(encoded[1]);
+  const single=app.slice(app.indexOf("function popupContent(e){"),app.indexOf("\nfunction eventsAtSameVenue("));
+  const venue=app.slice(app.indexOf("function venuePopupContent(events){"),app.indexOf("\nfunction snapPopup("));
+
+  assert.match(single,/root\.className="pop-card"/);
+  assert.match(single,/grid\.className="pop-grid"/);
+  assert.match(single,/img\.className="pop-thumb"/);
+  assert.match(single,/main\.append\(title,date,place\)/);
+  assert.match(single,/grid\.append\(img,main\)/);
+  assert.match(single,/body\.appendChild\(grid\)/);
+  assert.match(single,/actions\.className="pop-actions"/);
+  assert.match(single,/body\.appendChild\(actions\)/);
+  assert.match(single,/Array\.isArray\(e\.ticketOptions\)/);
+  assert.match(venue,/root\.appendChild\(body\)/);
+  assert.doesNotMatch(venue,/pop-card|pop-grid/);
+
+  assert.match(css,/\.pop-card \.pop-grid\{display:grid;grid-template-columns:108px minmax\(0,1fr\)/);
+  assert.match(css,/\.pop-card \.pop-thumb\{[^}]*width:108px;height:108px;aspect-ratio:1;object-fit:cover;object-position:50% 18%/);
+  assert.match(css,/\.pop-card \.pop-actions\{[^}]*justify-content:center/);
+  assert.match(css,/@media\(max-width:640px\)\{[\s\S]*?\.pop-card \.pop-grid\{grid-template-columns:88px minmax\(0,1fr\)/);
+  assert.match(css,/\.mapboxgl-popup\{max-width:min\(var\(--pop-w,286px\),calc\(100vw - 44px\)\)!important/);
 });
