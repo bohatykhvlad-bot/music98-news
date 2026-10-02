@@ -45,6 +45,13 @@ for name,url in SOURCES.items():
  except Exception as e:print("SOURCE_ERROR",name,repr(e),flush=True)
 # additional direct candidates from source image search
 other={
+"musicrow-official-caylee":"https://musicrow.com/wp-content/uploads/2026/04/Ella-Langley-copy-scaled.jpeg",
+"musicrow-official-other":"https://music-row-website-assets.s3.amazonaws.com/wp-content/uploads/2026/05/Ella-Langley.jpg",
+"amy-harris-00419":"https://thetraveladdict.com/wp-content/uploads/2026/03/EllaLangley-00419.jpg",
+"amy-harris-00019":"https://thetraveladdict.com/wp-content/uploads/2026/03/EllaLangley-00019.jpg",
+"amy-harris-00082":"https://thetraveladdict.com/wp-content/uploads/2026/03/EllaLangley-00082.jpg",
+"amy-harris-01007":"https://thetraveladdict.com/wp-content/uploads/2026/03/EllaLangley-01007.jpg",
+"amy-harris-01023":"https://thetraveladdict.com/wp-content/uploads/2026/03/EllaLangley-01023.jpg",
 "cma-2026-crop":"https://hermes.media.static.aol.com/media/2026/06/26/01f8e265-4258-3e48-86ed-42ce8e6bd15a/17ed187e-708c-438d-9cce-ddf98d639744.jpg",
 "cma-2026-stagecoach":"https://hermes.media.static.aol.com/media/2026/08/05/9931fa68-a7a2-378d-83ef-9a55f519db19/de760506-f3af-44ff-88ca-fdbfabc80bea.jpg",
 }
