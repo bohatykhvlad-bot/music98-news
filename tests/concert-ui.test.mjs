@@ -265,13 +265,13 @@ test("concert popup dynamically assembles full photo and event details, includin
     document:doc,
     applyConcertArt:(img,original,preset)=>artCalls.push({img,original,preset}),
     fmtDate:()=>"24 Oct 2026",
-    placeLine:()=>"Austin · Texas · USA",
+    locationLine:()=>"Austin, Texas, USA",
     queuePillInkCenter:()=>{},
     window:{music98PillPress:null}
   });
   for(const url of ["https://tickets.example/event",null]){
     const before=artCalls.length;
-    const result=fn({artist:"Formula 1",image:"https://photos.example/original.jpg",url,time:"08:00"});
+    const result=fn({artist:"Formula 1",venue:"Levi's Stadium",image:"https://photos.example/original.jpg",url,time:"08:00"});
     assert.equal(result.className,"pop-card");
     assert.equal(result.children.length,1);
     const body=result.children[0];
@@ -285,8 +285,8 @@ test("concert popup dynamically assembles full photo and event details, includin
     assert.equal(img.width,138);
     assert.equal(img.height,138);
     assert.equal(main.className,"pop-main");
-    assert.deepEqual(main.children.map(c=>c.className),["pop-title","pop-meta","pop-meta"]);
-    assert.deepEqual(main.children.map(c=>c.textContent),["Formula 1","24 Oct 2026 · 08:00","Austin · Texas · USA"]);
+    assert.deepEqual(main.children.map(c=>c.className),["pop-title","pop-meta","pop-meta pop-venue","pop-meta pop-location"]);
+    assert.deepEqual(main.children.map(c=>c.textContent),["Formula 1","24 Oct 2026 · 08:00","Levi's Stadium","Austin, Texas, USA"]);
     assert.equal(artCalls.length,before+1);
     assert.equal(artCalls[before].preset,"event");
     assert.equal(artCalls[before].original,"https://photos.example/original.jpg");
@@ -447,6 +447,14 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
   assert.match(app,/events\.length\+" upcoming concerts · "\+item\.name/);
 });
 
+
+test("expanded artist header corners match the outer card without white crescents",()=>{
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(css,/\.tour-card\{[^}]*border-radius:24px;overflow:hidden/);
+  assert.match(css,/\.tour-card\.open\{[^}]*background:var\(--bg2\)/);
+  assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\);border-radius:23px 23px 0 0\}/);
+  assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*background:#fff/);
+});
 test("concert artist artwork matches chart dimensions and expanded accent border",()=>{
   const chart=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
   const encoded=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
@@ -478,7 +486,9 @@ test("single-event popup follows content height without dead space and centers B
 
   assert.match(single,/root\.className="pop-card"/);
   assert.match(single,/img\.className="pop-thumb"/);
-  assert.match(single,/main\.append\(title,date,place\)/);
+  assert.match(single,/main\.append\(title,date\)/);
+  assert.match(single,/venue\.className="pop-meta pop-venue"/);
+  assert.match(single,/location\.className="pop-meta pop-location"/);
   assert.match(single,/grid\.append\(img,main\)/);
   assert.match(single,/body\.appendChild\(grid\)/);
   assert.match(single,/actions\.className="pop-actions"/);
@@ -501,36 +511,20 @@ test("single-event popup follows content height without dead space and centers B
   assert.match(css,/\.mapboxgl-popup\{max-width:min\(var\(--pop-w,286px\),calc\(100vw - 44px\)\)!important/);
 });
 
-test("location strings collapse duplicate city, region and country in both popup modes",async()=>{
+test("both concert popups use comma-separated locations without repeated city or country",async()=>{
   const {runInNewContext}=await import("node:vm");
   const from=app.indexOf("function locationLine(e){");
   const to=app.indexOf("\nfunction artistKey(",from);
   assert.ok(from>=0 && to>from,"shared location helper must exist");
-  const {locationLine,placeLine}=runInNewContext(
-    app.slice(from,to)+"\n({locationLine,placeLine})"
-  );
-  const singapore={
-    venue:"National Stadium",city:"Singapore",state:" Singapore ",country:"SINGAPORE"
-  };
+  const locationLine=runInNewContext(app.slice(from,to)+"\nlocationLine");
+  const singapore={venue:"National Stadium",city:"Singapore",state:" Singapore ",country:"SINGAPORE"};
   assert.equal(locationLine(singapore),"Singapore");
-  assert.equal(placeLine(singapore),"National Stadium · Singapore");
-  assert.equal(placeLine({
-    venue:"Moda Center",city:"Portland",state:"Oregon",country:"United States Of America"
-  }),"Moda Center · Portland · Oregon · USA");
-  assert.equal(placeLine({
-    venue:"The Forum",city:"London",state:"",country:"United Kingdom"
-  }),"The Forum · London · United Kingdom");
-  assert.equal(placeLine({
-    venue:"SoFi Stadium",city:"Inglewood",state:"California",country:"United States of America",countryCode:"US"
-  }),"SoFi Stadium · Inglewood · California · USA");
-  assert.equal(locationLine({city:"Toronto",state:"Ontario",country:"Canada",countryCode:"CA"}),"Toronto · Ontario · Canada");
-  assert.equal(placeLine({
-    venue:"National Stadium",city:"  Singapore  ",state:"",country:"Singapore"
-  }),"National Stadium · Singapore");
-  assert.equal(locationLine({
-    city:" New  York ",state:"new york",country:"United States"
-  }),"New York · USA");
-  assert.match(app,/place\.textContent=placeLine\(e\)/);
+  assert.equal(locationLine({city:"Portland",state:"Oregon",country:"United States Of America"}),"Portland, Oregon, USA");
+  assert.equal(locationLine({city:"London",state:"",country:"United Kingdom"}),"London, United Kingdom");
+  assert.equal(locationLine({city:"Santa Clara",state:"California",country:"United States of America",countryCode:"US"}),"Santa Clara, California, USA");
+  assert.equal(locationLine({city:"Toronto",state:"Ontario",country:"Canada",countryCode:"CA"}),"Toronto, Ontario, Canada");
+  assert.equal(locationLine({city:" New  York ",state:"new york",country:"United States"}),"New York, USA");
+  assert.match(app,/location\.textContent=address/);
   assert.match(app,/place\.textContent=locationLine\(first\)/);
 });
 
