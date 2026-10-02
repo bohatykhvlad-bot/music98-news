@@ -36,6 +36,16 @@ for p in ["https://morganwallen.com/post-malone-morgan-wallen-release-i-had-some
   for m in re.findall(r'<img[^>]+>',s,re.I):
    if "Malone" in m or "Wallen" in m or "Ella" in m or "press" in m:print("IMAGE_TAG",m[:450])
  except Exception as e:print("HTML_ERROR",p,e)
+
+for p in ["https://app.box.com/s/im7ys9giua9fklfrbh2b6zz37kwrni4o","https://sm01.app.box.com/s/hqy3qys50h7pnab56bf0nm6x633nnhwm"]:
+ try:
+  b,t=get(p);s=b.decode("utf-8","replace")
+  print("BOX",p,"STATUS_OK",len(s),"TYPE",t,flush=True)
+  for pattern in ["Post Malone","Morgan Wallen","file_id","sharedLink","itemId","item_id","Dandelion",".jpg","fileName","file_name"]:
+   m=re.search(re.escape(pattern),s,re.I)
+   if m:print("BOX_MATCH",pattern,s[max(0,m.start()-130):m.start()+280].replace("\\n"," ")[:410],flush=True)
+ except Exception as e:print("BOX_ERROR",p,str(e)[:180],flush=True)
+
 if not thumbs:raise RuntimeError("No visuals fetched")
 out=Image.new("RGB",(680,408*len(thumbs)),"white");d=ImageDraw.Draw(out)
 for idx,(name,im) in enumerate(thumbs):
