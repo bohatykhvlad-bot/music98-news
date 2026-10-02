@@ -352,7 +352,7 @@ test("failed area loads clear stale event markers",()=>{
 
 test("Ticketmaster disclosure is aligned to the numeric rank glyph column",()=>{
   assert.match(app,/\.disclosure\{margin-top:8px;padding:10px 4px 2px 17px;/);
-  assert.match(app,/\.tour-row\{[\s\S]*grid-template-columns:24px 48px minmax\(0,1fr\) 18px;[\s\S]*padding:7px 8px/);
+  assert.match(app,/\.tour-row\{[\s\S]*grid-template-columns:24px 56px minmax\(0,1fr\) 18px;[\s\S]*padding:7px 8px/);
 });
 
 test("expanded artist view shows one summary line, not a duplicate subtitle",()=>{
