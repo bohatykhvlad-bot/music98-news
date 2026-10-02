@@ -183,7 +183,19 @@ function shortDate(e){
   const d=new Date(e.date+"T12:00:00");
   return new Intl.DateTimeFormat("en",{month:"short",day:"numeric"}).format(d).toUpperCase();
 }
-function placeLine(e){ return [e.venue,e.city,e.state,e.country].filter(Boolean).join(" · "); }
+function locationLine(e){
+  const seen=new Set();
+  return [e.city,e.state,e.country]
+    .map(value=>String(value||"").trim().replace(/\\s+/g," "))
+    .filter(value=>{
+      if(!value) return false;
+      const key=value.toLocaleLowerCase("en");
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).join(" · ");
+}
+function placeLine(e){ return [String(e.venue||"").trim(),locationLine(e)].filter(Boolean).join(" · "); }
 function artistKey(a){ return String(a.id||a.attractionId||a.name||"").toLowerCase(); }
 
 function setLayerVisible(id,visible){
@@ -659,7 +671,7 @@ function venuePopupContent(events){
   const body=document.createElement("div"); body.className="pop-body";
   const title=document.createElement("div"); title.className="pop-title"; title.textContent=first.venue||first.city||"Concerts";
   body.appendChild(title);
-  const place=document.createElement("div"); place.className="pop-meta"; place.textContent=[first.city,first.state,first.country].filter(Boolean).join(" · ");
+  const place=document.createElement("div"); place.className="pop-meta"; place.textContent=locationLine(first);
   body.appendChild(place);
   const list=document.createElement("div"); list.className="venue-list";
   events.forEach(ev=>{
