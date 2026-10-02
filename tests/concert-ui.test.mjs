@@ -71,7 +71,12 @@ test("map shell has no gray shadow gap and canvas fills it",()=>{
 test("More button is optically centered inside the expanded event block",()=>{
   assert.match(app,/\.tour-card\.open \.tour-events\{[^}]*padding:2px 9px 10px/);
   assert.match(app,/\.event-link\{[^}]*margin:4px 0/);
-  assert.match(app,/\.tour-more\{[^}]*margin:8px auto 2px/);
+  assert.match(app,/\.tour-more\{[^}]*margin:12px auto 2px/);
+  const encoded=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
+  assert.ok(encoded,"concert stylesheet must be present");
+  const css=JSON.parse(encoded[1]);
+  assert.match(css,/\.tour-events\{[^}]*transition:max-height \.28s cubic-bezier\(\.3,\.7,\.4,1\),opacity \.18s ease/);
+  assert.doesNotMatch(css,/padding \.28s cubic-bezier/);
 });
 
 test("Buy Tickets uses the shared site press binder",()=>{
