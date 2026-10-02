@@ -130,7 +130,7 @@ def main():
    now=current()
    fresh=runner.find_post(now["posts"],ID)
    if fresh.get("body","").strip()==new:break
-   assert fresh.get("body","").strip()==SOURCE_TEXT,"Unknown concurrent edit"
+   assert fresh.get("body","").strip()==actual,"Unknown concurrent edit"
    time.sleep(2)
   else:raise RuntimeError("Desk write did not propagate")
   assert fresh.get("status")=="draft"
