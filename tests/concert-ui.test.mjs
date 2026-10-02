@@ -233,8 +233,8 @@ test("Belfast is not mapped to the dead ND pseudo-country",()=>{
 });
 test("popup retains the exact event artwork and has only Buy Tickets",()=>{
   const section=app.slice(app.indexOf("function popupContent(e){"),app.indexOf("\nfunction eventsAtSameVenue("));
-  assert.match(section,/img\.src=e\.popupImage\|\|e\.image\|\|e\.artistImage\|\|"\/logo.png"/);
-  assert.match(section,/if\(e\.popupImage && img\.src===e\.popupImage/);
+  assert.match(section,/applyConcertArt\\(img,e\\.image\\|\\|e\\.artistImage\\|\\|"\\/logo.png",720\\)/);
+  assert.doesNotMatch(section,/popupImage/);
   assert.match(section,/label\.textContent="Buy Tickets"/);
   assert.doesNotMatch(section,/ticketOptions|ticket-alt|alternatives\.forEach/);
   const encoded=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
@@ -467,4 +467,68 @@ test("location strings collapse duplicate city, region and country in both popup
   }),"New York · USA");
   assert.match(app,/place\.textContent=placeLine\(e\)/);
   assert.match(app,/place\.textContent=locationLine\(first\)/);
+});
+
+
+test("Cloudflare uses only the original image as its source, without variant substitution",async()=>{
+  const {runInNewContext}=await import("node:vm");
+  const from=app.indexOf("function optimizedConcertImageUrl(original,size){");
+  const to=app.indexOf("\nfunction applyConcertArt(",from);
+  assert.ok(from>0&&to>from);
+  const {optimizedConcertImageUrl}=runInNewContext(
+    app.slice(from,to)+"\n({optimizedConcertImageUrl})",
+    {URL,window:{location:{origin:"https://music98.news"}}}
+  );
+  const original="https://s1.ticketm.net/dam/a/abc/EXACT-ORIGINAL.jpg";
+  const full=optimizedConcertImageUrl(original,720);
+  assert.equal(full,"https://music98.news/cdn-cgi/image/width=720,height=720,fit=scale-down,quality=85,format=auto/"+original);
+  assert.equal(optimizedConcertImageUrl(original,256),"https://music98.news/cdn-cgi/image/width=256,height=256,fit=scale-down,quality=85,format=auto/"+original);
+  assert.equal(optimizedConcertImageUrl(original,800),"");
+  assert.equal(optimizedConcertImageUrl("https://untrusted.example/photo.jpg",720),"");
+  assert.equal(optimizedConcertImageUrl("http://s1.ticketm.net/a.jpg",720),"");
+  assert.equal(optimizedConcertImageUrl("/logo.png",720),"");
+  assert.match(app,/applyConcertArt\(img,item\.image\|\|"\/logo\.png",256\)/);
+  assert.match(app,/applyConcertArt\(img,e\.image\|\|e\.artistImage\|\|"\/logo\.png",720\)/);
+  assert.doesNotMatch(app,/compactSameConcertImage|popupImage/);
+});
+
+test("image transform support is checked once and failure preserves both originals",async()=>{
+  const {runInNewContext}=await import("node:vm");
+  const from=app.indexOf("let concertArtResizeSupported=null;");
+  const to=app.indexOf("\nfunction popupContent(e){",from);
+  assert.ok(from>0 && to>from);
+  let probes=0;
+  const client=runInNewContext(
+    app.slice(from,to)+"\n({applyConcertArt})",
+    {
+      URL,
+      window:{location:{origin:"https://music98.news"}},
+      fetch:async()=>{
+        probes++;
+        return {ok:false,headers:{get:()=>null}};
+      }
+    }
+  );
+  const element=()=>{
+    let value="";
+    return {
+      isConnected:true,onerror:null,
+      getAttribute:n=>n==="src"?value:null,
+      set src(v){value=v;},
+      get src(){return value;}
+    };
+  };
+  const images=[element(),element()];
+  const first="https://s1.ticketm.net/dam/a/x/THIS-EVENT.jpg";
+  const second="https://s1.ticketm.net/dam/a/y/ANOTHER-EVENT.jpg";
+  client.applyConcertArt(images[0],first,720);
+  client.applyConcertArt(images[1],second,256);
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(probes,1);
+  assert.equal(images[0].src,first);
+  assert.equal(images[1].src,second);
+  const later=element();
+  client.applyConcertArt(later,second,256);
+  assert.equal(later.src,second);
+  assert.equal(probes,1);
 });
