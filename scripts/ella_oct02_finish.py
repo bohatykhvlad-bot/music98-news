@@ -58,7 +58,7 @@ def analyze(body):
  prose=[x for x in blocks if not x.startswith("[")]
  carriers=[x for x in blocks if x.startswith("[")]
  lengths=[len(x.split()) for x in prose]
- assert len(prose)==19 and len(carriers)==8,(len(prose),len(carriers))
+ assert len(prose)==19 and len(carriers)==10,(len(prose),len(carriers))
  assert all(80<=n<=200 for n in lengths),lengths
  assert all(not(a.startswith("[") and b.startswith("[")) for a,b in zip(blocks,blocks[1:]))
  first=prose[0];excerpt=first.split(". ")[0]+"."
@@ -125,6 +125,11 @@ def main():
   print("AUDIT_PHOTO",name,existing_photo_ok(name),flush=True)
  raw=picture()
  if len(sys.argv)<2 or sys.argv[1]=="--audit":
+  audit=copy.deepcopy(old) if old else record(body,excerpt)
+  audit["body"]=body;audit["excerpt"]=excerpt
+  ff,ww,ii=gate.check_post(audit,strict=True)
+  print("AUDIT_CANDIDATE_GATE","FAIL" if ff else "PASS","ERRORS",json.dumps(ff,ensure_ascii=True),"WARNINGS",json.dumps(ww,ensure_ascii=True),flush=True)
+  if ff:raise RuntimeError("Audit gate failed without writing")
   print("AUDIT_ONLY_NOT_SAVED",flush=True)
   return
  if sys.argv[1]!="--save-draft":raise RuntimeError("Unknown action")
