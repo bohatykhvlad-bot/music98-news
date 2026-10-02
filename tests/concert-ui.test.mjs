@@ -492,16 +492,19 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 });
 
 
-test("closed artist highlight fills the full 14px outer card before expansion",()=>{
+test("artist gray highlight keeps fixed geometry while independent white panel expands",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.tour-card\{[^}]*border:1px solid transparent;border-radius:var\(--event-radius\);overflow:hidden/);
-  assert.match(css,/\.tour-card:hover:not\(\.open\)\{background:var\(--bg2\);border-color:var\(--line\)\}/);
-  assert.match(css,/\.tour-card\.open\{[^}]*background:#fff;border-color:var\(--line\)/);
-  assert.match(css,/\.tour-row\{[^}]*width:100%;[^}]*border-radius:13px/);
-  assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\);border-radius:13px 13px 0 0\}/);
-  assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*background:#fff/);
-  assert.match(css,/\.tour-events\{[^}]*transition:max-height \.28s cubic-bezier\(\.3,\.7,\.4,1\),opacity \.18s ease/);
-  assert.doesNotMatch(css,/\.tour-card\.open \.tour-events\{[^}]*margin-top:6px/);
+  assert.match(css,/--event-radius:14px/);
+  assert.match(css,/\.tour-card\{[^}]*border:0;border-radius:0;overflow:visible;background:transparent/);
+  assert.doesNotMatch(css,/\.tour-card\.open\{[^}]*background|\.tour-card:hover:not\(\.open\)\{background/);
+  assert.match(css,/\.tour-row\{[^}]*width:100%;[^}]*border:1px solid transparent;background:transparent;border-radius:var\(--event-radius\)/);
+  assert.match(css,/\.tour-row:hover\{background:var\(--bg2\);border-color:var\(--line\)\}/);
+  assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\);border-color:var\(--line\)\}/);
+  assert.doesNotMatch(css,/\.tour-card\.open \.tour-row\{[^}]*border-radius/);
+  assert.match(css,/\.tour-events\{[^}]*margin:0 1px;padding:0 9px;border-radius:var\(--event-radius\);background:#fff/);
+  assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*margin-top:6px;box-shadow:inset 0 0 0 1px var\(--line\)/);
+  assert.match(css,/\.tour-events\{[^}]*transition:max-height \.28s cubic-bezier\(\.3,\.7,\.4,1\),opacity \.18s ease,margin-top \.28s/);
+  assert.match(css,/\.event-link\{[^}]*border-radius:var\(--event-radius\)/);
 });
 test("concert artist artwork matches chart dimensions and expanded accent border",()=>{
   const chart=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
