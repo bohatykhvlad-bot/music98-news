@@ -71,6 +71,11 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_oct02_photo_investigation.py
+      - name: Audit original Ella portrait ICC profile
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-icc-audit]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/audit_ella_color_profile_20261002.py
       - name: Audit final Ella layout and source photographs
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-finalize-audit]') }}
         run: |
