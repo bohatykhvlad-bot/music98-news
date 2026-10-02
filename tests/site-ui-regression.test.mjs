@@ -202,7 +202,7 @@ test("mobile chart reclaims arrow space without shrinking artwork or playback",(
     ".artwrap{grid-area:art;width:44px;height:44px;",
     ".rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}"
   ])assert.ok(mobile.includes(value),value);
-  assert.match(page,/\\.delta\\{font-size:12\\.5px;font-weight:700;text-align:center\\}/);
+  assert.ok(page.includes(".delta{font-size:12.5px;font-weight:700;text-align:center}"));
   assert.ok(page.includes(".delta.new{font-size:12.5px;letter-spacing:0}"));
   assert.ok(page.includes(".delta.reentry{font-size:12.5px;letter-spacing:-.02em}"));
   assert.ok(mobile.includes(".chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;"));
