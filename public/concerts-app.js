@@ -750,6 +750,8 @@ function popupContent(e){
     full.href=eventImageUrl;
     full.target="_blank";
     full.rel="noopener noreferrer";
+    full.draggable=false;
+    full.addEventListener("dragstart",event=>event.preventDefault());
     full.setAttribute("aria-label","Open the original concert image in a new tab");
     full.appendChild(img);
     full.addEventListener("click",event=>event.stopPropagation());
