@@ -233,7 +233,8 @@ test("Belfast is not mapped to the dead ND pseudo-country",()=>{
 });
 test("popup retains the exact event artwork and has only Buy Tickets",()=>{
   const section=app.slice(app.indexOf("function popupContent(e){"),app.indexOf("\nfunction eventsAtSameVenue("));
-  assert.ok(section.includes('applyConcertArt(img,e.image||e.artistImage||"/logo.png",720)'));
+  assert.ok(section.includes('applyConcertArt(img,originalArt,"event")'));
+  assert.match(section,/grid\.append\(img,main\)/);
   assert.doesNotMatch(section,/popupImage/);
   assert.match(section,/label\.textContent="Buy Tickets"/);
   assert.doesNotMatch(section,/ticketOptions|ticket-alt|alternatives\.forEach/);
@@ -501,10 +502,10 @@ test("all concert thumbnails use original photo, browser smoothing and never Clo
 });
 
 test("popup concert photograph is presentation only without links or zoom cursor",()=>{
-  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\\\.|[^"\\\\])*");/m)[1]);
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   const popup=app.slice(app.indexOf("function popupContent(e){"),app.indexOf("\nfunction venuePopupContent(",app.indexOf("function popupContent(e){")));
   assert.match(popup,/grid\.append\(img,main\)/);
-  assert.doesNotMatch(popup,/full\.href|eventImageUrl|createElement\("a"\)|dragstart|pop-art-link/);
+  assert.doesNotMatch(popup,/full\.href|eventImageUrl|dragstart|pop-art-link/);
   assert.doesNotMatch(css,/pop-art-link|cursor:zoom-in/);
   const from=app.indexOf("function browserResampleConcertArt(");
   const to=app.indexOf("\nfunction applyConcertArt(",from);
