@@ -653,37 +653,31 @@ function listThumbSrc(p){
   return presetThumb(p);
 }
 
-const MAX_ORIGINAL_PHOTO_BYTES=10_000_000;
-function readPhoto(file, cb, _unusedMax){
-  // Keep full-frame source dimensions and original encoded bytes.
-  // Cropping and zoom are display-only controls in the article/hero editor.
-  if(!file) return;
-  if(!/^image\/(jpeg|png|webp)$/i.test(file.type)){
-    toast("Use an original JPG, PNG or WebP photo.");
-    return;
-  }
-  if(file.size>MAX_ORIGINAL_PHOTO_BYTES){
-    toast("Original exceeds the 10 MB upload limit. Use a smaller original or a different image.");
-    return;
-  }
-  const reader=new FileReader();
-  reader.onerror=()=>toast("Could not read the original photo.");
-  reader.onload=()=>{
-    const data=String(reader.result||"");
-    uploadPhoto(data,src=>cb(src),err=>toast(err==="too_large"
-      ? "Original exceeds the server photo size limit."
-      : "Photo upload failed. The original was not altered or added."));
+function readPhoto(file, cb, max=1800){
+  if(!file || file.type.indexOf("image/")!==0) return;
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = ()=>{
+    let w = img.width, h = img.height;
+    if(Math.max(w,h)>max){ const s = max/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
+    const c = document.createElement("canvas"); c.width=w; c.height=h;
+    c.getContext("2d").drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);
+    const data = c.toDataURL("image/jpeg", 0.86);
+    /* the blob goes to KV via /api/photo; the post keeps only the URL -
+       desk.json stays tiny (a data: URL here would bloat every page load) */
+    uploadPhoto(data, src=> cb(src), ()=> cb(data));
   };
-  reader.readAsDataURL(file);
+  img.onerror = ()=> URL.revokeObjectURL(url);
+  img.src = url;
 }
 let photoSeq = 0;
 function uploadPhoto(data, ok, fail){
-  const ext=/^data:image\/(jpeg|png|webp)/i.exec(data);
-  if(!ext){fail("bad_type");return;}
-  const name="u"+Date.now().toString(36)+(photoSeq++).toString(36)+"."+ext[1].toLowerCase().replace("jpeg","jpg");
-  api("/api/photo",{method:"POST",headers:headers(),body:JSON.stringify({name,data})})
-    .then(j=>(j&&j.url)?ok(j.url):fail(j?.error||"upload_failed"))
-    .catch(err=>fail(/413|too_large/i.test(String(err))?"too_large":"upload_failed"));
+  const ext = /^data:image\/(jpeg|png|webp)/i.exec(data);
+  const name = "u" + Date.now().toString(36) + (photoSeq++).toString(36) + "." + (ext ? ext[1].replace("jpeg","jpg") : "jpg");
+  api("/api/photo", {method:"POST", headers: headers(), body: JSON.stringify({name, data})})
+    .then(j => (j && j.url) ? ok(j.url) : fail())
+    .catch(fail);
 }
 function dropHasImage(dt){
   if(!dt) return false;
