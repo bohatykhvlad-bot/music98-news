@@ -68,9 +68,12 @@ test("map has no custom minus or floating map status and native zoom-out resets 
   assert.match(app,/btn\.addEventListener\("click",resetMapFilters\)/);
   assert.equal(app.includes("radiusEl"),false);
 });
-test("map shell has no gray shadow gap and canvas fills it",()=>{
-  assert.match(app,/\.map-shell\{[^}]*background:#fff;box-shadow:none/);
-  assert.match(app,/#map \.mapboxgl-canvas\{[^}]*width:100%!important;height:100%!important/);
+test("map shell fills cleanly and uses the same site card shadow as the sidebar",()=>{
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(css,/\.map-shell\{[^}]*background:#fff;box-shadow:var\(--shadow\)/);
+  assert.match(css,/#map\{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#fff\}/);
+  assert.match(css,/#map \.mapboxgl-map,#map \.mapboxgl-canvas-container\{[^}]*inset:0!important;[^}]*width:100%!important;height:100%!important;[^}]*background:#fff!important/);
+  assert.match(css,/#map \.mapboxgl-canvas\{[^}]*inset:0!important;[^}]*width:100%!important;height:100%!important/);
 });
 
 test("More button is optically centered inside the expanded event block",()=>{
@@ -484,7 +487,7 @@ test("failed area loads clear stale event markers",()=>{
 
 test("Concerts sidebar is one complete white card with a shared site shadow",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.map-shell\{[^}]*box-shadow:none/);
+  assert.match(css,/\.map-shell\{[^}]*box-shadow:var\(--shadow\)/);
   assert.match(css,/\.side\{[^}]*box-shadow:var\(--shadow\);overflow:hidden/);
   assert.match(css,/\.tour-card\.open\{[^}]*box-shadow:var\(--shadow\)/);
   assert.match(css,/\.disclosure\{margin:0;height:12px;padding:0 4px 0 17px;display:flex;align-items:flex-end[^}]*top:2px/);
