@@ -1763,7 +1763,7 @@ function snapCoord(value, step) {
 function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,stateCode,radius}) {
   const out = new URL(requestUrl);
   out.search = "";
-  out.searchParams.set("__cachev","concerts-global-v22");
+  out.searchParams.set("__cachev","concerts-global-v23");
 
   if(mode==="artist-search"){
     out.searchParams.set("mode","artist-search");
@@ -1897,7 +1897,9 @@ export async function onRequestGet({ request, env, waitUntil }) {
 
     const tm = baseEventUrl(env.TICKETMASTER_API_KEY);
     tm.searchParams.set("size", "200");
-    tm.searchParams.set("sort", (artist || attractionId || city) ? "date,asc" : "distance,date,asc");
+    // The first five 200-item pages must contain the earliest upcoming dates,
+    // not simply the geographically closest results.
+    tm.searchParams.set("sort", "date,asc");
 
     if (attractionId) {
       tm.searchParams.set("attractionId", attractionId);
