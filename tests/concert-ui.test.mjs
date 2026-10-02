@@ -524,19 +524,19 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 
 
 test("flat Concerts sidebar keeps unchanged rank and footer alignment",()=>{
-  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\\.tours\\{[^}]*scrollbar-gutter:stable;margin:0;padding:0 0 6px 0;overscroll-behavior:contain\\}/);
-  assert.doesNotMatch(css,/\\.tours\\{[^}]*margin:-\\d+px/);
-  assert.match(css,/\\.side\\{[^}]*padding:13px 13px 4px;height:420px/);
-  assert.match(css,/\\.side-sub\\{[^}]*margin:0 4px 10px 17px/);
-  assert.match(css,/\\.side-status\\{[^}]*margin:0 4px 8px 17px/);
-  assert.match(css,/\\.side-empty\\{[^}]*padding:12px 5px 12px 17px/);
-  assert.match(css,/\\.disclosure\\{[^}]*margin:0;height:12px;padding:0 4px 0 17px/);
-  assert.match(css,/\\.tour-card\\.open\\{\\s*background:#fff;box-shadow:none/);
-  assert.match(css,/\\.tour-events\\{[^}]*padding:0 9px;background:#fff/);
-  assert.match(css,/\\.tour-card\\.open \\.tour-events\\{[^}]*padding:2px 9px 10px/);
-  assert.match(css,/\\.event-link\\{[^}]*width:100%;[^}]*margin:4px 0/);
-  assert.match(css,/@media\\(max-width:700px\\)\\{[\\s\\S]*?\\.tours\\{overflow:visible;margin:0;padding:0;scrollbar-gutter:auto\\}/);
+  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\.|[^"\])*");/m)[1]);
+  assert.match(css,/\.tours\{[^}]*scrollbar-gutter:stable;margin:0;padding:0 0 6px 0;overscroll-behavior:contain\}/);
+  assert.doesNotMatch(css,/\.tours\{[^}]*margin:-\d+px/);
+  assert.match(css,/\.side\{[^}]*padding:13px 13px 4px;height:420px/);
+  assert.match(css,/\.side-sub\{[^}]*margin:0 4px 10px 17px/);
+  assert.match(css,/\.side-status\{[^}]*margin:0 4px 8px 17px/);
+  assert.match(css,/\.side-empty\{[^}]*padding:12px 5px 12px 17px/);
+  assert.match(css,/\.disclosure\{[^}]*margin:0;height:12px;padding:0 4px 0 17px/);
+  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:none/);
+  assert.match(css,/\.tour-events\{[^}]*padding:0 9px;background:#fff/);
+  assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*padding:2px 9px 10px/);
+  assert.match(css,/\.event-link\{[^}]*width:100%;[^}]*margin:4px 0/);
+  assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.tours\{overflow:visible;margin:0;padding:0;scrollbar-gutter:auto\}/);
 });
 test("Concerts page retains consistent desktop and mobile alignment",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
