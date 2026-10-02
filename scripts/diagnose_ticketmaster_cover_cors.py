@@ -25,7 +25,7 @@ for url in ["https://music98.news/","https://music98.news/concerts"]:
    print("LIVE_SHELL_VERSION",url,"http",resp.status,"cache",resp.headers.get("Cache-Control"),"cf",resp.headers.get("Cf-Cache-Status"),"script_fragment",repr(text[max(0,spot-60):spot+70]) if spot>=0 else "not-present",flush=True)
  except Exception as e:print("LIVE_SHELL_ERROR",url,str(e)[:130],flush=True)
 
-url="https://music98.news/concerts-app.js?v=20261002-04"
+url="https://music98.news/concerts-app.js?v=20261002-05"
 try:
  req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Cache-Control":"no-cache"})
  with urllib.request.urlopen(req,timeout=20) as resp:
