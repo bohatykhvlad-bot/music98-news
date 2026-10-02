@@ -63,6 +63,14 @@ try:
  if not source:
   print("TICKETMASTER_EXTERNAL_TRANSFORM","NO_TICKETMASTER_COVER_IN_EXISTING_POPULAR_SNAPSHOT",flush=True)
  else:
+  try:
+   direct_req=urllib.request.Request(source,method="HEAD",headers={"User-Agent":"Mozilla/5.0"})
+   with urllib.request.urlopen(direct_req,timeout=15) as direct:
+    print("TICKETMASTER_DIRECT_ORIGIN",direct.status,direct.headers.get("Content-Type"),direct.headers.get("Content-Length"),flush=True)
+  except urllib.error.HTTPError as direct:
+   print("TICKETMASTER_DIRECT_ORIGIN",direct.code,direct.headers.get("Content-Type"),flush=True)
+  except Exception as direct:
+   print("TICKETMASTER_DIRECT_ORIGIN","ERROR",type(direct).__name__,str(direct)[:110],flush=True)
   from urllib.parse import quote
   target="https://music98.news/cdn-cgi/image/width=256,height=256,fit=scale-down,quality=85,format=auto/"+source
   try:
