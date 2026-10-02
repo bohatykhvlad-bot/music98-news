@@ -1,3 +1,19 @@
+# Final update — genuine 2026 guitar performance photograph now saved to Draft (2026-10-02)
+
+**This verified outcome supersedes older pending-image notes below.** Ella's existing unpublished article `ella26choosintexas` now has a genuine photograph of her on stage with her acoustic guitar, captured in March 2026 by **Andrew Wendowski** at CRS New Faces of Country Music. This exact file came from the photographer's own editorial photography site, Music Mayhem, not a Getty thumbnail or unattributed syndication:
+
+- Author original: https://musicmayhemmagazine.com/wp-content/uploads/2026/03/Ella-Langley-Photo-by-Andrew-Wendowski.jpg
+- Author page: https://musicmayhemmagazine.com/author/awendowskiphoto/
+- New hosted original, stored byte for byte without cropping/upscaling: https://music98.news/photos/ella-crs2026-andrew-wendowski-live-guitar-1200.jpg
+- Verified native size **1200 × 800 JPEG**, 72,764 bytes, SHA-256 `d10df3afc21f994e130659fd6c960b81c6f5fa67412c2abf1e1783e74d335bf0`.
+- The previous concluding 2026 Miriam Visser Ottawa Bluesfest picture was replaced. The neighboring paragraph was rewritten to correctly describe Andrew's actual CRS stage scene; every other current Desk article block and all other posts were preserved.
+- Saved in **Draft only**, no publication. Latest editorial runner: https://github.com/bohatykhvlad-bot/music98-news/actions/runs/37057893684 (**success**). Strict editorial gates passed **3/3**; independent fresh Desk readbacks confirmed exact target body, `NEW_IMAGE True`, `status draft` **3/3**. Publication exclusion checked by script.
+- Limits: this author's highest publicly verified original is **1200 px wide**, below Music98's preferred **1920 px long-edge minimum**. Do not upscale and present as true high resolution. The photographer's identity is confirmed, but **permission to republish beyond Draft has NOT been verified**; clear rights or obtain an official licensed original before publication.
+- Visual source comparison sheet: `.editorial/ella-andrew-own-2026-guitar-qc.b64` (4 genuine 2026 Andrew photos; chosen frame is from his own website).
+- Current production media reference: `[photo:photos/ella-crs2026-andrew-wendowski-live-guitar-1200.jpg|Andrew Wendowski|https://musicmayhemmagazine.com/author/awendowskiphoto/|50% 50%|1]`.
+
+---
+
 # Ella Langley — Choosin' Texas | Final editorial/photo QC | 2026-10-02
 
 **Scope:** existing Music98 Desk post `ella26choosintexas`. **Status:** draft only. Do not publish automatically. This file records unresolved source/rights issues rather than claiming a photo is cleared.
