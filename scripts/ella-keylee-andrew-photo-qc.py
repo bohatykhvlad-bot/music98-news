@@ -9,7 +9,11 @@ UA="Mozilla/5.0"
 def download(url):
  with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":UA}),timeout=20) as r:return r.read(),r.headers.get("Content-Type","")
 sources=[]
-raw,ct=download(URL);page=raw.decode("utf8","replace")
+try:
+ raw,ct=download(URL);page=raw.decode("utf8","replace")
+except Exception as exc:
+ print("OFFRECORD_BLOCKED",str(exc)[:120],flush=True)
+ page=""
 # Find unembedded originals in gallery, not just the page hero (Alanis).
 for m in re.finditer(r'https?[^"'+"'" +r'\s<>]+?(?:\.jpg|\.jpeg|\.webp)',html.unescape(page),re.I):
  url=m.group(0).replace("\\/","/")
