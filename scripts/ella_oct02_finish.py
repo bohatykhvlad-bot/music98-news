@@ -75,7 +75,11 @@ def main():
  body=BODYFILE.read_text(encoding="utf-8").strip()
  excerpt=analyze(body)
  before=get()
- old=runner.find_post(before["posts"],ID)
+ old=next((p for p in before["posts"] if str(p.get("id"))==ID),None)
+ print("DESK_STATS","TOTAL",len(before["posts"]),"ELLA_MATCHES",[(p.get("id"),p.get("title"),p.get("status"),p.get("type")) for p in before["posts"] if "ella" in (str(p.get("title"))+" "+str(p.get("artist"))).lower()],flush=True)
+ if old is None:
+  print("CANONICAL_ID_NOT_FOUND_NO_WRITES",flush=True)
+  return
  if old.get("status")!="draft":raise RuntimeError("Refuse changes to non-draft")
  if old.get("artist")!="Ella Langley":raise RuntimeError("Wrong artist record")
  print("CURRENT_DRAFT",ID,"TITLE",old.get("title"),"BODY_SHA",digest(old.get("body")),"STATUS",old.get("status"),"COVER",old.get("cover"),flush=True)
