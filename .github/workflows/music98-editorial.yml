@@ -84,6 +84,18 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_correct_color_photo_attribution_final.py --save
+      - name: Review official 2026 Sony Ella photos for final story image
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-photo2026-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella-2026-new-last-photo-qc.py
+          git config user.name "music98 editorial QC"
+          git config user.email "editorial@music98.news"
+          git add .editorial/ella-2026-new-final-photo-qc.b64 .editorial/ella-2026-new-final-photo-qc.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Visual 16:9 source photo QC for 2026 Ella replacement"
+            git push
+          fi
       - name: Inspect new Ella source photo crop and guarded draft editorial changes
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-editorial-audit]') }}
         run: |
