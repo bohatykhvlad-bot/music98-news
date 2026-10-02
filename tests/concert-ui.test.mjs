@@ -492,19 +492,23 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 });
 
 
-test("expanded Concerts card restores visible shared shadow while the gray header stays fixed",()=>{
+test("gray concert artist header never changes dimensions between hover and expanded states",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/:host\{[^}]*--shadow:0 12px 34px rgba\(15,45,55,\.10\)/);
-  assert.match(css,/\.tour-card\{[^}]*border:1px solid transparent;border-radius:var\(--event-radius\);overflow:hidden;background:transparent/);
-  assert.match(css,/\.tour-card\.open\{\s*background:#fff;border-color:var\(--line\);box-shadow:var\(--shadow\)/);
-  assert.match(css,/\.tour-row\{[^}]*min-height:62px;[^}]*border:0;background:transparent;border-radius:13px/);
+  assert.match(css,/--event-radius:14px/);
+  assert.match(css,/\.tour-card\{[^}]*border:0;border-radius:var\(--event-radius\);overflow:hidden;background:transparent/);
+  assert.match(css,/\.tour-card\{[^}]*transition:box-shadow \.2s ease/);
+  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:var\(--shadow\)/);
+  assert.match(css,/\.tour-row\{\s*width:100%;height:70px;min-height:70px;display:grid;/);
+  assert.match(css,/\.tour-row\{[^}]*border:0;background:transparent;border-radius:var\(--event-radius\);padding:7px 8px/);
+  assert.match(css,/@media\(max-width:640px\)\{[^}]*\.tour-row\{height:62px;min-height:62px;grid-template-columns:24px 44px/);
   assert.match(css,/\.tour-card:hover:not\(\.open\) \.tour-row\{background:var\(--bg2\)\}/);
-  assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\);border-radius:13px 13px 0 0\}/);
-  assert.doesNotMatch(css,/\.tour-card:hover\{background:var\(--bg2\)|\.tour-card\.open\{[^}]*background:var\(--bg2\)/);
-  assert.match(css,/\.tour-events\{[^}]*padding:0 9px;background:#fff/);
+  const opened=css.match(/\.tour-card\.open \.tour-row\{([^}]*)\}/);
+  assert.ok(opened,"expanded header rules must exist");
+  assert.equal(opened[1],"background:var(--bg2);border-radius:var(--event-radius) var(--event-radius) 0 0");
+  assert.doesNotMatch(opened[1],/(?:width|height|padding|margin|border-width|transform|scale):/);
+  assert.match(css,/\.tour-events\{[^}]*transition:max-height \.28s cubic-bezier\(\.3,\.7,\.4,1\),opacity \.18s ease/);
   assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*max-height:4800px;opacity:1;pointer-events:auto;padding:2px 9px 10px/);
   assert.doesNotMatch(css,/\.tour-card\.open \.tour-events\{[^}]*margin-top|\.tour-card\.open \.tour-events\{[^}]*box-shadow/);
-  assert.match(css,/\.tour-events\{[^}]*transition:max-height \.28s cubic-bezier\(\.3,\.7,\.4,1\),opacity \.18s ease/);
 });
 test("concert artist artwork matches chart dimensions and expanded accent border",()=>{
   const chart=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
