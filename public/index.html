@@ -803,7 +803,9 @@ textarea{resize:vertical;min-height:64px}
   .pdur{font-size:11px;flex:none}
   .pextra .abadge{flex:none;min-width:0}
   .abadge img{height:22px;width:auto;max-width:92px;display:block}
-  .weeks{grid-area:week;text-align:left;justify-self:start;align-self:center;font-size:11px;white-space:nowrap;height:auto;display:block;padding-top:0;margin:0;line-height:1.2}
+  /* The image is inset 2px within .artwrap; align the first numeral to the
+     visible cover edge, not to the wrapper's grid-column edge. */
+  .weeks{grid-area:week;text-align:left;justify-self:start;align-self:center;font-size:11px;white-space:nowrap;height:auto;display:block;padding-top:0;padding-left:2px;margin:0;line-height:1.2;font-variant-numeric:tabular-nums}
   .ctext .ctrack{font-size:13px}
   .crow{grid-template-columns:24px 1fr 1fr 70px;grid-auto-rows:auto}
   .crow .weeks-in,.crowbtns{grid-column:span 2}

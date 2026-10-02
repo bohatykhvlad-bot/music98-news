@@ -203,7 +203,12 @@ test("mobile chart reclaims arrow space without shrinking artwork or playback",(
     ".rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}"
   ])assert.ok(mobile.includes(value),value);
   assert.ok(page.includes(".chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:82px 56px"));
+  /* Week text starts exactly at the visible image's padded inset. */
+  assert.ok(mobile.includes(".weeks{grid-area:week;text-align:left;justify-self:start;"));
+  assert.ok(mobile.includes("padding-top:0;padding-left:2px;margin:0;"));
+  assert.ok(mobile.includes("font-variant-numeric:tabular-nums"));
 });
+
 
 test("the UI insists on all five full sources and verified Spotify metadata",()=>{
  assert.match(page,/j.complete === true/);
