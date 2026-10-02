@@ -30,7 +30,8 @@ import {
   refreshPopularTourSnapshots,
   refreshCapitalEventSnapshots,
   refreshMapMarketSnapshot,
-  onRequestGet
+  onRequestGet,
+  compactSameConcertImage
 } from "../functions/api/concerts.js";
 
 test("hotspot threshold is 10 or more", () => {
@@ -1714,4 +1715,29 @@ test("public Popular rejects a complete current-algorithm snapshot from a non-li
   const data=await response.json();
   assert.equal(data.warming,true);
   assert.deepEqual(data.artists,[]);
+});
+
+
+test("popup image stays the exact Ticketmaster event cover when selecting a compact derivative",()=>{
+  const base="https://s1.ticketm.net/dam/a/abc/12345678-1234-4321-9876-abcdefabcdef";
+  const unrelated="https://s1.ticketm.net/dam/a/def/fedcba98-1234-4321-9876-abcdefabcdef";
+  const large={url:base+"_EVENT_DETAIL_16_9.jpg",width:2048,height:1152,ratio:"16_9"};
+  const medium={url:base+"_TABLET_LANDSCAPE_16_9.jpg",width:1024,height:576,ratio:"16_9"};
+  const compact={url:base+"_LANDSCAPE_16_9.jpg",width:720,height:405,ratio:"16_9"};
+  const tooSmall={url:base+"_SMALL_16_9.jpg",width:205,height:115,ratio:"16_9"};
+  const otherConcert={url:unrelated+"_LANDSCAPE_16_9.jpg",width:720,height:405,ratio:"16_9"};
+  const differentCrop={url:base+"_PORTRAIT_3_2.jpg",width:720,height:480,ratio:"3_2"};
+  const variants=[otherConcert,differentCrop,tooSmall,medium,large,compact];
+  assert.equal(compactSameConcertImage(variants,large.url),compact.url);
+  assert.equal(compactSameConcertImage(variants,medium.url),compact.url);
+  assert.equal(compactSameConcertImage([otherConcert,large],large.url),large.url);
+  assert.equal(compactSameConcertImage([differentCrop,large],large.url),large.url);
+  assert.equal(compactSameConcertImage([tooSmall,large],large.url),large.url);
+  assert.equal(compactSameConcertImage([],large.url),large.url);
+  assert.equal(compactSameConcertImage(variants,""),"");
+  // Unknown third-party images are not swapped for another image on size alone.
+  assert.equal(compactSameConcertImage([
+    {url:"https://example.com/large.jpg",width:2600,height:1400},
+    {url:"https://example.com/small.jpg",width:720,height:400}
+  ],"https://example.com/large.jpg"),"https://example.com/large.jpg");
 });
