@@ -93,3 +93,24 @@ test("only today's official Apple chart may fill a blocked origin",()=>{
  assert.match(top50,/if\(apple.length<SOURCE_MIN_ROWS\)/);
  assert.match(top50,/if\(!completeChartSources\(sources\)\)/);
 });
+
+test("styled Kworb rows must not disappear from Spotify's Top 50",()=>{
+  const start=top50.indexOf("function parseSpotify(html) {");
+  const end=top50.indexOf("function parseYouTube(data) {",start);
+  assert.ok(start>=0&&end>start);
+  const parser=new Function("SIZE",top50.slice(start,end)+"return parseSpotify;")(50);
+  const html=Array.from({length:50},(_,i)=>{
+    const rank=i+1,open=[17,36,50].includes(rank)?'<tr class="d2">':"<tr>";
+    return open+'<td class="np">'+rank+'</td>\n<td class="np">+5</td>\n'+
+      '<td class="text mp"><div><a>Artist '+rank+'</a> - <a>Song '+rank+
+      '</a></div></td></tr>';
+  }).join("");
+  const got=parser(html);
+  assert.equal(got.length,50);
+  assert.deepEqual(got.map(x=>x.pos),Array.from({length:50},(_,i)=>i+1));
+  for(const pos of [17,36,50]) {
+    assert.equal(got[pos-1].artist,"Artist "+pos);
+    assert.equal(got[pos-1].title,"Song "+pos);
+  }
+  assert.match(top50,/if\(spotify.length!==SIZE \|\| spotify.some/);
+});

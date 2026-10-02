@@ -4,6 +4,8 @@ if (!r.ok) throw new Error("live top50 HTTP " + r.status);
 const j = await r.json();
 if(j.fallback || j.complete!==true || !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])>=40))
   throw new Error("refusing partial or fallback chart audit: "+JSON.stringify(j.sources||{}));
+if(Number(j.sources?.S)!==50)
+  throw new Error("Live Spotify input missing ranks: "+JSON.stringify(j.sources));
 const news = (j.tracks || []).filter(x => String(x.delta).toLowerCase() === "new");
 const olivia = (j.tracks || []).find(x => /drop dead/i.test(x.title || "") && /olivia rodrigo/i.test(x.artist || ""));
 const rankSnapshot = (j.tracks || []).map((t, i) => ({

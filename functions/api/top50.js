@@ -6,7 +6,7 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
    Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v34";
+const TOP50_KV = "top50v35";
 const TOP50_RETRY_KV="top50v34:retry";
 const SOURCE_MIN_ROWS=40;
 const SOURCES = ["A", "S", "D", "B", "Y"];
@@ -624,7 +624,8 @@ function parseDeezer(data) {
 
 function parseSpotify(html) {
   const rows = [];
-  const re = /<tr><td class="np">(\d+)<\/td>\s*<td class="np">[^<]*<\/td>\s*<td class="text mp"><div>(.*?)<\/div><\/td>/gs;
+  /* Styled Kworb rows (<tr class="d2">) are regular ranked entries too. */
+  const re = /<tr\b[^>]*>\s*<td class="np">(\d+)<\/td>\s*<td class="np">[^<]*<\/td>\s*<td class="text mp"><div>(.*?)<\/div><\/td>/gs;
   let m;
   while ((m = re.exec(html))) {
     const pos = Number(m[1]);
@@ -794,6 +795,12 @@ export async function buildTop50(origin, env) {
     apple=await freshAppleRanking(env,origin);
     appleOrigin=apple.length>=SOURCE_MIN_ROWS?"github-current-day":"unavailable";
   }
+  /* Missing/malformed Spotify positions must never distort the combined score. */
+  if(spotify.length!==SIZE || spotify.some((row,i)=>row.pos!==i+1))
+    throw new Error("spotify_incomplete_top50:"+JSON.stringify({
+      parsed:spotify.length,missing:Array.from({length:SIZE},(_,i)=>i+1)
+        .filter(n=>!spotify.some(row=>row.pos===n))
+    }));
   const sources={A:apple.length,S:spotify.length,D:deezer.length,B:billboard.length,Y:youtube.length};
   if(!completeChartSources(sources))
     throw new Error("incomplete_chart_sources:"+JSON.stringify(sources));
@@ -847,7 +854,7 @@ export async function buildTop50(origin, env) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "all-five-sources-v34",
+    rev: "all-five-sources-v35-spotify50",
     sources,
     sourceOrigin:{A:appleOrigin},
     complete:true,

@@ -14,6 +14,7 @@ if (!r.ok) throw new Error("live top50 HTTP " + r.status);
 const j = await r.json();
 if(j.fallback || j.complete!==true || !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])>=40))
   throw new Error("refusing to snapshot incomplete ranking");
+if(Number(j.sources?.S)!==50)throw new Error("refusing Spotify source with fewer than 50 rows");
 const tracks = Array.isArray(j.tracks) ? j.tracks : [];
 if (tracks.length !== 50) throw new Error("refusing tenure snapshot: expected 50 rows, got " + tracks.length);
 if (j.arrows && j.arrows.ok === false) throw new Error("refusing tenure snapshot: live arrow/tenure self-check failed");
