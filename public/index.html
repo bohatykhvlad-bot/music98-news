@@ -371,14 +371,10 @@ body.editmode .card .tag{top:auto;bottom:10px}
 .cartist{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .delta{font-size:12.5px;font-weight:700;text-align:center}
 .delta .darr,.delta .dnum,.delta.same{color:var(--text)}
-/* NEW badge = same pill construction as the top nav pills (owner: unified
-   style): inline-flex capsule, fixed height, equal side padding, ink-centered
-   via text-box. Ratio matches .nav-btn (32px height / 14px font -> 24px / 10.5px). */
-.delta.new,.delta.reentry{color:#fff;background:var(--text);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;height:24px;line-height:1;text-box:trim-both cap alphabetic;width:fit-content;justify-self:center;white-space:nowrap;box-sizing:border-box}
-.delta.new{padding:0 calc(13px - .08em) 0 13px;font-size:10.5px;letter-spacing:.08em}
-.delta.reentry{min-width:82px;padding:0 calc(13px - .08em) 0 13px;font-size:10.5px;letter-spacing:.08em}
-/* vertical: ink-true centering via text-box (caps top .. baseline) - the
-   padding hack was tuned to one rasterizer; the mechanism works everywhere */
+/* NEW and RE-ENTRY appear as plain dark text in the movement column. */
+.delta.new,.delta.reentry{color:var(--text);background:transparent;border:0;border-radius:0;display:inline-block;align-self:center;justify-self:center;width:auto;max-width:100%;height:auto;min-width:0;padding:0;line-height:1.1;text-box:trim-both cap alphabetic;white-space:nowrap}
+.delta.new{font-size:11px;letter-spacing:.02em}
+.delta.reentry{font-size:10.5px;letter-spacing:0}
 .artwrap{position:relative;width:56px;height:56px;padding:2px;border-radius:12px;background:transparent;flex:none;overflow:visible;border:0;outline:0;box-shadow:none}
 .artwrap img{width:100%;height:100%;object-fit:cover;display:block;border-radius:10px;background:var(--card2)}
 .chart-row.playing .artwrap{background:var(--accent);outline:0;box-shadow:none}
@@ -785,10 +781,9 @@ textarea{resize:vertical;min-height:64px}
     transition:background .15s ease;
   }
   .chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;line-height:1.1;min-height:0;max-width:100%;overflow:hidden}
-  .delta.new{height:20px;padding:0 calc(9px - .03em) 0 9px;font-size:8.5px;letter-spacing:.03em;line-height:1;box-sizing:border-box}
-  .delta.reentry{height:20px;min-width:56px;padding:0 5px;font-size:8px;letter-spacing:.02em;line-height:1;box-sizing:border-box;overflow:visible;white-space:nowrap}
+  .delta.new{height:auto;min-width:0;padding:0;font-size:10px;letter-spacing:0;line-height:1.1}
+  .delta.reentry{height:auto;min-width:0;padding:0;font-size:9px;letter-spacing:0;line-height:1.1;overflow:visible;white-space:nowrap}
   .delta.up,.delta.down,.delta.same{color:var(--text)}
-  .delta.new,.delta.reentry{background:var(--text);color:#fff}
   .artwrap{grid-area:art;width:44px;height:44px;padding:2px;border-radius:10px;align-self:center}
   .artwrap img{border-radius:8px}
   .ctext{grid-area:names;align-self:center;min-width:0}
