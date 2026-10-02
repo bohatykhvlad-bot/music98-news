@@ -67,6 +67,43 @@ def analyze(body):
  assert not re.search(r"[\u2019\u2018\u2014]",body),"wrong apostrophe or long em dash"
  print("COPY_QC",sum(lengths),"WORDS",len(prose),"PARAGRAPHS",len(carriers),"MEDIA","EXCERPT",len(excerpt),flush=True)
  return excerpt
+def upload_simple(name, raw, mime):
+ data="data:"+mime+";base64,"+base64.b64encode(raw).decode("ascii")
+ result=runner.http("https://music98.news/api/photo",runner.desk_key(),{"name":name,"data":data},method="POST")
+ if not result.get("ok") or result.get("url")!="photos/"+name:
+  raise RuntimeError("Upload failed "+name+" "+repr(result))
+ for n in range(7):
+  sz=existing_photo_ok("photos/"+name)
+  if sz:return sz
+  time.sleep(3)
+ raise RuntimeError("Uploaded photo not visible "+name)
+def ensure_ella_images():
+ cover="photos/ella-choosin-texas-cover.jpg"
+ body_photo="photos/ella-choosin-texas-caylee-robillard.webp"
+ sz=existing_photo_ok(cover)
+ if not sz:
+  url="https://fortworth.culturemap.com/media-library/ella-langley.jpg?coordinates=0%2C0%2C0%2C0&height=1500&id=63691936&width=2000"
+  raw,ctype=fetch_binary(url);im=Image.open(io.BytesIO(raw))
+  assert im.size==(2000,1500) and im.format=="JPEG"
+  sz=upload_simple(cover.split("/")[-1],raw,"image/jpeg")
+ assert sz[0]>=1920,("hero too small",sz)
+ sz=existing_photo_ok(body_photo)
+ if not sz:
+  url="https://media.zenfs.com/en/billboard_547/80f5cb3c59c106a6caf51f7d27dfe52d"
+  raw,ctype=fetch_binary(url);im=Image.open(io.BytesIO(raw))
+  assert im.size==(1548,1024) and im.format=="JPEG"
+  buf=io.BytesIO();im.save(buf,"WEBP",quality=92,method=6)
+  sz=upload_simple(body_photo.split("/")[-1],buf.getvalue(),"image/webp")
+ assert sz[0]>=1200,("body photo too small",sz)
+def record(body,excerpt):
+ from datetime import datetime,timezone
+ now=datetime.now(timezone.utc)
+ return {"id":ID,"type":"news","tag":"Feature","rtype":"","artist":"Ella Langley",
+  "title":'Ella Langley and the "Choosin\' Texas" Phenomenon',"excerpt":excerpt,"body":body,
+  "date":now.strftime("%Y-%m-%d"),"publishAt":now.isoformat(timespec="milliseconds").replace("+00:00","Z"),
+  "status":"draft","pinned":False,
+  "cover":{"kind":"img","src":"photos/ella-choosin-texas-cover.jpg",
+    "credit":"Ella Langley","creditUrl":"https://www.ellalangley.com/","pos":"50% 43%"}}
 def main():
  runner.load_env()
  gate.KEY=runner.desk_key()
@@ -75,55 +112,60 @@ def main():
  body=BODYFILE.read_text(encoding="utf-8").strip()
  excerpt=analyze(body)
  before=get()
+ matches=[p for p in before["posts"] if "ella" in (str(p.get("title"))+" "+str(p.get("artist"))).lower()]
+ print("DESK_STATS","TOTAL",len(before["posts"]),"ELLA_MATCHES",[(p.get("id"),p.get("title"),p.get("status")) for p in matches],flush=True)
  old=next((p for p in before["posts"] if str(p.get("id"))==ID),None)
- print("DESK_STATS","TOTAL",len(before["posts"]),"ELLA_MATCHES",[(p.get("id"),p.get("title"),p.get("status"),p.get("type")) for p in before["posts"] if "ella" in (str(p.get("title"))+" "+str(p.get("artist"))).lower()],flush=True)
- if old is None:
-  print("CANONICAL_ID_NOT_FOUND_NO_WRITES",flush=True)
-  return
- if old.get("status")!="draft":raise RuntimeError("Refuse changes to non-draft")
- if old.get("artist")!="Ella Langley":raise RuntimeError("Wrong artist record")
- print("CURRENT_DRAFT",ID,"TITLE",old.get("title"),"BODY_SHA",digest(old.get("body")),"STATUS",old.get("status"),"COVER",old.get("cover"),flush=True)
- cover=old.get("cover") or {}
- if cover.get("src"):
-  if not existing_photo_ok(cover["src"]):raise RuntimeError("Hero image missing")
- # Existing media already present in current draft; keep its source if accessible.
- existing="photos/ella-choosin-texas-caylee-robillard.webp"
- if not existing_photo_ok(existing):raise RuntimeError("Existing Caylee photograph missing")
+ if old and (old.get("status")!="draft" or old.get("artist")!="Ella Langley"):
+  raise RuntimeError("Existing id protected; not a target Ella draft")
+ if old:print("UPDATING_EXISTING",ID,"BODY_SHA",digest(old.get("body")),flush=True)
+ else:print("CREATING_MISSING_CANONICAL_DRAFT",ID,flush=True)
+ if matches and not old:
+  raise RuntimeError("Unexpected Ella draft with another id; review before creating duplicate")
+ for name in ["photos/ella-choosin-texas-cover.jpg","photos/ella-choosin-texas-caylee-robillard.webp"]:
+  print("AUDIT_PHOTO",name,existing_photo_ok(name),flush=True)
  raw=picture()
  if len(sys.argv)<2 or sys.argv[1]=="--audit":
   print("AUDIT_ONLY_NOT_SAVED",flush=True)
   return
  if sys.argv[1]!="--save-draft":raise RuntimeError("Unknown action")
- protected={k:copy.deepcopy(v) for k,v in old.items() if k not in {"body","excerpt"}}
+ protected={k:copy.deepcopy(v) for k,v in old.items() if k not in {"body","excerpt"}} if old else None
  backup=Path("/tmp/desk-before-ella-oct02.json")
  backup.write_text(json.dumps(before,ensure_ascii=False),encoding="utf-8")
- print("PRIVATE_BACKUP_LOCAL",str(backup),len(before["posts"]),flush=True)
+ print("PRIVATE_BACKUP_LOCAL",str(backup),"POSTS",len(before["posts"]),flush=True)
+ ensure_ella_images()
  upload(raw)
- candidate=copy.deepcopy(old)
+ candidate=copy.deepcopy(old) if old else record(body,excerpt)
  candidate["body"]=body;candidate["excerpt"]=excerpt
  fails,warns,info=gate.check_post(candidate,strict=True)
- print("CANDIDATE_GATE","PASS" if not fails else "FAIL","WARNINGS",json.dumps(warns,ensure_ascii=True),"INFO",repr(info)[:600],flush=True)
+ print("CANDIDATE_GATE","PASS" if not fails else "FAIL","WARNINGS",json.dumps(warns,ensure_ascii=True),"INFO",repr(info)[:500],flush=True)
  if fails:
   print("CANDIDATE_GATE_ERRORS",json.dumps(fails,ensure_ascii=True),flush=True)
-  raise RuntimeError("Candidate gate failed; existing draft unchanged")
+  raise RuntimeError("Candidate gate failed; desk unchanged")
  def mutate(posts):
-  cur=runner.find_post(posts,ID)
-  if cur.get("status")!="draft" or digest(cur.get("body"))!=digest(old.get("body")):
-   raise RuntimeError("Draft edited while preparing; abort")
-  if {k:v for k,v in cur.items() if k not in {"body","excerpt"}}!=protected:
-   raise RuntimeError("Owner edits detected; abort")
-  cur["body"]=body;cur["excerpt"]=excerpt
-  return copy.deepcopy(cur)
- runner.guarded_write(mutate)
+  cur=next((p for p in posts if str(p.get("id"))==ID),None)
+  if old:
+   if not cur or cur.get("status")!="draft" or digest(cur.get("body"))!=digest(old.get("body")):
+    raise RuntimeError("Existing draft changed during edit")
+   if {k:v for k,v in cur.items() if k not in {"body","excerpt"}}!=protected:
+    raise RuntimeError("Protected fields changed; abort")
+   cur["body"]=body;cur["excerpt"]=excerpt
+   return copy.deepcopy(cur)
+  if cur is not None or any("ella" in (str(p.get("title"))+" "+str(p.get("artist"))).lower() for p in posts):
+   raise RuntimeError("Ella post appeared; do not duplicate")
+  posts.insert(0,copy.deepcopy(candidate))
+  return copy.deepcopy(posts[0])
+ now=runner.guarded_write(mutate)
  final=runner.find_post(get()["posts"],ID)
  assert final.get("status")=="draft" and final.get("body")==body and final.get("excerpt")==excerpt
- assert {k:v for k,v in final.items() if k not in {"body","excerpt"}}==protected
+ assert final==now
+ if protected:
+  assert {k:v for k,v in final.items() if k not in {"body","excerpt"}}==protected
  for n in range(1,4):
   passed,lines=runner.run_gate(ID,quiet=False)
-  print("POSTWRITE_GATE",n,"PASS" if passed else "FAIL","\n".join(lines[-25:]),flush=True)
-  if not passed:raise RuntimeError("Draft persisted but postwrite gate failed")
+  print("POSTWRITE_GATE",n,"PASS" if passed else "FAIL","\n".join(lines[-20:]),flush=True)
+  if not passed:raise RuntimeError("Draft saved but gate failed")
  public=runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()))
- assert not any(str(p.get("id"))==ID for p in public.get("posts",[])),"Draft leaked public"
- print("VERIFIED_SAVED_DRAFT",ID,"WORDS",len(gate.prose_of(body).split()),"PUBLIC_VISIBLE",False,"COVER_UNCHANGED",True,flush=True)
+ assert not any(str(p.get("id"))==ID for p in public.get("posts",[])),"Draft leaked publicly"
+ print("VERIFIED_SAVED_DRAFT",ID,"WORDS",len(gate.prose_of(body).split()),"PUBLIC_VISIBLE",False,"CREATED",not bool(old),flush=True)
 if __name__=="__main__":
  main()
