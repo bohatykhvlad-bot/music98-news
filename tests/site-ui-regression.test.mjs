@@ -198,13 +198,18 @@ test("mobile chart reclaims arrow space without shrinking artwork or playback",(
     "grid-template-columns:56px 44px minmax(0,1fr) 36px;",
     "gap:6px 8px;",
     "padding:12px 17px 12px 12px;",
-    ".delta.reentry{height:auto;min-width:0;padding:0;font-size:9px;",
+    ".delta.reentry{height:auto;min-width:0;padding:0;font-size:11px;letter-spacing:-.06em;",
     ".artwrap{grid-area:art;width:44px;height:44px;",
     ".rplay{grid-area:play;justify-self:end;align-self:center;width:36px;height:36px}"
   ])assert.ok(mobile.includes(value),value);
+  assert.match(page,/\\.delta\\{font-size:12\\.5px;font-weight:700;text-align:center\\}/);
+  assert.ok(page.includes(".delta.new{font-size:12.5px;letter-spacing:0}"));
+  assert.ok(page.includes(".delta.reentry{font-size:12.5px;letter-spacing:-.02em}"));
+  assert.ok(mobile.includes(".chart-row .delta{grid-area:delta;display:flex;align-items:center;justify-content:center;align-self:center;font-size:11px;"));
+  assert.ok(mobile.includes(".delta.reentry{height:auto;min-width:0;padding:0;font-size:11px;letter-spacing:-.06em;"));
   assert.ok(page.includes(".delta.new,.delta.reentry{color:var(--text);background:transparent;border:0;border-radius:0"));
   assert.ok(!page.includes(".delta.new,.delta.reentry{background:var(--text);color:#fff"));
-  assert.ok(mobile.includes(".delta.new{height:auto;min-width:0;padding:0;font-size:10px;"));
+  assert.ok(mobile.includes(".delta.new{height:auto;min-width:0;padding:0;font-size:11px;"));
   assert.ok(!mobile.includes(".delta.new,.delta.reentry{background:var(--text);color:#fff"));
   assert.ok(page.includes(".chart-row{--pw:40px;--pexp:0px;display:grid;grid-template-columns:82px 56px"));
   /* Week text starts exactly at the visible image's padded inset. */
