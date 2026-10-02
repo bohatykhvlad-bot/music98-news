@@ -17,7 +17,7 @@ for url in SOURCES:
  except Exception as e:print("SHARE_FAILED",url,type(e).__name__,str(e)[:100],flush=True)
 try:
  import gdown
- files=gdown.download_folder(id="1Zj42_sfjozD4BJO5OKjkUkb3ozmOHBiW",output="/tmp/ella_label_press_assets",quiet=True,remaining_ok=True)
+ files=gdown.download_folder(id="1Zj42_sfjozD4BJO5OKjkUkb3ozmOHBiW",output="/tmp/ella_label_press_assets",quiet=True)
  print("LABEL_DOWNLOADS",len(files or []),flush=True)
  for file in files or []:
   try:
