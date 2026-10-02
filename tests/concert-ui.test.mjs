@@ -28,10 +28,11 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
   assert.match(app,/const POPUP_CITY_MIN_ZOOM=6\.2/);
   assert.doesNotMatch(app,/function popupLerp/);
   assert.doesNotMatch(app,/const t=Math\.max\(0,Math\.min\(1,\(z-2\.3\)/);
-  assert.match(app,/const width=singleEvent\?"340px":"286px"/);
+  assert.match(app,/const width=singleEvent\?\(window\.matchMedia\("\(max-width:700px\)"\)\.matches\?"300px":"340px"\):"286px"/);
   assert.match(app,/popup\.setMaxWidth\(width\)/);
   assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:"286px",focusAfterOpen:false\}\)/);
-  assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:"340px",focusAfterOpen:false\}\)/);
+  assert.match(app,/const popupMaxWidth=window\.matchMedia\("\(max-width:700px\)"\)\.matches\?"300px":"340px"/);
+  assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:popupMaxWidth,focusAfterOpen:false\}\)/);
   assert.match(app,/map\.on\("zoom",\(\)=>\{\n  applyMapMode\(\);\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\)\{ closePopup\(\); return; \}/);
   assert.match(app,/function showPopup\(e\)\{\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
   assert.match(app,/function showVenuePopup\(events\)\{\n  if\(!events\?\.length \|\| map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
@@ -417,6 +418,7 @@ test("single event popup uses responsive square artwork and bottom-aligned ticke
   assert.match(css,/\.pop-card \.pop-main\{[^}]*display:flex;flex-direction:column/);
   assert.match(css,/\.pop-card \.pop-actions\{[^}]*justify-content:center;margin-top:auto/);
   assert.match(css,/\.pop-card \.pop-actions \.buy\{width:min\(150px,100%\);margin:0\}/);
+  assert.match(css,/\.pop-card \.pop-meta \+ \.pop-meta\{margin-bottom:0\}/);
   assert.match(css,/@media\(max-width:640px\)\{[\s\S]*?\.pop-card \.pop-grid\{grid-template-columns:100px minmax\(0,1fr\)/);
   assert.match(css,/\.mapboxgl-popup\{max-width:min\(var\(--pop-w,286px\),calc\(100vw - 44px\)\)!important/);
 });
