@@ -84,6 +84,9 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_correct_color_photo_attribution_final.py --save
+      - name: Correct Ella live-photo photographer attribution without publisher link
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-photo-credit-fix]') }}
+        run: python scripts/ella-fix-live-photo-credit.py
       - name: Review Caylee original live electric guitar Ella photo before draft substitution
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-caylee-live-qc]') }}
         run: |
