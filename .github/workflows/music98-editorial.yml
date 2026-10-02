@@ -41,6 +41,11 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella-official-photo-probe-20261002.py
+      - name: Inspect public Ella Sony and Triple Tigers photo archives
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-label-archive-probe]') }}
+        run: |
+          python -m pip install --quiet Pillow requests gdown
+          python scripts/ella-label-archive-probe-20261002.py
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
