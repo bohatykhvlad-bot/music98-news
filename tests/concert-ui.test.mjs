@@ -201,11 +201,13 @@ test("inactive map toggles use the shared gray hover highlight",()=>{
 });
 
 
-test("manually moving the map offers Search this area from Popular and Near me",()=>{
+test("manually moving the map offers Search this area from Popular, Near me and expanded artist",()=>{
   const move=app.slice(app.indexOf('map.on("moveend",()=>{'),app.indexOf('function resizeMapStable()'));
-  assert.match(move,/!\["popular","nearby","artist-area"\]\.includes\(activeMode\)/);
+  assert.match(move,/!\["popular","nearby","artist","artist-area"\]\.includes\(activeMode\)/);
+  assert.match(move,/mode:activeMode==="artist" \? "artist-area" : activeMode/);
   assert.match(move,/searchAreaBtn\.hidden=false/);
   const click=app.slice(app.indexOf('searchAreaBtn.addEventListener("click",()=>{'),app.indexOf('search.addEventListener("input",()=>{'));
+  assert.match(click,/pending\.mode==="artist-area" && artistContext/);
   assert.match(click,/loadArea\(pending\.lat,pending\.lng,"Map area",\{fit:false,radius:pending\.radius,force:true\}\)/);
 });
 
@@ -480,12 +482,12 @@ test("failed area loads clear stale event markers",()=>{
 });
 
 
-test("Concerts outer sidebar is flat like the map while expanded artists keep their shadow",()=>{
+test("Concerts sidebar is one complete white card with a shared site shadow",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   assert.match(css,/\.map-shell\{[^}]*box-shadow:none/);
-  assert.match(css,/\.side\{[^}]*box-shadow:none;overflow:hidden/);
+  assert.match(css,/\.side\{[^}]*box-shadow:var\(--shadow\);overflow:hidden/);
   assert.match(css,/\.tour-card\.open\{[^}]*box-shadow:var\(--shadow\)/);
-  assert.match(css,/\.disclosure\{margin:0;height:16px;padding:0 4px 0 17px;display:flex;align-items:flex-end/);
+  assert.match(css,/\.disclosure\{margin:0;height:12px;padding:0 4px 0 17px;display:flex;align-items:flex-end[^}]*top:2px/);
   const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
   assert.match(html,/Ticketing by Ticketmaster<\/p>/);
   assert.doesNotMatch(html,/Ticketing by Ticketmaster\./);
@@ -521,11 +523,11 @@ test("Concerts sidebar has symmetric shadow insets without moving the text basel
   assert.equal(padLeft,margin,"left artist and rank coordinates cannot shift");
   assert.ok(padTop>=12 && padBottom>=18);
   assert.doesNotMatch(css,/\.tours\{[^}]*margin:-\d+px/);
-  assert.match(css,/\.side\{[^}]*padding:13px 13px 8px;height:420px/);
+  assert.match(css,/\.side\{[^}]*padding:13px 13px 4px;height:420px/);
   assert.match(css,/\.side-sub\{[^}]*margin:0 4px 10px 17px/);
   assert.match(css,/\.side-status\{[^}]*margin:0 4px 8px 17px/);
   assert.match(css,/\.side-empty\{[^}]*padding:12px 5px 12px 17px/);
-  assert.match(css,/\.disclosure\{[^}]*margin:0;height:16px;padding:0 4px 0 17px/);
+  assert.match(css,/\.disclosure\{[^}]*margin:0;height:12px;padding:0 4px 0 17px/);
   assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:var\(--shadow\)/);
   assert.match(css,/\.tour-events\{[^}]*padding:0 9px;background:#fff/);
   assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*padding:2px 9px 10px/);
@@ -708,6 +710,12 @@ test("Near me has one correctly ranked, aligned summary rather than a duplicate 
   assert.match(app,/setStatus\(nearbyEvents\.length \? "Ranked by number of upcoming concerts"/);
 });
 
+test("placeholder attractions can never reach the artist renderer, including stale caches",()=>{
+  const render=app.slice(app.indexOf("function renderArtists(items,mode){"),app.indexOf("\nfunction restoreModeMap("));
+  assert.match(render,/const visibleItems=\(items\|\|\[\]\)\.filter\(item=>!isPlaceholderConcertArtist\(item\?\.name\)\)/);
+  assert.match(render,/visibleItems\.forEach\(\(item,index\)=>/);
+  assert.doesNotMatch(render,/items\.forEach\(\(item,index\)=>/);
+});
 test("Near me never ranks placeholder attractions or puts their concerts on the map",()=>{
   const start=app.indexOf("function isPlaceholderConcertArtist(name){");
   const end=app.indexOf("\nfunction setTourBoxHeight(",start);
