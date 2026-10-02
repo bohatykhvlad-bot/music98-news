@@ -9,6 +9,8 @@ def get(url):
  req=urllib.request.Request(url,headers={"User-Agent":UA,"Referer":"https://www.google.com/"})
  with urllib.request.urlopen(req,timeout=25) as q:return q.read(),q.headers.get("Content-Type","")
 SOURCES={
+"sony-2025-solo-asset-folder":"https://app.box.com/s/gaf2juqfpnxnfse6ljodiu5xa4bmeu8f",
+"sony-norway-standing":"https://kommunikasjon.ntb.no/files/8931514/18858703/263460/no",
 "sony-2026-press":"https://app.box.com/s/rqb31gg29dirmsc3d40o3al1k11sywog",
 "sony-ella-wallen-2026":"https://app.box.com/s/r8u64hrr2h4no9r0tz27vyyjecvghdhd",
 "hits-original":"https://res.cloudinary.com/hits-photos-archive/image/upload/v1769533762/MAIN_PRESS_WIDE_USE_IMAGE_1_DIGITAL_RGB_a73yrl.jpg",
@@ -26,7 +28,7 @@ for name,url in SOURCES.items():
    s=b.decode("utf-8","replace")
    if "box.com" in url:
     idx=s.find("Box.postStreamData")
-    print("BOXMETA",name,re.sub(r"\\s+"," ",s[idx:idx+3500])[:1500],flush=True)
+    print("BOXMETA",name,re.sub(r"\\s+"," ",s[idx:idx+3500])[:3000],flush=True)
     m=re.search(r'"itemID"\s*:\s*(\d+)',s)
     if m:
      fid=m.group(1); shared=url.split("/s/")[-1]
