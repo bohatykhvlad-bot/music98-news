@@ -35,7 +35,7 @@ PHOTOS={
 def digest(obj):
  return hashlib.sha256(json.dumps(obj,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
 def get_binary(url):
- req=urllib.request.Request(url,headers={"User-Agent":runner.UA,"Cache-Control":"no-cache"})
+ req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Accept":"image/avif,image/webp,image/jpeg,image/png,*/*"})
  with urllib.request.urlopen(req,timeout=60) as r:return r.read(),r.headers.get("Content-Type","")
 def fresh():
  return runner.http(runner.DESK_API+"?fresh="+str(time.time_ns()),runner.desk_key())
