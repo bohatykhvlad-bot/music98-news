@@ -26,7 +26,7 @@ if p:
  assert p.get("cover",{}).get("creditUrl")=="https://www.cayleerobillard.com/"
  assert "ella-caylee-2024-cma-guitar-native-3648.jpg" in live
  assert "ella-crs2026-guitar-amy-harris.jpg" not in live
- assert len([x for x in live.split("\\n\\n") if "Nashville" in x])==2
+ assert live.count("Nashville")==2
  for k in range(1,4):
   ok,lines=post.run_gate("ella26choosintexas",quiet=True)
   print("FINAL_EDITORIAL_GATE",k,"PASS" if ok else "FAIL","RELEVANT",json.dumps([v for v in lines if "PASS" in v or "FAIL" in v or "media-late" in v]),flush=True)
