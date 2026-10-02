@@ -399,29 +399,29 @@ test("single-event popup follows content height without dead space and centers B
   const single=app.slice(app.indexOf("function popupContent(e){"),app.indexOf("\nfunction eventsAtSameVenue("));
   const venue=app.slice(app.indexOf("function venuePopupContent(events){"),app.indexOf("\nfunction snapPopup("));
 
-  assert.match(single,/root\\.className="pop-card"/);
-  assert.match(single,/img\\.className="pop-thumb"/);
-  assert.match(single,/main\\.append\\(title,date,place\\)/);
-  assert.match(single,/grid\\.append\\(img,main\\)/);
-  assert.match(single,/body\\.appendChild\\(grid\\)/);
-  assert.match(single,/actions\\.className="pop-actions"/);
-  assert.match(single,/body\\.appendChild\\(actions\\)/);
-  assert.doesNotMatch(single,/main\\.appendChild\\(actions\\)/);
-  assert.match(single,/Array\\.isArray\\(e\\.ticketOptions\\)/);
-  assert.match(venue,/root\\.appendChild\\(body\\)/);
+  assert.match(single,/root\.className="pop-card"/);
+  assert.match(single,/img\.className="pop-thumb"/);
+  assert.match(single,/main\.append\(title,date,place\)/);
+  assert.match(single,/grid\.append\(img,main\)/);
+  assert.match(single,/body\.appendChild\(grid\)/);
+  assert.match(single,/actions\.className="pop-actions"/);
+  assert.match(single,/body\.appendChild\(actions\)/);
+  assert.doesNotMatch(single,/main\.appendChild\(actions\)/);
+  assert.match(single,/Array\.isArray\(e\.ticketOptions\)/);
+  assert.match(venue,/root\.appendChild\(body\)/);
   assert.doesNotMatch(venue,/pop-card|pop-grid/);
 
-  assert.match(css,/\\.pop-card\\{width:100%;height:auto;background:#fff\\}/);
-  assert.match(css,/\\.pop-card \\.pop-body\\{padding:14px 14px 16px\\}/);
-  assert.match(css,/\\.pop-card \\.pop-grid\\{display:grid;grid-template-columns:138px minmax\\(0,1fr\\);gap:12px;align-items:start\\}/);
-  assert.match(css,/\\.pop-card \\.pop-thumb\\{[^}]*width:138px;height:138px;aspect-ratio:1;object-fit:cover;object-position:50% 18%/);
-  assert.match(css,/\\.pop-card \\.pop-actions\\{[^}]*justify-content:center;margin-top:12px;padding:0/);
-  assert.match(css,/\\.pop-card \\.pop-actions \\.buy\\{width:min\\(150px,100%\\);margin:0\\}/);
-  assert.doesNotMatch(css,/\\.pop-card\\{[^}]*aspect-ratio:1/);
-  assert.doesNotMatch(css,/\\.pop-card \\.pop-grid\\{[^}]*min-height/);
-  assert.match(css,/@media\\(max-width:640px\\)\\{[\\s\\S]*?\\.pop-card \\.pop-grid\\{grid-template-columns:100px minmax\\(0,1fr\\);gap:10px\\}/);
-  assert.match(css,/\\.pop-card \\.pop-actions\\{margin-top:10px\\}/);
-  assert.match(css,/\\.mapboxgl-popup\\{max-width:min\\(var\\(--pop-w,286px\\),calc\\(100vw - 44px\\)\\)!important/);
+  assert.match(css,/\.pop-card\{width:100%;height:auto;background:#fff\}/);
+  assert.match(css,/\.pop-card \.pop-body\{padding:14px 14px 16px\}/);
+  assert.match(css,/\.pop-card \.pop-grid\{display:grid;grid-template-columns:138px minmax\(0,1fr\);gap:12px;align-items:start\}/);
+  assert.match(css,/\.pop-card \.pop-thumb\{[^}]*width:138px;height:138px;aspect-ratio:1;object-fit:cover;object-position:50% 18%/);
+  assert.match(css,/\.pop-card \.pop-actions\{[^}]*justify-content:center;margin-top:12px;padding:0/);
+  assert.match(css,/\.pop-card \.pop-actions \.buy\{width:min\(150px,100%\);margin:0\}/);
+  assert.doesNotMatch(css,/\.pop-card\{[^}]*aspect-ratio:1/);
+  assert.doesNotMatch(css,/\.pop-card \.pop-grid\{[^}]*min-height/);
+  assert.match(css,/@media\(max-width:640px\)\{[\s\S]*?\.pop-card \.pop-grid\{grid-template-columns:100px minmax\(0,1fr\);gap:10px\}/);
+  assert.match(css,/\.pop-card \.pop-actions\{margin-top:10px\}/);
+  assert.match(css,/\.mapboxgl-popup\{max-width:min\(var\(--pop-w,286px\),calc\(100vw - 44px\)\)!important/);
 });
 
 test("location strings collapse duplicate city, region and country in both popup modes",async()=>{
@@ -430,7 +430,7 @@ test("location strings collapse duplicate city, region and country in both popup
   const to=app.indexOf("\nfunction artistKey(",from);
   assert.ok(from>=0 && to>from,"shared location helper must exist");
   const {locationLine,placeLine}=runInNewContext(
-    app.slice(from,to)+"\\n({locationLine,placeLine})"
+    app.slice(from,to)+"\n({locationLine,placeLine})"
   );
   const singapore={
     venue:"National Stadium",city:"Singapore",state:" Singapore ",country:"SINGAPORE"
@@ -449,6 +449,6 @@ test("location strings collapse duplicate city, region and country in both popup
   assert.equal(locationLine({
     city:" New  York ",state:"new york",country:"United States"
   }),"New York · United States");
-  assert.match(app,/place\\.textContent=placeLine\\(e\\)/);
-  assert.match(app,/place\\.textContent=locationLine\\(first\\)/);
+  assert.match(app,/place\.textContent=placeLine\(e\)/);
+  assert.match(app,/place\.textContent=locationLine\(first\)/);
 });
