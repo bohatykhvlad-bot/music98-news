@@ -106,6 +106,21 @@ def main():
  actual=target.get("body","").strip()
  print("CURRENT_BODY_SHA",hashlib.sha256(actual.encode()).hexdigest(),
        "EXPECTED_PREVIOUS",hashlib.sha256(PREVIOUS.encode()).hexdigest(),flush=True)
+ if actual==NEXT:
+  print("ALREADY_UPDATED_DRAFT_DETECTED",flush=True)
+  data,_=source_crop()
+  hostedraw,hostimg=hosted()
+  assert hostedraw and hashlib.sha256(hostedraw).digest()==hashlib.sha256(data).digest()
+  assert hostimg.size==(2730,1536)
+  for i in range(3):
+   ok,lines=runner.run_gate(ID,quiet=True)
+   print("EXISTING_DRAFT_GATE",i+1,"PASS" if ok else "FAIL",json.dumps(lines,ensure_ascii=True),flush=True)
+   if not ok:raise RuntimeError("Existing updated Ella draft fails editorial gate")
+  public=runner.http(runner.DESK_API+"?nocache="+str(time.time_ns()))
+  assert not any(str(x.get("id"))==ID for x in public.get("posts",[]))
+  print("FINAL_2026_IMAGE_AND_ELLA_DRAFT_CONFIRMED",PHOTO,(2730,1536),
+        "EXISTING_ALREADY_SAVED",True,"PUBLISHED",False,flush=True)
+  return
  if actual!=PREVIOUS:
   print("CONCURRENT_OWNER_EDITS_DIFF_BEGIN",flush=True)
   print("\n".join(difflib.unified_diff(PREVIOUS.splitlines(),actual.splitlines(),fromfile="previous-reviewed",tofile="actual-desk",lineterm="")),flush=True)
@@ -142,9 +157,17 @@ def main():
   p["body"]=NEXT
   return copy.deepcopy(p)
  saved=runner.guarded_write(update)
- assert saved["status"]=="draft" and saved["body"].strip()==NEXT
- after=read();post=runner.find_post(after["posts"],ID)
- assert post["body"].strip()==NEXT and post["status"]=="draft"
+ if saved.get("body","").strip()!=NEXT:
+  print("DESK_RETURN_MAY_BE_STALE_AFTER_WRITE; checking fresh cache-busted reads",flush=True)
+ for attempt in range(12):
+  after=read();post=runner.find_post(after["posts"],ID)
+  if post.get("body","").strip()==NEXT and post.get("status")=="draft":
+   print("DESK_PROPAGATION_CONFIRMED","ATTEMPT",attempt+1,flush=True)
+   break
+  if post.get("body","").strip()!=PREVIOUS:
+   raise RuntimeError("Unexpected owner body changes during propagation")
+  time.sleep(2)
+ else:raise RuntimeError("New draft content not visible after guarded POST")
  assert {k:v for k,v in post.items() if k!="body"}==protected
  assert {str(p["id"]):digest(p) for p in after["posts"] if str(p["id"])!=ID}==otherhash
  for i in range(3):
