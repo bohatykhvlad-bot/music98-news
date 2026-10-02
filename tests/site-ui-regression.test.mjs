@@ -129,6 +129,12 @@ test("SPA /concerts uses concerts-specific document metadata",()=>{
 });
 
 
+test("main news hero stays flat on a separate evenly shadowed white card",()=>{
+  assert.match(page,/\.hero-card\{margin-bottom:18px;padding:6px;background:var\(--card\);border-radius:calc\(var\(--r\) \+ 6px\);box-shadow:var\(--shadow\)\}/);
+  assert.match(page,/\.hero\{[^}]*margin:0;box-shadow:none/);
+  assert.match(page,/<div class="hero-card">\s*<a class="hero"/);
+  assert.doesNotMatch(page,/\.hero\{[^}]*box-shadow:var\(--shadow\)/);
+});
 test("search mode removes the empty hero spacer and Facebook glyph is optically centered",()=>{
   assert.match(page,/body\.searching #heroSlot:empty\{min-height:0\}/);
   assert.match(page,/\.social a\[title="Facebook"\] svg\{transform:translateY\(-1px\)\}/);
