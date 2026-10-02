@@ -156,6 +156,15 @@ jobs:
           git config user.email "editorial@music98.news"
           git add .editorial/ella-ryman-2025-alternative-uncropped-preview.b64
           git diff --cached --quiet || (git commit -m "Review alternate uncut guitarist frame" && git push)
+      - name: Inspect genuinely different Ella BST acoustic press original and 16x9 framing
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-distinct-bst-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_distinct_kendall_bst_original_qc.py
+          git config user.name "music98 photo audit"
+          git config user.email "editorial@music98.news"
+          git add .editorial/ella-alternate-kendall-bst-2900-preview.b64 .editorial/ella-alternate-kendall-bst-2900-meta.json
+          git diff --cached --quiet || (git commit -m "Review distinctive 2900px BST Ella concert original and article crop" && git push)
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
