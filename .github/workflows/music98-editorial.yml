@@ -84,6 +84,11 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella_correct_color_photo_attribution_final.py --save
+      - name: Inspect Kirk Stauffer's original 2026 Ella SXSW stage gallery
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-kirk2026-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow beautifulsoup4
+          python scripts/ella-kirk-2026-stage-qc.py
       - name: QC original Ella Flickr and Wikimedia live guitar photo candidates
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-flickr-commons-qc]') }}
         run: |
