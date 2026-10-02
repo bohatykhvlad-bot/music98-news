@@ -76,6 +76,12 @@ jobs:
         run: |
           python -m pip install --quiet Pillow
           python scripts/ella-final-photo-qc.py
+      - name: Audit LINKIN PARK contextual update
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[lp20261002-audit]') }}
+        run: python scripts/revise_lp_context_20261002.py --audit
+      - name: Save verified LINKIN PARK editorial update
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[lp20261002-save]') }}
+        run: python scripts/revise_lp_context_20261002.py --save
       - name: Read current LINKIN PARK text without changes
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[lp20261002-inspect]') }}
         run: python scripts/audit_lp_20261002_readonly.py
