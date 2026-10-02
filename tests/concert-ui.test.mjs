@@ -492,13 +492,15 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 });
 
 
-test("artist gray header stays fixed inside one connected white concert card",()=>{
+test("expanded Concerts card restores visible shared shadow while the gray header stays fixed",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(css,/:host\{[^}]*--shadow:0 12px 34px rgba\(15,45,55,\.10\)/);
   assert.match(css,/\.tour-card\{[^}]*border:1px solid transparent;border-radius:var\(--event-radius\);overflow:hidden;background:transparent/);
-  assert.match(css,/\.tour-card\.open\{[^}]*background:#fff;border-color:var\(--line\)/);
-  assert.match(css,/\.tour-row\{[^}]*border:0;background:transparent;border-radius:13px/);
-  assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\)\}/);
-  assert.doesNotMatch(css,/\.tour-card\.open \.tour-row\{[^}]*border-radius/);
+  assert.match(css,/\.tour-card\.open\{background:#fff;border-color:var\(--line\);box-shadow:var\(--shadow\)\}/);
+  assert.match(css,/\.tour-row\{[^}]*min-height:62px;[^}]*border:0;background:transparent;border-radius:13px/);
+  assert.match(css,/\.tour-card:hover:not\(\.open\) \.tour-row\{background:var\(--bg2\)\}/);
+  assert.match(css,/\.tour-card\.open \.tour-row\{background:var\(--bg2\);border-radius:13px 13px 0 0\}/);
+  assert.doesNotMatch(css,/\.tour-card:hover\{background:var\(--bg2\)|\.tour-card\.open\{[^}]*background:var\(--bg2\)/);
   assert.match(css,/\.tour-events\{[^}]*padding:0 9px;background:#fff/);
   assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*max-height:4800px;opacity:1;pointer-events:auto;padding:2px 9px 10px/);
   assert.doesNotMatch(css,/\.tour-card\.open \.tour-events\{[^}]*margin-top|\.tour-card\.open \.tour-events\{[^}]*box-shadow/);
