@@ -3,7 +3,7 @@
   "current": {
     "updated": "2026-10-02",
     "week": 15,
-    "rev": "all-five-sources-v35-spotify50",
+    "rev": "verified-spotify-v36",
     "complete": true,
     "sources": {
       "A": 50,
@@ -12,6 +12,14 @@
       "B": 50,
       "Y": 50
     },
+    "sourceDates": {
+      "S": "2026-09-30"
+    },
+    "sourceOrigin": {
+      "A": "github-current-day",
+      "S": "kworb-crosschecked-kworb+musicrank"
+    },
+    "spotifyFingerprint": "66661a544e9e112bc80aa5dccaf2ee84dea8e0c77f478b8205657ae4ec5a0530",
     "tracks": [
       {
         "rank": 1,
