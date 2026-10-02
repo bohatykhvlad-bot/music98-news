@@ -433,6 +433,17 @@ body.editmode .card .tag{top:auto;bottom:10px}
 /* etalon behavior: the names column SHRINKS to make room for the pill -
    the text stays visible (it truncates if needed), it never fades out */
 .ctext .ctrack{color:var(--muted);font-size:14px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;grid-column:2}
+/* Only the actively played row scrolls, and only for text that is actually
+   truncated. Each line has its own clip, so neither text nor the play capsule
+   can draw over neighbouring chart columns. */
+#chartList .chart-row .cartist.chart-marquee-on,
+#chartList .chart-row .ctrack.chart-marquee-on{overflow:hidden;text-overflow:clip}
+#chartList .chart-marquee-belt{display:inline-flex;align-items:baseline;gap:32px;width:max-content;max-width:none;white-space:nowrap;animation:chart-marquee-travel var(--chart-marquee-seconds,10s) linear infinite;will-change:transform}
+#chartList .chart-marquee-copy{display:inline-block;flex:none;white-space:nowrap}
+@keyframes chart-marquee-travel{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--chart-marquee-distance)),0,0)}}
+@media (prefers-reduced-motion:reduce){
+  #chartList .chart-marquee-belt{animation:none!important;will-change:auto}
+}
 
 .chart-row.playing{background:var(--bg2)}
 .chart-note{margin:14px 2px 0;color:var(--muted2);font-size:12.5px}
@@ -1781,6 +1792,101 @@ function progTo(p, cur, dur){
     const d = row.querySelector(".pdur"); if(d) d.textContent = fmtTime(cur)+" / "+fmtTime(dur||90);
   });
 }
+
+/* Active-row ticker: preserve the static ellipsis on every other row and
+   animate only the overflowing artist/title. Do not change the player grid. */
+function chartMarqueeMetrics(textWidth,viewportWidth){
+  if(!Number.isFinite(textWidth)||!Number.isFinite(viewportWidth)||
+     viewportWidth<8||textWidth<=viewportWidth+1)return null;
+  const distance=textWidth+32; // matches the belt's 32px inter-copy gap
+  return {distance,seconds:Math.max(8,distance/38)};
+}
+const chartMarqueeReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
+let chartMarqueeRow=null;
+let chartMarqueeFrame=0;
+function clearChartMarqueeLine(line){
+  if(!line || !line.classList.contains("chart-marquee-on"))return;
+  const primary=line.querySelector(".chart-marquee-copy");
+  line.textContent=primary ? primary.textContent : line.textContent;
+  line.classList.remove("chart-marquee-on");
+  line.style.removeProperty("--chart-marquee-distance");
+  line.style.removeProperty("--chart-marquee-seconds");
+}
+function clearChartMarqueeRow(row){
+  if(!row)return;
+  for(const line of row.querySelectorAll(".cartist, .ctrack")){
+    if(chartMarqueeObserver)chartMarqueeObserver.unobserve(line);
+    clearChartMarqueeLine(line);
+  }
+}
+function updateChartMarqueeLine(line){
+  if(!line || line.clientWidth<8){clearChartMarqueeLine(line);return;}
+  const active=line.classList.contains("chart-marquee-on");
+  const first=active ? line.querySelector(".chart-marquee-copy") : null;
+  const textWidth=first ? first.getBoundingClientRect().width : line.scrollWidth;
+  const metrics=chartMarqueeMetrics(textWidth,line.clientWidth);
+  if(!metrics){clearChartMarqueeLine(line);return;}
+  if(!active){
+    const original=line.textContent;
+    const belt=document.createElement("span");
+    belt.className="chart-marquee-belt";
+    const primary=document.createElement("span");
+    primary.className="chart-marquee-copy";
+    primary.textContent=original;
+    const duplicate=document.createElement("span");
+    duplicate.className="chart-marquee-copy";
+    duplicate.textContent=original;
+    duplicate.setAttribute("aria-hidden","true");
+    belt.append(primary,duplicate);
+    line.replaceChildren(belt);
+    line.classList.add("chart-marquee-on");
+  }
+  const primary=line.querySelector(".chart-marquee-copy");
+  const measured=chartMarqueeMetrics(primary.getBoundingClientRect().width,line.clientWidth);
+  if(!measured){clearChartMarqueeLine(line);return;}
+  const distance=measured.distance.toFixed(2)+"px";
+  const seconds=measured.seconds.toFixed(2)+"s";
+  if(line.style.getPropertyValue("--chart-marquee-distance")!==distance)
+    line.style.setProperty("--chart-marquee-distance",distance);
+  if(line.style.getPropertyValue("--chart-marquee-seconds")!==seconds)
+    line.style.setProperty("--chart-marquee-seconds",seconds);
+}
+function syncChartMarquee(){
+  const active=chartMarqueeReduce.matches
+    ? null : document.querySelector("#chartList .chart-row.playing");
+  if(chartMarqueeRow!==active){
+    clearChartMarqueeRow(chartMarqueeRow);
+    chartMarqueeRow=active;
+    if(active && chartMarqueeObserver){
+      for(const line of active.querySelectorAll(".cartist, .ctrack"))
+        chartMarqueeObserver.observe(line);
+    }
+  }
+  if(chartMarqueeRow){
+    for(const line of chartMarqueeRow.querySelectorAll(".cartist, .ctrack"))
+      updateChartMarqueeLine(line);
+  }
+}
+function scheduleChartMarquee(){
+  if(chartMarqueeFrame)cancelAnimationFrame(chartMarqueeFrame);
+  chartMarqueeFrame=requestAnimationFrame(()=>{
+    chartMarqueeFrame=0;
+    syncChartMarquee();
+  });
+}
+const chartMarqueeObserver=typeof ResizeObserver==="function"
+  ? new ResizeObserver(scheduleChartMarquee) : null;
+window.addEventListener("resize",scheduleChartMarquee,{passive:true});
+if(chartMarqueeReduce.addEventListener)
+  chartMarqueeReduce.addEventListener("change",scheduleChartMarquee);
+else if(chartMarqueeReduce.addListener)
+  chartMarqueeReduce.addListener(scheduleChartMarquee);
+if(document.fonts && document.fonts.ready)
+  document.fonts.ready.then(scheduleChartMarquee);
+$("#chartList").addEventListener("transitionend",e=>{
+  if(e.propertyName==="grid-template-columns"&&e.target.matches(".chart-row"))
+    scheduleChartMarquee();
+});
 function markRows(){
   $$("#chartList .chart-row").forEach(row=>{
     const on = row.dataset.key === curKey;
@@ -1822,6 +1928,7 @@ function markRows(){
       } else { cm.style.removeProperty("--pexp"); row.style.removeProperty("--pw"); }
     }
   });
+  scheduleChartMarquee();
 }
 function stopPreview(){
   playGen++;

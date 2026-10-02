@@ -216,3 +216,25 @@ test("the UI insists on all five full sources and verified Spotify metadata",()=
  assert.match(page,/!!j.sourceDates\?\.S && !!j.spotifyFingerprint/);
  assert.match(page,/Last complete chart:/);
 });
+
+test("chart ticker scrolls only clipped text of the currently playing row",()=>{
+ const start=page.indexOf("function chartMarqueeMetrics(");
+ const end=page.indexOf("const chartMarqueeReduce=",start);
+ assert.ok(start>0&&end>start);
+ const measure=new Function(page.slice(start,end)+";return chartMarqueeMetrics;")();
+ assert.equal(measure(90,112),null);
+ assert.equal(measure(113,112),null);
+ assert.equal(measure(115,112).distance,147);
+ assert.equal(measure(400,112).seconds>8,true);
+ assert.match(page,/document\.querySelector\("#chartList \.chart-row\.playing"\)/);
+ assert.match(page,/clearChartMarqueeRow\(chartMarqueeRow\)/);
+ assert.match(page,/line\.replaceChildren\(belt\)/);
+ assert.match(page,/duplicate\.setAttribute\("aria-hidden","true"\)/);
+ assert.match(page,/line\.clientWidth/);
+ assert.match(page,/scheduleChartMarquee\(\);\s*}\s*function stopPreview/);
+ assert.match(page,/new ResizeObserver\(scheduleChartMarquee\)/);
+ assert.match(page,/chartMarqueeReduce\.addEventListener\("change",scheduleChartMarquee\)/);
+ assert.match(page,/#chartList \.chart-marquee-belt\{[^}]*animation:chart-marquee-travel/);
+ assert.match(page,/@media \(prefers-reduced-motion:reduce\)\{/);
+ assert.doesNotMatch(page,/\.chart-row\.playing \.cartist\{[^}]*transform:/);
+});
