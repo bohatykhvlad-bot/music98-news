@@ -27,10 +27,14 @@ const h=await mr.text();
 const main=h.indexOf("<main"),target=h.indexOf("Patient Zero",Math.max(0,main));
 const patterns=["Sep 30, 2026","2026-09-30","No. 1","Number 2","BbY WOW","Patient Zero","application/ld+json","__next_f"];
 for(const pat of patterns){
- const positions=[],re=new RegExp(pat.replace(/[.*+?^$\{\}()|[\]\\]/g,"\\$&"),"gi");let mt;
- while((mt=re.exec(h)) && positions.length<5)positions.push(mt.index);
- console.log("MUSICRANK_PROBE",JSON.stringify({pattern:pat,count:h.split(pat).length-1,
-  hits:positions.map(pos=>({pos,s:h.slice(Math.max(0,pos-220),pos+550).replace(/\\s+/g," ").slice(0,770)}))}));
+ const positions=[],lower=h.toLowerCase(),needle=pat.toLowerCase();let from=0,next;
+ while(positions.length<4 && (next=lower.indexOf(needle,from))>=0){
+   positions.push(next);from=next+needle.length;
+ }
+ console.log("MUSICRANK_PROBE",JSON.stringify({pattern:pat,count:lower.split(needle).length-1,
+   hits:positions.map(pos=>({pos,s:h.slice(Math.max(0,pos-220),pos+650).replace(/\s+/g," ").slice(0,870)}))}));
 }
-console.log("MUSICRANK_TAGS",JSON.stringify({main,firstPatient:target,articleCount:(h.match(/<article\\b/g)||[]).length,
-  itemRank:(h.match(/data-rank=/g)||[]).length,jsonLd:(h.match(/application\\/ld\\+json/g)||[]).length}));
+console.log("MUSICRANK_TAGS",JSON.stringify({main,firstPatient:target,
+ articleCount:h.split("<article").length-1,
+ itemRank:h.split("data-rank=").length-1,
+ jsonLd:h.split("application/ld+json").length-1}));
