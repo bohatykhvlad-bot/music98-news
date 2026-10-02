@@ -717,6 +717,8 @@ textarea{resize:vertical;min-height:64px}
   .card:active,.hero:active,.rcard:active{border-color:var(--line);transform:none;box-shadow:none}
 }
 @media (max-width:640px){
+  /* Mobile chart: the footer status label is intentionally not displayed. */
+  #tab-charts #chartStatus{display:none!important}
   .wrap{padding:0 16px}
   .topbar{--hp:0;height:auto;background:#fff;padding:0;box-shadow:0 1px 0 var(--line);backdrop-filter:none;-webkit-backdrop-filter:none}
   .topbar-glass{display:none}
@@ -1261,7 +1263,7 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v41";
+const DAILYKEY = "music98news_daily_v42";
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 const CHART_LAUNCH = "2026-09-17";
@@ -2194,7 +2196,9 @@ function setChartStatus(f, tag){
   const st = $("#chartStatus"); if(!st) return;
   let txt = "";
   if(tag === "live" || tag === "live-mem" || tag === "cache") txt = "";
-  else if(tag === "snap") txt = "This week’s Top 50";
+  else if(tag === "loading") txt = "Loading today’s chart…";
+  else if(tag === "backup") txt = "Showing the latest verified chart while today’s chart is unavailable.";
+  else if(tag === "fail") txt = "Today’s chart is temporarily unavailable.";
   else txt = "Showing the latest copy stored in this browser.";
   st.textContent = txt;
   st.hidden = !txt;
@@ -2231,22 +2235,32 @@ function refreshDailyTop50(){
   }
   let cached = null;
   try{ cached = JSON.parse(lsGetRaw(DAILYKEY)||"null"); }catch(e){ cached = null; }
-  const hasFreshCache=!!(cached && cached.date === todayUTC() && cached.tracks && cached.tracks.length >= 10 && cached.tracks.every(t=>String(t.art||"").trim()));
+  const hasFreshCache=!!(cached && cached.date === todayUTC() && cached.tracks && cached.tracks.length === 50 && cached.tracks.every(t=>String(t.art||"").trim()));
   if(hasFreshCache) applyDaily(cached.tracks, "cache");
-  else applyDaily(TOP50, "snap");
+  else {
+    /* Never flash the 17 September baked launch chart (all rows show day one).
+       An empty loading state is preferable to displaying fabricated movement. */
+    autoRows = null;
+    data.chart = [];
+    renderCharts();
+    setChartStatus({}, "loading");
+  }
   // A same-day local cache is only an instant paint, never the final answer.
-  // Always revalidate so an updated chart cannot stay frozen until tomorrow.
-  const grab = u => fetch(u,{cache:"no-store",headers:{"Cache-Control":"no-cache"}}).then(r=>{ if(!r.ok) throw 0; return r.json(); });
-  /* ?d + rev bust both browser and edge copies after chart/cache fixes. */
-  grab("/api/top50?d=" + todayUTC() + "&rev=41").catch(()=> grab("/data/top50.json?rev=41")).then(j=>{
-    const tracks = (j && j.tracks) || [];
-    if(tracks.length < 10) throw 0;
-    /* Never poison the same-day browser cache with placeholder artwork.
-       The next load should retry the server instead of preserving a broken row. */
-    if(!tracks.every(t=>String(t.art||"").trim())) throw 0;
-    lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
-    applyDaily(tracks, "live");
-  }).catch(()=>{});
+  // The server returns the latest verified recovery snapshot if live sources fail.
+  fetch("/api/top50?d=" + todayUTC() + "&rev=42",
+    {cache:"no-store",headers:{"Cache-Control":"no-cache"}})
+    .then(r=>{ if(!r.ok) throw 0; return r.json(); })
+    .then(j=>{
+      const tracks = (j && j.tracks) || [];
+      if(tracks.length !== 50) throw 0;
+      const fresh = j.updated === todayUTC() && !j.fallback;
+      /* Preserve yesterday's verified rank/tenure without calling it today's.
+         Only fully decorated fresh results may be kept as today's browser cache. */
+      if(fresh && tracks.every(t=>String(t.art||"").trim()))
+        lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks}));
+      applyDaily(tracks, fresh ? "live" : "backup");
+    })
+    .catch(()=>{ if(!hasFreshCache) setChartStatus({}, "fail"); });
 }
 function syncAutoChart(feedId){
   feedId = feedId || S.feed || "global";

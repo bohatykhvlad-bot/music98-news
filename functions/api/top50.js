@@ -922,14 +922,65 @@ function withTimeout(promise, ms) {
   ]);
 }
 
+/* Reject the 2026-10-01 failure mode before serving a poisoned daily KV
+   payload: rows that were already established cannot all return to day one.
+   Compare only with a verified backup from the same or preceding chart day. */
+function cachedTenureRegressed(payload, backup) {
+  const current = backup && backup.current;
+  if (!payload || !current || !Array.isArray(current.tracks)) return false;
+  if (String(payload.updated || "") < String(current.updated || "")) return true;
+  const reference = payload.updated === current.updated ? backup.previous : current;
+  if (!reference || !Array.isArray(reference.tracks)) return false;
+  const gap = Math.round((Date.parse(payload.updated + "T00:00:00Z") -
+    Date.parse(reference.updated + "T00:00:00Z")) / 86400000);
+  if (gap !== 0 && gap !== 1) return false;
+  const old = new Map(reference.tracks.map(t => [tenureKey(t.title, t.artist), t]));
+  const established = (payload.tracks || []).map(t => ({t, prev:old.get(tenureKey(t.title,t.artist))}))
+    .filter(x => x.prev && Number(x.prev.weeks) >= 2);
+  if (established.length < 10) return false;
+  const broken = established.filter(({t,prev}) =>
+    Number(t.weeks) < Number(prev.weeks) + gap);
+  return broken.length >= Math.ceil(established.length * 0.25);
+}
+
+/* This checked-in snapshot is updated only after the live chart passes its
+   tenure audit. Unlike the 17 September baked seed, it preserves an actual
+   recent ranking, arrow positions and cumulative day counts. */
+async function verifiedBackupTop50(env, origin, backup) {
+  const snap = backup && backup.current;
+  if (!snap || !Array.isArray(snap.tracks) || snap.tracks.length !== SIZE ||
+      !/^20\\d{2}-\\d{2}-\\d{2}$/.test(String(snap.updated || ""))) return null;
+  const baked = await readSeed(env, origin, "top50.json");
+  const known = new Map(((baked && baked.tracks) || [])
+    .map(t => [tenureKey(t.title,t.artist), t]));
+  const tracks = snap.tracks.map((t,i) => {
+    const prev = known.get(tenureKey(t.title,t.artist)) || {};
+    return {
+      rank: i+1, title: t.title, artist: t.artist,
+      weeks: Math.max(1, Number(t.weeks) || 1), delta: String(t.delta ?? "0"),
+      url: prev.url || "", prev: prev.prev || "", year: prev.year || "", art: ""
+    };
+  });
+  await applyNames(env, tracks, origin);
+  await applyCovers(env, tracks, origin);
+  await applyLoudness(env, tracks, origin);
+  tracks.forEach(t => { t.url = appleAff(t.url); if (!isApplePreview(t.prev)) t.prev = ""; });
+  return {
+    updated: snap.updated, launch:"2026-09-17", week:Number(snap.week)+1,
+    rev:"verified-backup-v34", fallback:"verified-snapshot", tracks,
+    covers:{ missing:tracks.filter(t=>!t.art).length }
+  };
+}
+
 /* Последний удачный сбор лежит в памяти по ключу дня. Если сегодняшняя сборка не
    удалась, показать вчерашний настоящий чарт честнее, чем запечённый снапшот первого
    дня: в нём и места, и счётчик дней давно не те (он писался 17.09). */
-async function lastGood(env) {
+async function lastGood(env, backup) {
   if (!env || !env.DESK) return null;
   try {
     const v = await env.DESK.get(TOP50_KV, { type: "json" });
-    if (v && Array.isArray(v.tracks) && v.tracks.length) return v;
+    if (v && Array.isArray(v.tracks) && v.tracks.length === SIZE &&
+        !cachedTenureRegressed(v, backup)) return v;
   } catch {}
   return null;
 }
@@ -980,43 +1031,56 @@ async function decorateCachedTop50(env, payload, origin) {
   return payload;
 }
 
+/* Prefer the newest proven chart: a healthy KV chart, or the checked-in
+   snapshot if KV was reset or its only chart is older. Never fall back to the
+   immutable 17 September launch chart and silently label it as current. */
+async function bestVerifiedFallback(env, origin, backup) {
+  const good = await lastGood(env, backup);
+  const savedDay = backup && backup.current && backup.current.updated || "";
+  if (good && String(good.updated) >= savedDay)
+    return decorateCachedTop50(env, good, origin);
+  try {
+    const saved = await verifiedBackupTop50(env, origin, backup);
+    if (saved) return saved;
+  } catch {}
+  return good ? decorateCachedTop50(env, good, origin) : null;
+}
+
 export async function onRequestGet({ env, request }) {
   const today = new Date().toISOString().slice(0, 10);
   const origin = new URL(request.url).origin;
+  const backup = await readSeed(env, origin, "chart-tenure-backup.json");
   if (env && env.DESK) {
     try {
       const cached = await env.DESK.get(TOP50_KV, { type: "json" });
-      if (cached && cached.updated === today && Array.isArray(cached.tracks) && cached.tracks.length) {
+      if (cached && cached.updated === today && Array.isArray(cached.tracks) &&
+          cached.tracks.length === SIZE && !cachedTenureRegressed(cached, backup)) {
         return top50Response(await decorateCachedTop50(env, cached, origin));
       }
     } catch {}
   }
   try {
     const payload = await withTimeout(buildTop50(origin, env), 14000);
+    const activeSources = Object.values(payload.sources || {})
+      .filter(n => Number(n) >= 10).length;
+    if (!Array.isArray(payload.tracks) || payload.tracks.length !== SIZE ||
+        activeSources < 2) throw new Error("incomplete chart sources");
     const memory = {};
     payload.tracks = await applyTenure(env, payload.tracks, memory, origin);
     payload.memory = memory;
     payload.arrows = arrowCheck(payload.tracks);
-    if (env && env.DESK && payload.tracks && payload.tracks.length) {
+    if (payload.arrows && payload.arrows.ok === false ||
+        cachedTenureRegressed(payload, backup))
+      throw new Error("chart tenure continuity failed");
+    if (env && env.DESK) {
       try { await env.DESK.put(TOP50_KV, JSON.stringify(payload)); } catch {}
     }
-    if (payload.tracks && payload.tracks.length) return top50Response(payload);
+    return top50Response(payload);
   } catch (err) {
-    const good = await lastGood(env);
-    if (good) return top50Response(await decorateCachedTop50(env, good, origin));
-    const baked = await bakedWithCovers(env, await bakedTop50(request), origin);
-    if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
-    return new Response(JSON.stringify({ error: "rebuild_failed", detail: String(err) }), {
-      status: 502,
-      headers: { "Content-Type": "application/json" },
+    const fallback = await bestVerifiedFallback(env, origin, backup);
+    if (fallback) return top50Response(fallback);
+    return new Response(JSON.stringify({error:"chart_temporarily_unavailable"}), {
+      status:503, headers:{"Content-Type":"application/json","Cache-Control":"no-store"}
     });
   }
-  const good = await lastGood(env);
-  if (good) return top50Response(await decorateCachedTop50(env, good, origin));
-  const baked = await bakedWithCovers(env, await bakedTop50(request), origin);
-  if (baked && Array.isArray(baked.tracks) && baked.tracks.length) return top50Response(baked);
-  return new Response(JSON.stringify({ error: "rebuild_failed" }), {
-    status: 502,
-    headers: { "Content-Type": "application/json" },
-  });
 }
