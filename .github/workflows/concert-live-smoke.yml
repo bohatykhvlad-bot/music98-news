@@ -81,14 +81,18 @@ jobs:
                   assert '<link rel="canonical" href="https://music98.news/concerts">' in html
                   direct_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',html)
                   assert direct_src
-                  assert direct_src.group(1)=="/concerts-app.js?v=20261002-03"
+                  assert direct_src.group(1)=="/concerts-app.js?v=20261002-07"
                   _,_,home=get("https://music98.news/")
                   home_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',home)
                   assert home_src and direct_src.group(1)==home_src.group(1)
                   _,jh,js=get("https://music98.news"+direct_src.group(1))
-                  assert 'applyConcertArt(img,e.image||e.artistImage||"/logo.png",720)' in js
-                  assert 'applyConcertArt(img,item.image||"/logo.png",256)' in js
-                  assert "function browserResampleConcertArt(img,side)" in js
+                  assert 'applyConcertArt(img,originalArt,"event")' in js
+                  assert re.search(r"(?m)^\\s+grid\\.append\\(img,main\\);\\s*\\n\\s+body\\.appendChild\\(grid\\);",js)
+                  assert "dragging.\\\\n  grid.append" not in js
+                  assert 'root.className="pop-card"' in js
+                  assert 'img.className="pop-thumb"' in js
+                  assert 'applyConcertArt(img,item.image||"/logo.png","icon")' in js
+                  assert "function browserResampleConcertArt(img,preset)" in js
                   assert 'imageSmoothingQuality="high"' in js
                   assert "popupImage" not in js
                   assert "compactSameConcertImage" not in js
