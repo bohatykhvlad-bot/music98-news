@@ -439,16 +439,20 @@ test("location strings collapse duplicate city, region and country in both popup
   assert.equal(placeLine(singapore),"National Stadium · Singapore");
   assert.equal(placeLine({
     venue:"Moda Center",city:"Portland",state:"Oregon",country:"United States Of America"
-  }),"Moda Center · Portland · Oregon · United States Of America");
+  }),"Moda Center · Portland · Oregon · USA");
   assert.equal(placeLine({
     venue:"The Forum",city:"London",state:"",country:"United Kingdom"
   }),"The Forum · London · United Kingdom");
+  assert.equal(placeLine({
+    venue:"SoFi Stadium",city:"Inglewood",state:"California",country:"United States of America",countryCode:"US"
+  }),"SoFi Stadium · Inglewood · California · USA");
+  assert.equal(locationLine({city:"Toronto",state:"Ontario",country:"Canada",countryCode:"CA"}),"Toronto · Ontario · Canada");
   assert.equal(placeLine({
     venue:"National Stadium",city:"  Singapore  ",state:"",country:"Singapore"
   }),"National Stadium · Singapore");
   assert.equal(locationLine({
     city:" New  York ",state:"new york",country:"United States"
-  }),"New York · United States");
+  }),"New York · USA");
   assert.match(app,/place\.textContent=placeLine\(e\)/);
   assert.match(app,/place\.textContent=locationLine\(first\)/);
 });
