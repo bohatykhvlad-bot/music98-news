@@ -21,6 +21,15 @@ try:
  print("LABEL_DOWNLOADS",len(files or []),flush=True)
  for file in files or []:
   try:
-   with Image.open(file) as im: print("LABEL_IMAGE",file,im.size,im.format,flush=True)
+   with Image.open(file) as im:
+    print("LABEL_IMAGE",file,im.size,im.format,flush=True)
+    if "Approved Photo 2025" in file:
+     import base64
+     from pathlib import Path
+     im.thumbnail((750,900))
+     from io import BytesIO
+     b=BytesIO();im.convert("RGB").save(b,"JPEG",quality=74)
+     Path(".editorial/ella-triple-tigers-approved-2025-preview.b64").write_text(base64.b64encode(b.getvalue()).decode(),encoding="ascii")
+     print("APPROVED_PREVIEW_READY",flush=True)
   except Exception:print("LABEL_FILE",file,flush=True)
 except Exception as exc:print("LABEL_FOLDER_READ_FAILED",str(exc)[:180],flush=True)
