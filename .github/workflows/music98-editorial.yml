@@ -28,6 +28,9 @@ jobs:
       - name: Prepare environment
         run: |
           printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+      - name: Inspect source-cover browser resampling eligibility
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[concert-cors-probe]') }}
+        run: python scripts/diagnose_ticketmaster_cover_cors.py
       - name: Check runner
         run: |
           python --version
