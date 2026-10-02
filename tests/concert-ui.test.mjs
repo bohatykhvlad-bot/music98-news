@@ -597,6 +597,6 @@ test("Near me lists up to 30 artists and description/status share rank alignment
   assert.equal(status?.[1],desc?.[1]);
   assert.equal(disclosure?.[1],desc?.[1]);
   const area=app.slice(app.indexOf("async function loadArea("),app.indexOf("\nfunction geoPositionOnce("));
-  assert.match(area,/setStatus\(data\.partial && total>events\.length/);
+  assert.match(area,/setStatus\(events\.length \? "Ranked by number of upcoming concerts"/);
   assert.doesNotMatch(area,/loaded concerts of/);
 });
