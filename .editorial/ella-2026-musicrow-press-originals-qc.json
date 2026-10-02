@@ -1,0 +1,38 @@
+[
+  {
+    "key": "musicrow_2026_acm",
+    "url": "https://music-row-website-assets.s3.amazonaws.com/wp-content/uploads/2026/05/ELLA-LANGLEY-ACM-ARTIST-SONGWRITER-AWARD-copy-scaled.jpeg",
+    "size": [
+      2560,
+      2556
+    ],
+    "bytes": 3790109
+  },
+  {
+    "key": "musicrow_2026_april",
+    "url": "https://musicrow.com/wp-content/uploads/2026/04/Ella-Langley-copy-scaled.jpeg",
+    "size": [
+      2560,
+      2480
+    ],
+    "bytes": 3152765
+  },
+  {
+    "key": "musicrow_2026_feb",
+    "url": "https://musicrow.com/wp-content/uploads/2026/02/Ella-Langley.-Photo-Caylee-Robillard-FB-scaled.jpg",
+    "size": [
+      2560,
+      1557
+    ],
+    "bytes": 1702275
+  },
+  {
+    "key": "musicrow_2026_feb2",
+    "url": "https://musicrow.com/wp-content/uploads/2026/02/Ella-Langley.-Photo-Caylee-Robillard-scaled.jpeg",
+    "size": [
+      2560,
+      2305
+    ],
+    "bytes": 2470471
+  }
+]
