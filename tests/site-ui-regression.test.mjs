@@ -35,7 +35,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle version is bumped after original-image transformation update",()=>{
-  assert.match(page,/concerts-app\.js\?v=20261002-02/);
+  assert.match(page,/concerts-app\.js\?v=20261002-03/);
 });
 
 
