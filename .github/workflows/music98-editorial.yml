@@ -88,6 +88,15 @@ jobs:
       - name: Inspect Auburn first-party 2026 Ella concert images
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-auburn-photos-qc]') }}
         run: python scripts/ella_auburn_2026_primary_stage_assets_qc.py
+      - name: Inspect Caylee photographer-attributed Ella Ryman hi-res concert originals
+        if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[ella-ryman-originals-qc]') }}
+        run: |
+          python -m pip install --quiet Pillow
+          python scripts/ella_caylee_ryman_all_originals_qc.py
+          git config user.name "music98 concert photo QC"
+          git config user.email "editorial@music98.news"
+          git add .editorial/ella-ryman-caylee-originals-wide-preview.b64 .editorial/ella-ryman-caylee-originals.json
+          git diff --cached --quiet || (git commit -m "Review native Ella Ryman images at true article framing" && git push)
       - name: Stage Leon Bridges cover visual QC
         if: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[leon-cover-qc]') }}
         run: |
