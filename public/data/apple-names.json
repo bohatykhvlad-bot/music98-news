@@ -30,8 +30,8 @@
   "babylon|taylorswift": {
     "title": "Babylon",
     "artist": "Taylor Swift",
-    "url": "https://music.apple.com/us/album/6814995859?i=6814996163",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/14/4b/6a/144b6aa7-a2af-41a7-fd2f-8e8aac953c41/mzaf_15506372320552650974.plus.aac.p.m4a",
+    "url": "https://music.apple.com/us/album/6814997249?i=6814997429",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/58/f2/54/58f254a3-25aa-0542-bf46-4627c8f2e06b/mzaf_5527018976386911832.plus.aac.p.m4a",
     "year": "2026"
   },
   "backtofriends|sombr": {
@@ -100,8 +100,8 @@
   "cleveland|taylorswift": {
     "title": "Cleveland!",
     "artist": "Taylor Swift",
-    "url": "https://music.apple.com/us/album/6814995859?i=6814996161",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2e/6a/66/2e6a6692-b534-7a7a-960b-f03971890156/mzaf_5159890340173357660.plus.aac.p.m4a",
+    "url": "https://music.apple.com/us/album/6814997249?i=6814997427",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/39/42/5b/39425b91-27b1-4b37-2f57-6f704fa5d8a6/mzaf_158326623628930700.plus.aac.p.m4a",
     "year": "2026"
   },
   "daidai|shakira": {
@@ -146,6 +146,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7c/2b/3a/7c2b3a60-f0b7-3e59-f715-af52e1f2f36d/mzaf_975280973131817811.plus.aac.p.m4a",
     "year": "2025"
   },
+  "greatexpectation|siennaspiro": {
+    "title": "Great Expectation",
+    "artist": "SIENNA SPIRO",
+    "url": "https://music.apple.com/us/album/6769552402?i=6769552411",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/40/c1/d9/40c1d9be-697c-b5ee-e8ae-73fef69df41b/mzaf_7009964384917073301.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "hatethatimadeyouloveme|arianagrande": {
     "title": "hate that i made you love me",
     "artist": "Ariana Grande",
@@ -165,13 +172,6 @@
     "artist": "Ella Langley & Morgan Wallen",
     "url": "https://music.apple.com/us/album/1895158676?i=6763091996",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/57/33/a4/5733a427-883b-586d-d90e-281c91d9ef4e/mzaf_201398670995826930.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "ijustmight|brunomars": {
-    "title": "I Just Might",
-    "artist": "Bruno Mars",
-    "url": "https://music.apple.com/us/album/1866732792?i=1866732800",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/ef/58/86ef584b-cb46-43df-12e3-fce4b436688c/mzaf_10081886156675578892.plus.aac.p.m4a",
     "year": "2026"
   },
   "iknewitiknewyou|taylorswift": {
@@ -291,6 +291,13 @@
     "artist": "Olivia Dean",
     "url": "https://music.apple.com/us/album/1817609404?i=1817609507",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b3/0a/c0/b30ac06f-1b78-f579-8e72-e2fc9eb3a2c8/mzaf_7319723033619206839.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "somethingtolose|stellalefty": {
+    "title": "Something To Lose",
+    "artist": "STELLA LEFTY & Vincent Mason",
+    "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7c/cd/dc/7ccddc8d-4a7b-3d29-e57a-d656923f8a25/mzaf_6248843394382590578.plus.aac.p.m4a",
     "year": "2026"
   },
   "stupidsong|oliviarodrigo": {

@@ -1,16 +1,15 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-02T01:43:46.463Z",
+  "updatedAt": "2026-10-02T08:46:09.613Z",
   "chartUpdated": "2026-10-02",
-  "chartRev": "all-five-sources-v34",
+  "chartRev": "all-five-sources-v35-spotify50",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 24,
-    "apple-chart": 24,
-    "previous-audit": 1,
-    "deezer": 1
+    "apple-feed": 26,
+    "apple-chart": 23,
+    "previous-audit": 1
   },
   "entries": {
     "ahha|bcardi": {
@@ -30,7 +29,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:21.852Z",
+      "checkedAt": "2026-10-02T08:45:53.935Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -111,7 +110,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:21.853Z",
+      "checkedAt": "2026-10-02T08:45:54.576Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -147,7 +146,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:09.616Z",
+      "checkedAt": "2026-10-02T08:45:49.418Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -243,7 +242,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:58.903Z",
+      "checkedAt": "2026-10-02T08:45:40.343Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -326,31 +325,31 @@
       "identity": "babylon|swifttaylor",
       "title": "Babylon",
       "artist": "Taylor Swift",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f1/a3/c7/f1a3c711-ff60-caee-2314-37c0dd3f7616/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
       "provider": "apple-feed",
       "releaseTitle": "The Life of a Showgirl: The Encore",
       "releaseArtist": "Taylor Swift",
       "releaseDate": "2026-09-24T07:00:00Z",
       "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/6814995859?i=6814996163",
-      "collectionId": "6814995859",
-      "trackId": "6814996163",
+      "url": "https://music.apple.com/us/album/6814997249?i=6814997429",
+      "collectionId": "6814997249",
+      "trackId": "6814997429",
       "confidence": 99,
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:06.307Z",
+      "checkedAt": "2026-10-02T08:45:47.347Z",
       "alternatives": [
         {
           "provider": "apple-feed",
-          "id": "6814996163",
-          "collectionId": "6814995859",
+          "id": "6814997429",
+          "collectionId": "6814997249",
           "releaseTitle": "The Life of a Showgirl: The Encore",
           "releaseArtist": "Taylor Swift",
           "releaseDate": "2026-09-24T07:00:00Z",
           "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f1/a3/c7/f1a3c711-ff60-caee-2314-37c0dd3f7616/26UM1IM21436.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6814995859?i=6814996163",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6814997249?i=6814997429",
           "score": 1270,
           "confidence": 99,
           "consensus": 1,
@@ -375,7 +374,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:16.662Z",
+      "checkedAt": "2026-10-02T08:46:05.811Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -456,7 +455,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:44.343Z",
+      "checkedAt": "2026-10-02T08:45:31.407Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -488,11 +487,11 @@
       "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
       "collectionId": "1440650852",
       "trackId": "1440650961",
-      "confidence": 98,
-      "score": 1120,
-      "consensus": 2,
+      "confidence": 96,
+      "score": 880,
+      "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:35.355Z",
+      "checkedAt": "2026-10-02T08:46:04.520Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -504,9 +503,9 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/73/08/1a/73081a96-0f7c-b5f8-2757-5c17fb714323/12UMGIM31899.rgb.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
-          "score": 1120,
-          "confidence": 98,
-          "consensus": 2,
+          "score": 880,
+          "confidence": 96,
+          "consensus": 1,
           "earliestReleaseYear": 2012
         },
         {
@@ -519,9 +518,9 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/73/08/1a/73081a96-0f7c-b5f8-2757-5c17fb714323/12UMGIM31899.rgb.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
-          "score": 995,
-          "confidence": 98,
-          "consensus": 2,
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
           "earliestReleaseYear": 2012
         },
         {
@@ -534,24 +533,9 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/bd/89/97/bd89971c-fc5a-47dd-5e90-a433d1b9e11f/12UMGIM31898.rgb.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1440804754?i=1440805856",
-          "score": 995,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2012
-        },
-        {
-          "provider": "deezer",
-          "id": "37027991",
-          "collectionId": "3602971",
-          "releaseTitle": "Believe (Deluxe Edition)",
-          "releaseArtist": "Justin Bieber",
-          "releaseDate": "2012-06-19",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/312ece7b31fb86c7a13afd757e99437c/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/37027991",
-          "score": 940,
-          "confidence": 98,
-          "consensus": 2,
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
           "earliestReleaseYear": 2012
         }
       ]
@@ -561,7 +545,7 @@
       "title": "Be By You",
       "artist": "Luke Combs",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
+      "provider": "apple-chart",
       "releaseTitle": "The Way I Am",
       "releaseArtist": "Luke Combs",
       "releaseDate": "2026-02-13T12:00:00Z",
@@ -569,14 +553,14 @@
       "url": "https://music.apple.com/us/album/1862634688?i=1862634805",
       "collectionId": "1862634688",
       "trackId": "1862634805",
-      "confidence": 99,
-      "score": 1270,
+      "confidence": 96,
+      "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:07.839Z",
+      "checkedAt": "2026-10-02T08:45:47.346Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
+          "provider": "apple-chart",
           "id": "1862634805",
           "collectionId": "1862634688",
           "releaseTitle": "The Way I Am",
@@ -585,8 +569,38 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1862634688?i=1862634805",
-          "score": 1270,
-          "confidence": 99,
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "3838327301",
+          "collectionId": "917051721",
+          "releaseTitle": "Be By You",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-05-22",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/644133900f1391ee0a7e8f84c6572e3a/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3838327301",
+          "score": 670,
+          "confidence": 91,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1862634805",
+          "collectionId": "1862634688",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-02-13T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1862634688?i=1862634805",
+          "score": 645,
+          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -609,7 +623,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:49.141Z",
+      "checkedAt": "2026-10-02T08:45:34.257Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -645,7 +659,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:44.346Z",
+      "checkedAt": "2026-10-02T08:45:31.409Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -681,7 +695,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:58.904Z",
+      "checkedAt": "2026-10-02T08:45:40.345Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -717,7 +731,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:44.345Z",
+      "checkedAt": "2026-10-02T08:45:31.408Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -753,7 +767,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:21.853Z",
+      "checkedAt": "2026-10-02T08:45:54.576Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -776,31 +790,31 @@
       "identity": "cleveland|swifttaylor",
       "title": "Cleveland!",
       "artist": "Taylor Swift",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f1/a3/c7/f1a3c711-ff60-caee-2314-37c0dd3f7616/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
       "provider": "apple-feed",
       "releaseTitle": "The Life of a Showgirl: The Encore",
       "releaseArtist": "Taylor Swift",
       "releaseDate": "2026-09-24T07:00:00Z",
       "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/6814995859?i=6814996161",
-      "collectionId": "6814995859",
-      "trackId": "6814996161",
+      "url": "https://music.apple.com/us/album/6814997249?i=6814997427",
+      "collectionId": "6814997249",
+      "trackId": "6814997427",
       "confidence": 99,
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:09.617Z",
+      "checkedAt": "2026-10-02T08:45:49.419Z",
       "alternatives": [
         {
           "provider": "apple-feed",
-          "id": "6814996161",
-          "collectionId": "6814995859",
+          "id": "6814997427",
+          "collectionId": "6814997249",
           "releaseTitle": "The Life of a Showgirl: The Encore",
           "releaseArtist": "Taylor Swift",
           "releaseDate": "2026-09-24T07:00:00Z",
           "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f1/a3/c7/f1a3c711-ff60-caee-2314-37c0dd3f7616/26UM1IM21436.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6814995859?i=6814996161",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6814997249?i=6814997427",
           "score": 1270,
           "confidence": 99,
           "consensus": 1,
@@ -825,7 +839,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:45.862Z",
+      "checkedAt": "2026-10-02T08:45:32.828Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -921,7 +935,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:56.149Z",
+      "checkedAt": "2026-10-02T08:45:37.451Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -957,7 +971,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:57.702Z",
+      "checkedAt": "2026-10-02T08:45:39.251Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1023,7 +1037,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:58.904Z",
+      "checkedAt": "2026-10-02T08:45:42.668Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1047,7 +1061,7 @@
       "title": "Earrings",
       "artist": "Malcolm Todd",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
+      "provider": "apple-feed",
       "releaseTitle": "Sweet Boy",
       "releaseArtist": "Malcolm Todd",
       "releaseDate": "2024-04-05T12:00:00Z",
@@ -1055,14 +1069,14 @@
       "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
       "collectionId": "1738257523",
       "trackId": "1738257931",
-      "confidence": 98,
-      "score": 1010,
-      "consensus": 2,
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:06.307Z",
+      "checkedAt": "2026-10-02T08:45:47.346Z",
       "alternatives": [
         {
-          "provider": "apple-chart",
+          "provider": "apple-feed",
           "id": "1738257931",
           "collectionId": "1738257523",
           "releaseTitle": "Sweet Boy",
@@ -1071,39 +1085,9 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
-          "score": 1010,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1738257931",
-          "collectionId": "1738257523",
-          "releaseTitle": "Sweet Boy",
-          "releaseArtist": "Malcolm Todd",
-          "releaseDate": "2024-04-05T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "deezer",
-          "id": "2732302771",
-          "collectionId": "567736181",
-          "releaseTitle": "Sweet Boy",
-          "releaseArtist": "Malcolm Todd",
-          "releaseDate": "2024-04-05",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/bee99e8730b8fb1ad941bbe2607a5a99/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/2732302771",
-          "score": 830,
-          "confidence": 98,
-          "consensus": 2,
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
           "earliestReleaseYear": 2024
         }
       ]
@@ -1125,7 +1109,7 @@
       "score": 850,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:07.839Z",
+      "checkedAt": "2026-10-02T08:45:50.097Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1204,6 +1188,42 @@
         }
       ]
     },
+    "greatexpectation|siennaspiro": {
+      "identity": "greatexpectation|siennaspiro",
+      "title": "Great Expectation",
+      "artist": "SIENNA SPIRO",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f4/e5/61/f4e561f5-3e73-68c7-7ca4-295ac5a063ed/26UMGIM51351.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "Visitor (Deluxe)",
+      "releaseArtist": "SIENNA SPIRO",
+      "releaseDate": "2026-07-02T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6769552402?i=6769552411",
+      "collectionId": "6769552402",
+      "trackId": "6769552411",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-02T08:45:50.098Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "6769552411",
+          "collectionId": "6769552402",
+          "releaseTitle": "Visitor (Deluxe)",
+          "releaseArtist": "SIENNA SPIRO",
+          "releaseDate": "2026-07-02T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f4/e5/61/f4e561f5-3e73-68c7-7ca4-295ac5a063ed/26UMGIM51351.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6769552402?i=6769552411",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
     "hatethatimadeyouloveme|arianagrande": {
       "identity": "hatethatimadeyouloveme|arianagrande",
       "title": "hate that i made you love me",
@@ -1221,7 +1241,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:44.349Z",
+      "checkedAt": "2026-10-02T08:45:31.411Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1257,7 +1277,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:22.771Z",
+      "checkedAt": "2026-10-02T08:45:55.201Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1353,7 +1373,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:49.139Z",
+      "checkedAt": "2026-10-02T08:45:34.256Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1367,87 +1387,6 @@
           "url": "https://music.apple.com/us/album/1895158676?i=6763091996",
           "score": 1350,
           "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "ijustmight|brunomars": {
-      "identity": "ijustmight|brunomars",
-      "title": "I Just Might",
-      "artist": "Bruno Mars",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/46/bf/ed46bf4e-7cb9-965a-54f3-03059977fe6c/075679589293.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "The Romantic",
-      "releaseArtist": "Bruno Mars",
-      "releaseDate": "2026-01-09T08:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1866732792?i=1866732800",
-      "collectionId": "1866732792",
-      "trackId": "1866732800",
-      "confidence": 98,
-      "score": 1010,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-02T01:43:46.461Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1866732800",
-          "collectionId": "1866732792",
-          "releaseTitle": "The Romantic",
-          "releaseArtist": "Bruno Mars",
-          "releaseDate": "2026-01-09T08:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/46/bf/ed46bf4e-7cb9-965a-54f3-03059977fe6c/075679589293.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1866732792?i=1866732800",
-          "score": 1010,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "1866732800",
-          "collectionId": "1866732792",
-          "releaseTitle": "The Romantic",
-          "releaseArtist": "Bruno Mars",
-          "releaseDate": "2026-01-09T08:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/46/bf/ed46bf4e-7cb9-965a-54f3-03059977fe6c/075679589293.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1866732792?i=1866732800",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "3867905101",
-          "collectionId": "927507111",
-          "releaseTitle": "The Romantic",
-          "releaseArtist": "Bruno Mars",
-          "releaseDate": "2026-02-27",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/d68fc5f1f260273691180b9f4b77b354/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3867905101",
-          "score": 830,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "1869157139",
-          "collectionId": "1869157136",
-          "releaseTitle": "I Just Might - Single",
-          "releaseArtist": "Bruno Mars",
-          "releaseDate": "2026-01-13T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1c/14/0e/1c140ef6-b94a-1207-77d8-f0c94075bd8e/075679591296.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1869157136?i=1869157139",
-          "score": 725,
-          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -1470,7 +1409,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:03.845Z",
+      "checkedAt": "2026-10-02T08:45:42.667Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1551,7 +1490,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:16.662Z",
+      "checkedAt": "2026-10-02T08:45:50.099Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1587,7 +1526,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:45.863Z",
+      "checkedAt": "2026-10-02T08:45:32.831Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1623,7 +1562,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:49.139Z",
+      "checkedAt": "2026-10-02T08:45:34.255Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1643,7 +1582,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:51.491Z",
+      "checkedAt": "2026-10-02T08:45:41.401Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1709,7 +1648,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:13.221Z",
+      "checkedAt": "2026-10-02T08:45:48.779Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1790,7 +1729,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:44.351Z",
+      "checkedAt": "2026-10-02T08:45:32.829Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1826,7 +1765,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:56.146Z",
+      "checkedAt": "2026-10-02T08:45:37.450Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1922,7 +1861,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:28.137Z",
+      "checkedAt": "2026-10-02T08:45:58.141Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1988,7 +1927,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:44.350Z",
+      "checkedAt": "2026-10-02T08:45:31.411Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2002,42 +1941,6 @@
           "url": "https://music.apple.com/us/album/6792883860?i=6792884088",
           "score": 1270,
           "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "ohyeah|lacysteve": {
-      "identity": "ohyeah|lacysteve",
-      "title": "oh yeah?",
-      "artist": "Steve Lacy",
-      "art": "https://cdn-images.dzcdn.net/images/cover/c64458bda012cdf305dc92a07626a51d/1000x1000-000000-80-0-0.jpg",
-      "provider": "deezer",
-      "releaseTitle": "Oh yeah?",
-      "releaseArtist": "Steve Lacy",
-      "releaseDate": "2026-07-17",
-      "releaseClass": "album",
-      "url": "https://www.deezer.com/track/4151325372",
-      "collectionId": "1028123642",
-      "trackId": "4151325372",
-      "confidence": 91,
-      "score": 590,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-02T01:43:43.195Z",
-      "alternatives": [
-        {
-          "provider": "deezer",
-          "id": "4151325372",
-          "collectionId": "1028123642",
-          "releaseTitle": "Oh yeah?",
-          "releaseArtist": "Steve Lacy",
-          "releaseDate": "2026-07-17",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/c64458bda012cdf305dc92a07626a51d/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4151325372",
-          "score": 590,
-          "confidence": 91,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -2060,7 +1963,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:56.149Z",
+      "checkedAt": "2026-10-02T08:45:37.450Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2096,7 +1999,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:06.309Z",
+      "checkedAt": "2026-10-02T08:45:47.347Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2132,7 +2035,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:36.079Z",
+      "checkedAt": "2026-10-02T08:46:05.188Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2198,7 +2101,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:26.153Z",
+      "checkedAt": "2026-10-02T08:45:55.972Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2264,7 +2167,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:05.342Z",
+      "checkedAt": "2026-10-02T08:45:54.575Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2330,7 +2233,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:40.622Z",
+      "checkedAt": "2026-10-02T08:46:09.611Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2396,7 +2299,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:00.764Z",
+      "checkedAt": "2026-10-02T08:45:43.411Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2460,6 +2363,102 @@
         }
       ]
     },
+    "somethingtolose|leftymasonstellavincent": {
+      "identity": "somethingtolose|leftymasonstellavincent",
+      "title": "Something To Lose",
+      "artist": "STELLA LEFTY & Vincent Mason",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Is This Heaven? - EP",
+      "releaseArtist": "STELLA LEFTY",
+      "releaseDate": "2026-05-14T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+      "collectionId": "6766964604",
+      "trackId": "6766964605",
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-02T08:46:00.433Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6766964605",
+          "collectionId": "6766964604",
+          "releaseTitle": "Is This Heaven? - EP",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6766964605",
+          "collectionId": "6766964604",
+          "releaseTitle": "Is This Heaven? - EP",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6783994835",
+          "collectionId": "6783994651",
+          "releaseTitle": "Is This Heaven? (Extended)",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a5/bd/a9/a5bda9ec-a7d8-f812-442a-72a2a6158415/075679569011.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6783994651?i=6783994835",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4020643591",
+          "collectionId": "982409841",
+          "releaseTitle": "Is This Heaven?",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-15",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/30c36833c1fe5b5c398139a4622b65f4/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4020643591",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6796823831",
+          "collectionId": "6796823160",
+          "releaseTitle": "Long Way Home",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/4b/9b/ed4b9bb0-8670-db21-e48c-9e874a6dc3e1/075679562654.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6796823160?i=6796823831",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
     "stupidsong|oliviarodrigo": {
       "identity": "stupidsong|oliviarodrigo",
       "title": "stupid song",
@@ -2477,7 +2476,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:44.345Z",
+      "checkedAt": "2026-10-02T08:45:31.409Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2513,7 +2512,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:27.182Z",
+      "checkedAt": "2026-10-02T08:45:57.120Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2594,7 +2593,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:42:49.141Z",
+      "checkedAt": "2026-10-02T08:45:34.257Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2630,7 +2629,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:09.617Z",
+      "checkedAt": "2026-10-02T08:45:50.097Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2666,7 +2665,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:33.077Z",
+      "checkedAt": "2026-10-02T08:46:02.486Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2750,7 +2749,7 @@
       "title": "What You Need",
       "artist": "Tems",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c3/59/9a/c3599a96-fb7c-d4f3-c9ce-664128e4e94c/196873703305.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
+      "provider": "apple-feed",
       "releaseTitle": "Love Is A Kingdom",
       "releaseArtist": "Tems",
       "releaseDate": "2025-11-20T12:00:00Z",
@@ -2758,14 +2757,14 @@
       "url": "https://music.apple.com/us/album/1853635930?i=1853635937",
       "collectionId": "1853635930",
       "trackId": "1853635937",
-      "confidence": 98,
-      "score": 1010,
-      "consensus": 2,
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:12.688Z",
+      "checkedAt": "2026-10-02T08:45:50.098Z",
       "alternatives": [
         {
-          "provider": "apple-chart",
+          "provider": "apple-feed",
           "id": "1853635937",
           "collectionId": "1853635930",
           "releaseTitle": "Love Is A Kingdom",
@@ -2774,53 +2773,8 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c3/59/9a/c3599a96-fb7c-d4f3-c9ce-664128e4e94c/196873703305.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1853635930?i=1853635937",
-          "score": 1010,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "1853635937",
-          "collectionId": "1853635930",
-          "releaseTitle": "Love Is A Kingdom",
-          "releaseArtist": "Tems",
-          "releaseDate": "2025-11-20T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c3/59/9a/c3599a96-fb7c-d4f3-c9ce-664128e4e94c/196873703305.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1853635930?i=1853635937",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "deezer",
-          "id": "3661467392",
-          "collectionId": "858423922",
-          "releaseTitle": "Love Is A Kingdom",
-          "releaseArtist": "Tems",
-          "releaseDate": "2025-11-21",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/584f40f4d2b62b611a7ab8561b656ff3/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3661467392",
-          "score": 830,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "1882510088",
-          "collectionId": "1882510085",
-          "releaseTitle": "What You Need - Single",
-          "releaseArtist": "Tems",
-          "releaseDate": "2025-11-20T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ca/c1/b0/cac1b080-04fc-42bc-14fc-319a32b3daeb/196874183243.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1882510085?i=1882510088",
-          "score": 725,
-          "confidence": 94,
+          "score": 1270,
+          "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2025
         }
@@ -2843,7 +2797,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T01:43:33.078Z",
+      "checkedAt": "2026-10-02T08:46:02.486Z",
       "alternatives": [
         {
           "provider": "apple-feed",
