@@ -60,6 +60,15 @@ test("map uses only the daily verified market snapshot",()=>{
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
 
+test("map countries use a subtle neutral grey while water stays unchanged",()=>{
+  const palette=app.match(/function addTopographicRelief\(\)\{([\s\S]*?)\n\}\n\nfunction addLayers\(\)/);
+  assert.ok(palette,"map style adjustment function must exist");
+  assert.match(palette[1],/setPaintProperty\(id,"background-color","#eef1f2"\)/);
+  assert.match(palette[1],/setPaintProperty\(id,"fill-color","#eef1f2"\)/);
+  assert.match(palette[1],/setPaintProperty\(id,"fill-color","#dff4fa"\)/);
+  assert.match(palette[1],/setPaintProperty\(id,"line-color","#cfeaf2"\)/);
+});
+
 test("map has no custom minus or floating map status and native zoom-out resets filters",()=>{
   assert.equal(app.includes("resetMapBtn"),false);
   assert.equal(app.includes("map-status"),false);
