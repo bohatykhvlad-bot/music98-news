@@ -38,6 +38,7 @@
   --muted2:#8a969b; --faint:#c3ccd0; --body-text:#2b3438;
   --glass:rgba(255,255,255,.6); --glass-line:rgba(255,255,255,.55);
   --r:16px; --shadow:0 12px 34px rgba(15,45,55,.10);
+  --story-shadow:0 0 22px rgba(15,45,55,.14);
   --font:"Pretendard",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 /* desktop scale (owner: 100% felt oversized, 92-93% is the sweet spot between
@@ -161,7 +162,7 @@ main{position:relative;z-index:1}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
 
 /* hero — left cell matches the text column; photo fills and crops to the face */
-.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px;box-shadow:var(--story-shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .hero .cover{position:relative;aspect-ratio:16/9;min-height:0;height:auto;overflow:hidden;background:var(--card2)}
 #heroSlot:empty{min-height:300px}
 .hero .cover img,.card .cover img,.article .acover img,#articlePage .acover img,.rcard .rcover img{
@@ -183,7 +184,7 @@ main{position:relative;z-index:1}
 .hero h2{margin:0;font-size:clamp(21px,2.6vw,30px);line-height:1.18;letter-spacing:-.02em}
 .hero p{margin:0;color:var(--muted);font-size:15px}
 .hero .meta{margin-top:auto;padding-top:0;line-height:1}
-.hero:active,.hero:focus,.hero:focus-visible{border-color:var(--line);outline:none;box-shadow:var(--shadow)}
+.hero:active,.hero:focus,.hero:focus-visible{border-color:var(--line);outline:none;box-shadow:var(--story-shadow)}
 
 /* cards */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:18px}
@@ -204,6 +205,11 @@ main{position:relative;z-index:1}
    phase) - mid-scroll cards still clip at the section edge as before */
 /* compositor hint: the rail is the site's hot scroll surface - hinting
    its own layer keeps drag/momentum off the main-thread paint path */
+/* Give News and Releases equal shadow clearance on every desktop edge.
+   Negative outer margins preserve each card's existing alignment and rail layout. */
+@media (min-width:641px){
+  #tab-news #newsGrid,#tab-releases #relGrid{padding:20px 44px 20px 20px;margin:-20px 0 -20px -20px}
+}
 .rail{will-change:scroll-position}
 .rail::-webkit-scrollbar{display:none}
 .rail>*{scroll-snap-align:none}
@@ -225,11 +231,13 @@ main{position:relative;z-index:1}
 .rail.gliding .card:hover,.rail.gliding .rcard:hover{transform:none;box-shadow:none}
 /* gliding must not strip the GRABBED card either (inertia phase = still lifted) */
 .rail.gliding .card.grab,.rail.gliding .rcard.grab{transform:translateY(-4px)!important;box-shadow:var(--shadow)!important;border-color:var(--accent-dim)!important}
+.rail.gliding .card.grab{box-shadow:var(--story-shadow)!important}
 /* grabbed card: the CSS lift lives OUTSIDE .dragging/.gliding scoping and is
    !important - it must survive release + inertia (owner rule 2026-09-23):
    drop happens ONLY in JS when the cursor physically moves off the card */
 @media (hover:hover) and (pointer:fine){
   .card.grab,.rcard.grab{transform:translateY(-4px)!important;border-color:var(--accent-dim)!important;box-shadow:var(--shadow)!important}
+  .card.grab{box-shadow:var(--story-shadow)!important}
   /* smooth transition back on drop - but never during the gesture itself;
      the drop animates on the SAME curve as the lift (owner: release must
      not snap down faster than it rose) */
@@ -703,7 +711,7 @@ textarea{resize:vertical;min-height:64px}
   .nav-btn:hover:not(.active){background:var(--bg2);color:var(--text)}
   .chart-row:hover{background:var(--card2)}
   .rplay:hover{color:#03282b;transform:scale(1.07)}
-  .card:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
+  .card:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--story-shadow)}
   .hero:hover{border-color:var(--accent-dim)}
   .rcard:hover{transform:translateY(-4px);border-color:var(--accent-dim);box-shadow:var(--shadow)}
   .btn:hover{border-color:var(--accent-dim);color:var(--acc2)}
@@ -721,9 +729,9 @@ textarea{resize:vertical;min-height:64px}
   .rplay:hover{color:var(--acc2);transform:none}
   .chart-row.playing .rplay:hover,.chart-row.playing .rplay:active{color:#03282b;transform:none}
   .card:hover,.rcard:hover{transform:none;border-color:var(--line);box-shadow:none}
-  .hero:hover{transform:none;border-color:var(--line);box-shadow:var(--shadow)}
+  .hero:hover{transform:none;border-color:var(--line);box-shadow:var(--story-shadow)}
   .card:active,.rcard:active{border-color:var(--line);transform:none;box-shadow:none}
-  .hero:active{border-color:var(--line);transform:none;box-shadow:var(--shadow)}
+  .hero:active{border-color:var(--line);transform:none;box-shadow:var(--story-shadow)}
 }
 @media (max-width:640px){
   /* Mobile chart: the footer status label is intentionally not displayed. */
