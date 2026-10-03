@@ -325,3 +325,11 @@ test("major card surfaces share one centered shadow across sections",()=>{
   assert.ok(padTop-4>=22,"shadow must fit above cards lifted 4px");
   assert.ok(padBottom>=22&&padLeft>=22,"bottom and left shadows must not be clipped");
 });
+
+
+test("subscribe email focus does not retain a cyan mouse-focus halo",()=>{
+  assert.match(page,/\.sub-in input\{[^}]*background:#fff;box-shadow:none;outline:none;transition:none/);
+  assert.match(page,/\.sub-in input:focus\{border-color:var\(--line\);box-shadow:none;outline:none\}/);
+  assert.match(page,/\.sub-in input:focus-visible\{outline:2px solid var\(--accent\);outline-offset:2px\}/);
+  assert.doesNotMatch(page,/\.sub-in input:focus,\.sub-in input:focus-visible\{[^}]*box-shadow/);
+});
