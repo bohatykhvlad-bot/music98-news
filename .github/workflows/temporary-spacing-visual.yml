@@ -1,0 +1,84 @@
+name: Temporary section spacing visual check
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-spacing-visual.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Render actual page styles in a browser with four representative sections
+        shell: bash
+        run: |
+          node <<'JS'
+          const fs=require('fs');
+          const page=fs.readFileSync('public/index.html','utf8');
+          const css=page.match(/<style>([\s\S]*?)<\/style>/i)?.[1];
+          const concerts=fs.readFileSync('public/concerts-app.js','utf8');
+          const c=concerts.match(/const CONCERTS_CSS=("(?:[^"\\]|\\.)*");/);
+          if(!css||!c)throw Error('CSS_EXTRACT_FAILED');
+          const concertCSS=JSON.parse(c[1]);
+          const fixture=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}
+          body{padding-top:0!important} .spacing-panel{margin-bottom:12px!important}
+          .spacing-panel .hero{max-height:165px} .spacing-panel .hero .cover{height:160px;min-height:0;aspect-ratio:auto}
+          .spacing-panel .hero .cover img{display:none} .spacing-panel .hero .body{height:160px}
+          .spacing-panel .card{height:105px} .spacing-panel .card .cover{height:65px;aspect-ratio:auto}
+          .spacing-panel .chart{height:85px;min-height:85px}
+          .spacing-panel .rail{height:160px} 
+          .spacing-panel .rail .card .body{padding:4px}
+          .spacing-panel .rail .card p{display:none}
+          .visual-label{display:none}
+          </style></head><body>
+          <main class="wrap">
+            <section class="tab active spacing-panel" id="tab-news"><div class="hd"><h1 class="hd-t">Latest stories</h1></div><div id="heroSlot"><div class="hero"><div class="cover" style="background:#e5eded"></div><div class="body"><h2>Feature story</h2><p>News example</p></div></div></div></section>
+            <section class="tab active spacing-panel" id="tab-releases"><div class="hd"><h1 class="hd-t">Albums, EPs &amp; singles</h1></div><div class="rail-wrap"><div class="rail grid-rail" id="relGrid"><a class="card square"><div class="cover" style="background:#d9e9e9"></div><div class="body"><h3>Album example</h3></div></a></div></div></section>
+            <section class="tab active spacing-panel" id="tab-charts"><div class="hd"><h1 class="hd-t">Daily Top 50</h1></div><div class="chart" id="chartList" style="background:#e5eded"></div></section>
+            <section class="tab active spacing-panel" id="tab-concerts"><music98-concerts id="concertFixture"></music98-concerts></section>
+          </main>
+          <pre id="metrics" style="display:none"></pre>
+          <script>
+          const shadow=document.getElementById('concertFixture').attachShadow({mode:'open'});
+          shadow.innerHTML='<style>'+ ${JSON.stringify(concertCSS)} +'</style><main class="wrap"><section class="hero"><div><h1>Concerts Near You</h1></div></section><div class="controls"><div class="search-wrap"><input class="city-input" placeholder="Search city or artist"></div></div></main>';
+          function rect(s,root=document){return root.querySelector(s).getBoundingClientRect()}
+          const round=x=>Math.round(x*100)/100;
+          const val={
+           viewport:innerWidth,
+           news:round(rect('#heroSlot .hero').top-rect('#tab-news .hd').bottom),
+           releases:round(rect('#relGrid .card').top-rect('#tab-releases .hd').bottom),
+           chart:round(rect('#chartList').top-rect('#tab-charts .hd').bottom),
+           concerts:round(rect('.controls',shadow).top-rect('.hero',shadow).bottom),
+           newsX:round(rect('#heroSlot .hero').left),releaseX:round(rect('#relGrid .card').left)
+          };
+          document.getElementById('metrics').textContent=JSON.stringify(val);
+          </script>
+          </body></html>`;
+          fs.writeFileSync('/tmp/m98-spacing.html',fixture);
+          JS
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$BROWSER"
+          for WIDTH in 1400 820 600; do
+            "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size="$WIDTH,1250" --dump-dom file:///tmp/m98-spacing.html > "/tmp/m98-$WIDTH.html" 2>/tmp/m98-chrome.log
+            WIDTH="$WIDTH" node <<'JS'
+          const fs=require('fs');
+          const s=fs.readFileSync('/tmp/m98-'+process.env.WIDTH+'.html','utf8');
+          const m=s.match(/<pre id="metrics"[^>]*>([^<]+)<\/pre>/);
+          if(!m)throw Error('BROWSER_METRICS_MISSING');
+          const data=JSON.parse(m[1].replace(/&quot;/g,'"'));
+          const values=['news','releases','chart','concerts'].map(k=>data[k]);
+          if(values.some(x=>Math.abs(x-12)>1))throw Error('VISIBLE_GAPS_DIFFER '+JSON.stringify(data));
+          console.log('VISUAL_GEOMETRY_PASS '+JSON.stringify(data));
+          JS
+          done
+          "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size="1100,1170" --screenshot=/tmp/m98-spacing.png file:///tmp/m98-spacing.html >/dev/null 2>/tmp/m98-chrome.log
+          python3 - <<'PY'
+          import base64
+          from pathlib import Path
+          img=Path('/tmp/m98-spacing.png').read_bytes()
+          print('VISUAL_SCREENSHOT_BYTES',len(img))
+          print('VISUAL_SCREENSHOT_B64='+base64.b64encode(img).decode())
+          PY
