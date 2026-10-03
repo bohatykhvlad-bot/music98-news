@@ -430,12 +430,14 @@ test("map popup stays above the desktop Search this area pill with a 14px gap",(
   assert.match(app,/map\.easeTo\(\{center:newCenter,duration:280\}\)/,"visibility pan never changes zoom");
 });
 
-test("artist dates have TTL, partial-result feedback and stale-response guard",()=>{
+test("artist dates have TTL, reader-facing partial status and stale-response guard",()=>{
   assert.match(app,/ARTIST_EVENT_CACHE_MS=5\*60\*1000/);
   assert.match(app,/Date\.now\(\)-cached\.at<ARTIST_EVENT_CACHE_MS/);
   assert.match(app,/partial:!!payload\?\.partial/);
   assert.match(app,/requestId!==areaRequestSeq \|\| expandedKey!==key \|\| activeMode!==\"artist\"/);
-  assert.match(app,/Showing \"\+events\.length\+\" loaded dates of \"\+result\.total/);
+  assert.match(app,/result\.partial && result\.total>events\.length/);
+  assert.match(app,/Showing the nearest upcoming concerts · /);
+  assert.doesNotMatch(app,/loaded dates of|Ticketmaster results ·/);
 });
 
 test("concert feedback and keyboard focus stay in the results panel",()=>{
