@@ -35,7 +35,7 @@ test("chart artwork is server-audited and has no browser point-fix table",()=>{
 });
 
 test("concert bundle serves complete mobile and desktop map concert popups",()=>{
-  assert.ok(page.includes("concerts-app.js?v=20261003-29"));
+  assert.ok(page.includes("concerts-app.js?v=20261003-30"));
 });
 
 
@@ -288,4 +288,11 @@ test("scrolling glass header keeps its existing fade with full-width straight ge
   assert.match(page,/\.topbar\.is-melting \.topbar-glass\{transition:opacity \.48s ease\}/);
   assert.match(page,/function setHeaderAway\(away\)\{/);
   assert.match(page,/\.topbar-in\{[^}]*grid-template-columns:1fr auto 1fr/);
+});
+
+test("chart and concerts pages never display technical source or partial-fetch diagnostics",()=>{
+  const concerts=readFileSync(new URL("../public/concerts-app.js",import.meta.url),"utf8");
+  assert.doesNotMatch(page,/chartSourceNotice|Waiting for all five ranking sources|Showing the latest verified chart while today/);
+  assert.doesNotMatch(concerts,/loaded dates of|Ticketmaster results ·/);
+  assert.match(concerts,/Showing the nearest upcoming concerts ·/);
 });
