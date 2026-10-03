@@ -229,11 +229,13 @@ test("mobile chart reclaims arrow space without shrinking artwork or playback",(
 });
 
 
-test("the UI insists on all five full sources and verified Spotify metadata",()=>{
+test("the UI requires five full sources and verified Spotify metadata without technical diagnostics",()=>{
  assert.match(page,/j.complete === true/);
  assert.match(page,/Number\(j.sources\?\.\[k\]\)===50/);
  assert.match(page,/!!j.sourceDates\?\.S && !!j.spotifyFingerprint/);
- assert.match(page,/Last complete chart:/);
+ assert.doesNotMatch(page,/Last complete chart:/);
+ assert.match(page,/else if\(tag === "backup"\) txt = ""/);
+ assert.match(page,/j\.updated === todayUTC\(\) && !j\.fallback && j\.complete === true/);
 });
 
 test("chart ticker scrolls only clipped text of the currently playing row",()=>{
