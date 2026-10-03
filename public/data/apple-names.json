@@ -34,13 +34,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/58/f2/54/58f254a3-25aa-0542-bf46-4627c8f2e06b/mzaf_5527018976386911832.plus.aac.p.m4a",
     "year": "2026"
   },
-  "backtofriends|sombr": {
-    "title": "back to friends",
-    "artist": "sombr",
-    "url": "https://music.apple.com/us/album/1786481196?i=1786481197",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d7/63/7d/d7637dec-cf2d-1455-3398-f1a6340359d0/mzaf_88927986796632454.plus.aac.p.m4a",
-    "year": "2024"
-  },
   "bbywow|karolg": {
     "title": "BbY WOW",
     "artist": "KAROL G, Judeline & rusowsky",
@@ -102,6 +95,13 @@
     "artist": "Taylor Swift",
     "url": "https://music.apple.com/us/album/6814997249?i=6814997427",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/39/42/5b/39425b91-27b1-4b37-2f57-6f704fa5d8a6/mzaf_158326623628930700.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "coldshoulder|drake": {
+    "title": "Cold Shoulder",
+    "artist": "Drake, Don Toliver & Yebba",
+    "url": "https://music.apple.com/us/album/6818209777?i=6818209992",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2b/e7/90/2be79044-e886-61c2-db0a-d74ca25fb408/mzaf_3222422080615506204.plus.aac.p.m4a",
     "year": "2026"
   },
   "daidai|shakira": {
@@ -258,12 +258,12 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/88/d5/1e88d560-253f-3fa2-87a0-2f83b9681948/mzaf_11928544907491655022.plus.aac.p.m4a",
     "year": "2026"
   },
-  "raisedbywolves|fallinginreverse": {
-    "title": "Raised by Wolves",
-    "artist": "Falling In Reverse",
-    "url": "https://music.apple.com/us/album/1485046670?i=1485046672",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a9/de/33/a9de335a-6297-21ef-1de8-8c11a3c69370/mzaf_16397496827139916532.plus.aac.p.m4a",
-    "year": "2011"
+  "quebec|drake": {
+    "title": "Quebec",
+    "artist": "Drake",
+    "url": "https://music.apple.com/us/album/6818209777?i=6818209990",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e3/0d/16/e30d1691-e062-60cc-fd56-8cf7a93e243e/mzaf_12506259548484800381.plus.aac.p.m4a",
+    "year": "2026"
   },
   "riskitall|brunomars": {
     "title": "Risk It All",
@@ -279,18 +279,18 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/48/89/4d/48894def-36b6-0085-9184-b28a200cf47a/mzaf_6109765307626823795.plus.aac.p.m4a",
     "year": "2026"
   },
-  "september|earth": {
-    "title": "September",
-    "artist": "Earth, Wind & Fire",
-    "url": "https://music.apple.com/us/album/1456445670?i=1456446747",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/78/d4/95/78d49529-bd72-c490-5392-3a7f3d24755b/mzaf_6924139238970009441.plus.aac.p.m4a",
-    "year": "1978"
-  },
   "soeasy|oliviadean": {
     "title": "So Easy (To Fall In Love)",
     "artist": "Olivia Dean",
     "url": "https://music.apple.com/us/album/1817609404?i=1817609507",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b3/0a/c0/b30ac06f-1b78-f579-8e72-e2fc9eb3a2c8/mzaf_7319723033619206839.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "solareclipse|drake": {
+    "title": "Solar Eclipse",
+    "artist": "Drake & Don Toliver",
+    "url": "https://music.apple.com/us/album/6818209777?i=6818209989",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/b2/bc/1eb2bc0d-28e0-cc09-e24f-85b47358a773/mzaf_13880485937262246167.plus.aac.p.m4a",
     "year": "2026"
   },
   "somethingtolose|stellalefty": {

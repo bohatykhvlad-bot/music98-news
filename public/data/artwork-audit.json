@@ -1,16 +1,15 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-02T12:50:46.426Z",
-  "chartUpdated": "2026-10-02",
+  "updatedAt": "2026-10-03T11:50:27.032Z",
+  "chartUpdated": "2026-10-03",
   "chartRev": "verified-spotify-v36",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 25,
+    "apple-feed": 26,
     "apple-chart": 23,
-    "previous-audit": 1,
-    "apple": 1
+    "previous-audit": 1
   },
   "entries": {
     "ahha|bcardi": {
@@ -30,7 +29,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:26.753Z",
+      "checkedAt": "2026-10-03T11:50:00.160Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -111,7 +110,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:27.591Z",
+      "checkedAt": "2026-10-03T11:50:01.708Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -147,7 +146,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:22.299Z",
+      "checkedAt": "2026-10-03T11:49:46.583Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -243,7 +242,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:12.416Z",
+      "checkedAt": "2026-10-03T11:49:26.718Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -339,7 +338,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:20.416Z",
+      "checkedAt": "2026-10-03T11:49:53.180Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -358,87 +357,6 @@
         }
       ]
     },
-    "backtofriends|sombr": {
-      "identity": "backtofriends|sombr",
-      "title": "back to friends",
-      "artist": "sombr",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/d5/ad/5dd5ad1b-fabf-9218-77f0-3adbfd5328ac/054391237118.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "back to friends - Single",
-      "releaseArtist": "sombr",
-      "releaseDate": "2024-12-27T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/1786481196?i=1786481197",
-      "collectionId": "1786481196",
-      "trackId": "1786481197",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-02T12:50:43.788Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1786481197",
-          "collectionId": "1786481196",
-          "releaseTitle": "back to friends - Single",
-          "releaseArtist": "sombr",
-          "releaseDate": "2024-12-27T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/d5/ad/5dd5ad1b-fabf-9218-77f0-3adbfd5328ac/054391237118.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1786481196?i=1786481197",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1786481197",
-          "collectionId": "1786481196",
-          "releaseTitle": "back to friends - Single",
-          "releaseArtist": "sombr",
-          "releaseDate": "2024-12-27T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/d5/ad/5dd5ad1b-fabf-9218-77f0-3adbfd5328ac/054391237118.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1786481196?i=1786481197",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "deezer",
-          "id": "3151351511",
-          "collectionId": "686344041",
-          "releaseTitle": "back to friends",
-          "releaseArtist": "sombr",
-          "releaseDate": "2024-12-27",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/37a20b62f754b7ff5a9a29a8f2fe9d27/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3151351511",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1832087996",
-          "collectionId": "1832087626",
-          "releaseTitle": "I Barely Know Her",
-          "releaseArtist": "sombr",
-          "releaseDate": "2024-12-27T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/79/87/33/798733c3-e926-b1ef-435b-6a2dd7993171/093624827795.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1832087626?i=1832087996",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        }
-      ]
-    },
     "bbywow|gjudelinekarolrusowsky": {
       "identity": "bbywow|gjudelinekarolrusowsky",
       "title": "BbY WOW",
@@ -447,7 +365,7 @@
       "provider": "apple-feed",
       "releaseTitle": "NO ME ARREPIENTO DE SENTIR TANTO",
       "releaseArtist": "KAROL G",
-      "releaseDate": "2026-08-07T12:00:00Z",
+      "releaseDate": "2026-08-05T12:00:00Z",
       "releaseClass": "album",
       "url": "https://music.apple.com/us/album/6796864741?i=6796864754",
       "collectionId": "6796864741",
@@ -456,7 +374,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:00.679Z",
+      "checkedAt": "2026-10-03T11:49:10.070Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -464,7 +382,7 @@
           "collectionId": "6796864741",
           "releaseTitle": "NO ME ARREPIENTO DE SENTIR TANTO",
           "releaseArtist": "KAROL G",
-          "releaseDate": "2026-08-07T12:00:00Z",
+          "releaseDate": "2026-08-05T12:00:00Z",
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2b/66/b2/2b66b26c-ab23-faa1-c4ee-06fa2cce8f76/26UM1IM00558.rgb.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/6796864741?i=6796864754",
@@ -492,7 +410,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:42.306Z",
+      "checkedAt": "2026-10-03T11:50:27.030Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -558,7 +476,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:20.415Z",
+      "checkedAt": "2026-10-03T11:49:41.081Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -624,7 +542,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:06.015Z",
+      "checkedAt": "2026-10-03T11:49:18.129Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -660,7 +578,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:00.682Z",
+      "checkedAt": "2026-10-03T11:49:10.072Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -696,7 +614,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:12.418Z",
+      "checkedAt": "2026-10-03T11:49:26.719Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -732,7 +650,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:00.680Z",
+      "checkedAt": "2026-10-03T11:49:10.071Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -768,7 +686,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:27.590Z",
+      "checkedAt": "2026-10-03T11:50:12.700Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -804,7 +722,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:22.300Z",
+      "checkedAt": "2026-10-03T11:50:01.705Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -816,6 +734,42 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/6814997249?i=6814997427",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "coldshoulder|dondraketoliveryebba": {
+      "identity": "coldshoulder|dondraketoliveryebba",
+      "title": "Cold Shoulder",
+      "artist": "Drake, Don Toliver & Yebba",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "HABIBTI (FOMO)",
+      "releaseArtist": "Drake",
+      "releaseDate": "2026-10-02T07:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6818209777?i=6818209992",
+      "collectionId": "6818209777",
+      "trackId": "6818209992",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-03T11:50:01.708Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "6818209992",
+          "collectionId": "6818209777",
+          "releaseTitle": "HABIBTI (FOMO)",
+          "releaseArtist": "Drake",
+          "releaseDate": "2026-10-02T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6818209777?i=6818209992",
           "score": 1270,
           "confidence": 99,
           "consensus": 1,
@@ -840,7 +794,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:02.520Z",
+      "checkedAt": "2026-10-03T11:49:13.207Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -936,7 +890,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:08.524Z",
+      "checkedAt": "2026-10-03T11:49:25.044Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -972,7 +926,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:10.412Z",
+      "checkedAt": "2026-10-03T11:49:25.044Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1026,7 +980,7 @@
       "title": "drop dead",
       "artist": "Olivia Rodrigo",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/b0/f1/1eb0f1d8-84e4-3a66-be48-133f330b0153/26UMGIM21837.rgb.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "drop dead (singalong pack) - Single",
       "releaseArtist": "Olivia Rodrigo",
       "releaseDate": "2026-04-16T12:00:00Z",
@@ -1035,11 +989,26 @@
       "collectionId": "1894362510",
       "trackId": "1894362511",
       "confidence": 98,
-      "score": 965,
+      "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:17.358Z",
+      "checkedAt": "2026-10-03T11:49:35.946Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1894362511",
+          "collectionId": "1894362510",
+          "releaseTitle": "drop dead (singalong pack) - Single",
+          "releaseArtist": "Olivia Rodrigo",
+          "releaseDate": "2026-04-16T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/b0/f1/1eb0f1d8-84e4-3a66-be48-133f330b0153/26UMGIM21837.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1894362510?i=1894362511",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
         {
           "provider": "apple",
           "id": "1894362511",
@@ -1099,21 +1068,6 @@
           "confidence": 98,
           "consensus": 2,
           "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6762909196",
-          "collectionId": "1895071887",
-          "releaseTitle": "drop dead (you know all the words - isolated vocals) - Single",
-          "releaseArtist": "Olivia Rodrigo",
-          "releaseDate": "2026-04-16T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/98/1e/26/981e2682-a303-70b5-8d1c-b6c0459d2af1/26UMGIM48939.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1895071887?i=6762909196",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
         }
       ]
     },
@@ -1122,7 +1076,7 @@
       "title": "Earrings",
       "artist": "Malcolm Todd",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
+      "provider": "apple-chart",
       "releaseTitle": "Sweet Boy",
       "releaseArtist": "Malcolm Todd",
       "releaseDate": "2024-04-05T12:00:00Z",
@@ -1130,14 +1084,14 @@
       "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
       "collectionId": "1738257523",
       "trackId": "1738257931",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:20.416Z",
+      "checkedAt": "2026-10-03T11:49:42.293Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
+          "provider": "apple-chart",
           "id": "1738257931",
           "collectionId": "1738257523",
           "releaseTitle": "Sweet Boy",
@@ -1146,9 +1100,39 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
-          "score": 1270,
-          "confidence": 99,
-          "consensus": 1,
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1738257931",
+          "collectionId": "1738257523",
+          "releaseTitle": "Sweet Boy",
+          "releaseArtist": "Malcolm Todd",
+          "releaseDate": "2024-04-05T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "deezer",
+          "id": "2732302771",
+          "collectionId": "567736181",
+          "releaseTitle": "Sweet Boy",
+          "releaseArtist": "Malcolm Todd",
+          "releaseDate": "2024-04-05",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/bee99e8730b8fb1ad941bbe2607a5a99/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/2732302771",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
           "earliestReleaseYear": 2024
         }
       ]
@@ -1170,7 +1154,7 @@
       "score": 850,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:23.604Z",
+      "checkedAt": "2026-10-03T11:49:48.532Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1266,7 +1250,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:23.606Z",
+      "checkedAt": "2026-10-03T11:50:01.706Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1302,7 +1286,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:00.683Z",
+      "checkedAt": "2026-10-03T11:49:10.073Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1338,7 +1322,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:29.640Z",
+      "checkedAt": "2026-10-03T11:50:03.328Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1434,7 +1418,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:06.015Z",
+      "checkedAt": "2026-10-03T11:49:18.130Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1470,7 +1454,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:15.054Z",
+      "checkedAt": "2026-10-03T11:49:34.797Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1551,7 +1535,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:23.606Z",
+      "checkedAt": "2026-10-03T11:49:53.180Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1587,7 +1571,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:02.523Z",
+      "checkedAt": "2026-10-03T11:49:13.211Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1623,7 +1607,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:06.014Z",
+      "checkedAt": "2026-10-03T11:49:18.129Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1643,7 +1627,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:13.389Z",
+      "checkedAt": "2026-10-03T11:49:29.202Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1709,7 +1693,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:21.627Z",
+      "checkedAt": "2026-10-03T11:49:44.767Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1790,7 +1774,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:02.522Z",
+      "checkedAt": "2026-10-03T11:49:13.209Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1826,7 +1810,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:08.523Z",
+      "checkedAt": "2026-10-03T11:49:23.037Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1922,7 +1906,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:33.501Z",
+      "checkedAt": "2026-10-03T11:50:14.049Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1988,7 +1972,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:00.684Z",
+      "checkedAt": "2026-10-03T11:49:13.210Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2024,7 +2008,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:08.524Z",
+      "checkedAt": "2026-10-03T11:49:23.039Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2060,7 +2044,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:20.417Z",
+      "checkedAt": "2026-10-03T11:49:53.180Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2079,69 +2063,39 @@
         }
       ]
     },
-    "raisedbywolves|fallinginreverse": {
-      "identity": "raisedbywolves|fallinginreverse",
-      "title": "Raised by Wolves",
-      "artist": "Falling In Reverse",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/70/e4/44/70e444ff-910e-274f-b441-88732f7c70b4/0045778714766.png/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "The Drug in Me Is You",
-      "releaseArtist": "Falling In Reverse",
-      "releaseDate": "2011-06-07T12:00:00Z",
+    "quebec|drake": {
+      "identity": "quebec|drake",
+      "title": "Quebec",
+      "artist": "Drake",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "HABIBTI (FOMO)",
+      "releaseArtist": "Drake",
+      "releaseDate": "2026-10-02T07:00:00Z",
       "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1485046670?i=1485046672",
-      "collectionId": "1485046670",
-      "trackId": "1485046672",
-      "confidence": 98,
-      "score": 1120,
-      "consensus": 2,
+      "url": "https://music.apple.com/us/album/6818209777?i=6818209990",
+      "collectionId": "6818209777",
+      "trackId": "6818209990",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:43.240Z",
+      "checkedAt": "2026-10-03T11:49:48.533Z",
       "alternatives": [
         {
-          "provider": "apple-chart",
-          "id": "1485046672",
-          "collectionId": "1485046670",
-          "releaseTitle": "The Drug in Me Is You",
-          "releaseArtist": "Falling In Reverse",
-          "releaseDate": "2011-06-07T12:00:00Z",
+          "provider": "apple-feed",
+          "id": "6818209990",
+          "collectionId": "6818209777",
+          "releaseTitle": "HABIBTI (FOMO)",
+          "releaseArtist": "Drake",
+          "releaseDate": "2026-10-02T07:00:00Z",
           "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/70/e4/44/70e444ff-910e-274f-b441-88732f7c70b4/0045778714766.png/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1485046670?i=1485046672",
-          "score": 1120,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2011
-        },
-        {
-          "provider": "apple",
-          "id": "1485046672",
-          "collectionId": "1485046670",
-          "releaseTitle": "The Drug in Me Is You",
-          "releaseArtist": "Falling In Reverse",
-          "releaseDate": "2011-06-07T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/70/e4/44/70e444ff-910e-274f-b441-88732f7c70b4/0045778714766.png/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1485046670?i=1485046672",
-          "score": 995,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2011
-        },
-        {
-          "provider": "deezer",
-          "id": "378343161",
-          "collectionId": "43858651",
-          "releaseTitle": "The Drug In Me Is You",
-          "releaseArtist": "Falling in Reverse",
-          "releaseDate": "2011-11-30",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/e190e83e8c6dcb9480779da6856feb71/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/378343161",
-          "score": 940,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2011
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6818209777?i=6818209990",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
         }
       ]
     },
@@ -2162,7 +2116,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:30.255Z",
+      "checkedAt": "2026-10-03T11:50:07.695Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2228,7 +2182,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:27.590Z",
+      "checkedAt": "2026-10-03T11:50:01.705Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2277,72 +2231,6 @@
         }
       ]
     },
-    "september|earthfirewind": {
-      "identity": "september|earthfirewind",
-      "title": "September",
-      "artist": "Earth, Wind & Fire",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c6/3b/0d/c63b0ddb-ba2d-49fc-f255-9c925dd4e6e1/886447605004.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "The Eternal Dance",
-      "releaseArtist": "Earth, Wind & Fire",
-      "releaseDate": "1978-11-18T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1456445670?i=1456446747",
-      "collectionId": "1456445670",
-      "trackId": "1456446747",
-      "confidence": 96,
-      "score": 880,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-02T12:50:46.423Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1456446747",
-          "collectionId": "1456445670",
-          "releaseTitle": "The Eternal Dance",
-          "releaseArtist": "Earth, Wind & Fire",
-          "releaseDate": "1978-11-18T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c6/3b/0d/c63b0ddb-ba2d-49fc-f255-9c925dd4e6e1/886447605004.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1456445670?i=1456446747",
-          "score": 880,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 1978
-        },
-        {
-          "provider": "apple",
-          "id": "1456446747",
-          "collectionId": "1456445670",
-          "releaseTitle": "The Eternal Dance",
-          "releaseArtist": "Earth, Wind & Fire",
-          "releaseDate": "1978-11-18T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/c6/3b/0d/c63b0ddb-ba2d-49fc-f255-9c925dd4e6e1/886447605004.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1456445670?i=1456446747",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1978
-        },
-        {
-          "provider": "deezer",
-          "id": "487484142",
-          "collectionId": "61504292",
-          "releaseTitle": "September",
-          "releaseArtist": "Earth, Wind & Fire",
-          "releaseDate": "2018-04-17",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/18f41ecd3781fb96bffa2b0b49955db5/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/487484142",
-          "score": 160,
-          "confidence": 91,
-          "consensus": 1,
-          "earliestReleaseYear": 1978
-        }
-      ]
-    },
     "soeasy|deanolivia": {
       "identity": "soeasy|deanolivia",
       "title": "So Easy (To Fall In Love)",
@@ -2360,7 +2248,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:17.908Z",
+      "checkedAt": "2026-10-03T11:49:38.558Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2424,6 +2312,42 @@
         }
       ]
     },
+    "solareclipse|dondraketoliver": {
+      "identity": "solareclipse|dondraketoliver",
+      "title": "Solar Eclipse",
+      "artist": "Drake & Don Toliver",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "HABIBTI (FOMO)",
+      "releaseArtist": "Drake",
+      "releaseDate": "2026-10-02T07:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6818209777?i=6818209989",
+      "collectionId": "6818209777",
+      "trackId": "6818209989",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-03T11:50:01.706Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "6818209989",
+          "collectionId": "6818209777",
+          "releaseTitle": "HABIBTI (FOMO)",
+          "releaseArtist": "Drake",
+          "releaseDate": "2026-10-02T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6818209777?i=6818209989",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
     "somethingtolose|leftymasonstellavincent": {
       "identity": "somethingtolose|leftymasonstellavincent",
       "title": "Something To Lose",
@@ -2441,7 +2365,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:35.169Z",
+      "checkedAt": "2026-10-03T11:50:15.298Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2537,7 +2461,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:00.681Z",
+      "checkedAt": "2026-10-03T11:49:10.072Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2573,7 +2497,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:32.194Z",
+      "checkedAt": "2026-10-03T11:50:12.699Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2654,7 +2578,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:06.015Z",
+      "checkedAt": "2026-10-03T11:49:23.038Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2690,7 +2614,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:23.605Z",
+      "checkedAt": "2026-10-03T11:50:01.707Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2726,7 +2650,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:38.389Z",
+      "checkedAt": "2026-10-03T11:50:20.789Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2810,7 +2734,7 @@
       "title": "What You Need",
       "artist": "Tems",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c3/59/9a/c3599a96-fb7c-d4f3-c9ce-664128e4e94c/196873703305.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
+      "provider": "apple-chart",
       "releaseTitle": "Love Is A Kingdom",
       "releaseArtist": "Tems",
       "releaseDate": "2025-11-20T12:00:00Z",
@@ -2818,14 +2742,14 @@
       "url": "https://music.apple.com/us/album/1853635930?i=1853635937",
       "collectionId": "1853635930",
       "trackId": "1853635937",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:23.605Z",
+      "checkedAt": "2026-10-03T11:49:53.179Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
+          "provider": "apple-chart",
           "id": "1853635937",
           "collectionId": "1853635930",
           "releaseTitle": "Love Is A Kingdom",
@@ -2834,8 +2758,53 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c3/59/9a/c3599a96-fb7c-d4f3-c9ce-664128e4e94c/196873703305.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1853635930?i=1853635937",
-          "score": 1270,
-          "confidence": 99,
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "apple",
+          "id": "1853635937",
+          "collectionId": "1853635930",
+          "releaseTitle": "Love Is A Kingdom",
+          "releaseArtist": "Tems",
+          "releaseDate": "2025-11-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c3/59/9a/c3599a96-fb7c-d4f3-c9ce-664128e4e94c/196873703305.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1853635930?i=1853635937",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "deezer",
+          "id": "3661467392",
+          "collectionId": "858423922",
+          "releaseTitle": "Love Is A Kingdom",
+          "releaseArtist": "Tems",
+          "releaseDate": "2025-11-21",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/584f40f4d2b62b611a7ab8561b656ff3/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3661467392",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "apple",
+          "id": "1882510088",
+          "collectionId": "1882510085",
+          "releaseTitle": "What You Need - Single",
+          "releaseArtist": "Tems",
+          "releaseDate": "2025-11-20T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ca/c1/b0/cac1b080-04fc-42bc-14fc-319a32b3daeb/196874183243.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1882510085?i=1882510088",
+          "score": 725,
+          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2025
         }
@@ -2858,7 +2827,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-02T12:50:38.390Z",
+      "checkedAt": "2026-10-03T11:50:20.790Z",
       "alternatives": [
         {
           "provider": "apple-feed",
