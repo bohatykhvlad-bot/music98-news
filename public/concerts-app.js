@@ -391,6 +391,10 @@ function addTopographicRelief(){
         }else if(layer.type==="line" && /(road|street|motorway|trunk|primary|secondary|tertiary)/i.test(id)){
           map.setPaintProperty(id,"line-color",/(motorway|trunk|primary)/i.test(id)?"#dde3e5":"#edf0f1");
         }
+        // Keep map labels readable on the near-white land without touching icons or markers.
+        if(layer.type==="symbol" && Object.prototype.hasOwnProperty.call(layer.layout||{},"text-field")){
+          map.setPaintProperty(id,"text-color","#111111");
+        }
         if(layer.type==="symbol" && /(poi|transit|airport|ferry)/i.test(id) && typeof map.setLayerZoomRange==="function"){
           map.setLayerZoomRange(id,8.5,24);
         }else if(layer.type==="symbol" && /(road.*label|road-label)/i.test(id) && typeof map.setLayerZoomRange==="function"){
