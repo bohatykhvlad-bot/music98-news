@@ -274,7 +274,9 @@ test("scrolling glass header keeps its existing fade with full-width straight ge
   const full=page.match(/\.topbar-glass-full\{([^}]*)\}/);
   const isle=page.match(/\.topbar-glass-isle\{([^}]*)\}/);
   assert.ok(full && isle,"both original scroll layers must remain");
-  const geometry=s=>s.match(/top:0;\s*height:60px;\s*left:0;\s*right:var\(--sbw,0px\);\s*border-radius:0/);
+  assert.ok(page.includes("border:1px solid rgba(0,0,0,.08);"));
+  assert.ok(page.includes(".topbar{--hp:0;height:auto;background:#fff;padding:0;box-shadow:0 1px 0 rgba(0,0,0,.08);"));
+  const geometry=s=>s.match(/top:0;\s*height:55px;\s*left:0;\s*right:var\(--sbw,0px\);\s*border-radius:0/);
   assert.ok(geometry(full[1]),"full header must have no top/side gaps or rounded edges");
   assert.ok(geometry(isle[1]),"scroll header must use the same edge-to-edge geometry");
   assert.match(page,/\.topbar\.is-away \.topbar-glass-full\{opacity:0\}/);
