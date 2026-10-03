@@ -17,7 +17,7 @@ test("legal pages reuse exact main logo geometry and glass header design",()=>{
   const mobileEnd=main.indexOf("  .top-actions{flex:1",mobileStart);
   assert.ok(mobileStart>=0 && mobileEnd>mobileStart);
   assert.ok(legalCSS.includes(main.slice(mobileStart,mobileEnd)));
-  assert.match(legalCSS,/\.topbar-glass\{[^}]*border:0;\s*border-bottom:1px solid rgba\(0,0,0,\.07\)/);
+  assert.match(legalCSS,/\.topbar-glass\{[^}]*border:0;\s*border-bottom:1px solid rgba\(255,255,255,\.8\)/);
   assert.match(legalCSS,/@media \(min-width:1100px\)\{html\{zoom:\.96\}\}/);
   assert.match(legalCSS,/\.topbar\{font-family:var\(--font\)\}/);
   assert.match(legalCSS,/body\{padding-top:var\(--header-h,55px\)\}/);
