@@ -76,17 +76,17 @@ jobs:
             if(sha(post.body||"")!==patch.originalBodySHA256)throw Error("DRAFT_EDITED_SINCE_REVIEW_NO_OVERWRITE");
             const snapshot=JSON.stringify(before.posts.filter(p=>p.id!==patch.id));
             const coverSnapshot=JSON.stringify(post.cover);
-            const media=(post.body.match(/\\[(?:photo|youtube|apple|tiktok|instagram):/g)||[]).length;
-            const paragraphs=post.body.split("\\n\\n");
+            const media=(post.body.match(/\[(?:photo|youtube|apple|tiktok|instagram):/g)||[]).length;
+            const paragraphs=post.body.split("\n\n");
             for(const op of patch.changes.slice().sort((a,b)=>b.start-a.start)){
                if(!Number.isInteger(op.start)||!Number.isInteger(op.end)||op.start<0||op.end<op.start||op.end>paragraphs.length||!Array.isArray(op.new)||!op.new.every(x=>typeof x==="string"))throw Error("BAD_PATCH");
                paragraphs.splice(op.start,op.end-op.start,...op.new);
             }
-            const updated=paragraphs.join("\\n\\n");
+            const updated=paragraphs.join("\n\n");
             if(sha(updated)!==patch.updatedBodySHA256)throw Error("PATCH_OUTPUT_MISMATCH");
             if(!updated.startsWith(patch.excerpt))throw Error("EXCERPT_NO_LONGER_LITERAL");
-            if((updated.match(/\\[(?:photo|youtube|apple|tiktok|instagram):/g)||[]).length!==media)throw Error("MEDIA_COUNT_CHANGED");
-            const photo=updated.match(/\\[photo:(https:\\/\\/[^|]+)\\|Miriam Visser\\|/);
+            if((updated.match(/\[(?:photo|youtube|apple|tiktok|instagram):/g)||[]).length!==media)throw Error("MEDIA_COUNT_CHANGED");
+            const photo=updated.match(/\[photo:(https:\/\/[^|]+)\|Miriam Visser\|/);
             if(!photo)throw Error("NO_NEW_GUITAR_PHOTO");
             const image=await fetch(photo[1],{method:"HEAD"});
             if(!image.ok)throw Error("PHOTO_NOT_ACCESSIBLE_"+image.status);
@@ -98,7 +98,7 @@ jobs:
             if(!target||target.status!=="draft"||sha(target.body||"")!==patch.updatedBodySHA256||target.excerpt!==patch.excerpt)throw Error("POST_SAVE_VERIFY_FAILED");
             if(JSON.stringify(after.posts.filter(p=>p.id!==patch.id))!==snapshot)throw Error("NON_TARGET_POST_CHANGED");
             if(JSON.stringify(target.cover)!==coverSnapshot)throw Error("COVER_CHANGED_AFTER");
-            console.log("ELLA_DRAFT_UPDATE VERIFIED ID "+patch.id+" ORIGINALS_UNCHANGED true STATUS draft PARAGRAPHS "+target.body.split("\\n\\n").length+" PHOTO_SOURCE_REACHABLE true");
+            console.log("ELLA_DRAFT_UPDATE VERIFIED ID "+patch.id+" ORIGINALS_UNCHANGED true STATUS draft PARAGRAPHS "+target.body.split("\n\n").length+" PHOTO_SOURCE_REACHABLE true");
           })().catch(e=>{console.error("ELLA_DRAFT_UPDATE FAILED "+String(e.message).slice(0,150));process.exit(1)});
           
           NODE
