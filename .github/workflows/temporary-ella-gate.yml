@@ -56,3 +56,5 @@ jobs:
           print('ELLA_GATE_LOG_LINES:',len(s.splitlines()))
           PY
           exit "$outcome"
+
+# Re-run private editorial check after verified date registry update.
