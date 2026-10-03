@@ -313,5 +313,13 @@ test("major card surfaces share one centered shadow across sections",()=>{
   assert.match(page,/\.rcard:hover\{[^}]*box-shadow:var\(--shadow\)/);
   assert.match(page,/\.subscribe::before\{[^}]*box-shadow:var\(--shadow\)/);
   assert.match(concerts,/\.tour-card\.open\{[^}]*box-shadow:var\(--shadow\)/);
-  assert.match(page,/#tab-news #newsGrid,#tab-releases #relGrid\{padding:20px 44px 20px 20px;margin:-20px 0 -20px -20px\}/);
+  const rail=page.match(/#tab-news #newsGrid,#tab-releases #relGrid\{padding:(\d+)px 44px (\d+)px (\d+)px;margin:-(\d+)px 0 -(\d+)px -(\d+)px\}/);
+  assert.ok(rail,"News and Releases must have identical carousel shadow clearance");
+  const [padTop,padBottom,padLeft,marginTop,marginBottom,marginLeft]=rail.slice(1).map(Number);
+  assert.equal(padTop,padBottom,"equal top and bottom clearance");
+  assert.equal(padTop,marginTop,"larger top clearance cannot shift cards down");
+  assert.equal(padBottom,marginBottom,"larger bottom clearance cannot alter layout height");
+  assert.equal(padLeft,marginLeft,"larger left clearance cannot shift card alignment");
+  assert.ok(padTop-4>=22,"shadow must fit above cards lifted 4px");
+  assert.ok(padBottom>=22&&padLeft>=22,"bottom and left shadows must not be clipped");
 });
