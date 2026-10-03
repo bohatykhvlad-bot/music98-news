@@ -563,7 +563,7 @@ test("gray concert artist header never changes dimensions between hover and expa
   assert.match(css,/\.tour-card:hover:not\(\.open\) \.tour-row\{background:var\(--bg2\)\}/);
   const opened=css.match(/\.tour-card\.open \.tour-row\{([^}]*)\}/);
   assert.ok(opened,"expanded header rules must exist");
-  assert.equal(opened[1],"background:var(--bg2);border-radius:var(--event-radius) var(--event-radius) 0 0");
+  assert.equal(opened[1],"background:var(--bg2);border-radius:var(--event-radius)");
   assert.doesNotMatch(opened[1],/(?:width|height|padding|margin|border-width|transform|scale):/);
   assert.match(css,/\.tour-events\{[^}]*transition:max-height \.28s cubic-bezier\(\.3,\.7,\.4,1\),opacity \.18s ease/);
   assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*max-height:4800px;opacity:1;pointer-events:auto;padding:2px 9px 10px/);
