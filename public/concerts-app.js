@@ -371,10 +371,10 @@ function addTopographicRelief(){
       const id=String(layer.id||"");
       try{
         if(layer.type==="background"){
-          map.setPaintProperty(id,"background-color","#f4f6f7");
+          map.setPaintProperty(id,"background-color","#fafbfb");
         }
         if(layer.type==="fill" && /(^land$|land-|park|landcover|landuse|wood|grass|scrub|pitch|golf|cemetery)/i.test(id)){
-          map.setPaintProperty(id,"fill-color","#f4f6f7");
+          map.setPaintProperty(id,"fill-color","#fafbfb");
           map.setPaintProperty(id,"fill-opacity",.92);
         }
         if(layer.type==="fill" && /building/i.test(id)){
