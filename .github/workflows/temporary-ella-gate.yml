@@ -58,3 +58,24 @@ jobs:
           exit "$outcome"
 
 # Re-run private editorial check after verified date registry update.
+
+      - name: Audit saved Ella last photo metadata without revealing draft text
+        shell: bash
+        run: |
+          node <<'NODE'
+          (async()=>{
+            const key=process.env.ADMIN_PASSWORD;
+            const res=await fetch("https://music98.news/api/desk",{headers:{"X-Admin-Key":key},cache:"no-store"});
+            if(!res.ok)throw Error("desk fetch "+res.status);
+            const obj=await res.json();
+            const p=obj.posts.find(p=>p.id==="ella26choosintexas");
+            if(!p)throw Error("draft missing");
+            const matches=[...(p.body||"").matchAll(/\\[photo:([^|\\]]+)\\|([^|\\]]+)\\|([^\\]]*)\\]/g)];
+            const last=matches[matches.length-1];
+            console.log("ELLA_AUDIT STATUS="+p.status+" PHOTO_COUNT="+matches.length);
+            console.log("ELLA_AUDIT LAST_PHOTO_URL="+(last?.[1]||"none"));
+            console.log("ELLA_AUDIT LAST_PHOTO_AUTHOR="+(last?.[2]||"none"));
+            console.log("ELLA_AUDIT LAST_PHOTO_CREDIT_URL="+(last?.[3]||"none"));
+            console.log("ELLA_AUDIT BODY_PARAGRAPHS="+String(p.body||"").split("\\n\\n").length);
+          })().catch(e=>{console.log("ELLA_AUDIT_ERROR "+e.message);process.exitCode=1});
+          NODE
