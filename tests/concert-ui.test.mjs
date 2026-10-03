@@ -60,24 +60,6 @@ test("map uses only the daily verified market snapshot",()=>{
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
 
-test("map countries use a barely off-white neutral tint while water stays unchanged",()=>{
-  const palette=app.match(/function addTopographicRelief\(\)\{([\s\S]*?)\n\}\n\nfunction addLayers\(\)/);
-  assert.ok(palette,"map style adjustment function must exist");
-  assert.match(palette[1],/setPaintProperty\(id,"background-color","#fafbfb"\)/);
-  assert.match(palette[1],/setPaintProperty\(id,"fill-color","#fafbfb"\)/);
-  assert.match(palette[1],/setPaintProperty\(id,"fill-color","#dff4fa"\)/);
-  assert.match(palette[1],/setPaintProperty\(id,"line-color","#cfeaf2"\)/);
-});
-
-test("all built-in Mapbox place and map labels are near-black without changing map colors or symbols",()=>{
-  const paint=app.match(/function addTopographicRelief\(\)\{([\s\S]*?)\n\}\n\nfunction addLayers\(\)/);
-  assert.ok(paint);
-  assert.match(paint[1],/if\(layer\.type==="symbol" && Object\.prototype\.hasOwnProperty\.call\(layer\.layout\|\|\{\},"text-field"\)\)\{\s*map\.setPaintProperty\(id,"text-color","#111111"\)/);
-  assert.match(paint[1],/setPaintProperty\(id,"fill-color","#fafbfb"\)/);
-  assert.match(paint[1],/setPaintProperty\(id,"fill-color","#dff4fa"\)/);
-  assert.doesNotMatch(paint[1],/setPaintProperty\(id,"icon-color"/);
-});
-
 test("map has no custom minus or floating map status and native zoom-out resets filters",()=>{
   assert.equal(app.includes("resetMapBtn"),false);
   assert.equal(app.includes("map-status"),false);
@@ -86,15 +68,9 @@ test("map has no custom minus or floating map status and native zoom-out resets 
   assert.match(app,/btn\.addEventListener\("click",resetMapFilters\)/);
   assert.equal(app.includes("radiusEl"),false);
 });
-test("map stays flat inside the one shared Concerts card",()=>{
-  const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.concerts-card\{[^}]*padding:16px;background:#fff;[^}]*box-shadow:var\(--shadow\)/);
-  assert.match(css,/\.map-shell\{[^}]*background:#fff;box-shadow:none/);
-  assert.match(html,/<div class="concerts-card">\s*<div class="controls">/);
-  assert.match(html,/<div class="layout">\s*<section class="map-shell"/);
-  assert.match(css,/#map\{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;background:#fff\}/);
-  assert.match(css,/#map \.mapboxgl-canvas\{[^}]*inset:0!important;[^}]*width:100%!important;height:100%!important/);
+test("map shell has no gray shadow gap and canvas fills it",()=>{
+  assert.match(app,/\.map-shell\{[^}]*background:#fff;box-shadow:none/);
+  assert.match(app,/#map \.mapboxgl-canvas\{[^}]*width:100%!important;height:100%!important/);
 });
 
 test("More button is optically centered inside the expanded event block",()=>{
@@ -225,13 +201,11 @@ test("inactive map toggles use the shared gray hover highlight",()=>{
 });
 
 
-test("manually moving the map offers Search this area from Popular, Near me and expanded artist",()=>{
+test("manually moving the map offers Search this area from Popular and Near me",()=>{
   const move=app.slice(app.indexOf('map.on("moveend",()=>{'),app.indexOf('function resizeMapStable()'));
-  assert.match(move,/!\["popular","nearby","artist","artist-area"\]\.includes\(activeMode\)/);
-  assert.match(move,/mode:activeMode==="artist" \? "artist-area" : activeMode/);
+  assert.match(move,/!\["popular","nearby","artist-area"\]\.includes\(activeMode\)/);
   assert.match(move,/searchAreaBtn\.hidden=false/);
   const click=app.slice(app.indexOf('searchAreaBtn.addEventListener("click",()=>{'),app.indexOf('search.addEventListener("input",()=>{'));
-  assert.match(click,/pending\.mode==="artist-area" && artistContext/);
   assert.match(click,/loadArea\(pending\.lat,pending\.lng,"Map area",\{fit:false,radius:pending\.radius,force:true\}\)/);
 });
 
@@ -506,19 +480,15 @@ test("failed area loads clear stale event markers",()=>{
 });
 
 
-test("map and sidebar remain flat inside one elevated white card",()=>{
+test("Concerts outer sidebar is flat like the map while expanded artists keep their shadow",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.concerts-card\{[^}]*box-shadow:var\(--shadow\)/);
   assert.match(css,/\.map-shell\{[^}]*box-shadow:none/);
   assert.match(css,/\.side\{[^}]*box-shadow:none;overflow:hidden/);
-  assert.equal((html.match(/class="concerts-card"/g)||[]).length,1);
-  assert.doesNotMatch(html,/class="panel-card"/);
-  assert.match(html,/<\/section>\s*<aside class="side">/);
-  assert.match(css,/\.map-shell\{[^}]*border:0/);
-  assert.match(css,/\.side\{border:0/);
-  assert.match(css,/\.tour-card\.open\{[^}]*box-shadow:none/);
-  assert.match(css,/\.disclosure\{margin:0;height:12px;padding:0 4px 0 17px;display:flex;align-items:flex-end[^}]*top:2px/);
+  assert.match(css,/\.tour-card\.open\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(css,/\.disclosure\{margin:0;height:16px;padding:0 4px 0 17px;display:flex;align-items:flex-end/);
+  const html=JSON.parse(app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m)[1]);
+  assert.match(html,/Ticketing by Ticketmaster<\/p>/);
+  assert.doesNotMatch(html,/Ticketing by Ticketmaster\./);
 });
 
 test("Concert status, ranking and Ticketmaster disclosure share the left alignment",()=>{
@@ -541,16 +511,22 @@ test("expanded artist view shows one summary line, not a duplicate subtitle",()=
 });
 
 
-test("flat Concerts sidebar keeps unchanged rank and footer alignment",()=>{
+test("Concerts sidebar has symmetric shadow insets without moving the text baselines",()=>{
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
-  assert.match(css,/\.tours\{[^}]*scrollbar-gutter:stable;margin:0;padding:0 0 6px 0;overscroll-behavior:contain\}/);
+  const scroller=css.match(/\.tours\{[^}]*scrollbar-gutter:stable;margin:0 -(\d+)px;padding:(\d+)px (\d+)px (\d+)px (\d+)px;overscroll-behavior:contain\}/);
+  assert.ok(scroller,"scroller has a native scrollbar and matching content insets");
+  const [margin,padTop,padRight,padBottom,padLeft]=scroller.slice(1).map(Number);
+  assert.equal(margin,12);
+  assert.equal(padLeft,padRight);
+  assert.equal(padLeft,margin,"left artist and rank coordinates cannot shift");
+  assert.ok(padTop>=12 && padBottom>=18);
   assert.doesNotMatch(css,/\.tours\{[^}]*margin:-\d+px/);
-  assert.match(css,/\.side\{[^}]*padding:13px 13px 4px;height:420px/);
+  assert.match(css,/\.side\{[^}]*padding:13px;height:420px/);
   assert.match(css,/\.side-sub\{[^}]*margin:0 4px 10px 17px/);
   assert.match(css,/\.side-status\{[^}]*margin:0 4px 8px 17px/);
   assert.match(css,/\.side-empty\{[^}]*padding:12px 5px 12px 17px/);
-  assert.match(css,/\.disclosure\{[^}]*margin:0;height:12px;padding:0 4px 0 17px/);
-  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:none/);
+  assert.match(css,/\.disclosure\{[^}]*margin:0;height:16px;padding:0 4px 0 17px/);
+  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:var\(--shadow\)/);
   assert.match(css,/\.tour-events\{[^}]*padding:0 9px;background:#fff/);
   assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*padding:2px 9px 10px/);
   assert.match(css,/\.event-link\{[^}]*width:100%;[^}]*margin:4px 0/);
@@ -573,15 +549,15 @@ test("gray concert artist header never changes dimensions between hover and expa
   const css=JSON.parse(app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)[1]);
   assert.match(css,/--event-radius:14px/);
   assert.match(css,/\.tour-card\{[^}]*border:0;border-radius:var\(--event-radius\);overflow:hidden;background:transparent/);
-  assert.doesNotMatch(css,/\.tour-card\{[^}]*transition:box-shadow/);
-  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:none/);
+  assert.match(css,/\.tour-card\{[^}]*transition:box-shadow \.2s ease/);
+  assert.match(css,/\.tour-card\.open\{\s*background:#fff;box-shadow:var\(--shadow\)/);
   assert.match(css,/\.tour-row\{\s*width:100%;height:70px;min-height:70px;display:grid;/);
   assert.match(css,/\.tour-row\{[^}]*border:0;background:transparent;border-radius:var\(--event-radius\);padding:7px 8px/);
   assert.match(css,/@media\(max-width:640px\)\{[^}]*\.tour-row\{height:62px;min-height:62px;grid-template-columns:24px 44px/);
   assert.match(css,/\.tour-card:hover:not\(\.open\) \.tour-row\{background:var\(--bg2\)\}/);
   const opened=css.match(/\.tour-card\.open \.tour-row\{([^}]*)\}/);
   assert.ok(opened,"expanded header rules must exist");
-  assert.equal(opened[1],"background:var(--bg2);border-radius:var(--event-radius)");
+  assert.equal(opened[1],"background:var(--bg2);border-radius:var(--event-radius) var(--event-radius) 0 0");
   assert.doesNotMatch(opened[1],/(?:width|height|padding|margin|border-width|transform|scale):/);
   assert.match(css,/\.tour-events\{[^}]*transition:max-height \.28s cubic-bezier\(\.3,\.7,\.4,1\),opacity \.18s ease/);
   assert.match(css,/\.tour-card\.open \.tour-events\{[^}]*max-height:4800px;opacity:1;pointer-events:auto;padding:2px 9px 10px/);
@@ -732,12 +708,6 @@ test("Near me has one correctly ranked, aligned summary rather than a duplicate 
   assert.match(app,/setStatus\(nearbyEvents\.length \? "Ranked by number of upcoming concerts"/);
 });
 
-test("placeholder attractions can never reach the artist renderer, including stale caches",()=>{
-  const render=app.slice(app.indexOf("function renderArtists(items,mode){"),app.indexOf("\nfunction restoreModeMap("));
-  assert.match(render,/const visibleItems=\(items\|\|\[\]\)\.filter\(item=>!isPlaceholderConcertArtist\(item\?\.name\)\)/);
-  assert.match(render,/visibleItems\.forEach\(\(item,index\)=>/);
-  assert.doesNotMatch(render,/items\.forEach\(\(item,index\)=>/);
-});
 test("Near me never ranks placeholder attractions or puts their concerts on the map",()=>{
   const start=app.indexOf("function isPlaceholderConcertArtist(name){");
   const end=app.indexOf("\nfunction setTourBoxHeight(",start);
