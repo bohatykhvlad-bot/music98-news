@@ -1,0 +1,42 @@
+name: Temporary Ella secure update
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-ella-safe-write.yml
+      - .github/ella-reviewed-update.enc.b64
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate securely wrapped transport key and photo probe
+        shell: bash
+        if: ${{ !hashFiles('.github/ella-reviewed-update.enc.b64') }}
+        run: |
+          node <<'NODE'
+          const {scryptSync,publicEncrypt,constants}=require("node:crypto");
+          const pub="-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAy0aRjULcX0D9rJu+WUuK\nEPOHzokW0hECKkWIsqyC745iEvKuJS+COWU1tdWHIoB7dWaqGcCzmD+s4kuMKUaK\nYpwjrcYOgWwjVV2COWo6Ox4fdZceYDiuQid+ZZc6lWe2LTcEWRS2F0NhQaIiyoin\nYVHTpWG6OYY1+PE6n4LxEK3XGj6jlUXra30PB06eLwxt7wmmXcw0qg7YVNKAQcMm\nAyoVumhCe2yDZlG0r4qAYoxcCCEORc37qxBDDBLZq9spfv/5ZjUPVVBYXPgZOUDA\nIxiUKTE3YV1XaR8mSrJgGUnc2OtsB52efoUCW8MaD2JmHYLXkU4z2cGGUw2Ht7qc\nUYNdLnD2U9n2rAajQX1EF4hoDafrekIYYgu8gReVMc9An5sWpJd0JuXgE/WM+PWh\najfeQF5oLFywum2fQbJl7omHg/I7l9VrTPCUiV6Ha6vmSsLg2I1sGDDDpFoH3a+S\n9Wj/67AZ7woo9ajy8T1mqzTOc0Rsm/3zwoyca+0devijAgMBAAE=\n-----END PUBLIC KEY-----";
+          (async()=>{
+          const secret=process.env.ADMIN_PASSWORD;
+          if(!secret)throw Error("ADMIN_PASSWORD unavailable");
+          const key=scryptSync(secret,"music98-ella-editorial-2026-10-03-v2",32);
+          const wrapped=publicEncrypt({key:pub,padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:"sha256"},key);
+          console.log("ELLA_DERIVED_KEY_WRAPPED="+wrapped.toString("base64"));
+          for(const name of ["EllaLangley_01.jpg","EllaLangley_02.jpg","EllaLangley_01-1024x640.jpg"]){
+          const url="https://charlatan.ca/wp-content/uploads/2026/07/"+name;
+          try{const r=await fetch(url,{headers:{"User-Agent":"Mozilla/5.0"}});if(!r.ok){console.log("PHOTO_PROBE "+name+" HTTP "+r.status);continue;}
+          const arr=new Uint8Array(await r.arrayBuffer());
+          let width=0,height=0;
+          for(let i=2;i<arr.length-9;){if(arr[i]!==255){i++;continue;}const marker=arr[i+1],seg=(arr[i+2]<<8)|arr[i+3];if([0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9].includes(marker)){height=(arr[i+5]<<8)|arr[i+6];width=(arr[i+7]<<8)|arr[i+8];break}i+=2+Math.max(2,seg)}
+          console.log("PHOTO_PROBE "+name+" HTTP "+r.status+" TYPE "+r.headers.get("content-type")+" BYTES "+arr.length+" DIM "+width+"x"+height);
+          }catch(e){console.log("PHOTO_PROBE "+name+" ERROR "+e.name)}
+          }
+          })().catch(e=>{console.log("KEY_OR_PROBE_ERROR "+String(e.message).slice(0,100));process.exit(1)});
+          
+          NODE
