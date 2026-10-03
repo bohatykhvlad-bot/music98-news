@@ -87,17 +87,17 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .topbar-glass-full{
   top:0;
   height:68px;
-  left:max(0px, calc(50% - 590px));
-  right:max(var(--sbw,0px), calc(50% - 590px));
+  left:0;
+  right:var(--sbw,0px);
   border-radius:0;
   opacity:1;
 }
 .topbar-glass-isle{
-  top:10px;
-  height:48px;
-  left:max(14px, calc(50% - 590px));
-  right:max(calc(14px + var(--sbw,0px)), calc(50% - 590px));
-  border-radius:18px;
+  top:0;
+  height:68px;
+  left:0;
+  right:var(--sbw,0px);
+  border-radius:0;
   opacity:0;
 }
 .topbar.is-away .topbar-glass-full{opacity:0}
