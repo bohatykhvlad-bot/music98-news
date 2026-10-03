@@ -7,7 +7,9 @@ on:
       - "functions/lib/spotify-chart.js"
       - ".github/workflows/spotify-chart-source.yml"
   schedule:
-    - cron: "55 5,10,14 * * *"
+    # More checks improve recovery when Spotify and its independent mirror publish at different times.
+    # Every publish still requires 50 verified ranks; these runs use GitHub Actions, not Worker requests.
+    - cron: "55 1,5,9,13,17,21 * * *"
   workflow_dispatch:
 permissions:
   contents: write
