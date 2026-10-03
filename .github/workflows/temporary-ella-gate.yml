@@ -22,8 +22,10 @@ jobs:
           test -n "$ADMIN_PASSWORD"
           printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
           chmod 600 .env
+          set +e
           python scripts/gate.py --post ella26choosintexas > /tmp/ella_gate_result.log 2>&1
           outcome=$?
+          set -e
           GATE_OUTCOME="$outcome" python - <<'PY'
           import os,re
           from pathlib import Path
