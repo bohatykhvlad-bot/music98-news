@@ -17,9 +17,10 @@ test("legal pages reuse exact main logo geometry and glass header design",()=>{
   const mobileEnd=main.indexOf("  .top-actions{flex:1",mobileStart);
   assert.ok(mobileStart>=0 && mobileEnd>mobileStart);
   assert.ok(legalCSS.includes(main.slice(mobileStart,mobileEnd)));
+  assert.ok(legalCSS.includes("border:1px solid rgba(0,0,0,.08);"));
   assert.match(legalCSS,/@media \(min-width:1100px\)\{html\{zoom:\.96\}\}/);
   assert.match(legalCSS,/\.topbar\{font-family:var\(--font\)\}/);
-  assert.match(legalCSS,/body\{padding-top:var\(--header-h,60px\)\}/);
+  assert.match(legalCSS,/body\{padding-top:var\(--header-h,55px\)\}/);
   assert.match(legalJS,/function setHeaderAway\(away\)\{/);
   assert.match(legalJS,/function onScroll\(\)\{/);
   assert.match(legalJS,/window\.addEventListener\("scroll", onScroll/);
