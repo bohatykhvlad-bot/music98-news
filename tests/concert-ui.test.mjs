@@ -392,8 +392,8 @@ test("map popup stays above the desktop Search this area pill with a 14px gap",(
   const unclipped=shift(map,{left:330,right:670,top:30,bottom:310,width:340,height:280},pill);
   assert.equal(unclipped.shiftY,0,"already visible popups should not pan");
   const phoneMap={left:0,right:390,top:0,bottom:360,width:390,height:360};
-  const phonePill={left:125,right:265,top:366,bottom:406,width:140,height:40};
-  const phonePopup={left:100,right:380,top:170,bottom:410,width:280,height:240};
+  const phonePill={left:125,right:265,top:306,bottom:346,width:140,height:40};
+  const phonePopup={left:100,right:380,top:100,bottom:340,width:280,height:240};
   const mobile=shift(phoneMap,phonePopup,phonePill);
   assert.equal(phonePopup.bottom+mobile.shiftY,phonePill.top-14,"mobile popup clears the bottom-centered pill");
   assert.match(app,/map\.easeTo\(\{center:newCenter,duration:280\}\)/,"visibility pan never changes zoom");
