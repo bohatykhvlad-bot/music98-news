@@ -257,3 +257,14 @@ test("chart ticker scrolls only clipped text of the currently playing row",()=>{
  assert.match(page,/@media \(prefers-reduced-motion:reduce\)\{/);
  assert.doesNotMatch(page,/\.chart-row\.playing \.cartist\{[^}]*transform:/);
 });
+
+
+test("subscribe card has solid white background and preserves original geometry and shadow",()=>{
+  const match=page.match(/\\.subscribe::before\\{([\\s\\S]*?)\\n\\}/);
+  assert.ok(match,"subscribe white card must keep its existing pseudo-element");
+  const css=match[1];
+  assert.match(css,/border-radius:22px/);
+  assert.match(css,/background:#fff/);
+  assert.match(css,/box-shadow:0 18px 44px rgba\\(18,28,32,\\.10\\), 0 1px 0 rgba\\(255,255,255,\\.9\\) inset/);
+  assert.doesNotMatch(css,/backdrop-filter|background:rgba/);
+});
