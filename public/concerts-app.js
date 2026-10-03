@@ -1258,7 +1258,7 @@ async function toggleArtist(item,card,mode){
     sideSub.textContent="";
     if(events.length) fitEvents(events);
     setStatus(result.partial && result.total>events.length
-      ? "Showing "+events.length+" loaded dates of "+result.total+" Ticketmaster results · "+item.name
+      ? "Showing the nearest upcoming concerts · "+item.name
       : (events.length ? events.length+" upcoming concerts · "+item.name : "No upcoming concerts · "+item.name));
   }catch(err){
     if(requestId!==areaRequestSeq || expandedKey!==key) return;
