@@ -333,3 +333,17 @@ test("subscribe email focus does not retain a cyan mouse-focus halo",()=>{
   assert.match(page,/\.sub-in input:focus-visible\{outline:2px solid var\(--accent\);outline-offset:2px\}/);
   assert.doesNotMatch(page,/\.sub-in input:focus,\.sub-in input:focus-visible\{[^}]*box-shadow/);
 });
+
+
+test("all four main tabs use the same compact heading-to-content gap",()=>{
+  const concerts=readFileSync(new URL("../public/concerts-app.js",import.meta.url),"utf8");
+  assert.match(page,/--section-heading-gap:12px/);
+  assert.match(page,/\.tab \.hd\{margin:0 0 var\(--section-heading-gap\)\}/);
+  assert.doesNotMatch(page,/#tab-(?:news|releases|charts) \.hd\{margin:/,
+    "tab-specific heading gaps must not silently diverge");
+  assert.match(page,/#tab-releases \.rail-wrap\{margin-top:0\}/,
+    "release rail must not add an extra top gap");
+  assert.match(concerts,/\.hero\{margin:0 0 12px;align-items:center\}/);
+  assert.match(page,/#tab-news #newsGrid,#tab-releases #relGrid\{padding:32px 44px 32px 32px;margin:-32px 0 -32px -32px\}/,
+    "carousel shadow clearance must not change the visible card position");
+});
