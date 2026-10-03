@@ -22,10 +22,20 @@ async function collect(src){
  return {ok:false,error:String(last)};
 }
 const [kw,mr]=await Promise.all(sources.map(collect));
+console.log("SPOTIFY_SOURCE_STATUS",JSON.stringify({
+ checkedAt:new Date().toISOString(),
+ kworb:kw.ok?{date:kw.data.date,rows:kw.data.tracks.length}:{error:kw.error},
+ musicrank:mr.ok?{date:mr.data.date,rows:mr.data.tracks.length,
+  ldConfirmed:mr.data.ldConfirmed}:{error:mr.error}
+}));
 let chosen,provider,mirrorMatched=0,ldConfirmed=0;
 if(kw.ok&&mr.ok&&kw.data.date===mr.data.date){
  const match=compareSpotifyRankings(kw.data,mr.data);
- if(!match.ok)throw new Error("Spotify mirrors disagree at "+match.mismatchPositions.join(","));
+ if(!match.ok)throw new Error("Spotify mirrors disagree at "+
+  match.mismatchPositions.join(",")+": "+JSON.stringify(
+   match.mismatchPositions.slice(0,5).map(p=>({
+    position:p,kworb:kw.data.tracks[p-1],musicrank:mr.data.tracks[p-1]
+   }))));
  chosen=kw.data;provider="kworb+musicrank";mirrorMatched=50;ldConfirmed=mr.data.ldConfirmed;
 }else if(mr.ok&&(!kw.ok||mr.data.date>kw.data.date)){
  /* Musicrank has 50 visible ranks plus a separate agreeing top-20 JSON-LD.
