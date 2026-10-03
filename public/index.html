@@ -39,6 +39,7 @@
   --glass:rgba(255,255,255,.6); --glass-line:rgba(255,255,255,.55);
   --r:16px; --shadow:0 0 22px rgba(15,45,55,.14);
   --story-shadow:var(--shadow);
+  --section-heading-gap:12px;
   --font:"Pretendard",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 /* desktop scale (owner: 100% felt oversized, 92-93% is the sweet spot between
@@ -47,17 +48,9 @@
    widths are excluded: the 640/900px breakpoints below must keep CSS px. */
 @media (min-width:1100px){
   html{zoom:.96}
-  /* owner clarity (2026-09-24): "ты поднимаешь весь блок, а не карточки".
-     WRONG read — fixed: the SECTION stays where it was (tab padding back to
-     14px, heading starts at the familiar 18px below the header). What moves
-     is the SPACE between heading ink and the CARDS inside the section:
-     news margin 16->6, releases 24->14 (releases keeps +10 for descenders
-     p,g which eat ink gap). Rail keeps 20px floor so bottom gap stays 25.5. */
-  .tab .hd{margin:0 0 26px}
+  /* Match heading-to-content spacing across every desktop section. */
   .tab .rail{padding-bottom:20px}
   .subscribe{margin-top:24px}
-  #tab-news .hd{margin:0 0 6px}
-  #tab-releases .hd{margin:0 0 14px}
 }
 @property --pexp{syntax:"<length>";inherits:true;initial-value:0px}
 @property --hp{syntax:"<number>";inherits:true;initial-value:0}
@@ -154,7 +147,7 @@ main{position:relative;z-index:1}
 .tab{display:none;padding:14px 0 0}
 /* equal breathing around section headings (owner: blocks higher + equal gaps
    to the header above and the content below) */
-.tab .hd{margin:0 0 30px}
+.tab .hd{margin:0 0 var(--section-heading-gap)}
 .tab.active{display:block}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
@@ -193,6 +186,8 @@ main{position:relative;z-index:1}
    wrap (no -22px bleed past the content edge), same paddings, same pill
    anchors. Every card slider on the site clips at the content edge. */
 .rail-wrap{position:relative;margin-top:2px}
+/* Releases has no hero above its rail; don't add another 2px to the shared heading gap. */
+#tab-releases .rail-wrap{margin-top:0}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
 .rail-wrap .rail-btn.next{right:0}
 /* end clearance follows the slimmer pill (44px wide): next arrow sits 6px in
