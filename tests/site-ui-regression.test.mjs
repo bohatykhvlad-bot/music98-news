@@ -265,7 +265,7 @@ test("subscribe card has solid white background and preserves original geometry 
   const css=match[1];
   assert.match(css,/border-radius:22px/);
   assert.match(css,/background:#fff/);
-  assert.match(css,/box-shadow:0 18px 44px rgba\(18,28,32,\.10\), 0 1px 0 rgba\(255,255,255,\.9\) inset/);
+  assert.match(css,/box-shadow:var\(--shadow\)/);
   assert.doesNotMatch(css,/backdrop-filter|background:rgba/);
 });
 
@@ -295,4 +295,23 @@ test("chart and concerts pages never display technical source or partial-fetch d
   assert.doesNotMatch(page,/chartSourceNotice|Waiting for all five ranking sources|Showing the latest verified chart while today/);
   assert.doesNotMatch(concerts,/loaded dates of|Ticketmaster results ·/);
   assert.match(concerts,/Showing the nearest upcoming concerts ·/);
+});
+
+
+test("major card surfaces share one centered shadow across sections",()=>{
+  const centered="--shadow:0 0 22px rgba(15,45,55,.14)";
+  const concerts=readFileSync(new URL("../public/concerts-app.js",import.meta.url),"utf8");
+  const concertsStandalone=readFileSync(new URL("../public/concerts.html",import.meta.url),"utf8");
+  assert.ok(page.includes(centered),"News, Releases, chart and subscription share the site token");
+  assert.ok(concerts.includes(centered),"Concerts artist cards share the site token");
+  assert.ok(concertsStandalone.includes(centered),"Standalone Concerts shares the same token");
+  assert.match(page,/--story-shadow:var\(--shadow\)/);
+  assert.match(page,/\.hero\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.doesNotMatch(page,/\.hero\{[^}]*--shadow:/,"Hero must not secretly override the shared shadow");
+  assert.match(page,/\.chart\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(page,/\.card:hover\{[^}]*box-shadow:var\(--story-shadow\)/);
+  assert.match(page,/\.rcard:hover\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(page,/\.subscribe::before\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(concerts,/\.tour-card\.open\{[^}]*box-shadow:var\(--shadow\)/);
+  assert.match(page,/#tab-news #newsGrid,#tab-releases #relGrid\{padding:20px 44px 20px 20px;margin:-20px 0 -20px -20px\}/);
 });
