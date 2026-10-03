@@ -1,0 +1,41 @@
+name: Temporary Ella editorial gate
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-ella-gate.yml
+permissions:
+  contents: read
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify reviewed Ella draft against site editorial gate
+        shell: bash
+        run: |
+          test -n "$ADMIN_PASSWORD"
+          printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+          chmod 600 .env
+          python scripts/gate.py --post ella26choosintexas > /tmp/ella_gate_result.log 2>&1
+          outcome=$?
+          GATE_OUTCOME="$outcome" python - <<'PY'
+          import os,re
+          from pathlib import Path
+          s=Path('/tmp/ella_gate_result.log').read_text(errors='replace')
+          issues=[]
+          for line in s.splitlines():
+              t=line.strip()
+              if t.startswith(('X ','! ')):
+                  m=re.match(r'[X!]\s+([a-zA-Z][a-zA-Z0-9-]+)',t)
+                  if m: issues.append(m.group(1))
+          print('ELLA_GATE:', 'PASS' if os.environ['GATE_OUTCOME']=='0' else 'FAIL')
+          print('ELLA_GATE_ISSUE_CODES:',','.join(issues) if issues else 'none')
+          print('ELLA_GATE_LOG_LINES:',len(s.splitlines()))
+          PY
+          exit "$outcome"
