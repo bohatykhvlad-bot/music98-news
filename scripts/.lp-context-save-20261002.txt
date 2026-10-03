@@ -1,1 +1,0 @@
-Perform guarded LINKIN PARK editorial revision, scoped to current live post body only.

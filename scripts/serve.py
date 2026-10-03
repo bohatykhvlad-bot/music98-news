@@ -59,7 +59,7 @@ load_env()
 
 
 def admin_password() -> str:
-    return os.environ.get("ADMIN_PASSWORD", "music98")
+    return os.environ.get("ADMIN_PASSWORD", "")
 
 
 def migrate_publish_at(d):

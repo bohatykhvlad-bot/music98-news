@@ -18,6 +18,9 @@ test("legal pages reuse exact main logo geometry and glass header design",()=>{
   assert.ok(mobileStart>=0 && mobileEnd>mobileStart);
   assert.ok(legalCSS.includes(main.slice(mobileStart,mobileEnd)));
   assert.match(legalCSS,/\.topbar-glass\{[^}]*border:0;\s*border-bottom:1px solid rgba\(255,255,255,\.8\)/);
+  assert.match(legalCSS,/\.topbar-glass\{display:block\}/);
+  assert.match(legalCSS,/\.topbar-glass-full,\.topbar-glass-isle\{top:0;bottom:0;height:auto\}/);
+  assert.doesNotMatch(legalJS,/if\(mqPhone\.matches\)\{/);
   assert.match(legalCSS,/@media \(min-width:1100px\)\{html\{zoom:\.96\}\}/);
   assert.match(legalCSS,/\.topbar\{font-family:var\(--font\)\}/);
   assert.match(legalCSS,/body\{padding-top:var\(--header-h,55px\)\}/);
@@ -36,7 +39,7 @@ for(const filename of legalPages){
     assert.match(header[1],/<img class="brand-logo" src="\/logo.png" alt="music98.news"/);
     assert.match(header[1],/<span class="brand-name">music98.news<\/span>/);
     assert.doesNotMatch(header[1],/<nav\b|nav-btn|search|top-actions/);
-    assert.match(page,/<link rel="stylesheet" href="\/legal-header.css\?v=20261003-1">/);
+    assert.match(page,/<link rel="stylesheet" href="\/legal-header.css\?v=20261003-6">/);
     assert.match(page,/<script src="\/legal-header.js\?v=20261003-1" defer><\/script>/);
   });
 }

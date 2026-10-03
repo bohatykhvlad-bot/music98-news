@@ -43,8 +43,9 @@ body{padding-top:var(--header-h,55px)}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
 .topbar{font-family:var(--font)}
 @media (max-width:640px){
-  .topbar{--hp:0;height:auto;background:#fff;padding:0;box-shadow:0 1px 0 rgba(0,0,0,.08);backdrop-filter:none;-webkit-backdrop-filter:none}
-  .topbar-glass{display:none}
+  .topbar{--hp:0;height:auto;background:transparent;padding:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .topbar-glass{display:block}
+  .topbar-glass-full,.topbar-glass-isle{top:0;bottom:0;height:auto}
   .topbar-in{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:8px 16px 10px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;clip-path:none;backdrop-filter:none;-webkit-backdrop-filter:none}
   .brand{height:36px}
   .brand-logo{width:32px;height:32px}

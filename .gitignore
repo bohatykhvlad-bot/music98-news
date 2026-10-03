@@ -15,3 +15,10 @@ download.html
 skills-lock.json
 scripts/*.onnx
 .dev.vars
+
+# Keep private editorial material, research and one-shot triggers out of the public website source.
+.editorial/
+_style-memory.md
+docs/
+scripts/.*
+scripts/*.txt

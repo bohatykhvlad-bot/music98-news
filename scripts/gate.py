@@ -16,7 +16,7 @@ USAGE
   python scripts/gate.py --delta --post aubp23feat1   # only paragraphs changed since last run
   python scripts/gate.py --render https://music98.news/news/slug   # check the live page too
 
-WORKFLOW IT BELONGS TO (see _style-memory.md, "АЛГОРИТМ ПРОВЕРКИ")
+WORKFLOW IT BELONGS TO (private editorial rules are stored outside this public repository)
   1. edit freely while the owner is still giving notes
   2. FREEZE - owner says "готово"
   3. run this gate: it must be clean
@@ -35,7 +35,7 @@ import argparse, hashlib, json, os, re, ssl, sys, time
 import urllib.error, urllib.parse, urllib.request
 
 PROD = os.environ.get("MUSIC98_PROD", "https://music98.news")
-KEY = os.environ.get("MUSIC98_KEY", "RrrUuu181818@")
+KEY = (os.environ.get("MUSIC98_KEY") or os.environ.get("ADMIN_PASSWORD") or "").strip()
 STATE = os.path.join(os.environ.get("TEMP", "/tmp"), "music98-gate-state.json")
 
 LEAD_MIN_WORDS = 100          # hard floor for the paragraph in front of media

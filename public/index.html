@@ -729,8 +729,9 @@ textarea{resize:vertical;min-height:64px}
   /* Mobile chart: the footer status label is intentionally not displayed. */
   #tab-charts #chartStatus{display:none!important}
   .wrap{padding:0 16px}
-  .topbar{--hp:0;height:auto;background:#fff;padding:0;box-shadow:0 1px 0 rgba(0,0,0,.08);backdrop-filter:none;-webkit-backdrop-filter:none}
-  .topbar-glass{display:none}
+  .topbar{--hp:0;height:auto;background:transparent;padding:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .topbar-glass{display:block}
+  .topbar-glass-full,.topbar-glass-isle{top:0;bottom:0;height:auto}
   .topbar-in{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:8px 16px 10px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;clip-path:none;backdrop-filter:none;-webkit-backdrop-filter:none}
   .brand{height:36px}
   .brand-logo{width:32px;height:32px}
@@ -3707,17 +3708,11 @@ $("#subForm").addEventListener("submit", e=>{
 
 /* ============ glass header: solid island while scrolling; dissolves only at the top ============ */
 const topbar = document.querySelector(".topbar");
-const mqPhone = window.matchMedia("(max-width: 640px)");
 let hpRaf = 0;
 let hpAway = false;
 let hpReady = false;
 let meltTimer = 0;
 function setHeaderAway(away){
-  if(mqPhone.matches){
-    topbar.classList.remove("is-away","is-melting");
-    hpAway = false;
-    return;
-  }
   if(hpReady && away === hpAway) return;
   clearTimeout(meltTimer);
   if(!hpReady){
@@ -3977,6 +3972,6 @@ const initialCleanPath=location.pathname.replace(/\/+$/,"")||"/";
 if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20261003-26" defer></script>
+<script src="/concerts-app.js?v=20261003-27" defer></script>
 </body>
 </html>

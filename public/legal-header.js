@@ -1,17 +1,11 @@
 "use strict";
 /* Identical scroll-state transitions to the main header, without site search. */
 const topbar = document.querySelector(".topbar");
-const mqPhone = window.matchMedia("(max-width: 640px)");
 let hpRaf = 0;
 let hpAway = false;
 let hpReady = false;
 let meltTimer = 0;
 function setHeaderAway(away){
-  if(mqPhone.matches){
-    topbar.classList.remove("is-away","is-melting");
-    hpAway = false;
-    return;
-  }
   if(hpReady && away === hpAway) return;
   clearTimeout(meltTimer);
   if(!hpReady){

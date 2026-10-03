@@ -1,1 +1,0 @@
-2026-10-02 final layout version: validate 2434-word body, 10 distinct media positions, and all live URLs without writing.

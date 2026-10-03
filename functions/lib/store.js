@@ -96,8 +96,8 @@ export async function writeDesk(env, data) {
 
 export function adminOk(request, env) {
   const got = (request.headers.get("X-Admin-Key") || "").trim();
-  const want = String((env && env.ADMIN_PASSWORD) || "music98").trim();
-  return Boolean(got) && got === want;
+  const want = String((env && env.ADMIN_PASSWORD) || "").trim();
+  return Boolean(got && want) && got === want;
 }
 
 export function postStatus(p) {
