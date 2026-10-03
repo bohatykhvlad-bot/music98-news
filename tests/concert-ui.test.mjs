@@ -60,11 +60,11 @@ test("map uses only the daily verified market snapshot",()=>{
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
 
-test("map countries use a subtle neutral grey while water stays unchanged",()=>{
+test("map countries use a card-background neutral tint while water stays unchanged",()=>{
   const palette=app.match(/function addTopographicRelief\(\)\{([\s\S]*?)\n\}\n\nfunction addLayers\(\)/);
   assert.ok(palette,"map style adjustment function must exist");
-  assert.match(palette[1],/setPaintProperty\(id,"background-color","#eef1f2"\)/);
-  assert.match(palette[1],/setPaintProperty\(id,"fill-color","#eef1f2"\)/);
+  assert.match(palette[1],/setPaintProperty\(id,"background-color","#f4f6f7"\)/);
+  assert.match(palette[1],/setPaintProperty\(id,"fill-color","#f4f6f7"\)/);
   assert.match(palette[1],/setPaintProperty\(id,"fill-color","#dff4fa"\)/);
   assert.match(palette[1],/setPaintProperty\(id,"line-color","#cfeaf2"\)/);
 });
