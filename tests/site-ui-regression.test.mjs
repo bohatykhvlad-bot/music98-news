@@ -268,3 +268,18 @@ test("subscribe card has solid white background and preserves original geometry 
   assert.match(css,/box-shadow:0 18px 44px rgba\(18,28,32,\.10\), 0 1px 0 rgba\(255,255,255,\.9\) inset/);
   assert.doesNotMatch(css,/backdrop-filter|background:rgba/);
 });
+
+
+test("scrolling glass header keeps its existing fade with full-width straight geometry",()=>{
+  const full=page.match(/\.topbar-glass-full\{([^}]*)\}/);
+  const isle=page.match(/\.topbar-glass-isle\{([^}]*)\}/);
+  assert.ok(full && isle,"both original scroll layers must remain");
+  const geometry=s=>s.match(/top:0;\s*height:68px;\s*left:0;\s*right:var\(--sbw,0px\);\s*border-radius:0/);
+  assert.ok(geometry(full[1]),"full header must have no top/side gaps or rounded edges");
+  assert.ok(geometry(isle[1]),"scroll header must use the same edge-to-edge geometry");
+  assert.match(page,/\.topbar\.is-away \.topbar-glass-full\{opacity:0\}/);
+  assert.match(page,/\.topbar\.is-away \.topbar-glass-isle\{opacity:1\}/);
+  assert.match(page,/\.topbar\.is-melting \.topbar-glass\{transition:opacity \.48s ease\}/);
+  assert.match(page,/function setHeaderAway\(away\)\{/);
+  assert.match(page,/\.topbar-in\{[^}]*grid-template-columns:1fr auto 1fr/);
+});
