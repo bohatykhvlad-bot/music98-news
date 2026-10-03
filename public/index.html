@@ -875,7 +875,6 @@ textarea{resize:vertical;min-height:64px}
 
   <section class="tab" id="tab-charts">
     <div class="hd"><h1 class="hd-t">Daily Top 50</h1>
-      <p id="chartSourceNotice" class="chart-note" hidden></p>
     </div>
     <div class="chart-switch" id="chartSwitch" hidden></div>
     <div class="chart" id="chartList" role="list"></div>
@@ -2308,7 +2307,7 @@ function setChartStatus(f, tag){
   let txt = "";
   if(tag === "live" || tag === "live-mem" || tag === "cache") txt = "";
   else if(tag === "loading") txt = "Loading today’s chart…";
-  else if(tag === "backup") txt = "Showing the latest verified chart while today’s chart is unavailable.";
+  else if(tag === "backup") txt = "";
   else if(tag === "fail") txt = "Today’s chart is temporarily unavailable.";
   else txt = "Showing the latest copy stored in this browser.";
   st.textContent = txt;
@@ -2335,13 +2334,6 @@ function applyDaily(tracks, tag, updated){
   renderCharts();
   if($("#ef_rows")) renderChartRows();
   setChartStatus({},tag);
-  const notice=$("#chartSourceNotice");
-  if(notice){
-    notice.hidden=tag!=="backup";
-    notice.textContent=tag==="backup"
-      ? "Last complete chart: "+String(updated||"previous verified day")+". Waiting for all five ranking sources."
-      : "";
-  }
 }
 function refreshDailyTop50(){
   if(S.autoChart === false){
@@ -2360,7 +2352,6 @@ function refreshDailyTop50(){
     cached.tracks.every(t=>String(t.art||"").trim()));
   /* Never paint a locally cached ranking as today's chart before checking
      the latest independently verified source fingerprint with the server. */
-  $("#chartSourceNotice").hidden=true;
   autoRows=null;
   data.chart=[];
   renderCharts();
@@ -3972,6 +3963,6 @@ const initialCleanPath=location.pathname.replace(/\/+$/,"")||"/";
 if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20261003-29" defer></script>
+<script src="/concerts-app.js?v=20261003-30" defer></script>
 </body>
 </html>
