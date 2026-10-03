@@ -40,3 +40,65 @@ jobs:
           })().catch(e=>{console.log("KEY_OR_PROBE_ERROR "+String(e.message).slice(0,100));process.exit(1)});
           
           NODE
+      - name: Apply authenticated encrypted Ella-only editorial patch
+        if: ${{ hashFiles('.github/ella-reviewed-update.enc.b64') != '' }}
+        env:
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require("node:fs");
+          const {scryptSync,createDecipheriv,createHash}=require("node:crypto");
+          const {brotliDecompressSync}=require("node:zlib");
+          const sha=s=>createHash("sha256").update(s).digest("hex");
+          (async()=>{
+            const secret=process.env.ADMIN_PASSWORD;
+            if(!secret)throw Error("NO_EDITOR_CREDENTIAL");
+            const key=scryptSync(secret,"music98-ella-editorial-2026-10-03-v2",32);
+            const raw=Buffer.from(fs.readFileSync(".github/ella-reviewed-update.enc.b64","utf8").trim(),"base64");
+            if(raw.length<64||raw.subarray(0,9).toString()!=="M98PATCH1")throw Error("WRONG_PATCH_FORMAT");
+            const iv=raw.subarray(9,21),encrypted=raw.subarray(21);
+            const cipher=createDecipheriv("aes-256-gcm",key,iv);
+            cipher.setAuthTag(encrypted.subarray(encrypted.length-16));
+            const packed=Buffer.concat([cipher.update(encrypted.subarray(0,encrypted.length-16)),cipher.final()]);
+            const patch=JSON.parse(brotliDecompressSync(packed).toString("utf8"));
+            if(patch.id!=="ella26choosintexas"||patch.originalStatus!=="draft")throw Error("WRONG_ARTICLE");
+            const headers={"X-Admin-Key":secret,"Accept":"application/json","Content-Type":"application/json"};
+            const get=async()=>{
+              const r=await fetch("https://music98.news/api/desk",{headers,cache:"no-store"});
+              if(!r.ok)throw Error("GET_DESK_"+r.status);
+              const j=await r.json();if(!Array.isArray(j.posts))throw Error("INVALID_DESK");
+              return j;
+            };
+            const before=await get();
+            const post=before.posts.find(p=>p.id===patch.id);
+            if(!post||post.status!=="draft")throw Error("ARTICLE_NOT_DRAFT");
+            if(sha(post.body||"")!==patch.originalBodySHA256)throw Error("DRAFT_EDITED_SINCE_REVIEW_NO_OVERWRITE");
+            const snapshot=JSON.stringify(before.posts.filter(p=>p.id!==patch.id));
+            const coverSnapshot=JSON.stringify(post.cover);
+            const media=(post.body.match(/\\[(?:photo|youtube|apple|tiktok|instagram):/g)||[]).length;
+            const paragraphs=post.body.split("\\n\\n");
+            for(const op of patch.changes.slice().sort((a,b)=>b.start-a.start)){
+               if(!Number.isInteger(op.start)||!Number.isInteger(op.end)||op.start<0||op.end<op.start||op.end>paragraphs.length||!Array.isArray(op.new)||!op.new.every(x=>typeof x==="string"))throw Error("BAD_PATCH");
+               paragraphs.splice(op.start,op.end-op.start,...op.new);
+            }
+            const updated=paragraphs.join("\\n\\n");
+            if(sha(updated)!==patch.updatedBodySHA256)throw Error("PATCH_OUTPUT_MISMATCH");
+            if(!updated.startsWith(patch.excerpt))throw Error("EXCERPT_NO_LONGER_LITERAL");
+            if((updated.match(/\\[(?:photo|youtube|apple|tiktok|instagram):/g)||[]).length!==media)throw Error("MEDIA_COUNT_CHANGED");
+            const photo=updated.match(/\\[photo:(https:\\/\\/[^|]+)\\|Miriam Visser\\|/);
+            if(!photo)throw Error("NO_NEW_GUITAR_PHOTO");
+            const image=await fetch(photo[1],{method:"HEAD"});
+            if(!image.ok)throw Error("PHOTO_NOT_ACCESSIBLE_"+image.status);
+            post.body=updated;post.excerpt=patch.excerpt;
+            if(JSON.stringify(post.cover)!==coverSnapshot)throw Error("COVER_CHANGED");
+            const saved=await fetch("https://music98.news/api/desk",{method:"POST",headers,body:JSON.stringify({posts:before.posts})});
+            if(!saved.ok)throw Error("SAVE_FAILED_"+saved.status);
+            const after=await get(),target=after.posts.find(p=>p.id===patch.id);
+            if(!target||target.status!=="draft"||sha(target.body||"")!==patch.updatedBodySHA256||target.excerpt!==patch.excerpt)throw Error("POST_SAVE_VERIFY_FAILED");
+            if(JSON.stringify(after.posts.filter(p=>p.id!==patch.id))!==snapshot)throw Error("NON_TARGET_POST_CHANGED");
+            if(JSON.stringify(target.cover)!==coverSnapshot)throw Error("COVER_CHANGED_AFTER");
+            console.log("ELLA_DRAFT_UPDATE VERIFIED ID "+patch.id+" ORIGINALS_UNCHANGED true STATUS draft PARAGRAPHS "+target.body.split("\\n\\n").length+" PHOTO_SOURCE_REACHABLE true");
+          })().catch(e=>{console.error("ELLA_DRAFT_UPDATE FAILED "+String(e.message).slice(0,150));process.exit(1)});
+          
+          NODE
