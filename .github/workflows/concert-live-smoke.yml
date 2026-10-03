@@ -81,7 +81,7 @@ jobs:
                   assert '<link rel="canonical" href="https://music98.news/concerts">' in html
                   direct_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',html)
                   assert direct_src
-                  assert direct_src.group(1)=="/concerts-app.js?v=20261003-25"
+                  assert direct_src.group(1)=="/concerts-app.js?v=20261003-26"
                   _,_,home=get("https://music98.news/")
                   home_src=re.search(r'<script src="(/concerts-app\.js\?v=[^"]+)" defer></script>',home)
                   assert home_src and direct_src.group(1)==home_src.group(1)
