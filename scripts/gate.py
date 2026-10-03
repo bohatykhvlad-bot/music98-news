@@ -140,11 +140,15 @@ REFERENT = re.compile(
 # The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
+    # Ella Langley longread, fact-checked October 3, 2026 against the named sources.
+    "june 2026": "Ella Langley performed Choosin' Texas at CMA Fest in June 2026; official CMA performance posted June 25, 2026 (CMA YouTube i1IX4Dusi9k)",
+    "august 25": "Dolly Parton died August 25, 2026, aged 80 (Associated Press https://apnews.com/article/87156f3e6a1547b88bf414529b644ad3)",
+    "october 2026": "Miranda Lambert AP interview published October 2, 2026, discusses a country scene with a variety of voices (Associated Press https://apnews.com/article/670c88368e68e3f62ede48edf93e5177)",
     "october 9": "Dominic Fike 'How To Quit Smoking' album release date, 09.10.2026 (Apple Music / Columbia Records)",
     "september 29": "Dominic Fike Comedy Tragedy Parody show at The Wiltern, Los Angeles, 29.09.2026 (dominicfike.com / Ticketmaster)",
     "september 30": "Dominic Fike Comedy Tragedy Parody show at The Wiltern, Los Angeles, 30.09.2026 (dominicfike.com / Ticketmaster); LISA added-show general on-sale, 30.09.2026 (Caesars Entertainment 29.09.2026)",
     "september 23": "Taylor Swift announced The Life of a Showgirl: The Encore on 23.09.2026 (Pitchfork/NME)",
-    "october 3": "The Life of a Showgirl released on 03.10.2025 (Variety)",
+    "october 3": "The Life of a Showgirl released on 03.10.2025 (Variety); Ella Langley Choosin Texas reached 24 weeks atop Billboard Hot 100 on chart dated 03.10.2026 (The Atlantic 03.10.2026; Billboard chart)",
     "2016": "debut, SQUARE ONE, 08.08.2016 (YG); first music show win 21.08.2016 (Inkigayo)",
     "2018": "JENNIE 'SOLO', 12.11.2018 (YG/Columbia)",
     "2021": "ROSE 'R' 12.03.2021 and LISA 'LALISA' 10.09.2021; MONEY performance video 24.09.2021",
@@ -206,8 +210,8 @@ VERIFIED_DATES = {
                "promoted by Live Nation (Live Nation newsroom/Pollstar)",
     "may 13": "Feid vs Ferxxo: Falxo Tour closed 13.05.2026 in Dallas, fourteen cities "
               "(SeatGeek/Pollstar)",
-    "july 17": "Yeat LOVE/LYFE Tour opened 17.07.2026 in Minneapolis (yeatofficial.com/pages/tour, "
-               "themusicuniverse)",
+    "july 17": "Yeat LOVE/LYFE Tour opened 17.07.2026 in Minneapolis (yeatofficial.com/pages/tour, themusicuniverse); "
+               "Ella Langley performed at Ottawa Bluesfest 17.07.2026, photography by Miriam Visser (The Charlatan 18.07.2026)",
     "september 24": "Yeat LOVE/LYFE Tour Chicago stop, 24.09.2026, Huntington Bank Pavilion "
                     "(yeatofficial.com/pages/tour); Madonna and Charli xcx 'Danceteria Afterhours' remix "
                     "released 24.09.2026 on Warner (Wikipedia 'Danceteria (song)'; NME 25.09.2026; "
@@ -273,7 +277,8 @@ VERIFIED_DATES = {
     "january 22": "Teddy Swims 'UGLY', 22.01.2027 (Warner Records); 'Mr. Know It All' was the first "
                   "single of the era (10.04.2026), 'Perfect Man' came with the album news (18.09.2026)",
     "april 10": "Teddy Swims 'Mr. Know It All', 10.04.2026 (Warner Records) - the first single of the "
-                "UGLY era, so 'Perfect Man' is the second, not the first (stereoboard/Wikipedia)",
+                "UGLY era, so 'Perfect Man' is the second, not the first (stereoboard/Wikipedia); "
+                "Ella Langley Dandelion album released April 10, 2026 (Sony Music Canada press release)",
     "november 2025": "Teddy Swims 'Lose Control' certified Diamond by the RIAA on 21.11.2025 - the "
                      "200th song in US history to reach 10m certified units (RIAA/press)",
     "1984": "the MTV VMAs were first staged in 1984 (Guinness World Records; AP/Paramount)",
