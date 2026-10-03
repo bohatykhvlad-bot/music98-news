@@ -211,10 +211,10 @@ test("manually moving the map offers Search this area from Popular, Near me and 
   assert.match(click,/loadArea\(pending\.lat,pending\.lng,"Map area",\{fit:false,radius:pending\.radius,force:true\}\)/);
 });
 
-test("mobile Search this area stays centered at the map bottom below top controls",()=>{
-  assert.match(app,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{left:0;right:0;top:auto;bottom:14px;margin-inline:auto;height:40px\}/);
-  assert.match(app,/\.map-shell\.artist-context \.search-area-btn\{top:auto;bottom:14px\}/);
-  assert.doesNotMatch(app,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{left:auto;right:10px/);
+test("mobile Search this area remains at the top with the same right inset as map controls",()=>{
+  assert.match(app,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{left:auto;right:10px;top:10px;bottom:auto;margin-inline:0;height:40px\}/);
+  assert.match(app,/\.map-shell\.artist-context \.search-area-btn\{top:60px;right:10px\}/);
+  assert.doesNotMatch(app,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{left:0;right:0;top:auto;bottom:14px/);
 });
 
 
@@ -392,10 +392,10 @@ test("map popup stays above the desktop Search this area pill with a 14px gap",(
   const unclipped=shift(map,{left:330,right:670,top:30,bottom:310,width:340,height:280},pill);
   assert.equal(unclipped.shiftY,0,"already visible popups should not pan");
   const phoneMap={left:0,right:390,top:0,bottom:360,width:390,height:360};
-  const phonePill={left:125,right:265,top:306,bottom:346,width:140,height:40};
-  const phonePopup={left:100,right:380,top:100,bottom:340,width:280,height:240};
+  const phonePill={left:240,right:380,top:10,bottom:50,width:140,height:40};
+  const phonePopup={left:100,right:380,top:10,bottom:250,width:280,height:240};
   const mobile=shift(phoneMap,phonePopup,phonePill);
-  assert.equal(phonePopup.bottom+mobile.shiftY,phonePill.top-14,"mobile popup clears the bottom-centered pill");
+  assert.equal(phonePopup.top+mobile.shiftY,64,"mobile popup clears the top-right pill");
   assert.match(app,/map\.easeTo\(\{center:newCenter,duration:280\}\)/,"visibility pan never changes zoom");
 });
 
@@ -545,7 +545,7 @@ test("Concerts page retains consistent desktop and mobile alignment",()=>{
   assert.match(css,/@media\(max-width:900px\)\{\s*\.layout\{grid-template-columns:1fr\}/);
   assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.wrap\{padding:18px 14px 36px\}/);
   assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.map-mode-switch\{left:10px;top:10px/);
-  assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{left:0;right:0;top:auto;bottom:14px/);
+  assert.match(css,/@media\(max-width:700px\)\{[\s\S]*?\.search-area-btn\{left:auto;right:10px;top:10px/);
   assert.match(css,/@media\(max-width:640px\)\{\s*\.tour-row\{height:62px;min-height:62px/);
 });
 test("gray concert artist header never changes dimensions between hover and expanded states",()=>{
