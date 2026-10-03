@@ -1,10 +1,34 @@
 {
   "schema": 1,
-  "updated": "2026-10-02",
+  "updated": "2026-10-03",
   "source": "official-apple-rss",
   "tracks": [
     {
       "pos": 1,
+      "title": "Solar Eclipse",
+      "artist": "Drake & Don Toliver",
+      "url": "https://music.apple.com/us/album/solar-eclipse/6818209777?i=6818209989",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "year": "2026"
+    },
+    {
+      "pos": 2,
+      "title": "Quebec",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/quebec/6818209777?i=6818209990",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "year": "2026"
+    },
+    {
+      "pos": 3,
+      "title": "Cold Shoulder",
+      "artist": "Drake, Don Toliver & Yebba",
+      "url": "https://music.apple.com/us/album/cold-shoulder/6818209777?i=6818209992",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "year": "2026"
+    },
+    {
+      "pos": 4,
       "title": "Patient Zero",
       "artist": "Taylor Swift",
       "url": "https://music.apple.com/us/album/patient-zero/6814997249?i=6814997425",
@@ -12,7 +36,7 @@
       "year": "2026"
     },
     {
-      "pos": 2,
+      "pos": 5,
       "title": "BbY WOW",
       "artist": "KAROL G, Judeline & rusowsky",
       "url": "https://music.apple.com/us/album/bby-wow/6796864741?i=6796864754",
@@ -20,7 +44,7 @@
       "year": "2026"
     },
     {
-      "pos": 3,
+      "pos": 6,
       "title": "Choosin' Texas",
       "artist": "Ella Langley",
       "url": "https://music.apple.com/us/album/choosin-texas/1844932149?i=1844932150",
@@ -28,7 +52,7 @@
       "year": "2025"
     },
     {
-      "pos": 4,
+      "pos": 7,
       "title": "Last Thing You Need",
       "artist": "Morgan Wallen",
       "url": "https://music.apple.com/us/album/last-thing-you-need/6812476961?i=6812477290",
@@ -36,15 +60,7 @@
       "year": "2026"
     },
     {
-      "pos": 5,
-      "title": "Babylon",
-      "artist": "Taylor Swift",
-      "url": "https://music.apple.com/us/album/babylon/6814997249?i=6814997429",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
-      "year": "2026"
-    },
-    {
-      "pos": 6,
+      "pos": 8,
       "title": "Janice STFU",
       "artist": "Drake",
       "url": "https://music.apple.com/us/album/janice-stfu/6769568449?i=6769568596",
@@ -52,7 +68,15 @@
       "year": "2026"
     },
     {
-      "pos": 7,
+      "pos": 9,
+      "title": "Classic PT2",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/classic-pt2/6818209777?i=6818209993",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "year": "2026"
+    },
+    {
+      "pos": 10,
       "title": "Nicole Kidman",
       "artist": "ADÉLA",
       "url": "https://music.apple.com/us/album/nicole-kidman/6792883860?i=6792884088",
@@ -60,7 +84,7 @@
       "year": "2026"
     },
     {
-      "pos": 8,
+      "pos": 11,
       "title": "Been By Now",
       "artist": "Morgan Wallen",
       "url": "https://music.apple.com/us/album/been-by-now/6792676858?i=6792676860",
@@ -68,35 +92,11 @@
       "year": "2026"
     },
     {
-      "pos": 9,
-      "title": "Pink Clouding",
-      "artist": "Taylor Swift",
-      "url": "https://music.apple.com/us/album/pink-clouding/6814997249?i=6814997428",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
-      "year": "2026"
-    },
-    {
-      "pos": 10,
-      "title": "Cleveland!",
-      "artist": "Taylor Swift",
-      "url": "https://music.apple.com/us/album/cleveland/6814997249?i=6814997427",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
-      "year": "2026"
-    },
-    {
-      "pos": 11,
-      "title": "stupid song",
-      "artist": "Olivia Rodrigo",
-      "url": "https://music.apple.com/us/album/stupid-song/1889992111?i=1889992115",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
-      "year": "2026"
-    },
-    {
       "pos": 12,
-      "title": "the cure",
-      "artist": "Olivia Rodrigo",
-      "url": "https://music.apple.com/us/album/the-cure/1889992111?i=1889992123",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
+      "title": "Babylon",
+      "artist": "Taylor Swift",
+      "url": "https://music.apple.com/us/album/babylon/6814997249?i=6814997429",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
       "year": "2026"
     },
     {
@@ -125,18 +125,18 @@
     },
     {
       "pos": 16,
-      "title": "I Can't Love You Anymore",
-      "artist": "Ella Langley & Morgan Wallen",
-      "url": "https://music.apple.com/us/album/i-cant-love-you-anymore/1895158676?i=6763091996",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d9/7a/6e/d97a6e25-ef5c-0c26-64e9-266c18641a57/196874324103.jpg/600x600bb.jpg",
+      "title": "Pink Clouding",
+      "artist": "Taylor Swift",
+      "url": "https://music.apple.com/us/album/pink-clouding/6814997249?i=6814997428",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
       "year": "2026"
     },
     {
       "pos": 17,
-      "title": "Be Her",
-      "artist": "Ella Langley",
-      "url": "https://music.apple.com/us/album/be-her/1869436835?i=1869436845",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
+      "title": "I Can't Love You Anymore",
+      "artist": "Ella Langley & Morgan Wallen",
+      "url": "https://music.apple.com/us/album/i-cant-love-you-anymore/1895158676?i=6763091996",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d9/7a/6e/d97a6e25-ef5c-0c26-64e9-266c18641a57/196874324103.jpg/600x600bb.jpg",
       "year": "2026"
     },
     {
@@ -149,6 +149,38 @@
     },
     {
       "pos": 19,
+      "title": "stupid song",
+      "artist": "Olivia Rodrigo",
+      "url": "https://music.apple.com/us/album/stupid-song/1889992111?i=1889992115",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
+      "year": "2026"
+    },
+    {
+      "pos": 20,
+      "title": "Be Her",
+      "artist": "Ella Langley",
+      "url": "https://music.apple.com/us/album/be-her/1869436835?i=1869436845",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
+      "year": "2026"
+    },
+    {
+      "pos": 21,
+      "title": "Cleveland!",
+      "artist": "Taylor Swift",
+      "url": "https://music.apple.com/us/album/cleveland/6814997249?i=6814997427",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+      "year": "2026"
+    },
+    {
+      "pos": 22,
+      "title": "the cure",
+      "artist": "Olivia Rodrigo",
+      "url": "https://music.apple.com/us/album/the-cure/1889992111?i=1889992123",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
+      "year": "2026"
+    },
+    {
+      "pos": 23,
       "title": "LIKE ME (feat. 42 Dugg & Lil Baby)",
       "artist": "Future",
       "url": "https://music.apple.com/us/album/like-me-feat-42-dugg-lil-baby/1621803882?i=1621803969",
@@ -156,7 +188,7 @@
       "year": "2022"
     },
     {
-      "pos": 20,
+      "pos": 24,
       "title": "Best I Ever Had",
       "artist": "Drake",
       "url": "https://music.apple.com/us/album/best-i-ever-had/1452017773?i=1452017954",
@@ -164,23 +196,7 @@
       "year": "2009"
     },
     {
-      "pos": 21,
-      "title": "So Good (feat. Kendrick Lamar)",
-      "artist": "Jhené Aiko",
-      "url": "https://music.apple.com/us/album/so-good-feat-kendrick-lamar/6810715695?i=6810716062",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5f/51/9f/5f519f49-44c1-6aeb-f289-5b14c677abb1/26UM1IM17017.rgb.jpg/600x600bb.jpg",
-      "year": "2026"
-    },
-    {
-      "pos": 22,
-      "title": "Great Expectation",
-      "artist": "SIENNA SPIRO",
-      "url": "https://music.apple.com/us/album/great-expectation/6769552402?i=6769552411",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f4/e5/61/f4e561f5-3e73-68c7-7ca4-295ac5a063ed/26UMGIM51351.rgb.jpg/600x600bb.jpg",
-      "year": "2026"
-    },
-    {
-      "pos": 23,
+      "pos": 25,
       "title": "March Madness",
       "artist": "Future",
       "url": "https://music.apple.com/us/album/march-madness/1506297314?i=1506297772",
@@ -188,7 +204,7 @@
       "year": "2015"
     },
     {
-      "pos": 24,
+      "pos": 26,
       "title": "I'm The Problem",
       "artist": "Morgan Wallen",
       "url": "https://music.apple.com/us/album/im-the-problem/1802103958?i=1802103970",
@@ -196,7 +212,7 @@
       "year": "2025"
     },
     {
-      "pos": 25,
+      "pos": 27,
       "title": "I'M DAT N***A",
       "artist": "Future",
       "url": "https://music.apple.com/us/album/im-dat-n-a/1621119097?i=1621119426",
@@ -204,7 +220,7 @@
       "year": "2022"
     },
     {
-      "pos": 26,
+      "pos": 28,
       "title": "Don't We",
       "artist": "Morgan Wallen",
       "url": "https://music.apple.com/us/album/dont-we/1802103958?i=1802104400",
@@ -212,28 +228,12 @@
       "year": "2025"
     },
     {
-      "pos": 27,
+      "pos": 29,
       "title": "Frozen",
       "artist": "Lil Baby",
       "url": "https://music.apple.com/us/album/frozen/1621207919?i=1621207921",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/4c/5c/d2/4c5cd2e1-2244-2527-3ea3-2003ee734428/22UMGIM45519.rgb.jpg/600x600bb.jpg",
       "year": "2022"
-    },
-    {
-      "pos": 28,
-      "title": "I’m Spent",
-      "artist": "Drake & Loe Shimmy",
-      "url": "https://music.apple.com/us/album/im-spent/6769551464?i=6769551476",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c4/3b/89/c43b8964-a24e-b396-bd65-e5b45cabe039/26UMGIM63616.rgb.jpg/600x600bb.jpg",
-      "year": "2026"
-    },
-    {
-      "pos": 29,
-      "title": "Broken Window Serenade",
-      "artist": "Whiskey Myers",
-      "url": "https://music.apple.com/us/album/broken-window-serenade/1813021356?i=1813021660",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/cf/22/d0cf226c-607d-d97c-61d4-26eabde51f1d/886443002371_Cover.jpg/600x600bb.jpg",
-      "year": "2011"
     },
     {
       "pos": 30,
@@ -245,30 +245,14 @@
     },
     {
       "pos": 31,
-      "title": "The Fate of Ophelia",
-      "artist": "Taylor Swift",
-      "url": "https://music.apple.com/us/album/the-fate-of-ophelia/1833328839?i=1833328840",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2d/46/e0/2d46e0bc-8ab9-85dd-4b56-ee6951351034/25UM1IM19577.rgb.jpg/600x600bb.jpg",
-      "year": "2025"
-    },
-    {
-      "pos": 32,
-      "title": "Dope Girl",
-      "artist": "Rod Wave",
-      "url": "https://music.apple.com/us/album/dope-girl/6807069399?i=6807069451",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/44/13/75/441375a6-a91b-05ec-7b61-b7d17a892469/196874739525.jpg/600x600bb.jpg",
+      "title": "So Good (feat. Kendrick Lamar)",
+      "artist": "Jhené Aiko",
+      "url": "https://music.apple.com/us/album/so-good-feat-kendrick-lamar/6810715695?i=6810716062",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5f/51/9f/5f519f49-44c1-6aeb-f289-5b14c677abb1/26UM1IM17017.rgb.jpg/600x600bb.jpg",
       "year": "2026"
     },
     {
-      "pos": 33,
-      "title": "Marvins Room",
-      "artist": "Drake",
-      "url": "https://music.apple.com/us/album/marvins-room/1440642493?i=1440642743",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/600x600bb.jpg",
-      "year": "2011"
-    },
-    {
-      "pos": 34,
+      "pos": 32,
       "title": "Sum 2 Prove",
       "artist": "Lil Baby",
       "url": "https://music.apple.com/us/album/sum-2-prove/1534816297?i=1534816484",
@@ -276,7 +260,15 @@
       "year": "2020"
     },
     {
-      "pos": 35,
+      "pos": 33,
+      "title": "Broken Window Serenade",
+      "artist": "Whiskey Myers",
+      "url": "https://music.apple.com/us/album/broken-window-serenade/1813021356?i=1813021660",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/cf/22/d0cf226c-607d-d97c-61d4-26eabde51f1d/886443002371_Cover.jpg/600x600bb.jpg",
+      "year": "2011"
+    },
+    {
+      "pos": 34,
       "title": "Stick Talk",
       "artist": "Future",
       "url": "https://music.apple.com/us/album/stick-talk/1017053934?i=1017055092",
@@ -284,20 +276,28 @@
       "year": "2015"
     },
     {
-      "pos": 36,
-      "title": "Wants and Needs (feat. Lil Baby)",
-      "artist": "Drake",
-      "url": "https://music.apple.com/us/album/wants-and-needs-feat-lil-baby/1556669854?i=1556670532",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/63/2a/34/632a3488-d104-3ff1-dc02-4ed86f58ed05/21UMGIM18577.rgb.jpg/600x600bb.jpg",
-      "year": "2021"
+      "pos": 35,
+      "title": "Great Expectation",
+      "artist": "SIENNA SPIRO",
+      "url": "https://music.apple.com/us/album/great-expectation/6769552402?i=6769552411",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f4/e5/61/f4e561f5-3e73-68c7-7ca4-295ac5a063ed/26UMGIM51351.rgb.jpg/600x600bb.jpg",
+      "year": "2026"
     },
     {
-      "pos": 37,
+      "pos": 36,
       "title": "Right On",
       "artist": "Lil Baby",
       "url": "https://music.apple.com/us/album/right-on/1618153462?i=1618153473",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/56/6d/ce/566dceeb-e2ea-24ff-f601-1c18497b87f8/22UMGIM37903.rgb.jpg/600x600bb.jpg",
       "year": "2022"
+    },
+    {
+      "pos": 37,
+      "title": "Dope Girl",
+      "artist": "Rod Wave",
+      "url": "https://music.apple.com/us/album/dope-girl/6807069399?i=6807069451",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/44/13/75/441375a6-a91b-05ec-7b61-b7d17a892469/196874739525.jpg/600x600bb.jpg",
+      "year": "2026"
     },
     {
       "pos": 38,
@@ -317,46 +317,38 @@
     },
     {
       "pos": 40,
-      "title": "Man I Need",
-      "artist": "Olivia Dean",
-      "url": "https://music.apple.com/us/album/man-i-need/1817609404?i=1817609509",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/600x600bb.jpg",
-      "year": "2025"
+      "title": "Marvins Room",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/marvins-room/1440642493?i=1440642743",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/600x600bb.jpg",
+      "year": "2011"
     },
     {
       "pos": 41,
-      "title": "Solar Eclipse",
-      "artist": "Drake & Don Toliver",
-      "url": "https://music.apple.com/us/album/solar-eclipse/6818209777?i=6818209989",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
-      "year": "2026"
+      "title": "Wants and Needs (feat. Lil Baby)",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/wants-and-needs-feat-lil-baby/1556669854?i=1556670532",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/63/2a/34/632a3488-d104-3ff1-dc02-4ed86f58ed05/21UMGIM18577.rgb.jpg/600x600bb.jpg",
+      "year": "2021"
     },
     {
       "pos": 42,
-      "title": "Kacey Talk",
-      "artist": "YoungBoy Never Broke Again",
-      "url": "https://music.apple.com/us/album/kacey-talk/1530122403?i=1530123009",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/13/d6/e3/13d6e3ac-7a38-c6c3-6566-e027f3735426/075679802378.jpg/600x600bb.jpg",
-      "year": "2020"
+      "title": "WTF GOIN",
+      "artist": "Belly Gang Kushington & 21 Savage",
+      "url": "https://music.apple.com/us/album/wtf-goin/6779378647?i=6779378648",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/14/d5/7b/14d57b74-7680-e414-2424-f03f1173da3a/820233646390.jpg/600x600bb.jpg",
+      "year": "2026"
     },
     {
       "pos": 43,
-      "title": "Power Trip (feat. Miguel)",
-      "artist": "J. Cole",
-      "url": "https://music.apple.com/us/album/power-trip-feat-miguel/1529510479?i=1529510489",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/4f/c3/f3/4fc3f366-1148-74fe-2e88-ee37d4e633dd/20UMGIM65999.rgb.jpg/600x600bb.jpg",
-      "year": "2013"
+      "title": "The Fate of Ophelia",
+      "artist": "Taylor Swift",
+      "url": "https://music.apple.com/us/album/the-fate-of-ophelia/1833328839?i=1833328840",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2d/46/e0/2d46e0bc-8ab9-85dd-4b56-ee6951351034/25UM1IM19577.rgb.jpg/600x600bb.jpg",
+      "year": "2025"
     },
     {
       "pos": 44,
-      "title": "Snooze",
-      "artist": "SZA",
-      "url": "https://music.apple.com/us/album/snooze/1657869377?i=1657869492",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/bd/3b/a9/bd3ba9fb-9609-144f-bcfe-ead67b5f6ab3/196589564931.jpg/600x600bb.jpg",
-      "year": "2022"
-    },
-    {
-      "pos": 45,
       "title": "Just In Case",
       "artist": "Morgan Wallen",
       "url": "https://music.apple.com/us/album/just-in-case/1802103958?i=1802103977",
@@ -364,7 +356,31 @@
       "year": "2025"
     },
     {
+      "pos": 45,
+      "title": "I’m Spent",
+      "artist": "Drake & Loe Shimmy",
+      "url": "https://music.apple.com/us/album/im-spent/6769551464?i=6769551476",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c4/3b/89/c43b8964-a24e-b396-bd65-e5b45cabe039/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "year": "2026"
+    },
+    {
       "pos": 46,
+      "title": "Man I Need",
+      "artist": "Olivia Dean",
+      "url": "https://music.apple.com/us/album/man-i-need/1817609404?i=1817609509",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/600x600bb.jpg",
+      "year": "2025"
+    },
+    {
+      "pos": 47,
+      "title": "Kacey Talk",
+      "artist": "YoungBoy Never Broke Again",
+      "url": "https://music.apple.com/us/album/kacey-talk/1530122403?i=1530123009",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/13/d6/e3/13d6e3ac-7a38-c6c3-6566-e027f3735426/075679802378.jpg/600x600bb.jpg",
+      "year": "2020"
+    },
+    {
+      "pos": 48,
       "title": "Boston",
       "artist": "STELLA LEFTY",
       "url": "https://music.apple.com/us/album/boston/1884403092?i=1884403093",
@@ -372,36 +388,20 @@
       "year": "2026"
     },
     {
-      "pos": 47,
-      "title": "Knife Talk (feat. 21 Savage & Project Pat)",
-      "artist": "Drake",
-      "url": "https://music.apple.com/us/album/knife-talk-feat-21-savage-project-pat/1584281467?i=1584281787",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/11/36/38/1136384a-eebc-697a-c005-d890e41c0854/21UM1IM07518.rgb.jpg/600x600bb.jpg",
-      "year": "2021"
-    },
-    {
-      "pos": 48,
-      "title": "Girls Need Love",
-      "artist": "Summer Walker",
-      "url": "https://music.apple.com/us/album/girls-need-love/1438765128?i=1438765134",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/7c/1e/1a/7c1e1a21-013c-f31d-dc2c-c8118439641d/18UMGIM66021.rgb.jpg/600x600bb.jpg",
-      "year": "2018"
-    },
-    {
       "pos": 49,
+      "title": "Power Trip (feat. Miguel)",
+      "artist": "J. Cole",
+      "url": "https://music.apple.com/us/album/power-trip-feat-miguel/1529510479?i=1529510489",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/4f/c3/f3/4fc3f366-1148-74fe-2e88-ee37d4e633dd/20UMGIM65999.rgb.jpg/600x600bb.jpg",
+      "year": "2013"
+    },
+    {
+      "pos": 50,
       "title": "Low Down",
       "artist": "Lil Baby",
       "url": "https://music.apple.com/us/album/low-down/1534816297?i=1534816500",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/70/97/3a/70973a36-b897-e20e-4698-c05d4f5ee24f/20UMGIM30253.rgb.jpg/600x600bb.jpg",
       "year": "2020"
-    },
-    {
-      "pos": 50,
-      "title": "Like That",
-      "artist": "Future, Metro Boomin & Kendrick Lamar",
-      "url": "https://music.apple.com/us/album/like-that/1737149923?i=1737150439",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4e/9f/7b/4e9f7b71-28ad-a8dc-9b34-da532feb82f6/196871937382.jpg/600x600bb.jpg",
-      "year": "2024"
     }
   ]
 }
