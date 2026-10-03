@@ -69,6 +69,15 @@ test("map countries use a barely off-white neutral tint while water stays unchan
   assert.match(palette[1],/setPaintProperty\(id,"line-color","#cfeaf2"\)/);
 });
 
+test("all built-in Mapbox place and map labels are near-black without changing map colors or symbols",()=>{
+  const paint=app.match(/function addTopographicRelief\(\)\{([\s\S]*?)\n\}\n\nfunction addLayers\(\)/);
+  assert.ok(paint);
+  assert.match(paint[1],/if\(layer\.type==="symbol" && Object\.prototype\.hasOwnProperty\.call\(layer\.layout\|\|\{\},"text-field"\)\)\{\s*map\.setPaintProperty\(id,"text-color","#111111"\)/);
+  assert.match(paint[1],/setPaintProperty\(id,"fill-color","#fafbfb"\)/);
+  assert.match(paint[1],/setPaintProperty\(id,"fill-color","#dff4fa"\)/);
+  assert.doesNotMatch(paint[1],/setPaintProperty\(id,"icon-color"/);
+});
+
 test("map has no custom minus or floating map status and native zoom-out resets filters",()=>{
   assert.equal(app.includes("resetMapBtn"),false);
   assert.equal(app.includes("map-status"),false);
