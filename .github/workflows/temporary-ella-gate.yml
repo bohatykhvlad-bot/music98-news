@@ -37,7 +37,22 @@ jobs:
                   m=re.match(r'[X!]\s+([a-zA-Z][a-zA-Z0-9-]+)',t)
                   if m: issues.append(m.group(1))
           print('ELLA_GATE:', 'PASS' if os.environ['GATE_OUTCOME']=='0' else 'FAIL')
-          print('ELLA_GATE_ISSUE_CODES:',','.join(issues) if issues else 'none')
+          fails=[];warns=[];detail=[]
+          for line in s.splitlines():
+              t=line.strip()
+              m=re.match(r'([X!])\\s+([a-zA-Z][a-zA-Z0-9-]+)\\s+(.+)',t)
+              if not m:continue
+              severity,code,message=m.groups()
+              (fails if severity=='X' else warns).append(code)
+              if code=='date-unregistered':
+                  token=re.search(r"'([^']+)' is not",message)
+                  if token:detail.append('date='+token.group(1))
+              if code in ('short-paragraph','text-wall','thin-finale'):
+                  loc=re.search(r'paragraph[s]? [0-9]+(?:-[0-9]+)?(?: is [0-9]+ words)?',message)
+                  if loc:detail.append(code+' '+loc.group(0))
+          print('ELLA_GATE_FAIL_CODES:',','.join(fails) if fails else 'none')
+          print('ELLA_GATE_WARN_CODES:',','.join(warns) if warns else 'none')
+          print('ELLA_GATE_SAFE_DETAILS:', '; '.join(detail))
           print('ELLA_GATE_LOG_LINES:',len(s.splitlines()))
           PY
           exit "$outcome"
