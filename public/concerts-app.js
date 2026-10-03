@@ -772,6 +772,7 @@ function snapPopup(){
   if(Math.abs(dx)>.001 || Math.abs(dy)>.001) el.style.translate=dx.toFixed(3)+"px "+dy.toFixed(3)+"px";
 }
 const POPUP_CITY_MIN_ZOOM=6.2;
+const POPUP_OVERVIEW_DISMISS_ZOOM=4.7;
 function syncPopupPresentation(){
   if(!popup) return;
   const el=popup.getElement?.();
@@ -1797,37 +1798,6 @@ popularTab.addEventListener("click",()=>loadPopular());
 mapArtistBtn.addEventListener("click",showArtistContext);
 mapAllBtn.addEventListener("click",showAllConcertsInMapArea);
 
-function resetMapFilters(){
-  areaRequestSeq++;
-  popularRequestSeq++;
-  hidePendingAreaSearch();
-  closePopup();
-  clearArtistContext();
-  search.value="";
-  suggestions.hidden=true;
-  userMoving=false;
-  lastArea=null;
-  nearbyEvents=[];
-  nearbyTotal=0;
-  currentEvents=[];
-  currentTotal=0;
-  artistMapEvents=[];
-  setMode("popular");
-  sideSub.textContent="";
-  if(popularArtists.length){
-    renderArtists(popularArtists,"popular");
-    sideEmpty.hidden=true;
-  }
-  setEventData([]);
-  setStatus("");
-}
-function bindNativeZoomOutReset(){
-  const btn=map.getContainer()?.querySelector?.(".mapboxgl-ctrl-zoom-out");
-  if(!btn || btn.dataset.music98ResetBound==="1") return;
-  btn.dataset.music98ResetBound="1";
-  btn.addEventListener("click",resetMapFilters);
-}
-
 searchAreaBtn.addEventListener("click",()=>{
   const pending=pendingAreaSearch;
   hidePendingAreaSearch();
@@ -1914,13 +1884,13 @@ map.on("styleimagemissing",e=>{
 map.on("render",()=>{ if(popup) snapPopup(); });
 map.on("zoom",()=>{
   applyMapMode();
-  if(!popup) return;
-  if(map.getZoom()<POPUP_CITY_MIN_ZOOM){ closePopup(); return; }
+  if(popup && map.getZoom()<POPUP_OVERVIEW_DISMISS_ZOOM) closePopup();
 });
 map.on("zoomend",()=>{
   if(!popup) return;
-  if(map.getZoom()<POPUP_CITY_MIN_ZOOM){ closePopup(); return; }
-  requestAnimationFrame(ensurePopupFullyVisible);
+  if(map.getZoom()<POPUP_OVERVIEW_DISMISS_ZOOM){ closePopup(); return; }
+  // User-controlled zoom should not automatically pan the map to fit the card.
+  requestAnimationFrame(snapPopup);
 });
 map.on("moveend",()=>{
   if(!userMoving) return;
@@ -1961,7 +1931,6 @@ map.on("load",()=>{
   const hubs=map.getSource("hubs");
   if(hubs) hubs.setData(hubsGeoJSON());
   applyMapMode();
-  bindNativeZoomOutReset();
   bootConcertData();
   queuePillInkCenter();
   if(document.fonts?.ready) document.fonts.ready.then(queuePillInkCenter).catch(()=>{});

@@ -25,8 +25,9 @@ test("Buy Tickets only fills cyan on hover and has no press animation",()=>{
   assert.doesNotMatch(app,/\.buy\.press\{transform:scale/);
 });
 
-test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
+test("concert popup keeps fixed geometry and only dismisses after reaching the world overview",()=>{
   assert.match(app,/const POPUP_CITY_MIN_ZOOM=6\.2/);
+  assert.match(app,/const POPUP_OVERVIEW_DISMISS_ZOOM=4\.7/);
   assert.doesNotMatch(app,/function popupLerp/);
   assert.doesNotMatch(app,/const t=Math\.max\(0,Math\.min\(1,\(z-2\.3\)/);
   assert.match(app,/const width=singleEvent\?\(window\.matchMedia\("\(max-width:700px\)"\)\.matches\?"300px":"340px"\):"286px"/);
@@ -34,7 +35,8 @@ test("concert popup keeps fixed geometry and disappears below city zoom",()=>{
   assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:"286px",focusAfterOpen:false\}\)/);
   assert.match(app,/const popupMaxWidth=window\.matchMedia\("\(max-width:700px\)"\)\.matches\?"300px":"340px"/);
   assert.match(app,/new mapboxgl\.Popup\(\{offset:16,closeButton:true,maxWidth:popupMaxWidth,focusAfterOpen:false\}\)/);
-  assert.match(app,/map\.on\("zoom",\(\)=>\{\n  applyMapMode\(\);\n  if\(!popup\) return;\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\)\{ closePopup\(\); return; \}/);
+  assert.match(app,/map\.on\("zoom",\(\)=>\{\n  applyMapMode\(\);\n  if\(popup && map\.getZoom\(\)<POPUP_OVERVIEW_DISMISS_ZOOM\) closePopup\(\);/);
+  assert.match(app,/map\.on\("zoomend",\(\)=>\{[\s\S]*?requestAnimationFrame\(snapPopup\);/);
   assert.match(app,/function showPopup\(e\)\{\n  if\(map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
   assert.match(app,/function showVenuePopup\(events\)\{\n  if\(!events\?\.length \|\| map\.getZoom\(\)<POPUP_CITY_MIN_ZOOM\) return;/);
 });
@@ -60,14 +62,43 @@ test("map uses only the daily verified market snapshot",()=>{
   assert.match(app,/overview:\(h\.verified\|\|h\.pinned/);
 });
 
-test("map has no custom minus or floating map status and native zoom-out resets filters",()=>{
+test("map minus zooms normally without discarding artist and area filters",()=>{
   assert.equal(app.includes("resetMapBtn"),false);
   assert.equal(app.includes("map-status"),false);
   assert.match(app,/function setStatus\(message\)\{ sideStatus\.textContent=/);
-  assert.match(app,/\.mapboxgl-ctrl-zoom-out/);
-  assert.match(app,/btn\.addEventListener\("click",resetMapFilters\)/);
+  assert.match(app,/new mapboxgl\.NavigationControl\(\{showCompass:false\}\)/);
+  assert.doesNotMatch(app,/bindNativeZoomOutReset|music98ResetBound|resetMapFilters/);
   assert.equal(app.includes("radiusEl"),false);
 });
+
+test("a single minus step preserves an open concert popup without moving the map",()=>{
+  const zoomSource=app.slice(app.indexOf('map.on("zoom",()=>{'),app.indexOf('map.on("moveend",()=>{'));
+  assert.ok(zoomSource.startsWith('map.on("zoom",()=>{'));
+  const runAtZoom=zoom=>{
+    const handlers={};
+    const map={on:(name,fn)=>handlers[name]=fn,getZoom:()=>zoom};
+    const state=runInNewContext(`var popup={};var dismissals=0,pans=0,snaps=0,modes=0;
+      function closePopup(){popup=null;dismissals++}
+      function applyMapMode(){modes++}
+      function ensurePopupFullyVisible(){pans++}
+      function snapPopup(){snaps++}
+      ${zoomSource}
+      handlers.zoom();handlers.zoomend();
+      ({open:!!popup,dismissals,pans,snaps,modes})`,
+      {map,handlers,requestAnimationFrame:fn=>fn(),POPUP_OVERVIEW_DISMISS_ZOOM:4.7});
+    return state;
+  };
+  const step=runAtZoom(5.3);
+  assert.equal(step.open,true);
+  assert.equal(step.dismissals,0);
+  assert.equal(step.pans,0,"native zoom-out must not fly the camera to fit the popup");
+  assert.equal(step.snaps,1);
+  assert.equal(step.modes,1);
+  const overview=runAtZoom(4.6);
+  assert.equal(overview.open,false);
+  assert.equal(overview.dismissals,1);
+});
+
 test("map shell has no gray shadow gap and canvas fills it",()=>{
   assert.match(app,/\.map-shell\{[^}]*background:#fff;box-shadow:none/);
   assert.match(app,/#map \.mapboxgl-canvas\{[^}]*width:100%!important;height:100%!important/);
