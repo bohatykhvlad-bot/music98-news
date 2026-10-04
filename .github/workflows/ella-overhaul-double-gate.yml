@@ -40,7 +40,7 @@ jobs:
             const all=(await r.json()).posts;
             const old=all.find(x=>x.id==='ella26choosintexas');
             const media=s=>s.match(/\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]/g)||[];
-            console.log('ELLA_STAGING_DIAG found='+Boolean(old)+' actualStatus='+String(old?.status||'none')+' patchStatus='+String(patch.originalStatus||'none')+' patchId='+String(patch.id||'none')+' candidateHash='+patch.newBodySHA256);
+            console.log('ELLA_STAGING_DIAG found='+Boolean(old)+' actualStatus='+String(old?.status||'none')+' patchStatus='+String(patch.originalStatus||'none')+' patchId='+String(patch.id||'none')+' currentBodyHash='+hash(old?.body||'')+' currentTitleMatch='+(old?.title===patch.originalTitle)+' candidateHash='+patch.newBodySHA256);
             if(!old||old.status!=='live'||patch.id!=='ella26choosintexas'||patch.originalStatus!=='live')throw Error('WRONG_POST_STATUS');
             if(hash(old.body||'')!==patch.originalBodySHA256||old.title!==patch.originalTitle)throw Error('EXISTING_LIVE_ARTICLE_CHANGED');
             if(hash(patch.body)!==patch.newBodySHA256||!patch.body.startsWith(patch.excerpt))throw Error('PATCH_TEXT_OR_EXCERPT_MISMATCH');
