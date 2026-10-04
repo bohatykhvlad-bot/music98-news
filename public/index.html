@@ -7,7 +7,7 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9555543001162953"
     crossorigin="anonymous"></script>
 <title>music98.news — Music News, Releases & Charts</title>
-<meta name="m98-build" content="editorial-72">
+<meta name="m98-build" content="header-geometry-73">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
 <meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://itunes.apple.com">
@@ -39,7 +39,7 @@
   --glass:rgba(255,255,255,.6); --glass-line:rgba(255,255,255,.55);
   --r:16px; --shadow:0 0 22px rgba(15,45,55,.14);
   --story-shadow:var(--shadow);
-  --section-heading-gap:12px;
+  --section-heading-gap:14px;
   --font:"Pretendard",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 /* desktop scale (owner: 100% felt oversized, 92-93% is the sweet spot between
@@ -144,7 +144,7 @@ body.searching #heroSlot:empty{min-height:0}
 
 /* ---------- tabs / layout ---------- */
 main{position:relative;z-index:1}
-.tab{display:none;padding:14px 0 0}
+.tab{display:none;padding:var(--section-heading-gap) 0 0}
 /* equal breathing around section headings (owner: blocks higher + equal gaps
    to the header above and the content below) */
 .tab .hd{margin:0 0 var(--section-heading-gap)}
@@ -186,7 +186,7 @@ main{position:relative;z-index:1}
 /* unified rails (owner 2026-09-24): releases rail is now 1:1 with news - same
    wrap (no -22px bleed past the content edge), same paddings, same pill
    anchors. Every card slider on the site clips at the content edge. */
-.rail-wrap{position:relative;margin-top:2px}
+.rail-wrap{position:relative;margin-top:0}
 /* Releases has no hero above its rail; don't add another 2px to the shared heading gap. */
 #tab-releases .rail-wrap{margin-top:0}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
@@ -739,7 +739,7 @@ textarea{resize:vertical;min-height:64px}
   .topbar{--hp:0;height:auto;background:transparent;padding:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
   .topbar-glass{display:block}
   .topbar-glass-full,.topbar-glass-isle{top:0;bottom:0;height:auto}
-  .topbar-in{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:8px 16px 10px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;clip-path:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .topbar-in{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:9px 16px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;clip-path:none;backdrop-filter:none;-webkit-backdrop-filter:none}
   .brand{height:36px}
   .brand-logo{width:32px;height:32px}
   .brand-name{font-size:17px}
@@ -756,11 +756,10 @@ textarea{resize:vertical;min-height:64px}
   .foot-in{grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;row-gap:30px;padding:32px 16px 36px}
   .foot-in>.foot-col:first-child{grid-column:1/-1}
   .foot-in>.social{grid-column:1/-1}
-  .tab{padding-top:14px}
   .tab.rise{animation:none}
-  .hd{margin-bottom:18px}
+  .hd{margin-bottom:var(--section-heading-gap)}
   .hd-t{font-size:clamp(22px,7vw,26px);white-space:normal}
-  body{padding-top:calc(var(--header-h, 148px) + 8px)}
+  body{padding-top:var(--header-h, 110px)}
   #articlePage{margin:18px auto 32px;padding:0 16px}
   #articlePage h1{font-size:clamp(22px,7vw,32px)}
   .hero .body{padding:16px}
@@ -3976,6 +3975,6 @@ const initialCleanPath=location.pathname.replace(/\/+$/,"")||"/";
 if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();
 loadPublishedDesk();
 </script>
-<script src="/concerts-app.js?v=20261004-33" defer></script>
+<script src="/concerts-app.js?v=20261004-34" defer></script>
 </body>
 </html>
