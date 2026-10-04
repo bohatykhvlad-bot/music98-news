@@ -1,0 +1,71 @@
+name: Ella actual live portrait audit
+on:
+  push:
+    paths:
+      - .github/workflows/ella-visual-proof.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Inspect actual public article photo on phone and desktop
+        shell: bash
+        run: |
+          node <<'JS'
+          const {spawn}=require('node:child_process');
+          const fs=require('node:fs');
+          const browser=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(fs.existsSync);
+          if(!browser)throw Error('CHROMIUM_MISSING');
+          const chrome=spawn(browser,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port=9222','--remote-allow-origins=*','--user-data-dir=/tmp/m98-ella-real-photo','about:blank'],{stdio:'ignore'});
+          const wait=ms=>new Promise(r=>setTimeout(r,ms));
+          async function main(){
+            let ws;
+            try{
+              let pages;
+              for(let i=0;i<100;i++){
+                try{const r=await fetch('http://127.0.0.1:9222/json/list');if(r.ok){pages=await r.json();if(pages.some(x=>x.type==='page'))break}}catch{}
+                await wait(100);
+              }
+              if(!pages?.some(x=>x.type==='page'))throw Error('CDP_UNAVAILABLE');
+              ws=new WebSocket(pages.find(x=>x.type==='page').webSocketDebuggerUrl);
+              await new Promise((ok,err)=>{ws.onopen=ok;ws.onerror=err});
+              let seq=0;const pending=new Map();
+              ws.onmessage=e=>{const r=JSON.parse(e.data);if(!r.id)return;const p=pending.get(r.id);if(!p)return;pending.delete(r.id);r.error?p.reject(Error(JSON.stringify(r.error))):p.resolve(r.result)};
+              const send=(method,params={})=>new Promise((resolve,reject)=>{const id=++seq;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}))});
+              const evaluate=async expr=>(await send('Runtime.evaluate',{expression:expr,returnByValue:true})).result?.value;
+              await send('Runtime.enable');await send('Page.enable');
+              for(const width of [390,1280]){
+                await send('Emulation.setDeviceMetricsOverride',{width,height:1500,deviceScaleFactor:1,mobile:width<700,screenWidth:width,screenHeight:1500});
+                await send('Page.navigate',{url:'https://music98.news/the-ella-langley-phenomenon-and-countrys-new-boom?photoaudit='+Date.now()});
+                let info;
+                const probe='(()=>{const im=document.querySelector("#articlePage .abody-pic img[src*=\\"ella-langley-live-caylee-robillard-2026.jpg\\"]");if(!im||!im.complete||!im.naturalWidth)return null;const e=im.closest(".abody-box");const r=e.getBoundingClientRect();return {natural:[im.naturalWidth,im.naturalHeight],rect:[r.left,r.top,r.width,r.height],offset:[scrollX,scrollY],fitted:im.classList.contains("cover-fitted"),h1:document.querySelector("#articlePage h1")?.textContent||""}})()';
+                for(let n=0;n<70;n++){
+                  await evaluate('document.querySelector("#articlePage .abody-pic img[src*=ella-langley-live-caylee-robillard-2026.jpg]")?.scrollIntoView({block:"center"})');
+                  info=await evaluate(probe);
+                  if(info?.fitted&&info.rect[2]>200)break;
+                  await wait(180);
+                }
+                if(!info?.fitted)throw Error('PHOTO_NOT_RENDERED_'+width);
+                const [x,y,w,h]=info.rect;const aspect=w/h;
+                if(Math.abs(aspect-1638/2048)>0.025)throw Error('PHOTO_CROPPED_'+width+'_'+aspect);
+                console.log('ELLA_REAL_PHOTO_PASS '+JSON.stringify({width,natural:info.natural,box:[w,h],aspect,h1:info.h1}));
+                const png=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip:{x:Math.max(0,x+info.offset[0]),y:Math.max(0,y+info.offset[1]),width:Math.ceil(w),height:Math.ceil(h),scale:1}});
+                fs.writeFileSync('/tmp/ella-live-photo-'+width+'.png',Buffer.from(png.data,'base64'));
+                console.log('ELLA_REAL_PHOTO_B64_'+width+'='+png.data);
+              }
+            }finally{ws?.close();chrome.kill('SIGTERM')}
+          }
+          main().catch(e=>{console.error('ELLA_VISUAL_FAILURE '+e.message);process.exitCode=1});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ella-live-portrait-mobile-desktop
+          path: /tmp/ella-live-photo-*.png
+          if-no-files-found: ignore
