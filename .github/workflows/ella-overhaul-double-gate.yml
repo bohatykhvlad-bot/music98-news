@@ -86,3 +86,14 @@ jobs:
           if f:sys.exit(1)
           PY
           python scripts/preflight.py --post ella26choosintexas --file /tmp/ella-review-draft.json --baseline /tmp/ella-review-baseline.json --expected-media 10 --min-words 1300
+
+      - name: Capture actual mobile and desktop article preview before replacing anything
+        shell: bash
+        run: |
+          node scripts/ella-private-visual-preview.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ella-portrait-and-ending-preview
+          path: /tmp/ella-preview/*.png
+          if-no-files-found: warn
