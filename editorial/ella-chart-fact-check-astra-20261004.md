@@ -1,0 +1,10 @@
+# Ella Langley longread, final chart-context verification
+
+Editorial reference notes, not for inclusion in the article body.
+
+- Historic country triple on the Billboard Hot 100 (2023): The Recording Academy's December 2023 year-in-review confirms that, for the first time in the chart's history, country songs occupied the top three positions together. The review identifies Luke Combs' "Fast Car", Morgan Wallen's "Last Night", and Jason Aldean's "Try That in a Small Town". https://www.grammy.com/news/country-music-trends-2023-in-review/ (also contemporaneous Billboard reporting linked from that article)
+- Contested route to one of those chart positions: The same Recording Academy report discusses the controversy around Aldean's music video, so the article should not imply all three positions came from interchangeable listening patterns. https://www.grammy.com/news/country-music-trends-2023-in-review/
+- Shaboozey "A Bar Song (Tipsy)" reached 19 (non-consecutive) weeks at No. 1 on the all-genre U.S. Billboard Hot 100 in 2024, tying the record at the time. https://www.forbes.com/sites/matthewleimkuehler/2024/12/31/shaboozeys-2024-mega-hit-a-bar-song-tipsy-by-the-numbers/ ; contemporaneous Billboard-reproduced report https://www.yahoo.com/entertainment/shaboozey-celebrates-making-history-bar-233432236.html
+- Ella Langley's 2026 cumulative 24-week Hot 100 benchmark and the earlier 22-week Mariah Carey record were independently checked in the approved previous fact registry and contemporary October 2026 reporting: https://www.theatlantic.com/culture/2026/10/ella-langley-choosin-texas-billboard-record/688860/
+- Spotify editorial-team claim about Country-to-general-playlist programming is carried over unchanged from the approved previous fact registry and AP first-person reporting. It is **not** evidence of a specific TikTok-driven virality figure.
+- The previous 2016-versus-2026 streaming-share comparison was removed entirely because the methods and reporting periods do not match. No unsupported precise decade growth figure remains in the feature.
