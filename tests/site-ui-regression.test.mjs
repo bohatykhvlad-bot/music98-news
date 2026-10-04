@@ -347,3 +347,29 @@ test("all four main tabs use the same compact heading-to-content gap",()=>{
   assert.match(page,/#tab-news #newsGrid,#tab-releases #relGrid\{padding:32px 44px 32px 32px;margin:-32px 0 -32px -32px\}/,
     "carousel shadow clearance must not change the visible card position");
 });
+
+
+test("mobile News has a uniform newest-first feed and does not reserve an empty hero",()=>{
+  assert.match(page,/function byFresh\(a,b\)\{[\s\S]*?return postTime\(b\)-postTime\(a\)/);
+  const news=page.slice(page.indexOf("function renderNews(){"),page.indexOf("function renderReleases(){"));
+  assert.match(news,/const narrow = window\.matchMedia\("\(max-width: 640px\)"\)/);
+  assert.match(news,/const hero = \(query \|\| narrow\.matches\) \? null : \(posts\.find\(p=>p\.pinned\) \|\| posts\[0\]\)/);
+  assert.match(news,/const rest = posts\.filter\(p=>p!==hero\)/);
+  assert.match(news,/const shown = narrow\.matches \? rest\.slice/);
+  assert.match(page,/@media \(max-width:640px\)\{#tab-news #heroSlot:empty\{display:none;min-height:0\}\}/);
+  assert.match(news,/newsMobileLayout\.addEventListener\("change", renderNews\)/);
+});
+
+test("Concerts mobile heading remains left-aligned after final CSS overrides and matches site typography",()=>{
+  const concerts=readFileSync(new URL("../public/concerts-app.js",import.meta.url),"utf8");
+  const match=concerts.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
+  assert.ok(match,"Concerts CSS must be the real shadow-root stylesheet");
+  const css=JSON.parse(match[1]);
+  const base=css.lastIndexOf(".hero{margin:0 0 12px;align-items:center}");
+  const mobile=css.lastIndexOf("@media(max-width:700px){\n  .hero{align-items:flex-start;justify-content:flex-start;text-align:left;margin-bottom:18px}");
+  assert.ok(base>=0 && mobile>base,"mobile alignment must override later centered desktop declaration");
+  assert.match(css,/@media\(max-width:640px\)\{\n  \.hero h1\{font-size:clamp\(22px,7vw,26px\);line-height:1\.15\}/);
+  assert.match(page,/@media \(max-width:640px\)\{[\s\S]*?\.wrap\{padding:0 16px\}/);
+  assert.match(css,/\.wrap\{padding:0 0 18px;max-width:none\}/,
+    "embedded Concerts inherits the main site's shared horizontal page padding");
+});
