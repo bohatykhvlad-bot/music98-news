@@ -1,0 +1,20 @@
+name: Ella editorial last proofread Draft sync
+on:
+  push:
+    branches: [editorial/ella-full-review-selective-20261004]
+    paths: [.github/workflows/ella-last-proofread-sync.yml]
+permissions:
+  contents: read
+jobs:
+  sync-ella-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Safely save proofread Ella text only
+        run: python editorial/ella-last-proofread-sync.py
