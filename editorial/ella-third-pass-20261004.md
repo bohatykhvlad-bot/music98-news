@@ -26,7 +26,7 @@ On her 2024 hit with Riley Green, "you look like you love me," Langley insisted 
 
 The Riley Green duet and "Choosin' Texas" use the barroom in different ways. In the first, two strangers exchange bold, awkward approaches, and the spoken passages allow both characters a say. In the second, only one person tells us what went wrong. The man and the woman who has caught his eye never get a verse to explain themselves. It is a different songwriting task, achieved without changing the conversational voice that made Langley's earlier hit distinctive. Her next challenge was to perform that more private story in rooms far larger than the ones where her career began.
 
-At CMA Fest in June 2026, the audience knew the chorus of "Choosin' Texas" well enough to sing much of it back. In the official footage, Langley leaves the crowd room to take over, then resumes the verses without interrupting the rhythm. She had played small venues where few people knew her songs; now she could hear a festival audience singing one back to her.
+At CMA Fest in June 2026, the audience knew the chorus of "Choosin' Texas" well enough to sing much of it back. In the official footage, Langley leaves the crowd room to take over, then resumes the next verse while the band keeps playing.
 
 [youtube:i1IX4Dusi9k]
 
@@ -58,6 +58,6 @@ The success has not made opportunities equal, particularly for women in country 
 
 [photo:photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/|50% 50%|1]
 
-Langley has had to contend with attention far less celebratory than that festival singalong. During a September concert in Columbus, Ohio, she stopped to address online criticism of her appearance, speech and performances. She spoke about the years she traveled to small venues in a van and a Honda Accord, getting by on bar food and tip-jar money. She told the audience she was proud of the younger woman who had kept playing those shows.
+At a September show in Columbus, Ohio, Langley stopped to address criticism of her appearance, speech and performances. She told the audience that the remarks had shaken her enough to wonder whether she could handle the attention. Then she described the girl she had been before the charts took notice, traveling to small venues in a van and a Honda Accord, living on bar food and tip-jar money. She said she was proud of the young woman who had kept playing those shows.
 
 Before the vans and tip jars she recalled in Columbus, Langley sat beside her grandfather at his piano and learned "Froggy Went A Courtin'." She placed fragments of the tune at both ends of *Dandelion*. The closing recording has none of the full-band sound of "Choosin' Texas" and no duet partner beside her. The album that brought so many new listeners to her music gives its final moments to a song she already knew as a child.
