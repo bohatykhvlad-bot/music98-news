@@ -141,6 +141,7 @@ REFERENT = re.compile(
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
     # Ella Langley longread, fact-checked October 3, 2026 against the named sources.
+    "1952": "Kitty Wells recorded It Wasn\u0027t God Who Made Honky Tonk Angels in 1952, her pioneering Billboard country No. 1; Country Music Hall of Fame: https://www.countrymusichalloffame.org/hall-of-fame/kitty-wells",
     "june 2026": "Ella Langley performed Choosin' Texas at CMA Fest in June 2026; official CMA performance posted June 25, 2026 (CMA YouTube i1IX4Dusi9k)",
     "august 25": "Dolly Parton died August 25, 2026, aged 80 (Associated Press https://apnews.com/article/87156f3e6a1547b88bf414529b644ad3)",
     "october 2026": "Miranda Lambert AP interview published October 2, 2026, discusses a country scene with a variety of voices (Associated Press https://apnews.com/article/670c88368e68e3f62ede48edf93e5177)",
