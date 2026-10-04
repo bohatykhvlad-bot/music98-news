@@ -135,7 +135,7 @@ test("concert snapshot requests bypass browser cache and Popular never renders a
 test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.side-tabs\{\\n  width:244px;max-width:100%;display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(app,/\.side-tab\{\\n  width:100%;min-width:0;max-width:none/);
-  assert.match(app,/\.side-tab\{[\s\S]*?transition:\.18s;/);
+  assert.match(app,/\.side-tab\{[\s\S]*?transition:background-color \.18s ease,color \.18s ease;/);
   assert.match(app,/\.side-tab\{[\s\S]*?display:inline-flex;align-items:center;justify-content:center;text-align:center;text-indent:var\(--ink-x,0px\);line-height:1;text-box:trim-both cap alphabetic/);
   assert.match(app,/function pillInkShift\(el\)/);
   assert.match(app,/Math\.round\(raw\)/);
