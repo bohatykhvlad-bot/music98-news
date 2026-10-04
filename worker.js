@@ -262,7 +262,7 @@ export default {
     const res = await env.ASSETS.fetch(request);
     const type = (res.headers.get("content-type") || "").toLowerCase();
     const headers = new Headers(res.headers);
-    if (path === "/concerts-app.js") {
+    if (path === "/concerts-app.js" || path === "/concerts-raster-fallback.js") {
       headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
       headers.set("CDN-Cache-Control", "no-store");
       headers.set("Cloudflare-CDN-Cache-Control", "no-store");
