@@ -1,0 +1,27 @@
+name: Temporary Ella public editorial review
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-ella-live-review.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Inspect current public Ella article only
+        run: |
+          node <<'JS'
+          (async()=>{
+            const r=await fetch('https://music98.news/api/desk?fresh='+Date.now(),{headers:{'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'}});
+            if(!r.ok)throw Error('PUBLIC_API_'+r.status);
+            const all=(await r.json()).posts;
+            const p=all.find(x=>x.id==='ella26choosintexas');
+            if(!p||p.status!=='live')throw Error('LIVE_ARTICLE_NOT_FOUND');
+            const {createHash}=require('crypto');
+            const out={id:p.id,title:p.title,excerpt:p.excerpt,status:p.status,body:p.body,cover:p.cover,publishAt:p.publishAt,sha256:createHash('sha256').update(p.body).digest('hex')};
+            console.log('ELLA_PUBLIC_ARTICLE='+JSON.stringify(out));
+          })().catch(e=>{console.error('READ_FAILED '+e.message);process.exit(1)});
+          JS
