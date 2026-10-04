@@ -1,0 +1,133 @@
+name: Native pixel pill geometry
+on:
+  push:
+    paths:
+      - public/index.html
+      - public/concerts-app.js
+      - public/concerts.html
+      - public/legal-header.css
+      - .github/workflows/native-pixel-visual.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chrome:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect production CSS at desktop and phone widths in real Chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'JS'
+          const fs=require('node:fs');
+          const site=fs.readFileSync('public/index.html','utf8');
+          const bundle=fs.readFileSync('public/concerts-app.js','utf8');
+          const css=site.match(/<style>([\s\S]*?)<\/style>/)?.[1];
+          const raw=bundle.match(/const CONCERTS_CSS=("(?:[^"\\]|\\.)*");/)?.[1];
+          if(!css||!raw)throw Error('ACTUAL_STYLESHEET_EXTRACTION_FAILED');
+          const shadowCSS=JSON.parse(raw);
+          const html='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+css+'</style></head><body>'+
+            '<header class="topbar"><div class="topbar-glass topbar-glass-full"></div><div class="topbar-in"><a class="brand"><span class="brand-name">music98.news</span></a><nav class="nav"><button class="nav-btn active">News</button><button class="nav-btn">Releases</button><button class="nav-btn">Chart</button><button class="nav-btn">Concerts</button></nav><div class="top-actions"><div class="search"><input placeholder="Search"></div></div></div></header>'+
+            '<main class="wrap"><section class="tab active"><div class="hd"><h1 class="hd-t">Latest stories</h1></div></section><music98-concerts id="concert"></music98-concerts></main>'+
+            '<script>const root=document.querySelector("music98-concerts").attachShadow({mode:"open"});root.innerHTML="<style>"+'+JSON.stringify(shadowCSS)+'+"</style>"+'+JSON.stringify('<div class="side"><div class="side-tabs"><button class="side-tab active">Popular</button><button class="side-tab">Near me</button></div></div><div class="map-mode-switch"><button class="map-mode-btn active">Popular</button><button class="map-mode-btn">Near me</button></div')+';</script></body></html>';
+          fs.writeFileSync('/tmp/native-pills.html',html);
+          JS
+          node <<'JS'
+          const {spawn}=require('node:child_process');
+          const fs=require('node:fs');
+          const bin=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(fs.existsSync);
+          if(!bin)throw Error('CHROME_NOT_AVAILABLE');
+          const chrome=spawn(bin,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port=9227','--remote-allow-origins=*','--user-data-dir=/tmp/native-pills-chrome','about:blank'],{stdio:'ignore'});
+          let socket;
+          const pause=ms=>new Promise(r=>setTimeout(r,ms));
+          async function run(){
+            try{
+              let target;
+              for(let i=0;i<120;i++){
+                try{
+                  const r=await fetch('http://127.0.0.1:9227/json/list');
+                  if(r.ok){target=(await r.json()).find(x=>x.type==='page');if(target)break;}
+                }catch{}
+                await pause(100);
+              }
+              if(!target)throw Error('CHROME_TIMEOUT');
+              socket=new WebSocket(target.webSocketDebuggerUrl);
+              await new Promise((resolve,reject)=>{socket.onopen=resolve;socket.onerror=reject});
+              let seq=0;const waiting=new Map();
+              socket.onmessage=e=>{
+                const msg=JSON.parse(e.data);
+                if(!msg.id)return;
+                const p=waiting.get(msg.id);
+                if(!p)return;
+                waiting.delete(msg.id);
+                msg.error?p.reject(Error(JSON.stringify(msg.error))):p.resolve(msg.result);
+              };
+              const send=(method,params={})=>new Promise((resolve,reject)=>{
+                const id=++seq;waiting.set(id,{resolve,reject});
+                socket.send(JSON.stringify({id,method,params}));
+              });
+              await send('Page.enable');
+              await send('Runtime.enable');
+              const expr=`(()=>{
+                const r=document.querySelector('music98-concerts').shadowRoot;
+                const box=(s,scope=document)=>scope.querySelector(s).getBoundingClientRect();
+                const nav=box('.nav'),top=box('.nav-btn.active');
+                const first=box('.nav-btn:first-child'),last=box('.nav-btn:last-child');
+                const side=box('.side-tabs',r),pill=box('.side-tab.active',r),end=box('.side-tab:last-child',r);
+                const sw=box('.map-mode-switch',r),mapBtn=box('.map-mode-btn.active',r);
+                const abs=n=>Math.round(n*1000)/1000;
+                const data={
+                  viewport:innerWidth,dpr:devicePixelRatio,htmlZoom:getComputedStyle(document.documentElement).zoom,
+                  navTop:abs(top.top-nav.top),navBottom:abs(nav.bottom-top.bottom),
+                  navLeft:abs(first.left-nav.left),navRight:abs(nav.right-last.right),
+                  sideTop:abs(pill.top-side.top),sideBottom:abs(side.bottom-pill.bottom),
+                  sideLeft:abs(pill.left-side.left),sideRight:abs(side.right-end.right),
+                  mapTop:abs(mapBtn.top-sw.top),mapBottom:abs(sw.bottom-mapBtn.bottom),
+                  sideFilter:getComputedStyle(r.querySelector('.side-tab.active')).filter,
+                  sideTransform:getComputedStyle(r.querySelector('.side-tab.active')).transform,
+                  navTransform:getComputedStyle(document.querySelector('.nav-btn.active')).transform,
+                  mainWidth:abs(box('main.wrap').width)
+                };
+                return data;
+              })()`;
+              for(const [width,dpr] of [[1280,1],[1280,1.5],[390,1],[390,1.5],[320,1],[768,1]]){
+                await send('Emulation.setDeviceMetricsOverride',{width,height:1100,deviceScaleFactor:dpr,mobile:width<=768,screenWidth:width,screenHeight:1100});
+                await send('Page.navigate',{url:'file:///tmp/native-pills.html?width='+width+'&dpr='+dpr});
+                let data;
+                for(let retry=0;retry<80;retry++){
+                  const v=await send('Runtime.evaluate',{expression:expr,returnByValue:true});
+                  data=v.result?.value;
+                  if(data?.viewport===width)break;
+                  await pause(50);
+                }
+                if(!data||data.viewport!==width)throw Error('METRICS_UNAVAILABLE_'+width);
+                const eq=(a,b)=>Math.abs(a-b)<=0.05;
+                if(data.htmlZoom!=='1'||!eq(data.navTop,data.navBottom)||!eq(data.navLeft,data.navRight)||
+                  !eq(data.sideTop,data.sideBottom)||!eq(data.sideLeft,data.sideRight)||
+                  !eq(data.mapTop,data.mapBottom)||
+                  data.sideFilter!=='none'||data.sideTransform!=='none'||data.navTransform!=='none')
+                  throw Error('PILL_GEOMETRY_FAIL '+JSON.stringify(data));
+                if(data.mainWidth>width+.1)throw Error('HORIZONTAL_LAYOUT_OVERFLOW '+JSON.stringify(data));
+                console.log('NATIVE_PILL_GEOMETRY_PASS '+JSON.stringify(data));
+                if(width===1280&&dpr===1.5 || width===390&&dpr===1.5){
+                  const png=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
+                  const path='/tmp/native-pills-'+width+'.png';
+                  fs.writeFileSync(path,Buffer.from(png.data,'base64'));
+                  console.log('SCREENSHOT '+path+' '+fs.statSync(path).size);
+                }
+              }
+            }finally{
+              if(socket)socket.close();
+              chrome.kill('SIGTERM');
+            }
+          }
+          run().catch(e=>{console.error('CHROMIUM_AUDIT_FAILED '+e.message);process.exitCode=1});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-pixel-pill-screenshots
+          path: /tmp/native-pills-*.png
+          if-no-files-found: ignore
