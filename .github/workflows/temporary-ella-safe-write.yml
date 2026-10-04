@@ -21,7 +21,7 @@ jobs:
         run: |
           node <<'NODE'
           const {scryptSync,publicEncrypt,constants}=require("node:crypto");
-          const pub="-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAy0aRjULcX0D9rJu+WUuK\nEPOHzokW0hECKkWIsqyC745iEvKuJS+COWU1tdWHIoB7dWaqGcCzmD+s4kuMKUaK\nYpwjrcYOgWwjVV2COWo6Ox4fdZceYDiuQid+ZZc6lWe2LTcEWRS2F0NhQaIiyoin\nYVHTpWG6OYY1+PE6n4LxEK3XGj6jlUXra30PB06eLwxt7wmmXcw0qg7YVNKAQcMm\nAyoVumhCe2yDZlG0r4qAYoxcCCEORc37qxBDDBLZq9spfv/5ZjUPVVBYXPgZOUDA\nIxiUKTE3YV1XaR8mSrJgGUnc2OtsB52efoUCW8MaD2JmHYLXkU4z2cGGUw2Ht7qc\nUYNdLnD2U9n2rAajQX1EF4hoDafrekIYYgu8gReVMc9An5sWpJd0JuXgE/WM+PWh\najfeQF5oLFywum2fQbJl7omHg/I7l9VrTPCUiV6Ha6vmSsLg2I1sGDDDpFoH3a+S\n9Wj/67AZ7woo9ajy8T1mqzTOc0Rsm/3zwoyca+0devijAgMBAAE=\n-----END PUBLIC KEY-----";
+          const pub="-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA4LhEoCL0IP4H/Q05KOFt\nnn/8NDTUkdHJ3abvkGuPWCfHGpjsZa9zh6QzqPHSZPLVUsuU2k4RzRYvYpTmhCz2\nv96Wv5Iy8b8d4jy/qAjAfjB9VyWVg2JJjBaFWLdUWDb6eyd0sMQM1RBLH8PP1EcJ\n2AmW3uLffmfxhK5zVO4uxpr9/oYikpYsxereEu/kvVyLr0nUXUJj/jvDPs8eRTB+\nH9G+yM8iidJutmzkI+crApqYKVjoj70L2UG+mXZTr1Ol7JhxFi6PFjsOKy+OhF/H\nwzldFqGAJKbYdjpWFkTJ6N59xg/F2VoA8P8Bf/UtgCcevbRSIF1AREOfPDwZi8wS\nK5INhSk3efNJJqXDHv0g8swfR3E7Gp2XN3cAO/t2TeW3axz9H08vZs6XQP8oDC9N\njJNwzbP9RLFw1uzv8RpYG682a30OTfgaq7aPQC18wrxdN2htpTiv+qcxhYuUTeeI\nm285QkaW5Wg4NX+pZLJM5uoXRs8JOdg4T3dNHXn+C0CDAgMBAAE=\n-----END PUBLIC KEY-----";
           (async()=>{
           const secret=process.env.ADMIN_PASSWORD;
           if(!secret)throw Error("ADMIN_PASSWORD unavailable");
@@ -86,9 +86,9 @@ jobs:
             if(sha(updated)!==patch.updatedBodySHA256)throw Error("PATCH_OUTPUT_MISMATCH");
             if(!updated.startsWith(patch.excerpt))throw Error("EXCERPT_NO_LONGER_LITERAL");
             if((updated.match(/\[(?:photo|youtube|apple|tiktok|instagram):/g)||[]).length!==media)throw Error("MEDIA_COUNT_CHANGED");
-            const photo=updated.match(/\[photo:(https:\/\/[^|]+)\|Miriam Visser\|/);
+            const photo=updated.match(/\[photo:(photos\/ella-langley-live-caylee-robillard-2026\.jpg)\|Caylee Robillard\|/);
             if(!photo)throw Error("NO_NEW_GUITAR_PHOTO");
-            const image=await fetch(photo[1],{method:"HEAD"});
+            const image=await fetch("https://music98.news/"+photo[1],{method:"HEAD",cache:"no-store"});
             if(!image.ok)throw Error("PHOTO_NOT_ACCESSIBLE_"+image.status);
             post.body=updated;post.excerpt=patch.excerpt;
             if(JSON.stringify(post.cover)!==coverSnapshot)throw Error("COVER_CHANGED");
