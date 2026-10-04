@@ -6,12 +6,45 @@ const CONCERTS_HTML="<main class=\"wrap\">\n  <section class=\"hero\">\n    <div
 function ensureMapbox(){
   if(window.mapboxgl) return Promise.resolve(window.mapboxgl);
   if(window.__music98MapboxPromise) return window.__music98MapboxPromise;
+  /* A stalled CDN request previously left the page blank forever. Retry a
+     failed/slow request once, then show an actionable fallback. */
   window.__music98MapboxPromise=new Promise((resolve,reject)=>{
-    const s=document.createElement("script");
-    s.src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js";
-    s.onload=()=>resolve(window.mapboxgl);
-    s.onerror=()=>reject(new Error("mapbox_load_failed"));
-    document.head.appendChild(s);
+    let tries=0;
+    const load=()=>{
+      const s=document.createElement("script");
+      let finished=false;
+      const timeout=setTimeout(()=>fail(new Error("mapbox_script_timeout")),10000);
+      const cleanup=()=>{
+        if(finished) return false;
+        finished=true;
+        clearTimeout(timeout);
+        s.onload=s.onerror=null;
+        return true;
+      };
+      const fail=err=>{
+        if(!cleanup()) return;
+        s.remove();
+        if(window.mapboxgl){ resolve(window.mapboxgl); return; }
+        if(++tries<2){ setTimeout(load,550); return; }
+        reject(err);
+      };
+      s.src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js";
+      s.onload=()=>{
+        if(!cleanup()) return;
+        if(window.mapboxgl) resolve(window.mapboxgl);
+        else{
+          s.remove();
+          if(++tries<2) setTimeout(load,550);
+          else reject(new Error("mapbox_library_unavailable"));
+        }
+      };
+      s.onerror=()=>fail(new Error("mapbox_load_failed"));
+      document.head.appendChild(s);
+    };
+    load();
+  }).catch(err=>{
+    window.__music98MapboxPromise=null;
+    throw err;
   });
   return window.__music98MapboxPromise;
 }
@@ -1923,7 +1956,11 @@ function bootConcertData(){
   loadMarkets();
   loadPopular();
 }
-map.on("load",()=>{
+/* "load" waits for every initial tile. A slow or blocked tile can postpone
+   it indefinitely even though the style is ready for our own marker layers. */
+const initializeMapLayers=()=>{
+  if(map.__m98Initialized) return;
+  map.__m98Initialized=true;
   if(!map.__fallback) mapFallback.hidden=true;
   resizeMapStable();
   addTopographicRelief();
@@ -1937,15 +1974,21 @@ map.on("load",()=>{
   requestAnimationFrame(resizeMapStable);
   setTimeout(resizeMapStable,90);
   setTimeout(resizeMapStable,320);
-});
+};
+map.on("style.load",initializeMapLayers);
+map.on("load",initializeMapLayers);
+if(typeof map.isStyleLoaded==="function" && map.isStyleLoaded()){
+  queueMicrotask(initializeMapLayers);
+}
 bootConcertData();
 if(mapInitError){
   mapFallback.hidden=false;
   mapFallbackText.textContent="The map is unavailable in this browser, but search and concert lists still work.";
 }else{
   setTimeout(()=>{
-    const ready=typeof map.loaded==="function" ? map.loaded() : false;
-    if(!ready){
+    /* Tile downloads can continue after the style/markers are usable. Do not
+       cover a working map just because Mapbox.loaded() is still false. */
+    if(!map.__m98Initialized){
       mapFallback.hidden=false;
       mapFallbackText.textContent="The map is taking longer to load. Search and concert lists are still available.";
     }
@@ -2000,7 +2043,20 @@ class Music98Concerts extends HTMLElement{
         return;
       }
       this._started=true;
-      ensureMapbox().then(()=>initConcerts(this.shadowRoot,this)).catch(err=>{
+      const slowNotice=setTimeout(()=>{
+        const box=this.shadowRoot.querySelector("#mapFallback");
+        const message=this.shadowRoot.querySelector("#mapFallbackText");
+        if(box && !window.mapboxgl){
+          box.hidden=false;
+          if(message) message.textContent="Connecting to the map. If it takes too long, use Retry map.";
+        }
+      },5500);
+      ensureMapbox().then(()=>{
+        clearTimeout(slowNotice);
+        this.shadowRoot.querySelector("#mapFallback")?.setAttribute("hidden","");
+        initConcerts(this.shadowRoot,this);
+      }).catch(err=>{
+        clearTimeout(slowNotice);
         console.error(err);
         const mapFallback=this.shadowRoot.querySelector("#mapFallback");
         const mapFallbackText=this.shadowRoot.querySelector("#mapFallbackText");
