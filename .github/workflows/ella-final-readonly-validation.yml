@@ -1,0 +1,60 @@
+name: Ella final read-only validation
+on:
+  push:
+    paths:
+      - .github/workflows/ella-final-readonly-validation.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  final-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify current editorial draft without writing or logging private content
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, re, urllib.request
+          key=os.environ.get("MUSIC98_KEY")
+          if not key:raise SystemExit("EDITOR_CREDENTIAL_UNAVAILABLE")
+          req=urllib.request.Request("https://music98.news/api/desk",headers={"X-Admin-Key":key,"Cache-Control":"no-cache"})
+          with urllib.request.urlopen(req,timeout=30) as resp:posts=json.load(resp)["posts"]
+          p=next((x for x in posts if x.get("id")=="ella26choosintexas"),None)
+          if not p:raise SystemExit("ELLA_NOT_FOUND")
+          body=p.get("body") or ""
+          digest=hashlib.sha256(body.encode()).hexdigest()
+          expected="db7ae2071ef0ca0e7c4b18951711593e0e3d0feaee9c0aba9f69330ee3e48502"
+          title="The Ella Langley Phenomenon and Country's New Boom"
+          media=re.findall(r"\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]",body)
+          photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
+          if p.get("status")!="draft" or digest!=expected or p.get("title")!=title or not body.startswith(p.get("excerpt") or "") or len(media)!=10 or photo not in body:
+              print("EDITORIAL_VERSION_MISMATCH status="+str(p.get("status"))+" sha="+digest+" media="+str(len(media)))
+              raise SystemExit(1)
+          print("ELLA_CURRENT_DRAFT_VERIFIED sha256="+digest+" title_verified=true excerpt_verified=true media=10 photo_credit_verified=true")
+          PY
+      - name: Run actual editorial gate without publishing draft text in logs
+        shell: bash
+        run: |
+          set +e
+          python scripts/gate.py --post ella26choosintexas --json > /tmp/ella_gate.json
+          result=$?
+          set -e
+          python - <<'PY'
+          import json
+          r=json.load(open("/tmp/ella_gate.json"))
+          for post in r.get("report",[]):
+            print("ELLA_GATE_FAIL_CODES="+",".join(x[0] for x in post.get("fails",[])))
+            print("ELLA_GATE_WARN_CODES="+",".join(x[0] for x in post.get("warns",[])))
+          PY
+          exit "$result"
+      - name: Run remote editorial preflight
+        shell: bash
+        run: |
+          python scripts/preflight.py --post ella26choosintexas --expected-media 10 --min-words 1300
