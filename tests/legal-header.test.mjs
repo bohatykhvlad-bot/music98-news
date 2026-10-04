@@ -22,7 +22,7 @@ test("legal pages reuse exact main logo geometry and glass header design",()=>{
   assert.match(legalCSS,/\.topbar-glass\{display:block\}/);
   assert.match(legalCSS,/\.topbar-glass-full,\.topbar-glass-isle\{top:0;bottom:0;height:auto\}/);
   assert.doesNotMatch(legalJS,/if\(mqPhone\.matches\)\{/);
-  assert.match(legalCSS,/@media \(min-width:1100px\)\{html\{zoom:\.96\}\}/);
+  assert.doesNotMatch(legalCSS,/zoom:/);
   assert.match(legalCSS,/\.topbar\{font-family:var\(--font\)\}/);
   assert.match(legalCSS,/body\{padding-top:var\(--header-h,55px\)\}/);
   assert.match(legalJS,/function setHeaderAway\(away\)\{/);
