@@ -1,0 +1,23 @@
+name: Apply approved Ella editorial Draft
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ella-approved-draft-sync.yml
+permissions:
+  contents: read
+jobs:
+  editorial-draft-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: editorial/ella-langley-95-review-20261004
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Update Ella draft body and excerpt only
+        run: python editorial/apply-ella-reviewed-draft.py
