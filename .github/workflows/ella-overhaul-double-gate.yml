@@ -1,0 +1,83 @@
+name: Ella rebuild double editorial gate
+on:
+  push:
+    paths:
+      - .github/ella-live-editorial-overhaul.enc.b64
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  independent-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Decrypt approved editorial text into private runner files
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto'),zlib=require('node:zlib');
+          const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
+          (async()=>{
+            const secret=process.env.ADMIN_PASSWORD;
+            if(!secret)throw Error('EDITOR_PASSWORD_NOT_AVAILABLE');
+            const raw=Buffer.from(fs.readFileSync('.github/ella-live-editorial-overhaul.enc.b64','utf8').trim(),'base64');
+            if(raw.subarray(0,9).toString()!=='M98PATCH2')throw Error('INVALID_ENCRYPTED_PATCH');
+            const key=crypto.scryptSync(secret,'music98-ella-editorial-2026-10-03-v2',32);
+            const d=crypto.createDecipheriv('aes-256-gcm',key,raw.subarray(9,21));
+            d.setAuthTag(raw.subarray(raw.length-16));
+            const packed=Buffer.concat([d.update(raw.subarray(21,raw.length-16)),d.final()]);
+            const patch=JSON.parse(zlib.brotliDecompressSync(packed).toString('utf8'));
+            const headers={'X-Admin-Key':secret,'User-Agent':'Mozilla/5.0','Accept':'application/json'};
+            const r=await fetch('https://music98.news/api/desk',{headers,cache:'no-store',signal:AbortSignal.timeout(30000)});
+            if(!r.ok)throw Error('DESK_UNAVAILABLE_'+r.status);
+            const all=(await r.json()).posts;
+            const old=all.find(x=>x.id==='ella26choosintexas');
+            const media=s=>s.match(/\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]/g)||[];
+            if(!old||old.status!=='live'||patch.id!=='ella26choosintexas'||patch.originalStatus!=='live')throw Error('WRONG_POST_STATUS');
+            if(hash(old.body||'')!==patch.originalBodySHA256||old.title!==patch.originalTitle)throw Error('EXISTING_LIVE_ARTICLE_CHANGED');
+            if(hash(patch.body)!==patch.newBodySHA256||!patch.body.startsWith(patch.excerpt))throw Error('PATCH_TEXT_OR_EXCERPT_MISMATCH');
+            if(JSON.stringify(media(old.body))!==JSON.stringify(media(patch.body))||JSON.stringify(media(old.body))!==JSON.stringify(patch.expectedMedia)||patch.expectedMedia.length!==10)throw Error('MEDIA_CHANGED');
+            if(!patch.body.includes('photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/'))throw Error('GUITAR_PHOTO_OR_CREDIT_MISSING');
+            const draft={...old,status:'draft',body:patch.body,excerpt:patch.excerpt};
+            fs.writeFileSync('/tmp/ella-review-draft.json',JSON.stringify(draft),{mode:0o600});
+            fs.writeFileSync('/tmp/ella-review-baseline.json',JSON.stringify(old),{mode:0o600});
+            console.log('ELLA_STAGING_PASS old='+patch.originalBodySHA256+' new='+patch.newBodySHA256+' media=10 and cover preserved');
+          })().catch(e=>{console.error('ELLA_STAGING_ERROR '+e.message);process.exit(1)});
+          NODE
+      - name: First complete editorial gate and formal preflight
+        shell: bash
+        run: |
+          test -s /tmp/ella-review-draft.json
+          python - <<'PY'
+          import json,sys
+          sys.path.insert(0,'scripts')
+          from gate import check_post
+          p=json.load(open('/tmp/ella-review-draft.json'))
+          f,w,_=check_post(p,strict=True)
+          print('ELLA_FIRST_GATE_FAIL_CODES='+','.join(x[0] for x in f))
+          print('ELLA_FIRST_GATE_WARN_CODES='+','.join(x[0] for x in w))
+          if f:sys.exit(1)
+          PY
+          python scripts/preflight.py --post ella26choosintexas --file /tmp/ella-review-draft.json --baseline /tmp/ella-review-baseline.json --expected-media 10 --min-words 1300
+      - name: Second independent process gate and preflight
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,sys,hashlib
+          sys.path.insert(0,'scripts')
+          from gate import check_post
+          p=json.load(open('/tmp/ella-review-draft.json'))
+          digest=hashlib.sha256(p['body'].encode()).hexdigest()
+          f,w,_=check_post(p,strict=True)
+          print('ELLA_SECOND_GATE_FAIL_CODES='+','.join(x[0] for x in f))
+          print('ELLA_SECOND_GATE_WARN_CODES='+','.join(x[0] for x in w))
+          print('ELLA_SECOND_GATE_SHA256='+digest)
+          if f:sys.exit(1)
+          PY
+          python scripts/preflight.py --post ella26choosintexas --file /tmp/ella-review-draft.json --baseline /tmp/ella-review-baseline.json --expected-media 10 --min-words 1300
