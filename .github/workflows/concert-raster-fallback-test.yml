@@ -1,0 +1,77 @@
+name: Concert raster fallback browser acceptance
+on:
+  push:
+    paths:
+      - ".github/workflows/concert-raster-fallback-test.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  no-webgl-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify static syntax and forced WebGL failure behavior
+        shell: bash
+        run: |
+          node --check public/concerts-app.js
+          node --check public/concerts-raster-fallback.js
+          node <<'JS'
+          const fs=require('node:fs');
+          const {spawn}=require('node:child_process');
+          const sleep=ms=>new Promise(ok=>setTimeout(ok,ms));
+          const binary=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(fs.existsSync);
+          if(!binary)throw Error('NO_CHROME');
+          const proc=spawn(binary,['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--disable-webgl','--disable-software-rasterizer','--remote-allow-origins=*','--remote-debugging-port=9228','--user-data-dir=/tmp/concert-raster-test','about:blank'],{stdio:'ignore'});
+          let ws,seq=0;
+          const waiting=new Map(),bad=[];
+          async function run(){
+            try{
+              let target;
+              for(let i=0;i<80;i++){
+                try{target=(await (await fetch('http://127.0.0.1:9228/json/list')).json()).find(t=>t.type==='page');if(target)break;}catch{}
+                await sleep(100);
+              }
+              if(!target)throw Error('CHROME_CDP_UNAVAILABLE');
+              ws=new WebSocket(target.webSocketDebuggerUrl);
+              await new Promise((ok,fail)=>{ws.onopen=ok;ws.onerror=fail;});
+              ws.onmessage=e=>{
+                const m=JSON.parse(e.data);
+                if(m.id){const p=waiting.get(m.id);if(p){waiting.delete(m.id);m.error?p.fail(m.error):p.ok(m.result);}return;}
+                if(m.method==='Runtime.exceptionThrown')bad.push((m.params?.exceptionDetails?.exception?.description||m.params?.exceptionDetails?.text||'').slice(0,400));
+              };
+              const call=(method,params={})=>new Promise((ok,fail)=>{const id=++seq;waiting.set(id,{ok,fail});ws.send(JSON.stringify({id,method,params}));});
+              await call('Page.enable');
+              await call('Runtime.enable');
+              await call('Emulation.setDeviceMetricsOverride',{width:390,height:850,screenWidth:390,screenHeight:850,deviceScaleFactor:1,mobile:true});
+              await call('Page.navigate',{url:'https://music98.news/concerts?fallbackaudit='+Date.now()});
+              let last;
+              for(let i=0;i<65;i++){
+                await sleep(400);
+                const r=await call('Runtime.evaluate',{expression:"(()=>{const h=document.querySelector('music98-concerts');const r=h?.shadowRoot;return {loaded:!!window.mapboxgl,leaflet:!!window.L?.map,raster:!!h?._concertMap?.__rasterController,tiles:r?.querySelectorAll('.leaflet-tile-loaded').length||0,markers:r?.querySelectorAll('.m98-raster-icon').length||0,canvas:r?.querySelectorAll('.mapboxgl-canvas').length||0,fallbackVisible:r?.querySelector('#mapFallback')?.hidden===false,fallbackText:r?.querySelector('#mapFallbackText')?.textContent||'',artists:r?.querySelectorAll('.tour-card').length||0}})()",returnByValue:true});
+                const v=r.result?.value||{};
+                last={...v,raster:!!v.raster};
+                if(v.raster&&v.markers>=10&&v.tiles>=1&&v.artists>=10&&!v.fallbackVisible){
+                  console.log('NO_WEBGL_RASTER_PASS '+JSON.stringify(last));
+                  const shot=await call('Page.captureScreenshot',{format:'png'});
+                  fs.writeFileSync('/tmp/concert-raster-390.png',Buffer.from(shot.data,'base64'));
+                  return;
+                }
+              }
+              console.error('NO_WEBGL_RASTER_FAILED '+JSON.stringify(last));
+              console.error('BROWSER_ERRORS '+JSON.stringify(bad.slice(-6)));
+              throw Error('RASTER_NOT_FUNCTIONAL');
+            }finally{ws?.close();proc.kill('SIGTERM');}
+          }
+          run().catch(e=>{console.error('ACCEPTANCE_FAILED '+e.message);process.exitCode=1});
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: concert-raster-390
+          path: /tmp/concert-raster-390.png
+          if-no-files-found: ignore
