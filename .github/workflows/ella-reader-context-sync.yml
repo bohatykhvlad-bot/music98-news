@@ -18,3 +18,4 @@ jobs:
           python-version: "3.12"
       - name: Validate and save reader-context Ella Draft only
         run: python editorial/ella-reader-context-sync.py
+# Reader-context revision checked against editorial gate
