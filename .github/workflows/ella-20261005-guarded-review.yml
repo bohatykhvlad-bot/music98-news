@@ -1,4 +1,4 @@
-name: Ella 20261005 full editorial canon review
+name: Ella 20261005 gated Draft save
 on:
   push:
     branches: [editorial/ella-full-review-selective-20261004]
@@ -11,12 +11,12 @@ jobs:
     timeout-minutes: 8
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-      DRY_RUN: "1"
+      DRY_RUN: "0"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Read-only canon gate plus preflight
+      - name: Gate, preflight and verified Draft save
         run: python editorial/ella-20261005-guarded-review.py
 # Final reviewed text-only quality verification
