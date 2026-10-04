@@ -44,14 +44,14 @@ jobs:
                 await send('Emulation.setDeviceMetricsOverride',{width,height:1500,deviceScaleFactor:1,mobile:width<700,screenWidth:width,screenHeight:1500});
                 await send('Page.navigate',{url:'https://music98.news/the-ella-langley-phenomenon-and-countrys-new-boom?photoaudit='+Date.now()});
                 let info;
-                const probe='(()=>{const im=document.querySelector("#articlePage .abody-pic img[src*=\\"ella-langley-live-caylee-robillard-2026.jpg\\"]");if(!im||!im.complete||!im.naturalWidth)return null;const e=im.closest(".abody-box");const r=e.getBoundingClientRect();return {natural:[im.naturalWidth,im.naturalHeight],rect:[r.left,r.top,r.width,r.height],offset:[scrollX,scrollY],fitted:im.classList.contains("cover-fitted"),h1:document.querySelector("#articlePage h1")?.textContent||""}})()';
+                const probe=()=>{const im=[...document.querySelectorAll("#articlePage .abody-pic img")].find(i=>i.currentSrc.includes("ella-langley-live-caylee-robillard-2026.jpg"));if(!im||!im.complete||!im.naturalWidth)return null;const e=im.closest(".abody-box"),r=e.getBoundingClientRect();return {natural:[im.naturalWidth,im.naturalHeight],rect:[r.left,r.top,r.width,r.height],offset:[scrollX,scrollY],fitted:im.classList.contains("cover-fitted"),h1:document.querySelector("#articlePage h1")?.textContent||""}};
                 for(let n=0;n<70;n++){
-                  await evaluate('document.querySelector("#articlePage .abody-pic img[src*=ella-langley-live-caylee-robillard-2026.jpg]")?.scrollIntoView({block:"center"})');
-                  info=await evaluate(probe);
+                  await evaluate('([...document.querySelectorAll("#articlePage .abody-pic img")].find(i=>i.currentSrc.includes("ella-langley-live-caylee-robillard-2026.jpg"))||{}).scrollIntoView?.({block:"center"})');
+                  info=await evaluate('('+probe.toString()+')()');
                   if(info?.fitted&&info.rect[2]>200)break;
                   await wait(180);
                 }
-                if(!info?.fitted)throw Error('PHOTO_NOT_RENDERED_'+width);
+                if(!info?.fitted){console.log('VISUAL_PAGE_DEBUG '+JSON.stringify(await evaluate('({path:location.pathname,title:document.title,imgs:document.querySelectorAll(".abody-pic img").length,article:document.querySelector("#articlePage")?.hidden})')));throw Error('PHOTO_NOT_RENDERED_'+width)}
                 const [x,y,w,h]=info.rect;const aspect=w/h;
                 if(Math.abs(aspect-1638/2048)>0.025)throw Error('PHOTO_CROPPED_'+width+'_'+aspect);
                 console.log('ELLA_REAL_PHOTO_PASS '+JSON.stringify({width,natural:info.natural,box:[w,h],aspect,h1:info.h1}));
