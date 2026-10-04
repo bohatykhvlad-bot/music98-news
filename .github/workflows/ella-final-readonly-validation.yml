@@ -30,7 +30,7 @@ jobs:
           if not p:raise SystemExit("ELLA_NOT_FOUND")
           body=p.get("body") or ""
           digest=hashlib.sha256(body.encode()).hexdigest()
-          expected="eefa06e69aab23141f33bed9fb2ebde54f21a67ba85c28a2a998202e29f1fa24"
+          expected="fe566b81923e0b8315b9ca19046de59c4daf7733277c305d96b2e7f7c47a9b83"
           title="The Ella Langley Phenomenon and Country's New Boom"
           media=re.findall(r"\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]",body)
           photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
