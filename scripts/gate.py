@@ -1132,6 +1132,10 @@ def check_post(p, strict):
     date_toks, date_pos = [], []
     for m in DATE_TOKEN.finditer(prose):
         tok = re.sub(r"\s+", " ", m.group(0)).strip()
+        # Bare lowercase "may" is usually a modal verb, not the month of May.
+        # Month names in house style are capitalized. Keep May 7 / May 2026 intact.
+        if m.group(0) == "may":
+            continue
         if re.fullmatch(r"(?:19|20)\d{2}", tok) and any(m.start() >= a and m.end() <= b for a, b in qspans):
             continue
         date_toks.append(tok)
