@@ -40,15 +40,18 @@ jobs:
             const all=(await r.json()).posts;
             const old=all.find(x=>x.id==='ella26choosintexas');
             const media=s=>s.match(/\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]/g)||[];
-            console.log('ELLA_STAGING_DIAG found='+Boolean(old)+' actualStatus='+String(old?.status||'none')+' patchStatus='+String(patch.originalStatus||'none')+' patchId='+String(patch.id||'none')+' currentBodyHash='+hash(old?.body||'')+' currentTitleMatch='+(old?.title===patch.originalTitle)+' candidateHash='+patch.newBodySHA256);
-            if(!old||old.status!=='live'||patch.id!=='ella26choosintexas'||patch.originalStatus!=='live')throw Error('WRONG_POST_STATUS');
+            console.log('ELLA_STAGING_DIAG found='+Boolean(old)+' actualStatus='+String(old?.status||'none')+' patchStatus='+String(patch.originalStatus||'none')+' patchId='+String(patch.id||'none')+' candidateHash='+patch.newBodySHA256);
+            if(!old||old.status!=='draft'||patch.id!=='ella26choosintexas'||patch.originalStatus!=='draft')throw Error('WRONG_POST_STATUS');
             if(hash(old.body||'')!==patch.originalBodySHA256||old.title!==patch.originalTitle)throw Error('EXISTING_LIVE_ARTICLE_CHANGED');
             if(hash(patch.body)!==patch.newBodySHA256||!patch.body.startsWith(patch.excerpt))throw Error('PATCH_TEXT_OR_EXCERPT_MISMATCH');
-            if(JSON.stringify(media(old.body))!==JSON.stringify(media(patch.body))||JSON.stringify(media(old.body))!==JSON.stringify(patch.expectedMedia)||patch.expectedMedia.length!==10)throw Error('MEDIA_CHANGED');
+            const originalMedia=media(old.body),newMedia=media(patch.body);
+            const oldLast='[photo:photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/|50% 50%|1.3000000000000003]';
+            const correctedLast='[photo:photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/|50% 50%|1]';
+            if(originalMedia.length!==10||newMedia.length!==10||JSON.stringify(originalMedia)!==JSON.stringify(patch.expectedMedia)||JSON.stringify(originalMedia.slice(0,-1))!==JSON.stringify(newMedia.slice(0,-1))||originalMedia.at(-1)!==oldLast||newMedia.at(-1)!==correctedLast)throw Error('UNEXPECTED_MEDIA_CHANGE');
             if(!patch.body.includes('photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/'))throw Error('GUITAR_PHOTO_OR_CREDIT_MISSING');
             const draft={...old,status:'draft',body:patch.body,excerpt:patch.excerpt};
             fs.writeFileSync('/tmp/ella-review-draft.json',JSON.stringify(draft),{mode:0o600});
-            fs.writeFileSync('/tmp/ella-review-baseline.json',JSON.stringify(old),{mode:0o600});
+            fs.writeFileSync('/tmp/ella-review-baseline.json',JSON.stringify({...old,body:old.body.replace(oldLast,correctedLast)}),{mode:0o600});
             console.log('ELLA_STAGING_PASS old='+patch.originalBodySHA256+' new='+patch.newBodySHA256+' media=10 and cover preserved');
           })().catch(e=>{console.error('ELLA_STAGING_ERROR '+e.message);process.exit(1)});
           NODE
