@@ -1,0 +1,22 @@
+name: Apply Ella selective full-review to Draft
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/ella-selected-full-review-sync-20261004.yml]
+permissions:
+  contents: read
+jobs:
+  sync-approved-ella-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: editorial/ella-full-review-selective-20261004
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify and save only Ella body/teaser, preserving owner photograph framing
+        run: python editorial/apply-ella-selected-full-review.py
