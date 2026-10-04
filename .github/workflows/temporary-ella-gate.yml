@@ -57,7 +57,7 @@ jobs:
           PY
           exit "$outcome"
 
-# Re-run editorial gate after full review and photo correction.
+# Re-run editorial gate after second-pass fact-check.
 
       - name: Audit saved Ella last photo metadata without revealing draft text
         shell: bash
