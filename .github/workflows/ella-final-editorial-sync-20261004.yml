@@ -1,0 +1,23 @@
+name: Apply final Ella editorial Draft only
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ella-final-editorial-sync-20261004.yml
+permissions:
+  contents: read
+jobs:
+  sync-only-ella-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: editorial/ella-sixth-proofread-20261004
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preflight and save only Ella body/teaser preserving owner photo crop
+        run: python editorial/apply-ella-sixth-draft.py
