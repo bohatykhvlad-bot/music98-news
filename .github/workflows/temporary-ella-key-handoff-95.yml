@@ -1,0 +1,27 @@
+name: Temporary Ella secure key handoff 95
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-ella-key-handoff-95.yml
+permissions:
+  contents: read
+jobs:
+  sealed-transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Seal derived editing key to ephemeral RSA public key
+        shell: bash
+        run: |
+          node <<'NODE'
+          const {scryptSync,publicEncrypt,constants}=require('node:crypto');
+          const publicKey="-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAnSYu1BQdcs5n0fUh1GRs\nG98FtqqaYRyDgMZXgeGrImgO4xGeUPnRgbh9bOj8oZ3MFpaPmyWjD4AVEXKKIhu3\ntRcA+I/hlQi5XtUmXCkMs0M9DcbRg9z+pk3g3v0HcnEx02dT5gr4n5AQkqgepDj0\nTXx1YKqFteSUQV7p8H+DWjJzNBd+UOpRJA4mYjNsLYIxD0H3hallpFIXKoRpDh8O\nT4r9EDFo7Po70W0M7SXx6/wnoELwGDOiUVYer+KTYLPGPhEJ7e5dpf5eh1r1PTRd\nDYVgZlRIZhXmFd6abFHj4ePvCzJcW7qRH3wLsYSaDa7qjdYZuoAI73txf8TaHixP\nUwWlCBgojHSt6raTvK1BvlXhxPSVJ6Dl7an+eFJyNlh9QSAgtD3E4qNIV1q6Bp2j\nCQG6PlUtK3A+qy0hbvfqjpY/B+aaUXU2AWOB/93GCMC/8pLD0uVD8KuWxuGP6FU6\nr6OKiK9MpHQ6ImZL2d89/F1kvoiX/eOke2rAH1Db+LhlAgMBAAE=\n-----END PUBLIC KEY-----";
+          const secret=process.env.ADMIN_PASSWORD;
+          if(!secret)throw Error('CREDENTIAL_UNAVAILABLE');
+          const key=scryptSync(secret,'music98-ella-editorial-2026-10-03-v2',32);
+          const wrapped=publicEncrypt({key:publicKey,padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},key);
+          console.log('ELLA_SEALED_EDITOR_KEY='+wrapped.toString('base64'));
+          console.log('RSA_KEY_SEALED_ONLY');
+          NODE
