@@ -31,45 +31,99 @@ jobs:
           '<pre id="metrics" hidden></pre><script>const host=document.getElementById("fixtureConcerts");const root=host.attachShadow({mode:"open"});root.innerHTML="<style>"+'+JSON.stringify(shadowCSS)+'+"</style>"+'+JSON.stringify(shadowHTML)+';const hdr=document.querySelector(".topbar");document.body.style.setProperty("--header-h",Math.ceil(hdr.getBoundingClientRect().height)+"px");const box=(selector,scope=document)=>scope.querySelector(selector)?.getBoundingClientRect();const z=x=>Math.round(x*100)/100;const title=box(".hero h1",root),search=box(".city-input",root),map=box(".map-shell",root),tab=box("#tab-concerts");const data={viewport:innerWidth,headerHeight:z(hdr.height||hdr.getBoundingClientRect().height),newsTitleX:z(box("#tab-news .hd-t").left),newsCardX:z(box("#newsGrid .card").left),newsCardWidth:z(box("#newsGrid .card").width),heroHeight:z(box("#heroSlot").height),concertTitleX:z(title.left),searchX:z(search.left),mapX:z(map.left),titleTop:z(title.top),concertTabTop:z(tab.top),titleSearchGap:z(search.top-title.bottom),overflow:z(document.documentElement.scrollWidth-innerWidth),concertAlign:getComputedStyle(root.querySelector(".hero")).alignItems,concertFont:getComputedStyle(root.querySelector(".hero h1")).fontSize};document.getElementById("metrics").textContent=JSON.stringify(data)</script></body></html>';
           fs.writeFileSync('/tmp/m98-mobile-fixture.html',fixture);
           JS
-      - name: Check actual browser alignment at five widths
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate actual mobile CSS viewports through Chrome device emulation
         shell: bash
         run: |
-          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
-          test -n "$BROWSER"
-          for WIDTH in 360 390 430 700 1280; do
-            "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size="$WIDTH,1900" --dump-dom file:///tmp/m98-mobile-fixture.html > "/tmp/m98-mobile-$WIDTH.html" 2>/tmp/m98-mobile-chrome.log
-            WIDTH="$WIDTH" node <<'JS'
+          node <<'JS'
+          const {spawn}=require('node:child_process');
           const fs=require('node:fs');
-          const width=Number(process.env.WIDTH);
-          const dom=fs.readFileSync('/tmp/m98-mobile-'+width+'.html','utf8');
-          const match=dom.match(/<pre id="metrics"[^>]*>([^<]+)<\/pre>/);
-          if(!match)throw Error('CHROME_DID_NOT_RENDER_GEOMETRY');
-          const x=JSON.parse(match[1].replace(/&quot;/g,'"'));
-          const close=(a,b,tol=1.1)=>Math.abs(a-b)<=tol;
-          if(x.overflow>1.1)throw Error('HORIZONTAL_OVERFLOW '+JSON.stringify(x));
-          if(width<=640){
-            if(x.heroHeight!==0||!close(x.newsTitleX,x.newsCardX)||!close(x.newsCardWidth,width-32,20))
-              throw Error('MOBILE_NEWS_CARD_GEOMETRY '+JSON.stringify(x));
+          const browser=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(x=>fs.existsSync(x));
+          if(!browser)throw Error('CHROME_NOT_INSTALLED');
+          const chrome=spawn(browser,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port=9222','--remote-allow-origins=*','--user-data-dir=/tmp/m98-mobile-chrome','about:blank'],{stdio:'ignore'});
+          const wait=ms=>new Promise(r=>setTimeout(r,ms));
+          async function run(){
+            let ws=null;
+            try{
+              let pages;
+              for(let i=0;i<100;i++){
+                try{
+                  const res=await fetch('http://127.0.0.1:9222/json/list');
+                  if(res.ok){pages=await res.json();if(pages.some(x=>x.type==='page'))break;}
+                }catch{}
+                await wait(100);
+              }
+              if(!pages?.some(x=>x.type==='page'))throw Error('CHROME_DEBUGGER_NOT_READY');
+              ws=new WebSocket(pages.find(x=>x.type==='page').webSocketDebuggerUrl);
+              await new Promise((ok,fail)=>{ws.onopen=ok;ws.onerror=fail;});
+              let seq=0;
+              const pending=new Map();
+              ws.onmessage=e=>{
+                const obj=JSON.parse(e.data);
+                if(!obj.id)return;
+                const entry=pending.get(obj.id);
+                if(!entry)return;
+                pending.delete(obj.id);
+                if(obj.error)entry.reject(Error(JSON.stringify(obj.error)));
+                else entry.resolve(obj.result);
+              };
+              const send=(method,params={})=>new Promise((resolve,reject)=>{
+                const id=++seq;pending.set(id,{resolve,reject});
+                ws.send(JSON.stringify({id,method,params}));
+              });
+              await send('Page.enable');
+              await send('Runtime.enable');
+              for(const width of [360,390,430,700,1280]){
+                await send('Emulation.setDeviceMetricsOverride',{
+                  width,height:2000,deviceScaleFactor:1,mobile:width<=700,
+                  screenWidth:width,screenHeight:2000
+                });
+                await send('Page.navigate',{url:'file:///tmp/m98-mobile-fixture.html?viewport='+width});
+                let data;
+                for(let attempt=0;attempt<80;attempt++){
+                  const r=await send('Runtime.evaluate',{
+                    expression:"document.getElementById('metrics')?.textContent||''",returnByValue:true
+                  });
+                  try{data=JSON.parse(r.result?.value||'');}catch{}
+                  if(data&&data.viewport===width)break;
+                  await wait(50);
+                }
+                if(!data||data.viewport!==width)throw Error('DEVICE_EMULATION_METRICS_MISSING_'+width);
+                const close=(a,b,tol=1.1)=>Math.abs(a-b)<=tol;
+                if(data.overflow>1.1)throw Error('HORIZONTAL_OVERFLOW '+JSON.stringify(data));
+                if(width<=640){
+                  if(data.heroHeight!==0||!close(data.newsTitleX,data.newsCardX)||!close(data.newsCardWidth,width-32,20))
+                    throw Error('MOBILE_NEWS_CARD_GEOMETRY '+JSON.stringify(data));
+                }
+                if(width<=700){
+                  if(!close(data.concertTitleX,data.searchX)||!close(data.searchX,data.mapX)||data.concertAlign!=='flex-start')
+                    throw Error('MOBILE_CONCERTS_LEFT_ALIGNMENT '+JSON.stringify(data));
+                  const top=data.titleTop-data.concertTabTop;
+                  if(Math.abs(top-data.titleSearchGap)>7)
+                    throw Error('MOBILE_CONCERTS_UNBALANCED_VERTICAL_GAPS '+JSON.stringify(data));
+                }
+                if(width>=1200&&data.concertAlign!=='center')
+                  throw Error('DESKTOP_CONCERTS_CHANGED '+JSON.stringify(data));
+                console.log('MOBILE_DESKTOP_GEOMETRY_PASS '+JSON.stringify(data));
+                if(width===390){
+                  const png=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});
+                  fs.writeFileSync('/tmp/music98-mobile-390.png',Buffer.from(png.data,'base64'));
+                  console.log('MOBILE_VISUAL_PNG_BYTES='+Buffer.from(png.data,'base64').length);
+                  console.log('MOBILE_SCREENSHOT_B64='+png.data);
+                }
+              }
+            }finally{
+              if(ws)ws.close();
+              chrome.kill('SIGTERM');
+            }
           }
-          if(width<=700){
-            if(!close(x.concertTitleX,x.searchX)||!close(x.searchX,x.mapX)||x.concertAlign!=='flex-start')
-              throw Error('MOBILE_CONCERTS_LEFT_ALIGNMENT '+JSON.stringify(x));
-            const top=x.titleTop-x.concertTabTop;
-            if(Math.abs(top-x.titleSearchGap)>7)throw Error('MOBILE_CONCERTS_UNBALANCED_VERTICAL_GAPS '+JSON.stringify(x));
-          }
-          if(width>=1200&&x.concertAlign!=='center')throw Error('DESKTOP_CONCERTS_CHANGED '+JSON.stringify(x));
-          console.log('MOBILE_DESKTOP_GEOMETRY_PASS '+JSON.stringify(x));
+          run().catch(e=>{console.error('VISUAL_TEST_FAILED '+e.message);process.exitCode=1});
           JS
-          done
-      - name: Capture mobile screenshot for inspection
-        shell: bash
-        run: |
-          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
-          "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size="390,2000" --screenshot=/tmp/music98-mobile-390.png file:///tmp/m98-mobile-fixture.html >/dev/null 2>/tmp/m98-mobile-chrome.log
-          python3 - <<'PY'
-          import base64
-          from pathlib import Path
-          p=Path('/tmp/music98-mobile-390.png')
-          print('MOBILE_VISUAL_PNG_BYTES='+str(p.stat().st_size))
-          print('MOBILE_SCREENSHOT_B64='+base64.b64encode(p.read_bytes()).decode())
-          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: music98-mobile-news-concerts
+          path: /tmp/music98-mobile-390.png
+          if-no-files-found: ignore
