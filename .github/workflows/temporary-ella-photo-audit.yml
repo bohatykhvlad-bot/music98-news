@@ -1,0 +1,27 @@
+name: Temporary Ella original photo audit
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-ella-photo-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect public Ella photo tokens without modifying content
+        run: |
+          node <<'JS'
+          (async()=>{
+            const r=await fetch('https://music98.news/api/desk?t='+Date.now(),{cache:'no-store',headers:{'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'}});
+            if(!r.ok)throw Error('PUBLIC_DESK_HTTP_'+r.status);
+            const posts=(await r.json()).posts||[];
+            console.log('PUBLIC_COUNT '+posts.length);
+            const selected=posts.filter(x=>/ella|langley/i.test(x.id+' '+x.title));
+            for(const p of selected){
+              const photos=(p.body||'').match(/\\[photo:[^\\]]+\\]/g)||[];
+              console.log('ELLA_PUBLIC_INFO '+JSON.stringify({id:p.id,status:p.status,title:p.title,cover:p.cover?.src||p.cover,photos,bodyLength:p.body?.length}));
+            }
+          })().catch(e=>{console.error('AUDIT_FAILED '+e.message);process.exitCode=1})
+          JS
