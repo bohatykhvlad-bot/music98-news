@@ -1,0 +1,22 @@
+name: Apply Ella Astra surgical edits to Draft
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/ella-astra-chart-draft-sync.yml]
+permissions:
+  contents: read
+jobs:
+  safe-ella-draft-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: editorial/ella-astra-chart-fixes-20261004
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Save only Ella revised body and its matching teaser, retain owner's photos
+        run: python editorial/apply-ella-astra-chart-draft.py
