@@ -102,3 +102,72 @@ jobs:
           })().catch(e=>{console.error("ELLA_DRAFT_UPDATE FAILED "+String(e.message).slice(0,150));process.exit(1)});
           
           NODE
+      - name: Replace only final Ella draft photo with verified original
+        env:
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        shell: bash
+        run: |
+          node <<'NODE'
+          const {createHash}=require('node:crypto');
+          const photoFile='ella-langley-live-caylee-robillard-2026.jpg';
+          const photoPath='photos/'+photoFile;
+          const photoHash='25c2e3b6e03e2cbe74cd55d9e39fe1881c0c0fe7c3ff288c5fa57efd1c44375e';
+          const editorKey=process.env.ADMIN_PASSWORD;
+          const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+          const sha=data=>createHash('sha256').update(data).digest('hex');
+          (async()=>{
+            if(!editorKey)throw Error('EDITOR_SECRET_UNAVAILABLE');
+            let ready=false;
+            for(let attempt=0;attempt<12;attempt++){
+              try{
+                const url='https://music98.news/'+photoPath+'?originalcheck='+attempt;
+                const r=await fetch(url,{cache:'no-store'});
+                if(r.ok&&r.headers.get('content-type')?.startsWith('image/')){
+                  const bytes=Buffer.from(await r.arrayBuffer());
+                  if(sha(bytes)===photoHash){ready=true;break;}
+                }
+              }catch{}
+              await sleep(10000);
+            }
+            if(!ready)throw Error('ORIGINAL_IMAGE_NOT_YET_AVAILABLE_ON_SITE');
+            const headers={'X-Admin-Key':editorKey,'Content-Type':'application/json','Accept':'application/json'};
+            async function getDesk(){
+              const r=await fetch('https://music98.news/api/desk',{headers,cache:'no-store'});
+              if(!r.ok)throw Error('DESK_FETCH_'+r.status);
+              const d=await r.json();
+              if(!Array.isArray(d.posts))throw Error('INVALID_DESK_RESPONSE');
+              return d;
+            }
+            const before=await getDesk();
+            const target=before.posts.find(p=>p.id==='ella26choosintexas');
+            if(!target||target.status!=='draft')throw Error('ELLA_NOT_DRAFT_ABORT');
+            const oldBody=target.body;
+            if(typeof oldBody!=='string')throw Error('ELLA_BODY_INVALID');
+            const tokens=[...oldBody.matchAll(/\[photo:([^\]]+)\]/g)];
+            if(tokens.length!==2)throw Error('UNEXPECTED_PHOTO_COUNT_'+tokens.length);
+            const last=tokens.at(-1);
+            const fields=last[1].split('|');
+            const url=fields[0],credit=fields[1];
+            if(url===photoPath&&credit==='Caylee Robillard'&&fields[2]==='https://cayleerobillard.com/'){
+              console.log('ELLA_LAST_PHOTO_ALREADY_CORRECT');return;
+            }
+            if(url!=='https://charlatan.ca/wp-content/uploads/2026/07/EllaLangley_01.jpg'||credit!=='Miriam Visser'){
+              throw Error('UNEXPECTED_LAST_PHOTO_ABORT');
+            }
+            const newToken='[photo:'+photoPath+'|Caylee Robillard|https://cayleerobillard.com/|50% 50%|1]';
+            const newBody=oldBody.slice(0,last.index)+newToken+oldBody.slice(last.index+last[0].length);
+            if(newBody===oldBody||newBody.match(/\[photo:/g)?.length!==tokens.length)throw Error('INVALID_PHOTO_SWAP');
+            const otherSnapshot=JSON.stringify(before.posts.filter(p=>p.id!==target.id));
+            const unchanged=Object.fromEntries(Object.entries(target).filter(([k])=>k!=='body'));
+            target.body=newBody;
+            const save=await fetch('https://music98.news/api/desk',{method:'POST',headers,body:JSON.stringify({posts:before.posts})});
+            if(!save.ok)throw Error('SAVE_FAILED_'+save.status);
+            const after=await getDesk();
+            const saved=after.posts.find(p=>p.id===target.id);
+            if(!saved||saved.status!=='draft'||saved.body!==newBody)throw Error('PHOTO_SAVE_VERIFY_FAILED');
+            if(JSON.stringify(after.posts.filter(p=>p.id!==target.id))!==otherSnapshot)throw Error('OTHER_POST_CHANGED_ABORT');
+            const otherFields=Object.fromEntries(Object.entries(saved).filter(([k])=>k!=='body'));
+            if(JSON.stringify(otherFields)!==JSON.stringify(unchanged))throw Error('OTHER_ELLA_FIELD_CHANGED');
+            console.log('ELLA_LAST_PHOTO_REPLACED_AND_VERIFIED PHOTO_SHA256 '+photoHash+' PHOTO_COUNT '+tokens.length+' DRAFT true OTHER_POSTS_UNCHANGED true OTHER_ELLA_FIELDS_UNCHANGED true');
+          })().catch(e=>{console.error('ELLA_PHOTO_UPDATE_FAILED '+e.message);process.exit(1)});
+          NODE
