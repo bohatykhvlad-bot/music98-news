@@ -1,0 +1,21 @@
+name: Ella 20261005 full editorial canon review
+on:
+  push:
+    branches: [editorial/ella-full-review-selective-20261004]
+    paths: [.github/workflows/ella-20261005-guarded-review.yml]
+permissions:
+  contents: read
+jobs:
+  review-ella-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      DRY_RUN: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Read-only canon gate plus preflight
+        run: python editorial/ella-20261005-guarded-review.py
