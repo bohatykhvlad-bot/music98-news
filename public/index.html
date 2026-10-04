@@ -2617,56 +2617,90 @@ function renderReleases(){
 function syncRail(sel){
   const rail = $(sel);
   if(!rail) return;
-  const wrap = rail.parentElement;
-  const prev = wrap.querySelector(".rail-btn.prev");
-  const next = wrap.querySelector(".rail-btn.next");
-  const update = ()=>{
-    /* clientWidth/scrollWidth reads force layout; cache the max and refresh
-       it lazily (rAF-coalesced) so the scroll handler stays on the fast path.
-       Hidden-tab guard: while a tab is display:none its rail measures 0 wide,
-       so the cached max would be -1 and EVERY scroll write would clamp to it
-       (owner bug: releases rail jumped back to the start). A non-positive max
-       must never be cached; retry on the next call when the tab is visible. */
-    const max = rail.scrollWidth - rail.clientWidth - 1;
-    if(max > 0 || rail._max == null){ if(max > 0) rail._max = max; }
-    prev.classList.toggle("ok", rail._max > 0 && rail.scrollLeft > 4);
-    next.classList.toggle("ok", rail._max > 0 && rail.scrollLeft < rail._max);
-  };
-  rail._invalidateMax = ()=>{ rail._max = null; };
   if(!rail._railWired){
+    const wrap = rail.parentElement;
+    const prev = wrap.querySelector(".rail-btn.prev");
+    const next = wrap.querySelector(".rail-btn.next");
+    let pending = 0;
+    const update = ()=>{
+      /* Measure the scroll extent only after a width/content change. In
+         particular, never read scrollWidth on every scroll animation frame. */
+      if(rail._max == null){
+        const width = rail.clientWidth;
+        if(!width){
+          /* A hidden tab has no geometry. Do not cache its zero-size extent:
+             setTab() will refresh both rails when the tab becomes visible. */
+          prev.classList.remove("ok");
+          next.classList.remove("ok");
+          return;
+        }
+        rail._max = Math.max(0, rail.scrollWidth - width - 1);
+      }
+      const x = rail.scrollLeft;
+      prev.classList.toggle("ok", rail._max > 0 && x > 4);
+      next.classList.toggle("ok", rail._max > 0 && x < rail._max);
+    };
+    const schedule = ()=>{
+      if(!pending) pending = requestAnimationFrame(()=>{ pending = 0; update(); });
+    };
+    const refresh = ()=>{
+      if(pending){ cancelAnimationFrame(pending); pending = 0; }
+      update();
+    };
+    rail._invalidateMax = ()=>{ rail._max = null; schedule(); };
+    rail._refreshRail = refresh;
     rail._railWired = true;
-    rail.addEventListener("scroll", ()=>{ update(); }, {passive:true});
-    window.addEventListener("resize", ()=>{ rail._invalidateMax(); update(); });
-    new MutationObserver(()=>{ rail._invalidateMax(); update(); }).observe(rail, {childList:true});
+    rail.addEventListener("scroll", schedule, {passive:true});
+    window.addEventListener("resize", rail._invalidateMax, {passive:true});
+    new MutationObserver(rail._invalidateMax).observe(rail, {childList:true});
+    if(typeof ResizeObserver === "function"){
+      new ResizeObserver(rail._invalidateMax).observe(rail);
+    }
   }
-  update();
+  /* An explicit call follows a render, tab switch or gesture boundary.
+     The per-frame scroll listener takes the cached, rAF-coalesced path. */
+  rail._max = null;
+  rail._refreshRail();
 }
 function wireRail(gridSel, prevSel, nextSel){
   const rail = $(gridSel);
   if(!rail) return;
   const step = ()=> (rail.firstElementChild ? rail.firstElementChild.getBoundingClientRect().width + 18 : 300);
-  const hold = {raf:0, v:0, dir:0, t0:0};
-  const stopHold = ()=>{ hold.raf = 0; hold.v = 0; hold.dir = 0; rail._holding = false; rail.style.scrollBehavior = ""; rail.classList.remove("gliding"); };
-  const glide = ()=>{
+  const hold = {raf:0, v:0, dir:0, pressedAt:0, frameAt:0, button:null};
+  const stopHold = ()=>{
+    if(hold.raf) cancelAnimationFrame(hold.raf);
+    hold.raf = 0; hold.v = 0; hold.dir = 0;
+    hold.button?.classList.remove("hold");
+    hold.button = null;
+    rail._holding = false;
+    rail.style.scrollBehavior = "";
+    rail.classList.remove("gliding");
+  };
+  const glide = now=>{
     if(!hold.dir){ stopHold(); return; }
-    const dt = Math.min(50, performance.now() - hold.t0); hold.t0 = performance.now();
-    /* accelerate while held: 0 -> ~26px/frame, ease-out ramp;
-       direct scrollLeft writes need instant behavior - CSS smooth would
-       re-animate every write and the rail would crawl */
+    const dt = Math.min(50, Math.max(0, now - hold.frameAt));
+    hold.frameAt = now;
+    /* Keep the original held-arrow acceleration and 26px/60Hz-frame cap. */
     rail.style.scrollBehavior = "auto";
-    rail.classList.add("gliding");   /* hover-freeze while auto-scrolling */
+    rail.classList.add("gliding");
     hold.v = Math.min(26, hold.v + dt * 0.045);
     rail.scrollLeft += hold.dir * hold.v * (dt/16.7);
-    if(rail._max == null || rail._max < 0) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    if(rail._max == null) rail._max = Math.max(0, rail.scrollWidth - rail.clientWidth - 1);
     if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=rail._max)){ stopHold(); return; }
     hold.raf = requestAnimationFrame(glide);
   };
-  const inertia = ()=>{
+  const inertia = now=>{
     if(Math.abs(hold.v) < 0.4 || !hold.dir){ stopHold(); return; }
-    const dt = 16.7;
-    rail.scrollLeft += hold.dir * hold.v * (dt/16.7);
-    hold.v *= 0.94;
-    if(rail._max == null || rail._max < 0) rail._max = rail.scrollWidth - rail.clientWidth - 1;
+    const dt = Math.min(50, Math.max(0, now - hold.frameAt));
+    hold.frameAt = now;
+    /* Preserve the old 60Hz friction, but express it per elapsed time.
+       A trapezoidal integral keeps distance virtually identical at 60Hz
+       without making 120/144Hz monitors brake twice as quickly. */
+    const decay = Math.pow(0.94, dt/16.7);
+    const nextV = hold.v * decay;
+    rail.scrollLeft += hold.dir * (hold.v + nextV) * 0.5 * (dt/16.7);
+    hold.v = nextV;
+    if(rail._max == null) rail._max = Math.max(0, rail.scrollWidth - rail.clientWidth - 1);
     if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=rail._max)){ stopHold(); return; }
     hold.raf = requestAnimationFrame(inertia);
   };
@@ -2679,34 +2713,35 @@ function wireRail(gridSel, prevSel, nextSel){
        a latched .hold kept the dark chevron and hover read as dead) */
     btn.addEventListener("pointerleave", ()=> btn.classList.remove("hold"));
     btn.addEventListener("pointerdown", e=>{
+      if(e.button != null && e.button !== 0) return;
       e.preventDefault();
+      if(hold.button) stopHold(); /* restart after an interrupted glide */
       try{ btn.setPointerCapture(e.pointerId); }catch(_){}
       btn.classList.add("hold");
       rail._holding = true;
-      hold.dir = dir; hold.v = 0; hold.t0 = performance.now();
+      hold.button = btn; hold.dir = dir; hold.v = 0;
+      hold.pressedAt = hold.frameAt = performance.now();
       hold.raf = requestAnimationFrame(glide);
     });
-    const release = ()=>{
-      /* ALWAYS drop the visual hold first: stopHold clears rail._holding when
-         the glide hit the rail edge on its own, and the early-return below used
-         to leave the .hold class latched - a stuck dark arrow */
+    const release = (cancelled=false)=>{
       btn.classList.remove("hold");
-      if(!rail._holding) { cancelAnimationFrame(hold.raf); return; }
-      cancelAnimationFrame(hold.raf);
-      /* a quick tap = one card step; a long hold = inertia glide */
-      const held = performance.now() - hold.t0;
+      if(hold.button !== btn || !rail._holding) return;
+      if(hold.raf) cancelAnimationFrame(hold.raf);
+      if(cancelled){ stopHold(); return; }
+      /* Hold duration must use immutable press time, not the last frame. */
+      const held = performance.now() - hold.pressedAt;
       if(held < 240){
         stopHold();
         rail.scrollBy({left: dir * step(), behavior:"smooth"});
       }else{
+        hold.frameAt = performance.now();
         hold.raf = requestAnimationFrame(inertia);
       }
     };
-    btn.addEventListener("pointerup", release);
-    btn.addEventListener("pointercancel", release);
+    btn.addEventListener("pointerup", ()=>release());
+    btn.addEventListener("pointercancel", ()=>release(true));
   });
-  rail.addEventListener("scroll", ()=> syncRail(gridSel), {passive:true});
-  new MutationObserver(()=> syncRail(gridSel)).observe(rail, {childList:true});
+  /* syncRail owns the sole scroll/DOM observers for this rail. */
   syncRail(gridSel);
   /* drag the cards themselves: press + move = the rail follows the pointer,
      release = momentum. A real click (no meaningful drag) still opens the
