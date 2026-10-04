@@ -1,0 +1,55 @@
+name: Ella draft title update
+on:
+  push:
+    paths:
+      - .github/workflows/ella-draft-title.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  update-title:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Set verified title on existing draft only
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib
+          import os
+          import sys
+          sys.path.insert(0, "scripts")
+          from post import desk_key, guarded_write, find_post
+          if not os.environ.get("ADMIN_PASSWORD"):
+              raise SystemExit("ADMIN_PASSWORD not configured")
+          target_id = "ella26choosintexas"
+          expected_body = "5fd538cd0fd18b175d2e00e76a6864101cb929274a70fbf79ea21270400d8c73"
+          desired_title = "The Ella Langley Phenomenon and Country's New Boom"
+          prior_titles = {
+              'Ella Langley and the "Choosin\' Texas" Phenomenon',
+              'Ella Langley\'s "Choosin\' Texas" and Country Music\'s Expanding Audience',
+              desired_title,
+          }
+          def change(posts):
+              post = find_post(posts, target_id)
+              if post.get("status") != "draft":
+                  raise RuntimeError("STOP: Ella is no longer a draft")
+              if hashlib.sha256((post.get("body") or "").encode("utf-8")).hexdigest() != expected_body:
+                  raise RuntimeError("STOP: reviewed body has changed")
+              if post.get("title") not in prior_titles:
+                  raise RuntimeError("STOP: title changed by another editor")
+              if not (post.get("body") or "").startswith(post.get("excerpt") or ""):
+                  raise RuntimeError("STOP: excerpt/body mismatch")
+              post["title"] = desired_title
+              return post
+          result = guarded_write(change)
+          if result.get("title") != desired_title or result.get("status") != "draft":
+              raise RuntimeError("STOP: title verification failed")
+          print("ELLA_TITLE_VERIFIED draft=true body_sha256="+expected_body+" title="+result["title"])
+          PY
