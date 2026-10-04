@@ -23,7 +23,7 @@ def get_remote(pid):
     key = os.getenv("MUSIC98_KEY") or os.getenv("ADMIN_PASSWORD")
     if not key: raise ValueError("MUSIC98_KEY/ADMIN_PASSWORD not configured")
     req = Request("https://music98.news/api/desk",
-                  headers={"X-Admin-Key": key, "Cache-Control": "no-cache", "Accept":"application/json"})
+                  headers={"X-Admin-Key": key, "Cache-Control": "no-cache", "Accept":"application/json", "User-Agent":"Mozilla/5.0"})
     with urlopen(req, timeout=30) as r:
         return select(json.loads(r.read()), pid)
 
