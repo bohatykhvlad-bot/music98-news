@@ -32,8 +32,9 @@ test("mobile nav, logo row and safe header space are symmetrical",()=>{
 });
 
 test("News, Releases and Chart headings share one desktop/mobile section rhythm",()=>{
+  assert.match(home,/--section-heading-top:8px;/);
   assert.match(home,/--section-heading-gap:14px;/);
-  assert.match(home,/\.tab\{display:none;padding:var\(--section-heading-gap\) 0 0\}/);
+  assert.match(home,/\.tab\{display:none;padding:var\(--section-heading-top\) 0 0\}/);
   assert.match(home,/\.tab \.hd\{margin:0 0 var\(--section-heading-gap\)\}/);
   assert.match(home,/\.rail-wrap\{position:relative;margin-top:0\}/);
   assert.match(home,/\.hd\{margin-bottom:var\(--section-heading-gap\)\}/);
@@ -56,5 +57,5 @@ test("standalone Concerts fallback uses the same full desktop and mobile navigat
   assert.match(standalone,/\.nav-btn\{width:100%;[^}]*height:32px;[^}]*top:0\}/);
   assert.match(standalone,/\.topbar-in\{height:auto;padding:9px 16px;display:flex;flex-wrap:wrap;gap:8px\}/);
   assert.match(standalone,/\.nav-btn\{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0\}/);
-  assert.match(standalone,/\.wrap\{padding:14px 16px 36px\}/);
+  assert.match(standalone,/\.wrap\{padding:8px 16px 36px\}/);
 });
