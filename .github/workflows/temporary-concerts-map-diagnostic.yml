@@ -1,0 +1,92 @@
+name: Temporary Concerts map live diagnostic
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-concerts-map-diagnostic.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  map-diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Probe live endpoints and Mapbox availability
+        run: |
+          node <<'NODE'
+          (async()=>{
+            for(const u of [
+              'https://music98.news/concerts',
+              'https://music98.news/concerts-app.js?v=20261004-31',
+              'https://music98.news/api/concerts?mode=markets&v=concert-markets-v7',
+              'https://music98.news/api/concerts?mode=popular&v=popular-v11',
+              'https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js'
+            ]){
+              try{
+                const res=await fetch(u,{headers:{'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'},signal:AbortSignal.timeout(15000)});
+                const contentType=res.headers.get('content-type')||'';
+                const body=await res.text();
+                let summary={url:u.replace(/\?.*/,''),status:res.status,contentType,bytes:body.length};
+                if(u.includes('/api/concerts')){
+                  try{const o=JSON.parse(body);summary.keys=Object.keys(o).slice(0,15);summary.markets=o.markets?.length;summary.artists=o.artists?.length;summary.warming=o.warming;summary.error=o.error;}catch{summary.text=body.slice(0,140);}
+                }else if(u.includes('concerts-app.js'))summary.hasCustomElement=body.includes('customElements.define("music98-concerts"');
+                else if(u.includes('/concerts'))summary.bundle=body.match(/concerts-app\.js\?v=[\w-]+/)?.[0];
+                else if(res.status>=400)summary.text=body.slice(0,140);
+                console.log('HTTP_PROBE '+JSON.stringify(summary));
+              }catch(e){console.log('HTTP_PROBE_ERROR '+u.replace(/\?.*/,'')+' '+e.message);}
+            }
+          })();
+          NODE
+      - name: Inspect clean Chromium page errors and map status
+        run: |
+          node <<'NODE'
+          const {spawn}=require('node:child_process');
+          const fs=require('node:fs');
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const path=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(fs.existsSync);
+          if(!path)throw Error('NO_CHROMIUM');
+          const chrome=spawn(path,['--headless=new','--no-sandbox','--disable-dev-shm-usage','--disable-gpu','--remote-debugging-port=9227','--remote-allow-origins=*','--user-data-dir=/tmp/concert-debug','about:blank'],{stdio:'ignore'});
+          let ws;
+          async function main(){
+            let target;
+            for(let i=0;i<80;i++){
+              try{const r=await fetch('http://127.0.0.1:9227/json/list');target=(await r.json()).find(x=>x.type==='page');if(target)break;}catch{}
+              await sleep(100);
+            }
+            if(!target)throw Error('NO_DEBUG_TARGET');
+            ws=new WebSocket(target.webSocketDebuggerUrl);
+            await new Promise((ok,bad)=>{ws.onopen=ok;ws.onerror=bad});
+            const waiting=new Map(),errors=[],responses=[],consoleLog=[];let seq=0;
+            ws.onmessage=e=>{
+              const m=JSON.parse(e.data);
+              if(m.id){const p=waiting.get(m.id);if(p){waiting.delete(m.id);m.error?p.bad(m.error):p.ok(m.result);}return;}
+              if(m.method==='Runtime.exceptionThrown')errors.push(m.params.exceptionDetails.exception?.description?.slice(0,800)||m.params.exceptionDetails.text);
+              if(m.method==='Runtime.consoleAPICalled'&&['error','warning'].includes(m.params.type))consoleLog.push((m.params.args||[]).map(x=>x.value||x.description).join(' ').slice(0,450));
+              if(m.method==='Network.loadingFailed')responses.push({event:'failed',error:m.params.errorText,blocked:m.params.blockedReason});
+              if(m.method==='Network.responseReceived'&&(/mapbox|concerts/.test(m.params.response.url)||m.params.response.status>=400))responses.push({url:m.params.response.url.replace(/access_token=[^&]+/,'access_token=REDACTED').slice(0,210),status:m.params.response.status,mime:m.params.response.mimeType});
+            };
+            const send=(method,params={})=>new Promise((ok,bad)=>{const id=++seq;waiting.set(id,{ok,bad});ws.send(JSON.stringify({id,method,params}));});
+            await send('Page.enable');await send('Runtime.enable');await send('Network.enable');
+            await send('Emulation.setDeviceMetricsOverride',{width:390,height:850,deviceScaleFactor:1,mobile:true,screenWidth:390,screenHeight:850});
+            await send('Page.navigate',{url:'https://music98.news/concerts?diagnostic='+Date.now()});
+            await sleep(13000);
+            const r=await send('Runtime.evaluate',{expression:"(()=>{const h=document.querySelector('music98-concerts'); const s=h?.shadowRoot;const map=window.mapboxgl;return {url:location.href,ready:document.readyState,customElement:!!customElements.get('music98-concerts'),host:!!h,hostWidth:h?.getBoundingClientRect().width,shadow:!!s,canvas:s?.querySelectorAll('.mapboxgl-canvas').length,fallbackText:s?.querySelector('#mapFallbackText')?.textContent,fallbackHidden:s?.querySelector('#mapFallback')?.hidden,popularStatus:s?.querySelector('#sideEmpty')?.textContent,tours:s?.querySelectorAll('.tour-card').length,mapboxLoaded:!!map,webglSupported:!!map?.supported?.(),script:document.querySelector('script[src*=\"concerts-app\"]')?.src}})()",returnByValue:true});
+            console.log('BROWSER_STATE '+JSON.stringify(r.result?.value));
+            console.log('BROWSER_ERRORS '+JSON.stringify(errors.slice(-12)));
+            console.log('BROWSER_CONSOLE '+JSON.stringify(consoleLog.slice(-12)));
+            console.log('BROWSER_NETWORK '+JSON.stringify(responses.filter(x=>x.status>=400||x.event==='failed').slice(-16)));
+            const screenshot=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
+            fs.writeFileSync('/tmp/concert-debug.png',Buffer.from(screenshot.data,'base64'));
+            console.log('SCREENSHOT_BYTES '+fs.statSync('/tmp/concert-debug.png').size);
+          }
+          main().catch(e=>{console.error('DIAGNOSTIC_ERROR '+e.message);process.exitCode=1}).finally(()=>{ws?.close();chrome.kill();});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: concert-map-diagnostic
+          path: /tmp/concert-debug.png
+          if-no-files-found: ignore
