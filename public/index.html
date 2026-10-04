@@ -39,6 +39,7 @@
   --glass:rgba(255,255,255,.6); --glass-line:rgba(255,255,255,.55);
   --r:16px; --shadow:0 0 22px rgba(15,45,55,.14);
   --story-shadow:var(--shadow);
+  --section-heading-top:8px;
   --section-heading-gap:14px;
   --font:"Pretendard",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
@@ -144,7 +145,7 @@ body.searching #heroSlot:empty{min-height:0}
 
 /* ---------- tabs / layout ---------- */
 main{position:relative;z-index:1}
-.tab{display:none;padding:var(--section-heading-gap) 0 0}
+.tab{display:none;padding:var(--section-heading-top) 0 0}
 /* equal breathing around section headings (owner: blocks higher + equal gaps
    to the header above and the content below) */
 .tab .hd{margin:0 0 var(--section-heading-gap)}
