@@ -18,3 +18,4 @@ jobs:
           python-version: "3.12"
       - name: Validate and save new Ella feature text only
         run: python editorial/ella-phenomenon-reader-sync.py
+# Editorial retest after precise gate fixes
