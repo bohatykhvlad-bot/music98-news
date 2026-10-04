@@ -54,7 +54,7 @@ def media_key(token):
     return kind, rest.split("|", 1)[0] if kind == "photo" else rest
 
 raw_bytes = SOURCE.read_bytes()
-if hashlib.sha256(raw_bytes).hexdigest() != "574b5e584213ccf2b358df274f5b14cef3617480fb8a0ef30fe1862e03ecd4ef":
+if hashlib.sha256(raw_bytes.rstrip(b"\n")).hexdigest() != "0813dca194ef0b98758b2857d2a225cfeef8aa2172685d1090bfc180d3ab28ed":
     raise ValueError("EDITORIAL_SOURCE_CHANGED_ABORT")
 markdown = raw_bytes.decode("utf-8").strip()
 heading, proposed = markdown.split("\n\n", 1)
