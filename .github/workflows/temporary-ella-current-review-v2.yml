@@ -1,0 +1,30 @@
+name: Ella temporary encrypted read-only review v2
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-ella-current-review-v2.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  encrypted-read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Export only hybrid-encrypted article snapshot for editorial review
+        shell: bash
+        run: |
+          node <<'NODE'
+          const crypto=require('node:crypto'),zlib=require('node:zlib');const pub="-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAv1kbKJSwIBVwrAMcDsBA\n36rKSpHm8opvy8VeHlv+ZhNug3JGBmdVsWtQ4MssltCBcCj1lICyf24OtoUyqc4i\naRXBWcBUKJRQDuREcrAfwbPGkIWMX+lSzMnf1wPM5G081Qu2xToOEj/+DxXUDvD5\nRik4FfW/XxSUiZwD+wQvCducsIi90iZCuvsig7ALPGUBT0IUC053wmBxDp4lNJht\nf2ibNCCrqKAGMbRaVzmwExl2yc6FilIWuEfH7/TDXZ4WRhidb49ZsWFpeuNkAC07\nXUIB5fvd2Z8w42cUJInoKRnEJDWDiWPw+uBMk8hE8H/K8i0xi8ReBDYfbf47PezF\n5Y6X1+pTy4fUJGIv7ibY7QrgoJJRlO0EYaZ5FB7/Ln22xqbWlfTWbha04KmxNcO1\nAaoGLujqYsIORtHQl7q0d5Ev8chJxR2N+f3DHNVsBj5ILMiMP0HFgs0X15Atk2kO\nTnltrlcGIUKfYX7DTbrE49FIqSV6zsflN9N76IEFRqydAgMBAAE=\n-----END PUBLIC KEY-----";
+          (async()=>{const k=process.env.ADMIN_PASSWORD;if(!k)throw Error('ADMIN_SECRET_UNAVAILABLE');
+          const r=await fetch('https://music98.news/api/desk',{headers:{'X-Admin-Key':k,'User-Agent':'Mozilla/5.0'},cache:'no-store',signal:AbortSignal.timeout(25000)});
+          if(!r.ok)throw Error('DESK_HTTP_'+r.status);const all=(await r.json()).posts;const p=all.find(x=>x.id==='ella26choosintexas');if(!p)throw Error('TARGET_NOT_FOUND');
+          const safe={id:p.id,title:p.title,status:p.status,excerpt:p.excerpt,body:p.body,cover:p.cover,media:p.media,publishAt:p.publishAt,date:p.date,type:p.type,artist:p.artist};
+          const text=Buffer.from(JSON.stringify(safe));const packed=zlib.brotliCompressSync(text,{params:{[zlib.constants.BROTLI_PARAM_QUALITY]:11}});
+          const aes=crypto.randomBytes(32),iv=crypto.randomBytes(12),c=crypto.createCipheriv('aes-256-gcm',aes,iv),enc=Buffer.concat([c.update(packed),c.final()]);
+          const wrapped=crypto.publicEncrypt({key:pub,padding:crypto.constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},aes);
+          const payload=Buffer.concat([Buffer.from('M98R02'),wrapped,iv,c.getAuthTag(),enc]);
+          console.log('ELLA_REVIEW_ENCRYPTED_RECORD='+payload.toString('base64'));console.log('ELLA_ENCRYPTED_HANDOFF_OK article_not_logged=true');})().catch(e=>{console.error('READONLY_FAILED '+e.message);process.exitCode=1});
+          NODE
