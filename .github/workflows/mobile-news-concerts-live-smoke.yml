@@ -1,0 +1,41 @@
+name: Mobile News and Concerts live deploy smoke
+on:
+  push:
+    paths:
+      - .github/workflows/mobile-news-concerts-live-smoke.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check live News and Concerts assets after deployment
+        run: |
+          node <<'JS'
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const agent={'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'};
+          const root='https://music98.news';
+          for(let n=0;n<12;n++){
+            try{
+              const urls=['/','/concerts','/concerts-app.js?v=20261004-31'];
+              const results=await Promise.all(urls.map(async path=>{
+                const res=await fetch(root+path+'?mobileaudit='+Date.now(),{headers:agent,cache:'no-store',signal:AbortSignal.timeout(15000)});
+                return {path,status:res.status,cache:res.headers.get('cache-control')||'',body:await res.text()};
+              }));
+              const index=results[0],direct=results[1],app=results[2];
+              const newsReady=index.status===200&&index.body.includes('const hero = (query || narrow.matches) ? null')&&index.body.includes('concerts-app.js?v=20261004-31');
+              const directReady=direct.status===200&&direct.body.includes('concerts-app.js?v=20261004-31');
+              const concertsReady=app.status===200&&app.body.includes('align-items:flex-start;justify-content:flex-start;text-align:left;margin-bottom:18px')&&/no-store/.test(app.cache);
+              if(newsReady&&directReady&&concertsReady){
+                console.log('LIVE_MOBILE_NEWS_READY=true LIVE_CONCERTS_DIRECT_READY=true LIVE_CONCERTS_APP_READY=true JS_NO_STORE=true');
+                process.exit(0);
+              }
+              console.log('DEPLOY_CHECK_PENDING attempt='+n+' news='+newsReady+' direct='+directReady+' app='+concertsReady);
+            }catch(e){console.log('DEPLOY_CHECK_RETRY attempt='+n+' error='+e.name);}
+            await sleep(12000);
+          }
+          console.error('LIVE_MOBILE_DEPLOY_NOT_CONFIRMED');
+          process.exit(1);
+          JS
