@@ -26,7 +26,7 @@ jobs:
           sys.path.insert(0,'scripts')
           from gate import check_post
           from preflight import check
-          raw=Path('editorial/ella-third-pass-20261004.md').read_text().strip()
+          raw=Path('editorial/ella-selected-full-review-20261004.md').read_text().strip()
           title,body=raw.split('\n\n',1)
           title=title.removeprefix('# ')
           first=body.split('. Country radio',1)[0]+'.'
