@@ -62,6 +62,7 @@ jobs:
           baseline={**post,'body':'\n\n'.join(expected)}
           fails,warns,infos=check_post(post,True)
           print('ELLA_GATE_FAIL_CODES='+','.join(a for a,b in fails))
+          print('ELLA_GATE_FAIL_DETAILS='+json.dumps(fails,ensure_ascii=False)[:2000])
           print('ELLA_GATE_WARN_CODES='+','.join(a for a,b in warns))
           print('ELLA_GATE_WARN_TEXT='+json.dumps(warns,ensure_ascii=False)[:2500])
           if fails:raise SystemExit('STRICT_GATE_FAILED')
