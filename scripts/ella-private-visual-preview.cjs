@@ -51,13 +51,16 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
    const pageRatio=info.img.width/info.photo.width;
    if(pageRatio>1.025)throw Error('PHOTO_IS_ZOOMED_'+width+' '+pageRatio);
    if(!info.title.includes('Ella Langley'))throw Error('WRONG_ARTICLE_LOADED');
+   await ev(`([...document.querySelectorAll('#articlePage .abody-pic img')].find(i=>i.currentSrc.includes('ella-langley-live-caylee-robillard-2026.jpg'))||{}).scrollIntoView?.({block:'center'})`);
+   await wait(900);
    const file=(label,x,y,w,h)=>c('Page.captureScreenshot',{format:'png',captureBeyondViewport:true,clip:{x,y,width:w,height:h,scale:1}}).then(v=>{
-    fs.writeFileSync('/tmp/ella-preview/'+label+'-'+width+'.png',Buffer.from(v.data,'base64'));
+    const buf=Buffer.from(v.data,'base64');if(label==='photo'&&buf.length<15000)throw Error('PHOTO_SCREENSHOT_BLANK_'+width+'_'+buf.length);fs.writeFileSync('/tmp/ella-preview/'+label+'-'+width+'.png',buf);
     console.log('ELLA_PREVIEW_SCREENSHOT '+label+' viewport='+width+' bytes='+Buffer.from(v.data,'base64').length);
    });
    await file('photo',Math.max(0,Math.floor(info.photo.x)),Math.floor(info.photo.y),Math.ceil(info.photo.width),Math.ceil(info.photo.height));
    const begin=Math.max(0,Math.floor(info.ending[0].top-35));const end=Math.ceil(info.ending.at(-1).bottom+30);
    const textWidth=width<700?width-14:Math.min(width-60,940);
+   await ev(`document.querySelector('.topbar')?.style.setProperty('visibility','hidden')`);
    await file('ending',width<700?7:Math.floor((width-textWidth)/2),begin,textWidth,end-begin);
    console.log('ELLA_PREVIEW_PASS viewport='+width+' photo_aspect='+ratio.toFixed(5)+' natural='+info.natural.join('x')+' original_unzoomed=true last_paragraphs=2');
   }
