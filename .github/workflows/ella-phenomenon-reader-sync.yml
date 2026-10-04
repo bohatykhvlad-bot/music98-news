@@ -1,0 +1,20 @@
+name: Ella phenomenon reader-context Draft sync
+on:
+  push:
+    branches: [editorial/ella-full-review-selective-20261004]
+    paths: [.github/workflows/ella-phenomenon-reader-sync.yml]
+permissions:
+  contents: read
+jobs:
+  sync-ella-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate and save new Ella feature text only
+        run: python editorial/ella-phenomenon-reader-sync.py
