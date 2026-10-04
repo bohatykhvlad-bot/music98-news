@@ -57,7 +57,7 @@ jobs:
           PY
           exit "$outcome"
 
-# Re-run private editorial check after verified date registry update.
+# Re-run editorial gate after full review and photo correction.
 
       - name: Audit saved Ella last photo metadata without revealing draft text
         shell: bash
