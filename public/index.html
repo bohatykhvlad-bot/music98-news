@@ -107,11 +107,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
 .nav{justify-self:center;width:410px;max-width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;height:40px;gap:4px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:3px;border-radius:999px}
-.nav-btn{width:100%;text-indent:var(--ink-x,0px);border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 8px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:.18s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
-/* optical ink centering (owner: text reads high even though the pixel
-   envelope is symmetric 11/11 and 19/18): cap-height words concentrate mass
-   above the midline, so the eye wants a hair more air on top. Nudge the text
-   node itself down half a pixel - layout, capsule and hit-area untouched: */
+.nav-btn{width:100%;text-indent:var(--ink-x,0px);border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 8px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:background-color .18s ease,color .18s ease;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+/* Keep pill text on the untransformed center line. A fractional optical
+   offset would blur the glyphs under the site's compact desktop zoom. */
 .nav-btn{position:relative;top:0}
 /* optical, mechanism not numbers: trim-both cap alphabetic shrinks the text
    box to the real ink (cap top .. baseline) so flex centering centers the
@@ -150,8 +148,8 @@ main{position:relative;z-index:1}
    to the header above and the content below) */
 .tab .hd{margin:0 0 var(--section-heading-gap)}
 .tab.active{display:block}
-.tab.rise{animation:rise .28s ease both}
-@keyframes rise{from{transform:translateY(10px)}to{transform:none}}
+/* Switching tabs never moves or fades an entire text layer. */
+.tab.rise{animation:none}
 .hd{margin:0 0 24px}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
 
