@@ -1,0 +1,23 @@
+name: Ella approved feature draft sync October 4
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/ella-feature-draft-sync-20261004.yml
+permissions:
+  contents: read
+jobs:
+  update-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: editorial/ella-longread-rewrite-20261004
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify strict gate and update only Ella body and excerpt in existing Draft
+        run: python editorial/apply-ella-rewrite-draft.py
