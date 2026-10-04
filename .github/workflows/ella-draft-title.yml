@@ -38,6 +38,8 @@ jobs:
           }
           def change(posts):
               post = find_post(posts, target_id)
+              current_sha = hashlib.sha256((post.get("body") or "").encode("utf-8")).hexdigest()
+              print("ELLA_CURRENT_BODY_SHA256="+current_sha+" TITLE="+str(post.get("title") or "")[:96], flush=True)
               if post.get("status") != "draft":
                   raise RuntimeError("STOP: Ella is no longer a draft")
               if hashlib.sha256((post.get("body") or "").encode("utf-8")).hexdigest() != expected_body:
