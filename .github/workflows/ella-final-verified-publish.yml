@@ -1,0 +1,121 @@
+name: Ella final verified publication
+on:
+  push:
+    paths:
+      - .github/workflows/ella-final-verified-publish.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Confirm exact approved unpublished article
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, re, urllib.request
+          secret=os.getenv("MUSIC98_KEY")
+          if not secret: raise SystemExit("NO_EDITOR_CREDENTIAL")
+          req=urllib.request.Request("https://music98.news/api/desk",headers={"X-Admin-Key":secret,"Cache-Control":"no-cache","User-Agent":"Mozilla/5.0"})
+          with urllib.request.urlopen(req, timeout=30) as res:posts=json.load(res)["posts"]
+          matched=[x for x in posts if x.get("id")=="ella26choosintexas"]
+          if len(matched)!=1:raise SystemExit("ARTICLE_MISSING_OR_DUPLICATE")
+          p=matched[0];body=p.get("body") or ""
+          expected="eefa06e69aab23141f33bed9fb2ebde54f21a67ba85c28a2a998202e29f1fa24"
+          digest=hashlib.sha256(body.encode()).hexdigest()
+          title="The Ella Langley Phenomenon and Country's New Boom"
+          photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
+          media=re.findall(r"\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]",body)
+          if not all([p.get("status")=="draft",digest==expected,p.get("title")==title,body.startswith(p.get("excerpt") or ""),len(media)==10,photo in body,p.get("cover")]):
+            print("NOT_APPROVED_VERSION sha256="+digest+" media="+str(len(media)))
+            raise SystemExit(1)
+          print("ELLA_APPROVED_DRAFT sha256="+digest+" media=10 title/excerpt/cover/photo verified")
+          PY
+      - name: Check both original photographs serve real image bytes
+        shell: bash
+        run: |
+          node <<'NODE'
+          const {createHash}=require('node:crypto');
+          (async()=>{
+            for(const [path,sha] of [
+              ['photos/ella-dandelion-caylee-2026-2730x3631-original.jpg',null],
+              ['photos/ella-langley-live-caylee-robillard-2026.jpg','25c2e3b6e03e2cbe74cd55d9e39fe1881c0c0fe7c3ff288c5fa57efd1c44375e']
+            ]){
+              const res=await fetch('https://music98.news/'+path+'?finalaudit='+Date.now(),{headers:{'User-Agent':'Mozilla/5.0'},signal:AbortSignal.timeout(20000)});
+              if(!res.ok||!res.headers.get('content-type')?.startsWith('image/'))throw Error('PHOTO_UNAVAILABLE_'+res.status);
+              const b=Buffer.from(await res.arrayBuffer());
+              if(b.length<100000||b[0]!==0xff||b[1]!==0xd8||b[2]!==0xff)throw Error('BAD_OR_COMPRESSED_PHOTO');
+              if(sha&&createHash('sha256').update(b).digest('hex')!==sha)throw Error('ORIGINAL_PHOTO_HASH_CHANGED');
+              console.log('PHOTO_VERIFIED '+path+' bytes='+b.length);
+            }
+          })().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
+      - name: Run authoritative editorial gate and remote preflight
+        shell: bash
+        run: |
+          set +e
+          python scripts/gate.py --post ella26choosintexas --json > /tmp/ella_gate.json
+          gate_status=$?
+          set -e
+          python - <<'PY'
+          import json
+          report=json.load(open('/tmp/ella_gate.json'))['report'][0]
+          print("ELLA_GATE_FAIL_CODES="+",".join(x[0] for x in report['fails']))
+          print("ELLA_GATE_WARN_CODES="+",".join(x[0] for x in report['warns']))
+          PY
+          test "$gate_status" -eq 0
+          python scripts/preflight.py --post ella26choosintexas --expected-media 10 --min-words 1300
+      - name: Publish only unchanged reviewed text and preserve other posts
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,sys
+          sys.path.insert(0,'scripts')
+          from post import run_gate,guarded_write,find_post,slot_stamp
+          pid='ella26choosintexas'
+          expected='eefa06e69aab23141f33bed9fb2ebde54f21a67ba85c28a2a998202e29f1fa24'
+          title="The Ella Langley Phenomenon and Country's New Boom"
+          gate_ok,_=run_gate(pid)
+          if not gate_ok:raise SystemExit('GATE_FAILED_BEFORE_PUBLISH')
+          def mutate(posts):
+            p=find_post(posts,pid)
+            digest=hashlib.sha256((p.get('body') or '').encode()).hexdigest()
+            if p.get('status')!='draft' or digest!=expected or p.get('title')!=title or not (p.get('body') or '').startswith(p.get('excerpt') or ''):
+              raise RuntimeError('DRAFT_CHANGED_ABORT')
+            p['status']='live'
+            slot_stamp(p)
+            return p
+          saved=guarded_write(mutate)
+          if saved.get('status')!='live' or hashlib.sha256((saved.get('body') or '').encode()).hexdigest()!=expected or saved.get('title')!=title:
+            raise SystemExit('PUBLISH_VERIFICATION_FAILED')
+          print('ELLA_PUBLICATION_SAVED verified_sha256='+expected+' status=live')
+          PY
+      - name: Verify public article visibility and site response
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib,json,time,urllib.request
+          expected='eefa06e69aab23141f33bed9fb2ebde54f21a67ba85c28a2a998202e29f1fa24'
+          for attempt in range(10):
+            try:
+              req=urllib.request.Request('https://music98.news/api/desk?finalaudit='+str(time.time()),headers={'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'})
+              with urllib.request.urlopen(req,timeout=20) as r:posts=json.load(r)['posts']
+              p=next((x for x in posts if x.get('id')=='ella26choosintexas'),None)
+              if p and p.get('status')=='live' and hashlib.sha256((p.get('body') or '').encode()).hexdigest()==expected:
+                homepage=urllib.request.Request('https://music98.news/',headers={'User-Agent':'Mozilla/5.0'})
+                with urllib.request.urlopen(homepage,timeout=20) as r:assert r.status==200
+                print('ELLA_PUBLICLY_VISIBLE_SHA256='+expected+' HOMEPAGE_OK status=live')
+                break
+            except Exception as e: print('PUBLIC_VERIFY_RETRY '+str(attempt+1)+' '+type(e).__name__)
+            time.sleep(5)
+          else:raise SystemExit('PUBLIC_VISIBILITY_NOT_CONFIRMED')
+          PY
