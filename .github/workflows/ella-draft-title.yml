@@ -29,7 +29,7 @@ jobs:
           if not os.environ.get("ADMIN_PASSWORD"):
               raise SystemExit("ADMIN_PASSWORD not configured")
           target_id = "ella26choosintexas"
-          expected_body = "5fd538cd0fd18b175d2e00e76a6864101cb929274a70fbf79ea21270400d8c73"
+          expected_body = "cc99241e041ce85771b1054a3977510cd2dbac9fbb2ee918f292094bfcc6c0d9"
           desired_title = "The Ella Langley Phenomenon and Country's New Boom"
           prior_titles = {
               'Ella Langley and the "Choosin\' Texas" Phenomenon',
