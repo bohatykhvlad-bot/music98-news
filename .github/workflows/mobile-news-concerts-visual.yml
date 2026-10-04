@@ -1,0 +1,75 @@
+name: Mobile News and Concerts visual geometry
+on:
+  push:
+    paths:
+      - .github/workflows/mobile-news-concerts-visual.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build fixture from actual News and Concerts production CSS
+        shell: bash
+        run: |
+          node <<'JS'
+          const fs=require('node:fs');
+          const page=fs.readFileSync('public/index.html','utf8');
+          const app=fs.readFileSync('public/concerts-app.js','utf8');
+          const css=page.match(/<style>([\s\S]*?)<\/style>/i)?.[1];
+          const cc=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
+          const ch=app.match(/^const CONCERTS_HTML=("(?:\\.|[^"\\])*");/m);
+          if(!css||!cc||!ch)throw Error('PRODUCTION_CSS_EXTRACTION_FAILED');
+          const shadowCSS=JSON.parse(cc[1]),shadowHTML=JSON.parse(ch[1]);
+          const fixture='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>'+css+'</style></head><body>'+
+          '<header class="topbar"><div class="topbar-glass topbar-glass-full"></div><div class="topbar-in"><a class="brand"><span class="brand-name">music98.news</span></a><div class="top-actions"><div class="search"><input placeholder="Search"></div></div><nav class="nav"><button class="nav-btn active">News</button><button class="nav-btn">Releases</button><button class="nav-btn">Chart</button><button class="nav-btn">Concerts</button></nav></div></header>'+
+          '<main class="wrap"><section class="tab active" id="tab-news"><div class="hd"><h1 class="hd-t">Latest stories</h1></div><div id="heroSlot"></div><div class="rail-wrap"><div class="rail grid-rail" id="newsGrid"><a class="card"><div class="cover" style="background:#dce6e8"></div><div class="body"><h3>Latest story</h3><p>Article teaser</p><div class="meta">Today</div></div></a><a class="card"><div class="cover" style="background:#e7eded"></div><div class="body"><h3>Previous story</h3><p>Article teaser</p><div class="meta">Yesterday</div></div></a></div></div></section>'+
+          '<section class="tab active" id="tab-concerts" style="margin-top:26px"><music98-concerts id="fixtureConcerts"></music98-concerts></section></main>'+
+          '<pre id="metrics" hidden></pre><script>const host=document.getElementById("fixtureConcerts");const root=host.attachShadow({mode:"open"});root.innerHTML="<style>"+'+JSON.stringify(shadowCSS)+'+"</style>"+'+JSON.stringify(shadowHTML)+';const hdr=document.querySelector(".topbar");document.body.style.setProperty("--header-h",Math.ceil(hdr.getBoundingClientRect().height)+"px");const box=(selector,scope=document)=>scope.querySelector(selector)?.getBoundingClientRect();const z=x=>Math.round(x*100)/100;const title=box(".hero h1",root),search=box(".city-input",root),map=box(".map-shell",root),tab=box("#tab-concerts");const data={viewport:innerWidth,headerHeight:z(hdr.height||hdr.getBoundingClientRect().height),newsTitleX:z(box("#tab-news .hd-t").left),newsCardX:z(box("#newsGrid .card").left),newsCardWidth:z(box("#newsGrid .card").width),heroHeight:z(box("#heroSlot").height),concertTitleX:z(title.left),searchX:z(search.left),mapX:z(map.left),titleTop:z(title.top),concertTabTop:z(tab.top),titleSearchGap:z(search.top-title.bottom),overflow:z(document.documentElement.scrollWidth-innerWidth),concertAlign:getComputedStyle(root.querySelector(".hero")).alignItems,concertFont:getComputedStyle(root.querySelector(".hero h1")).fontSize};document.getElementById("metrics").textContent=JSON.stringify(data)</script></body></html>';
+          fs.writeFileSync('/tmp/m98-mobile-fixture.html',fixture);
+          JS
+      - name: Check actual browser alignment at five widths
+        shell: bash
+        run: |
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          test -n "$BROWSER"
+          for WIDTH in 360 390 430 700 1280; do
+            "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --window-size="$WIDTH,1900" --dump-dom file:///tmp/m98-mobile-fixture.html > "/tmp/m98-mobile-$WIDTH.html" 2>/tmp/m98-mobile-chrome.log
+            WIDTH="$WIDTH" node <<'JS'
+          const fs=require('node:fs');
+          const width=Number(process.env.WIDTH);
+          const dom=fs.readFileSync('/tmp/m98-mobile-'+width+'.html','utf8');
+          const match=dom.match(/<pre id="metrics"[^>]*>([^<]+)<\/pre>/);
+          if(!match)throw Error('CHROME_DID_NOT_RENDER_GEOMETRY');
+          const x=JSON.parse(match[1].replace(/&quot;/g,'"'));
+          const close=(a,b,tol=1.1)=>Math.abs(a-b)<=tol;
+          if(x.overflow>1.1)throw Error('HORIZONTAL_OVERFLOW '+JSON.stringify(x));
+          if(width<=640){
+            if(x.heroHeight!==0||!close(x.newsTitleX,x.newsCardX)||!close(x.newsCardWidth,width-32,20))
+              throw Error('MOBILE_NEWS_CARD_GEOMETRY '+JSON.stringify(x));
+          }
+          if(width<=700){
+            if(!close(x.concertTitleX,x.searchX)||!close(x.searchX,x.mapX)||x.concertAlign!=='flex-start')
+              throw Error('MOBILE_CONCERTS_LEFT_ALIGNMENT '+JSON.stringify(x));
+            const top=x.titleTop-x.concertTabTop;
+            if(Math.abs(top-x.titleSearchGap)>7)throw Error('MOBILE_CONCERTS_UNBALANCED_VERTICAL_GAPS '+JSON.stringify(x));
+          }
+          if(width>=1200&&x.concertAlign!=='center')throw Error('DESKTOP_CONCERTS_CHANGED '+JSON.stringify(x));
+          console.log('MOBILE_DESKTOP_GEOMETRY_PASS '+JSON.stringify(x));
+          JS
+          done
+      - name: Capture mobile screenshot for inspection
+        shell: bash
+        run: |
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --window-size="390,2000" --screenshot=/tmp/music98-mobile-390.png file:///tmp/m98-mobile-fixture.html >/dev/null 2>/tmp/m98-mobile-chrome.log
+          python3 - <<'PY'
+          import base64
+          from pathlib import Path
+          p=Path('/tmp/music98-mobile-390.png')
+          print('MOBILE_VISUAL_PNG_BYTES='+str(p.stat().st_size))
+          print('MOBILE_SCREENSHOT_B64='+base64.b64encode(p.read_bytes()).decode())
+          PY
