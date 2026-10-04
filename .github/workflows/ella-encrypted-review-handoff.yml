@@ -1,0 +1,29 @@
+name: Ella encrypted snapshot handoff
+on:
+  push:
+    paths:
+      - .github/ella-current-review.enc.b64
+permissions:
+  contents: read
+jobs:
+  export-encrypted-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm only encrypted bytes are exported
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          p=Path('.github/ella-current-review.enc.b64')
+          data=base64.b64decode(p.read_text().strip(),validate=True)
+          assert data.startswith(b'M98E01') and len(data)>3000
+          print('ENCRYPTED_REVIEW_ARTIFACT_VERIFIED BYTES',len(data))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ella-current-encrypted-review
+          path: .github/ella-current-review.enc.b64
+          if-no-files-found: error
