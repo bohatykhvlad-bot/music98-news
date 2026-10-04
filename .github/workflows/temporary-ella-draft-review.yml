@@ -19,7 +19,7 @@ jobs:
           node <<'NODE'
           const { publicEncrypt, constants, randomBytes, createCipheriv } = require("node:crypto");
           const { brotliCompressSync } = require("node:zlib");
-          const pub = "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAYEAt7UwQlFXZ0x7QvUmSMgB\nk1rm9xNz7Z8brXYhST0mFzSzcp1TtBCOCToFOoyGHGc8RW9Ghz6DdM/HcV3S3UvI\n+wcQSifagHTHgDGmxMCppkGxsCJ86+Z+5LMAPp+HiwEPpCxAuIj9BkX5rzV/9QTt\nMvAgE0yGWS1jMORnL4QWLoc5tnQachnPOKdDeIVNS5IKLJ8/rnHJPIKeFaRElUJB\nyE6ODPbCpL7tUrQN8KZIEVkFgmofNFqihdsvz53lpaNaIQ6Y3MnsuwGU6bZqvwfE\n3s4Tnr2Z66J0+qq6f+7V++dW1HgIq88Hhl+M2gDIaeU7fD92cukTH+vyPdIfKg6L\nlsAadC6uA2QyD7gwvWm9ZdnPrDgDk1Nl+FP63OjYuuMTlGTw9vY2P+glDCOv164L\nkW/C+kZPcpMkWOwIvQD+GNO5IvoDqItaFZC/pDForqDC7CMJZ3w9emUaCoENIdEL\niy2UVpKn4KWAK7KipWJbp76Vheyd17ALS77UuxOJbUqfAgMBAAE=\n-----END PUBLIC KEY-----";
+          const pub = "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA4LhEoCL0IP4H/Q05KOFt\nnn/8NDTUkdHJ3abvkGuPWCfHGpjsZa9zh6QzqPHSZPLVUsuU2k4RzRYvYpTmhCz2\nv96Wv5Iy8b8d4jy/qAjAfjB9VyWVg2JJjBaFWLdUWDb6eyd0sMQM1RBLH8PP1EcJ\n2AmW3uLffmfxhK5zVO4uxpr9/oYikpYsxereEu/kvVyLr0nUXUJj/jvDPs8eRTB+\nH9G+yM8iidJutmzkI+crApqYKVjoj70L2UG+mXZTr1Ol7JhxFi6PFjsOKy+OhF/H\nwzldFqGAJKbYdjpWFkTJ6N59xg/F2VoA8P8Bf/UtgCcevbRSIF1AREOfPDwZi8wS\nK5INhSk3efNJJqXDHv0g8swfR3E7Gp2XN3cAO/t2TeW3axz9H08vZs6XQP8oDC9N\njJNwzbP9RLFw1uzv8RpYG682a30OTfgaq7aPQC18wrxdN2htpTiv+qcxhYuUTeeI\nm285QkaW5Wg4NX+pZLJM5uoXRs8JOdg4T3dNHXn+C0CDAgMBAAE=\n-----END PUBLIC KEY-----";
           (async () => {
             const key = process.env.ADMIN_PASSWORD || "";
             if (!key) { console.log("ELLA_READER: ADMIN_PASSWORD_UNCONFIGURED"); process.exit(2); }
