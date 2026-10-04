@@ -55,7 +55,7 @@ def media_key(token):
 
 raw_bytes = SOURCE.read_bytes()
 git_blob = hashlib.sha1(b"blob " + str(len(raw_bytes)).encode("ascii") + b"\0" + raw_bytes).hexdigest()
-if git_blob != "b80739dbfdbade287017b756857c3481301579aa":
+if git_blob != "2405c7a0e910738fa660056b8e8eb148e146083b":
     raise ValueError("EDITORIAL_SOURCE_CHANGED_ABORT")
 markdown = raw_bytes.decode("utf-8").strip()
 heading, proposed = markdown.split("\n\n", 1)
@@ -91,6 +91,8 @@ fails, warns, _ = check_post(candidate, strict=True)
 print("EDITORIAL_GATE_FAIL_CODES=" + ",".join(code for code, _ in fails))
 print("EDITORIAL_GATE_WARN_CODES=" + ",".join(sorted(set(code for code, _ in warns))))
 if fails:
+    for code, detail in fails:
+        print("EDITORIAL_GATE_DETAIL=" + str(code) + ": " + str(detail))
     raise ValueError("EDITORIAL_GATE_FAIL")
 if not preflight_check(candidate, orig, expected_media=10, min_words=1300):
     raise ValueError("EDITORIAL_PREFLIGHT_FAIL")
