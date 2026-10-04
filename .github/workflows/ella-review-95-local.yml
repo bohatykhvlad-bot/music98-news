@@ -55,6 +55,7 @@ jobs:
           baseline={**post,'body':'\n\n'.join(expected)}
           fails,warns,info=check_post(post,True)
           print('LOCAL_GATE_FAIL_CODES='+','.join(x[0] for x in fails))
+          print('LOCAL_GATE_FAIL_DETAILS='+json.dumps(fails,ensure_ascii=False)[:1800])
           print('LOCAL_GATE_WARN_CODES='+','.join(x[0] for x in warns))
           print('LOCAL_GATE_WARN_DETAILS='+json.dumps(warns,ensure_ascii=False)[:2200])
           if fails:raise SystemExit('LOCAL_GATE_FAIL')
