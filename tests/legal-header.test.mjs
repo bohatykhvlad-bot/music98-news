@@ -40,7 +40,7 @@ for(const filename of legalPages){
     assert.match(header[1],/<img class="brand-logo" src="\/logo.png" alt="music98.news"/);
     assert.match(header[1],/<span class="brand-name">music98.news<\/span>/);
     assert.doesNotMatch(header[1],/<nav\b|nav-btn|search|top-actions/);
-    assert.match(page,/<link rel="stylesheet" href="\/legal-header.css\?v=20261003-8">/);
+    assert.match(page,/<link rel="stylesheet" href="\/legal-header.css\?v=20261004-9">/);
     assert.match(page,/<script src="\/legal-header.js\?v=20261003-1" defer><\/script>/);
   });
 }
