@@ -18,3 +18,4 @@ jobs:
           python-version: "3.12"
       - name: Validate and sync final Ella text only
         run: python editorial/ella-phenomenon-final-sync.py
+# Recheck full-article narrative links
