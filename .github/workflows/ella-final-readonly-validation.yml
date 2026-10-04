@@ -24,7 +24,7 @@ jobs:
           import hashlib, json, os, re, urllib.request
           key=os.environ.get("MUSIC98_KEY")
           if not key:raise SystemExit("EDITOR_CREDENTIAL_UNAVAILABLE")
-          req=urllib.request.Request("https://music98.news/api/desk",headers={"X-Admin-Key":key,"Cache-Control":"no-cache"})
+          req=urllib.request.Request("https://music98.news/api/desk",headers={"X-Admin-Key":key,"Cache-Control":"no-cache","User-Agent":"Mozilla/5.0"})
           with urllib.request.urlopen(req,timeout=30) as resp:posts=json.load(resp)["posts"]
           p=next((x for x in posts if x.get("id")=="ella26choosintexas"),None)
           if not p:raise SystemExit("ELLA_NOT_FOUND")
