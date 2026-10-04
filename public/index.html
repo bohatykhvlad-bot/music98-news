@@ -158,6 +158,7 @@ main{position:relative;z-index:1}
 .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:18px;box-shadow:var(--shadow);cursor:pointer;position:relative;align-items:stretch;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;outline:none}
 .hero .cover{position:relative;aspect-ratio:16/9;min-height:0;height:auto;overflow:hidden;background:var(--card2)}
 #heroSlot:empty{min-height:300px}
+@media (max-width:640px){#tab-news #heroSlot:empty{display:none;min-height:0}}
 .hero .cover img,.card .cover img,.article .acover img,#articlePage .acover img,.rcard .rcover img{
   position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;border:0;display:block;
   -webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none
@@ -2534,7 +2535,10 @@ function renderNews(){
   /* searching: NO hero - every match renders as a card in the rail (owner:
      an artist with many posts must show the same scrollable card grid, not
      one big photo); hero only in browse mode */
-  const hero = query ? null : (posts.find(p=>p.pinned) || posts[0]), rest = posts.filter(p=>p!==hero);
+  const narrow = window.matchMedia("(max-width: 640px)");
+  /* Pinning affects the desktop hero only; mobile includes every story in date order. */
+  const hero = (query || narrow.matches) ? null : (posts.find(p=>p.pinned) || posts[0]);
+  const rest = posts.filter(p=>p!==hero);
   $("#heroSlot").innerHTML = hero ? `
     <a class="hero" href="${postPath(hero)}">
       <div class="cover">${coverImg(hero,false)}</div>
@@ -2546,7 +2550,6 @@ function renderNews(){
     </a>` : "";
   /* mobile (<=640px): the rail becomes a vertical column and shows one batch
      at a time; a Load More pill appends older posts. Desktop: full rail. */
-  const narrow = window.matchMedia("(max-width: 640px)");
   const shown = narrow.matches ? rest.slice(0, Math.max(RAIL_PAGE, (data._newsShown||RAIL_PAGE))) : rest;
   $("#newsGrid").innerHTML = shown.map(p=>`
     <a class="card" href="${postPath(p)}">
@@ -2574,6 +2577,10 @@ function renderNews(){
   bindCovers($("#newsGrid"));
   syncRail("#newsGrid");
 }
+/* Rebuild the card feed only when crossing the mobile breakpoint. */
+const newsMobileLayout = window.matchMedia("(max-width: 640px)");
+if(newsMobileLayout.addEventListener) newsMobileLayout.addEventListener("change", renderNews);
+else if(newsMobileLayout.addListener) newsMobileLayout.addListener(renderNews);
 function renderReleases(){
   const posts = data.posts.filter(p=>p.type==="release" && matches(p))
     .sort((a,b)=> postTime(b)-postTime(a));
