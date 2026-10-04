@@ -152,7 +152,7 @@ test("concert pills match top-nav timing and use equal-width segments",()=>{
   assert.match(app,/\.map-mode-btn\{width:100%;[^}]*transition:background \.18s ease,border-color \.18s ease,color \.18s ease/);
   assert.match(app,/@media\(hover:hover\) and \(pointer:fine\)\{\.nav-btn:hover:not\(\.active\)\{background:var\(--bg2\);color:var\(--text\)\}\}/);
   assert.doesNotMatch(app,/\.nav-btn:active\{[^}]*transform:/);
-  assert.match(app,/\.nav-btn\{width:100%;[^}]*transition:\.18s;[^}]*top:\.5px/);
+  assert.match(app,/\.nav-btn\{width:100%;[^}]*transition:\.18s;[^}]*top:0/);
   assert.match(app,/@media\(max-width:700px\)\{[\s\S]*?\.nav-btn\{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0\}/);
 });
 test("artist subtitle shares the exact left edge with artist name",()=>{
