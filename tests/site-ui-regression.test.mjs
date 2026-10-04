@@ -337,13 +337,13 @@ test("subscribe email focus does not retain a cyan mouse-focus halo",()=>{
 
 test("all four main tabs use the same compact heading-to-content gap",()=>{
   const concerts=readFileSync(new URL("../public/concerts-app.js",import.meta.url),"utf8");
-  assert.match(page,/--section-heading-gap:12px/);
+  assert.match(page,/--section-heading-gap:14px/);
   assert.match(page,/\.tab \.hd\{margin:0 0 var\(--section-heading-gap\)\}/);
   assert.doesNotMatch(page,/#tab-(?:news|releases|charts) \.hd\{margin:/,
     "tab-specific heading gaps must not silently diverge");
   assert.match(page,/#tab-releases \.rail-wrap\{margin-top:0\}/,
     "release rail must not add an extra top gap");
-  assert.match(concerts,/\.hero\{margin:0 0 12px;align-items:center\}/);
+  assert.match(concerts,/\.hero\{margin:0 0 var\(--section-heading-gap,14px\);align-items:center\}/);
   assert.match(page,/#tab-news #newsGrid,#tab-releases #relGrid\{padding:32px 44px 32px 32px;margin:-32px 0 -32px -32px\}/,
     "carousel shadow clearance must not change the visible card position");
 });
@@ -365,8 +365,8 @@ test("Concerts mobile heading remains left-aligned after final CSS overrides and
   const match=concerts.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m);
   assert.ok(match,"Concerts CSS must be the real shadow-root stylesheet");
   const css=JSON.parse(match[1]);
-  const base=css.lastIndexOf(".hero{margin:0 0 12px;align-items:center}");
-  const mobile=css.lastIndexOf("@media(max-width:700px){\n  .hero{align-items:flex-start;justify-content:flex-start;text-align:left;margin-bottom:18px}");
+  const base=css.lastIndexOf(".hero{margin:0 0 var(--section-heading-gap,14px);align-items:center}");
+  const mobile=css.lastIndexOf("@media(max-width:700px){\n  .hero{align-items:flex-start;justify-content:flex-start;text-align:left;margin-bottom:var(--section-heading-gap,14px)}");
   assert.ok(base>=0 && mobile>base,"mobile alignment must override later centered desktop declaration");
   assert.match(css,/@media\(max-width:640px\)\{\n  \.hero h1\{font-size:clamp\(22px,7vw,26px\);line-height:1\.15\}/);
   assert.match(page,/@media \(max-width:640px\)\{[\s\S]*?\.wrap\{padding:0 16px\}/);
