@@ -1,0 +1,66 @@
+name: Temporary Ella 95 candidate preflight
+on:
+  push:
+    paths:
+      - .github/ella-editorial-95.enc.b64
+permissions:
+  contents: read
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Decrypt privately and stage candidate without writing desk
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs'),crypto=require('node:crypto'),zlib=require('node:zlib');
+          const sha=s=>crypto.createHash('sha256').update(s).digest('hex');
+          (async()=>{
+            const secret=process.env.ADMIN_PASSWORD;if(!secret)throw Error('ADMIN_SECRET_MISSING');
+            const raw=Buffer.from(fs.readFileSync('.github/ella-editorial-95.enc.b64','utf8').trim(),'base64');
+            if(raw.subarray(0,9).toString()!=='M98PATCH1')throw Error('INVALID_PATCH');
+            const k=crypto.scryptSync(secret,'music98-ella-editorial-2026-10-03-v2',32),d=crypto.createDecipheriv('aes-256-gcm',k,raw.subarray(9,21));
+            d.setAuthTag(raw.subarray(raw.length-16));
+            const patch=JSON.parse(zlib.brotliDecompressSync(Buffer.concat([d.update(raw.subarray(21,raw.length-16)),d.final()])).toString('utf8'));
+            const headers={'X-Admin-Key':secret,'User-Agent':'Mozilla/5.0'};
+            const res=await fetch('https://music98.news/api/desk',{headers,cache:'no-store',signal:AbortSignal.timeout(30000)});
+            if(!res.ok)throw Error('DESK_HTTP_'+res.status);
+            const posts=(await res.json()).posts,orig=posts.find(p=>p.id==='ella26choosintexas');
+            if(!orig||orig.status!=='draft'||patch.id!==orig.id||patch.originalStatus!=='draft')throw Error('DRAFT_STATUS_MISMATCH');
+            if(sha(orig.body)!==patch.originalBodySHA256)throw Error('SOURCE_VERSION_CHANGED');
+            const before=orig.body.split(/\n\n/),b=before.slice();
+            for(const change of patch.changes.slice().sort((x,y)=>y.start-x.start))b.splice(change.start,change.end-change.start,...change.new);
+            const newBody=b.join('\n\n');
+            const media=s=>s.match(/^\[(?:photo|apple|youtube|ig|tiktok):[^\n]+$/gm)||[];
+            if(sha(newBody)!==patch.updatedBodySHA256||newBody===orig.body||!newBody.startsWith(patch.excerpt)||JSON.stringify(media(newBody))!==JSON.stringify(media(orig.body))||media(newBody).length!==10)throw Error('CANDIDATE_INTEGRITY_FAIL');
+            if(!newBody.includes('[photo:photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/|50% 50%|1]'))throw Error('FINAL_PORTRAIT_CHANGED');
+            fs.writeFileSync('/tmp/ella95-candidate.json',JSON.stringify({...orig,body:newBody,excerpt:patch.excerpt}),{mode:0o600});
+            fs.writeFileSync('/tmp/ella95-baseline.json',JSON.stringify(orig),{mode:0o600});
+            console.log('ELLA_95_STAGE_PASS original_sha='+patch.originalBodySHA256+' candidate_sha='+patch.updatedBodySHA256+' media_unmodified=10');
+          })().catch(e=>{console.error('STAGE_FAIL '+e.message);process.exitCode=1});
+          NODE
+      - name: Run authentic strict editorial gate on proposed update
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,sys
+          sys.path.insert(0,'scripts')
+          from gate import check_post
+          p=json.load(open('/tmp/ella95-candidate.json'))
+          fails,warns,_=check_post(p,strict=True)
+          for cat,ls in [('FAIL',fails),('WARN',warns)]:
+              for code,msg in ls:print('ELLA_95_'+cat+' '+code+' '+msg[:180])
+          if fails:raise SystemExit('STRICT_GATE_FAILED')
+          print('ELLA_95_GATE_PASS')
+          PY
+      - name: Run authentic preflight against prior saved draft
+        shell: bash
+        run: |
+          python scripts/preflight.py --post ella26choosintexas --file /tmp/ella95-candidate.json --baseline /tmp/ella95-baseline.json --expected-media 10 --min-words 1300
