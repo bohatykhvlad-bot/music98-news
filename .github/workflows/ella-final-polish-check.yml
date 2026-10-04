@@ -46,7 +46,8 @@ jobs:
           if media!=expected:raise SystemExit('MEDIA_LAYOUT_REGRESSION')
           paragraphs=[x for x in body.split('\n\n') if x and not x.startswith('[')]
           assert len(paragraphs)==21,(len(paragraphs),'prose paragraph count')
-          assert all(len(x.split())>=35 for x in paragraphs),'short paragraph: compact Easter egg is intentional'
+          assert all(len(x.split())>=70 for i,x in enumerate(paragraphs) if i!=6),'unexpected short paragraph'
+          assert 25<=len(paragraphs[6].split())<=40, 'Easter egg note should be compact'
           assert 85<=len(first)<=170,len(first)
           assert paragraphs[0].startswith('Ella Langley'), 'feature lede must promise feature topic'
           assert 'I-40' not in paragraphs[-1], 'old repeated ending retained'
