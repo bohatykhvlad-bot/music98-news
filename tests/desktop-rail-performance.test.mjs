@@ -142,6 +142,32 @@ test("hidden Releases never caches an invalid negative max on tab switches",()=>
   assert.equal(env.b.next.classList.has("ok"),true);
 });
 
+test("mouse drag retains lifted card and seamless momentum in both sections",()=>{
+  for(const which of ["a","b"]){
+    const env=rig(),{rail}=env[which];
+    const card={
+      classList:(()=>{const names=new Set();return {
+        add:x=>names.add(x),remove:x=>names.delete(x),has:x=>names.has(x)
+      }})(),
+      style:{},
+      closest:selector=>selector.includes(".card")?card:null
+    };
+    rail.emit("pointerdown",{target:card,button:0,pointerId:4,pointerType:"mouse",clientX:200});
+    assert.ok(rail.classList.has("dragging"));
+    assert.ok(card.classList.has("grab"));
+    assert.equal(card.style.transform,"translateY(-4px)");
+    rail.emit("pointermove",{pointerId:4,clientX:160});
+    env.frame(1000/60);
+    assert.ok(rail.scrollLeft>=39 && rail.scrollLeft<=41);
+    rail.emit("pointerup",{pointerId:4});
+    assert.equal(rail.classList.has("dragging"),false);
+    assert.equal(card.classList.has("grab"),true,"lift survives the release");
+    const released=rail.scrollLeft;
+    env.frame(1000/60);
+    assert.ok(rail.scrollLeft>released,"mouse momentum continues smoothly");
+  }
+});
+
 test("desktop lift, band, glass arrows, and distinct mobile stacking are unchanged",()=>{
   assert.match(page,/\.rail-btn\{[^}]*backdrop-filter:blur\(12px\) saturate\(180%\)/);
   assert.match(source,/const rubberMag = over =>/);
