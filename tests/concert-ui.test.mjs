@@ -781,3 +781,18 @@ test("Near me lists up to 30 artists and description/status share rank alignment
   assert.match(area,/setStatus\(events\.length \? "Ranked by number of upcoming concerts"/);
   assert.doesNotMatch(area,/loaded concerts of/);
 });
+
+test("Mapbox GL constructor failure retains concert data and starts a real non-WebGL map",()=>{
+  const raster=readFileSync(new URL("../public/concerts-raster-fallback.js",import.meta.url),"utf8");
+  assert.match(app,/map=createMapFallback\(root\.querySelector\("#map"\)\)/);
+  assert.match(app,/bootRaster\(\)\.then\(init=>/);
+  assert.match(app,/map\.__rasterController=api/);
+  assert.match(app,/if\(source\.data\)api\.setSource\(id,source\.data\)/);
+  assert.match(app,/onCity:h=>selectHotspotSuggestion\(h\)/);
+  assert.match(app,/onEvent:\(id,source\)=>/);
+  assert.match(raster,/window\.music98InitRasterConcerts=async function/);
+  assert.match(raster,/L\.map\(container,/);
+  assert.match(raster,/api\.mapbox\.com\/styles\/v1\/mapbox\/light-v11\/tiles\/256/);
+  assert.match(raster,/map\.on\("zoomend",render\)/);
+  assert.doesNotMatch(raster,/WebGLRenderingContext|mapboxgl\.Map/);
+});
