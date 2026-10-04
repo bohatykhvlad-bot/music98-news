@@ -64,17 +64,30 @@ function createMapFallback(container){
     __fallback:true,
     dragRotate:{disable:noop},
     touchZoomRotate:{disableRotation:noop},
-    addControl:noop,resize:noop,flyTo:noop,easeTo:noop,fitBounds:noop,
+    addControl:noop,
+    resize:()=>fallback.__rasterController?.resize(),
+    flyTo:opts=>fallback.__rasterController?.flyTo(opts),
+    easeTo:opts=>fallback.__rasterController?.flyTo(opts),
+    fitBounds:(bounds,opts)=>fallback.__rasterController?.fitBounds(bounds,opts),
     addLayer:noop,setLayoutProperty:noop,setPaintProperty:noop,setLayerZoomRange:noop,
     addImage:noop,hasImage:()=>false,getLayer:()=>null,getStyle:()=>({layers:[]}),
-    getZoom:()=>0,getCenter:()=>({lat:0,lng:0}),
+    getZoom:()=>fallback.__rasterController?.getZoom()??0,
+    getCenter:()=>fallback.__rasterController?.getCenter()??{lat:0,lng:0},
     project:()=>({x:0,y:0}),unproject:()=>({lat:0,lng:0}),
     queryRenderedFeatures:()=>[],
     getCanvas:()=>({style:{}}),
     getContainer:()=>container,
     addSource:(id)=>{
-      if(!sources.has(id)) sources.set(id,{setData:noop,getClusterExpansionZoom:async()=>0});
+      if(!sources.has(id)) sources.set(id,{
+        data:null,
+        setData(data){
+          this.data=data;
+          fallback.__rasterController?.setSource(id,data);
+        },
+        getClusterExpansionZoom:async()=>0
+      });
     },
+    __rasterSourceData:()=>sources,
     getSource:id=>sources.get(id)||null,
     on:(event,layerOrHandler,maybeHandler)=>{
       const handler=typeof layerOrHandler==="function" ? layerOrHandler : maybeHandler;
@@ -101,7 +114,8 @@ try{
   map.addControl(new mapboxgl.NavigationControl({showCompass:false}),"bottom-right");
 }catch(err){
   mapInitError=err;
-  console.error("Concert map unavailable",err);
+  console.error("Mapbox GL could not create a map; starting raster fallback",err);
+  try{map?.remove?.();}catch(e){}
   map=createMapFallback(root.querySelector("#map"));
 }
 
@@ -291,6 +305,7 @@ function applyMapMode(){
 function setMode(mode){
   if(activeMode!==mode) closePopup();
   activeMode=mode;
+  map.__rasterController?.setMode(mode);
   if(mode!=="popular") clearPopularWarmRetry();
   if(mode!=="nearby" && mode!=="artist-area") hidePendingAreaSearch();
   syncModeTabs();
@@ -1983,7 +1998,63 @@ if(typeof map.isStyleLoaded==="function" && map.isStyleLoaded()){
 bootConcertData();
 if(mapInitError){
   mapFallback.hidden=false;
-  mapFallbackText.textContent="The map is unavailable in this browser, but search and concert lists still work.";
+  const originalError=String(mapInitError?.message||mapInitError||"Map initialization failed").slice(0,240);
+  mapFallbackText.textContent="Starting a map that works without WebGL…";
+  /* Load a separate renderer ONLY when GL construction fails. The main
+     Mapbox map is unchanged for browsers where WebGL works. */
+  const bootRaster=()=>{
+    const existing=window.music98InitRasterConcerts;
+    if(existing) return Promise.resolve(existing);
+    return new Promise((resolve,reject)=>{
+      const script=document.createElement("script");
+      const timer=setTimeout(()=>fail(new Error("raster_fallback_script_timeout")),12000);
+      let finished=false;
+      function fail(err){
+        if(finished)return;
+        finished=true;clearTimeout(timer);script.onload=script.onerror=null;
+        reject(err);
+      }
+      script.src="/concerts-raster-fallback.js?v=20261004-1";
+      script.onload=()=>{
+        if(finished)return;
+        clearTimeout(timer);finished=true;
+        if(typeof window.music98InitRasterConcerts==="function")resolve(window.music98InitRasterConcerts);
+        else reject(new Error("raster_fallback_function_missing"));
+      };
+      script.onerror=()=>fail(new Error("raster_fallback_script_failed"));
+      document.head.appendChild(script);
+    });
+  };
+  bootRaster().then(init=>{
+    /* A GL constructor may have appended an incomplete canvas before it threw. */
+    root.querySelector("#map").replaceChildren();
+    return init({
+      root,token:MAPBOX_TOKEN,mobile:compactWorldView,
+      onReady:()=>{mapFallback.hidden=true;},
+      onReadyApi:api=>{
+        map.__rasterController=api;
+        api.setMode(activeMode);
+        for(const [id,source] of map.__rasterSourceData()){
+          if(source.data)api.setSource(id,source.data);
+        }
+      },
+      onCity:h=>selectHotspotSuggestion(h),
+      onEvent:(id,source)=>{
+        const events=source==="artist-events"?artistMapEvents:currentEvents;
+        const e=events.find(item=>String(item.id)===id);
+        if(e)map.__rasterController?.openEventPopup(e);
+      },
+      onWarning:message=>{
+        mapFallback.hidden=false;
+        mapFallbackText.textContent=message;
+      }
+    });
+  }).catch(err=>{
+    mapFallback.hidden=false;
+    mapFallbackText.textContent="Mapbox GL: "+originalError+"; alternative map: "+
+      String(err?.message||err).slice(0,180)+". Search and concert lists are still available.";
+    console.error("Both Concerts map renderers failed",err);
+  });
 }else{
   setTimeout(()=>{
     /* Tile downloads can continue after the style/markers are usable. Do not
