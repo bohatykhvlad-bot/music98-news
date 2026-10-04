@@ -1,0 +1,46 @@
+name: Ella draft title only
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  update-title:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Set verified Ella title and preserve other fields
+        shell: bash
+        run: |
+          node <<'NODE'
+          (async()=>{
+            const secret=process.env.ADMIN_PASSWORD;
+            if(!secret)throw Error('MISSING_EDITOR_CREDENTIAL');
+            const headers={'X-Admin-Key':secret,'Accept':'application/json','Content-Type':'application/json'};
+            const get=async()=>{
+              const r=await fetch('https://music98.news/api/desk',{headers,cache:'no-store'});
+              if(!r.ok)throw Error('DESK_GET_'+r.status);
+              const j=await r.json();if(!Array.isArray(j.posts))throw Error('INVALID_DESK');
+              return j;
+            };
+            const desk=await get();
+            const post=desk.posts.find(p=>p.id==='ella26choosintexas');
+            if(!post||post.status!=='draft')throw Error('ARTICLE_NOT_IN_DRAFT');
+            const old='Ella Langley and the "Choosin\u0027 Texas" Phenomenon';
+            const desired='The Ella Langley Phenomenon and Country\u0027s New Boom';
+            if(post.title===desired){console.log('ELLA_TITLE_ALREADY_CORRECT');return}
+            if(post.title!==old)throw Error('CURRENT_TITLE_CHANGED_REVIEW_REQUIRED');
+            const originalPost=structuredClone(post);
+            const otherPosts=JSON.stringify(desk.posts.filter(p=>p.id!==post.id));
+            post.title=desired;
+            const saved=await fetch('https://music98.news/api/desk',{method:'POST',headers,body:JSON.stringify({posts:desk.posts})});
+            if(!saved.ok)throw Error('SAVE_FAILED_'+saved.status);
+            const verify=await get();
+            const now=verify.posts.find(p=>p.id===post.id);
+            if(!now||now.status!=='draft'||now.title!==desired)throw Error('TITLE_VERIFY_FAILED');
+            for(const key of Object.keys(originalPost))if(key!=='title'&&JSON.stringify(now[key])!==JSON.stringify(originalPost[key]))throw Error('OTHER_ARTICLE_FIELD_CHANGED_'+key);
+            if(JSON.stringify(verify.posts.filter(p=>p.id!==post.id))!==otherPosts)throw Error('OTHER_POST_CHANGED');
+            console.log('ELLA_TITLE_UPDATED_VERIFIED; ALL_OTHER_FIELDS_UNCHANGED; DRAFT=true');
+          })().catch(e=>{console.error('ELLA_TITLE_ERROR '+String(e.message).slice(0,100));process.exit(1)});
+          NODE
