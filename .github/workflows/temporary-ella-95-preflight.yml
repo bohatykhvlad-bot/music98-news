@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - .github/ella-editorial-95.enc.b64
+      - .github/workflows/temporary-ella-95-preflight.yml
 permissions:
   contents: read
 jobs:
@@ -34,7 +35,7 @@ jobs:
             if(!res.ok)throw Error('DESK_HTTP_'+res.status);
             const posts=(await res.json()).posts,orig=posts.find(p=>p.id==='ella26choosintexas');
             if(!orig||orig.status!=='draft'||patch.id!==orig.id||patch.originalStatus!=='draft')throw Error('DRAFT_STATUS_MISMATCH');
-            if(sha(orig.body)!==patch.originalBodySHA256)throw Error('SOURCE_VERSION_CHANGED');
+            if(sha(orig.body)!==patch.originalBodySHA256)throw Error('SOURCE_VERSION_CHANGED actual_sha='+sha(orig.body)+' expected_sha='+patch.originalBodySHA256+' current_status='+orig.status);
             const before=orig.body.split(/\n\n/),b=before.slice();
             for(const change of patch.changes.slice().sort((x,y)=>y.start-x.start))b.splice(change.start,change.end-change.start,...change.new);
             const newBody=b.join('\n\n');
