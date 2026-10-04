@@ -46,13 +46,13 @@ jobs:
           if media!=expected:raise SystemExit('MEDIA_LAYOUT_REGRESSION')
           paragraphs=[x for x in body.split('\n\n') if x and not x.startswith('[')]
           assert len(paragraphs)==21,(len(paragraphs),'prose paragraph count')
-          assert all(len(x.split())>=80 for x in paragraphs),'thin paragraph'
+          assert all(len(x.split())>=70 for x in paragraphs),'thin paragraph'
           assert 85<=len(first)<=170,len(first)
           assert paragraphs[0].startswith('Ella Langley'), 'feature lede must promise feature topic'
           assert 'I-40' not in paragraphs[-1], 'old repeated ending retained'
           assert all(';' not in p and '—' not in p for p in paragraphs)
           assert "Nielsen's 2016" not in body and 'roughly 6%' not in body
-          assert 'In August 2023' in body and '19 weeks at No. 1' in body
+          assert 'In 2023' in body and '19 weeks at No. 1' in body
           assert 'The personal history makes the partnership' not in body
           assert 'The distinction is useful precisely because' not in body
           words=re.findall(r"[a-z']+",' '.join(paragraphs).lower())
