@@ -97,3 +97,5 @@ jobs:
           name: ella-portrait-and-ending-preview
           path: /tmp/ella-preview/*.png
           if-no-files-found: warn
+
+# Re-run private preview after screenshot paint and sticky-header fixes.
