@@ -58,3 +58,5 @@ jobs:
         shell: bash
         run: |
           python scripts/preflight.py --post ella26choosintexas --expected-media 10 --min-words 1300
+
+# Recheck the saved draft after the inline portrait editor framing correction.
