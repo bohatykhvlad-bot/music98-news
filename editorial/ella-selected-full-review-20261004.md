@@ -42,7 +42,7 @@ Post Malone offers a useful contrast. He had already built a huge audience throu
 
 [youtube:4QIZE708gJ4]
 
-While the single was reaching listeners far beyond country, Langley was making an album that looked further into the genre itself. Her album *Dandelion*, released in April,, made with Lambert and West, moves beyond the relationship in "Choosin' Texas." "Be Her" turns inward, considering the woman Langley wants to become. "Butterfly Season" brings Lambert back as a duet partner. The album also reaches much further into country history, offering clues to the music that interests Langley when she is not trying to sustain the momentum of a record-breaking single.
+While the single was reaching listeners far beyond country, Langley was making an album that looked further into the genre itself. Her album *Dandelion*, released in April and made with Lambert and West, moves beyond the relationship in "Choosin' Texas." "Be Her" turns inward, considering the woman Langley wants to become. "Butterfly Season" brings Lambert back as a duet partner. The album also reaches much further into country history, offering clues to the music that interests Langley when she is not trying to sustain the momentum of a record-breaking single.
 
 [apple:album:1869436835]
 
