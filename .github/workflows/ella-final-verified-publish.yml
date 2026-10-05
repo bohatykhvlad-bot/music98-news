@@ -35,7 +35,7 @@ jobs:
           title="The Ella Langley Phenomenon and Country's New Boom"
           photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
           media=re.findall(r"\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]",body)
-          if not all([p.get("status")=="draft",digest==expected,p.get("title")==title,body.startswith(p.get("excerpt") or ""),len(media)==10,photo in body,p.get("cover")]):
+          if not all([p.get("status")=="live",p.get("type")=="news",p.get("pinned") is True,digest==expected,p.get("title")==title,body.startswith(p.get("excerpt") or ""),len(media)==10,photo in body,p.get("cover")]):
             print("NOT_APPROVED_VERSION sha256="+digest+" media="+str(len(media)))
             raise SystemExit(1)
           print("ELLA_APPROVED_DRAFT sha256="+digest+" media=10 title/excerpt/cover/photo verified")
@@ -73,42 +73,56 @@ jobs:
           print("ELLA_GATE_WARN_CODES="+",".join(x[0] for x in report['warns']))
           PY
           test "$gate_status" -eq 0
-          python scripts/preflight.py --post ella26choosintexas --expected-media 10 --min-words 1300
-      - name: Publish only unchanged reviewed text and preserve other posts
+      - name: Update reviewed opening and preserve article data
         shell: bash
         run: |
           python - <<'PY'
           import copy,hashlib,sys
           sys.path.insert(0,'scripts')
-          from post import run_gate,guarded_write,find_post,slot_stamp
+          from post import run_gate,guarded_write,find_post
           from gate import check_post
           from preflight import check as preflight_check
           pid='ella26choosintexas'
-          expected='9c44bbafa838d2436e8eb03f41876f01b2c2edf95c60c6cfe5f4ce638c01996e'
+          expected=open('/tmp/ella_new_body_sha256.txt',encoding='ascii').read().strip()
           title="The Ella Langley Phenomenon and Country's New Boom"
+          old_lead="""At Nashville's CMA Fest in June 2026, country singer Ella Langley let a crowd sing much of "Choosin' Texas" back to her as the band played. By the Billboard Hot 100 chart dated October 3, the song had spent 24 weeks at No. 1, breaking the record previously held by Mariah Carey's "All I Want for Christmas Is You." The Hot 100 ranks songs across genres using US radio airplay, streams and sales. It was an extraordinary result for a relaxed country recording built around steel guitar, a danceable rhythm and an unhappy trip to Texas. The more interesting question is how a singer so rooted in country began reaching listeners far beyond it."""
+          new_lead="""By the Billboard Hot 100 dated October 3, Ella Langley’s “Choosin’ Texas” had spent 24 weeks at No. 1, a longer run than any song in the chart’s history. The Hot 100 ranks songs across genres using US radio airplay, streams and sales. How did a song this rooted in country find such a broad audience, and what does its record say about country’s growing pull in pop?"""
+          new_excerpt="By the Billboard Hot 100 dated October 3, Ella Langley’s “Choosin’ Texas” had spent 24 weeks at No. 1, a longer run than any song in the chart’s history."
           gate_ok,_=run_gate(pid)
-          if not gate_ok:raise SystemExit('GATE_FAILED_BEFORE_PUBLISH')
+          if not gate_ok: raise SystemExit('GATE_FAILED_BEFORE_UPDATE')
           def mutate(posts):
             p=find_post(posts,pid)
-            digest=hashlib.sha256((p.get('body') or '').encode()).hexdigest()
-            if p.get('status')!='draft' or digest!=expected or p.get('title')!=title or not (p.get('body') or '').startswith(p.get('excerpt') or ''):
-              raise RuntimeError('DRAFT_CHANGED_ABORT')
+            old_body=p.get('body') or ''
+            digest=hashlib.sha256(old_body.encode()).hexdigest()
+            if p.get('status')!='live' or p.get('type')!='news' or p.get('pinned') is not True or digest!=expected or p.get('title')!=title or not old_body.startswith(p.get('excerpt') or ''):
+              raise RuntimeError('LIVE_ARTICLE_CHANGED_ABORT')
+            if not old_body.startswith(old_lead+'\n\n'):
+              raise RuntimeError('EXPECTED_OLD_LEAD_MISMATCH_ABORT')
+            body=new_lead+old_body[len(old_lead):]
+            import re
+            media=re.compile(r'\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]')
+            old_media=media.findall(old_body)
+            if len(old_media)!=10 or media.findall(body)!=old_media:
+              raise RuntimeError('MEDIA_TOKENS_CHANGED_ABORT')
             candidate=copy.deepcopy(p)
-            candidate['type']='news'
-            candidate['pinned']=True
+            candidate['body']=body
+            candidate['excerpt']=new_excerpt
             fails,warns,_=check_post(candidate,strict=True)
-            if fails: raise RuntimeError('NEWS_CANDIDATE_GATE_FAILED '+','.join(x[0] for x in fails))
-            if not preflight_check(candidate,p,expected_media=10,min_words=1300):
-              raise RuntimeError('NEWS_CANDIDATE_PREFLIGHT_FAILED')
-            p['type']='news'
-            p['pinned']=True
-            p['status']='live'
-            slot_stamp(p)
+            if fails: raise RuntimeError('UPDATED_ARTICLE_GATE_FAILED '+','.join(x[0] for x in fails))
+            draft_candidate=copy.deepcopy(candidate)
+            draft_candidate['status']='draft'
+            if not preflight_check(draft_candidate,p,expected_media=10,min_words=1300):
+              raise RuntimeError('UPDATED_ARTICLE_PREFLIGHT_FAILED')
+            p['body']=body
+            p['excerpt']=new_excerpt
             return p
           saved=guarded_write(mutate)
-          if saved.get('status')!='live' or saved.get('type')!='news' or saved.get('pinned') is not True or hashlib.sha256((saved.get('body') or '').encode()).hexdigest()!=expected or saved.get('title')!=title:
-            raise SystemExit('PUBLISH_OR_MAIN_NEWS_PIN_VERIFICATION_FAILED')
-          print('ELLA_PUBLICATION_SAVED verified_sha256='+expected+' status=live type=news pinned=true')
+          saved_body=saved.get('body') or ''
+          if saved.get('status')!='live' or saved.get('type')!='news' or saved.get('pinned') is not True or saved.get('title')!=title or saved.get('excerpt')!=new_excerpt or not saved_body.startswith(new_lead):
+            raise SystemExit('UPDATED_ARTICLE_VERIFY_FAILED')
+          new_hash=hashlib.sha256(saved_body.encode()).hexdigest()
+          open('/tmp/ella_new_body_sha256.txt','w',encoding='ascii').write(new_hash)
+          print('ELLA_LEAD_UPDATED status=live type=news pinned=true words='+str(len(saved_body.split()))+' media=10 body_sha='+new_hash)
           PY
       - name: Verify public article visibility and site response
         shell: bash
