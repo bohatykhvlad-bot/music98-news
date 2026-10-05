@@ -36,9 +36,8 @@ SCHEDULE_RUN=re.compile(rf"\b{MONTH}\s+\d{{1,2}}\s*,\s*\d{{1,2}}(?:\s*,\s*\d{{1,
 TECH_CREDIT=re.compile(r"\b(?:produced|co-produced|engineered|mixed|mastered)\s+by\b|\b(?:producer|engineer|mixer|mastering engineer)\b",re.I)
 PHYSICAL=re.compile(r"\b(?:CD|vinyl|cassette|LP|2LP|pressing|physical edition|physical copy|poster|insert|color variant|colou?r variant|gatefold)\b",re.I)
 SOURCE_PROOF=re.compile(r"\b(?:Apple Music|Spotify|Sony|RCA|Warner|official store|official website|release material)\s+(?:lists?|shows?|states?|describes?|says?)\b",re.I)
-ARTIST_SHORT_FORMS={
+GUEST_SHORT_FORMS={
     "Dua Lipa":("Dua","Lipa"),
-    "Victoria Monét":("Victoria","Monét"),
     "Bruno Mars":("Bruno","Mars"),
     "Taylor Swift":("Taylor","Swift"),
     "Ella Langley":("Ella","Langley"),
@@ -100,17 +99,34 @@ def save_state(state):
 def inspect(post,allows):
     body=post.get("body") or ""
     title=post.get("title") or ""
-    for full, shorts in ARTIST_SHORT_FORMS.items():
-        if full in body:
-            tail=body.split(full,1)[1]
-            for short in shorts:
-                if re.search(r"\b"+re.escape(short)+r"\b",tail):
-                    fails.append(f"name style: write the artist's full name '{full}' instead of shortened '{short}'")
-    paras=prose_paragraphs(body)
     fails=[]
     notes=[]
+
+    # Name rhythm. The post's main artist may use the surname after the first
+    # full mention, but never the first name alone. Guest artists with a
+    # multi-word stage name stay full when named again.
+    primary=(post.get("artist") or "").strip()
+    if " " in primary and primary in body:
+        first,surname=primary.split(" ",1)
+        tail=body.split(primary,1)[1]
+        if re.search(r"\b"+re.escape(first)+r"\b(?!\s+"+re.escape(surname)+r")",tail):
+            fails.append(f"name style: do not use the main artist's first name alone ('{first}')")
+    for full, shorts in GUEST_SHORT_FORMS.items():
+        if full==primary or full not in body:
+            continue
+        tail=body.split(full,1)[1]
+        for short in shorts:
+            if re.search(r"\b"+re.escape(short)+r"\b",tail):
+                fails.append(f"name style: guest artist '{full}' is shortened to '{short}'")
+
+    paras=prose_paragraphs(body)
     if not paras:
         return ["no prose paragraphs"],[]
+    if " " in primary:
+        surname=primary.split(" ",1)[1]
+        starts=sum(1 for p in paras if re.match(r"^(?:"+re.escape(primary)+r"|"+re.escape(surname)+r")\b",p))
+        if starts>=3:
+            fails.append(f"name rhythm: {starts} paragraphs open with the artist's name/surname; rewrite with pronouns or sentence restructuring")
 
     for idx,p in enumerate(paras,1):
         ss=sentences(p)
