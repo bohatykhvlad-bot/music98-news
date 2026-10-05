@@ -14,10 +14,12 @@ COMMANDS
   read <url>...               fetch pages, print only fact-bearing sentences
   about "<words>" <url>...    same, but ranked against the words you care about
   register <token> "<fact>"   add a date to gate.py VERIFIED_DATES
+  create --file POST.json     create a new draft only after editorial + gate + preflight
   set <id> --body-file F      guarded desk write, status untouched
   slot <id> [--at ISO] [--date YYYY-MM-DD]
                               move the publication slot (publishAt + date together)
   gate <id>                   run gate.py, print only verdict lines
+  preflight <id>              run mandatory saved-draft preflight
   editorial <id> [--body-file F] [--phase pre-edit|post-edit]
                               mandatory full-read barrier before and after editing
   publish <id>                flip to live - refuses unless gate + editorial stamp pass
@@ -47,6 +49,7 @@ if hasattr(sys.stdout, "reconfigure"):
 REPO = Path(__file__).resolve().parents[1]
 DESK_API = "https://music98.news/api/desk"
 GATE = REPO / "scripts" / "gate.py"
+PREFLIGHT = REPO / "scripts" / "preflight.py"
 READTHROUGH = REPO / "scripts" / "editorial_readthrough.py"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/131.0 Safari/537.36")
@@ -305,6 +308,106 @@ def cmd_dump(pid, out):
     print("          current excerpt: %s" % p.get("excerpt"))
 
 
+def _local_gate(post):
+    sys.path.insert(0, str(REPO / "scripts"))
+    from gate import check_post
+    fails, warns, _ = check_post(post, strict=True)
+    for code, msg, *rest in fails:
+        print("GATE FAIL", code, msg)
+    for code, msg, *rest in warns:
+        print("GATE WARN", code, msg)
+    return not fails
+
+
+def _local_preflight(post, baseline=None, expected_media=None, min_words=None):
+    sys.path.insert(0, str(REPO / "scripts"))
+    from preflight import check
+    return check(post, baseline, expected_media, min_words)
+
+
+def run_preflight(pid, file=None, baseline=None, expected_media=None, min_words=None):
+    cmd=[sys.executable, str(PREFLIGHT), "--post", pid]
+    if file:
+        cmd += ["--file", str(file)]
+    if baseline:
+        cmd += ["--baseline", str(baseline)]
+    if expected_media is not None:
+        cmd += ["--expected-media", str(expected_media)]
+    if min_words is not None:
+        cmd += ["--min-words", str(min_words)]
+    r=subprocess.run(cmd,capture_output=True,text=True,encoding="utf-8",errors="replace",cwd=str(REPO))
+    out=(r.stdout or "")+(r.stderr or "")
+    return r.returncode==0,[line.rstrip() for line in out.splitlines() if line.strip()]
+
+
+def cmd_preflight(pid):
+    ok,lines=run_preflight(pid)
+    for line in lines: print(line)
+    if not ok:
+        raise SystemExit(1)
+    return True
+
+
+def cmd_create(post_file, allows=None, reason=None):
+    path=Path(post_file)
+    data=json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(data,dict) and isinstance(data.get("posts"),list):
+        if len(data["posts"])!=1:
+            die("create --file must contain exactly one post")
+        post=data["posts"][0]
+    else:
+        post=data
+    if not isinstance(post,dict):
+        die("create --file must contain a post object")
+    pid=str(post.get("id") or "").strip()
+    if not pid:
+        die("new draft is missing id")
+    if post.get("status")!="draft":
+        die("create accepts draft status only")
+    body=(post.get("body") or "").strip()
+    excerpt=(post.get("excerpt") or "").strip()
+    if not body or not excerpt or not body.startswith(excerpt):
+        die("new draft needs non-empty body and literal-prefix excerpt")
+
+    # Full final read is an explicit barrier for new posts. Unlike an existing
+    # edit, there is no pre-edit source, so only the post-edit phase applies.
+    cmd=[sys.executable,str(READTHROUGH),"--post",pid,"--file",str(path),
+         "--phase","post-edit","--confirm-full-read"]
+    for item in (allows or []):
+        cmd += ["--allow",item]
+    if reason:
+        cmd += ["--reason",reason]
+    r=subprocess.run(cmd,capture_output=True,text=True,encoding="utf-8",errors="replace",cwd=str(REPO))
+    print((r.stdout or "")+(r.stderr or ""),end="")
+    if r.returncode!=0:
+        die("new draft failed editorial full-read barrier")
+
+    if not _local_gate(post):
+        die("new draft failed gate before desk write")
+    if not _local_preflight(post):
+        die("new draft failed preflight before desk write")
+
+    before=desk_read()
+    posts=before["posts"]
+    if any(str(x.get("id"))==pid for x in posts):
+        die("post id already exists: %s" % pid)
+    snapshot={x["id"]:x for x in posts}
+    posts.insert(0,post)
+    http(DESK_API,desk_key(),{"posts":posts},method="POST")
+    after=desk_read()
+    now=find_post(after["posts"],pid)
+    others={x["id"]:x for x in after["posts"] if str(x.get("id"))!=pid}
+    changed=[i for i in snapshot if json.dumps(snapshot[i],sort_keys=True,ensure_ascii=False)
+             != json.dumps(others.get(i),sort_keys=True,ensure_ascii=False)]
+    if changed:
+        die("other posts changed during create: %s" % changed)
+    for field in ("id","type","title","excerpt","body","status","artist"):
+        if now.get(field)!=post.get(field):
+            die("created draft field changed: %s" % field)
+    print("create    ok: %s status=draft words=%d" % (pid, words(now.get("body") or "")))
+    return now
+
+
 def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
     require_editorial_stamp(pid, body_file=body_file, title=title)
     body = Path(body_file).read_text(encoding="utf-8").strip()
@@ -313,6 +416,15 @@ def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
     exc = (excerpt or auto_excerpt(body)).strip()
     if exc not in body:
         die("excerpt is not a literal substring of the body:\n  %s" % exc)
+
+    current=find_post(desk_read()["posts"],pid)
+    candidate=json.loads(json.dumps(current))
+    candidate["body"]=body
+    candidate["excerpt"]=exc
+    if title:
+        candidate["title"]=title
+    if not _local_preflight(candidate, baseline=current):
+        die("set refused: staged body failed preflight before desk write")
 
     def mutate(posts):
         p = find_post(posts, pid)
@@ -405,6 +517,11 @@ def require_editorial_stamp(pid, body_file=None, title=None):
 
 def cmd_publish(pid):
     require_editorial_stamp(pid)
+    pf_ok,pf_lines=run_preflight(pid)
+    if not pf_ok:
+        print("publish   REFUSED - preflight is not clean:")
+        for line in pf_lines: print("  "+line)
+        raise SystemExit(1)
     ok, lines = run_gate(pid)
     if not ok:
         print("publish   REFUSED - gate is not clean:")
@@ -495,16 +612,18 @@ def cmd_verify(pid):
 
 
 def cmd_finish(pid, body_file, title=None, excerpt=None):
-    print("1/4 set")
+    print("1/5 set")
     cmd_set(pid, body_file, title=title, excerpt=excerpt)
-    print("2/4 gate")
+    print("2/5 gate")
     ok = cmd_gate(pid)
     if not ok:
         print("\nSTOPPED before publish. Nothing went live.")
         raise SystemExit(1)
-    print("3/4 publish")
+    print("3/5 preflight")
+    cmd_preflight(pid)
+    print("4/5 publish")
     cmd_publish(pid)
-    print("4/4 verify")
+    print("5/5 verify")
     cmd_verify(pid)
     print("\nDONE - post is live.")
 
@@ -534,7 +653,7 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("list")
-    for name in ("show", "gate", "publish", "verify"):
+    for name in ("show", "gate", "preflight", "publish", "verify"):
         sp = sub.add_parser(name)
         sp.add_argument("id")
 
@@ -562,6 +681,11 @@ def main():
     sp = sub.add_parser("register")
     sp.add_argument("token")
     sp.add_argument("fact")
+
+    sp = sub.add_parser("create")
+    sp.add_argument("--file", required=True)
+    sp.add_argument("--allow", action="append", choices=["technical-credit","physical-format","source-attribution","single-sentence"])
+    sp.add_argument("--reason")
 
     sp = sub.add_parser("set")
     sp.add_argument("id")
@@ -596,10 +720,14 @@ def main():
         cmd_read(a.urls, about=a.words, per_source=a.max)
     elif a.cmd == "register":
         cmd_register(a.token, a.fact)
+    elif a.cmd == "create":
+        cmd_create(a.file, a.allow, a.reason)
     elif a.cmd == "set":
         cmd_set(a.id, a.body_file, a.title, a.excerpt, a.publish)
     elif a.cmd == "gate":
         raise SystemExit(0 if cmd_gate(a.id) else 1)
+    elif a.cmd == "preflight":
+        cmd_preflight(a.id)
     elif a.cmd == "editorial":
         cmd_editorial(a.id, a.body_file, a.title, a.allow, a.reason, a.phase)
     elif a.cmd == "publish":
