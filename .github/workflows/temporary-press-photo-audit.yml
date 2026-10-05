@@ -82,6 +82,17 @@ jobs:
             try:
               data,h=get(u);print("DIM",dims(data),len(data),u)
             except Exception as e: print("DIM_FAIL",u,type(e).__name__)
+          print("\n=== WORDPRESS MEDIA METADATA")
+          for u in [
+            "https://www.quavohuncho.net/wp-json/wp/v2/media?search=editorial&per_page=20",
+            "https://www.quavohuncho.net/wp-json/wp/v2/media?search=architecture&per_page=20",
+            "https://www.quavohuncho.net/wp-json/wp/v2/media?search=portrait&per_page=20",
+          ]:
+            try:
+              raw,h=get(u)
+              txt=raw.decode("utf-8","replace")
+              print("WP_MEDIA",u,txt[:6000].replace("\n"," "))
+            except Exception as e: print("WP_MEDIA_FAIL",u,type(e).__name__,str(e)[:100])
           print("\n=== METADATA / HIRES CHECK")
           extra = [
             "https://ca.rollingstone.com/media-library/image.webp?coordinates=0%2C0%2C0%2C0&height=1600&id=68053917&quality=95&width=2400",
