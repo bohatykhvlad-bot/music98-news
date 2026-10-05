@@ -36,13 +36,12 @@ SCHEDULE_RUN=re.compile(rf"\b{MONTH}\s+\d{{1,2}}\s*,\s*\d{{1,2}}(?:\s*,\s*\d{{1,
 TECH_CREDIT=re.compile(r"\b(?:produced|co-produced|engineered|mixed|mastered)\s+by\b|\b(?:producer|engineer|mixer|mastering engineer)\b",re.I)
 PHYSICAL=re.compile(r"\b(?:CD|vinyl|cassette|LP|2LP|pressing|physical edition|physical copy|poster|insert|color variant|colou?r variant|gatefold)\b",re.I)
 SOURCE_PROOF=re.compile(r"\b(?:Apple Music|Spotify|Sony|RCA|Warner|official store|official website|release material)\s+(?:lists?|shows?|states?|describes?|says?)\b",re.I)
-FIRST_NAME_ONLY={
-    "Dua Lipa":"Dua",
-    "Victoria Monét":"Victoria",
-    "Bruno Mars":"Bruno",
-    "Taylor Swift":"Taylor",
-    "Ella Langley":"Ella",
-    "Shakira":"Shakira",
+ARTIST_SHORT_FORMS={
+    "Dua Lipa":("Dua","Lipa"),
+    "Victoria Monét":("Victoria","Monét"),
+    "Bruno Mars":("Bruno","Mars"),
+    "Taylor Swift":("Taylor","Swift"),
+    "Ella Langley":("Ella","Langley"),
 }
 OBVIOUS_EXPLAINER=re.compile(r"^(?:Therefore|Thus|This means|That means|In other words|Anyone buying|That gives|This gives)\b",re.I)
 AI_BRIDGES=(
@@ -101,11 +100,12 @@ def save_state(state):
 def inspect(post,allows):
     body=post.get("body") or ""
     title=post.get("title") or ""
-    for full, first in FIRST_NAME_ONLY.items():
+    for full, shorts in ARTIST_SHORT_FORMS.items():
         if full in body:
             tail=body.split(full,1)[1]
-            if re.search(r"\b"+re.escape(first)+r"\b",tail):
-                fails.append(f"name style: after first full mention of {full}, use the surname or full name instead of '{first}'")
+            for short in shorts:
+                if re.search(r"\b"+re.escape(short)+r"\b",tail):
+                    fails.append(f"name style: write the artist's full name '{full}' instead of shortened '{short}'")
     paras=prose_paragraphs(body)
     fails=[]
     notes=[]
