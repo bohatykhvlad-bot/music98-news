@@ -33,11 +33,11 @@ jobs:
 
           [youtube:YFhpMpONGUY]
 
-          Young returned with "From Down Here" after stepping away from touring, writing the song with James Blake and working with him on its production. The track followed *I'm Only F**king Myself* and arrived after "Messy" won Best Pop Solo Performance at the Grammy Awards. Since returning to the stage, she has played major festivals again, including Reading and Austin City Limits, while rebuilding the live schedule that had been interrupted.
+          Young returned with "From Down Here" after stepping away from touring. She wrote the song with James Blake, and it arrived after "Messy" won a Grammy. Since returning to the stage, she has played major festivals again, including Reading and ACL, while rebuilding the live schedule that had been interrupted.
 
           Everything Begins now gives that return a full headline route. The venues are significant because Young was playing much smaller North American rooms before "Messy" became a global breakthrough. Radio City Music Hall and the Greek Theatre place her in a different touring bracket without the announcement needing to be padded with every city on the itinerary.
 
-          Artist presales begin October 7, followed by the general sale on October 9 at 10 a.m. local time through Young's official site. Sofia and the Antoinettes will support her on the announced North American dates."""
+          Artist presales begin October 7, followed by the general sale on October 9 at 10 a.m. local time through Young's official site. Sofia and the Antoinettes will support her on the announced North American dates, giving the run a consistent bill from its opening night through the West Coast finish."""
           body="\n\n".join(x.strip() for x in body.split("\n\n"))
           post={
             "id":"lola27everythingbegins","type":"news","tag":"News","rtype":"","artist":"Lola Young",
