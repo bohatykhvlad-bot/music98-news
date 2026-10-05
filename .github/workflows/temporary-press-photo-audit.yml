@@ -24,6 +24,7 @@ jobs:
             "QUAVO_TRANCE":"https://www.universalmusic.ca/2026/08/14/quavo-drops-new-single-trance/",
             "QUAVO_OFFICIAL":"https://www.quavohuncho.net/",
             "LOLA_UMG":"https://universalmusic.es/lola-young-regresa-con-su-nuevo-single-from-down-here/",
+            "LOLA_TOUR_PRESS":"https://femmusic.com/2026/10/05/lola-young-2027-north-american-headline-tour/",
           }
           H={"User-Agent":"Mozilla/5.0","Accept":"text/html,image/avif,image/webp,*/*"}
           def get(u):
@@ -52,6 +53,35 @@ jobs:
                 print("ASSET",len(data),h.get("Content-Type"),u)
               except Exception as e:
                 print("ASSET_FAIL",u,type(e).__name__)
+          def dims(data):
+            if data[:2] == b"\xff\xd8":
+              i=2
+              while i+9 < len(data):
+                if data[i] != 0xff: i+=1; continue
+                marker=data[i+1]
+                if marker in range(0xc0,0xc4):
+                  return int.from_bytes(data[i+7:i+9],"big"), int.from_bytes(data[i+5:i+7],"big")
+                if i+4 > len(data): break
+                seg=int.from_bytes(data[i+2:i+4],"big")
+                if seg < 2: break
+                i += 2 + seg
+            if data[:8] == b"\x89PNG\r\n\x1a\n" and len(data)>=24:
+              return int.from_bytes(data[16:20],"big"),int.from_bytes(data[20:24],"big")
+            return None
+          print("\n=== DIMENSION CHECK")
+          for u in [
+            "https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/editorial-compressed.jpg",
+            "https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/architecture-compressed.jpg",
+            "https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/music-portrait-compressed.jpg",
+            "https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/chrome-life-cover-compressed.jpg",
+            "https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/08/TranceBTS-28.jpg",
+            "https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/08/TranceBTS-49.jpg",
+            "https://universalmusic.es/wp-content/uploads/sites/50/2026/05/unnamed-22.jpg",
+            "https://universalmusic.es/wp-content/uploads/sites/50/2026/05/Untitled-Project-9.jpg",
+          ]:
+            try:
+              data,h=get(u);print("DIM",dims(data),len(data),u)
+            except Exception as e: print("DIM_FAIL",u,type(e).__name__)
           # Explicit original-size candidates derived from WP thumbnails.
           for u in [
             "https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/08/TranceBTS-28.jpg",
