@@ -1,0 +1,34 @@
+name: Temporary Lola rebuild through canonical gates
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-lola-rebuild.yml
+      - .github/staging/lola-rebuild.json
+permissions:
+  contents: read
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure canonical runner
+        run: printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+      - name: PRE-EDIT full read of exact current draft
+        run: python scripts/post.py editorial lola27everythingbegins --phase pre-edit
+      - name: Upload visually reviewed original press photo
+        run: python scripts/post.py photo --url "https://chuffmedia.com/images/artists/03_CC_250428_LolaYoung_0390_V1_2025-06-23-124058.jpg" --name "lola-young-conor-cunningham-press-original.jpg"
+      - name: POST-EDIT full read of exact staged draft
+        run: python scripts/editorial_readthrough.py --post lola27everythingbegins --file .github/staging/lola-rebuild.json --phase post-edit --confirm-full-read
+      - name: Replace only through canonical gated writer
+        run: python scripts/post.py replace-draft lola27everythingbegins --file .github/staging/lola-rebuild.json
+      - name: Re-run saved draft checks
+        run: |
+          python scripts/post.py gate lola27everythingbegins
+          python scripts/post.py preflight lola27everythingbegins
