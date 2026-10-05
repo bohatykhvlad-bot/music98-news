@@ -35,7 +35,7 @@ jobs:
           with urllib.request.urlopen(q,timeout=45) as r:
               b2=r.read()
           open("/tmp/lola-chuff-raw.jpg","wb").write(b2)
-          im2=Image.open("/tmp/lola-universal.jpg")
+          im2=Image.open("/tmp/lola-chuff-raw.jpg")
           print("LOLA_CHUFF_RAW",im2.size,len(b2),im2.format)
           print("LOLA_EXIF",dict(im2.getexif()))
           # Known tour press derivative, retained only as a negative control.
@@ -52,5 +52,5 @@ jobs:
           name: lola-tour-press-original
           path: |
             /tmp/lola-press.jpg
-            /tmp/lola-universal.jpg
+            /tmp/lola-chuff-raw.jpg
           if-no-files-found: error
