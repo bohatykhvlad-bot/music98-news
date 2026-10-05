@@ -1,0 +1,64 @@
+name: Temporary press photo audit
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-press-photo-audit.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Inspect official press assets
+        shell: python
+        run: |
+          import re, urllib.request, urllib.parse
+          from html import unescape
+
+          pages = {
+            "QUAVO_RELEASE":"https://www.universalmusic.ca/2026/10/02/quavo-releases-highly-anticipated-new-album-qromelife/",
+            "QUAVO_TRANCE":"https://www.universalmusic.ca/2026/08/14/quavo-drops-new-single-trance/",
+            "QUAVO_OFFICIAL":"https://www.quavohuncho.net/",
+            "LOLA_UMG":"https://universalmusic.es/lola-young-regresa-con-su-nuevo-single-from-down-here/",
+          }
+          H={"User-Agent":"Mozilla/5.0","Accept":"text/html,image/avif,image/webp,*/*"}
+          def get(u):
+            req=urllib.request.Request(u,headers=H)
+            with urllib.request.urlopen(req,timeout=25) as r:
+              return r.read(), r.headers
+          for label,url in pages.items():
+            print("\n===",label,url)
+            try: raw,_=get(url)
+            except Exception as e:
+              print("PAGE_FAIL",type(e).__name__,str(e)[:120]);continue
+            html=raw.decode("utf-8","replace")
+            urls=[]
+            for m in re.finditer(r'''(?:src|href|srcset)=["']([^"']+)["']''',html,re.I):
+              val=unescape(m.group(1))
+              for part in val.split(","):
+                u=part.strip().split(" ")[0]
+                if re.search(r'\.(?:jpe?g|png|webp)(?:\?|$)',u,re.I):
+                  u=urllib.parse.urljoin(url,u)
+                  if u not in urls: urls.append(u)
+            for u in urls:
+              if not any(k in u.lower() for k in ("quavo","qrom","trance","lola","unnamed","2026/10","2026/08","2026/05")):
+                continue
+              try:
+                data,h=get(u)
+                print("ASSET",len(data),h.get("Content-Type"),u)
+              except Exception as e:
+                print("ASSET_FAIL",u,type(e).__name__)
+          # Explicit original-size candidates derived from WP thumbnails.
+          for u in [
+            "https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/08/TranceBTS-28.jpg",
+            "https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/08/TranceBTS-49.jpg",
+            "https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/08/OFFICIAL-ARTWORK.jpeg",
+            "https://universalmusic.es/wp-content/uploads/sites/50/2026/05/unnamed-22.jpg",
+          ]:
+            try:
+              data,h=get(u);print("CANDIDATE",len(data),h.get("Content-Type"),u)
+            except Exception as e: print("CANDIDATE_FAIL",u,type(e).__name__,str(e)[:100])
