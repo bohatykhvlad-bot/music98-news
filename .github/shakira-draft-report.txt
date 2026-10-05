@@ -1,14 +1,10 @@
 POST=shakira26amazonmadrid
-GATE_CODE=1
-   --  length           420 words in the body (419 in prose), 7 paragraphs
-   !   short-paragraph  paragraph 0 is 39 words - a fragment, merge it or grow it: "Shakira's October 3 Madrid concert became Amazon Music's mos"
-   !   echo             1 4-grams repeat twice (callbacks are fine, check the list): has drawn a larger
-   X   negation-cluster 3 negations in one sentence: Amazon's announcement should not be mistaken for an all-platform streaming record, and without a viewer figure
-   X   register-term    'milestone' - say the actual result: …marking Shakira's first full-concert global livestream. The milestone is a specific one rather than an overall streaming…
-   X   register-term    'benchmark' - say what it is measured against: …on Amazon Music, none has drawn a larger audience. That new benchmark came from a show whose biggest surprise was not a…
-FAIL - fix the X lines, then run again
+GATE_CODE=0
+   --  length           400 words in the body (399 in prose), 7 paragraphs
+PASS - gate clean
 
-GATE: FAIL - fix the X lines first
+GATE: PASS
 PREFLIGHT_CODE=0
-POST=shakira26amazonmadrid STATUS=draft WORDS=420 MEDIA=1
+POST=shakira26amazonmadrid STATUS=draft WORDS=400 MEDIA=1
+WARN finale may be thin
 PREFLIGHT: PASS
