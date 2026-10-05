@@ -55,7 +55,7 @@ def media_key(token):
 
 raw_bytes = SOURCE.read_bytes()
 git_blob = hashlib.sha1(b"blob " + str(len(raw_bytes)).encode("ascii") + b"\0" + raw_bytes).hexdigest()
-if git_blob != "d84f9f95ac70fd9e5062eceabe441675504fda18":
+if git_blob != "677f9a600830075a31b5a7cc8bc18c152b4c9858":
     raise ValueError("EDITORIAL_SOURCE_CHANGED_ABORT")
 markdown = raw_bytes.decode("utf-8").strip()
 heading, proposed = markdown.split("\n\n", 1)
