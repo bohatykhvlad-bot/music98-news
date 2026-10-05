@@ -1,0 +1,61 @@
+name: Temporary rebuild Quavo draft
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-rebuild-quavo.yml
+permissions:
+  contents: read
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure editor key
+        run: printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+      - name: Pre-edit full read stamp on exact current Quavo draft
+        run: python scripts/post.py editorial quavo26qromelife --phase pre-edit
+      - name: Build reviewed Quavo candidate
+        shell: python
+        run: |
+          import json
+          body="""Quavo has released *QRÖMELIFE*, a 14-track solo album executive produced by Pharrell Williams and built around a brighter, more expansive version of his melodic rap sound.
+
+          The record grew out of more than a year and a half of work with Pharrell, with sessions taking place at Louis Vuitton's headquarters in Paris and on a yacht in Miami. Rather than treating Pharrell as a late-stage executive producer, Quavo describes him as the person who helped pull the different sides of his music into one project. The result moves between Atlanta rap, funk, club music and polished pop without turning the album into a showcase for production tricks.
+
+          [apple:album:6809921222]
+
+          That range is clearest in the way *QRÖMELIFE* moves between songs. "Trance (Walk It Down)" leans into a loose dance-floor pulse, while "House Music" with Justin Timberlake reaches toward glossy synths and funk. "Backwards" brings T.I. into a more recognizably Atlanta setting. The album has several guests, but their names are less important than the way Quavo uses each track to shift the temperature without losing the same voice at the center.
+
+          The most significant reunion comes on "Away," where Offset appears with Quavo for their first shared recording in years. It matters because *QRÖMELIFE* arrives after a period when Migos had stopped releasing music as a trio and Quavo's previous solo work was closely tied to the loss of Takeoff. Here, the grief has not disappeared, but it no longer dictates the entire mood of the record. Quavo sounds more interested in what comes after survival than in retelling the loss itself.
+
+          That idea also sits behind the album's visual language. The chrome QRÖMELIFE glasses that appear across the artwork and official photos turn the title into something physical rather than simply a logo. Quavo has described QRÖME as a way of carrying what a person has lived through and reflecting it outward. The imagery is deliberately polished, but the concept comes from pressure, grief and the decision to keep moving.
+
+          Fatherhood has added another layer to that change. Quavo has spoken about becoming a father and wanting to give his daughter the kind of presence he did not have growing up. It is not presented as a separate storyline from the album. Instead, it fits the broader sense that *QRÖMELIFE* is interested in adulthood, responsibility and moving forward without pretending the past is gone.
+
+          Pharrell's involvement keeps that reflection from turning the album inward for too long. The beats stay mobile, often playful, and Quavo spends much of the record returning to the melodic instincts that helped define his work with Migos. *QRÖMELIFE* does not attempt to recreate that group or repeat *Rocket Power*. It gives Quavo a different place to stand after both, with a record that sounds less like recovery in progress and more like a new phase already underway."""
+          body="\n\n".join(x.strip() for x in body.split("\n\n"))
+          post={
+            "id":"quavo26qromelife","type":"release","tag":"Release","rtype":"Album","artist":"Quavo",
+            "title":"QRÖMELIFE",
+            "excerpt":"Quavo has released *QRÖMELIFE*, a 14-track solo album executive produced by Pharrell Williams and built around a brighter, more expansive version of his melodic rap sound.",
+            "body":body,"date":"2026-10-06","pinned":False,"status":"draft",
+            "cover":{"kind":"img","src":"","credit":"Quality Control Music","creditUrl":"https://qualitycontrolmusic.com/","pos":"50% 38%","zoom":1,"cardY":0.38,"cardZoom":1,"lockX":0.5},
+            "coverImport":{"url":"https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/architecture-compressed.jpg","name":"quavo-qromelife-official-visual.jpg"}
+          }
+          open("/tmp/quavo.json","w",encoding="utf-8").write(json.dumps(post,ensure_ascii=False))
+      - name: Final complete read stamp on exact candidate
+        run: python scripts/editorial_readthrough.py --post quavo26qromelife --file /tmp/quavo.json --phase post-edit --confirm-full-read --allow technical-credit --reason "Pharrell's album-wide production role is central to the release story"
+      - name: Replace draft only through gated writer
+        run: python scripts/post.py replace-draft quavo26qromelife --file /tmp/quavo.json
+      - name: Re-run saved draft gates
+        run: |
+          python scripts/post.py gate quavo26qromelife
+          python scripts/post.py preflight quavo26qromelife
+          python scripts/post.py show quavo26qromelife
