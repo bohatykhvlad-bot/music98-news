@@ -18,8 +18,8 @@ COMMANDS
   slot <id> [--at ISO] [--date YYYY-MM-DD]
                               move the publication slot (publishAt + date together)
   gate <id>                   run gate.py, print only verdict lines
-  editorial <id> [--body-file F]
-                              mandatory full-read barrier; writes exact-body stamp
+  editorial <id> [--body-file F] [--phase pre-edit|post-edit]
+                              mandatory full-read barrier before and after editing
   publish <id>                flip to live - refuses unless gate + editorial stamp pass
   verify <id>                 live checks: public API, cover, youtube
   finish <id> --body-file F   set -> gate -> publish -> verify, one run
@@ -361,8 +361,8 @@ def cmd_gate(pid):
 
 
 def run_editorial(pid, body_file=None, title=None, confirm=False, check_stamp=False,
-                  allows=None, reason=None):
-    cmd=[sys.executable, str(READTHROUGH), "--post", pid]
+                  allows=None, reason=None, phase="post-edit"):
+    cmd=[sys.executable, str(READTHROUGH), "--post", pid, "--phase", phase]
     if body_file:
         cmd += ["--body-file", str(body_file)]
     if title:
@@ -380,9 +380,9 @@ def run_editorial(pid, body_file=None, title=None, confirm=False, check_stamp=Fa
     return r.returncode==0,[line.rstrip() for line in out.splitlines() if line.strip()]
 
 
-def cmd_editorial(pid, body_file=None, title=None, allows=None, reason=None):
+def cmd_editorial(pid, body_file=None, title=None, allows=None, reason=None, phase="post-edit"):
     ok,lines=run_editorial(pid,body_file=body_file,title=title,confirm=True,
-                           allows=allows,reason=reason)
+                           allows=allows,reason=reason,phase=phase)
     for line in lines:
         print(line)
     if not ok:
@@ -542,6 +542,7 @@ def main():
     sp.add_argument("id")
     sp.add_argument("--body-file")
     sp.add_argument("--title")
+    sp.add_argument("--phase", choices=["pre-edit","post-edit"], default="post-edit")
     sp.add_argument("--allow", action="append", choices=["technical-credit","physical-format","source-attribution","single-sentence"])
     sp.add_argument("--reason")
 
@@ -600,7 +601,7 @@ def main():
     elif a.cmd == "gate":
         raise SystemExit(0 if cmd_gate(a.id) else 1)
     elif a.cmd == "editorial":
-        cmd_editorial(a.id, a.body_file, a.title, a.allow, a.reason)
+        cmd_editorial(a.id, a.body_file, a.title, a.allow, a.reason, a.phase)
     elif a.cmd == "publish":
         cmd_publish(a.id)
     elif a.cmd == "verify":
