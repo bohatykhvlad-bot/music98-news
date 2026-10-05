@@ -9,7 +9,7 @@ import argparse, json, os, re, sys
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-MEDIA = re.compile(r"\[(photo|youtube|apple|instagram|tiktok):([^\]]+)\]", re.I)
+MEDIA = re.compile(r"\[(photo|youtube|apple|instagram|ig|tiktok):([^\]]+)\]", re.I)
 def select(payload, pid):
     if isinstance(payload, dict) and isinstance(payload.get("posts"), list):
         matches = [post for post in payload["posts"] if post.get("id") == pid]
