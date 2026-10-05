@@ -52,5 +52,5 @@ jobs:
           name: lola-tour-press-original
           path: |
             /tmp/lola-press.jpg
-            /tmp/lola-official.jpg
+            /tmp/lola-universal.jpg
           if-no-files-found: error
