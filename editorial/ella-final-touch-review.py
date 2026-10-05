@@ -80,7 +80,8 @@ if [media_key(x) for x in MEDIA.findall(body)] != [media_key(x) for x in old_med
 if [x for x in MEDIA.findall(body)] != old_media:
     raise ValueError("MEDIA_TOKENS_NOT_PRESERVED")
 first = body.split("\n\n", 1)[0]
-excerpt = first.split(". ", 1)[0] + "."
+parts = re.split(r'(?<=[.!?])\\s+(?=[A-Z"“‘])', first, maxsplit=1)
+excerpt = parts[0].strip()
 if not 22 <= len(re.findall(r"\b[\w\x27-]+\b", excerpt)) <= 40:
     raise ValueError("EXCERPT_WORD_COUNT_OUTSIDE_22_40_HISTORICAL_BAND")
 if not (85 <= len(excerpt) <= 170) or not body.startswith(excerpt):
