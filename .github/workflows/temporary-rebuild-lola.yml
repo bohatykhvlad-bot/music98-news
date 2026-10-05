@@ -44,8 +44,8 @@ jobs:
             "title":"Lola Young Announces 2027 Everything Begins Tour",
             "excerpt":"Lola Young has announced the Everything Begins Tour, a 17-date North American run that will take her back to headline stages across the United States and Canada in spring 2027.",
             "body":body,"date":"2026-10-06","pinned":False,"status":"draft",
-            "cover":{"kind":"img","src":"","credit":"Harriet K Bols","creditUrl":"https://www.instagram.com/harriettkbols/","pos":"50% 42%","zoom":1,"cardY":0.42,"cardZoom":1,"lockX":0.5},
-            "coverImport":{"url":"https://bunny-wp-pullzone-qbcmv8y9wp.b-cdn.net/wp-content/uploads/2026/10/Lola-Young-by-Harriet-K-Bols2.jpg","name":"lola-young-everything-begins-harriet-k-bols-original.jpg"}
+            "cover":{"kind":"img","src":"","credit":"Nicole Ngai","creditUrl":"https://www.nicolengai.com/","pos":"50% 42%","zoom":1,"cardY":0.42,"cardZoom":1,"lockX":0.5},
+            "coverImport":{"url":"https://files.constantcontact.com/ce05d74a001/5040b9ff-fe6f-4a5d-9e75-f3bc0448dc0b.jpg","name":"lola-young-from-down-here-nicole-ngai-original.jpg"}
           }
           open("/tmp/lola.json","w",encoding="utf-8").write(json.dumps(post,ensure_ascii=False))
       - name: Final complete read stamp on exact candidate
