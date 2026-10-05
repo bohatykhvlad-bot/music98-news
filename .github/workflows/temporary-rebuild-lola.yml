@@ -1,0 +1,59 @@
+name: Temporary rebuild Lola draft
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-rebuild-lola.yml
+permissions:
+  contents: read
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure editor key
+        run: printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+      - name: Pre-edit full read stamp on exact current Lola draft
+        run: python scripts/post.py editorial lola27everythingbegins --phase pre-edit
+      - name: Build reviewed Lola candidate
+        shell: python
+        run: |
+          import json
+          body="""Lola Young has announced the Everything Begins Tour, a 17-date North American run that will take her back to headline stages across the United States and Canada in spring 2027. The route is her first full North American headline run since she stepped away from touring.
+
+          The tour opens in Nashville and closes at the Greek Theatre in Los Angeles, with Radio City Music Hall in New York and two nights at Massey Hall in Toronto among the biggest stops. Young has described touring America as one of her long-held ambitions, and the new itinerary shows how quickly the scale of her live career has changed since "Messy" broke through.
+
+          The title Everything Begins turns one of Young's own tattoos on its head. She has "Everything Ends" tattooed on her body, and the new tour name reframes that phrase around renewal rather than finality. That makes the announcement feel connected to the period she has been writing about in her recent music rather than simply functioning as another list of dates.
+
+          [youtube:YFhpMpONGUY]
+
+          Young returned with "From Down Here" after stepping away from touring, writing the song with James Blake and working with him on its production. The track followed *I'm Only F**king Myself* and arrived after "Messy" won Best Pop Solo Performance at the Grammy Awards. Since returning to the stage, she has played major festivals again, including Reading and Austin City Limits, while rebuilding the live schedule that had been interrupted.
+
+          Everything Begins now gives that return a full headline route. The venues are significant because Young was playing much smaller North American rooms before "Messy" became a global breakthrough. Radio City Music Hall and the Greek Theatre place her in a different touring bracket without the announcement needing to be padded with every city on the itinerary.
+
+          Artist presales begin October 7, followed by the general sale on October 9 at 10 a.m. local time through Young's official site. Sofia and the Antoinettes will support her on the announced North American dates."""
+          body="\n\n".join(x.strip() for x in body.split("\n\n"))
+          post={
+            "id":"lola27everythingbegins","type":"news","tag":"News","rtype":"","artist":"Lola Young",
+            "title":"Lola Young Announces 2027 Everything Begins Tour",
+            "excerpt":"Lola Young has announced the Everything Begins Tour, a 17-date North American run that will take her back to headline stages across the United States and Canada in spring 2027.",
+            "body":body,"date":"2026-10-06","pinned":False,"status":"draft",
+            "cover":{"kind":"img","src":"","credit":"Harriet K Bols","creditUrl":"https://www.instagram.com/harriettkbols/","pos":"50% 42%","zoom":1,"cardY":0.42,"cardZoom":1,"lockX":0.5},
+            "coverImport":{"url":"https://bunny-wp-pullzone-qbcmv8y9wp.b-cdn.net/wp-content/uploads/2026/10/Lola-Young-by-Harriet-K-Bols2.jpg","name":"lola-young-everything-begins-harriet-k-bols-original.jpg"}
+          }
+          open("/tmp/lola.json","w",encoding="utf-8").write(json.dumps(post,ensure_ascii=False))
+      - name: Final complete read stamp on exact candidate
+        run: python scripts/editorial_readthrough.py --post lola27everythingbegins --file /tmp/lola.json --phase post-edit --confirm-full-read
+      - name: Replace draft only through gated writer
+        run: python scripts/post.py replace-draft lola27everythingbegins --file /tmp/lola.json
+      - name: Re-run saved draft gates
+        run: |
+          python scripts/post.py gate lola27everythingbegins
+          python scripts/post.py preflight lola27everythingbegins
+          python scripts/post.py show lola27everythingbegins
