@@ -1,47 +1,116 @@
-name: Temporary Victoria release research
+name: Temporary Victoria release draft
 on:
   push:
     branches: [main]
     paths: [.github/workflows/temporary-victoria-research.yml]
 permissions:
-  contents: read
+  contents: write
 jobs:
-  inspect:
+  build-draft:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 10
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      POST_ID: auvictoriafol26r1
+      ART_PATH: public/photos/victoria-monet-frequency-of-love-marvin-2026.jpg
+      ART_WEB: photos/victoria-monet-frequency-of-love-marvin-2026.jpg
     steps:
-      - name: Inspect recent release conventions
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch Sony artwork and preserve full composition
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet Pillow
+          curl -L --fail --retry 3 -A "Mozilla/5.0" "https://drive.google.com/uc?export=download&id=1RkQzPnrxbGyrZyQX5243WlLpBvTkH4Ep" -o /tmp/victoria-original.jpg
+          mkdir -p public/photos
+          python - <<'PY'
+          from PIL import Image
+          import os
+          src="/tmp/victoria-original.jpg"
+          dst=os.environ["ART_PATH"]
+          im=Image.open(src)
+          print("ORIGINAL",im.format,im.size,"BYTES",os.path.getsize(src))
+          if im.size != (7443,7443):
+              raise SystemExit("UNEXPECTED_SOURCE_DIMENSIONS")
+          im=im.convert("RGB")
+          im=im.resize((2600,2600),Image.Resampling.LANCZOS)
+          im.save(dst,"JPEG",quality=88,optimize=True,progressive=True)
+          print("SITE_ART",Image.open(dst).size,"BYTES",os.path.getsize(dst))
+          if os.path.getsize(dst)>2900000:
+              im.save(dst,"JPEG",quality=84,optimize=True,progressive=True)
+          if os.path.getsize(dst)>2900000:
+              raise SystemExit("ART_TOO_LARGE")
+          PY
+      - name: Commit optimized full-frame official artwork
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "music98-bot"
+          git config user.email "music98-bot@users.noreply.github.com"
+          git add "$ART_PATH"
+          git commit -m "Add Frequency Of Love artwork by MAR+VIN"
+          git push
+      - name: Wait for artwork deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 20); do
+            code=$(curl -L -s -o /tmp/art.jpg -w "%{http_code}" "https://music98.news/$ART_WEB?draftprobe=$i" || true)
+            if [ "$code" = "200" ]; then echo "ART_DEPLOYED"; exit 0; fi
+            sleep 8
+          done
+          exit 1
+      - name: Save Victoria release as draft only
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
+          const post={"id":"auvictoriafol26r1","type":"release","tag":"New Release","rtype":"Album","artist":"Victoria Monét","title":"Frequency Of Love","excerpt":"Victoria Monét has released her second album *Frequency Of Love*, a 22-song record that moves between R&B, house, funk and acoustic soul.","body":"Victoria Monét has released her second album *Frequency Of Love*, a 22-song record that moves between R&B, house, funk and acoustic soul. The album arrived October 2 and is her first full-length since *JAGUAR II*, which won Best R&B Album while Monét took Best New Artist at the 2024 Grammys.\n\nPart of the time between those records was deliberately spent outside music. Monét enrolled at the Institute of Culinary Education and graduated in May 2026, then completed an externship at Verse L.A. while rehearsing for Bruno Mars' European stadium tour. She has described cooking school as a way to reconnect with creating for its own sake after the promotional cycle around her Grammy wins. That reset ended up changing the album too.\n\nMonét initially imagined *Frequency Of Love* as a more focused dive into yacht rock, inspired in part by tracing the musicians who played on records by Michael Jackson and Quincy Jones. The idea widened as her listening did. By the time the album was finished, the original plan had opened into a record that could move from older soul and pop references to contemporary dance music without settling into one period.\n\nThe finished album makes those turns quickly. \"Reach Out,\" produced by KAYTRANADA and D'Mile, pushes toward the dance floor, while the Chlöe-assisted \"Lose Myself\" leans into house. \"That's Why I Love You\" with Bruno Mars reaches toward bolero-pop, and \"See You In My Dreams\" with SZA pulls the record back toward hazier R&B. The guests are prominent, but Monét remains the center of the record. \"Reach Out\" also connects the new album to the end of the *JAGUAR II* era. Monét recorded the song around the period when the deluxe edition was being assembled, then held it back because she believed it deserved more than a bonus-track role. The official video, directed by Dave Meyers, was filmed at the Salk Institute in La Jolla.\n\n[youtube:h99lQg2zSl0]\n\nThe album title does not mean the record stays in romantic bliss. Monét has framed love here as something that also includes heartbreak, risk, self-love and motherhood. That wider definition helps explain why a song with her daughter Hazel Monét can sit alongside flirtation, regret and club music without feeling like a separate family interlude. The sequencing keeps returning to affection from different angles rather than building toward one neat answer.\n\nThe track count changes by format. Apple Music and Sony's release material list 22 songs for the digital album, while Monét's official store currently describes its first-edition CD and standard vinyl pressings as 17-track releases. That difference is worth noting for anyone buying a physical copy rather than streaming the full project.\n\nMonét takes *Frequency Of Love* on tour beginning October 27 in Raleigh. The 27-city North American run ends December 17 in San Francisco. The release also launches the Frequency Of Love Foundation, a youth initiative centered on food, agriculture, culinary education and wellness. The foundation also ties food education to science, gut health and brain function. Fans buying tour tickets can add a $1 contribution toward its community garden programs.","date":"2026-10-05","pinned":false,"status":"draft","cover":{"kind":"img","src":"photos/victoria-monet-frequency-of-love-marvin-2026.jpg","credit":"MAR+VIN","creditUrl":"https://www.mar-vin.com/","pos":"50% 50%","zoom":1,"cardY":0.5,"cardZoom":1,"lockX":0.5}};
           const key=process.env.ADMIN_PASSWORD;
+          if(!key)throw Error("NO_ADMIN_PASSWORD");
+          const headers={"X-Admin-Key":key,"Accept":"application/json","Content-Type":"application/json","Cache-Control":"no-cache"};
           (async()=>{
-            if(!key)throw Error("NO_KEY");
-            const r=await fetch("https://music98.news/api/desk",{headers:{"X-Admin-Key":key,"Accept":"application/json"},cache:"no-store"});
-            if(!r.ok)throw Error("DESK_"+r.status);
-            const j=await r.json();
-            const rel=(j.posts||[]).filter(p=>p.type==="release"&&(p.status||"live")==="live")
-              .sort((a,b)=>new Date(b.publishAt||b.date||0)-new Date(a.publishAt||a.date||0)).slice(0,4);
-            for(const p of rel){
-              const paras=String(p.body||"").split(/\n\n+/).filter(Boolean);
-              console.log("RELEASE",JSON.stringify({id:p.id,title:p.title,artist:p.artist,rtype:p.rtype,tag:p.tag,excerpt:p.excerpt,media:paras.filter(x=>/^\[(photo|youtube|apple|ig|instagram|tiktok):/i.test(x)),ending:paras.at(-1)}));
-            }
+            const g=await fetch("https://music98.news/api/desk",{headers,cache:"no-store"});
+            if(!g.ok)throw Error("GET_DESK_"+g.status);
+            const data=await g.json();
+            if(!Array.isArray(data.posts))throw Error("INVALID_DESK");
+            if(data.posts.some(p=>p.id===post.id))throw Error("POST_ID_ALREADY_EXISTS");
+            const before=JSON.stringify(data.posts);
+            const posts=[post,...data.posts];
+            const s=await fetch("https://music98.news/api/desk",{method:"POST",headers,body:JSON.stringify({posts,touched:[post.id]})});
+            if(!s.ok)throw Error("SAVE_"+s.status);
+            const v=await fetch("https://music98.news/api/desk",{headers,cache:"no-store"}), after=await v.json();
+            const got=(after.posts||[]).find(p=>p.id===post.id);
+            if(!got||got.status!=="draft"||got.body!==post.body||got.excerpt!==post.excerpt||got.title!==post.title)throw Error("DRAFT_VERIFY");
+            if(JSON.stringify(after.posts.filter(p=>p.id!==post.id))!==before)throw Error("OTHER_POST_CHANGED");
+            console.log("VICTORIA_DRAFT_SAVED",post.id,"STATUS",got.status,"OTHER_POSTS_UNCHANGED",true);
           })().catch(e=>{console.error(e.message);process.exit(1)});
           NODE
-      - name: Probe official Sony artwork file
+      - name: Run Victoria gate and preflight
         shell: bash
         run: |
           set -euo pipefail
-          url="https://drive.google.com/uc?export=download&id=1RkQzPnrxbGyrZyQX5243WlLpBvTkH4Ep"
-          curl -L --fail --retry 3 -A "Mozilla/5.0" "$url" -o /tmp/victoria.jpg
-          file /tmp/victoria.jpg
-          python - <<'PY'
-          from PIL import Image
-          import os
-          p="/tmp/victoria.jpg"
-          im=Image.open(p)
-          print("ARTWORK",im.format,im.size,"BYTES",os.path.getsize(p))
-          PY
+          printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+          set +e
+          python scripts/post.py gate "$POST_ID" > /tmp/gate.txt 2>&1
+          gate_code=$?
+          MUSIC98_KEY="$ADMIN_PASSWORD" python scripts/preflight.py --post "$POST_ID" --expected-media 1 --min-words 450 > /tmp/preflight.txt 2>&1
+          preflight_code=$?
+          set -e
+          cat /tmp/gate.txt; cat /tmp/preflight.txt
+          {
+            echo "POST=$POST_ID"; echo "GATE_CODE=$gate_code"; cat /tmp/gate.txt
+            echo "PREFLIGHT_CODE=$preflight_code"; cat /tmp/preflight.txt
+          } > .github/victoria-draft-report.txt
+          git config user.name "music98-bot"
+          git config user.email "music98-bot@users.noreply.github.com"
+          git add .github/victoria-draft-report.txt
+          git commit -m "Record Victoria draft validation report"
+          git push
+          test "$gate_code" -eq 0
+          test "$preflight_code" -eq 0
