@@ -1,7 +1,0 @@
-POST=shakira26amazonmadrid
-   --  length           418 words in the body (417 in prose), 7 paragraphs
-PASS - gate clean
-
-GATE: PASS
-POST=shakira26amazonmadrid STATUS=draft WORDS=418 MEDIA=1
-PREFLIGHT: PASS
