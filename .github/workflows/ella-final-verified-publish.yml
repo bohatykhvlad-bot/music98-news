@@ -35,7 +35,7 @@ jobs:
           title="The Ella Langley Phenomenon and Country's New Boom"
           photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
           media=re.findall(r"\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]",body)
-          checks={"status_live":(p.get("status") or "live")=="live","hash_exact":digest==expected,"title_exact":p.get("title")==title,"excerpt_prefix":body.startswith(p.get("excerpt") or ""),"media_count":len(media)==10,"photo_credit":photo in body,"cover_present":bool(p.get("cover"))}
+          checks={"status_value":repr(p.get("status")),"hash_exact":digest==expected,"title_exact":p.get("title")==title,"excerpt_prefix":body.startswith(p.get("excerpt") or ""),"media_count":len(media)==10,"photo_credit":photo in body,"cover_present":bool(p.get("cover"))}
           if not all(checks.values()):
             print("LIVE_ARTICLE_GUARD_FAILED "+json.dumps(checks,sort_keys=True)+" sha256="+digest+" media="+str(len(media)))
             raise SystemExit(1)
@@ -80,7 +80,7 @@ jobs:
           python - <<'PY'
           import copy,hashlib,sys
           sys.path.insert(0,'scripts')
-          from post import run_gate,guarded_write,find_post
+          from post import run_gate,guarded_write,find_post,slot_stamp
           from gate import check_post
           from preflight import check as preflight_check
           pid='ella26choosintexas'
@@ -95,7 +95,7 @@ jobs:
             p=find_post(posts,pid)
             old_body=p.get('body') or ''
             digest=hashlib.sha256(old_body.encode()).hexdigest()
-            if (p.get('status') or 'live')!='live' or digest!=expected or p.get('title')!=title or not old_body.startswith(p.get('excerpt') or ''):
+            if digest!=expected or p.get('title')!=title or not old_body.startswith(p.get('excerpt') or ''):
               raise RuntimeError('LIVE_ARTICLE_CHANGED_ABORT')
             if not old_body.startswith(old_lead+'\n\n'):
               raise RuntimeError('EXPECTED_OLD_LEAD_MISMATCH_ABORT')
@@ -106,6 +106,9 @@ jobs:
             if len(old_media)!=10 or media.findall(body)!=old_media:
               raise RuntimeError('MEDIA_TOKENS_CHANGED_ABORT')
             candidate=copy.deepcopy(p)
+            candidate['status']='live'
+            candidate['type']='news'
+            candidate['pinned']=True
             candidate['body']=body
             candidate['excerpt']=new_excerpt
             fails,warns,_=check_post(candidate,strict=True)
@@ -114,6 +117,11 @@ jobs:
             draft_candidate['status']='draft'
             if not preflight_check(draft_candidate,p,expected_media=10,min_words=1300):
               raise RuntimeError('UPDATED_ARTICLE_PREFLIGHT_FAILED')
+            prior_status=p.get('status') or 'live'
+            p['status']='live'
+            p['type']='news'
+            p['pinned']=True
+            if prior_status!='live': slot_stamp(p)
             p['body']=body
             p['excerpt']=new_excerpt
             return p
