@@ -41,13 +41,13 @@ test("TikTok fallback controls use the site's cyan hover fill and no press trans
   assert.match(desk,/\.composer \.tk-retry:active,\.composer \.tk-open:active\{transform:none\}/);
 });
 
-test("TikTok stays narrow while Instagram keeps its wider native footprint",()=>{
+test("TikTok stays narrow while Instagram uses its native responsive footprint",()=>{
   assert.match(page,/\.yembed\{[^}]*max-width:660px/);
   assert.match(page,/\.yembed\.tk\{max-width:292px\}/);
-  assert.match(page,/\.yembed\.ig\{max-width:400px\}/);
+  assert.match(page,/\.yembed\.ig\{width:min\(540px,100%\);max-width:none\}/);
   assert.match(desk,/\.composer \.yembed\{max-width:520px/);
   assert.match(desk,/\.composer \.yembed\.tk\{max-width:230px\}/);
-  assert.match(desk,/\.composer \.yembed\.ig\{max-width:340px\}/);
+  assert.match(desk,/\.composer \.yembed\.ig\{max-width:none;width:100%\}/);
 });
 
 test("TikTok player keeps a clean vertical 9:16 frame",()=>{
