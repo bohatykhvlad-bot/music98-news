@@ -52,6 +52,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 REPO = Path(__file__).resolve().parents[1]
 DESK_API = "https://music98.news/api/desk"
+PHOTO_API = "https://music98.news/api/photo"
 GATE = REPO / "scripts" / "gate.py"
 PREFLIGHT = REPO / "scripts" / "preflight.py"
 READTHROUGH = REPO / "scripts" / "editorial_readthrough.py"
@@ -431,6 +432,24 @@ def cmd_create(post_file, allows=None, reason=None):
     return now
 
 
+def import_photo(source_url, name):
+    req=urllib.request.Request(source_url,headers={"User-Agent":UA,"Accept":"image/jpeg,image/png,image/webp,image/*"})
+    with urllib.request.urlopen(req,timeout=90) as r:
+        blob=r.read()
+        ctype=(r.headers.get("Content-Type") or "").split(";",1)[0].lower()
+    if ctype not in ("image/jpeg","image/png","image/webp"):
+        die("cover import is not a supported image: %s" % ctype)
+    if len(blob)<100000:
+        die("cover import is suspiciously small: %d bytes" % len(blob))
+    import base64
+    payload={"name":name,"data":"data:%s;base64,%s" % (ctype,base64.b64encode(blob).decode("ascii"))}
+    result=http(PHOTO_API,desk_key(),payload,method="POST")
+    if not result.get("ok") or not result.get("url"):
+        die("photo import failed")
+    print("photo     imported: %s (%d bytes)" % (result["url"],len(blob)))
+    return result["url"]
+
+
 def cmd_replace_draft(pid, post_file, allows=None, reason=None):
     path=Path(post_file)
     data=json.loads(path.read_text(encoding="utf-8"))
@@ -445,6 +464,15 @@ def cmd_replace_draft(pid, post_file, allows=None, reason=None):
         die("replace-draft file has wrong post id")
     if staged.get("status")!="draft":
         die("replace-draft accepts draft status only")
+    cover_import=staged.pop("coverImport",None)
+    if cover_import:
+        if not isinstance(cover_import,dict) or not cover_import.get("url") or not cover_import.get("name"):
+            die("coverImport requires url and name")
+        cover=staged.get("cover")
+        if not isinstance(cover,dict):
+            die("coverImport requires cover object")
+        cover["src"]=import_photo(str(cover_import["url"]),str(cover_import["name"]))
+
     body=(staged.get("body") or "").strip()
     excerpt=(staged.get("excerpt") or "").strip()
     if not body or not excerpt or not body.startswith(excerpt):
