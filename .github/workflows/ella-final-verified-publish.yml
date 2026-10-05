@@ -1,4 +1,4 @@
-name: Ella final verified publication
+name: Ella verified draft lead correction
 on:
   push:
     paths:
@@ -7,149 +7,58 @@ on:
 permissions:
   contents: read
 jobs:
-  validate-and-publish:
+  correct-draft:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 8
     env:
-      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Confirm exact approved unpublished article
+      - name: Correct opening and keep the article out of live
         shell: bash
         run: |
           python - <<'PY'
-          import hashlib, json, os, re, urllib.request
-          secret=os.getenv("MUSIC98_KEY")
-          if not secret: raise SystemExit("NO_EDITOR_CREDENTIAL")
-          req=urllib.request.Request("https://music98.news/api/desk",headers={"X-Admin-Key":secret,"Cache-Control":"no-cache","User-Agent":"Mozilla/5.0"})
-          with urllib.request.urlopen(req, timeout=30) as res:posts=json.load(res)["posts"]
-          matched=[x for x in posts if x.get("id")=="ella26choosintexas"]
-          if len(matched)!=1:raise SystemExit("ARTICLE_MISSING_OR_DUPLICATE")
-          p=matched[0];body=p.get("body") or ""
-          expected="9c44bbafa838d2436e8eb03f41876f01b2c2edf95c60c6cfe5f4ce638c01996e"
-          digest=hashlib.sha256(body.encode()).hexdigest()
-          title="The Ella Langley Phenomenon and Country's New Boom"
-          photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
-          media=re.findall(r"\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]",body)
-          checks={"status_value":repr(p.get("status")),"hash_exact":digest==expected,"title_exact":p.get("title")==title,"excerpt_prefix":body.startswith(p.get("excerpt") or ""),"media_count":len(media)==10,"photo_credit":photo in body,"cover_present":bool(p.get("cover"))}
-          if not all(checks.values()):
-            print("LIVE_ARTICLE_GUARD_FAILED "+json.dumps(checks,sort_keys=True)+" sha256="+digest+" media="+str(len(media)))
-            raise SystemExit(1)
-          print("ELLA_APPROVED_DRAFT sha256="+digest+" media=10 title/excerpt/cover/photo verified")
-          PY
-      - name: Check both original photographs serve real image bytes
-        shell: bash
-        run: |
-          node <<'NODE'
-          const {createHash}=require('node:crypto');
-          (async()=>{
-            for(const [path,sha] of [
-              ['photos/ella-dandelion-caylee-2026-2730x3631-original.jpg',null],
-              ['photos/ella-langley-live-caylee-robillard-2026.jpg','25c2e3b6e03e2cbe74cd55d9e39fe1881c0c0fe7c3ff288c5fa57efd1c44375e']
-            ]){
-              const res=await fetch('https://music98.news/'+path+'?finalaudit='+Date.now(),{headers:{'User-Agent':'Mozilla/5.0'},signal:AbortSignal.timeout(20000)});
-              if(!res.ok||!res.headers.get('content-type')?.startsWith('image/'))throw Error('PHOTO_UNAVAILABLE_'+res.status);
-              const b=Buffer.from(await res.arrayBuffer());
-              if(b.length<100000||b[0]!==0xff||b[1]!==0xd8||b[2]!==0xff)throw Error('BAD_OR_COMPRESSED_PHOTO');
-              if(sha&&createHash('sha256').update(b).digest('hex')!==sha)throw Error('ORIGINAL_PHOTO_HASH_CHANGED');
-              console.log('PHOTO_VERIFIED '+path+' bytes='+b.length);
-            }
-          })().catch(e=>{console.error(e.message);process.exit(1)});
-          NODE
-      - name: Run authoritative editorial gate and remote preflight
-        shell: bash
-        run: |
-          set +e
-          python scripts/gate.py --post ella26choosintexas --json > /tmp/ella_gate.json
-          gate_status=$?
-          set -e
-          python - <<'PY'
-          import json
-          report=json.load(open('/tmp/ella_gate.json'))['report'][0]
-          print("ELLA_GATE_FAIL_CODES="+",".join(x[0] for x in report['fails']))
-          print("ELLA_GATE_WARN_CODES="+",".join(x[0] for x in report['warns']))
-          PY
-          test "$gate_status" -eq 0
-      - name: Update reviewed opening and preserve article data
-        shell: bash
-        run: |
-          python - <<'PY'
-          import copy,hashlib,sys
+          import copy,hashlib,re,sys
           sys.path.insert(0,'scripts')
-          from post import run_gate,guarded_write,find_post,slot_stamp
+          from post import guarded_write,find_post
           from gate import check_post
           from preflight import check as preflight_check
           pid='ella26choosintexas'
-          expected=open('/tmp/ella_new_body_sha256.txt',encoding='ascii').read().strip()
           title="The Ella Langley Phenomenon and Country's New Boom"
           old_lead="""At Nashville's CMA Fest in June 2026, country singer Ella Langley let a crowd sing much of "Choosin' Texas" back to her as the band played. By the Billboard Hot 100 chart dated October 3, the song had spent 24 weeks at No. 1, breaking the record previously held by Mariah Carey's "All I Want for Christmas Is You." The Hot 100 ranks songs across genres using US radio airplay, streams and sales. It was an extraordinary result for a relaxed country recording built around steel guitar, a danceable rhythm and an unhappy trip to Texas. The more interesting question is how a singer so rooted in country began reaching listeners far beyond it."""
           new_lead="""By the Billboard Hot 100 dated October 3, Ella Langley’s “Choosin’ Texas” had spent 24 weeks at No. 1, a longer run than any song in the chart’s history. The Hot 100 ranks songs across genres using US radio airplay, streams and sales. How did a song this rooted in country find such a broad audience, and what does its record say about country’s growing pull in pop?"""
           new_excerpt="By the Billboard Hot 100 dated October 3, Ella Langley’s “Choosin’ Texas” had spent 24 weeks at No. 1, a longer run than any song in the chart’s history."
-          gate_ok,_=run_gate(pid)
-          if not gate_ok: raise SystemExit('GATE_FAILED_BEFORE_UPDATE')
+          media=re.compile(r'\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]')
           def mutate(posts):
             p=find_post(posts,pid)
+            if p.get('title')!=title: raise RuntimeError('ARTICLE_TITLE_CHANGED_ABORT')
             old_body=p.get('body') or ''
-            digest=hashlib.sha256(old_body.encode()).hexdigest()
-            if digest!=expected or p.get('title')!=title or not old_body.startswith(p.get('excerpt') or ''):
-              raise RuntimeError('LIVE_ARTICLE_CHANGED_ABORT')
-            if not old_body.startswith(old_lead+'\n\n'):
-              raise RuntimeError('EXPECTED_OLD_LEAD_MISMATCH_ABORT')
-            body=new_lead+old_body[len(old_lead):]
-            import re
-            media=re.compile(r'\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]')
-            old_media=media.findall(old_body)
-            if len(old_media)!=10 or media.findall(body)!=old_media:
-              raise RuntimeError('MEDIA_TOKENS_CHANGED_ABORT')
+            if old_body.startswith(old_lead+'\n\n'):
+              body=new_lead+old_body[len(old_lead):]
+            elif old_body.startswith(new_lead+'\n\n'):
+              body=old_body
+            else:
+              raise RuntimeError('ARTICLE_BODY_NOT_EXPECTED_VERSION_ABORT')
+            if len(media.findall(body))!=10: raise RuntimeError('ARTICLE_MEDIA_COUNT_CHANGED_ABORT')
             candidate=copy.deepcopy(p)
-            candidate['status']='live'
-            candidate['type']='news'
-            candidate['pinned']=True
             candidate['body']=body
             candidate['excerpt']=new_excerpt
+            candidate['status']='draft'
             fails,warns,_=check_post(candidate,strict=True)
-            if fails: raise RuntimeError('UPDATED_ARTICLE_GATE_FAILED '+','.join(x[0] for x in fails))
-            draft_candidate=copy.deepcopy(candidate)
-            draft_candidate['status']='draft'
-            if not preflight_check(draft_candidate,p,expected_media=10,min_words=1300):
-              raise RuntimeError('UPDATED_ARTICLE_PREFLIGHT_FAILED')
-            prior_status=p.get('status') or 'live'
-            p['status']='live'
-            p['type']='news'
-            p['pinned']=True
-            if prior_status!='live': slot_stamp(p)
+            if fails: raise RuntimeError('DRAFT_GATE_FAILED '+','.join(x[0] for x in fails))
+            if not preflight_check(candidate,p,expected_media=10,min_words=1300):
+              raise RuntimeError('DRAFT_PREFLIGHT_FAILED')
             p['body']=body
             p['excerpt']=new_excerpt
+            p['status']='draft'
             return p
           saved=guarded_write(mutate)
-          saved_body=saved.get('body') or ''
-          if (saved.get('status') or 'live')!='live' or saved.get('type')!='news' or saved.get('pinned') is not True or saved.get('title')!=title or saved.get('excerpt')!=new_excerpt or not saved_body.startswith(new_lead):
-            raise SystemExit('UPDATED_ARTICLE_VERIFY_FAILED')
-          new_hash=hashlib.sha256(saved_body.encode()).hexdigest()
-          open('/tmp/ella_new_body_sha256.txt','w',encoding='ascii').write(new_hash)
-          print('ELLA_LEAD_UPDATED status=live type=news pinned=true words='+str(len(saved_body.split()))+' media=10 body_sha='+new_hash)
-          PY
-      - name: Verify public article visibility and site response
-        shell: bash
-        run: |
-          python - <<'PY'
-          import hashlib,json,time,urllib.request
-          expected='9c44bbafa838d2436e8eb03f41876f01b2c2edf95c60c6cfe5f4ce638c01996e'
-          for attempt in range(10):
-            try:
-              req=urllib.request.Request('https://music98.news/api/desk?finalaudit='+str(time.time()),headers={'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'})
-              with urllib.request.urlopen(req,timeout=20) as r:posts=json.load(r)['posts']
-              p=next((x for x in posts if x.get('id')=='ella26choosintexas'),None)
-              if p and (p.get('status') or 'live')=='live' and p.get('type')=='news' and p.get('pinned') is True and hashlib.sha256((p.get('body') or '').encode()).hexdigest()==expected:
-                homepage=urllib.request.Request('https://music98.news/',headers={'User-Agent':'Mozilla/5.0'})
-                with urllib.request.urlopen(homepage,timeout=20) as r:assert r.status==200
-                print('ELLA_PUBLICLY_VISIBLE_SHA256='+expected+' HOMEPAGE_OK status=live')
-                break
-            except Exception as e: print('PUBLIC_VERIFY_RETRY '+str(attempt+1)+' '+type(e).__name__)
-            time.sleep(5)
-          else:raise SystemExit('PUBLIC_VISIBILITY_NOT_CONFIRMED')
+          body=saved.get('body') or ''
+          if saved.get('status')!='draft' or saved.get('excerpt')!=new_excerpt or not body.startswith(new_lead):
+            raise SystemExit('DRAFT_SAVE_VERIFY_FAILED')
+          print('ELLA_DRAFT_CORRECTED status=draft words='+str(len(body.split()))+' media=10 body_sha='+hashlib.sha256(body.encode()).hexdigest())
           PY
