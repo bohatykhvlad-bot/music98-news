@@ -14,22 +14,25 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install --disable-pip-version-check pillow
-      - name: Fetch QRÖMELIFE shoot candidates
+      - name: Fetch official QRÖMELIFE site visuals
         run: |
           python - <<'PY'
           import urllib.request
           from PIL import Image
-          names=["87A6879","87A6897","87A6888","87A6907"]
-          for n in names:
-              u=f"https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2026%2F09%2F22%2F{n}-scaled.jpg?cbr=1&fit=max&format=jpg&q=98&w=3500"
+          urls={
+            "editorial":"https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/editorial-compressed.jpg",
+            "architecture":"https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/architecture-compressed.jpg",
+            "music-portrait":"https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/music-portrait-compressed.jpg",
+          }
+          for n,u in urls.items():
               q=urllib.request.Request(u,headers={"User-Agent":"Mozilla/5.0"})
-              with urllib.request.urlopen(q,timeout=45) as r:b=r.read()
+              with urllib.request.urlopen(q,timeout=60) as r:b=r.read()
               p=f"/tmp/{n}.jpg";open(p,"wb").write(b)
               im=Image.open(p)
-              print("QUAVO_CANDIDATE",n,im.size,len(b),im.format)
+              print("QUAVO_OFFICIAL",n,im.size,len(b),im.format)
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: quavo-qromelife-candidates
-          path: /tmp/87A*.jpg
+          name: quavo-qromelife-official-visuals
+          path: /tmp/*.jpg
           if-no-files-found: error
