@@ -1,0 +1,54 @@
+{
+  "posts": [
+    {
+      "id": "shakira26amazonmadrid",
+      "type": "news",
+      "tag": "News",
+      "rtype": "",
+      "artist": "Shakira",
+      "title": "Shakira Sets Amazon Music Livestream Record With Madrid Show and Dua Lipa Duet",
+      "excerpt": "Shakira's October 3 Madrid concert became Amazon Music's most-viewed livestream by a female artist, a record announced the following day.",
+      "body": "Shakira's October 3 Madrid concert became Amazon Music's most-viewed livestream by a female artist, a record announced the following day. Dua Lipa appeared during the show for a surprise performance of \"Antología,\" while Amazon did not publish a viewer total.\n\nThe show streamed worldwide through Amazon Music, Prime Video and Twitch and marked Shakira's first full-concert global livestream. Amazon's claim applies specifically to its own platform, not to concert streams across every service. Shakira Stadium was built temporarily inside Madrid's Iberdrola Music complex for the residency and holds more than 50,000 people. The broadcast was part of Amazon Music's 2026 Women Shaping Latin Music campaign. The surprise duet also reached back to *Pies Descalzos*, where \"Antología\" first appeared in 1995. Amazon made the livestream available worldwide without requiring viewers to hold a paid subscription, and kept it available for replay through the weekend.\n\n[ig:p:DeFRhLolil0|@shakira|https://www.instagram.com/p/DeFRhLolil0/]\n\nDua Lipa had already covered \"Antología\" at her own Bogotá show in 2025 while Shakira was performing the same song that night in Asunción. Shakira later praised the cover online, and the two exchanged messages of admiration, but they had never performed together. In Madrid, Shakira introduced Dua Lipa by saying she admired her and considered herself a fan before the two sang the song together for the first time onstage.\n\nThe residency sits inside Es Latina, a month-long cultural program built around Macondo Park. The entire site was designed as a temporary city around the residency rather than as a permanent venue. It takes its name from Gabriel García Márquez's fictional Macondo and includes a museum tracing Shakira's career, a literature area inspired by García Márquez, food and fashion spaces, workshops, and additional live performances around the main concerts. A nightly carnival in Macondo Plaza continues the program after the main show.",
+      "date": "2026-10-05",
+      "pinned": false,
+      "status": "live",
+      "publishAt": "2026-10-05T15:03:25.094Z",
+      "cover": {
+        "kind": "img",
+        "src": "photos/shakira-dua-lipa-madrid-nicolas-gerardin-2026.jpg",
+        "credit": "Nicolas Gerardin",
+        "creditUrl": "https://www.nicolasgerardin.com/",
+        "pos": "50% 57%",
+        "zoom": 1,
+        "cardY": 0.56,
+        "cardZoom": 1.18,
+        "lockX": 0.5
+      }
+    },
+    {
+      "id": "auvictoriafol26r1",
+      "type": "release",
+      "tag": "New Release",
+      "rtype": "Album",
+      "artist": "Victoria Monét",
+      "title": "Frequency Of Love",
+      "excerpt": "Victoria Monét has released her second album *Frequency Of Love*, a 22-song record that moves between R&B, house, funk and acoustic soul.",
+      "body": "Victoria Victoria Monét has released her second album *Frequency Of Love*, a 22-song record that moves between R&B, house, funk and acoustic soul. Released October 2, it is her first full-length since *JAGUAR II*, which won Best R&B Album as Victoria Monét took Best New Artist at the 2024 Grammys.\n\nThe gap was deliberate. Victoria Monét has said she wanted enough life to happen before making the next record, and part of that time took her to culinary school. She graduated from the Institute of Culinary Education in May 2026 and completed an externship at Verse L.A. while rehearsing for Bruno Mars' European stadium tour. Cooking gave her a way to make something without immediately turning it into promotion or income after the long Grammy cycle around *JAGUAR II*.\n\n*Frequency Of Love* began with a narrower idea. Victoria Monét was tracing musicians who worked on records by Michael Jackson and Quincy Jones, which led her toward Toto and yacht rock. Culinary school disrupted that plan in a useful way. On pasta days she listened to Italian artists, and when the class made Jamaican food she listened to Jamaican records. The final album keeps some of that influence but moves well beyond it.\n\n\"Reach Out\" leans into house, \"You Hurt Me Too\" was written with a James Bond theme in mind, and \"Juicy\" carries more of the album's early concept. \"Reach Out\" also predates the album. Victoria Monét recorded it around the period when the *JAGUAR II* deluxe edition was being assembled, then held it back because she thought it deserved more than a bonus-track slot. She released it as an advance single for *Frequency Of Love* before the album arrived. The video was shot at the Salk Institute in La Jolla, California, using the site's concrete architecture as the setting for the performance.\n\n[youtube:h99lQg2zSl0]\n\nVictoria Monét has described love on the album broadly, including romance, heartbreak, self-love and motherhood. Her daughter Hazel Victoria Monét also appears on the album alongside Leon Thomas. Elsewhere, the songs move between attraction, disappointment and the risk that comes with letting someone close. The album also reaches back to \"Somebody,\" a mid-century standard Victoria Monét first heard as a child while watching *Introducing Dorothy Dandridge* with her grandmother. Dandridge stayed with her long enough that Victoria Monét later dressed as her for Halloween twice.\n\nVictoria Monét takes *Frequency Of Love* on a 27-city North American tour beginning October 27 in Raleigh. The announced run ends December 17 in San Francisco. She is also launching the Frequency Of Love Foundation, which plans youth programs around food, agriculture, cooking and wellness. Its planned workshops cover where food comes from, how it affects gut and brain health, and how cooking can become a creative skill. Community garden programs are also part of the foundation's first plans.",
+      "date": "2026-10-05",
+      "pinned": false,
+      "status": "live",
+      "publishAt": "2026-10-05T15:03:24.094Z",
+      "cover": {
+        "kind": "img",
+        "src": "photos/victoria-monet-marvin-portrait-2026.jpg",
+        "credit": "MAR+VIN",
+        "creditUrl": "https://www.mar-vin.com/",
+        "pos": "50% 48%",
+        "zoom": 1,
+        "cardY": 0.5,
+        "cardZoom": 1,
+        "lockX": 0.5
+      }
+    }
+  ]
+}
