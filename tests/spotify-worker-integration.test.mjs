@@ -1,58 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {buildTop50} from "../functions/api/top50.js";
+import {buildTop50,onRequestGet} from "../functions/api/top50.js";
+import {mergeKey,artworkKey} from "../functions/lib/chart-identity.js";
+import {DAILY_CHART_METHOD,parseAppleGlobal} from "../functions/lib/daily-chart-sources.js";
+import {fakeDailySource} from "./fixtures/daily-chart.mjs";
 
-function fakeSource({deezerCount=50,youtubeCount=50,kworbMissing=[],kworbSwap=false}={}){
- const today=new Date().toISOString().slice(0,10);
- const kwDate=today.replaceAll("-","/");
- const rows=Array.from({length:50},(_,i)=>({
-   pos:i+1,title:"Source Song "+(i+1),artist:"Source Artist "+(i+1)
- }));
- const snapshot={schema:1,verified:true,provider:"kworb+musicrank",mirrorMatched:50,
-   fingerprint:"a".repeat(64),chartDate:today,tracks:rows};
- const kw='<title>Spotify Daily Chart - Global</title><h2>'+kwDate+'</h2><table>'+
-   rows.filter(x=>!kworbMissing.includes(x.pos)).map(x=>
-     ([17,36,50].includes(x.pos)?'<tr class="d2">':"<tr>")+
-     '<td class="np">'+x.pos+'</td><td class="np">=</td>'+
-     '<td class="text mp"><div><b>'+x.artist+'</b> - '+(kworbSwap&&x.pos===36?"Wrong Song":x.title)+'</div></td></tr>'
-   ).join("")+'</table>';
- const apple={feed:{results:rows.map(x=>({name:x.title,artistName:x.artist}))}};
- const deezer={data:rows.slice(0,deezerCount).map(x=>({
-   title:x.title,artist:{name:x.artist}}))};
- const bb=rows.map(x=>'o-chart-results-list-row //'+
-   '<span id="title-of-a-story">'+x.title+'</span>'+
-   '<a href="https://www.billboard.com/artist/'+x.pos+'">'+x.artist+'</a>'
- ).join("");
- const youtube={contents:{sectionListRenderer:{contents:[{musicAnalyticsSectionRenderer:{
-   content:{trackTypes:[{chartPeriodType:"CHART_PERIOD_TYPE_WEEKLY",
-     trackViews:rows.slice(0,youtubeCount).map(x=>({
-       name:x.title,artists:[{name:x.artist}],
-       chartEntryMetadata:{currentPosition:x.pos}}))}]}
- }}]}}};
- const fakeFetch=async input=>{
-   const url=String(input);
-   const response=body=>new Response(typeof body==="string"?body:JSON.stringify(body),
-    {status:200,headers:{"Content-Type":"application/json"}});
-   if(url.includes("rss.applemarketingtools.com"))return response(apple);
-   if(url.includes("kworb.net"))return response(kw);
-   if(url.includes("api.deezer.com"))return response(deezer);
-   if(url.includes("billboard.com"))return response(bb);
-   if(url.includes("charts.youtube.com"))return response(youtube);
-   return new Response("missing",{status:404});
- };
- return {fakeFetch,snapshot};
-}
 async function expectRejected(options,pattern){
- const {fakeFetch,snapshot}=fakeSource(options),previous=globalThis.fetch;
+ const {fakeFetch,snapshot}=fakeDailySource(options),previous=globalThis.fetch;
  globalThis.fetch=fakeFetch;
  try{await assert.rejects(buildTop50("https://music98.news",{},snapshot),pattern);}
  finally{globalThis.fetch=previous;}
 }
 test("worker refuses 49 Deezer rows rather than making an incomplete combined chart",async()=>{
  await expectRejected({deezerCount:49},/incomplete_chart_sources/);
-});
-test("worker refuses a weekly YouTube response with 49 valid positions",async()=>{
- await expectRejected({youtubeCount:49},/incomplete_chart_sources/);
 });
 test("worker rejects a changed Spotify rank even if both mirrors appear complete",async()=>{
  await expectRejected({kworbSwap:true},/spotify_mirror_disagreement:36/);
@@ -61,4 +21,77 @@ test("worker falls back to verified independent Spotify if the live HTML lost a 
  /* The mirror fallback is allowed, but another incomplete source must still
     block any publication before ranking/tenure mutations. */
  await expectRejected({kworbMissing:[17],deezerCount:49},/incomplete_chart_sources/);
+});
+
+function mediaEnvironment(source) {
+ const today=new Date().toISOString().slice(0,10);
+ const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+ const week=Math.floor((Date.now()-Date.UTC(2026,8,17))/86400000);
+ const appleRows=parseAppleGlobal(source.apple).tracks;
+ const names=Object.fromEntries(appleRows.map((row,i)=>[mergeKey(row.title,row.artist),{
+   title:row.title,artist:row.artist,url:row.url,year:"2026",
+   prev:"https://audio-ssl.itunes.apple.com/preview/"+(i+1)+".m4a"
+ }]));
+ const covers=Object.fromEntries(appleRows.map(row=>[artworkKey(row.title,row.artist),row.art]));
+ const oldTracks=source.rows.map(t=>({...t,rank:t.pos,weeks:7,delta:"0"}));
+ const old={updated:yesterday,week:week-1,complete:true,
+   sources:{A:50,S:50,D:50,B:50,Y:50},tracks:oldTracks};
+ const assets={"apple-names.json":names,"covers.json":covers,"loudness.json":{},
+   "spotify-chart.json":source.snapshot,"chart-tenure-backup.json":{schema:1,current:old,previous:null}};
+ const values=new Map([["top50v36",{...old,updated:today}]]),writes=[];
+ return {assets,values,writes,env:{
+   ASSETS:{fetch:async input=>{
+     const name=new URL(String(input)).pathname.split("/").at(-1);
+     return name in assets ? new Response(JSON.stringify(assets[name])) : new Response("missing",{status:404});
+   }},
+   DESK:{get:async key=>values.get(key)||null,put:async(key,value)=>{writes.push(key);values.set(key,JSON.parse(value));}}
+ }};
+}
+
+test("daily migration preserves Apple audio/artwork, day counts and repeat-request movement",async()=>{
+ const source=fakeDailySource(),{env,values,writes}=mediaEnvironment(source),previous=globalThis.fetch;
+ globalThis.fetch=source.fakeFetch;
+ try{
+   const request=new Request("https://music98.news/api/top50");
+   const response=await onRequestGet({env,request}),payload=await response.json();
+   assert.equal(response.status,200);
+   assert.equal(payload.methodology,DAILY_CHART_METHOD);
+   assert.deepEqual(payload.sources,{A:50,S:50,D:50});
+   assert.equal(payload.arrows.ok,true);
+   assert.ok(payload.tracks.every(t=>t.weeks===8 && t.delta==="0"));
+   assert.ok(payload.tracks.every(t=>t.prev.startsWith("https://audio-ssl.itunes.apple.com/")));
+   assert.ok(payload.tracks.every(t=>t.art.endsWith("600x600bb.jpg") && t.url.includes("music.apple.com/us/album/")));
+   assert.equal(writes.at(-1),"top50v37");
+   assert.ok(values.has("top50v36"));
+   assert.ok(source.requests.every(url=>!url.includes("youtube") && !url.includes("billboard") && !url.includes("/chart/0")));
+   const cached=await (await onRequestGet({env,request})).json();
+   assert.deepEqual(cached.tracks,payload.tracks);
+ }finally{globalThis.fetch=previous;}
+});
+
+test("incomplete daily source does not mutate tenure or publish an old weekly edition",async()=>{
+ const source=fakeDailySource({deezerCount:49}),{env,writes}=mediaEnvironment(source),previous=globalThis.fetch;
+ globalThis.fetch=source.fakeFetch;
+ try{
+   const response=await onRequestGet({env,request:new Request("https://music98.news/api/top50")});
+   assert.equal(response.status,503);
+   assert.deepEqual(writes,["top50v37:retry"]);
+ }finally{globalThis.fetch=previous;}
+});
+
+test("validated daily global snapshots recover both Apple and Deezer outages",async()=>{
+ const source=fakeDailySource({appleOffline:true,deezerOffline:true});
+ const {env,assets}=mediaEnvironment(source),previous=globalThis.fetch;
+ const today=new Date().toISOString().slice(0,10);
+ assets["apple-chart.json"]={schema:2,updated:today,sourceDate:today,region:"global",cadence:"daily",
+   source:"official-apple-global-playlist",tracks:parseAppleGlobal(source.apple).tracks};
+ assets["deezer-chart.json"]={schema:2,updated:today,sourceDate:today,region:"global",cadence:"daily",
+   source:"official-deezer-worldwide-playlist",tracks:source.rows};
+ globalThis.fetch=source.fakeFetch;
+ try{
+   const payload=await buildTop50("https://music98.news",env,source.snapshot);
+   assert.deepEqual(payload.sources,{A:50,S:50,D:50});
+   assert.equal(payload.sourceOrigin.A,"github-current-day-global");
+   assert.equal(payload.sourceOrigin.D,"github-current-day-worldwide");
+ }finally{globalThis.fetch=previous;}
 });

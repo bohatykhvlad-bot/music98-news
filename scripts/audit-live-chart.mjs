@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
+import {DAILY_CHART_METHOD,completeDailySources} from "../functions/lib/daily-chart-sources.js";
 /* Production and GitHub's independent Spotify reference must match exactly.
    Wait briefly for Workers Builds to deploy when a new snapshot is committed. */
 const mirror=JSON.parse(fs.readFileSync(new URL("../public/data/spotify-chart.json",import.meta.url),"utf8"));
@@ -12,7 +13,7 @@ for(let attempt=0;attempt<5;attempt++){
  if(res.ok){
    j=await res.json();
    if(!j.fallback && j.complete===true &&
-     ["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])===50) &&
+     j.methodology===DAILY_CHART_METHOD && completeDailySources(j.sources) &&
      j.sourceDates?.S===verified.date && j.spotifyFingerprint===verified.fingerprint)break;
  }
  reason=JSON.stringify({status:res.status,updated:j?.updated,rev:j?.rev,
@@ -20,7 +21,7 @@ for(let attempt=0;attempt<5;attempt++){
  if(attempt<4)await new Promise(done=>setTimeout(done,14000));
 }
 if(!j || j.fallback || j.complete!==true ||
-  !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])===50) ||
+  j.methodology!==DAILY_CHART_METHOD || !completeDailySources(j.sources) ||
   j.sourceDates?.S!==verified.date || j.spotifyFingerprint!==verified.fingerprint)
   throw new Error("Published chart differs from the verified source: "+reason);
 console.log("SPOTIFY_SOURCE_AUDIT",JSON.stringify({date:verified.date,provider:verified.source,
