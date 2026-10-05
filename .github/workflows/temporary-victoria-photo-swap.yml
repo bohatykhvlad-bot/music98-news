@@ -1,0 +1,83 @@
+name: Temporary Victoria photo swap
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/temporary-victoria-photo-swap.yml]
+permissions:
+  contents: write
+jobs:
+  swap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      POST_ID: auvictoriafol26r1
+      DEST: public/photos/victoria-monet-marvin-portrait-2026.jpg
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Resolve fresh MAR+VIN editorial portrait
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet Pillow beautifulsoup4
+          python - <<'PY'
+          import requests, os
+          from bs4 import BeautifulSoup
+          from PIL import Image
+          from io import BytesIO
+          urls=[
+            "https://www.nme.com/reviews/album/victoria-monet-frequency-of-love-review-3972142",
+            "https://variety.com/2026/music/news/victoria-monet-frequency-of-love-vocal-issues-motherhood-1236897279/"
+          ]
+          candidates=[]
+          for page in urls:
+              try:
+                  r=requests.get(page,headers={"User-Agent":"Mozilla/5.0"},timeout=30)
+                  print("PAGE",page,"STATUS",r.status_code)
+                  soup=BeautifulSoup(r.text,"html.parser")
+                  for key in [("property","og:image"),("name","twitter:image")]:
+                      tag=soup.find("meta",attrs={key[0]:key[1]})
+                      if tag and tag.get("content"):
+                          candidates.append((page,tag["content"]))
+              except Exception as e:
+                  print("PAGE_ERROR",page,repr(e))
+          seen=set()
+          for page,url in candidates:
+              if url in seen: continue
+              seen.add(url)
+              try:
+                  rr=requests.get(url,headers={"User-Agent":"Mozilla/5.0","Referer":page},timeout=40)
+                  rr.raise_for_status()
+                  im=Image.open(BytesIO(rr.content)).convert("RGB")
+                  print("CANDIDATE",page,url,im.size,len(rr.content))
+                  # Require a real editorial-size image, not a thumbnail.
+                  if im.width < 1600 or im.height < 1000:
+                      continue
+                  # Preserve full frame, only resize for site storage.
+                  maxw=2600
+                  if im.width>maxw:
+                      h=round(im.height*maxw/im.width)
+                      im=im.resize((maxw,h),Image.Resampling.LANCZOS)
+                  im.save(os.environ["DEST"],"JPEG",quality=88,optimize=True,progressive=True)
+                  print("SELECTED",url,"SAVED",im.size,os.path.getsize(os.environ["DEST"]))
+                  open("/tmp/source-url.txt","w").write(url)
+                  break
+              except Exception as e:
+                  print("CANDIDATE_ERROR",url,repr(e))
+          else:
+              raise SystemExit("NO_SUITABLE_PORTRAIT")
+          PY
+      - name: Commit portrait only
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "music98-bot"
+          git config user.email "music98-bot@users.noreply.github.com"
+          git add "$DEST"
+          git commit -m "Add text-free Victoria Monet portrait by MAR+VIN"
+          git push
