@@ -15,6 +15,8 @@ COMMANDS
   about "<words>" <url>...    same, but ranked against the words you care about
   register <token> "<fact>"   add a date to gate.py VERIFIED_DATES
   create --file POST.json     create a new draft only after editorial + gate + preflight
+  replace-draft <id> --file POST.json
+                              replace one existing draft after pre/post read + gate + preflight
   set <id> --body-file F      guarded desk write, status untouched
   slot <id> [--at ISO] [--date YYYY-MM-DD]
                               move the publication slot (publishAt + date together)
@@ -408,6 +410,76 @@ def cmd_create(post_file, allows=None, reason=None):
     return now
 
 
+def cmd_replace_draft(pid, post_file, allows=None, reason=None):
+    path=Path(post_file)
+    data=json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(data,dict) and isinstance(data.get("posts"),list):
+        matches=[x for x in data["posts"] if str(x.get("id"))==pid]
+        if len(matches)!=1:
+            die("replace-draft file must contain exactly one matching post")
+        staged=matches[0]
+    else:
+        staged=data
+    if not isinstance(staged,dict) or str(staged.get("id"))!=pid:
+        die("replace-draft file has wrong post id")
+    if staged.get("status")!="draft":
+        die("replace-draft accepts draft status only")
+    body=(staged.get("body") or "").strip()
+    excerpt=(staged.get("excerpt") or "").strip()
+    if not body or not excerpt or not body.startswith(excerpt):
+        die("replace-draft needs non-empty body and literal-prefix excerpt")
+
+    current=find_post(desk_read()["posts"],pid)
+    if current.get("status")!="draft":
+        die("replace-draft refuses non-draft current post")
+
+    # Require PRE-EDIT stamp on exact current desk body.
+    pre_ok,pre_lines=run_editorial(pid,check_stamp=True,phase="pre-edit")
+    if not pre_ok:
+        print("replace-draft REFUSED - pre-edit full-read stamp missing or stale:")
+        for line in pre_lines: print("  "+line)
+        raise SystemExit(1)
+
+    # Require POST-EDIT stamp on exact staged full-post body and verify its pre
+    # stamp against the current desk source.
+    cmd=[sys.executable,str(READTHROUGH),"--post",pid,"--file",str(path),
+         "--phase","post-edit","--check-stamp"]
+    r=subprocess.run(cmd,capture_output=True,text=True,encoding="utf-8",errors="replace",cwd=str(REPO))
+    out=(r.stdout or "")+(r.stderr or "")
+    for line in out.splitlines():
+        if line.strip(): print(line.rstrip())
+    if r.returncode!=0:
+        die("replace-draft refused: final full-read stamp missing or stale")
+
+    if not _local_gate(staged):
+        die("replace-draft failed gate before desk write")
+    if not _local_preflight(staged):
+        die("replace-draft failed preflight before desk write")
+
+    allowed_fields={"type","tag","rtype","artist","title","excerpt","body","cover","date","pinned","status"}
+    unknown=[k for k in staged if k not in allowed_fields and k not in current]
+    if unknown:
+        die("replace-draft contains unsupported fields: %s" % unknown)
+
+    def mutate(posts):
+        p=find_post(posts,pid)
+        if p.get("status")!="draft":
+            raise RuntimeError("target stopped being a draft")
+        for key in allowed_fields:
+            if key in staged:
+                p[key]=staged[key]
+        return p
+
+    now=guarded_write(mutate)
+    for field in ("id","type","title","excerpt","body","status","artist","cover"):
+        want=staged.get(field,current.get(field))
+        if now.get(field)!=want:
+            die("replace-draft post-save mismatch: %s" % field)
+    print("replace   ok: %s status=draft words=%d media=%d" %
+          (pid,words(now.get("body") or ""),len(MEDIA_RE.findall(now.get("body") or ""))))
+    return now
+
+
 def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
     require_editorial_stamp(pid, body_file=body_file, title=title)
     body = Path(body_file).read_text(encoding="utf-8").strip()
@@ -687,6 +759,12 @@ def main():
     sp.add_argument("--allow", action="append", choices=["technical-credit","physical-format","source-attribution","single-sentence"])
     sp.add_argument("--reason")
 
+    sp = sub.add_parser("replace-draft")
+    sp.add_argument("id")
+    sp.add_argument("--file", required=True)
+    sp.add_argument("--allow", action="append", choices=["technical-credit","physical-format","source-attribution","single-sentence"])
+    sp.add_argument("--reason")
+
     sp = sub.add_parser("set")
     sp.add_argument("id")
     sp.add_argument("--body-file", required=True)
@@ -722,6 +800,8 @@ def main():
         cmd_register(a.token, a.fact)
     elif a.cmd == "create":
         cmd_create(a.file, a.allow, a.reason)
+    elif a.cmd == "replace-draft":
+        cmd_replace_draft(a.id, a.file, a.allow, a.reason)
     elif a.cmd == "set":
         cmd_set(a.id, a.body_file, a.title, a.excerpt, a.publish)
     elif a.cmd == "gate":
