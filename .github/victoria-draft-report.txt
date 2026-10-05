@@ -1,0 +1,16 @@
+POST=auvictoriafol26r1
+GATE_CODE=1
+   --  length           511 words in the body (510 in prose), 8 paragraphs
+   !   simile           'like a': That wider definition helps explain why a song with her daughter Hazel Monét can sit alongside flirtation, regret and club music w
+   !   abstract-density 3 abstract nouns (education, foundation, frequency): The release also launches the Frequency Of Love Foundation, a youth initiative centered on food, agriculture, culinary e
+   !   tautology        'album' repeats 2 times in one sentence: The album arrived October 2 and is her first full-length since *JAGUAR II*, which won Best R&B Album while Monét took Best New Art
+   !   quote-title      short quote next to a title cue: "That's Why I Love You"
+   !   quote-title      short quote next to a title cue: 'See You In My Dreams'
+   X   register-term    'initiative' - say the plan: …ase also launches the Frequency Of Love Foundation, a youth initiative centered on food, agriculture, culinary education…
+FAIL - fix the X lines, then run again
+
+GATE: FAIL - fix the X lines first
+PREFLIGHT_CODE=0
+POST=auvictoriafol26r1 STATUS=draft WORDS=514 MEDIA=1
+WARN finale may be thin
+PREFLIGHT: PASS
