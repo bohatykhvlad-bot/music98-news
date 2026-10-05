@@ -37,7 +37,7 @@ def check(post, baseline, expected_media, min_words):
     if post.get("status") != "draft": failures.append("article is not a draft")
     if not title or ":" in title: failures.append("missing title or forbidden colon")
     if not excerpt or not body.startswith(excerpt): failures.append("excerpt must begin the actual article verbatim")
-    elif not excerpt.endswith((".", "!", "?")): failures.append("excerpt must end at a full sentence")
+    elif not re.search(r'[.!?](?:["\u2019\u201d])?$\', excerpt): failures.append("excerpt must end at a full sentence")
     elif len(excerpt) < 85 or len(excerpt) > 170: warnings.append("excerpt length is outside preferred range")
     if expected_media is not None and len(media) != expected_media:
         failures.append(f"expected {expected_media} media, found {len(media)}")
