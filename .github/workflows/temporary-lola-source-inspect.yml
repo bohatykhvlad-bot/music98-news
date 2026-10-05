@@ -54,3 +54,4 @@ jobs:
             /tmp/lola-press.jpg
             /tmp/lola-chuff-raw.jpg
           if-no-files-found: error
+# retrigger raw press inspection
