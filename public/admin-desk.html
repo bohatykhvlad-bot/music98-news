@@ -254,16 +254,14 @@ a{color:var(--text)}
 .composer .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#000}
 .composer .yembed.tk{max-width:340px}
 .composer .yembed.tk .ytbox{aspect-ratio:9/16;height:auto;padding-bottom:0;background:#fff}
-.composer .yembed.tk iframe{opacity:0}
-.composer .yembed.tk.is-ready iframe{opacity:1}
 .composer .yembed.tk.is-failed iframe{display:none}
-.composer .tk-state{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;padding:20px;background:#fff;color:var(--text);text-align:center}
-.composer .yembed.tk.is-ready .tk-state{display:none}
-.composer .tk-fallback{display:none;flex-direction:column;align-items:center;gap:12px;max-width:250px;font-size:12px;line-height:1.4}
-.composer .yembed.tk.is-failed .tk-loading{display:none}
-.composer .yembed.tk.is-failed .tk-fallback{display:flex}
+.composer .tk-state{display:none;position:absolute;inset:0;z-index:2;align-items:center;justify-content:center;padding:20px;background:#fff;color:var(--text);text-align:center}
+.composer .yembed.tk.is-failed .tk-state{display:flex}
+.composer .tk-fallback{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:250px;font-size:12px;line-height:1.4}
 .composer .tk-actions{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-.composer .tk-retry,.composer .tk-open{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--text);font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+.composer .tk-retry,.composer .tk-open{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 11px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--text);font:inherit;font-weight:600;text-decoration:none;cursor:pointer;transform:none;transition:background .16s ease,border-color .16s ease,color .16s ease}
+.composer .tk-retry:active,.composer .tk-open:active{transform:none}
+@media (hover:hover) and (pointer:fine){.composer .tk-retry:hover,.composer .tk-open:hover{background:var(--accent);border-color:var(--accent);color:#03282b}}
 .composer .yembed.ig{max-width:340px}
 .composer .yembed.ig .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(122% + 210px);background:#fff}
 .composer .yembed .pcred{margin:8px 2px 0;font-size:11px}
@@ -896,37 +894,26 @@ function tiktokOpenUrl(id, creditUrl){
 function tiktokBlock(id, credit, creditUrl){
   credit = credit||""; creditUrl = creditUrl||"";
   const src = tiktokSrc(id), open = tiktokOpenUrl(id, creditUrl);
-  return `<figure class="blk yembed tk" contenteditable="false" data-tiktok="${esc(id)}" data-tiktok-src="${esc(src)}" data-pauthor="${esc(credit)}" data-plink="${esc(creditUrl)}">${blkChrome()}<div class="ytbox"><iframe src="${esc(src)}" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe><div class="tk-state" aria-live="polite"><span class="tk-loading">Loading TikTok…</span><div class="tk-fallback"><span>TikTok is temporarily unavailable.</span><span class="tk-actions"><button class="tk-retry" type="button">Retry</button><a class="tk-open" href="${esc(open)}" target="_blank" rel="noopener noreferrer">Open on TikTok</a></span></div></div></div>${vcredPanel(credit, creditUrl)}${videoCredFor("Video","TikTok",credit,creditUrl)}</figure>`;
+  return `<figure class="blk yembed tk" contenteditable="false" data-tiktok="${esc(id)}" data-tiktok-src="${esc(src)}" data-pauthor="${esc(credit)}" data-plink="${esc(creditUrl)}">${blkChrome()}<div class="ytbox"><iframe src="${esc(src)}" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe><div class="tk-state" aria-live="polite"><div class="tk-fallback"><span>TikTok couldn't be loaded.</span><span class="tk-actions"><button class="tk-retry" type="button">Retry</button><a class="tk-open" href="${esc(open)}" target="_blank" rel="noopener noreferrer">Open on TikTok</a></span></div></div></div>${vcredPanel(credit, creditUrl)}${videoCredFor("Video","TikTok",credit,creditUrl)}</figure>`;
 }
 function tiktokSetFailed(box){
   if(!box) return;
-  clearTimeout(box._tkTimer);
-  box.classList.remove("is-ready");
   box.classList.add("is-failed");
 }
 function tiktokSetReady(box){
   if(!box) return;
-  clearTimeout(box._tkTimer);
   box.classList.remove("is-failed");
-  box.classList.add("is-ready");
 }
 function bindTikTokPlayer(box){
   if(!box || box._tkBound) return;
   const frame = box.querySelector("iframe");
   if(!frame) return;
   box._tkBound = true;
-  const armTimeout = ()=>{
-    clearTimeout(box._tkTimer);
-    if(box.classList.contains("is-ready")) return;
-    box._tkTimer = setTimeout(()=>{ if(!box.classList.contains("is-ready")) tiktokSetFailed(box); }, 12000);
-  };
-  frame.addEventListener("load", armTimeout);
   const retry = box.querySelector(".tk-retry");
   if(retry) retry.addEventListener("click", event=>{
     event.preventDefault();
     event.stopPropagation();
-    clearTimeout(box._tkTimer);
-    box.classList.remove("is-ready","is-failed");
+    box.classList.remove("is-failed");
     const src = box.dataset.tiktokSrc || tiktokSrc(box.dataset.tiktok||"");
     frame.src = "about:blank";
     setTimeout(()=>{ frame.src = src; }, 40);
