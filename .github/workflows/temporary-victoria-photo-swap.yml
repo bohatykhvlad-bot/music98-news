@@ -72,12 +72,25 @@ jobs:
           else:
               raise SystemExit("NO_SUITABLE_PORTRAIT")
           PY
-      - name: Commit portrait only
+      - name: Create visual QA preview and commit
         shell: bash
         run: |
           set -euo pipefail
+          python - <<'PY'
+          from PIL import Image
+          import base64, os
+          p=os.environ["DEST"]
+          im=Image.open(p).convert("RGB")
+          im.thumbnail((900,900),Image.Resampling.LANCZOS)
+          im.save("/tmp/victoria-preview.jpg","JPEG",quality=85,optimize=True)
+          open(".github/victoria-photo-preview.b64","w").write(base64.b64encode(open("/tmp/victoria-preview.jpg","rb").read()).decode())
+          PY
           git config user.name "music98-bot"
           git config user.email "music98-bot@users.noreply.github.com"
-          git add "$DEST"
-          git commit -m "Add text-free Victoria Monet portrait by MAR+VIN"
-          git push
+          git add "$DEST" .github/victoria-photo-preview.b64
+          if git diff --cached --quiet; then
+            echo "NO_IMAGE_CHANGES"
+          else
+            git commit -m "Add Victoria Monet MAR+VIN portrait preview"
+            git push
+          fi
