@@ -4,6 +4,7 @@ import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
 import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,completeDailySources} from "../functions/lib/daily-chart-sources.js";
 
 const OUT = new URL("../public/data/chart-tenure-backup.json", import.meta.url);
+const DAILY_OUT = new URL("../public/data/daily-top50-backup.json", import.meta.url);
 const liveUrl = "https://music98.news/api/top50?tenureSnapshot=" + Date.now();
 const r = await fetch(liveUrl, {
   headers: {
@@ -102,6 +103,8 @@ if (current && current.updated === snapshot.updated) {
 }
 backup.schema = 1;
 fs.writeFileSync(OUT, JSON.stringify(backup, null, 2) + "\n");
+// The same audited edition, with its Apple media, survives a reset of Worker KV.
+fs.writeFileSync(DAILY_OUT, JSON.stringify(j, null, 2) + "\n");
 console.log("TENURE_SNAPSHOT_SAVED", JSON.stringify({
   updated:snapshot.updated,
   week:snapshot.week,

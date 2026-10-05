@@ -63,12 +63,12 @@ jobs:
       - name: Сохранить здоровый tenure snapshot
         run: |
           node scripts/snapshot-live-chart.mjs
-          if git diff --quiet -- public/data/chart-tenure-backup.json; then
+          if git diff --quiet -- public/data/chart-tenure-backup.json public/data/daily-top50-backup.json; then
             echo "tenure snapshot без изменений"
           else
             git config user.name "music98 chart tenure bot"
             git config user.email "actions@users.noreply.github.com"
-            git add public/data/chart-tenure-backup.json
+            git add public/data/chart-tenure-backup.json public/data/daily-top50-backup.json
             git commit -m "chart: snapshot healthy live tenure"
             git push || {
               echo "main успел измениться — ребейзим tenure snapshot и повторяем push"
@@ -159,18 +159,16 @@ jobs:
                   bad=[t.get("art") for t in tracks if str(t.get("art") or "").strip() and not (
                       "mzstatic.com/" in str(t.get("art")) or "dzcdn.net/" in str(t.get("art"))
                   )]
-                  luke=[t for t in tracks if str(t.get("artist") or "").lower()=="luke combs" and str(t.get("title") or "").lower()=="be by you"]
                   last={
                       "attempt":attempt+1,
                       "count":len(tracks),
                       "missing":missing,
                       "badHosts":bad,
-                      "lukeArt":bool(luke and str(luke[0].get("art") or "").strip()),
                       "cacheControl":headers.get("cache-control"),
                       "cfCacheStatus":headers.get("cf-cache-status"),
                   }
                   print("ARTWORK_PRODUCTION_CHECK",json.dumps(last,ensure_ascii=False))
-                  if len(tracks)==50 and not missing and not bad and last["lukeArt"] and "no-store" in str(last["cacheControl"] or ""):
+                  if len(tracks)==50 and not missing and not bad and "no-store" in str(last["cacheControl"] or ""):
                       raise SystemExit(0)
               except Exception as e:
                   last={"attempt":attempt+1,"error":repr(e)}

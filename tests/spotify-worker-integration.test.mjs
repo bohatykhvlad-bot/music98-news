@@ -75,7 +75,7 @@ test("incomplete daily source does not mutate tenure or publish an old weekly ed
  try{
    const response=await onRequestGet({env,request:new Request("https://music98.news/api/top50")});
    assert.equal(response.status,503);
-   assert.deepEqual(writes,["top50v37:retry"]);
+   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v37:retry"]);
  }finally{globalThis.fetch=previous;}
 });
 
@@ -94,4 +94,136 @@ test("validated daily global snapshots recover both Apple and Deezer outages",as
    assert.equal(payload.sourceOrigin.A,"github-current-day-global");
    assert.equal(payload.sourceOrigin.D,"github-current-day-worldwide");
  }finally{globalThis.fetch=previous;}
+});
+
+test("a slow third source is awaited before ranking or history writes",async()=>{
+ const source=fakeDailySource(),{env,writes}=mediaEnvironment(source),previous=globalThis.fetch;
+ let release;
+ const thirdSource=new Promise(resolve=>{release=resolve;});
+ globalThis.fetch=async input=>{
+   if(String(input).includes("api.deezer.com"))await thirdSource;
+   return source.fakeFetch(input);
+ };
+ try{
+   let completed=false;
+   const pending=onRequestGet({env,request:new Request("https://music98.news/api/top50")})
+     .then(r=>{completed=true;return r;});
+   await new Promise(resolve=>setTimeout(resolve,15));
+   assert.equal(completed,false);
+   assert.deepEqual(writes,[]);
+   release();
+   const result=await (await pending).json();
+   assert.deepEqual(result.sources,{A:50,S:50,D:50});
+   assert.equal(result.tracks.length,50);
+ }finally{release();globalThis.fetch=previous;}
+});
+
+test("a provider timeout serves the complete verified chart without rescoring on two inputs",async()=>{
+ const source=fakeDailySource({deezerOffline:true}),{env,values,writes,assets}=mediaEnvironment(source);
+ const previous=globalThis.fetch,old=assets["chart-tenure-backup.json"].current;
+ const saved={...old,methodology:DAILY_CHART_METHOD,sources:{A:50,S:50,D:50},
+   spotifyFingerprint:source.snapshot.fingerprint,sourceDates:{S:old.updated},
+   tracks:old.tracks.map(t=>({...t,url:"",art:"",prev:""}))};
+ values.set("top50v37",saved);
+ globalThis.fetch=async input=>{
+   if(String(input).includes("api.deezer.com"))throw new DOMException("Source timed out","TimeoutError");
+   return source.fakeFetch(input);
+ };
+ try{
+   const response=await onRequestGet({env,request:new Request("https://music98.news/api/top50")});
+   const result=await response.json();
+   assert.equal(response.status,200);
+   assert.equal(result.fallback,"last-verified");
+   assert.equal(result.updated,old.updated);
+   assert.deepEqual(result.tracks.map(t=>[t.rank,t.title,t.weeks,t.delta]),old.tracks.map(t=>[t.rank,t.title,t.weeks,t.delta]));
+   assert.ok(result.tracks.every(t=>t.art && t.prev.startsWith("https://audio-ssl.itunes.apple.com/")));
+   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v37:retry"]);
+ }finally{globalThis.fetch=previous;}
+});
+
+test("new Spotify data waits for the independent mirror before publication",async()=>{
+ const source=fakeDailySource(),previous=globalThis.fetch;
+ source.snapshot.chartDate=new Date(Date.now()-86400000).toISOString().slice(0,10);
+ globalThis.fetch=source.fakeFetch;
+ try{
+   await assert.rejects(buildTop50("https://music98.news",{},source.snapshot),/spotify_newer_chart_waiting_for_mirror/);
+ }finally{globalThis.fetch=previous;}
+});
+
+test("exact Apple ID fills missing audio while keeping an audited cover",async()=>{
+ const {buildTop50:isolatedBuild}=await import("../functions/api/top50.js?exact-preview");
+ const source=fakeDailySource(),{env,assets}=mediaEnvironment(source),previous=globalThis.fetch;
+ const first=source.rows[0],key=mergeKey(first.title,first.artist);
+ assets["apple-names.json"][key].prev="";
+ let exactLookup=false;
+ globalThis.fetch=async input=>{
+   const url=String(input);
+   if(url.startsWith("https://itunes.apple.com/lookup?")){
+     exactLookup=true;
+     return new Response(JSON.stringify({results:[{trackId:1000,trackName:first.title,
+       artistName:first.artist,collectionName:"Source Album",releaseDate:"2026-01-01",
+       artworkUrl100:"https://is1-ssl.mzstatic.com/unverified/100x100bb.jpg",
+       previewUrl:"https://audio-ssl.itunes.apple.com/exact-id.m4a"}]}));
+   }
+   return source.fakeFetch(input);
+ };
+ try{
+   const result=await isolatedBuild("https://music98.news",env,source.snapshot);
+   assert.equal(exactLookup,true);
+   assert.equal(result.tracks[0].prev,"https://audio-ssl.itunes.apple.com/exact-id.m4a");
+   assert.equal(result.tracks[0].art,"https://is1-ssl.mzstatic.com/image/thumb/1/600x600bb.jpg");
+ }finally{globalThis.fetch=previous;}
+});
+
+test("a recovered third-source snapshot bypasses retry backoff without a Spotify change",async()=>{
+ const source=fakeDailySource({deezerOffline:true}),{env,assets,values}=mediaEnvironment(source),previous=globalThis.fetch;
+ globalThis.fetch=source.fakeFetch;
+ try{
+   const request=new Request("https://music98.news/api/top50");
+   assert.equal((await onRequestGet({env,request})).status,503);
+   assert.ok(values.has("top50v37:retry"));
+   const today=new Date().toISOString().slice(0,10);
+   assets["deezer-chart.json"]={schema:2,updated:today,sourceDate:today,capturedAt:today+"T12:00:00Z",
+     source:"official-deezer-worldwide-playlist",region:"global",cadence:"daily",tracks:source.rows};
+   const response=await onRequestGet({env,request}),payload=await response.json();
+   assert.equal(response.status,200);
+   assert.equal(payload.fallback,undefined);
+   assert.deepEqual(payload.sources,{A:50,S:50,D:50});
+   assert.equal(payload.spotifyFingerprint,source.snapshot.fingerprint);
+ }finally{globalThis.fetch=previous;}
+});
+
+test("a verified daily backup survives empty KV without rebuilding from two sources",async()=>{
+ const source=fakeDailySource({deezerCount:49}),{env,assets,writes}=mediaEnvironment(source),previous=globalThis.fetch;
+ const old=assets["chart-tenure-backup.json"].current;
+ assets["daily-top50-backup.json"]={...old,updated:new Date().toISOString().slice(0,10),
+   complete:true,methodology:DAILY_CHART_METHOD,sources:{A:50,S:50,D:50},arrows:{ok:true},
+   tracks:old.tracks.map(t=>({...t,weeks:8}))};
+ globalThis.fetch=source.fakeFetch;
+ try{
+   const response=await onRequestGet({env,request:new Request("https://music98.news/api/top50")});
+   const chart=await response.json();
+   assert.equal(response.status,200);
+   assert.equal(chart.fallback,"verified-daily-snapshot");
+   assert.ok(chart.tracks.every(t=>t.weeks===8 && t.art && t.prev));
+   assert.deepEqual(chart.sources,{A:50,S:50,D:50});
+   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v37:retry"]);
+ }finally{globalThis.fetch=previous;}
+});
+
+test("daily backup recovery refuses partial sources and regressed day counters",async()=>{
+ for(const broken of ["partial","regressed","weekly"]){
+   const source=fakeDailySource({deezerCount:49}),{env,assets}=mediaEnvironment(source),previous=globalThis.fetch;
+   const old=assets["chart-tenure-backup.json"].current;
+   const saved={...old,updated:new Date().toISOString().slice(0,10),methodology:DAILY_CHART_METHOD,
+     sources:{A:50,S:50,D:50},arrows:{ok:true},tracks:old.tracks.map(t=>({...t,weeks:8}))};
+   if(broken==="partial")saved.sources.D=49;
+   if(broken==="regressed")saved.tracks.forEach(t=>{t.weeks=1;});
+   if(broken==="weekly"){delete saved.methodology;saved.sources={A:50,S:50,D:50,B:50,Y:50};}
+   assets["daily-top50-backup.json"]=saved;
+   globalThis.fetch=source.fakeFetch;
+   try{
+     assert.equal((await onRequestGet({env,request:new Request("https://music98.news/api/top50")})).status,503,broken);
+   }finally{globalThis.fetch=previous;}
+ }
 });

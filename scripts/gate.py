@@ -140,6 +140,9 @@ REFERENT = re.compile(
 # The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
+    "october 7": "Lola Young Everything Begins Tour artist presales begin 07.10.2026 (Pollstar 05.10.2026; official tour announcement).",
+    "april 6": "Lola Young Everything Begins Tour opens at The Pinnacle in Nashville on 06.04.2027 (Pollstar 05.10.2026).",
+    "may 4": "Lola Young Everything Begins Tour closes at the Greek Theatre in Los Angeles on 04.05.2027 (Pollstar 05.10.2026).",
     "may 2026": "Victoria Monét graduated from the Institute of Culinary Education in May 2026 (Sony Music Canada 02.10.2026; Los Angeles Times 02.10.2026).",
     "october 27": "Victoria Monét's Frequency Of Love Tour opens in Raleigh on 27.10.2026 (Sony Music Canada 02.10.2026; victoriamonet.co).",
     "december 17": "Victoria Monét's Frequency Of Love Tour closes its announced 2026 North American run in San Francisco on 17.12.2026 (Sony Music Canada 02.10.2026).",

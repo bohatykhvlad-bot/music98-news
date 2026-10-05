@@ -1,5 +1,8 @@
 name: music98 editorial check
 on:
+  push:
+    paths:
+      - .github/rebuild-draft-spec.json
   workflow_dispatch:
     inputs:
       post_id:
@@ -25,6 +28,22 @@ jobs:
           test -n "$ADMIN_PASSWORD"
           printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
       - name: Validate the requested post
+        if: github.event_name == 'workflow_dispatch'
         env:
           POST_ID: ${{ inputs.post_id }}
         run: python scripts/post.py gate "$POST_ID"
+      - name: Rebuild one draft through full canonical pipeline
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          POST_ID="$(python -c 'import json; print(json.load(open(".github/rebuild-draft-spec.json"))["id"])')"
+          ALLOW="$(python -c 'import json; print(json.load(open(".github/rebuild-draft-spec.json")).get("allow",""))')"
+          REASON="$(python -c 'import json; print(json.load(open(".github/rebuild-draft-spec.json")).get("reason",""))')"
+          python scripts/post.py editorial "$POST_ID" --phase pre-edit
+          args=()
+          if [ -n "$ALLOW" ]; then args+=(--allow "$ALLOW"); fi
+          if [ -n "$REASON" ]; then args+=(--reason "$REASON"); fi
+          python scripts/editorial_readthrough.py --post "$POST_ID" --file .github/rebuild-draft-spec.json --phase post-edit --confirm-full-read "${args[@]}"
+          python scripts/post.py replace-draft "$POST_ID" --file .github/rebuild-draft-spec.json "${args[@]}"
+          python scripts/post.py gate "$POST_ID"
+          python scripts/post.py preflight "$POST_ID"

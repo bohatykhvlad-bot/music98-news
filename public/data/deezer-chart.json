@@ -1,0 +1,463 @@
+{
+  "schema": 2,
+  "updated": "2026-10-05",
+  "capturedAt": "2026-10-05T23:39:06.943Z",
+  "sourceDate": "2026-10-05",
+  "dateKind": "capture",
+  "source": "official-deezer-worldwide-playlist",
+  "region": "global",
+  "cadence": "daily",
+  "sourceUrl": "https://api.deezer.com/playlist/3155776842",
+  "tracks": [
+    {
+      "pos": 1,
+      "title": "Boston",
+      "artist": "STELLA LEFTY",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 2,
+      "title": "Choosin' Texas",
+      "artist": "Ella Langley",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 3,
+      "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
+      "artist": "Taylor Swift",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 4,
+      "title": "Be Her",
+      "artist": "Ella Langley",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 5,
+      "title": "BbY WOW",
+      "artist": "KAROL G",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 6,
+      "title": "Dracula (with JENNIE)",
+      "artist": "Tame Impala",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 7,
+      "title": "Man I Need",
+      "artist": "Olivia Dean",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 8,
+      "title": "hate that i made you love me",
+      "artist": "Ariana Grande",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 9,
+      "title": "Midnight Sun",
+      "artist": "Zara Larsson",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 10,
+      "title": "drop dead",
+      "artist": "Olivia Rodrigo",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 11,
+      "title": "So Easy (To Fall In Love)",
+      "artist": "Olivia Dean",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 12,
+      "title": "stupid song",
+      "artist": "Olivia Rodrigo",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 13,
+      "title": "Mexico Honey",
+      "artist": "Kacey Musgraves",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 14,
+      "title": "Been By Now",
+      "artist": "Morgan Wallen",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 15,
+      "title": "Jaded",
+      "artist": "Koe Wetzel",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 16,
+      "title": "Medicine",
+      "artist": "Megan Moroney",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 17,
+      "title": "Don't We",
+      "artist": "Morgan Wallen",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 18,
+      "title": "Cowgirl",
+      "artist": "Shaboozey",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 19,
+      "title": "Woman",
+      "artist": "Kane Brown",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 20,
+      "title": "Be By You",
+      "artist": "Luke Combs",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 21,
+      "title": "Think As You Drunk",
+      "artist": "Riley Green",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 22,
+      "title": "Empty Words",
+      "artist": "Corey Kent",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 23,
+      "title": "Kid Myself",
+      "artist": "John Morgan",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 24,
+      "title": "Overrated",
+      "artist": "Warren Zeiders",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 25,
+      "title": "All My Exes",
+      "artist": "Lauren Alaina",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 26,
+      "title": "Something To Lose",
+      "artist": "STELLA LEFTY",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 27,
+      "title": "McArthur",
+      "artist": "HARDY",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 28,
+      "title": "Take Me Back (Leave Me There)",
+      "artist": "Cody Johnson",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 29,
+      "title": "Phone, Keys, Wallet",
+      "artist": "Lainey Wilson",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 30,
+      "title": "Loving Life Again",
+      "artist": "Ella Langley",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 31,
+      "title": "Rethink Some Things",
+      "artist": "Luke Combs",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 32,
+      "title": "Carry On",
+      "artist": "Kenny Chesney",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 33,
+      "title": "Good News",
+      "artist": "Shaboozey",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 34,
+      "title": "I Can't Love You Anymore",
+      "artist": "Ella Langley",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 35,
+      "title": "BIRDS OF A FEATHER",
+      "artist": "Billie Eilish",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 36,
+      "title": "Country And She Knows It",
+      "artist": "Luke Bryan",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 37,
+      "title": "Better Me For You (Brown Eyes)",
+      "artist": "Max McNown",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 38,
+      "title": "Manchild",
+      "artist": "Sabrina Carpenter",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 39,
+      "title": "Dai Dai",
+      "artist": "Shakira",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 40,
+      "title": "Another Drink",
+      "artist": "Marshmello",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 41,
+      "title": "Days Like These",
+      "artist": "Luke Combs",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 42,
+      "title": "Love Me Not",
+      "artist": "Ravyn Lenae",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 43,
+      "title": "My Love Mine All Mine",
+      "artist": "Mitski",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 44,
+      "title": "The Fate of Ophelia",
+      "artist": "Taylor Swift",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 45,
+      "title": "MUTT",
+      "artist": "Leon Thomas",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 46,
+      "title": "Anxiety",
+      "artist": "Doechii",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 47,
+      "title": "A Bar Song (Tipsy)",
+      "artist": "Shaboozey",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 48,
+      "title": "Die With A Smile",
+      "artist": "Lady Gaga",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 49,
+      "title": "MORNING DEW (DONK)",
+      "artist": "Beyoncé",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 50,
+      "title": "Livin' On A Prayer",
+      "artist": "Bon Jovi",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    }
+  ]
+}

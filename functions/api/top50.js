@@ -135,8 +135,9 @@ async function applyCovers(env, tracks, origin) {
   }
   return tracks;
 }
-/* Остальные обложки добираем одним batch-запросом Apple по track id из ссылки:
-   это ровно тот релиз, который мы показываем и на который ведёт кнопка. */
+/* Missing artwork or audio is resolved by exact Apple track ID. A new global
+   playlist row can have artwork before it appears in the title-search index.
+   Existing audited artwork must never be replaced while filling its preview. */
 function applyAppleCanonicalIdentity(track, title, artist) {
   const nextTitle = String(title || track.title || "").trim();
   const nextArtist = String(artist || track.artist || "").trim();
@@ -150,7 +151,7 @@ function applyAppleCanonicalIdentity(track, title, artist) {
 async function enrichArtByIds(tracks, stats) {
   const want = [];
   for (const t of tracks) {
-    if (t.art) continue;
+    if (t.art && isApplePreview(t.prev)) continue;
     const m = String(t.url || "").match(/[?&]i=(\d+)/);
     if (m) want.push([t, m[1]]);
   }
@@ -174,7 +175,7 @@ async function enrichArtByIds(tracks, stats) {
     if (!item || !appleCandidateCompatible(t.title, t.artist, item)) continue;
     if (!applyAppleCanonicalIdentity(t, item.trackName, item.artistName)) continue;
     const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
-    if (art && isAppleArt(art)) {
+    if (!t.art && art && isAppleArt(art)) {
       t.art = art;
       if (stats) stats.filled += 1;
     }
@@ -969,14 +970,23 @@ async function decorateCachedTop50(env, payload, origin) {
    immutable 17 September launch chart and silently label it as current. */
 async function bestVerifiedFallback(env, origin, backup) {
   const good = await lastGood(env, backup);
+  // Full verified daily edition supports an empty/reset KV on first deployment.
+  // Keep legacy tenure snapshots for history recovery without relabelling them.
+  let daily = null;
+  try {
+    const saved = await readSeed(env, origin, "daily-top50-backup.json");
+    if (verifiedSourceSnapshot(saved) && saved.arrows?.ok === true &&
+        !cachedTenureRegressed(saved, backup)) daily = saved;
+  } catch {}
+  const healthy = good && (!daily || String(good.updated) >= String(daily.updated)) ? good : daily;
   const savedDay = backup && backup.current && backup.current.updated || "";
-  if (good && String(good.updated) >= savedDay)
-    return decorateCachedTop50(env, good, origin);
+  if (healthy && String(healthy.updated) >= savedDay)
+    return decorateCachedTop50(env, {...healthy,fallback:healthy === good ? "last-verified" : "verified-daily-snapshot"}, origin);
   try {
     const saved = await verifiedBackupTop50(env, origin, backup);
     if (saved) return saved;
   } catch {}
-  return good ? decorateCachedTop50(env, good, origin) : null;
+  return healthy ? decorateCachedTop50(env, {...healthy,fallback:healthy === good ? "last-verified" : "verified-daily-snapshot"}, origin) : null;
 }
 
 async function fallbackOrUnavailable(env,origin,backup) {
@@ -989,27 +999,37 @@ async function fallbackOrUnavailable(env,origin,backup) {
 export async function onRequestGet({env,request}) {
   const today=new Date().toISOString().slice(0,10);
   const origin=new URL(request.url).origin;
-  const [backup,spotifySeed]=await Promise.all([
+  const [backup,spotifySeed,appleSeed,deezerSeed]=await Promise.all([
     readSeed(env,origin,"chart-tenure-backup.json"),
-    readSeed(env,origin,"spotify-chart.json")
+    readSeed(env,origin,"spotify-chart.json"),
+    readSeed(env,origin,"apple-chart.json"),
+    readSeed(env,origin,"deezer-chart.json")
   ]);
+  // A newly deployed source snapshot must unblock a failed refresh immediately,
+  // even when Spotify has not changed. Keep the existing retry delay otherwise.
+  const seedEdition=JSON.stringify([["A",appleSeed],["D",deezerSeed]].map(([id,raw])=>{
+    const seed=verifiedDailySeed(raw,id);
+    return seed ? [id,seed.capturedAt||seed.updated,seed.sourceDate] : [id,""];
+  }));
   const verified=verifiedSpotifySnapshot(spotifySeed);
   if(!verified)return fallbackOrUnavailable(env,origin,backup);
   if(env?.DESK)try{
     const cached=await env.DESK.get(TOP50_KV,{type:"json"});
     if(cached?.updated===today && verifiedSourceSnapshot(cached) &&
+       cached.seedEdition===seedEdition &&
        cached.sourceDates?.S===verified.date &&
        cached.spotifyFingerprint===verified.fingerprint &&
        !cachedTenureRegressed(cached,backup))
       return top50Response(await decorateCachedTop50(env, cached, origin));
     const retry=await env.DESK.get(TOP50_RETRY_KV,{type:"json"});
-    if(retry?.fingerprint===verified.fingerprint)
+    if(retry?.fingerprint===verified.fingerprint && retry.seedEdition===seedEdition)
       return fallbackOrUnavailable(env,origin,backup);
   }catch{}
   try{
     const payload=await withTimeout(buildTop50(origin,env,spotifySeed),14000);
     if(payload.complete!==true || !completeChartSources(payload.sources) ||
        payload.tracks?.length!==SIZE)throw new Error("incomplete_chart_sources");
+    payload.seedEdition=seedEdition;
     const memory={deferPersist:true};
     payload.tracks=await applyTenure(env,payload.tracks,memory,origin);
     payload.arrows=arrowCheck(payload.tracks);
@@ -1030,7 +1050,7 @@ export async function onRequestGet({env,request}) {
   }catch(err){
     if(env?.DESK)try{
       await env.DESK.put(TOP50_RETRY_KV,JSON.stringify({
-        failedAt:new Date().toISOString(),fingerprint:verified.fingerprint,
+        failedAt:new Date().toISOString(),fingerprint:verified.fingerprint,seedEdition,
         detail:String(err?.message||"unavailable").slice(0,160)
       }),{expirationTtl:1800});
     }catch{}
