@@ -6,13 +6,16 @@ This is intentionally different from gate.py and preflight.py.
 It looks for editorial failures that are easy to miss when a text is checked
 as facts + syntax instead of read as an article.
 
-A body is not allowed to be saved/published through scripts/post.py until:
-1) this script has been run on the exact current body,
-2) all hard findings are fixed or explicitly waived with a reason,
-3) --confirm-full-read was supplied after a complete top-to-bottom read,
-4) the resulting body hash still matches at set/publish time.
+Existing-text edits use two separate full-read barriers:
+1) PRE-EDIT: read the exact source top-to-bottom before changing anything.
+2) POST-EDIT: after the last change, read the exact final body top-to-bottom again.
 
-The stamp is local and content-hashed. Any body edit invalidates it.
+The pre-edit stamp proves the source was read before correction. It may contain
+editorial findings because those findings are what the edit is supposed to fix.
+The post-edit stamp is stricter: hard findings must be fixed or explicitly waived.
+
+Both stamps are local and content-hashed. Any source change invalidates PRE-EDIT.
+Any body edit invalidates POST-EDIT.
 """
 from __future__ import annotations
 
@@ -140,6 +143,21 @@ def inspect(post,allows):
         date_hits=MONTH_DATE.findall(p)
         if len(date_hits)>=4:
             fails.append(f"paragraph {idx}: calendar overload ({len(date_hits)} explicit dates)")
+        elif len(date_hits)>=3:
+            notes.append(f"paragraph {idx}: date-heavy paragraph ({len(date_hits)} explicit dates); confirm every date earns its place")
+
+        # Dense proper-name payloads often reveal research notes leaking into prose.
+        # This is heuristic, so 4+ multi-word capitalized names is a review note,
+        # while 6+ becomes a hard editorial failure.
+        name_hits=re.findall(r"(?<![.!?]\s)\b[A-Z][a-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Z][a-zÀ-ÖØ-öø-ÿ'’-]+)+\b",p)
+        unique_names=[]
+        for n in name_hits:
+            if n not in unique_names:
+                unique_names.append(n)
+        if len(unique_names)>=6:
+            fails.append(f"paragraph {idx}: name overload ({len(unique_names)} multi-word proper names); rewrite as narrative, not credits/list")
+        elif len(unique_names)>=4:
+            notes.append(f"paragraph {idx}: dense name payload ({len(unique_names)} multi-word proper names); reread for unnecessary names")
         if TECH_CREDIT.search(p) and "technical-credit" not in allows:
             fails.append(f"paragraph {idx}: technical production credit needs an explicit editorial reason")
         if PHYSICAL.search(p) and "physical-format" not in allows:
@@ -189,6 +207,7 @@ def main():
     ap.add_argument("--title",default="")
     ap.add_argument("--confirm-full-read",action="store_true")
     ap.add_argument("--check-stamp",action="store_true")
+    ap.add_argument("--phase",choices=("pre-edit","post-edit"),default="post-edit")
     ap.add_argument("--allow",action="append",default=[],choices=sorted(WAIVER_CHOICES))
     ap.add_argument("--reason",default="")
     a=ap.parse_args()
@@ -214,12 +233,13 @@ def main():
     body=post.get("body") or ""
     sha=body_hash(body)
     state=load_state()
+    phase_key=a.phase.replace("-","_")
     if a.check_stamp:
-        rec=state.get(a.post) or {}
+        rec=((state.get(a.post) or {}).get(phase_key) or {})
         ok=rec.get("sha256")==sha and rec.get("confirmed") is True
-        print(f"EDITORIAL_STAMP: {'PASS' if ok else 'FAIL'} sha={sha[:12]}")
+        print(f"EDITORIAL_{a.phase.upper().replace('-','_')}_STAMP: {'PASS' if ok else 'FAIL'} sha={sha[:12]}")
         if not ok:
-            print("FAIL full-read stamp is missing or stale; run editorial_readthrough.py --confirm-full-read on this exact body")
+            print(f"FAIL {a.phase} full-read stamp is missing or stale for this exact body")
         raise SystemExit(0 if ok else 1)
 
     allows=set(a.allow)
@@ -227,29 +247,41 @@ def main():
         print("FAIL waivers require --reason")
         raise SystemExit(1)
     fails,notes=inspect(post,allows)
-    print(f"POST={a.post} WORDS={words(body)} SHA={sha[:12]}")
+    print(f"POST={a.post} PHASE={a.phase} WORDS={words(body)} SHA={sha[:12]}")
     for n in notes: print("REVIEW",n)
-    for f in fails: print("FAIL",f)
-    if fails:
+    for f in fails:
+        print(("FINDING" if a.phase=="pre-edit" else "FAIL"),f)
+
+    # PRE-EDIT is allowed to discover defects. Its purpose is to prove that the
+    # entire source was read before editing, not to certify that the source is clean.
+    if a.phase=="post-edit" and fails:
         print("EDITORIAL_READTHROUGH: FAIL")
         raise SystemExit(1)
     if not a.confirm_full_read:
         print("FAIL full uninterrupted top-to-bottom read not attested")
-        print("READ CHECK: remove anything that is merely verified, repeated, scheduled, technical, store-like, or obvious.")
+        print("READ CHECK: read the complete body in order; do not review only the requested paragraph or diff.")
         print("EDITORIAL_READTHROUGH: FAIL")
         raise SystemExit(1)
 
-    state[a.post]={
+    post_state=state.setdefault(a.post,{})
+    post_state[phase_key]={
         "sha256":sha,
         "confirmed":True,
         "confirmedAt":datetime.now(timezone.utc).isoformat(),
         "source":source,
         "allows":sorted(allows),
         "reason":a.reason.strip(),
+        "findings":len(fails),
+        "reviewNotes":len(notes),
     }
     save_state(state)
-    print("EDITORIAL_READTHROUGH: PASS")
-    print("STAMP: written for exact body hash; any body edit invalidates it")
+    print(f"EDITORIAL_READTHROUGH: PASS ({a.phase})")
+    if a.phase=="pre-edit":
+        print("STAMP: source hash locked as read-before-edit; changing/reloading the source requires a new pre-edit read")
+        if fails:
+            print(f"ISSUE_MAP: {len(fails)} mechanical finding(s) detected; fix in context after the full read")
+    else:
+        print("STAMP: final body hash locked as fully reread; any body edit invalidates it")
 
 if __name__=="__main__":
     main()
