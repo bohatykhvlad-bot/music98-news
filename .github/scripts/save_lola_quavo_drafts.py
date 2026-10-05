@@ -6,6 +6,7 @@ import io
 import json
 import os
 import re
+import time
 import urllib.request
 
 from PIL import Image
@@ -24,14 +25,23 @@ QUAVO_BODY_SRC = "https://www.universalmusic.ca/wp-content/uploads/sites/1843/20
 
 
 def fetch_bytes(url: str):
-    req = urllib.request.Request(
-        url,
-        headers={"User-Agent": "Mozilla/5.0", "Accept": "image/avif,image/webp,image/*,*/*"},
-    )
-    with urllib.request.urlopen(req, timeout=45) as r:
-        data = r.read()
-        ctype = (r.headers.get("Content-Type") or "").split(";")[0].lower()
-    return data, ctype
+    last = None
+    for attempt in range(5):
+        try:
+            req = urllib.request.Request(
+                url,
+                headers={"User-Agent": "Mozilla/5.0", "Accept": "image/avif,image/webp,image/*,*/*"},
+            )
+            with urllib.request.urlopen(req, timeout=60) as r:
+                data = r.read()
+                ctype = (r.headers.get("Content-Type") or "").split(";")[0].lower()
+            return data, ctype
+        except Exception as exc:
+            last = exc
+            if attempt == 4:
+                break
+            time.sleep(2 + attempt * 2)
+    raise last
 
 
 def verify_image(label: str, url: str, min_width: int = 1920):
