@@ -12,26 +12,36 @@ test("TikTok embeds use the official player/v1 endpoint everywhere",()=>{
   assert.doesNotMatch(desk,/tiktok\.com\/embed\/v2\//);
 });
 
-test("TikTok is lazy-loaded and hidden until the player reports ready",()=>{
+test("TikTok iframe is visible immediately and lazy-loaded without a ready gate",()=>{
   assert.match(page,/title="TikTok"[^>]*loading="lazy"/);
   assert.match(desk,/title="TikTok"[^>]*loading="lazy"/);
-  assert.match(page,/\.yembed\.tk iframe\{opacity:0\}/);
-  assert.match(page,/\.yembed\.tk\.is-ready iframe\{opacity:1\}/);
-  assert.match(desk,/\.composer \.yembed\.tk iframe\{opacity:0\}/);
-  assert.match(desk,/\.composer \.yembed\.tk\.is-ready iframe\{opacity:1\}/);
+  assert.doesNotMatch(page,/\.yembed\.tk iframe\{opacity:0\}/);
+  assert.doesNotMatch(desk,/\.composer \.yembed\.tk iframe\{opacity:0\}/);
+  assert.doesNotMatch(page,/_tkTimer|12000/);
+  assert.doesNotMatch(desk,/_tkTimer|12000/);
 });
 
-test("TikTok server and playback errors are replaced by a local fallback",()=>{
+test("TikTok fallback only replaces the iframe after a real player error",()=>{
   for(const src of [page,desk]){
     assert.match(src,/msg\.type === "onPlayerError"/);
-    assert.match(src,/TikTok is temporarily unavailable\./);
+    assert.match(src,/TikTok couldn't be loaded\./);
     assert.match(src,/>Retry<\/button>/);
     assert.match(src,/>Open on TikTok<\/a>/);
-    assert.match(src,/setTimeout\(\(\)=>\{ if\(!box\.classList\.contains\("is-ready"\)\) tiktokSetFailed\(box\); \}, 12000\)/);
+    assert.match(src,/classList\.add\("is-failed"\)/);
+    assert.match(src,/classList\.remove\("is-failed"\)/);
   }
+  assert.match(page,/\.yembed\.tk\.is-failed iframe\{display:none\}/);
+  assert.match(desk,/\.composer \.yembed\.tk\.is-failed iframe\{display:none\}/);
 });
 
-test("TikTok player keeps a clean vertical 9:16 frame rather than the legacy measured card height",()=>{
+test("TikTok fallback controls use the site's cyan hover fill and no press transform",()=>{
+  assert.match(page,/\.tk-retry:hover,\.tk-open:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
+  assert.match(page,/\.tk-retry:active,\.tk-open:active\{transform:none\}/);
+  assert.match(desk,/\.composer \.tk-retry:hover,\.composer \.tk-open:hover\{background:var\(--accent\);border-color:var\(--accent\);color:#03282b\}/);
+  assert.match(desk,/\.composer \.tk-retry:active,\.composer \.tk-open:active\{transform:none\}/);
+});
+
+test("TikTok player keeps a clean vertical 9:16 frame",()=>{
   assert.match(page,/\.yembed\.tk \.ytbox\{aspect-ratio:9\/16;height:auto;padding-bottom:0/);
   assert.match(desk,/\.composer \.yembed\.tk \.ytbox\{aspect-ratio:9\/16;height:auto;padding-bottom:0/);
   assert.doesNotMatch(page,/padding-bottom:calc\(160% \+ 75px\)/);
