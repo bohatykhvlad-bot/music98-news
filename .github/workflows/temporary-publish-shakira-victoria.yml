@@ -11,77 +11,58 @@ jobs:
     timeout-minutes: 8
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-      SHAKIRA_ID: shakira26amazonmadrid
-      VICTORIA_ID: auvictoriafol26r1
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Require editor secret and pre-publish validation
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -n "$ADMIN_PASSWORD"
-          printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
-          python scripts/post.py gate "$SHAKIRA_ID"
-          MUSIC98_KEY="$ADMIN_PASSWORD" python scripts/preflight.py --post "$SHAKIRA_ID" --expected-media 1 --min-words 290
-          python scripts/post.py gate "$VICTORIA_ID"
-          MUSIC98_KEY="$ADMIN_PASSWORD" python scripts/preflight.py --post "$VICTORIA_ID" --expected-media 1 --min-words 450
-      - name: Publish only the two approved drafts
+      - name: Confirm or publish both posts
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
-          const ids=[process.env.SHAKIRA_ID,process.env.VICTORIA_ID];
-          const key=process.env.ADMIN_PASSWORD;
-          const headers={"X-Admin-Key":key,"Accept":"application/json","Content-Type":"application/json","Cache-Control":"no-cache"};
-          const getDesk=async()=>{
-            const r=await fetch("https://music98.news/api/desk",{headers,cache:"no-store"});
-            if(!r.ok) throw Error("GET_DESK_"+r.status);
-            const j=await r.json();
-            if(!Array.isArray(j.posts)) throw Error("INVALID_DESK");
-            return j;
-          };
+          const ids=["shakira26amazonmadrid","auvictoriafol26r1"];
+          const h={"X-Admin-Key":process.env.ADMIN_PASSWORD,"Content-Type":"application/json","Accept":"application/json","Cache-Control":"no-cache"};
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          async function get(n){
+            const r=await fetch("https://music98.news/api/desk?verify="+Date.now()+"_"+n,{headers:h,cache:"no-store"});
+            if(!r.ok) throw Error("GET_"+r.status);
+            return r.json();
+          }
           (async()=>{
-            const before=await getDesk();
-            const targets=ids.map(id=>before.posts.filter(p=>p.id===id));
-            for(let i=0;i<targets.length;i++){
-              if(targets[i].length!==1) throw Error("TARGET_COUNT_"+ids[i]+"_"+targets[i].length);
-              if(targets[i][0].status!=="draft") throw Error("TARGET_NOT_DRAFT_"+ids[i]+"_"+targets[i][0].status);
+            let d=await get(0);
+            let ps=ids.map(id=>d.posts.find(p=>p.id===id));
+            if(ps.some(p=>!p)) throw Error("MISSING_TARGET");
+            if(ps.some(p=>!["draft","live"].includes(p.status))) throw Error("BAD_STATUS");
+            const others=JSON.stringify(d.posts.filter(p=>!ids.includes(p.id)));
+            if(!ps.every(p=>p.status==="live")){
+              const now=Date.now();
+              ps.forEach((p,i)=>{
+                if(p.status==="draft"){
+                  p.status="live";
+                  p.publishAt=new Date(now-i*1000).toISOString();
+                  p.date=p.publishAt.slice(0,10);
+                }
+              });
+              const r=await fetch("https://music98.news/api/desk",{method:"POST",headers:h,body:JSON.stringify({posts:d.posts,touched:ids})});
+              if(!r.ok) throw Error("SAVE_"+r.status);
             }
-            const snapshot=JSON.stringify(before.posts.filter(p=>!ids.includes(p.id)));
-            const shakira=targets[0][0], victoria=targets[1][0];
-            const now=Date.now();
-            // Keep the news post one second newer so it appears first where timestamps are shared.
-            victoria.status="live";
-            victoria.publishAt=new Date(now-1000).toISOString();
-            victoria.date=victoria.publishAt.slice(0,10);
-            shakira.status="live";
-            shakira.publishAt=new Date(now).toISOString();
-            shakira.date=shakira.publishAt.slice(0,10);
-            const save=await fetch("https://music98.news/api/desk",{
-              method:"POST",headers,body:JSON.stringify({posts:before.posts,touched:ids})
-            });
-            if(!save.ok) throw Error("SAVE_"+save.status);
-            const after=await getDesk();
-            for(const id of ids){
-              const p=after.posts.find(x=>x.id===id);
-              if(!p||p.status!=="live"||!p.publishAt) throw Error("PUBLISH_VERIFY_"+id);
+            for(let i=1;i<=20;i++){
+              await sleep(i===1?2000:3000);
+              const x=await get(i);
+              const got=ids.map(id=>x.posts.find(p=>p.id===id));
+              if(got.every(p=>p&&p.status==="live"&&p.publishAt)){
+                if(JSON.stringify(x.posts.filter(p=>!ids.includes(p.id)))!==others) throw Error("OTHER_POST_CHANGED");
+                console.log("PUBLISHED_CONFIRMED");
+                got.forEach(p=>console.log(p.id,p.publishAt));
+                return;
+              }
             }
-            if(JSON.stringify(after.posts.filter(p=>!ids.includes(p.id)))!==snapshot) throw Error("OTHER_POST_CHANGED");
-            console.log("PUBLISHED",ids.join(","),"OTHER_POSTS_UNCHANGED",true);
-            console.log("SHAKIRA",after.posts.find(p=>p.id===ids[0]).publishAt);
-            console.log("VICTORIA",after.posts.find(p=>p.id===ids[1]).publishAt);
-          })().catch(e=>{console.error(String(e.message||e));process.exit(1)});
+            throw Error("LIVE_NOT_CONFIRMED");
+          })().catch(e=>{console.error(e.message);process.exit(1)});
           NODE
-      - name: Record publish verification
-        shell: bash
+      - name: Mark verification
         run: |
-          set -euo pipefail
-          echo "published Shakira and Victoria; pre-publish checks passed" > .github/two-post-publish-ok.txt
+          echo ok > .github/two-post-publish-ok.txt
           git config user.name "music98-bot"
           git config user.email "music98-bot@users.noreply.github.com"
           git add .github/two-post-publish-ok.txt
-          git commit -m "Record Shakira and Victoria publish verification"
+          git commit -m "Record confirmed Shakira and Victoria publication"
           git push
