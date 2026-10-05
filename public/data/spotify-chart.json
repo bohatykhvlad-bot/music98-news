@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "verified": true,
-  "chartDate": "2026-10-01",
+  "chartDate": "2026-10-03",
   "provider": "kworb+musicrank",
   "mirrorMatched": 50,
   "ldConfirmed": 20,
-  "fingerprint": "c711f572fc3c025ae27d30abffa9cfd21057f2b07e7d60c65b62a32c57182b60",
+  "fingerprint": "27e5e52d83a3ac371791c6573d0367602de253b8372123de97e1e23d422837f3",
   "tracks": [
     {
       "pos": 1,
@@ -63,33 +63,6 @@
     },
     {
       "pos": 7,
-      "title": "Self Aware",
-      "artist": "Temper City",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 8,
-      "title": "stupid song",
-      "artist": "Olivia Rodrigo",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 9,
-      "title": "The One That Got Away",
-      "artist": "Katy Perry",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 10,
       "title": "Beauty And A Beat (w/ Nicki Minaj)",
       "artist": "Justin Bieber",
       "url": "",
@@ -98,7 +71,43 @@
       "prev": ""
     },
     {
+      "pos": 8,
+      "title": "The One That Got Away",
+      "artist": "Katy Perry",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 9,
+      "title": "Self Aware",
+      "artist": "Temper City",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 10,
+      "title": "Dai Dai (w/ Burna Boy)",
+      "artist": "Shakira",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 11,
+      "title": "stupid song",
+      "artist": "Olivia Rodrigo",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 12,
       "title": "back to friends",
       "artist": "sombr",
       "url": "",
@@ -107,7 +116,25 @@
       "prev": ""
     },
     {
-      "pos": 12,
+      "pos": 13,
+      "title": "Choosin' Texas",
+      "artist": "Ella Langley",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 14,
+      "title": "Billie Jean",
+      "artist": "Michael Jackson",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 15,
       "title": "Loser",
       "artist": "Tame Impala",
       "url": "",
@@ -116,43 +143,7 @@
       "prev": ""
     },
     {
-      "pos": 13,
-      "title": "Iris",
-      "artist": "The Goo Goo Dolls",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 14,
-      "title": "hate that i made you love me",
-      "artist": "Ariana Grande",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 15,
-      "title": "Sweater Weather",
-      "artist": "The Neighbourhood",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
       "pos": 16,
-      "title": "Training Season",
-      "artist": "Dua Lipa",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 17,
       "title": "Love Me Not",
       "artist": "Ravyn Lenae",
       "url": "",
@@ -161,9 +152,18 @@
       "prev": ""
     },
     {
+      "pos": 17,
+      "title": "Sweater Weather",
+      "artist": "The Neighbourhood",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 18,
-      "title": "Babydoll",
-      "artist": "Dominic Fike",
+      "title": "Iris",
+      "artist": "The Goo Goo Dolls",
       "url": "",
       "art": "",
       "year": "",
@@ -180,8 +180,8 @@
     },
     {
       "pos": 20,
-      "title": "SWIM",
-      "artist": "BTS",
+      "title": "Babydoll",
+      "artist": "Dominic Fike",
       "url": "",
       "art": "",
       "year": "",
@@ -189,8 +189,8 @@
     },
     {
       "pos": 21,
-      "title": "The Fate of Ophelia",
-      "artist": "Taylor Swift",
+      "title": "Training Season",
+      "artist": "Dua Lipa",
       "url": "",
       "art": "",
       "year": "",
@@ -198,6 +198,15 @@
     },
     {
       "pos": 22,
+      "title": "hate that i made you love me",
+      "artist": "Ariana Grande",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 23,
       "title": "Great Expectation",
       "artist": "SIENNA SPIRO",
       "url": "",
@@ -206,18 +215,9 @@
       "prev": ""
     },
     {
-      "pos": 23,
-      "title": "Choosin' Texas",
-      "artist": "Ella Langley",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
       "pos": 24,
-      "title": "Treat You Better",
-      "artist": "Shawn Mendes",
+      "title": "SWIM",
+      "artist": "BTS",
       "url": "",
       "art": "",
       "year": "",
@@ -225,6 +225,15 @@
     },
     {
       "pos": 25,
+      "title": "The Fate of Ophelia",
+      "artist": "Taylor Swift",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 26,
       "title": "Man I Need",
       "artist": "Olivia Dean",
       "url": "",
@@ -233,18 +242,9 @@
       "prev": ""
     },
     {
-      "pos": 26,
-      "title": "Billie Jean",
-      "artist": "Michael Jackson",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
       "pos": 27,
-      "title": "Dai Dai (w/ Burna Boy)",
-      "artist": "Shakira",
+      "title": "Treat You Better",
+      "artist": "Shawn Mendes",
       "url": "",
       "art": "",
       "year": "",
@@ -252,8 +252,8 @@
     },
     {
       "pos": 28,
-      "title": "Ordinary",
-      "artist": "Alex Warren",
+      "title": "Solar Eclipse (w/ Don Toliver)",
+      "artist": "Drake",
       "url": "",
       "art": "",
       "year": "",
@@ -261,33 +261,6 @@
     },
     {
       "pos": 29,
-      "title": "Babylon",
-      "artist": "Taylor Swift",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 30,
-      "title": "Wonderwall - Remastered",
-      "artist": "Oasis",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 31,
-      "title": "Sailor Song",
-      "artist": "Gigi Perez",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 32,
       "title": "Stop The Wedding!",
       "artist": "Ashe",
       "url": "",
@@ -296,25 +269,16 @@
       "prev": ""
     },
     {
-      "pos": 33,
-      "title": "End of Beginning",
-      "artist": "Djo",
+      "pos": 30,
+      "title": "Ordinary",
+      "artist": "Alex Warren",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 34,
-      "title": "drop dead",
-      "artist": "Olivia Rodrigo",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 35,
+      "pos": 31,
       "title": "Cinderella (w/ Ty Dolla $ign)",
       "artist": "Mac Miller",
       "url": "",
@@ -323,16 +287,16 @@
       "prev": ""
     },
     {
-      "pos": 36,
-      "title": "Pink Clouding",
-      "artist": "Taylor Swift",
+      "pos": 32,
+      "title": "Wonderwall - Remastered",
+      "artist": "Oasis",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 37,
+      "pos": 33,
       "title": "Mr. Brightside",
       "artist": "The Killers",
       "url": "",
@@ -341,34 +305,7 @@
       "prev": ""
     },
     {
-      "pos": 38,
-      "title": "Cleveland!",
-      "artist": "Taylor Swift",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 39,
-      "title": "Every Breath You Take",
-      "artist": "The Police",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 40,
-      "title": "Creep",
-      "artist": "Radiohead",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 41,
+      "pos": 34,
       "title": "Raindance (w/ Tems)",
       "artist": "Dave",
       "url": "",
@@ -377,9 +314,72 @@
       "prev": ""
     },
     {
-      "pos": 42,
+      "pos": 35,
+      "title": "Sailor Song",
+      "artist": "Gigi Perez",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 36,
+      "title": "End of Beginning",
+      "artist": "Djo",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 37,
+      "title": "Every Breath You Take",
+      "artist": "The Police",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 38,
+      "title": "drop dead",
+      "artist": "Olivia Rodrigo",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 39,
+      "title": "Animal",
+      "artist": "KATSEYE",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 40,
       "title": "Jamaican (Bam Bam) (w/ SOLTO (FR))",
       "artist": "HUGEL",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 41,
+      "title": "Creep",
+      "artist": "Radiohead",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 42,
+      "title": "Sure Thing",
+      "artist": "Miguel",
       "url": "",
       "art": "",
       "year": "",
@@ -396,33 +396,6 @@
     },
     {
       "pos": 44,
-      "title": "Sure Thing",
-      "artist": "Miguel",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 45,
-      "title": "I Wanna Be Yours",
-      "artist": "Arctic Monkeys",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 46,
-      "title": "One Of The Girls (w/ JENNIE, Lily-Rose Depp)",
-      "artist": "The Weeknd",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 47,
       "title": "Starboy (w/ Daft Punk)",
       "artist": "The Weeknd",
       "url": "",
@@ -431,7 +404,25 @@
       "prev": ""
     },
     {
-      "pos": 48,
+      "pos": 45,
+      "title": "One Of The Girls (w/ JENNIE, Lily-Rose Depp)",
+      "artist": "The Weeknd",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 46,
+      "title": "OLIVIA LA FLAKA (w/ Tito Double P, Victor Mendivil, Ovi)",
+      "artist": "Natanael Cano",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 47,
       "title": "Just Give Me a Reason (w/ Nate Ruess)",
       "artist": "P!nk",
       "url": "",
@@ -440,9 +431,18 @@
       "prev": ""
     },
     {
+      "pos": 48,
+      "title": "DtMF",
+      "artist": "Bad Bunny",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 49,
-      "title": "Yellow",
-      "artist": "Coldplay",
+      "title": "Risk It All",
+      "artist": "Bruno Mars",
       "url": "",
       "art": "",
       "year": "",
@@ -450,13 +450,13 @@
     },
     {
       "pos": 50,
-      "title": "OLIVIA LA FLAKA (w/ Tito Double P, Victor Mendivil, Ovi)",
-      "artist": "Natanael Cano",
+      "title": "I Wanna Be Yours",
+      "artist": "Arctic Monkeys",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     }
   ],
-  "capturedAt": "2026-10-03T02:12:56.621Z"
+  "capturedAt": "2026-10-05T00:13:39.619Z"
 }
