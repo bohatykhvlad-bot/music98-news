@@ -140,6 +140,8 @@ REFERENT = re.compile(
 # The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
+    "october 4": "Amazon Music announced on 04.10.2026 that Shakira's October 3 Madrid concert was its most-viewed livestream by a female artist to date (Pollstar 04.10.2026; Billboard 04.10.2026).",
+    "1995": "Shakira's Pies Descalzos, which includes Antología, was released in 1995 (EFE 03.10.2026; official Shakira catalog context).",
     # Ella Langley longread, fact-checked October 3, 2026 against the named sources.
     "1952": "Kitty Wells recorded It Wasn\u0027t God Who Made Honky Tonk Angels in 1952, her pioneering Billboard country No. 1; Country Music Hall of Fame: https://www.countrymusichalloffame.org/hall-of-fame/kitty-wells",
     "june 2026": "Ella Langley performed Choosin' Texas at CMA Fest in June 2026; official CMA performance posted June 25, 2026 (CMA YouTube i1IX4Dusi9k)",
