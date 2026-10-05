@@ -41,6 +41,13 @@ test("TikTok fallback controls use the site's cyan hover fill and no press trans
   assert.match(desk,/\.composer \.tk-retry:active,\.composer \.tk-open:active\{transform:none\}/);
 });
 
+test("TikTok uses the same visual footprint as YouTube/photo embeds, rotated vertically",()=>{
+  assert.match(page,/\.yembed\{[^}]*max-width:660px/);
+  assert.match(page,/\.yembed\.tk\{max-width:371px\}/);
+  assert.match(desk,/\.composer \.yembed\{max-width:520px/);
+  assert.match(desk,/\.composer \.yembed\.tk\{max-width:293px\}/);
+});
+
 test("TikTok player keeps a clean vertical 9:16 frame",()=>{
   assert.match(page,/\.yembed\.tk \.ytbox\{aspect-ratio:9\/16;height:auto;padding-bottom:0/);
   assert.match(desk,/\.composer \.yembed\.tk \.ytbox\{aspect-ratio:9\/16;height:auto;padding-bottom:0/);
