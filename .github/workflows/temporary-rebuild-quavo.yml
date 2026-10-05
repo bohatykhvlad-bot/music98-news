@@ -25,7 +25,7 @@ jobs:
         shell: python
         run: |
           import json
-          body="""Quavo has released *QRÖMELIFE*, a 14-track solo album executive produced by Pharrell Williams and built around a brighter, more expansive version of his melodic rap sound.
+          body="""Quavo has released *QRÖMELIFE*, a 14-track solo album executive produced by Pharrell Williams and built around a brighter, more expansive version of his melodic rap sound. It is his first full-length solo record since *Rocket Power*, but its mood is far less inward-looking.
 
           The record grew out of more than a year and a half of work with Pharrell, with sessions taking place at Louis Vuitton's headquarters in Paris and on a yacht in Miami. Rather than treating Pharrell as a late-stage executive producer, Quavo describes him as the person who helped pull the different sides of his music into one project. The result moves between Atlanta rap, funk, club music and polished pop without turning the album into a showcase for production tricks.
 
