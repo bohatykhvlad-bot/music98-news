@@ -3473,7 +3473,7 @@ function tiktokPlayerSrc(id){
 }
 function tiktokOpenUrl(id, creditUrl){
   const u = String(creditUrl||"").trim();
-  if(/^https:\/\/(?:www\.)?tiktok\.com\//i.test(u)) return u;
+  if(/^https:\/\/(?:www\.)?tiktok\.com\/@[^/]+\/(?:video|photo)\/\d+/i.test(u)) return u;
   return "https://www.tiktok.com/player/v1/"+id;
 }
 function tiktokEmbed(id, credit, creditUrl){
