@@ -54,6 +54,23 @@ def check(post, baseline, expected_media, min_words):
             failures.append(f"youtube {i} has malformed id")
     if any(MEDIA.fullmatch(a) and MEDIA.fullmatch(b) for a,b in zip(paragraphs,paragraphs[1:])):
         failures.append("back-to-back media without prose")
+    # Facts can be individually correct and still make the article read like notes.
+    # Flag calendar/name density so these defects cannot hide behind factual accuracy.
+    month = r"(?:January|February|March|April|May|June|July|August|September|October|November|December)"
+    for i, para in enumerate(prose, 1):
+        dates = re.findall(rf"\b{month}\s+\d{{1,2}}\b", para, re.I)
+        if len(dates) >= 4:
+            failures.append(f"paragraph {i} is calendar-like: {len(dates)} explicit dates")
+        elif len(dates) == 3:
+            warnings.append(f"paragraph {i} is date-heavy; confirm all three dates are editorially necessary")
+
+        names = re.findall(r"\b[A-Z][a-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Z][a-zÀ-ÖØ-öø-ÿ'’-]+)+\b", para)
+        unique_names = list(dict.fromkeys(names))
+        if len(unique_names) >= 7:
+            failures.append(f"paragraph {i} reads like a name list: {len(unique_names)} multi-word proper names")
+        elif len(unique_names) >= 5:
+            warnings.append(f"paragraph {i} is name-dense; reread for unnecessary credits/guests")
+
     if prose and len(prose[-1].split()) < 75: warnings.append("finale may be thin")
     if baseline:
         oldmedia = [(m.group(1).lower(),m.group(2)) for m in MEDIA.finditer(baseline.get("body") or "")]
