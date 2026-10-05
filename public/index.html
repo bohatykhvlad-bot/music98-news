@@ -573,13 +573,22 @@ footer{border-top:1px solid var(--line);background:var(--bg2);margin-top:0}
 .yembed.tk,.yembed.ig{max-width:400px;margin:8px auto 22px}
 #articlePage .yembed .pcred,.article .yembed .pcred,#articlePage .abody-pic .pcred,#articlePage .pcred{margin:8px 2px 14px}
 .yembed .ytbox{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
-/* TikTok-карточка: кадр вертикальный, поэтому окно 9:16 и узкая колонка */
-/* Вертикальные карточки чужих платформ (TikTok, Instagram) считаются не по 9:16:
-   у их эмбеда под видео есть шапка, строка «Watch now» и подпись, и при 9:16 они уезжают
-   за край, а окно получает внутреннюю прокрутку (владелец, 24.09). Высоту берём измеренную:
-   медиа = 160% ширины (TikTok) / 122% (Instagram), плюс фиксированная шапка+подпись. */
+/* TikTok now uses the official player/v1 iframe. Keep the technical iframe
+   hidden until the player reports ready, so TikTok server/error pages never flash
+   inside an article. If it fails or never becomes ready, show our own fallback. */
 .yembed.tk{max-width:400px}
-.yembed.tk .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(160% + 75px);background:#fff}
+.yembed.tk .ytbox{aspect-ratio:9/16;height:auto;padding-bottom:0;background:#fff}
+.yembed.tk iframe{opacity:0}
+.yembed.tk.is-ready iframe{opacity:1}
+.yembed.tk.is-failed iframe{display:none}
+.tk-state{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;padding:24px;background:#fff;color:var(--text);text-align:center}
+.yembed.tk.is-ready .tk-state{display:none}
+.tk-fallback{display:none;flex-direction:column;align-items:center;gap:14px;max-width:280px;font-size:14px;line-height:1.45}
+.yembed.tk.is-failed .tk-loading{display:none}
+.yembed.tk.is-failed .tk-fallback{display:flex}
+.tk-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.tk-retry,.tk-open{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--text);font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+@media (hover:hover) and (pointer:fine){.tk-retry:hover,.tk-open:hover{background:var(--bg2)}}
 .yembed.ig{max-width:400px}
 .yembed.ig .ytbox{aspect-ratio:auto;height:0;padding-bottom:calc(122% + 210px);background:#fff}
 .yembed iframe{position:absolute;inset:0;width:100%;height:100%;max-width:none;border:0;display:block}
@@ -3459,11 +3468,67 @@ function videoCreditHTML(word, platform, credit, url){
     : esc(name);
   return `<p class="pcred">${inner} via ${platform}</p>`;
 }
+function tiktokPlayerSrc(id){
+  return "https://www.tiktok.com/player/v1/"+id+"?rel=0&description=0&music_info=0";
+}
+function tiktokOpenUrl(id, creditUrl){
+  const u = String(creditUrl||"").trim();
+  if(/^https:\/\/(?:www\.)?tiktok\.com\//i.test(u)) return u;
+  return "https://www.tiktok.com/player/v1/"+id;
+}
 function tiktokEmbed(id, credit, creditUrl){
   if(!/^\d{6,25}$/.test(id||"")) return "";
   const cred = videoCreditHTML("Video", "TikTok", credit, creditUrl);
-  return `<div class="yembed tk"><div class="ytbox"><iframe src="https://www.tiktok.com/embed/v2/${id}?lang=en" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>${cred}</div>`;
+  const src = tiktokPlayerSrc(id);
+  const open = tiktokOpenUrl(id, creditUrl);
+  return `<div class="yembed tk" data-tiktok-id="${esc(id)}" data-tiktok-src="${esc(src)}"><div class="ytbox"><iframe src="${esc(src)}" title="TikTok" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe><div class="tk-state" aria-live="polite"><span class="tk-loading">Loading TikTok…</span><div class="tk-fallback"><span>TikTok is temporarily unavailable.</span><span class="tk-actions"><button class="tk-retry" type="button">Retry</button><a class="tk-open" href="${esc(open)}" target="_blank" rel="noopener noreferrer">Open on TikTok</a></span></div></div></div>${cred}</div>`;
 }
+function tiktokSetFailed(box){
+  if(!box) return;
+  clearTimeout(box._tkTimer);
+  box.classList.remove("is-ready");
+  box.classList.add("is-failed");
+}
+function tiktokSetReady(box){
+  if(!box) return;
+  clearTimeout(box._tkTimer);
+  box.classList.remove("is-failed");
+  box.classList.add("is-ready");
+}
+function bindTikTokPlayer(box){
+  if(!box || box._tkBound) return;
+  const frame = box.querySelector("iframe");
+  if(!frame) return;
+  box._tkBound = true;
+  const armTimeout = ()=>{
+    clearTimeout(box._tkTimer);
+    if(box.classList.contains("is-ready")) return;
+    box._tkTimer = setTimeout(()=>{ if(!box.classList.contains("is-ready")) tiktokSetFailed(box); }, 12000);
+  };
+  frame.addEventListener("load", armTimeout);
+  const retry = box.querySelector(".tk-retry");
+  if(retry) retry.addEventListener("click", ()=>{
+    clearTimeout(box._tkTimer);
+    box.classList.remove("is-ready","is-failed");
+    const src = box.dataset.tiktokSrc || tiktokPlayerSrc(box.dataset.tiktokId||"");
+    frame.src = "about:blank";
+    setTimeout(()=>{ frame.src = src; }, 40);
+  });
+}
+function bindTikTokPlayers(root){
+  (root||document).querySelectorAll(".yembed.tk[data-tiktok-id]").forEach(bindTikTokPlayer);
+}
+window.addEventListener("message", event=>{
+  if(event.origin !== "https://www.tiktok.com") return;
+  const msg = event.data;
+  if(!msg || msg["x-tiktok-player"] !== true) return;
+  document.querySelectorAll(".yembed.tk[data-tiktok-id] iframe").forEach(frame=>{
+    if(frame.contentWindow !== event.source) return;
+    const box = frame.closest(".yembed.tk");
+    if(msg.type === "onPlayerError") tiktokSetFailed(box);
+    else if(msg.type === "onPlayerReady" || msg.type === "onStateChange" || msg.type === "onCurrentTime") tiktokSetReady(box);
+  });
+});
 function instagramEmbed(kind, code, credit, creditUrl){
   const k = (kind === "reel" || kind === "tv") ? kind : "p";
   if(!/^[A-Za-z0-9_-]{5,20}$/.test(code||"")) return "";
@@ -3535,6 +3600,7 @@ function showArticle(p){
     ${relatedHTML(p)}`;
   jumpY(0);
   bindCovers(page);
+  bindTikTokPlayers(page);
   page.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
   parkAppleEmbeds(page);
   $("#aback").addEventListener("click", e=>{ e.preventDefault(); closeArticle(); });
