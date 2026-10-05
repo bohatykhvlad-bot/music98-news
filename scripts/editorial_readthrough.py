@@ -115,9 +115,11 @@ def inspect(post,allows):
         if full==primary or full not in body:
             continue
         tail=body.split(full,1)[1]
-        for short in shorts:
-            if re.search(r"\b"+re.escape(short)+r"\b",tail):
-                fails.append(f"name style: guest artist '{full}' is shortened to '{short}'")
+        first,surname=full.split(" ",1)
+        if re.search(r"\b"+re.escape(first)+r"\b(?!\s+"+re.escape(surname)+r")",tail):
+            fails.append(f"name style: guest artist '{full}' is shortened to '{first}'")
+        if re.search(r"(?<!"+re.escape(first)+r"\s)\b"+re.escape(surname)+r"\b",tail):
+            fails.append(f"name style: guest artist '{full}' is shortened to '{surname}'")
 
     paras=prose_paragraphs(body)
     if not paras:
