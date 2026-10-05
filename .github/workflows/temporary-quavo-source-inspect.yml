@@ -14,21 +14,22 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m pip install --disable-pip-version-check pillow
-      - name: Fetch QRÖMELIFE glasses portrait
+      - name: Fetch QRÖMELIFE shoot candidates
         run: |
           python - <<'PY'
           import urllib.request
           from PIL import Image
-          u="https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2026%2F09%2F22%2F87A6893-scaled.jpg?cbr=1&fit=max&format=jpg&q=98&w=3500"
-          q=urllib.request.Request(u,headers={"User-Agent":"Mozilla/5.0"})
-          with urllib.request.urlopen(q,timeout=45) as r:
-              b=r.read()
-          open("/tmp/quavo-qromelife.jpg","wb").write(b)
-          im=Image.open("/tmp/quavo-qromelife.jpg")
-          print("QUAVO_SOURCE",im.size,len(b),im.format)
+          names=["87A6879","87A6897","87A6888","87A6907"]
+          for n in names:
+              u=f"https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2026%2F09%2F22%2F{n}-scaled.jpg?cbr=1&fit=max&format=jpg&q=98&w=3500"
+              q=urllib.request.Request(u,headers={"User-Agent":"Mozilla/5.0"})
+              with urllib.request.urlopen(q,timeout=45) as r:b=r.read()
+              p=f"/tmp/{n}.jpg";open(p,"wb").write(b)
+              im=Image.open(p)
+              print("QUAVO_CANDIDATE",n,im.size,len(b),im.format)
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: quavo-qromelife-glasses
-          path: /tmp/quavo-qromelife.jpg
+          name: quavo-qromelife-candidates
+          path: /tmp/87A*.jpg
           if-no-files-found: error
