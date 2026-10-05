@@ -81,7 +81,36 @@ Then perform the strongest manual equivalent possible, but do not rename that ma
 ## 1.5 Report errors proactively
 If an error is discovered, report it immediately. Do not wait for the owner to notice.
 
+## 1.6 Gated desk writes are mandatory
+For agent-driven editorial work, **direct authenticated POST writes to `/api/desk` are forbidden**.
+
+The agent must use the canonical guarded runner:
+- new draft: `python scripts/post.py create --file <post.json>`
+- existing body edit: `python scripts/post.py set ...`
+- publish: `python scripts/post.py publish <id>`
+
+Do not create a temporary workflow, Python script, Node script, curl request, or inline GitHub Action that writes posts directly to the desk. A fresh GET + careful POST is not a substitute for the editorial pipeline.
+
+Reason: a direct desk write bypasses full-read attestation, gate, preflight, and the type/media rules. If the canonical writer cannot perform the required operation, stop and improve the canonical writer first. Do not bypass it.
+
+A post saved through an ungated path is **UNVERIFIED**, even if its fields, hashes, dimensions, or status were checked afterward. Post-save readback cannot retroactively turn a bypassed write into a gated write.
+
+## 1.7 Evidence, not claims
+Never use the phrase "checked", "verified", "ready", "HQ", "good quality", or equivalent unless the specific evidence exists for that claim.
+
+Examples:
+- image dimensions prove dimensions only;
+- byte size proves byte size only;
+- HTTP 200 proves availability only;
+- a desk readback proves saved fields only;
+- gate PASS proves only what gate checks;
+- preflight PASS proves only what preflight checks.
+
+None of those proves that an image looks sharp, that the crop is good, that the article reads well, or that the chosen media belongs to the correct campaign.
+
 ---
+
+
 
 # 2. WORKFLOW STATE MACHINE
 
@@ -95,6 +124,7 @@ For an **existing text being reviewed or edited**, states are mandatory and orde
 → `REGRESSION_CHECKED`
 → `GATE_PASSED`
 → `PREFLIGHT_PASSED`
+→ `VISUAL_EVIDENCE_VERIFIED`
 → `VERIFIED`
 → `READY`
 
@@ -108,6 +138,7 @@ For a **newly researched post**, the research path precedes the same final barri
 → `REGRESSION_CHECKED`
 → `GATE_PASSED`
 → `PREFLIGHT_PASSED`
+→ `VISUAL_EVIDENCE_VERIFIED`
 → `VERIFIED`
 → `READY`
 
@@ -470,6 +501,17 @@ Let the renderer omit the artist prefix.
 
 ## 13.1 Photos
 Use HQ source files.
+
+**Pixel dimensions are not a visual-quality verdict.** A 2400×1600 file may still be soft, upscaled, heavily compressed, badly cropped, or the wrong campaign image. Never call an image HQ or acceptable solely because its dimensions or byte size clear a threshold.
+
+Before a photo can be called visually approved:
+1. identify the exact campaign / shoot / event it belongs to;
+2. inspect the actual pixels at useful viewing size, not only metadata;
+3. inspect the saved desk/article rendering at desktop and mobile sizes;
+4. confirm subject sharpness, face/eyes, crop, focal point and obvious compression;
+5. confirm the photographer credit belongs to that exact image or shoot.
+
+If any of these cannot be completed, report `VISUAL CHECK NOT RUN` and do not call the photo ready.
 
 Avoid web thumbnails around ~600×400.
 
