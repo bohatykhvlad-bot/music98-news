@@ -1,4 +1,4 @@
-name: Temporary live copy cleanup
+name: Temporary Victoria physical-edition paragraph fix
 on:
   push:
     branches: [main]
@@ -6,78 +6,50 @@ on:
 permissions:
   contents: write
 jobs:
-  cleanup:
+  fix:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 5
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-      - name: Clean Shakira and Victoria live copy
+      - name: Replace only Victoria physical-edition paragraph
         shell: bash
         run: |
           set -euo pipefail
           node <<'NODE'
-          const ids=["shakira26amazonmadrid","auvictoriafol26r1"];
+          const id="auvictoriafol26r1";
           const h={"X-Admin-Key":process.env.ADMIN_PASSWORD,"Content-Type":"application/json","Accept":"application/json","Cache-Control":"no-cache"};
           const sleep=ms=>new Promise(r=>setTimeout(r,ms));
           async function get(n){
-            const r=await fetch("https://music98.news/api/desk?copyfix="+Date.now()+"_"+n,{headers:h,cache:"no-store"});
+            const r=await fetch("https://music98.news/api/desk?physicalfix="+Date.now()+"_"+n,{headers:h,cache:"no-store"});
             if(!r.ok) throw Error("GET_"+r.status);
             return r.json();
           }
           (async()=>{
             const d=await get(0);
-            const sh=d.posts.find(p=>p.id===ids[0]);
-            const vi=d.posts.find(p=>p.id===ids[1]);
-            if(!sh||!vi||sh.status!=="live"||vi.status!=="live") throw Error("TARGET_NOT_LIVE");
-            const otherSnapshot=JSON.stringify(d.posts.filter(p=>!ids.includes(p.id)));
-            const shMeta=JSON.stringify(Object.fromEntries(Object.entries(sh).filter(([k])=>k!=="body")));
-            const viMeta=JSON.stringify(Object.fromEntries(Object.entries(vi).filter(([k])=>k!=="body")));
-
-            const shOld="The final Madrid show is set for October 12, ending a residency that started as three announced dates and grew to 13.";
-            const shNew="Shakira will close the expanded Madrid residency with its final show on October 12.";
-            if(!sh.body.includes(shOld)) throw Error("SHAKIRA_ENDING_NOT_FOUND");
-            sh.body=sh.body.replace(shOld,shNew);
-
-            const prodOld='"Reach Out," produced by KAYTRANADA and D\'Mile, heads toward the dance floor.';
-            const prodNew='"Reach Out" heads toward the dance floor.';
-            if(!vi.body.includes(prodOld)) throw Error("VICTORIA_PRODUCER_LINE_NOT_FOUND");
-            vi.body=vi.body.replace(prodOld,prodNew);
-
-            const formatOld="The track count changes by format. Apple Music and Sony list 22 songs for the digital album, while Monét's official store describes the first-edition CD and standard vinyl pressings as 17-track releases. Anyone buying a physical copy will therefore get a shorter sequence than the full digital version.";
-            const formatNew="The digital edition runs 22 songs, while the first-edition CD and standard vinyl contain 17.";
-            if(!vi.body.includes(formatOld)) throw Error("VICTORIA_FORMAT_PARAGRAPH_NOT_FOUND");
-            vi.body=vi.body.replace(formatOld,formatNew);
-
-            const banned=["Apple Music and Sony","official store describes","produced by KAYTRANADA","D'Mile","Anyone buying a physical copy"];
-            for(const x of banned) if(vi.body.includes(x)) throw Error("BANNED_REMAINS_"+x);
-
-            const save=await fetch("https://music98.news/api/desk",{method:"POST",headers:h,body:JSON.stringify({posts:d.posts,touched:ids})});
-            if(!save.ok) throw Error("SAVE_"+save.status);
-
-            for(let i=1;i<=15;i++){
+            const p=d.posts.find(x=>x.id===id);
+            if(!p||p.status!=="live") throw Error("TARGET_NOT_LIVE");
+            const other=JSON.stringify(d.posts.filter(x=>x.id!==id));
+            const meta=JSON.stringify(Object.fromEntries(Object.entries(p).filter(([k])=>k!=="body")));
+            const old="The digital edition runs 22 songs, while the first-edition CD and standard vinyl contain 17.";
+            const neu="The digital edition runs 22 songs, while the first-edition CD and standard vinyl contain 17. The vinyl comes on two discs and includes a double-sided poster.";
+            if(!p.body.includes(old)) throw Error("TARGET_PARAGRAPH_NOT_FOUND");
+            p.body=p.body.replace(old,neu);
+            const s=await fetch("https://music98.news/api/desk",{method:"POST",headers:h,body:JSON.stringify({posts:d.posts,touched:[id]})});
+            if(!s.ok) throw Error("SAVE_"+s.status);
+            for(let i=1;i<=12;i++){
               await sleep(2000);
               const a=await get(i);
-              const sh2=a.posts.find(p=>p.id===ids[0]);
-              const vi2=a.posts.find(p=>p.id===ids[1]);
-              if(sh2&&vi2&&sh2.body===sh.body&&vi2.body===vi.body){
-                if(JSON.stringify(a.posts.filter(p=>!ids.includes(p.id)))!==otherSnapshot) throw Error("OTHER_POST_CHANGED");
-                const shMeta2=JSON.stringify(Object.fromEntries(Object.entries(sh2).filter(([k])=>k!=="body")));
-                const viMeta2=JSON.stringify(Object.fromEntries(Object.entries(vi2).filter(([k])=>k!=="body")));
-                if(shMeta2!==shMeta||viMeta2!==viMeta) throw Error("NON_BODY_FIELD_CHANGED");
-                console.log("LIVE_COPY_FIX_VERIFIED");
+              const q=a.posts.find(x=>x.id===id);
+              if(q&&q.body===p.body){
+                if(JSON.stringify(a.posts.filter(x=>x.id!==id))!==other) throw Error("OTHER_POST_CHANGED");
+                const meta2=JSON.stringify(Object.fromEntries(Object.entries(q).filter(([k])=>k!=="body")));
+                if(meta2!==meta) throw Error("NON_BODY_FIELD_CHANGED");
+                console.log("VICTORIA_PHYSICAL_PARAGRAPH_VERIFIED");
                 return;
               }
             }
-            throw Error("KV_VERIFY_TIMEOUT");
+            throw Error("VERIFY_TIMEOUT");
           })().catch(e=>{console.error(e.message);process.exit(1)});
           NODE
-      - name: Record verification
-        run: |
-          echo ok > .github/live-copy-cleanup-ok.txt
-          git config user.name "music98-bot"
-          git config user.email "music98-bot@users.noreply.github.com"
-          git add .github/live-copy-cleanup-ok.txt
-          git commit -m "Record verified live copy cleanup"
-          git push
