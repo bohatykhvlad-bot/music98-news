@@ -1,4 +1,4 @@
-name: Mandatory second check on revised posts
+name: Apply fully reviewed Shakira and Victoria copy
 on:
   push:
     branches: [main]
@@ -9,17 +9,20 @@ on:
 permissions:
   contents: read
 jobs:
-  review:
+  apply:
     runs-on: ubuntu-latest
-    timeout-minutes: 6
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Editorial readthrough Shakira
+      - name: Mandatory editorial readthrough Shakira
         run: python scripts/editorial_readthrough.py --post shakira26amazonmadrid --file .github/editorial-revised-posts.json --confirm-full-read
-      - name: Editorial readthrough Victoria
+      - name: Mandatory editorial readthrough Victoria
         run: python scripts/editorial_readthrough.py --post auvictoriafol26r1 --file .github/editorial-revised-posts.json --confirm-full-read
       - name: Gate both staged bodies
         shell: python
@@ -32,14 +35,73 @@ jobs:
           for p in data["posts"]:
               fails,warns,info=g.check_post(p,strict=True)
               print("POST",p["id"])
-              for k,v in info:
-                  if k in ("length","dates","numbers"): print("INFO",k,v)
               for k,v in warns: print("WARN",k,v)
               for k,v in fails: print("FAIL",k,v)
               print("GATE","PASS" if not fails else "FAIL")
               bad=bad or bool(fails)
           if bad: sys.exit(1)
-      - name: Preflight Shakira
-        run: python scripts/preflight.py --post shakira26amazonmadrid --file .github/editorial-revised-posts.json --expected-media 1 --min-words 250
-      - name: Preflight Victoria
-        run: python scripts/preflight.py --post auvictoriafol26r1 --file .github/editorial-revised-posts.json --expected-media 1 --min-words 420
+      - name: Preflight both exact staged bodies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/preflight.py --post shakira26amazonmadrid --file .github/editorial-revised-posts.json --expected-media 1 --min-words 280
+          python scripts/preflight.py --post auvictoriafol26r1 --file .github/editorial-revised-posts.json --expected-media 1 --min-words 450
+      - name: Apply body and excerpt only
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require("fs");
+          const revised=JSON.parse(fs.readFileSync(".github/editorial-revised-posts.json","utf8"));
+          const ids=["shakira26amazonmadrid","auvictoriafol26r1"];
+          const byId=Object.fromEntries(revised.posts.map(p=>[p.id,p]));
+          const h={"X-Admin-Key":process.env.ADMIN_PASSWORD,"Content-Type":"application/json","Accept":"application/json","Cache-Control":"no-cache"};
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          async function get(n){
+            const r=await fetch("https://music98.news/api/desk?finalcopy="+Date.now()+"_"+n,{headers:h,cache:"no-store"});
+            if(!r.ok) throw Error("GET_"+r.status);
+            return r.json();
+          }
+          (async()=>{
+            const d=await get(0);
+            const nonTargets=JSON.stringify(d.posts.filter(p=>!ids.includes(p.id)));
+            const targetMeta={};
+            for(const id of ids){
+              const p=d.posts.find(x=>x.id===id);
+              if(!p||p.status!=="live") throw Error("TARGET_NOT_LIVE_"+id);
+              targetMeta[id]=JSON.stringify(Object.fromEntries(Object.entries(p).filter(([k])=>!["body","excerpt"].includes(k))));
+              p.body=byId[id].body;
+              p.excerpt=byId[id].excerpt;
+            }
+            const s=await fetch("https://music98.news/api/desk",{method:"POST",headers:h,body:JSON.stringify({posts:d.posts,touched:ids})});
+            if(!s.ok) throw Error("SAVE_"+s.status);
+            for(let i=1;i<=20;i++){
+              await sleep(2000);
+              const a=await get(i);
+              const ok=ids.every(id=>{
+                const p=a.posts.find(x=>x.id===id);
+                return p&&p.body===byId[id].body&&p.excerpt===byId[id].excerpt;
+              });
+              if(!ok) continue;
+              if(JSON.stringify(a.posts.filter(p=>!ids.includes(p.id)))!==nonTargets) throw Error("OTHER_POST_CHANGED");
+              for(const id of ids){
+                const p=a.posts.find(x=>x.id===id);
+                const meta=JSON.stringify(Object.fromEntries(Object.entries(p).filter(([k])=>!["body","excerpt"].includes(k))));
+                if(meta!==targetMeta[id]) throw Error("TARGET_METADATA_CHANGED_"+id);
+              }
+              console.log("LIVE_BODY_APPLY_VERIFIED");
+              return;
+            }
+            throw Error("KV_VERIFY_TIMEOUT");
+          })().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
+      - name: Re-read exact live bodies after propagation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/editorial_readthrough.py --post shakira26amazonmadrid --confirm-full-read
+          python scripts/editorial_readthrough.py --post auvictoriafol26r1 --confirm-full-read
+          python scripts/post.py gate shakira26amazonmadrid
+          python scripts/post.py gate auvictoriafol26r1
+          python scripts/post.py verify shakira26amazonmadrid
+          python scripts/post.py verify auvictoriafol26r1
