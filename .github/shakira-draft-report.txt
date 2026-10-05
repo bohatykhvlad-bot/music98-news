@@ -1,0 +1,17 @@
+POST=shakira26amazonmadrid
+GATE_CODE=1
+   --  length           356 words in the body (355 in prose), 7 paragraphs
+   !   thin-leadin      68 words in paragraph 2 before the carrier at 3 (guideline 100, not a defect)
+   !   short-paragraph  paragraph 0 is 24 words - a fragment, merge it or grow it: "Shakira's October 3 Madrid concert became Amazon Music's mos"
+   !   one-sentence-paragraph paragraph 0 is a single sentence: "Shakira's October 3 Madrid concert became Amazon Music's mos"
+   X   date-unregistered 'October 4' is not in VERIFIED_DATES - register it with the fact it stands for, or drop it: …ise "Antología" duet.  Amazon Music announced the record on October 4, one day after the show was broadcast worldwide th…
+   X   date-unregistered '1995' is not in VERIFIED_DATES - register it with the fact it stands for, or drop it: …ología," the ballad Shakira released on *Pies Descalzos* in 1995. Dua had already sung the song during her own Bogotá co…
+   X   date-unregistered '1995' is not in VERIFIED_DATES - register it with the fact it stands for, or drop it: …ología," the ballad Shakira released on *Pies Descalzos* in 1995. Dua had already sung the song during her own Bogotá co…
+FAIL - fix the X lines, then run again
+
+GATE: FAIL - fix the X lines first
+PREFLIGHT_CODE=1
+POST=shakira26amazonmadrid STATUS=draft WORDS=366 MEDIA=0
+WARN finale may be thin
+FAIL expected 1 media, found 0
+PREFLIGHT: FAIL
