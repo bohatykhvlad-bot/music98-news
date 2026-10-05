@@ -522,7 +522,19 @@ def cmd_replace_draft(pid, post_file, allows=None, reason=None):
     now=guarded_write(mutate)
     for field in ("id","type","title","excerpt","body","status","artist","cover"):
         want=staged.get(field,current.get(field))
-        if now.get(field)!=want:
+        got=now.get(field)
+        if got!=want:
+            if field=="body":
+                import hashlib
+                gs=str(got or "")
+                ws=str(want or "")
+                ghash=hashlib.sha256(gs.encode("utf-8")).hexdigest()[:16]
+                whash=hashlib.sha256(ws.encode("utf-8")).hexdigest()[:16]
+                first=next((i for i,(a,b) in enumerate(zip(gs,ws)) if a!=b),min(len(gs),len(ws)))
+                print("replace   body mismatch got_len=%d want_len=%d got_sha=%s want_sha=%s first_diff=%d" %
+                      (len(gs),len(ws),ghash,whash,first))
+                print("          got_context=%r" % gs[max(0,first-30):first+70])
+                print("          want_context=%r" % ws[max(0,first-30):first+70])
             die("replace-draft post-save mismatch: %s" % field)
     print("replace   ok: %s status=draft words=%d media=%d" %
           (pid,words(now.get("body") or ""),len(MEDIA_RE.findall(now.get("body") or ""))))
