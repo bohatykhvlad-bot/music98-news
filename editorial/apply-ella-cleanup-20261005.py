@@ -63,9 +63,11 @@ desk = get_desk()
 posts = desk.get('posts')
 if not isinstance(posts, list):
     raise SystemExit('DESK_POSTS_MISSING')
-matches = [i for i,p in enumerate(posts) if p.get('id') == POST_ID]
+all_matches = [(i, p.get('status'), p.get('title')) for i,p in enumerate(posts) if p.get('id') == POST_ID]
+print('TARGET_MATCHES=' + json.dumps(all_matches, ensure_ascii=False))
+matches = [i for i,p in enumerate(posts) if p.get('id') == POST_ID and p.get('status') == 'draft']
 if len(matches) != 1:
-    raise SystemExit('TARGET_NOT_UNIQUE')
+    raise SystemExit('DRAFT_TARGET_NOT_UNIQUE')
 idx = matches[0]
 old_posts = copy.deepcopy(posts)
 old = copy.deepcopy(posts[idx])
@@ -154,9 +156,9 @@ print('DESK_POST_RESPONSE', response[:500])
 
 saved_desk = get_desk()
 saved_posts = saved_desk.get('posts') or []
-saved_matches = [p for p in saved_posts if p.get('id') == POST_ID]
+saved_matches = [p for p in saved_posts if p.get('id') == POST_ID and p.get('status') == 'draft']
 if len(saved_matches) != 1:
-    raise SystemExit('SAVED_TARGET_NOT_UNIQUE')
+    raise SystemExit('SAVED_DRAFT_TARGET_NOT_UNIQUE')
 saved = saved_matches[0]
 if saved.get('status') != 'draft':
     raise SystemExit('SAVED_STATUS_NOT_DRAFT')
@@ -167,9 +169,10 @@ if saved.get('cover') != cover_before:
 if re.findall(r'\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]', saved.get('body') or '', re.I) != media_before:
     raise SystemExit('SAVED_MEDIA_CHANGED')
 
-old_by_id = {p.get('id'):stable(p) for p in old_posts if p.get('id') != POST_ID}
-saved_by_id = {p.get('id'):stable(p) for p in saved_posts if p.get('id') != POST_ID}
-if old_by_id != saved_by_id:
+old_non_target = [stable(p) for j,p in enumerate(old_posts) if j != idx]
+saved_draft_idx = next(i for i,p in enumerate(saved_posts) if p.get('id') == POST_ID and p.get('status') == 'draft')
+saved_non_target = [stable(p) for j,p in enumerate(saved_posts) if j != saved_draft_idx]
+if old_non_target != saved_non_target:
     raise SystemExit('NON_TARGET_POST_CHANGED')
 
 env = os.environ.copy()
