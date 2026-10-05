@@ -203,13 +203,17 @@ posts = before.get("posts") or []
 ids = {d["id"] for d in drafts}
 titles = {d["title"] for d in drafts}
 existing = [p for p in posts if p.get("id") in ids or p.get("title") in titles]
-if existing:
-    raise SystemExit(
-        "DRAFT_ALREADY_EXISTS " + ",".join(str(p.get("id")) for p in existing)
-    )
+for p in existing:
+    if p.get("id") not in ids or p.get("status") != "draft":
+        raise SystemExit("UNSAFE_EXISTING_TARGET " + str(p.get("id")))
+    expected = next(d for d in drafts if d["id"] == p["id"])
+    if p.get("title") != expected["title"]:
+        raise SystemExit("EXISTING_TITLE_MISMATCH " + str(p.get("id")))
 
-snapshot = json.dumps(posts, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
-payload = json.dumps({"posts": drafts + posts}, ensure_ascii=False).encode("utf-8")
+untouched_before = [p for p in posts if p.get("id") not in ids]
+snapshot = json.dumps(untouched_before, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+new_posts = drafts + untouched_before
+payload = json.dumps({"posts": new_posts}, ensure_ascii=False).encode("utf-8")
 req = urllib.request.Request(
     DESK,
     data=payload,
@@ -236,13 +240,19 @@ if json.dumps(
 
 for d in drafts:
     p = next((x for x in ap if x.get("id") == d["id"]), None)
-    if (
-        not p
-        or p.get("status") != "draft"
-        or p.get("body") != d["body"]
-        or p.get("excerpt") != d["excerpt"]
-        or p.get("cover", {}).get("credit") != d["cover"]["credit"]
-    ):
+    checks = {
+        "exists": bool(p),
+        "status": bool(p and p.get("status") == "draft"),
+        "body": bool(p and p.get("body") == d["body"]),
+        "excerpt": bool(p and p.get("excerpt") == d["excerpt"]),
+        "credit": bool(p and p.get("cover", {}).get("credit") == d["cover"]["credit"]),
+        "title": bool(p and p.get("title") == d["title"]),
+    }
+    print("VERIFY", d["id"], json.dumps(checks, sort_keys=True))
+    if not all(checks.values()):
+        if p:
+            print("VERIFY_LENGTHS", d["id"], len(p.get("body") or ""), len(d["body"]), len(p.get("excerpt") or ""), len(d["excerpt"]))
+            print("VERIFY_COVER", d["id"], json.dumps(p.get("cover"), ensure_ascii=False, sort_keys=True))
         raise SystemExit(d["id"] + "_POST_SAVE_VERIFY_FAILED")
     print(
         f"DRAFT_SAVED id={d['id']} status=draft "
