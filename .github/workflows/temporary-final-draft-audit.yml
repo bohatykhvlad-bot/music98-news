@@ -1,0 +1,31 @@
+name: Temporary final draft audit
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-final-draft-audit.yml
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure read-only editorial tools
+        run: |
+          printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+          printf 'MUSIC98_KEY=%s\n' "$MUSIC98_KEY" >> .env
+      - name: Recheck stable saved drafts
+        run: |
+          for id in lola27everythingbegins quavo26qromelife; do
+            echo "=== $id ==="
+            python scripts/post.py gate "$id"
+            python scripts/post.py preflight "$id"
+            python scripts/post.py show "$id" | sed -n '1,12p'
+          done
