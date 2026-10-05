@@ -18,7 +18,9 @@ COMMANDS
   slot <id> [--at ISO] [--date YYYY-MM-DD]
                               move the publication slot (publishAt + date together)
   gate <id>                   run gate.py, print only verdict lines
-  publish <id>                flip to live - refuses unless the gate passes
+  editorial <id> [--body-file F]
+                              mandatory full-read barrier; writes exact-body stamp
+  publish <id>                flip to live - refuses unless gate + editorial stamp pass
   verify <id>                 live checks: public API, cover, youtube
   finish <id> --body-file F   set -> gate -> publish -> verify, one run
 
@@ -45,6 +47,7 @@ if hasattr(sys.stdout, "reconfigure"):
 REPO = Path(__file__).resolve().parents[1]
 DESK_API = "https://music98.news/api/desk"
 GATE = REPO / "scripts" / "gate.py"
+READTHROUGH = REPO / "scripts" / "editorial_readthrough.py"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/131.0 Safari/537.36")
 MONTHS = ("january february march april may june july august september "
@@ -303,6 +306,7 @@ def cmd_dump(pid, out):
 
 
 def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
+    require_editorial_stamp(pid, body_file=body_file, title=title)
     body = Path(body_file).read_text(encoding="utf-8").strip()
     if not body:
         die("body file is empty: %s" % body_file)
@@ -356,7 +360,51 @@ def cmd_gate(pid):
     return ok
 
 
+def run_editorial(pid, body_file=None, title=None, confirm=False, check_stamp=False,
+                  allows=None, reason=None):
+    cmd=[sys.executable, str(READTHROUGH), "--post", pid]
+    if body_file:
+        cmd += ["--body-file", str(body_file)]
+    if title:
+        cmd += ["--title", title]
+    if confirm:
+        cmd.append("--confirm-full-read")
+    if check_stamp:
+        cmd.append("--check-stamp")
+    for item in (allows or []):
+        cmd += ["--allow", item]
+    if reason:
+        cmd += ["--reason", reason]
+    r=subprocess.run(cmd,capture_output=True,text=True,encoding="utf-8",errors="replace",cwd=str(REPO))
+    out=(r.stdout or "")+(r.stderr or "")
+    return r.returncode==0,[line.rstrip() for line in out.splitlines() if line.strip()]
+
+
+def cmd_editorial(pid, body_file=None, title=None, allows=None, reason=None):
+    ok,lines=run_editorial(pid,body_file=body_file,title=title,confirm=True,
+                           allows=allows,reason=reason)
+    for line in lines:
+        print(line)
+    if not ok:
+        print("\nEDITORIAL: FAIL - fix the reader-facing defects, then reread the whole text.")
+        raise SystemExit(1)
+    return True
+
+
+def require_editorial_stamp(pid, body_file=None, title=None):
+    ok,lines=run_editorial(pid,body_file=body_file,title=title,check_stamp=True)
+    if not ok:
+        print("editorial REFUSED - mandatory full-read stamp is missing or stale:")
+        for line in lines:
+            print("  "+line)
+        print("  Run: python scripts/post.py editorial %s%s" %
+              (pid, (" --body-file "+str(body_file)) if body_file else ""))
+        raise SystemExit(1)
+    return True
+
+
 def cmd_publish(pid):
+    require_editorial_stamp(pid)
     ok, lines = run_gate(pid)
     if not ok:
         print("publish   REFUSED - gate is not clean:")
@@ -490,6 +538,13 @@ def main():
         sp = sub.add_parser(name)
         sp.add_argument("id")
 
+    sp = sub.add_parser("editorial")
+    sp.add_argument("id")
+    sp.add_argument("--body-file")
+    sp.add_argument("--title")
+    sp.add_argument("--allow", action="append", choices=["technical-credit","physical-format","source-attribution","single-sentence"])
+    sp.add_argument("--reason")
+
     sp = sub.add_parser("dump")
     sp.add_argument("id")
     sp.add_argument("--out", required=True)
@@ -544,6 +599,8 @@ def main():
         cmd_set(a.id, a.body_file, a.title, a.excerpt, a.publish)
     elif a.cmd == "gate":
         raise SystemExit(0 if cmd_gate(a.id) else 1)
+    elif a.cmd == "editorial":
+        cmd_editorial(a.id, a.body_file, a.title, a.allow, a.reason)
     elif a.cmd == "publish":
         cmd_publish(a.id)
     elif a.cmd == "verify":
