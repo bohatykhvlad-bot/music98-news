@@ -24,9 +24,11 @@ test("main navigation text has no filters, transforms, moving hover transitions 
   assert.match(home,/\.nav-btn\{position:relative;top:0\}/);
 });
 
-test("switching news/releases/chart never moves or fades the entire text layer",()=>{
-  assert.match(home,/\.tab\.rise\{animation:none\}/);
-  assert.doesNotMatch(home,/@keyframes rise\{from\{transform:/);
+test("switching news/releases/chart keeps the short entrance rise without fading text",()=>{
+  assert.match(home,/\.tab\.rise\{animation:rise \.28s ease both\}/);
+  assert.match(home,/@keyframes rise\{from\{transform:translateY\(10px\)\}to\{transform:none\}\}/);
+  assert.doesNotMatch(home,/@keyframes rise\{[^}]*opacity:/);
+  assert.match(home,/s\.classList\.toggle\("rise", on\)/);
 });
 
 test("standalone and embedded concert glass stays behind the actual text layer",()=>{
