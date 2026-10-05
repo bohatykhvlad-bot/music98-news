@@ -1,10 +1,7 @@
 POST=shakira26amazonmadrid
-GATE_CODE=0
-   --  length           400 words in the body (399 in prose), 7 paragraphs
+   --  length           418 words in the body (417 in prose), 7 paragraphs
 PASS - gate clean
 
 GATE: PASS
-PREFLIGHT_CODE=0
-POST=shakira26amazonmadrid STATUS=draft WORDS=400 MEDIA=1
-WARN finale may be thin
+POST=shakira26amazonmadrid STATUS=draft WORDS=418 MEDIA=1
 PREFLIGHT: PASS
