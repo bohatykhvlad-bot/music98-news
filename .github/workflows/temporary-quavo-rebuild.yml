@@ -1,0 +1,34 @@
+name: Temporary Quavo rebuild through canonical gates
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-quavo-rebuild.yml
+      - .github/staging/quavo-rebuild.json
+permissions:
+  contents: read
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure canonical runner
+        run: printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+      - name: PRE-EDIT full read of exact current draft
+        run: python scripts/post.py editorial quavo26qromelife --phase pre-edit
+      - name: Upload exact official QRÖMELIFE World visual
+        run: python scripts/post.py photo --url "https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/architecture-compressed.jpg" --name "quavo-qromelife-official-world-02.jpg"
+      - name: POST-EDIT full read of exact staged release
+        run: python scripts/editorial_readthrough.py --post quavo26qromelife --file .github/staging/quavo-rebuild.json --phase post-edit --confirm-full-read
+      - name: Replace only through canonical gated writer
+        run: python scripts/post.py replace-draft quavo26qromelife --file .github/staging/quavo-rebuild.json
+      - name: Re-run saved draft checks
+        run: |
+          python scripts/post.py gate quavo26qromelife
+          python scripts/post.py preflight quavo26qromelife
