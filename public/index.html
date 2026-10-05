@@ -145,8 +145,8 @@ main{position:relative;z-index:1}
    to the header above and the content below) */
 .tab .hd{margin:0 0 var(--section-heading-gap)}
 .tab.active{display:block}
-/* Switching tabs never moves or fades an entire text layer. */
-.tab.rise{animation:none}
+.tab.rise{animation:rise .28s ease both}
+@keyframes rise{from{transform:translateY(10px)}to{transform:none}}
 .hd{margin:0 0 24px}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
 
