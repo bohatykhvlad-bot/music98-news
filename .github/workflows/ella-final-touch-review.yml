@@ -20,3 +20,4 @@ jobs:
       - name: Gate, excerpt and preflight
         run: python editorial/ella-final-touch-review.py
 # Retest after proper sentence-boundary parsing
+# Retest after regex escaping correction
