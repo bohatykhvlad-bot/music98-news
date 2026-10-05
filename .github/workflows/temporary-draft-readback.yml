@@ -1,0 +1,61 @@
+name: Temporary draft readback
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-draft-readback.yml
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Read back target drafts without writing
+        shell: python
+        run: |
+          import json, os, re, urllib.request
+          key=os.environ["ADMIN_PASSWORD"]
+          req=urllib.request.Request(
+              "https://music98.news/api/desk",
+              headers={"X-Admin-Key":key,"Accept":"application/json","Cache-Control":"no-cache","User-Agent":"music98-draft-readback"},
+          )
+          with urllib.request.urlopen(req,timeout=30) as r:
+              posts=json.load(r)["posts"]
+          expected={
+              "lola27everythingbegins":{
+                  "title":"Lola Young Announces 2027 Everything Begins Tour",
+                  "type":"news","credit":"Harriet K Bols",
+                  "cover":"photos/lola-young-everything-begins-harriet-k-bols-2026.webp",
+                  "words":214,
+              },
+              "quavo26qromelife":{
+                  "title":"QRÖMELIFE","type":"release","credit":"Tariq McAllister",
+                  "cover":"photos/quavo-qromelife-tariq-mcallister-cover.jpg",
+                  "words":367,
+              },
+          }
+          for pid,e in expected.items():
+              p=next((x for x in posts if x.get("id")==pid),None)
+              if not p:
+                  raise SystemExit("MISSING_"+pid)
+              body=p.get("body") or ""
+              wc=len(re.findall(r"\b[\w'*-]+\b",body))
+              checks={
+                  "status":p.get("status")=="draft",
+                  "title":p.get("title")==e["title"],
+                  "type":p.get("type")==e["type"],
+                  "credit":(p.get("cover") or {}).get("credit")==e["credit"],
+                  "cover":(p.get("cover") or {}).get("src")==e["cover"],
+                  "excerpt_prefix":body.startswith(p.get("excerpt") or ""),
+                  "words":wc==e["words"],
+                  "curly":sum(body.count(c) for c in "“”‘’")==0,
+              }
+              if pid=="quavo26qromelife":
+                  checks["body_photo"]="photos/quavo-qromelife-tariq-mcallister-body.jpg" in body
+                  checks["body_credit"]="Tariq McAllister|https://www.instagram.com/riq.mc/" in body
+              print("READBACK",pid,json.dumps(checks,sort_keys=True),"words="+str(wc))
+              if not all(checks.values()):
+                  raise SystemExit("READBACK_FAIL_"+pid)
+          print("DRAFT_READBACK_PASS")
