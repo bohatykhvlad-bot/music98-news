@@ -35,8 +35,9 @@ jobs:
           title="The Ella Langley Phenomenon and Country's New Boom"
           photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
           media=re.findall(r"\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]",body)
-          if not all([p.get("status")=="live",digest==expected,p.get("title")==title,body.startswith(p.get("excerpt") or ""),len(media)==10,photo in body,p.get("cover")]):
-            print("NOT_APPROVED_VERSION sha256="+digest+" media="+str(len(media)))
+          checks={"status_live":p.get("status")=="live","hash_exact":digest==expected,"title_exact":p.get("title")==title,"excerpt_prefix":body.startswith(p.get("excerpt") or ""),"media_count":len(media)==10,"photo_credit":photo in body,"cover_present":bool(p.get("cover"))}
+          if not all(checks.values()):
+            print("LIVE_ARTICLE_GUARD_FAILED "+json.dumps(checks,sort_keys=True)+" sha256="+digest+" media="+str(len(media)))
             raise SystemExit(1)
           print("ELLA_APPROVED_DRAFT sha256="+digest+" media=10 title/excerpt/cover/photo verified")
           PY
