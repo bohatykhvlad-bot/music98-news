@@ -1,0 +1,24 @@
+name: Ella final cleanup 2026-10-05
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/ella-final-cleanup-20261005.yml
+permissions:
+  contents: read
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ADMIN_PASSWORD: \${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: editorial/ella-sixth-proofread-20261004
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Apply reviewed Ella cleanup to Draft only
+        run: python editorial/apply-ella-cleanup-20261005.py
