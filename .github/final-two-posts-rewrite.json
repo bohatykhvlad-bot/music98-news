@@ -1,0 +1,39 @@
+{
+  "posts": [
+    {
+      "id": "shakira26amazonmadrid",
+      "type": "news",
+      "tag": "News",
+      "artist": "Shakira",
+      "title": "Shakira Sets Amazon Music Livestream Record With Madrid Show and Dua Lipa Duet",
+      "excerpt": "Shakira's October 3 concert in Madrid became Amazon Music's most-viewed livestream by a female artist, with Dua Lipa appearing as the night's surprise guest for \"Antología.\"",
+      "body": "Shakira's October 3 concert in Madrid became Amazon Music's most-viewed livestream by a female artist, with Dua Lipa appearing as the night's surprise guest for \"Antología.\" Amazon announced the record the following day but did not release a viewer total.\n\nThe concert streamed worldwide through Amazon Music, Prime Video and Twitch, making it Shakira's first complete concert broadcast globally. Amazon's claim is specific to its own platform rather than an all-platform streaming record. The show was also the centerpiece of the 2026 edition of Amazon Music's Women Shaping Latin Music campaign.\n\nDua Lipa joined Shakira for \"Antología,\" the ballad from *Pies Descalzos*, released in 1995. It was the first time the two artists had performed together, onstage or in a studio. The song already had a connection between them. During her 2025 tour stop in Bogotá, Dua Lipa covered \"Antología\" as part of her run of locally chosen songs, a performance Shakira later praised online.\n\n[ig:p:DeFRhLolil0|@shakira|https://www.instagram.com/p/DeFRhLolil0/]\n\nThe livestream came from Shakira Stadium, the temporary venue built inside Madrid's Iberdrola Music complex for the residency. The stadium holds more than 50,000 people, but the project around it is larger than the concert bowl itself. Macondo Park was created as a temporary city inspired by Gabriel García Márquez's fictional Macondo, with eight pavilions devoted to music, fashion, food, literature, art and film, children's culture and Shakira's own career.\n\nThe Madrid residency was originally announced as a much smaller run before demand pushed it into a longer closing chapter for the *Las Mujeres Ya No Lloran World Tour*. That unusual setting made the October 3 broadcast more than a camera feed from a standard tour stop: it opened one night of the temporary Madrid project to viewers around the world.",
+      "status": "draft",
+      "date": "2026-10-05",
+      "cover": {
+        "kind": "img",
+        "src": "photos/shakira-dua-lipa-madrid-nicolas-gerardin-2026.jpg",
+        "credit": "Nicolas Gerardin",
+        "creditUrl": "https://www.nicolasgerardin.com/"
+      }
+    },
+    {
+      "id": "auvictoriafol26r1",
+      "type": "release",
+      "tag": "New Release",
+      "rtype": "Album",
+      "artist": "Victoria Monét",
+      "title": "Frequency Of Love",
+      "excerpt": "Victoria Monét has released her second album *Frequency Of Love*, a 22-song record that moves between R&B, house, funk and acoustic soul.",
+      "body": "Victoria Monét has released her second album *Frequency Of Love*, a 22-song record that moves between R&B, house, funk and acoustic soul. It is her first full-length since *JAGUAR II*, the album that helped turn her into one of the biggest breakthrough stories of the 2024 Grammys.\n\nThe long gap was deliberate. After the awards cycle around *JAGUAR II*, she enrolled at the Institute of Culinary Education and graduated in May 2026, then completed an externship at Verse L.A. while rehearsing for Bruno Mars' European stadium tour. Cooking gave her a creative routine with no chart position or campaign attached to it. She described the appeal as \"creating something that I wasn't earning from.\"\n\nAt first, *Frequency Of Love* was supposed to lean much harder into yacht rock. Digging through the musicians who worked with Michael Jackson and Quincy Jones led her toward Toto and that late-'70s and early-'80s sound. Culinary school gradually broke open the original plan. Pasta days sent her toward Italian music; Jamaican dishes sent her toward Jamaican records. By the end, the album no longer belonged to one lane. As she put it, \"I don't know that I'll ever be a one-lane person.\"\n\nThat range shows up without needing a long guest list. \"Reach Out\" moves into sleek club R&B, \"You Hurt Me Too\" was written with the drama of a James Bond theme in mind, and \"Juicy\" carries more of the yacht-rock idea that shaped the album's earliest version. \"Reach Out\" also predates the finished record. She recorded it around the period when the *JAGUAR II* deluxe edition was being assembled, then held it back because she believed it deserved more than a bonus-track slot. The video was filmed at the Salk Institute in La Jolla.\n\n[youtube:h99lQg2zSl0]\n\nLove on the album is deliberately broader than romance. The songs move through attraction, heartbreak, self-love, motherhood and the risk of trusting someone enough to be hurt. Her daughter Hazel Monét appears alongside Leon Thomas on \"You Mean The World To Me,\" bringing family directly into that picture rather than treating it as a separate theme.\n\nAnother thread reaches much further back. \"Somebody,\" written by Harry Warren and Jack Brooks, entered her life when she was a child watching *Introducing Dorothy Dandridge* with her grandmother. Dorothy Dandridge became such a lasting reference that she later dressed as the actress for Halloween twice. On *Frequency Of Love*, that memory sits beside contemporary R&B and dance music without feeling like a history lesson.\n\nThe album now moves into its live chapter. The *Frequency Of Love* Tour opens October 27 in Raleigh and runs through December 17 in San Francisco. Alongside it, the Frequency Of Love Foundation is planning youth programs around food, agriculture, cooking and wellness, including hands-on education and community gardens. The connection is unusually direct: the same detour into cooking that changed the album is now part of what Monét wants to build beyond it.",
+      "status": "draft",
+      "date": "2026-10-05",
+      "cover": {
+        "kind": "img",
+        "src": "photos/victoria-monet-marvin-portrait-2026.jpg",
+        "credit": "MAR+VIN",
+        "creditUrl": "https://www.mar-vin.com/"
+      }
+    }
+  ]
+}
