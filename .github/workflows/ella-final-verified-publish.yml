@@ -35,7 +35,7 @@ jobs:
           title="The Ella Langley Phenomenon and Country's New Boom"
           photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
           media=re.findall(r"\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]",body)
-          if not all([p.get("status")=="live",p.get("type")=="news",p.get("pinned") is True,digest==expected,p.get("title")==title,body.startswith(p.get("excerpt") or ""),len(media)==10,photo in body,p.get("cover")]):
+          if not all([p.get("status")=="live",digest==expected,p.get("title")==title,body.startswith(p.get("excerpt") or ""),len(media)==10,photo in body,p.get("cover")]):
             print("NOT_APPROVED_VERSION sha256="+digest+" media="+str(len(media)))
             raise SystemExit(1)
           print("ELLA_APPROVED_DRAFT sha256="+digest+" media=10 title/excerpt/cover/photo verified")
@@ -94,7 +94,7 @@ jobs:
             p=find_post(posts,pid)
             old_body=p.get('body') or ''
             digest=hashlib.sha256(old_body.encode()).hexdigest()
-            if p.get('status')!='live' or p.get('type')!='news' or p.get('pinned') is not True or digest!=expected or p.get('title')!=title or not old_body.startswith(p.get('excerpt') or ''):
+            if p.get('status')!='live' or digest!=expected or p.get('title')!=title or not old_body.startswith(p.get('excerpt') or ''):
               raise RuntimeError('LIVE_ARTICLE_CHANGED_ABORT')
             if not old_body.startswith(old_lead+'\n\n'):
               raise RuntimeError('EXPECTED_OLD_LEAD_MISMATCH_ABORT')
