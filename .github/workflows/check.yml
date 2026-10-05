@@ -17,9 +17,10 @@ jobs:
           python-version: "3.12"
       - name: Validate editorial workflow scripts
         run: |
-          python -m py_compile scripts/editorial_readthrough.py scripts/post.py scripts/preflight.py
+          python -m py_compile scripts/editorial_readthrough.py scripts/post.py scripts/preflight.py scripts/test_editorial_readthrough.py
           python scripts/editorial_readthrough.py --help | grep -q -- "--phase"
           python scripts/post.py --help | grep -q -- "--phase"
+          python scripts/test_editorial_readthrough.py
       - uses: actions/setup-node@v4
         with:
           node-version: 22
