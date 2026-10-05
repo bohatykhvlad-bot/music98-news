@@ -12,85 +12,83 @@ jobs:
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
       POST_ID: auvictoriafol26r1
-      DEST: public/photos/victoria-monet-marvin-portrait-2026.jpg
+      NEW_WEB: photos/victoria-monet-marvin-portrait-2026.jpg
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Resolve fresh MAR+VIN editorial portrait
+      - name: Wait for clean MAR+VIN portrait deployment
         shell: bash
         run: |
           set -euo pipefail
-          python -m pip install --quiet Pillow beautifulsoup4 requests
-          python - <<'PY'
-          import requests, os
-          from bs4 import BeautifulSoup
-          from PIL import Image
-          from io import BytesIO
-          urls=[
-            "https://www.nme.com/reviews/album/victoria-monet-frequency-of-love-review-3972142",
-            "https://variety.com/2026/music/news/victoria-monet-frequency-of-love-vocal-issues-motherhood-1236897279/"
-          ]
-          candidates=[]
-          for page in urls:
-              try:
-                  r=requests.get(page,headers={"User-Agent":"Mozilla/5.0"},timeout=30)
-                  print("PAGE",page,"STATUS",r.status_code)
-                  soup=BeautifulSoup(r.text,"html.parser")
-                  for key in [("property","og:image"),("name","twitter:image")]:
-                      tag=soup.find("meta",attrs={key[0]:key[1]})
-                      if tag and tag.get("content"):
-                          candidates.append((page,tag["content"]))
-              except Exception as e:
-                  print("PAGE_ERROR",page,repr(e))
-          seen=set()
-          for page,url in candidates:
-              if url in seen: continue
-              seen.add(url)
-              try:
-                  rr=requests.get(url,headers={"User-Agent":"Mozilla/5.0","Referer":page},timeout=40)
-                  rr.raise_for_status()
-                  im=Image.open(BytesIO(rr.content)).convert("RGB")
-                  print("CANDIDATE",page,url,im.size,len(rr.content))
-                  # Require a real editorial-size image, not a thumbnail.
-                  if im.width < 1600 or im.height < 1000:
-                      continue
-                  # Preserve full frame, only resize for site storage.
-                  maxw=2600
-                  if im.width>maxw:
-                      h=round(im.height*maxw/im.width)
-                      im=im.resize((maxw,h),Image.Resampling.LANCZOS)
-                  im.save(os.environ["DEST"],"JPEG",quality=88,optimize=True,progressive=True)
-                  print("SELECTED",url,"SAVED",im.size,os.path.getsize(os.environ["DEST"]))
-                  open("/tmp/source-url.txt","w").write(url)
-                  break
-              except Exception as e:
-                  print("CANDIDATE_ERROR",url,repr(e))
-          else:
-              raise SystemExit("NO_SUITABLE_PORTRAIT")
-          PY
-      - name: Create visual QA preview and commit
+          for i in $(seq 1 20); do
+            code=$(curl -L -s -o /tmp/victoria.jpg -w "%{http_code}" "https://music98.news/$NEW_WEB?coverprobe=$i" || true)
+            if [ "$code" = "200" ]; then
+              echo "PORTRAIT_DEPLOYED"
+              exit 0
+            fi
+            sleep 6
+          done
+          exit 1
+      - name: Replace only Victoria draft cover
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from PIL import Image
-          import base64, os
-          p=os.environ["DEST"]
-          im=Image.open(p).convert("RGB")
-          im.thumbnail((900,900),Image.Resampling.LANCZOS)
-          im.save("/tmp/victoria-preview.jpg","JPEG",quality=85,optimize=True)
-          open(".github/victoria-photo-preview.b64","w").write(base64.b64encode(open("/tmp/victoria-preview.jpg","rb").read()).decode())
-          PY
+          node <<'NODE'
+          const key=process.env.ADMIN_PASSWORD, id=process.env.POST_ID;
+          if(!key) throw Error("NO_ADMIN_PASSWORD");
+          const headers={"X-Admin-Key":key,"Accept":"application/json","Content-Type":"application/json","Cache-Control":"no-cache"};
+          (async()=>{
+            const g=await fetch("https://music98.news/api/desk",{headers,cache:"no-store"});
+            if(!g.ok) throw Error("GET_"+g.status);
+            const data=await g.json();
+            const matches=(data.posts||[]).filter(p=>p.id===id);
+            if(matches.length!==1 || matches[0].status!=="draft") throw Error("TARGET_NOT_UNIQUE_DRAFT");
+            const post=matches[0];
+            const bodyBefore=post.body, titleBefore=post.title, excerptBefore=post.excerpt;
+            const othersBefore=JSON.stringify(data.posts.filter(p=>p.id!==id));
+            post.cover={
+              kind:"img",
+              src:process.env.NEW_WEB,
+              credit:"MAR+VIN",
+              creditUrl:"https://www.mar-vin.com/",
+              pos:"50% 50%",
+              zoom:1,
+              cardY:0.5,
+              cardZoom:1,
+              lockX:0.5
+            };
+            const s=await fetch("https://music98.news/api/desk",{method:"POST",headers,body:JSON.stringify({posts:data.posts,touched:[id]})});
+            if(!s.ok) throw Error("SAVE_"+s.status);
+            const v=await fetch("https://music98.news/api/desk",{headers,cache:"no-store"});
+            const after=await v.json(), got=(after.posts||[]).find(p=>p.id===id);
+            if(!got || got.status!=="draft") throw Error("DRAFT_VERIFY");
+            if(got.body!==bodyBefore || got.title!==titleBefore || got.excerpt!==excerptBefore) throw Error("TEXT_CHANGED");
+            if(!got.cover || got.cover.src!==process.env.NEW_WEB || got.cover.credit!=="MAR+VIN") throw Error("COVER_VERIFY");
+            if(JSON.stringify(after.posts.filter(p=>p.id!==id))!==othersBefore) throw Error("OTHER_POST_CHANGED");
+            console.log("VICTORIA_COVER_SWAP_VERIFIED",got.cover);
+          })().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
+      - name: Rerun editorial gate and preflight after cover change
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+          python scripts/post.py gate "$POST_ID"
+          MUSIC98_KEY="$ADMIN_PASSWORD" python scripts/preflight.py --post "$POST_ID" --expected-media 1 --min-words 450
+      - name: Remove superseded album artwork and QA preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f public/photos/victoria-monet-frequency-of-love-marvin-2026.jpg
+          rm -f .github/victoria-photo-preview.b64
           git config user.name "music98-bot"
           git config user.email "music98-bot@users.noreply.github.com"
-          git add "$DEST" .github/victoria-photo-preview.b64
+          git add -A
           if git diff --cached --quiet; then
-            echo "NO_IMAGE_CHANGES"
+            echo "NO_CLEANUP_CHANGES"
           else
-            git commit -m "Add Victoria Monet MAR+VIN portrait preview"
+            git commit -m "Use clean MAR+VIN portrait for Victoria Monet draft"
             git push
           fi
