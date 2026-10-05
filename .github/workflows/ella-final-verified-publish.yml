@@ -30,7 +30,7 @@ jobs:
           matched=[x for x in posts if x.get("id")=="ella26choosintexas"]
           if len(matched)!=1:raise SystemExit("ARTICLE_MISSING_OR_DUPLICATE")
           p=matched[0];body=p.get("body") or ""
-          expected="eefa06e69aab23141f33bed9fb2ebde54f21a67ba85c28a2a998202e29f1fa24"
+          expected="9c44bbafa838d2436e8eb03f41876f01b2c2edf95c60c6cfe5f4ce638c01996e"
           digest=hashlib.sha256(body.encode()).hexdigest()
           title="The Ella Langley Phenomenon and Country's New Boom"
           photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
@@ -78,11 +78,13 @@ jobs:
         shell: bash
         run: |
           python - <<'PY'
-          import hashlib,sys
+          import copy,hashlib,sys
           sys.path.insert(0,'scripts')
           from post import run_gate,guarded_write,find_post,slot_stamp
+          from gate import check_post
+          from preflight import check as preflight_check
           pid='ella26choosintexas'
-          expected='eefa06e69aab23141f33bed9fb2ebde54f21a67ba85c28a2a998202e29f1fa24'
+          expected='9c44bbafa838d2436e8eb03f41876f01b2c2edf95c60c6cfe5f4ce638c01996e'
           title="The Ella Langley Phenomenon and Country's New Boom"
           gate_ok,_=run_gate(pid)
           if not gate_ok:raise SystemExit('GATE_FAILED_BEFORE_PUBLISH')
@@ -91,26 +93,35 @@ jobs:
             digest=hashlib.sha256((p.get('body') or '').encode()).hexdigest()
             if p.get('status')!='draft' or digest!=expected or p.get('title')!=title or not (p.get('body') or '').startswith(p.get('excerpt') or ''):
               raise RuntimeError('DRAFT_CHANGED_ABORT')
+            candidate=copy.deepcopy(p)
+            candidate['type']='news'
+            candidate['pinned']=True
+            fails,warns,_=check_post(candidate,strict=True)
+            if fails: raise RuntimeError('NEWS_CANDIDATE_GATE_FAILED '+','.join(x[0] for x in fails))
+            if not preflight_check(candidate,p,expected_media=10,min_words=1300):
+              raise RuntimeError('NEWS_CANDIDATE_PREFLIGHT_FAILED')
+            p['type']='news'
+            p['pinned']=True
             p['status']='live'
             slot_stamp(p)
             return p
           saved=guarded_write(mutate)
-          if saved.get('status')!='live' or hashlib.sha256((saved.get('body') or '').encode()).hexdigest()!=expected or saved.get('title')!=title:
-            raise SystemExit('PUBLISH_VERIFICATION_FAILED')
-          print('ELLA_PUBLICATION_SAVED verified_sha256='+expected+' status=live')
+          if saved.get('status')!='live' or saved.get('type')!='news' or saved.get('pinned') is not True or hashlib.sha256((saved.get('body') or '').encode()).hexdigest()!=expected or saved.get('title')!=title:
+            raise SystemExit('PUBLISH_OR_MAIN_NEWS_PIN_VERIFICATION_FAILED')
+          print('ELLA_PUBLICATION_SAVED verified_sha256='+expected+' status=live type=news pinned=true')
           PY
       - name: Verify public article visibility and site response
         shell: bash
         run: |
           python - <<'PY'
           import hashlib,json,time,urllib.request
-          expected='eefa06e69aab23141f33bed9fb2ebde54f21a67ba85c28a2a998202e29f1fa24'
+          expected='9c44bbafa838d2436e8eb03f41876f01b2c2edf95c60c6cfe5f4ce638c01996e'
           for attempt in range(10):
             try:
               req=urllib.request.Request('https://music98.news/api/desk?finalaudit='+str(time.time()),headers={'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'})
               with urllib.request.urlopen(req,timeout=20) as r:posts=json.load(r)['posts']
               p=next((x for x in posts if x.get('id')=='ella26choosintexas'),None)
-              if p and p.get('status')=='live' and hashlib.sha256((p.get('body') or '').encode()).hexdigest()==expected:
+              if p and p.get('status')=='live' and p.get('type')=='news' and p.get('pinned') is True and hashlib.sha256((p.get('body') or '').encode()).hexdigest()==expected:
                 homepage=urllib.request.Request('https://music98.news/',headers={'User-Agent':'Mozilla/5.0'})
                 with urllib.request.urlopen(homepage,timeout=20) as r:assert r.status==200
                 print('ELLA_PUBLICLY_VISIBLE_SHA256='+expected+' HOMEPAGE_OK status=live')
