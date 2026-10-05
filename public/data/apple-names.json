@@ -34,6 +34,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/58/f2/54/58f254a3-25aa-0542-bf46-4627c8f2e06b/mzaf_5527018976386911832.plus.aac.p.m4a",
     "year": "2026"
   },
+  "backtofriends|sombr": {
+    "title": "back to friends",
+    "artist": "sombr",
+    "url": "https://music.apple.com/us/album/1786481196?i=1786481197",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d7/63/7d/d7637dec-cf2d-1455-3398-f1a6340359d0/mzaf_88927986796632454.plus.aac.p.m4a",
+    "year": "2024"
+  },
   "bbywow|karolg": {
     "title": "BbY WOW",
     "artist": "KAROL G, Judeline & rusowsky",
@@ -41,19 +48,19 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f3/08/da/f308da3d-00cc-7682-7be9-87cb882f4ea5/mzaf_129115212197250565.plus.aac.p.m4a",
     "year": "2026"
   },
+  "beatit|michaeljackson": {
+    "title": "Beat It",
+    "artist": "Michael Jackson",
+    "url": "https://music.apple.com/us/album/1641780996?i=1641781003",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d7/2f/13/d72f1392-a346-dce1-478a-6150573b01f1/mzaf_9876581218503934528.plus.aac.p.m4a",
+    "year": "1982"
+  },
   "beautyandabeat|justinbieber": {
     "title": "Beauty and a Beat (feat. Nicki Minaj)",
     "artist": "Justin Bieber",
     "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ea/b4/da/eab4da01-c422-c640-1ac3-97d746c5871c/mzaf_12363686639555987211.plus.aac.p.m4a",
     "year": "2012"
-  },
-  "bebyyou|lukecombs": {
-    "title": "Be By You",
-    "artist": "Luke Combs",
-    "url": "https://music.apple.com/us/album/1862634688?i=1862634805",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a1/3a/eb/a13aeb88-1a04-0f07-c062-02f1b18b8392/mzaf_7787513642053136740.plus.aac.p.m4a",
-    "year": "2026"
   },
   "beenbynow|morganwallen": {
     "title": "Been By Now",
@@ -68,6 +75,13 @@
     "url": "https://music.apple.com/us/album/1869436835?i=1869436845",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c8/7c/d4/c87cd4df-1197-1d1d-a07c-c5139d59a58f/mzaf_8671653320488087674.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "billiejean|michaeljackson": {
+    "title": "Billie Jean",
+    "artist": "Michael Jackson",
+    "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/6f/e6/1f6fe6c2-15b6-ed27-5c5f-0e63273cf167/mzaf_12076627970141246810.plus.aac.p.m4a",
+    "year": "1982"
   },
   "boston|stellalefty": {
     "title": "Boston",
@@ -167,6 +181,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/55/fe/49/55fe49c9-9c61-7d74-e98f-a0c1be69d4a5/mzaf_15683549856637703429.plus.aac.p.m4a",
     "year": "2026"
   },
+  "hotellobby|quavo": {
+    "title": "HOTEL LOBBY (Unc & Phew)",
+    "artist": "Quavo & Takeoff",
+    "url": "https://music.apple.com/us/album/1624591067?i=1624591079",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/cc/ad/1c/ccad1c01-9b07-b45b-27d7-6343558b431d/mzaf_12910275253395929538.plus.aac.p.m4a",
+    "year": "2022"
+  },
   "icantloveyouanymore|ellalangley": {
     "title": "I Can't Love You Anymore",
     "artist": "Ella Langley & Morgan Wallen",
@@ -179,13 +200,6 @@
     "artist": "Taylor Swift",
     "url": "https://music.apple.com/us/album/6775527442?i=6775527443",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/73/76/42/737642e6-c478-bed7-f11f-efee96072450/mzaf_5163950318414409594.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "jaded|koewetzel": {
-    "title": "Jaded",
-    "artist": "Koe Wetzel & Ella Langley",
-    "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/94/f7/e2/94f7e2cc-b182-cb75-7a31-7e88eee2191e/mzaf_12920756836197900992.plus.aac.p.m4a",
     "year": "2026"
   },
   "janicestfu|drake": {
@@ -209,13 +223,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/96/3c/93/963c93ce-93b1-40c6-ed8d-04bb8cc27c82/mzaf_4401986005887392953.plus.aac.p.m4a",
     "year": "2025"
   },
-  "lovinglifeagain|ellalangley": {
-    "title": "Loving Life Again",
-    "artist": "Ella Langley",
-    "url": "https://music.apple.com/us/album/1869436835?i=1869436847",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/cd/f7/c9/cdf7c910-e4c6-9828-c83a-9e7a215bb70c/mzaf_1496635585165093785.plus.aac.p.m4a",
-    "year": "2026"
-  },
   "manineed|oliviadean": {
     "title": "Man I Need",
     "artist": "Olivia Dean",
@@ -230,13 +237,6 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/59/bb/60/59bb60aa-1a0b-ff4c-3343-d7cb9e7d375a/mzaf_16759827430963483039.plus.aac.p.m4a",
     "year": "2025"
   },
-  "misery|pupsies": {
-    "title": "Misery.",
-    "artist": "pupsies",
-    "url": "https://music.apple.com/us/album/1895959918?i=6765465347",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/43/06/4f/43064fd1-7e64-a917-7734-a91f12df53fb/mzaf_9705965089268547948.plus.aac.p.m4a",
-    "year": "2026"
-  },
   "nicolekidman|adla": {
     "title": "Nicole Kidman",
     "artist": "ADÉLA",
@@ -249,13 +249,6 @@
     "artist": "Taylor Swift",
     "url": "https://music.apple.com/us/album/6814997249?i=6814997425",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0b/be/8c/0bbe8c0a-dc77-af41-97a5-c745cc43d38c/mzaf_11790447166833591507.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "pinkclouding|taylorswift": {
-    "title": "Pink Clouding",
-    "artist": "Taylor Swift",
-    "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/88/d5/1e88d560-253f-3fa2-87a0-2f83b9681948/mzaf_11928544907491655022.plus.aac.p.m4a",
     "year": "2026"
   },
   "quebec|drake": {
@@ -291,13 +284,6 @@
     "artist": "Drake & Don Toliver",
     "url": "https://music.apple.com/us/album/6818209777?i=6818209989",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/b2/bc/1eb2bc0d-28e0-cc09-e24f-85b47358a773/mzaf_13880485937262246167.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "somethingtolose|stellalefty": {
-    "title": "Something To Lose",
-    "artist": "STELLA LEFTY & Vincent Mason",
-    "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7c/cd/dc/7ccddc8d-4a7b-3d29-e57a-d656923f8a25/mzaf_6248843394382590578.plus.aac.p.m4a",
     "year": "2026"
   },
   "stupidsong|oliviarodrigo": {
