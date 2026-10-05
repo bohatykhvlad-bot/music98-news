@@ -110,7 +110,7 @@ jobs:
               for term in [b"tariq",b"mcallister",b"harriet",b"harriett",b"creator",b"artist",b"copyright",b"credit",b"photographer"]:
                 if term in low: hits.append(term.decode())
               print("META",dims(data),len(data),h.get("Content-Type"),"hits="+",".join(hits),u)
-              for key in (b"<dc:creator>",b"photoshop:Credit=",b"photoshop:Source=",b"dc:rights",b"exif:Artist"):
+              for key in (b"<dc:creator>",b"dc:creator",b"creator",b"photoshop:Credit=",b"photoshop:Source=",b"dc:rights",b"exif:Artist"):
                 pos=low.find(key.lower())
                 if pos>=0:
                   snippet=data[max(0,pos-80):pos+400].decode("latin1","ignore").replace("\n"," ")
