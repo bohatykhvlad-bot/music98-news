@@ -24,7 +24,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m pip install --quiet Pillow beautifulsoup4
+          python -m pip install --quiet Pillow beautifulsoup4 requests
           python - <<'PY'
           import requests, os
           from bs4 import BeautifulSoup
