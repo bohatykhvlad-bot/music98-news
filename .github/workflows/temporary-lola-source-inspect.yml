@@ -29,14 +29,14 @@ jobs:
               val=m.group(1)
               if any(k in val.lower() for k in ("press","lola","general","dsp","drive.google","dropbox")):
                   print("CANDIDATE",urllib.parse.urljoin(page,val))
-          # Official Universal press attachment, credited in campaign materials to Conor Cunningham.
-          u2="https://prowly-prod.s3.eu-west-1.amazonaws.com/uploads/landing_page_image/image/648122/fbf9f7ca497c45d3836ae7ba026942a3.jpg"
+          # Raw PR-agency press shot from Lola Young's current Chuff Media artist page.
+          u2="https://chuffmedia.com/images/artists/03_CC_250428_LolaYoung_0390_V1_2025-06-23-124058.jpg"
           q=urllib.request.Request(u2,headers={"User-Agent":"Mozilla/5.0"})
           with urllib.request.urlopen(q,timeout=45) as r:
               b2=r.read()
-          open("/tmp/lola-universal.jpg","wb").write(b2)
+          open("/tmp/lola-chuff-raw.jpg","wb").write(b2)
           im2=Image.open("/tmp/lola-universal.jpg")
-          print("LOLA_UNIVERSAL",im2.size,len(b2),im2.format)
+          print("LOLA_CHUFF_RAW",im2.size,len(b2),im2.format)
           print("LOLA_EXIF",dict(im2.getexif()))
           # Known tour press derivative, retained only as a negative control.
           u="https://bunny-wp-pullzone-qbcmv8y9wp.b-cdn.net/wp-content/uploads/2026/10/Lola-Young-by-Harriet-K-Bols2.jpg"
