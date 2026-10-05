@@ -140,6 +140,9 @@ REFERENT = re.compile(
 # The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
+    "may 2026": "Victoria Monét graduated from the Institute of Culinary Education in May 2026 (Sony Music Canada 02.10.2026; Los Angeles Times 02.10.2026).",
+    "october 27": "Victoria Monét's Frequency Of Love Tour opens in Raleigh on 27.10.2026 (Sony Music Canada 02.10.2026; victoriamonet.co).",
+    "december 17": "Victoria Monét's Frequency Of Love Tour closes its announced 2026 North American run in San Francisco on 17.12.2026 (Sony Music Canada 02.10.2026).",
     "october 4": "Amazon Music announced on 04.10.2026 that Shakira's October 3 Madrid concert was its most-viewed livestream by a female artist to date (Pollstar 04.10.2026; Billboard 04.10.2026).",
     "1995": "Shakira's Pies Descalzos, which includes Antología, was released in 1995 (EFE 03.10.2026; official Shakira catalog context).",
     # Ella Langley longread, fact-checked October 3, 2026 against the named sources.
