@@ -235,11 +235,18 @@ def main():
     state=load_state()
     phase_key=a.phase.replace("-","_")
     if a.check_stamp:
-        rec=((state.get(a.post) or {}).get(phase_key) or {})
+        post_state=state.get(a.post) or {}
+        rec=(post_state.get(phase_key) or {})
         ok=rec.get("sha256")==sha and rec.get("confirmed") is True
+        pre=(post_state.get("pre_edit") or {})
+        if a.phase=="post-edit":
+            ok=ok and pre.get("confirmed") is True
         print(f"EDITORIAL_{a.phase.upper().replace('-','_')}_STAMP: {'PASS' if ok else 'FAIL'} sha={sha[:12]}")
         if not ok:
-            print(f"FAIL {a.phase} full-read stamp is missing or stale for this exact body")
+            if a.phase=="post-edit" and pre.get("confirmed") is not True:
+                print("FAIL pre-edit full-read stamp is missing; read the complete source before correction")
+            else:
+                print(f"FAIL {a.phase} full-read stamp is missing or stale for this exact body")
         raise SystemExit(0 if ok else 1)
 
     allows=set(a.allow)
