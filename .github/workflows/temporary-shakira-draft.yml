@@ -1,0 +1,12 @@
+name: Temporary Shakira draft loader
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/temporary-shakira-draft.yml]
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "armed"
