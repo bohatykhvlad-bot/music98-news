@@ -12,6 +12,7 @@ COMMANDS
   list                        posts in the desk, one line each
   show <id>                   one post in full - this is what you edit
   read <url>...               fetch pages, print only fact-bearing sentences
+  photo --url URL --name FILE upload one verified source image to site photo storage
   about "<words>" <url>...    same, but ranked against the words you care about
   register <token> "<fact>"   add a date to gate.py VERIFIED_DATES
   create --file POST.json     create a new draft only after editorial + gate + preflight
@@ -33,6 +34,7 @@ Only `show` and `read` print prose. Everything else is a handful of lines.
 from __future__ import annotations
 
 import argparse
+import base64
 import html as htmllib
 import json
 import re
@@ -267,6 +269,25 @@ def guarded_write(mutate):
     if changed:
         die("other posts changed during the write: %s" % changed)
     return now
+
+
+def cmd_photo(url, name):
+    """Download one source image and store the exact bytes in site photo storage."""
+    req=urllib.request.Request(url,headers={"User-Agent":UA,"Accept":"image/jpeg,image/png,image/webp,image/*"})
+    with urllib.request.urlopen(req,timeout=60) as r:
+        raw=r.read()
+        ctype=(r.headers.get("Content-Type") or "").split(";",1)[0].lower()
+    if ctype not in ("image/jpeg","image/png","image/webp"):
+        die("photo source returned unsupported type: %s" % ctype)
+    if len(raw)<100000 or len(raw)>3_000_000:
+        die("photo source size outside allowed range: %d bytes" % len(raw))
+    data="data:%s;base64,%s" % (ctype,base64.b64encode(raw).decode("ascii"))
+    result=http("https://music98.news/api/photo",desk_key(),{"name":name,"data":data},method="POST")
+    if not result.get("ok"):
+        die("photo upload failed: %s" % result)
+    url=result.get("url")
+    print("photo     ok: %s bytes=%d url=%s" % (name,len(raw),url))
+    return url
 
 
 def cmd_list():
@@ -741,6 +762,10 @@ def main():
     sp.add_argument("id")
     sp.add_argument("--out", required=True)
 
+    sp = sub.add_parser("photo")
+    sp.add_argument("--url", required=True)
+    sp.add_argument("--name", required=True)
+
     sp = sub.add_parser("read")
     sp.add_argument("urls", nargs="+")
     sp.add_argument("--max", type=int, default=1100)
@@ -792,6 +817,8 @@ def main():
         cmd_show(a.id)
     elif a.cmd == "dump":
         cmd_dump(a.id, a.out)
+    elif a.cmd == "photo":
+        cmd_photo(a.url, a.name)
     elif a.cmd == "read":
         cmd_read(a.urls, per_source=a.max)
     elif a.cmd == "about":
