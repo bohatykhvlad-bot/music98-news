@@ -1,0 +1,69 @@
+name: Fix Victoria James Bond attribution
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/temporary-victoria-bond-fix.yml
+permissions:
+  contents: read
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Replace only the James Bond sentence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const id="auvictoriafol26r1";
+          const old='"You Hurt Me Too" was written with the drama of a James Bond theme in mind';
+          const neu='she has said she wrote "You Hurt Me Too" in the style of a James Bond theme';
+          const h={"X-Admin-Key":process.env.ADMIN_PASSWORD,"Content-Type":"application/json","Accept":"application/json","Cache-Control":"no-cache"};
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          async function get(n){
+            const r=await fetch("https://music98.news/api/desk?victoriabond="+Date.now()+"_"+n,{headers:h,cache:"no-store"});
+            if(!r.ok) throw Error("GET_"+r.status);
+            return r.json();
+          }
+          (async()=>{
+            const d=await get(0);
+            const p=d.posts.find(x=>x.id===id);
+            if(!p||p.status!=="live") throw Error("TARGET_NOT_LIVE");
+            const count=p.body.split(old).length-1;
+            if(count!==1) throw Error("OLD_PHRASE_COUNT_"+count);
+            const others=JSON.stringify(d.posts.filter(x=>x.id!==id));
+            const meta=JSON.stringify(Object.fromEntries(Object.entries(p).filter(([k])=>k!=="body")));
+            p.body=p.body.replace(old,neu);
+            if(/Victoria Victoria Monét/.test(p.body)) throw Error("BAD_NAME_DUPLICATION");
+            const s=await fetch("https://music98.news/api/desk",{method:"POST",headers:h,body:JSON.stringify({posts:d.posts,touched:[id]})});
+            if(!s.ok) throw Error("SAVE_"+s.status);
+            for(let i=1;i<=20;i++){
+              await sleep(2000);
+              const a=await get(i);
+              const q=a.posts.find(x=>x.id===id);
+              if(!q||q.body!==p.body) continue;
+              if(JSON.stringify(a.posts.filter(x=>x.id!==id))!==others) throw Error("OTHER_POST_CHANGED");
+              const meta2=JSON.stringify(Object.fromEntries(Object.entries(q).filter(([k])=>k!=="body")));
+              if(meta2!==meta) throw Error("TARGET_METADATA_CHANGED");
+              console.log("VICTORIA_BOND_ATTRIBUTION_VERIFIED");
+              return;
+            }
+            throw Error("KV_VERIFY_TIMEOUT");
+          })().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
+      - name: Mandatory re-read of live body
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+          python scripts/editorial_readthrough.py --post auvictoriafol26r1 --confirm-full-read
+          python scripts/post.py gate auvictoriafol26r1
+          python scripts/post.py verify auvictoriafol26r1
