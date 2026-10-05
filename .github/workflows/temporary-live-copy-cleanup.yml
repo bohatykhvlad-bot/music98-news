@@ -32,8 +32,8 @@ jobs:
             if(!p||p.status!=="live") throw Error("TARGET_NOT_LIVE");
             const other=JSON.stringify(d.posts.filter(x=>x.id!==id));
             const meta=JSON.stringify(Object.fromEntries(Object.entries(p).filter(([k])=>k!=="body")));
-            const old="The digital edition runs 22 songs, while the first-edition CD and standard vinyl contain 17.";
-            const neu="The digital edition runs 22 songs, while the first-edition CD and standard vinyl contain 17. The vinyl comes on two discs and includes a double-sided poster.";
+            const old="The digital edition runs 22 songs, while the first-edition CD and standard vinyl contain 17. The vinyl comes on two discs and includes a double-sided poster.";
+            const neu="One of the album's quieter references reaches much further back. On \"Care for Somebody (Interlude),\" Monét revisits a song she first encountered as a child while watching *Introducing Dorothy Dandridge* with her grandmother. The reference fits an album that keeps moving between older pop and R&B history and Monét's present-day writing.";
             if(!p.body.includes(old)) throw Error("TARGET_PARAGRAPH_NOT_FOUND");
             p.body=p.body.replace(old,neu);
             const s=await fetch("https://music98.news/api/desk",{method:"POST",headers:h,body:JSON.stringify({posts:d.posts,touched:[id]})});
