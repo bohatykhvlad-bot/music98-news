@@ -239,12 +239,21 @@ def main():
         rec=(post_state.get(phase_key) or {})
         ok=rec.get("sha256")==sha and rec.get("confirmed") is True
         pre=(post_state.get("pre_edit") or {})
+        pre_ok=pre.get("confirmed") is True
+        if a.phase=="post-edit" and a.body_file and pre_ok:
+            try:
+                source_body=load_remote(a.post).get("body") or ""
+                source_sha=body_hash(source_body)
+                pre_ok=pre.get("sha256")==source_sha
+            except Exception as exc:
+                print("FAIL cannot verify current desk source for pre-edit stamp:",type(exc).__name__,str(exc)[:120])
+                raise SystemExit(1)
         if a.phase=="post-edit":
-            ok=ok and pre.get("confirmed") is True
+            ok=ok and pre_ok
         print(f"EDITORIAL_{a.phase.upper().replace('-','_')}_STAMP: {'PASS' if ok else 'FAIL'} sha={sha[:12]}")
         if not ok:
-            if a.phase=="post-edit" and pre.get("confirmed") is not True:
-                print("FAIL pre-edit full-read stamp is missing; read the complete source before correction")
+            if a.phase=="post-edit" and not pre_ok:
+                print("FAIL pre-edit full-read stamp is missing or stale for the current desk source")
             else:
                 print(f"FAIL {a.phase} full-read stamp is missing or stale for this exact body")
         raise SystemExit(0 if ok else 1)
