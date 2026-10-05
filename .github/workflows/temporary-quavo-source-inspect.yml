@@ -1,0 +1,59 @@
+name: Temporary Quavo source inspect
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-quavo-source-inspect.yml
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check pillow
+      - name: Inspect official QRÖMELIFE visual source and metadata
+        shell: python
+        run: |
+          import json, re, urllib.request
+          from PIL import Image
+          urls={
+            "editorial":"https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/editorial-compressed.jpg",
+            "architecture":"https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/architecture-compressed.jpg",
+            "portrait":"https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/music-portrait-compressed.jpg",
+          }
+          H={"User-Agent":"Mozilla/5.0"}
+          for name,u in urls.items():
+            q=urllib.request.Request(u,headers=H)
+            with urllib.request.urlopen(q,timeout=60) as r: b=r.read()
+            p="/tmp/quavo-"+name+".jpg"
+            open(p,"wb").write(b)
+            im=Image.open(p)
+            raw=b.decode("latin1","ignore")
+            print("IMAGE",name,im.size,len(b),im.format)
+            print("EXIF",name,dict(im.getexif()))
+            for token in ("creator","photographer","credit","copyright","artist","tariq","brian","mcallister","nguyen"):
+              if token in raw.lower(): print("RAW_HIT",name,token)
+          for endpoint in (
+            "https://www.quavohuncho.net/wp-json/wp/v2/media?search=editorial&per_page=20",
+            "https://www.quavohuncho.net/wp-json/wp/v2/media?search=architecture&per_page=20",
+            "https://www.quavohuncho.net/wp-json/wp/v2/media?search=portrait&per_page=20",
+          ):
+            try:
+              q=urllib.request.Request(endpoint,headers=H)
+              with urllib.request.urlopen(q,timeout=30) as r: data=json.load(r)
+              for x in data:
+                print("MEDIA",json.dumps({
+                  "id":x.get("id"),"slug":x.get("slug"),"source_url":x.get("source_url"),
+                  "caption":(x.get("caption") or {}).get("rendered"),
+                  "description":(x.get("description") or {}).get("rendered"),
+                  "alt_text":x.get("alt_text")
+                },ensure_ascii=False))
+            except Exception as e: print("MEDIA_API_FAIL",type(e).__name__,str(e)[:100])
+      - uses: actions/upload-artifact@v4
+        with:
+          name: quavo-qromelife-official-visuals
+          path: /tmp/quavo-*.jpg
+          if-no-files-found: error
