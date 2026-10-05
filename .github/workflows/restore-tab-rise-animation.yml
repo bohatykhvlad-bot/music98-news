@@ -1,0 +1,35 @@
+name: Restore tab rise animation
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/restore-tab-rise-animation.yml]
+permissions:
+  contents: write
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Restore the original section entrance animation and remove this temporary workflow
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path("public/index.html")
+          s=p.read_text(encoding="utf-8")
+          old='''/* Switching tabs never moves or fades an entire text layer. */
+.tab.rise{animation:none}'''
+          new='''.tab.rise{animation:rise .28s ease both}
+@keyframes rise{from{transform:translateY(10px)}to{transform:none}}'''
+          if old not in s:
+              raise SystemExit("expected disabled animation block not found")
+          p.write_text(s.replace(old,new,1),encoding="utf-8")
+          Path(".github/workflows/restore-tab-rise-animation.yml").unlink()
+      - name: Commit restored animation
+        run: |
+          git config user.name "music98-bot"
+          git config user.email "music98-bot@users.noreply.github.com"
+          git add public/index.html .github/workflows/restore-tab-rise-animation.yml
+          git commit -m "Restore section entrance animation"
+          git push
