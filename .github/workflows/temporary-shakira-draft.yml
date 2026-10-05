@@ -6,100 +6,50 @@ on:
 permissions:
   contents: write
 jobs:
-  build-draft:
+  update-draft:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 6
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
       POST_ID: shakira26amazonmadrid
-      PHOTO_PATH: public/photos/shakira-dua-lipa-madrid-nicolas-gerardin-2026.jpg
-      PHOTO_WEB: photos/shakira-dua-lipa-madrid-nicolas-gerardin-2026.jpg
-      PHOTO_URL: https://static.pollstar.com/wp-content/uploads/2026/10/V8A6727-copy.jpg
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Fetch exact Nicolas Gerardin source photo and verify dimensions
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p public/photos
-          curl -L --fail --retry 3 -A "Mozilla/5.0" "$PHOTO_URL" -o "$PHOTO_PATH"
-          python - <<'PY'
-          import os,sys
-          p=os.environ["PHOTO_PATH"]
-          b=open(p,"rb").read()
-          if not b.startswith(b"\xff\xd8"): raise SystemExit("PHOTO_NOT_JPEG")
-          w=h=0;i=2
-          while i+9<len(b):
-              if b[i]!=0xff: i+=1; continue
-              marker=b[i+1]
-              if marker in (0xd8,0xd9): i+=2; continue
-              if i+4>len(b): break
-              seg=int.from_bytes(b[i+2:i+4],"big")
-              if marker in (0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb,0xcd,0xce,0xcf):
-                  h=int.from_bytes(b[i+5:i+7],"big"); w=int.from_bytes(b[i+7:i+9],"big"); break
-              i += 2 + max(seg,2)
-          print("PHOTO_BYTES",len(b),"PHOTO_DIM",f"{w}x{h}")
-          if w < 1920: raise SystemExit("PHOTO_WIDTH_BELOW_1920")
-          if len(b) > 2900000: raise SystemExit("PHOTO_FILE_ABOVE_2_9MB")
-          PY
-      - name: Commit original source photo
-        shell: bash
-        run: |
-          set -euo pipefail
-          git config user.name "music98-bot"
-          git config user.email "music98-bot@users.noreply.github.com"
-          git add "$PHOTO_PATH"
-          git commit -m "Add Shakira Madrid photo by Nicolas Gerardin"
-          git push
-      - name: Wait until deployed photo is reachable
-        shell: bash
-        run: |
-          set -euo pipefail
-          for i in $(seq 1 18); do
-            code=$(curl -L -s -o /tmp/p.jpg -w "%{http_code}" "https://music98.news/$PHOTO_WEB?draftprobe=$i" || true)
-            if [ "$code" = "200" ]; then
-              echo "PHOTO_DEPLOYED"
-              exit 0
-            fi
-            sleep 8
-          done
-          echo "PHOTO_NOT_DEPLOYED_IN_TIME"
-          exit 1
-      - name: Save only the new Shakira post as draft
+      - name: Update only the existing Shakira draft
         shell: bash
         run: |
           set -euo pipefail
           test -n "$ADMIN_PASSWORD"
           node <<'NODE'
-          const post={"id":"shakira26amazonmadrid","type":"news","tag":"News","rtype":"","artist":"Shakira","title":"Shakira Sets Amazon Music Livestream Record With Madrid Show and Dua Lipa Duet","excerpt":"Shakira's October 3 Madrid concert became Amazon Music's most-viewed livestream by a female artist, with Dua Lipa joining her for a surprise \"Antología\" duet.","body":"Shakira's October 3 Madrid concert became Amazon Music's most-viewed livestream by a female artist, with Dua Lipa joining her for a surprise \"Antología\" duet.\n\nAmazon Music announced the record on October 4, one day after the show was broadcast worldwide through Amazon Music, Prime Video and Twitch. The company has not disclosed a viewer total, so the claim is a specific one rather than an overall streaming record. The Madrid broadcast also marked Shakira's first full-concert global livestream and served as the centerpiece of Amazon Music's 2026 Women Shaping Latin Music campaign.\n\nThe concert took place at the temporary Shakira Stadium inside Madrid's Iberdrola Music complex, where more than 50,000 people watched in person. Dua Lipa appeared during the show for an acoustic performance of \"Antología,\" the ballad Shakira released on *Pies Descalzos* in 1995. Dua had already sung the song during her own Bogotá concert in 2025, but Madrid was the first time the two artists had performed together.\n\n[ig:p:DeFRhLolil0|@shakira|https://www.instagram.com/p/DeFRhLolil0/]\n\nThe duet arrived in the middle of a Madrid residency that has kept expanding. Shakira opened the run on September 18 after the residency, initially announced as three nights, grew to 12. On October 5, Shakira and Live Nation added a 13th and final Madrid concert for October 12, citing demand. That gives the residency another closing night after the previously announced October 9, 10 and 11 shows.\n\nMadrid is not a conventional tour stop. Shakira's team built a temporary stadium and the surrounding Macondo Park for the residency, creating a larger site for concerts, exhibitions and other programming around Latin music and culture. The October 3 broadcast effectively opened that setup to an audience far beyond the people who could enter the grounds.\n\nAmazon's announcement does not say how many people watched the broadcast, and it should not be mistaken for an all-platform streaming record. It is a narrower but still substantial marker. Among female artists who have livestreamed on Amazon Music, none has drawn a larger audience. One of the night's defining moments, meanwhile, came from a song Shakira first released in 1995, now shared onstage with Dua Lipa for the first time.","date":"2026-10-05","pinned":false,"status":"draft","cover":{"kind":"img","src":"photos/shakira-dua-lipa-madrid-nicolas-gerardin-2026.jpg","credit":"Nicolas Gerardin","creditUrl":"https://www.nicolasgerardin.com/","pos":"50% 50%","zoom":1,"cardY":0.5,"cardZoom":1,"lockX":0.5}};
+          const body="Shakira's October 3 Madrid concert became Amazon Music's most-viewed livestream by a female artist, with Dua Lipa joining her for a surprise \"Antología\" duet. Amazon Music announced the record on October 4 and did not release a viewer total.\n\nThe show was broadcast worldwide through Amazon Music, Prime Video and Twitch, marking Shakira's first full-concert global livestream. The milestone is a specific one rather than an overall streaming record. Amazon Music says no female artist has drawn a larger livestream audience on its platform, and the Madrid broadcast served as the centerpiece of its 2026 Women Shaping Latin Music campaign.\n\nThe concert took place at the temporary Shakira Stadium inside Madrid's Iberdrola Music complex, where more than 50,000 people watched in person. Dua Lipa appeared during the show for an acoustic performance of \"Antología,\" the ballad Shakira released on *Pies Descalzos* in 1995. Dua had already sung the song during her own Bogotá concert in 2025, but Madrid was the first time the two artists had performed together. Both later shared footage and photos from the duet, with Shakira calling the night a dream come true for many of them. The choice gave Dua's 2025 Bogotá cover a second life in Madrid, this time with Shakira beside her.\n\n[ig:p:DeFRhLolil0|@shakira|https://www.instagram.com/p/DeFRhLolil0/]\n\nThe duet arrived in the middle of a Madrid residency that has kept expanding. Shakira opened the run on September 18 after a residency initially announced as three nights had grown to 12. On October 5, Shakira and Live Nation added a 13th and final Madrid concert for October 12, citing demand. That gives the residency another closing night after the previously announced October 9, 10 and 11 shows.\n\nMadrid is not a conventional tour stop. Shakira's team built a temporary stadium and the surrounding Macondo Park for the residency, creating a larger site for concerts, exhibitions and other programming around Latin music and culture. The October 3 broadcast effectively opened that setup to an audience far beyond the people who could enter the grounds.\n\nAmazon's announcement should not be mistaken for an all-platform streaming record, and without a viewer figure there is no useful way to compare its raw audience with other major concert streams. The claim is narrower and clear. Among female artists who have livestreamed on Amazon Music, none has drawn a larger audience. That new benchmark came from a show whose biggest surprise was not a new song or elaborate production turn, but Shakira revisiting a 1995 ballad with Dua Lipa beside her for the first time.";
+          const excerpt="Shakira's October 3 Madrid concert became Amazon Music's most-viewed livestream by a female artist, with Dua Lipa joining her for a surprise \"Antología\" duet.";
           const key=process.env.ADMIN_PASSWORD;
+          const id=process.env.POST_ID;
           const headers={"X-Admin-Key":key,"Accept":"application/json","Content-Type":"application/json","Cache-Control":"no-cache"};
           (async()=>{
             const g=await fetch("https://music98.news/api/desk",{headers,cache:"no-store"});
             if(!g.ok) throw Error("GET_DESK_"+g.status);
             const data=await g.json();
-            if(!Array.isArray(data.posts)) throw Error("INVALID_DESK");
-            if(data.posts.some(p=>p.id===post.id)) throw Error("POST_ID_ALREADY_EXISTS");
-            const before=JSON.stringify(data.posts);
-            const posts=[post,...data.posts];
-            const s=await fetch("https://music98.news/api/desk",{method:"POST",headers,body:JSON.stringify({posts,touched:[post.id]})});
+            const matches=(data.posts||[]).filter(p=>p.id===id);
+            if(matches.length!==1) throw Error("TARGET_COUNT_"+matches.length);
+            const post=matches[0];
+            if(post.status!=="draft") throw Error("TARGET_NOT_DRAFT");
+            const othersBefore=JSON.stringify(data.posts.filter(p=>p.id!==id));
+            post.body=body;
+            post.excerpt=excerpt;
+            const s=await fetch("https://music98.news/api/desk",{method:"POST",headers,body:JSON.stringify({posts:data.posts,touched:[id]})});
             if(!s.ok) throw Error("SAVE_"+s.status);
             const v=await fetch("https://music98.news/api/desk",{headers,cache:"no-store"});
             const after=await v.json();
-            const got=after.posts.find(p=>p.id===post.id);
-            if(!got || got.status!=="draft") throw Error("DRAFT_VERIFY");
-            if(got.body!==post.body || got.title!==post.title || got.excerpt!==post.excerpt) throw Error("CONTENT_MISMATCH");
-            const others=after.posts.filter(p=>p.id!==post.id);
-            if(JSON.stringify(others)!==before) throw Error("OTHER_POST_CHANGED");
-            console.log("DRAFT_SAVED",post.id,"STATUS",got.status,"OTHER_POSTS_UNCHANGED",true);
+            const got=(after.posts||[]).find(p=>p.id===id);
+            if(!got || got.status!=="draft" || got.body!==body || got.excerpt!==excerpt) throw Error("DRAFT_VERIFY");
+            if(JSON.stringify(after.posts.filter(p=>p.id!==id))!==othersBefore) throw Error("OTHER_POST_CHANGED");
+            console.log("SHAKIRA_DRAFT_UPDATED",id,"STATUS",got.status,"OTHER_POSTS_UNCHANGED",true);
           })().catch(e=>{console.error(String(e.message||e));process.exit(1)});
           NODE
-      - name: Run editorial gate and preflight
+      - name: Run gate and preflight and record report
         shell: bash
         run: |
           set -euo pipefail
@@ -122,7 +72,7 @@ jobs:
           git config user.name "music98-bot"
           git config user.email "music98-bot@users.noreply.github.com"
           git add .github/shakira-draft-report.txt
-          git commit -m "Record Shakira draft validation report"
+          git commit -m "Refresh Shakira draft validation report"
           git push
           test "$gate_code" -eq 0
           test "$preflight_code" -eq 0
