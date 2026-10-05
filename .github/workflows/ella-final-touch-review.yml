@@ -19,3 +19,4 @@ jobs:
           python-version: "3.12"
       - name: Gate, excerpt and preflight
         run: python editorial/ella-final-touch-review.py
+# Retest after proper sentence-boundary parsing
