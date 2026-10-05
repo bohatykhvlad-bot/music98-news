@@ -1,25 +1,45 @@
-name: Temporary mandatory editorial review
+name: Mandatory second check on revised posts
 on:
   push:
     branches: [main]
     paths:
-      - scripts/editorial_readthrough.py
-      - .github/editorial-current-posts.json
+      - .github/editorial-revised-posts.json
       - .github/workflows/temporary-editorial-review.yml
+      - scripts/editorial_readthrough.py
 permissions:
   contents: read
 jobs:
   review:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Check Shakira current live body
-        continue-on-error: true
-        run: python scripts/editorial_readthrough.py --post shakira26amazonmadrid --file .github/editorial-current-posts.json --confirm-full-read
-      - name: Check Victoria current live body
-        continue-on-error: true
-        run: python scripts/editorial_readthrough.py --post auvictoriafol26r1 --file .github/editorial-current-posts.json --confirm-full-read
+      - name: Editorial readthrough Shakira
+        run: python scripts/editorial_readthrough.py --post shakira26amazonmadrid --file .github/editorial-revised-posts.json --confirm-full-read
+      - name: Editorial readthrough Victoria
+        run: python scripts/editorial_readthrough.py --post auvictoriafol26r1 --file .github/editorial-revised-posts.json --confirm-full-read
+      - name: Gate both staged bodies
+        shell: python
+        run: |
+          import importlib.util,json,sys
+          spec=importlib.util.spec_from_file_location("gate","scripts/gate.py")
+          g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g);g.CHECK_IDS=False
+          data=json.load(open(".github/editorial-revised-posts.json",encoding="utf-8"))
+          bad=False
+          for p in data["posts"]:
+              fails,warns,info=g.check_post(p,strict=True)
+              print("POST",p["id"])
+              for k,v in info:
+                  if k in ("length","dates","numbers"): print("INFO",k,v)
+              for k,v in warns: print("WARN",k,v)
+              for k,v in fails: print("FAIL",k,v)
+              print("GATE","PASS" if not fails else "FAIL")
+              bad=bad or bool(fails)
+          if bad: sys.exit(1)
+      - name: Preflight Shakira
+        run: python scripts/preflight.py --post shakira26amazonmadrid --file .github/editorial-revised-posts.json --expected-media 1 --min-words 250
+      - name: Preflight Victoria
+        run: python scripts/preflight.py --post auvictoriafol26r1 --file .github/editorial-revised-posts.json --expected-media 1 --min-words 420
