@@ -82,6 +82,30 @@ jobs:
             try:
               data,h=get(u);print("DIM",dims(data),len(data),u)
             except Exception as e: print("DIM_FAIL",u,type(e).__name__)
+          print("\n=== METADATA / HIRES CHECK")
+          extra = [
+            "https://ca.rollingstone.com/media-library/image.webp?coordinates=0%2C0%2C0%2C0&height=1600&id=68053917&quality=95&width=2400",
+            "https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/editorial-compressed.jpg",
+            "https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/architecture-compressed.jpg",
+            "https://www.quavohuncho.net/wp-content/uploads/sites/2353/2026/09/music-portrait-compressed.jpg",
+            "https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/08/TranceBTS-28.jpg",
+            "https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/08/TranceBTS-49.jpg",
+          ]
+          for u in extra:
+            try:
+              data,h=get(u)
+              low=data.lower()
+              hits=[]
+              for term in [b"tariq",b"mcallister",b"harriet",b"harriett",b"creator",b"artist",b"copyright",b"credit",b"photographer"]:
+                if term in low: hits.append(term.decode())
+              print("META",dims(data),len(data),h.get("Content-Type"),"hits="+",".join(hits),u)
+              for key in (b"<dc:creator>",b"photoshop:Credit=",b"photoshop:Source=",b"dc:rights",b"exif:Artist"):
+                pos=low.find(key.lower())
+                if pos>=0:
+                  snippet=data[max(0,pos-80):pos+400].decode("latin1","ignore").replace("\n"," ")
+                  print("META_SNIP",snippet[:500])
+            except Exception as e:
+              print("META_FAIL",type(e).__name__,str(e)[:100],u)
           # Explicit original-size candidates derived from WP thumbnails.
           for u in [
             "https://www.universalmusic.ca/wp-content/uploads/sites/1843/2026/08/TranceBTS-28.jpg",
