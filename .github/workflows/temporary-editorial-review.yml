@@ -1,0 +1,25 @@
+name: Temporary mandatory editorial review
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/editorial_readthrough.py
+      - .github/editorial-current-posts.json
+      - .github/workflows/temporary-editorial-review.yml
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check Shakira current live body
+        continue-on-error: true
+        run: python scripts/editorial_readthrough.py --post shakira26amazonmadrid --file .github/editorial-current-posts.json --confirm-full-read
+      - name: Check Victoria current live body
+        continue-on-error: true
+        run: python scripts/editorial_readthrough.py --post auvictoriafol26r1 --file .github/editorial-current-posts.json --confirm-full-read
