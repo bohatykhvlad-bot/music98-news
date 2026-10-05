@@ -1,0 +1,38 @@
+name: Read current Ella draft 2026-10-05
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/ella-read-current-draft-20261005.yml
+permissions:
+  contents: read
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ADMIN_PASSWORD: \${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Print current Ella draft read-only
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          key=os.environ["ADMIN_PASSWORD"]
+          req=urllib.request.Request("https://music98.news/api/desk",headers={"X-Admin-Key":key,"Accept":"application/json","Cache-Control":"no-cache","User-Agent":"Mozilla/5.0"})
+          data=json.loads(urllib.request.urlopen(req,timeout=30).read())
+          posts=data["posts"]
+          m=[p for p in posts if p.get("id")=="ella26choosintexas" and p.get("status")=="draft"]
+          if len(m)!=1: raise SystemExit(f"expected one Ella draft, got {len(m)}")
+          p=m[0]
+          print("TITLE<<<"+p.get("title","")+">>>")
+          print("EXCERPT<<<"+p.get("excerpt","")+">>>")
+          print("BODY_BEGIN")
+          print(p.get("body",""))
+          print("BODY_END")
+          PY
