@@ -240,7 +240,7 @@ def main():
         ok=rec.get("sha256")==sha and rec.get("confirmed") is True
         pre=(post_state.get("pre_edit") or {})
         pre_ok=pre.get("confirmed") is True
-        if a.phase=="post-edit" and a.body_file and pre_ok:
+        if a.phase=="post-edit" and (a.body_file or a.file) and pre_ok:
             try:
                 source_body=load_remote(a.post).get("body") or ""
                 source_sha=body_hash(source_body)
