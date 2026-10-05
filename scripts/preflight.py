@@ -27,8 +27,11 @@ def get_remote(pid):
     with urlopen(req, timeout=30) as r:
         return select(json.loads(r.read()), pid)
 
-def check(post, baseline, expected_media, min_words):
+def check(post, baseline, expected_media, min_words=None):
     failures, warnings = [], []
+    ptype=(post.get("type") or "").strip().lower()
+    inferred_min={"news":300,"release":450,"longread":1300}.get(ptype,300)
+    min_words=inferred_min if min_words is None else max(min_words,inferred_min)
     body, title, excerpt = (post.get("body") or "", post.get("title") or "", post.get("excerpt") or "")
     media = [(m.group(1).lower(), m.group(2)) for m in MEDIA.finditer(body)]
     paragraphs = [p.strip() for p in body.split("\n\n") if p.strip()]
@@ -41,7 +44,14 @@ def check(post, baseline, expected_media, min_words):
     elif len(excerpt) < 85 or len(excerpt) > 170: warnings.append("excerpt length is outside preferred range")
     if expected_media is not None and len(media) != expected_media:
         failures.append(f"expected {expected_media} media, found {len(media)}")
-    if words < min_words: failures.append(f"too few words: {words}")
+    if ptype in {"news","release","longread"} and not media:
+        failures.append(f"{ptype} has no body media")
+    if ptype == "release":
+        has_album_embed=any(kind=="apple" and value.lower().startswith("album:") for kind,value in media)
+        if not has_album_embed:
+            failures.append("release has no Apple Music album embed")
+    if words < min_words:
+        failures.append(f"too few words for {ptype or 'post'}: {words} < {min_words}")
     if not post.get("cover"): failures.append("cover missing")
     for i, (kind, value) in enumerate(media, 1):
         if kind == "photo":
@@ -89,7 +99,7 @@ if __name__ == "__main__":
     p.add_argument("--file", type=Path)
     p.add_argument("--baseline", type=Path)
     p.add_argument("--expected-media", type=int)
-    p.add_argument("--min-words", type=int, default=1300)
+    p.add_argument("--min-words", type=int, default=None, help="optional floor; house type minimum still applies")
     args=p.parse_args()
     try:
         article = select(json.loads(args.file.read_text()),args.post) if args.file else get_remote(args.post)
