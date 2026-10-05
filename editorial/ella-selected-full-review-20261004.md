@@ -1,6 +1,6 @@
 # The Ella Langley Phenomenon and Country's New Boom
 
-By the Billboard Hot 100 dated October 3, Ella Langley’s “Choosin’ Texas” had spent 24 weeks at No. 1, a longer run than any song in the chart’s history. The Hot 100 ranks songs across genres using US radio airplay, streams and sales. How did a song this rooted in country find such a broad audience, and what does its record say about country’s growing pull in pop?
+By the Billboard Hot 100 dated October 3, Ella Langley’s “Choosin’ Texas” had spent 24 weeks at No. 1, a longer run than any song in the chart’s history. The Hot 100 ranks songs across genres using US radio airplay, streams and sales. The record reached that audience without shedding the steel guitar, two-step feel or plainspoken storytelling that made it recognizably country. How did a song this rooted in the genre travel so far, and what does its success say about country’s growing pull in pop?
 
 The story in "Choosin' Texas" is easy to follow even without knowing the places it names. The narrator believes she has convinced her boyfriend to love Tennessee, until she takes him back to his old home in Abilene, Texas. Hearing George Strait's country classic "Amarillo by Morning" brings him to life, but so does the sight of another woman. As everyone around the couple dances, his girlfriend realizes where his feelings have been all along. By the bridge, she is imagining an eastbound drive on Interstate 40 and admitting she cannot change his mind. The song ends with that realization. It never needs to show her making the trip.
 
