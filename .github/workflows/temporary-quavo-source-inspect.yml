@@ -30,6 +30,15 @@ jobs:
               p=f"/tmp/{n}.jpg";open(p,"wb").write(b)
               im=Image.open(p)
               print("QUAVO_OFFICIAL",n,im.size,len(b),im.format)
+          import json
+          for term in ("architecture","editorial","music-portrait"):
+              api=f"https://www.quavohuncho.net/wp-json/wp/v2/media?search={term}&per_page=10"
+              try:
+                  q=urllib.request.Request(api,headers={"User-Agent":"Mozilla/5.0"})
+                  with urllib.request.urlopen(q,timeout=30) as r:txt=r.read().decode("utf-8","replace")
+                  print("WP_MEDIA",term,txt[:8000].replace("\n"," "))
+              except Exception as e:
+                  print("WP_MEDIA_FAIL",term,type(e).__name__,str(e)[:120])
           PY
       - uses: actions/upload-artifact@v4
         with:
