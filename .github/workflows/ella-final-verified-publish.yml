@@ -35,7 +35,7 @@ jobs:
           title="The Ella Langley Phenomenon and Country's New Boom"
           photo="photos/ella-langley-live-caylee-robillard-2026.jpg|Caylee Robillard|https://cayleerobillard.com/"
           media=re.findall(r"\[(?:photo|youtube|apple|instagram|tiktok):[^\]]+\]",body)
-          checks={"status_live":p.get("status")=="live","hash_exact":digest==expected,"title_exact":p.get("title")==title,"excerpt_prefix":body.startswith(p.get("excerpt") or ""),"media_count":len(media)==10,"photo_credit":photo in body,"cover_present":bool(p.get("cover"))}
+          checks={"status_live":(p.get("status") or "live")=="live","hash_exact":digest==expected,"title_exact":p.get("title")==title,"excerpt_prefix":body.startswith(p.get("excerpt") or ""),"media_count":len(media)==10,"photo_credit":photo in body,"cover_present":bool(p.get("cover"))}
           if not all(checks.values()):
             print("LIVE_ARTICLE_GUARD_FAILED "+json.dumps(checks,sort_keys=True)+" sha256="+digest+" media="+str(len(media)))
             raise SystemExit(1)
@@ -95,7 +95,7 @@ jobs:
             p=find_post(posts,pid)
             old_body=p.get('body') or ''
             digest=hashlib.sha256(old_body.encode()).hexdigest()
-            if p.get('status')!='live' or digest!=expected or p.get('title')!=title or not old_body.startswith(p.get('excerpt') or ''):
+            if (p.get('status') or 'live')!='live' or digest!=expected or p.get('title')!=title or not old_body.startswith(p.get('excerpt') or ''):
               raise RuntimeError('LIVE_ARTICLE_CHANGED_ABORT')
             if not old_body.startswith(old_lead+'\n\n'):
               raise RuntimeError('EXPECTED_OLD_LEAD_MISMATCH_ABORT')
@@ -119,7 +119,7 @@ jobs:
             return p
           saved=guarded_write(mutate)
           saved_body=saved.get('body') or ''
-          if saved.get('status')!='live' or saved.get('type')!='news' or saved.get('pinned') is not True or saved.get('title')!=title or saved.get('excerpt')!=new_excerpt or not saved_body.startswith(new_lead):
+          if (saved.get('status') or 'live')!='live' or saved.get('type')!='news' or saved.get('pinned') is not True or saved.get('title')!=title or saved.get('excerpt')!=new_excerpt or not saved_body.startswith(new_lead):
             raise SystemExit('UPDATED_ARTICLE_VERIFY_FAILED')
           new_hash=hashlib.sha256(saved_body.encode()).hexdigest()
           open('/tmp/ella_new_body_sha256.txt','w',encoding='ascii').write(new_hash)
@@ -136,7 +136,7 @@ jobs:
               req=urllib.request.Request('https://music98.news/api/desk?finalaudit='+str(time.time()),headers={'User-Agent':'Mozilla/5.0','Cache-Control':'no-cache'})
               with urllib.request.urlopen(req,timeout=20) as r:posts=json.load(r)['posts']
               p=next((x for x in posts if x.get('id')=='ella26choosintexas'),None)
-              if p and p.get('status')=='live' and p.get('type')=='news' and p.get('pinned') is True and hashlib.sha256((p.get('body') or '').encode()).hexdigest()==expected:
+              if p and (p.get('status') or 'live')=='live' and p.get('type')=='news' and p.get('pinned') is True and hashlib.sha256((p.get('body') or '').encode()).hexdigest()==expected:
                 homepage=urllib.request.Request('https://music98.news/',headers={'User-Agent':'Mozilla/5.0'})
                 with urllib.request.urlopen(homepage,timeout=20) as r:assert r.status==200
                 print('ELLA_PUBLICLY_VISIBLE_SHA256='+expected+' HOMEPAGE_OK status=live')
