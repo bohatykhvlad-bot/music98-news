@@ -99,6 +99,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+          python -m py_compile scripts/editorial_readthrough.py scripts/post.py scripts/preflight.py scripts/gate.py
           python scripts/editorial_readthrough.py --post shakira26amazonmadrid --confirm-full-read
           python scripts/editorial_readthrough.py --post auvictoriafol26r1 --confirm-full-read
           python scripts/post.py gate shakira26amazonmadrid
