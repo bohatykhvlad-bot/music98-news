@@ -1,4 +1,4 @@
-name: Ella final copy-fix QA
+name: Ella final copy-fix Draft save
 on:
   push:
     branches: [editorial/ella-full-review-selective-20261004]
@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 8
     env:
       ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-      DRY_RUN: "1"
+      DRY_RUN: "0"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
