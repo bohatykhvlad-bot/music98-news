@@ -1,0 +1,37 @@
+name: Review expanded Shakira
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/shakira-expanded-final.json
+      - .github/workflows/review-expanded-shakira.yml
+      - scripts/editorial_readthrough.py
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Mandatory second readthrough
+        run: python scripts/editorial_readthrough.py --post shakira26amazonmadrid --file .github/shakira-expanded-final.json --confirm-full-read
+      - name: Gate staged body
+        shell: python
+        run: |
+          import importlib.util,json,sys
+          spec=importlib.util.spec_from_file_location("gate","scripts/gate.py")
+          g=importlib.util.module_from_spec(spec);spec.loader.exec_module(g);g.CHECK_IDS=False
+          p=json.load(open(".github/shakira-expanded-final.json",encoding="utf-8"))
+          fails,warns,info=g.check_post(p,strict=True)
+          for k,v in info:
+              if k in ("length","dates","numbers"): print("INFO",k,v)
+          for k,v in warns: print("WARN",k,v)
+          for k,v in fails: print("FAIL",k,v)
+          print("GATE","PASS" if not fails else "FAIL")
+          if fails: sys.exit(1)
+      - name: Preflight staged body
+        run: python scripts/preflight.py --post shakira26amazonmadrid --file .github/shakira-expanded-final.json --expected-media 1 --min-words 430
