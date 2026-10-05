@@ -1,17 +1,14 @@
 POST=shakira26amazonmadrid
 GATE_CODE=1
-   --  length           356 words in the body (355 in prose), 7 paragraphs
-   !   thin-leadin      68 words in paragraph 2 before the carrier at 3 (guideline 100, not a defect)
-   !   short-paragraph  paragraph 0 is 24 words - a fragment, merge it or grow it: "Shakira's October 3 Madrid concert became Amazon Music's mos"
-   !   one-sentence-paragraph paragraph 0 is a single sentence: "Shakira's October 3 Madrid concert became Amazon Music's mos"
-   X   date-unregistered 'October 4' is not in VERIFIED_DATES - register it with the fact it stands for, or drop it: …ise "Antología" duet.  Amazon Music announced the record on October 4, one day after the show was broadcast worldwide th…
-   X   date-unregistered '1995' is not in VERIFIED_DATES - register it with the fact it stands for, or drop it: …ología," the ballad Shakira released on *Pies Descalzos* in 1995. Dua had already sung the song during her own Bogotá co…
-   X   date-unregistered '1995' is not in VERIFIED_DATES - register it with the fact it stands for, or drop it: …ología," the ballad Shakira released on *Pies Descalzos* in 1995. Dua had already sung the song during her own Bogotá co…
+   --  length           420 words in the body (419 in prose), 7 paragraphs
+   !   short-paragraph  paragraph 0 is 39 words - a fragment, merge it or grow it: "Shakira's October 3 Madrid concert became Amazon Music's mos"
+   !   echo             1 4-grams repeat twice (callbacks are fine, check the list): has drawn a larger
+   X   negation-cluster 3 negations in one sentence: Amazon's announcement should not be mistaken for an all-platform streaming record, and without a viewer figure
+   X   register-term    'milestone' - say the actual result: …marking Shakira's first full-concert global livestream. The milestone is a specific one rather than an overall streaming…
+   X   register-term    'benchmark' - say what it is measured against: …on Amazon Music, none has drawn a larger audience. That new benchmark came from a show whose biggest surprise was not a…
 FAIL - fix the X lines, then run again
 
 GATE: FAIL - fix the X lines first
-PREFLIGHT_CODE=1
-POST=shakira26amazonmadrid STATUS=draft WORDS=366 MEDIA=0
-WARN finale may be thin
-FAIL expected 1 media, found 0
-PREFLIGHT: FAIL
+PREFLIGHT_CODE=0
+POST=shakira26amazonmadrid STATUS=draft WORDS=420 MEDIA=1
+PREFLIGHT: PASS
