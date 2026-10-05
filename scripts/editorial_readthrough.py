@@ -49,6 +49,12 @@ AI_BRIDGES=(
     "part of that period was spent pursuing",
     "worth noting",
     "the finished album makes those turns quickly",
+    "make the range clear",
+    "makes the range clear",
+    "the reference fits an album",
+    "the title does not describe a record of",
+    "giving the album a family connection",
+    "the album followed that curiosity",
 )
 WAIVER_CHOICES={"technical-credit","physical-format","source-attribution","single-sentence"}
 
