@@ -1,0 +1,28 @@
+name: Verify live TikTok size
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/verify-live-tiktok-size.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - shell: python
+        run: |
+          import re, urllib.request, time
+          url="https://music98.news/?verify-tiktok-size=20261005b"
+          for i in range(12):
+              req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Cache-Control":"no-cache"})
+              with urllib.request.urlopen(req,timeout=20) as r:
+                  s=r.read().decode("utf-8","replace")
+              m=re.search(r'\.yembed\.tk\{max-width:(\d+)px\}',s)
+              print("ATTEMPT",i+1,"WIDTH",m.group(1) if m else "MISSING")
+              if m and m.group(1)=="371":
+                  print("LIVE_TIKTOK_WIDTH_OK")
+                  break
+              time.sleep(8)
+          else:
+              raise SystemExit("LIVE_WIDTH_NOT_371")
