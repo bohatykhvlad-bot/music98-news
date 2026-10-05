@@ -1,0 +1,46 @@
+name: Read live Ella longread
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/read-live-ella.yml]
+permissions:
+  contents: read
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Fetch current live Ella post
+        shell: python
+        run: |
+          import json, os, urllib.request, re
+          H={"X-Admin-Key":os.environ["ADMIN_PASSWORD"],"User-Agent":"music98-live-review","Cache-Control":"no-cache","Accept":"application/json"}
+          req=urllib.request.Request("https://music98.news/api/desk",headers=H)
+          with urllib.request.urlopen(req,timeout=30) as r:
+              data=json.load(r)
+          posts=data.get("posts") or []
+          found=[p for p in posts if p.get("id")=="ella26choosintexas" or p.get("title")=="The Ella Langley Phenomenon and Country's New Boom"]
+          if len(found)!=1: raise SystemExit("TARGET_COUNT="+str(len(found)))
+          p=found[0]
+          print("STATUS="+str(p.get("status")))
+          print("TITLE="+str(p.get("title")))
+          print("EXCERPT="+str(p.get("excerpt")))
+          print("DATE="+str(p.get("date") or p.get("publishAt") or ""))
+          body=str(p.get("body") or "")
+          print("WORDS="+str(len(re.findall(r"\b[\w’'-]+\b",body))))
+          print("MEDIA="+str(len(re.findall(r"\[(?:photo|youtube|apple|tiktok|instagram):[^\]]+\]",body,re.I))))
+          print("BODY_BEGIN")
+          print(body)
+          print("BODY_END")
+          url="https://music98.news/the-ella-langley-phenomenon-and-countrys-new-boom"
+          try:
+              q=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0","Cache-Control":"no-cache"})
+              with urllib.request.urlopen(q,timeout=30) as r:
+                  html=r.read().decode("utf-8","replace")
+                  print("PUBLIC_STATUS="+str(r.status))
+                  print("PUBLIC_FINAL_URL="+r.geturl())
+                  print("PUBLIC_HAS_TITLE="+str("The Ella Langley Phenomenon and Country" in html))
+          except Exception as e:
+              print("PUBLIC_ERROR="+repr(e))
