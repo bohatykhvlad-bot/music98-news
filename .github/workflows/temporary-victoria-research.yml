@@ -1,0 +1,47 @@
+name: Temporary Victoria release research
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/temporary-victoria-research.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Inspect recent release conventions
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const key=process.env.ADMIN_PASSWORD;
+          (async()=>{
+            if(!key)throw Error("NO_KEY");
+            const r=await fetch("https://music98.news/api/desk",{headers:{"X-Admin-Key":key,"Accept":"application/json"},cache:"no-store"});
+            if(!r.ok)throw Error("DESK_"+r.status);
+            const j=await r.json();
+            const rel=(j.posts||[]).filter(p=>p.type==="release"&&(p.status||"live")==="live")
+              .sort((a,b)=>new Date(b.publishAt||b.date||0)-new Date(a.publishAt||a.date||0)).slice(0,4);
+            for(const p of rel){
+              const paras=String(p.body||"").split(/\n\n+/).filter(Boolean);
+              console.log("RELEASE",JSON.stringify({id:p.id,title:p.title,artist:p.artist,rtype:p.rtype,tag:p.tag,excerpt:p.excerpt,media:paras.filter(x=>/^\[(photo|youtube|apple|ig|instagram|tiktok):/i.test(x)),ending:paras.at(-1)}));
+            }
+          })().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
+      - name: Probe official Sony artwork file
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://drive.google.com/uc?export=download&id=1RkQzPnrxbGyrZyQX5243WlLpBvTkH4Ep"
+          curl -L --fail --retry 3 -A "Mozilla/5.0" "$url" -o /tmp/victoria.jpg
+          file /tmp/victoria.jpg
+          python - <<'PY'
+          from PIL import Image
+          import os
+          p="/tmp/victoria.jpg"
+          im=Image.open(p)
+          print("ARTWORK",im.format,im.size,"BYTES",os.path.getsize(p))
+          PY
