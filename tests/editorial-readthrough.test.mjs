@@ -18,6 +18,8 @@ test("second editorial barrier exists and targets reader-facing failure modes",(
   assert.match(checker,/administrative\/release-format metadata/);
   assert.match(checker,/HTML entity leaked/);
   assert.match(checker,/canned recap construction/);
+  assert.match(checker,/choppy article paragraph/);
+  assert.match(checker,/paragraph rhythm/);
   assert.match(checker,/full uninterrupted top-to-bottom read not attested/);
 });
 
