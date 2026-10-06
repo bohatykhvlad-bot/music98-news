@@ -1,6 +1,386 @@
 {
   "schema": 1,
   "current": {
+    "updated": "2026-10-06",
+    "week": 19,
+    "rev": "daily-global-v37",
+    "complete": true,
+    "methodology": "daily-global-v1",
+    "sources": {
+      "A": 50,
+      "S": 50,
+      "D": 50
+    },
+    "sourceDateKinds": {
+      "A": "published",
+      "S": "chart-day",
+      "D": "capture"
+    },
+    "sourceDates": {
+      "A": "2026-10-06",
+      "S": "2026-10-04",
+      "D": "2026-10-06"
+    },
+    "sourceOrigin": {
+      "A": "official-global-live",
+      "S": "kworb-crosschecked-kworb+musicrank",
+      "D": "official-worldwide-live"
+    },
+    "spotifyFingerprint": "dcf3873fac162ce5f37024414fb2e6436a574a3e8e24bf0874278fb99077ceac",
+    "tracks": [
+      {
+        "rank": 1,
+        "title": "BbY WOW",
+        "artist": "KAROL G, Judeline & rusowsky",
+        "weeks": 17,
+        "delta": "0"
+      },
+      {
+        "rank": 2,
+        "title": "stupid song",
+        "artist": "Olivia Rodrigo",
+        "weeks": 17,
+        "delta": "1"
+      },
+      {
+        "rank": 3,
+        "title": "Choosin' Texas",
+        "artist": "Ella Langley",
+        "weeks": 17,
+        "delta": "-1"
+      },
+      {
+        "rank": 4,
+        "title": "hate that i made you love me",
+        "artist": "Ariana Grande",
+        "weeks": 17,
+        "delta": "4"
+      },
+      {
+        "rank": 5,
+        "title": "Patient Zero",
+        "artist": "Taylor Swift",
+        "weeks": 10,
+        "delta": "0"
+      },
+      {
+        "rank": 6,
+        "title": "Man I Need",
+        "artist": "Olivia Dean",
+        "weeks": 17,
+        "delta": "3"
+      },
+      {
+        "rank": 7,
+        "title": "Nicole Kidman",
+        "artist": "ADÉLA",
+        "weeks": 17,
+        "delta": "0"
+      },
+      {
+        "rank": 8,
+        "title": "the cure",
+        "artist": "Olivia Rodrigo",
+        "weeks": 17,
+        "delta": "2"
+      },
+      {
+        "rank": 9,
+        "title": "Ain't In LA",
+        "artist": "ADÉLA",
+        "weeks": 15,
+        "delta": "32"
+      },
+      {
+        "rank": 10,
+        "title": "Been By Now",
+        "artist": "Morgan Wallen",
+        "weeks": 17,
+        "delta": "6"
+      },
+      {
+        "rank": 11,
+        "title": "Beauty and a Beat",
+        "artist": "Justin Bieber, Nicki Minaj",
+        "weeks": 8,
+        "delta": "33"
+      },
+      {
+        "rank": 12,
+        "title": "drop dead",
+        "artist": "Olivia Rodrigo",
+        "weeks": 8,
+        "delta": "3"
+      },
+      {
+        "rank": 13,
+        "title": "Be Her",
+        "artist": "Ella Langley",
+        "weeks": 17,
+        "delta": "-7"
+      },
+      {
+        "rank": 14,
+        "title": "Great Expectation",
+        "artist": "SIENNA SPIRO",
+        "weeks": 4,
+        "delta": "28"
+      },
+      {
+        "rank": 15,
+        "title": "Boston",
+        "artist": "STELLA LEFTY",
+        "weeks": 17,
+        "delta": "6"
+      },
+      {
+        "rank": 16,
+        "title": "The Fate of Ophelia",
+        "artist": "Taylor Swift",
+        "weeks": 10,
+        "delta": "14"
+      },
+      {
+        "rank": 17,
+        "title": "Solar Eclipse",
+        "artist": "Drake & Don Toliver",
+        "weeks": 3,
+        "delta": "10"
+      },
+      {
+        "rank": 18,
+        "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
+        "artist": "Taylor Swift",
+        "weeks": 14,
+        "delta": "5"
+      },
+      {
+        "rank": 19,
+        "title": "Love Me Not",
+        "artist": "Ravyn Lenae",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 20,
+        "title": "Quebec",
+        "artist": "Drake",
+        "weeks": 3,
+        "delta": "6"
+      },
+      {
+        "rank": 21,
+        "title": "Cold Shoulder",
+        "artist": "Drake, Don Toliver & Yebba",
+        "weeks": 3,
+        "delta": "18"
+      },
+      {
+        "rank": 22,
+        "title": "Dai Dai",
+        "artist": "Shakira & Burna Boy",
+        "weeks": 17,
+        "delta": "-18"
+      },
+      {
+        "rank": 23,
+        "title": "Dracula",
+        "artist": "Tame Impala",
+        "weeks": 17,
+        "delta": "-10"
+      },
+      {
+        "rank": 24,
+        "title": "Earrings",
+        "artist": "Malcolm Todd",
+        "weeks": 17,
+        "delta": "4"
+      },
+      {
+        "rank": 25,
+        "title": "The One That Got Away",
+        "artist": "Katy Perry",
+        "weeks": 7,
+        "delta": "21"
+      },
+      {
+        "rank": 26,
+        "title": "Janice STFU",
+        "artist": "Drake",
+        "weeks": 17,
+        "delta": "-15"
+      },
+      {
+        "rank": 27,
+        "title": "Midnight Sun",
+        "artist": "Zara Larsson",
+        "weeks": 17,
+        "delta": "-13"
+      },
+      {
+        "rank": 28,
+        "title": "Self Aware",
+        "artist": "Temper City",
+        "weeks": 17,
+        "delta": "-4"
+      },
+      {
+        "rank": 29,
+        "title": "back to friends",
+        "artist": "sombr",
+        "weeks": 2,
+        "delta": "4"
+      },
+      {
+        "rank": 30,
+        "title": "Cinderella",
+        "artist": "Mac Miller, Ty Dolla $ign",
+        "weeks": 8,
+        "delta": "5"
+      },
+      {
+        "rank": 31,
+        "title": "Babylon",
+        "artist": "Taylor Swift",
+        "weeks": 10,
+        "delta": "5"
+      },
+      {
+        "rank": 32,
+        "title": "So Easy (To Fall In Love)",
+        "artist": "Olivia Dean",
+        "weeks": 17,
+        "delta": "-12"
+      },
+      {
+        "rank": 33,
+        "title": "Last Thing You Need",
+        "artist": "Morgan Wallen",
+        "weeks": 10,
+        "delta": "-16"
+      },
+      {
+        "rank": 34,
+        "title": "Sweater Weather",
+        "artist": "The Neighbourhood",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 35,
+        "title": "Die With A Smile",
+        "artist": "Lady Gaga & Bruno Mars",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 36,
+        "title": "Mexico Honey",
+        "artist": "Kacey Musgraves",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 37,
+        "title": "I Can't Love You Anymore",
+        "artist": "Ella Langley & Morgan Wallen",
+        "weeks": 17,
+        "delta": "-8"
+      },
+      {
+        "rank": 38,
+        "title": "Iris",
+        "artist": "The Goo Goo Dolls",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 39,
+        "title": "musubi",
+        "artist": "Ayumu Imazu",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 40,
+        "title": "Babydoll",
+        "artist": "Dominic Fike",
+        "weeks": 17,
+        "delta": "-22"
+      },
+      {
+        "rank": 41,
+        "title": "Jaded",
+        "artist": "Koe Wetzel & Ella Langley",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 42,
+        "title": "Medicine",
+        "artist": "Megan Moroney",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 43,
+        "title": "Stop The Wedding!",
+        "artist": "Ashe",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 44,
+        "title": "Billie Jean",
+        "artist": "Michael Jackson",
+        "weeks": 2,
+        "delta": "-12"
+      },
+      {
+        "rank": 45,
+        "title": "Don't We",
+        "artist": "Morgan Wallen",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 46,
+        "title": "Loser",
+        "artist": "Tame Impala",
+        "weeks": 17,
+        "delta": "-34"
+      },
+      {
+        "rank": 47,
+        "title": "Cowgirl",
+        "artist": "Shaboozey",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 48,
+        "title": "Pink Clouding",
+        "artist": "Taylor Swift",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 49,
+        "title": "Woman",
+        "artist": "Kane Brown",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 50,
+        "title": "Be By You",
+        "artist": "Luke Combs",
+        "weeks": 1,
+        "delta": "re-entry"
+      }
+    ]
+  },
+  "previous": {
     "updated": "2026-10-05",
     "week": 18,
     "rev": "verified-spotify-v36",
@@ -370,379 +750,6 @@
         "artist": "Quavo, Takeoff",
         "weeks": 1,
         "delta": "new"
-      }
-    ]
-  },
-  "previous": {
-    "updated": "2026-10-03",
-    "week": 16,
-    "rev": "verified-spotify-v36",
-    "complete": true,
-    "sources": {
-      "A": 50,
-      "S": 50,
-      "D": 50,
-      "B": 50,
-      "Y": 50
-    },
-    "sourceDates": {
-      "S": "2026-10-01"
-    },
-    "sourceOrigin": {
-      "A": "live",
-      "S": "kworb-crosschecked-kworb+musicrank"
-    },
-    "spotifyFingerprint": "c711f572fc3c025ae27d30abffa9cfd21057f2b07e7d60c65b62a32c57182b60",
-    "tracks": [
-      {
-        "rank": 1,
-        "title": "BbY WOW",
-        "artist": "KAROL G, Judeline & rusowsky",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 2,
-        "title": "Choosin' Texas",
-        "artist": "Ella Langley",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 3,
-        "title": "stupid song",
-        "artist": "Olivia Rodrigo",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 4,
-        "title": "Be Her",
-        "artist": "Ella Langley",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 5,
-        "title": "hate that i made you love me",
-        "artist": "Ariana Grande",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 6,
-        "title": "Dai Dai",
-        "artist": "Shakira & Burna Boy",
-        "weeks": 15,
-        "delta": "1"
-      },
-      {
-        "rank": 7,
-        "title": "Man I Need",
-        "artist": "Olivia Dean",
-        "weeks": 15,
-        "delta": "1"
-      },
-      {
-        "rank": 8,
-        "title": "Nicole Kidman",
-        "artist": "ADÉLA",
-        "weeks": 15,
-        "delta": "-2"
-      },
-      {
-        "rank": 9,
-        "title": "Janice STFU",
-        "artist": "Drake",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 10,
-        "title": "Last Thing You Need",
-        "artist": "Morgan Wallen",
-        "weeks": 8,
-        "delta": "0"
-      },
-      {
-        "rank": 11,
-        "title": "Been By Now",
-        "artist": "Morgan Wallen",
-        "weeks": 15,
-        "delta": "1"
-      },
-      {
-        "rank": 12,
-        "title": "I Can't Love You Anymore",
-        "artist": "Ella Langley & Morgan Wallen",
-        "weeks": 15,
-        "delta": "-1"
-      },
-      {
-        "rank": 13,
-        "title": "Midnight Sun",
-        "artist": "Zara Larsson",
-        "weeks": 15,
-        "delta": "1"
-      },
-      {
-        "rank": 14,
-        "title": "the cure",
-        "artist": "Olivia Rodrigo",
-        "weeks": 15,
-        "delta": "-1"
-      },
-      {
-        "rank": 15,
-        "title": "Patient Zero",
-        "artist": "Taylor Swift",
-        "weeks": 8,
-        "delta": "0"
-      },
-      {
-        "rank": 16,
-        "title": "Dracula",
-        "artist": "Tame Impala",
-        "weeks": 15,
-        "delta": "1"
-      },
-      {
-        "rank": 17,
-        "title": "Dead Fresh",
-        "artist": "Lil Baby",
-        "weeks": 15,
-        "delta": "-1"
-      },
-      {
-        "rank": 18,
-        "title": "Babydoll",
-        "artist": "Dominic Fike",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 19,
-        "title": "Boston",
-        "artist": "STELLA LEFTY",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 20,
-        "title": "Loser",
-        "artist": "Tame Impala",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 21,
-        "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
-        "artist": "Taylor Swift",
-        "weeks": 12,
-        "delta": "0"
-      },
-      {
-        "rank": 22,
-        "title": "drop dead",
-        "artist": "Olivia Rodrigo",
-        "weeks": 6,
-        "delta": "0"
-      },
-      {
-        "rank": 23,
-        "title": "So Easy (To Fall In Love)",
-        "artist": "Olivia Dean",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 24,
-        "title": "Be By You",
-        "artist": "Luke Combs",
-        "weeks": 4,
-        "delta": "0"
-      },
-      {
-        "rank": 25,
-        "title": "Earrings",
-        "artist": "Malcolm Todd",
-        "weeks": 15,
-        "delta": "0"
-      },
-      {
-        "rank": 26,
-        "title": "Loving Life Again",
-        "artist": "Ella Langley",
-        "weeks": 4,
-        "delta": "2"
-      },
-      {
-        "rank": 27,
-        "title": "Animal",
-        "artist": "KATSEYE",
-        "weeks": 15,
-        "delta": "2"
-      },
-      {
-        "rank": 28,
-        "title": "Golden",
-        "artist": "HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast",
-        "weeks": 12,
-        "delta": "3"
-      },
-      {
-        "rank": 29,
-        "title": "Quebec",
-        "artist": "Drake",
-        "weeks": 1,
-        "delta": "new"
-      },
-      {
-        "rank": 30,
-        "title": "What You Need",
-        "artist": "Tems",
-        "weeks": 15,
-        "delta": "3"
-      },
-      {
-        "rank": 31,
-        "title": "Babylon",
-        "artist": "Taylor Swift",
-        "weeks": 8,
-        "delta": "-5"
-      },
-      {
-        "rank": 32,
-        "title": "Jaded",
-        "artist": "Koe Wetzel & Ella Langley",
-        "weeks": 4,
-        "delta": "3"
-      },
-      {
-        "rank": 33,
-        "title": "Pink Clouding",
-        "artist": "Taylor Swift",
-        "weeks": 8,
-        "delta": "-6"
-      },
-      {
-        "rank": 34,
-        "title": "AH HA",
-        "artist": "Cardi B",
-        "weeks": 15,
-        "delta": "2"
-      },
-      {
-        "rank": 35,
-        "title": "Self Aware",
-        "artist": "Temper City",
-        "weeks": 15,
-        "delta": "2"
-      },
-      {
-        "rank": 36,
-        "title": "Cleveland!",
-        "artist": "Taylor Swift",
-        "weeks": 8,
-        "delta": "-6"
-      },
-      {
-        "rank": 37,
-        "title": "Great Expectation",
-        "artist": "SIENNA SPIRO",
-        "weeks": 2,
-        "delta": "-3"
-      },
-      {
-        "rank": 38,
-        "title": "Solar Eclipse",
-        "artist": "Drake & Don Toliver",
-        "weeks": 1,
-        "delta": "new"
-      },
-      {
-        "rank": 39,
-        "title": "The Fate of Ophelia",
-        "artist": "Taylor Swift",
-        "weeks": 8,
-        "delta": "-7"
-      },
-      {
-        "rank": 40,
-        "title": "Cold Shoulder",
-        "artist": "Drake, Don Toliver & Yebba",
-        "weeks": 1,
-        "delta": "new"
-      },
-      {
-        "rank": 41,
-        "title": "Ain't In LA",
-        "artist": "ADÉLA",
-        "weeks": 13,
-        "delta": "-2"
-      },
-      {
-        "rank": 42,
-        "title": "Hootie Frutti",
-        "artist": "KATSEYE",
-        "weeks": 15,
-        "delta": "-2"
-      },
-      {
-        "rank": 43,
-        "title": "Risk It All",
-        "artist": "Bruno Mars",
-        "weeks": 15,
-        "delta": "-2"
-      },
-      {
-        "rank": 44,
-        "title": "Sunflower",
-        "artist": "Post Malone & Swae Lee",
-        "weeks": 15,
-        "delta": "-2"
-      },
-      {
-        "rank": 45,
-        "title": "Cinderella",
-        "artist": "Mac Miller, Ty Dolla $ign",
-        "weeks": 6,
-        "delta": "-7"
-      },
-      {
-        "rank": 46,
-        "title": "Misery.",
-        "artist": "pupsies",
-        "weeks": 14,
-        "delta": "-3"
-      },
-      {
-        "rank": 47,
-        "title": "Something To Lose",
-        "artist": "STELLA LEFTY & Vincent Mason",
-        "weeks": 2,
-        "delta": "-3"
-      },
-      {
-        "rank": 48,
-        "title": "The One That Got Away",
-        "artist": "Katy Perry",
-        "weeks": 5,
-        "delta": "-3"
-      },
-      {
-        "rank": 49,
-        "title": "WTF GOIN",
-        "artist": "Belly Gang Kushington & 21 Savage",
-        "weeks": 15,
-        "delta": "-3"
-      },
-      {
-        "rank": 50,
-        "title": "Beauty and a Beat",
-        "artist": "Justin Bieber, Nicki Minaj",
-        "weeks": 6,
-        "delta": "-3"
       }
     ]
   }

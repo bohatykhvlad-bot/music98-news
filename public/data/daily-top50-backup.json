@@ -42,7 +42,7 @@
   "sourceOrigin": {
     "A": "official-global-live",
     "S": "kworb-crosschecked-kworb+musicrank",
-    "D": "github-current-day-worldwide"
+    "D": "official-worldwide-live"
   },
   "sourceDates": {
     "A": "2026-10-06",
@@ -66,7 +66,8 @@
     "asked": 1,
     "filled": 1,
     "failed": 0,
-    "missing": 0
+    "missing": 0,
+    "runtimeFilled": 0
   },
   "tracks": [
     {
@@ -332,7 +333,7 @@
       "gainDb": -7.4,
       "lufs": -8.6,
       "truePeakDbtp": 0.7,
-      "delta": "new",
+      "delta": "re-entry",
       "weeks": 1
     },
     {
@@ -556,7 +557,7 @@
       "gainDb": -6.4,
       "lufs": -9.6,
       "truePeakDbtp": 0.4,
-      "delta": "new",
+      "delta": "re-entry",
       "weeks": 1
     },
     {
@@ -598,7 +599,7 @@
       "gainDb": -5.2,
       "lufs": -10.8,
       "truePeakDbtp": 0.3,
-      "delta": "new",
+      "delta": "re-entry",
       "weeks": 1
     },
     {
@@ -640,7 +641,7 @@
       "gainDb": -8.9,
       "lufs": -7.1,
       "truePeakDbtp": 1,
-      "delta": "new",
+      "delta": "re-entry",
       "weeks": 1
     },
     {
@@ -738,7 +739,7 @@
       "gainDb": -8.7,
       "lufs": -7.3,
       "truePeakDbtp": 0.4,
-      "delta": "new",
+      "delta": "re-entry",
       "weeks": 1
     },
     {
@@ -766,37 +767,37 @@
       "gainDb": -6.3,
       "lufs": -9.7,
       "truePeakDbtp": -0.6,
-      "delta": "new",
+      "delta": "re-entry",
       "weeks": 1
     }
   ],
-  "seedEdition": "[[\"A\",\"2026-10-06T09:08:01.085Z\",\"2026-10-06\"],[\"D\",\"2026-10-06T01:00:51.513Z\",\"2026-10-06\"]]",
+  "seedEdition": "[[\"A\",\"2026-10-06T09:16:09.701Z\",\"2026-10-06\"],[\"D\",\"2026-10-06T09:16:10.138Z\",\"2026-10-06\"]]",
   "arrows": {
     "ok": true,
     "bad": 0,
     "mixed": 0,
-    "new": 14,
-    "reentry": 0
+    "new": 8,
+    "reentry": 6
   },
   "memory": {
     "recoveryApplied": true,
     "recoverySource": "last-complete-chart",
     "recoveryWeek": 18,
     "recoveryEvidence": {
-      "repair": true,
+      "repair": false,
       "overlap": 36,
       "established": 34,
-      "broken": 34,
-      "massReset": true,
-      "missingReference": true
+      "broken": 0,
+      "massReset": false,
+      "missingReference": false
     },
     "week": 19,
     "sameDay": false,
     "refSource": "today",
     "refLen": 50,
     "nearMiss": [],
-    "ever": 50,
-    "new": 14,
-    "reentry": 0
+    "ever": 89,
+    "new": 8,
+    "reentry": 6
   }
 }
