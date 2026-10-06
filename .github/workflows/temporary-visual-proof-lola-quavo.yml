@@ -1,0 +1,24 @@
+name: Temporary visual proof Lola Quavo
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-visual-proof-lola-quavo.yml
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download exact saved covers
+        run: |
+          mkdir -p /tmp/proof
+          curl -fL --retry 3 -o /tmp/proof/quavo-cover.jpg https://music98.news/photos/quavo-qromelife-official-architecture.jpg
+          curl -fL --retry 3 -o /tmp/proof/lola-cover.jpg https://music98.news/photos/lola-young-from-down-here-nicole-ngai-original.jpg
+          file /tmp/proof/*
+          wc -c /tmp/proof/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lola-quavo-cover-proof
+          path: /tmp/proof/*
+          if-no-files-found: error
