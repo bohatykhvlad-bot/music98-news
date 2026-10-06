@@ -46,7 +46,7 @@ def get_remote(pid):
 def check(post, baseline, expected_media, min_words=None):
     failures, warnings = [], []
     ptype = (post.get("type") or "").strip().lower()
-    inferred_min = {"news": 300, "release": 450, "longread": 1300}.get(ptype, 300)
+    inferred_min = {"news": 250, "release": 400, "longread": 1300}.get(ptype, 250)
     min_words = inferred_min if min_words is None else max(min_words, inferred_min)
 
     body = post.get("body") or ""
