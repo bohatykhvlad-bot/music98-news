@@ -141,7 +141,6 @@ REFERENT = re.compile(
 # The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
-    "october 7": "Lola Young Everything Begins Tour artist presales begin 07.10.2026 (Pollstar 05.10.2026; official tour announcement).",
     "april 6": "Lola Young Everything Begins Tour opens at The Pinnacle in Nashville on 06.04.2027 (Pollstar 05.10.2026).",
     "may 4": "Lola Young Everything Begins Tour closes at the Greek Theatre in Los Angeles on 04.05.2027 (Pollstar 05.10.2026).",
     "may 2026": "Victoria Monét graduated from the Institute of Culinary Education in May 2026 (Sony Music Canada 02.10.2026; Los Angeles Times 02.10.2026).",
@@ -154,7 +153,7 @@ VERIFIED_DATES = {
     "june 2026": "Ella Langley performed Choosin' Texas at CMA Fest in June 2026; official CMA performance posted June 25, 2026 (CMA YouTube i1IX4Dusi9k)",
     "august 25": "Dolly Parton died August 25, 2026, aged 80 (Associated Press https://apnews.com/article/87156f3e6a1547b88bf414529b644ad3)",
     "october 2026": "Miranda Lambert AP interview published October 2, 2026, discusses a country scene with a variety of voices (Associated Press https://apnews.com/article/670c88368e68e3f62ede48edf93e5177)",
-    "october 7": "Lola Young Everything Begins Tour artist presale begins 07.10.2026 (Pollstar 05.10.2026: https://news.pollstar.com/2026/10/05/lola-young-sets-2027-everything-begins-tour-of-north-america/)",
+    "october 7": "Lola Young Everything Begins Tour presales begin 07.10.2026 (Pollstar 05.10.2026: https://news.pollstar.com/2026/10/05/lola-young-sets-2027-everything-begins-tour-of-north-america/)",
     "october 9": "Dominic Fike 'How To Quit Smoking' album release date, 09.10.2026 (Apple Music / Columbia Records); Lola Young Everything Begins Tour general sale begins 09.10.2026 at 10 a.m. local time (Pollstar 05.10.2026)",
     "september 29": "Dominic Fike Comedy Tragedy Parody show at The Wiltern, Los Angeles, 29.09.2026 (dominicfike.com / Ticketmaster)",
     "september 30": "Dominic Fike Comedy Tragedy Parody show at The Wiltern, Los Angeles, 30.09.2026 (dominicfike.com / Ticketmaster); LISA added-show general on-sale, 30.09.2026 (Caesars Entertainment 29.09.2026)",
@@ -172,7 +171,6 @@ VERIFIED_DATES = {
     "september": "LISA 'LALISA' 10.09.2021 (text: that September)",
     "march": "JENNIE 'Ruby', 07.03.2025 (text: the following March)",
     "october 30": "Fallen Angel physical edition with three extra tracks, 30.10.2026",
-    "october 23": "LISA EP 'PRESS PLAY', 23.10.2026",
     "october 12": "Always Lalisa worldwide theatrical release begins 12.10.2026 (Sony Music Vision 02.09.2026)",
     "november": "LISA residency at Caesars Palace, November 2026",
     "november 12": "Newly added VIVA LA LISA show at The Colosseum at Caesars Palace, 12.11.2026 (Caesars Entertainment 29.09.2026)",
@@ -197,7 +195,6 @@ VERIFIED_DATES = {
     "september 3": "'Bass Persuades' title track + Mert Alas video 03.09.2026",
     "september 4": "LISA 'SaWaDiKa' released 04.09.2026 through LLOUD Co. / RCA Records (Sony Music Spain)",
     "september 8": "BbY WOW first hit No.1 on Billboard Global 200 (chart week of 12.09)",
-    "august 7": "KAROL G 'NO ME ARREPIENTO DE SENTIR TANTO' album out 07.08.2026 (Bichota)",
     "october 16": "Miley Hollywood Bowl night one, 16.10.2026 (Atlantic announcement)",
     "october": "Bass Persuades Hollywood Bowl 16+18.10.2026; Fallen Angel physical 30.10.2026",
     # CORRECTED 23.09.2026: the earlier entry here read "Taylor Swift wedding, June 2026".
@@ -229,10 +226,9 @@ VERIFIED_DATES = {
                     "Stereogum 24.09.2026)",
     "september 13": "Judeline interview with Rolling Stone published 13.09.2026",
     "september 16": "Yeat announced COCOON as a surprise EP 16.09.2026 (InMusic)",
-    "september 17": "COCOON first advertised as five tracks for 17.09.2026 (InMusic)",
     "september 27": "2026 MTV VMAs air 27.09.2026, CBS, Madonna opening; Song of the Summer fan voting "
                      "closes that day",
-    "october 23": "John Legend *Muse* out 23.10.2026 via Republic Records; produced in full and co-written by Pharrell Williams (Universal Music Canada 08.09.2026 and 25.09.2026)",
+    "october 23": "LISA EP 'PRESS PLAY' out 23.10.2026; John Legend *Muse* out 23.10.2026 via Republic Records, produced in full and co-written by Pharrell Williams (Universal Music Canada 08.09.2026 and 25.09.2026)",
     "2019": "Feid EP *19*, 2019 - the record EL CLUB DE LAS 19 FLORES reaches back to",
     "july 10": "Feid 'A XON DE QUE' advance track, 10.07.2026",
     "june 5": "Taylor Swift 'I Knew It, I Knew You' (Toy Story 5) out 05.06.2026 "
@@ -269,17 +265,14 @@ VERIFIED_DATES = {
                "(Wikipedia/UMG; lead single announced with it)",
     "june 26": "'On Wires', lead single, 26.06.2026 (Wikipedia, carlyraejepsen.wiki.gg, UMG)",
     "july 16": "'After All', 16.07.2026 (Wikipedia, UMG Philippines)",
-    "august 7": "'Don't Leave Me on the Dance Floor', 07.08.2026 in the Day and Night rollout "
-                "(Wikipedia, Genius); KAROL G's album of the same date is the other entry",
+    "august 7": "Carly Rae Jepsen 'Don't Leave Me on the Dance Floor' released 07.08.2026 in the Day and Night rollout (Wikipedia, Genius); KAROL G 'NO ME ARREPIENTO DE SENTIR TANTO' album out 07.08.2026 (Bichota)",
     "august 21": "'Motivation', 21.08.2026, closing the Day and Night singles run "
                  "(uDiscoverMusic 21.08.2026, Wikipedia)",
     "september 9": "Apple and ROSÉ announced the 'new trick' Shot on iPhone partnership 09.09.2026 "
                    "(Billboard 09.09.2026)",
     "2015": "Apple's Shot on iPhone campaign began in 2015 with user photos on billboards "
             "(Apple/press); the music-video branch is its newest form",
-    "september 17": "ROSÉ 'new trick' single and video 17.09.2026 (Apple/Shot on iPhone; "
-                    "texxandthecity 2 days later); Drake restored FOMO to YouTube 17.09.2026 "
-                    "after a two-day takedown",
+    "september 17": "COCOON first advertised as five tracks for 17.09.2026 (InMusic); ROSÉ 'new trick' single and video 17.09.2026 (Apple/Shot on iPhone; texxandthecity 2 days later); Drake restored FOMO to YouTube 17.09.2026 after a two-day takedown",
     "december 2024": "ROSÉ debut studio album 'rosie', 06.12.2024 (Atlantic/Interscope press)",
 
     # --- registered 23.09.2026 during the audit of the four live posts -----------------
