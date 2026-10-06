@@ -55,7 +55,7 @@ The middle section contains another full paragraph with enough detail to carry i
 
 Another short paragraph interrupts the flow and exists mainly to prove that repeated two-or-three-line blocks should not pass just because each individual sentence is grammatical and factual.
 
-The final section is again fully developed, adding a concrete closing detail that has not already been stated and giving the piece a natural end. It is long enough to show that the problem is the repeated short blocks in the middle, not a globally short article or an artificially low word count. The checker should identify the chopped rhythm even though the surrounding paragraphs are healthy."""
+The final section is again fully developed, adding a concrete closing detail that has not already been stated and giving the piece a natural end. It is long enough to show that the problem is the repeated short blocks in the middle, not a globally short article or an artificially low word count. The checker should identify the chopped rhythm even though the surrounding paragraphs are healthy. To keep the fixture safely above the article-length threshold, this final section also adds more ordinary context about sequencing, pacing and the difference between a developed paragraph and a patch. None of those extra sentences introduces a separate defect. They simply ensure that the test represents a normal-length news article whose overall word count cannot be blamed for the short blocks in the middle. The expected failure must therefore come from paragraph rhythm itself rather than from a globally brief draft."""
 }
 
 
