@@ -1,0 +1,1 @@
+Read and obey `music98-agent-operating-canon.md` before any editorial change. It is the single source of truth for music98 editorial work. Automated checks are safety nets, not writing targets. Do not save AI/PR/list-like/recap prose merely because tests pass.
