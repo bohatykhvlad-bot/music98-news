@@ -8,9 +8,8 @@ This is the mandatory working instruction for any AI editing music98.news.
 Priority:
 1. Owner's latest instruction in the current conversation.
 2. This canon.
-3. `site/_style-memory.md` for image/media presentation.
-4. Existing desk conventions.
-5. General editorial judgment.
+3. Existing desk conventions.
+4. General editorial judgment.
 
 A script PASS is never proof that an article is good. **Write for the reader first. Checks are a safety net, not a target.**
 
@@ -227,8 +226,6 @@ Then read only the final sentence of every paragraph. If they repeatedly explain
 ---
 
 ## 9. MEDIA / PHOTOS
-
-For detailed visual rules use `site/_style-memory.md`.
 
 Non-negotiable:
 - Prefer official hi-res press/promo originals.
