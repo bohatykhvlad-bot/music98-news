@@ -1,26 +1,25 @@
 import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
 import {compareSpotifyRankings,parseKworbSpotify,spotifyDateCurrent,verifiedSpotifySnapshot} from "../lib/spotify-chart.js";
+import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,DAILY_SOURCE_DETAILS,APPLE_GLOBAL_URL,DEEZER_GLOBAL_URL,
+  completeDailySources,parseAppleGlobal,parseDeezerWorldwide,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
 
 const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
-/* Bumped to v20 on 26.09: forces the rebuild where NEW always means one day.
-   Any future "refresh the chart now" is the same bump. */
-const TOP50_KV = "top50v36";
-const TOP50_RETRY_KV="top50v36:retry";
-const SOURCE_MIN_ROWS=50;
-const SOURCES = ["A", "S", "D", "B", "Y"];
+/* Separate ranking cache for daily-only global inputs. Tenure/media registries
+   retain their keys, so changing the formula does not reset established songs. */
+const TOP50_KV = "top50v37";
+const TOP50_RETRY_KV="top50v37:retry";
+const SOURCES = DAILY_SOURCE_IDS;
 /* A source missing even once changes the scoring scale and fabricates movement. */
 function completeChartSources(s) {
-  return !!s && SOURCES.every(k=>Number(s[k])===SIZE);
+  return completeDailySources(s);
 }
 function verifiedSourceSnapshot(s) {
-  return !!s && s.complete===true && completeChartSources(s.sources) &&
+  return !!s && s.methodology===DAILY_CHART_METHOD && s.complete===true && completeChartSources(s.sources) &&
     Array.isArray(s.tracks) && s.tracks.length===SIZE;
 }
-const YT_CHARTS =
-  "https://charts.youtube.com/youtubei/v1/browse?alt=json&key=AIzaSyCzEW7JUJdSql0-2V4tHUb6laYm4iAE_dM";
 
 function isApplePreview(url) {
   const u = String(url || "").toLowerCase();
@@ -136,8 +135,9 @@ async function applyCovers(env, tracks, origin) {
   }
   return tracks;
 }
-/* Остальные обложки добираем одним batch-запросом Apple по track id из ссылки:
-   это ровно тот релиз, который мы показываем и на который ведёт кнопка. */
+/* Missing artwork or audio is resolved by exact Apple track ID. A new global
+   playlist row can have artwork before it appears in the title-search index.
+   Existing audited artwork must never be replaced while filling its preview. */
 function applyAppleCanonicalIdentity(track, title, artist) {
   const nextTitle = String(title || track.title || "").trim();
   const nextArtist = String(artist || track.artist || "").trim();
@@ -151,7 +151,7 @@ function applyAppleCanonicalIdentity(track, title, artist) {
 async function enrichArtByIds(tracks, stats) {
   const want = [];
   for (const t of tracks) {
-    if (t.art) continue;
+    if (t.art && isApplePreview(t.prev)) continue;
     const m = String(t.url || "").match(/[?&]i=(\d+)/);
     if (m) want.push([t, m[1]]);
   }
@@ -175,7 +175,7 @@ async function enrichArtByIds(tracks, stats) {
     if (!item || !appleCandidateCompatible(t.title, t.artist, item)) continue;
     if (!applyAppleCanonicalIdentity(t, item.trackName, item.artistName)) continue;
     const art = String(item.artworkUrl100 || "").replace("100x100bb", "600x600bb");
-    if (art && isAppleArt(art)) {
+    if (!t.art && art && isAppleArt(art)) {
       t.art = art;
       if (stats) stats.filled += 1;
     }
@@ -262,7 +262,7 @@ async function applyNames(env, tracks, origin) {
 }
 
 /* A song's identity is mergeKey (normalized title + primary artist): the same key
-   ingest() already uses to fold Apple, Spotify, Deezer, Billboard and YouTube rows
+   ingest() already uses to fold daily Apple, Spotify and Deezer rows
    of one track into a single chart entry. Building the tenure key from the raw
    display string instead made Apple's "BbY WOW / KAROL G, Judeline & rusowsky" and
    Spotify's "BbY WOW (w/ Judeline, rusowsky) / KAROL G" two different songs, so any
@@ -330,7 +330,7 @@ function normalizeEver(old) {
    the first rebuild treated the entire Top 50 as day one. A checked-in snapshot
    from the previous healthy day gives us an independent recovery source. */
 function tenureBackupState(snapshot) {
-  if (!verifiedSourceSnapshot(snapshot)) return null;
+  if (!verifiedTenureEdition(snapshot)) return null;
   const snapshotWeek = Number(snapshot.week);
   if (!Number.isFinite(snapshotWeek)) return null;
   const keys = [];
@@ -417,7 +417,7 @@ async function applyTenure(env, tracks, diag, origin) {
   const evidence=tenureResetEvidence(tracks,ten,seen,firstDay,recovery.prior);
   if(recovery.prior) {
     const prior=recovery.prior;
-    /* Restore the last all-five-source chart, not the corrupted interim day. */
+    /* Restore the last verified edition, including history before migration. */
     const older=Object.fromEntries(Object.entries(seen)
       .filter(([,rec])=>Number(rec?.lastWeek)<=prior.week));
     seen={...older,...prior.seen};
@@ -583,97 +583,8 @@ async function getText(url) {
 async function getJson(url) {
   return JSON.parse(await getText(url));
 }
-async function postJson(url, body) {
-  const r = await fetch(url, {
-    method: "POST",
-    headers: {
-      "User-Agent": UA,
-      "Content-Type": "application/json",
-      Origin: "https://charts.youtube.com",
-      Referer: "https://charts.youtube.com/charts/TopSongs/global/weekly",
-    },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(8000),
-  });
-  if (!r.ok) throw new Error(String(r.status));
-  return r.json();
-}
-
-function parseApple(data) {
-  return ((data.feed && data.feed.results) || []).slice(0, SIZE).map((item, i) => ({
-    pos: i + 1,
-    title: item.name || "",
-    artist: item.artistName || "",
-    url: item.url || "",
-    art: (item.artworkUrl100 || "").replace("100x100bb", "600x600bb"),
-    year: (item.releaseDate || "").slice(0, 4),
-    prev: "",
-  })).filter((r) => r.title && r.artist);
-}
-
-function parseDeezer(data) {
-  return (data.data || []).slice(0, SIZE).map((item, i) => ({
-    pos: i + 1,
-    title: item.title || "",
-    artist: (item.artist && item.artist.name) || "",
-    url: "",
-    art: (item.album && (item.album.cover_xl || item.album.cover_medium)) || "",
-    year: "",
-    prev: "",
-  })).filter((r) => r.title && r.artist);
-}
-
 /* All HTML structure, highlighted rows and the source date are parsed in one tested module. */
 function parseSpotify(html) { return parseKworbSpotify(html); }
-
-function parseYouTube(data) {
-  const content =
-    data &&
-    data.contents &&
-    data.contents.sectionListRenderer &&
-    data.contents.sectionListRenderer.contents &&
-    data.contents.sectionListRenderer.contents[0] &&
-    data.contents.sectionListRenderer.contents[0].musicAnalyticsSectionRenderer &&
-    data.contents.sectionListRenderer.contents[0].musicAnalyticsSectionRenderer.content;
-  const groups = (content && content.trackTypes) || [];
-  const weekly = groups.find((g) => g.chartPeriodType === "CHART_PERIOD_TYPE_WEEKLY") || groups[0] || {};
-  const views = weekly.trackViews || [];
-  const seen = new Set();
-  const rows = [];
-  for (const item of views) {
-    const title = item.name || "";
-    const artist = ((item.artists || []).map((a) => a && a.name).filter(Boolean)).join(", ");
-    if (!title || !artist) continue;
-    const key = mergeKey(title, artist);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    const pos = Number(item.chartEntryMetadata && item.chartEntryMetadata.currentPosition) || rows.length + 1;
-    if (pos < 1 || pos > SIZE) continue;
-    rows.push({ pos, title, artist, url: "", art: "", year: "", prev: "" });
-    if (rows.length >= SIZE) break;
-  }
-  return rows.sort((a, b) => a.pos - b.pos).slice(0, SIZE);
-}
-
-function parseBillboard(html) {
-  const parts = html.split("o-chart-results-list-row //");
-  const seen = new Set();
-  const rows = [];
-  for (const chunk of parts.slice(1)) {
-    const tm = chunk.match(/id="title-of-a-story"[^>]*>\s*([^<]+)/);
-    const am = chunk.match(/href="https:\/\/www\.billboard\.com\/artist\/[^"]+"[^>]*>\s*([^<]+)/);
-    if (!tm || !am) continue;
-    const title = tm[1].replace(/&#039;/g, "'").trim();
-    const artist = am[1].trim();
-    if (!title || !artist) continue;
-    const key = mergeKey(title, artist);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    rows.push({ pos: rows.length + 1, title, artist, url: "", art: "", year: "", prev: "" });
-    if (rows.length >= SIZE) break;
-  }
-  return rows;
-}
 
 function ingest(bucket, src, rows) {
   for (const row of rows) {
@@ -731,50 +642,31 @@ async function seedBaked(origin, tracks) {
   } catch {}
 }
 
-/* If Apple's live origin is blocked on Cloudflare, use ONLY today's
-   validated official RSS chart fetched from GitHub Actions. */
-async function freshAppleRanking(env,origin) {
- const snap=await readSeed(env,origin,"apple-chart.json");
- const today=new Date().toISOString().slice(0,10);
- if(snap?.schema!==1||snap.updated!==today||
-    snap.source!=="official-apple-rss"||!Array.isArray(snap.tracks))return [];
- const pos=new Set(),keys=new Set(),rows=[];
- for(const rec of snap.tracks){
-   const n=Number(rec?.pos),title=String(rec?.title||"").trim(),
-     artist=String(rec?.artist||"").trim(),key=mergeKey(title,artist);
-   if(!title||!artist||!Number.isInteger(n)||n<1||n>SIZE||
-      pos.has(n)||keys.has(key))return [];
-   pos.add(n);keys.add(key);
-   rows.push({pos:n,title,artist,url:String(rec.url||""),
-      art:String(rec.art||""),year:String(rec.year||""),prev:""});
- }
- return rows.length===SIZE && rows.every((r,i)=>r.pos===i+1)
-    ? rows.sort((a,b)=>a.pos-b.pos) : [];
+/* Use only same-day validated global snapshots when a live platform fails. */
+async function freshDailyRanking(env,origin,source) {
+  const file=source==="A" ? "apple-chart.json" : "deezer-chart.json";
+  return verifiedDailySeed(await readSeed(env,origin,file),source);
 }
 export async function buildTop50(origin, env, spotifySeed) {
-  let [apple, spotify, deezer, billboard, youtube] = await Promise.all([
-    safe("A", async () => parseApple(await getJson("https://rss.applemarketingtools.com/api/v2/us/music/most-played/50/songs.json"))),
+  let [appleChart, spotify, deezer] = await Promise.all([
+    safe("A", async () => parseAppleGlobal(await getText(APPLE_GLOBAL_URL))),
     safe("S", async () => parseSpotify(await getText("https://kworb.net/spotify/country/global_daily.html"))),
-    safe("D", async () => parseDeezer(await getJson("https://api.deezer.com/chart/0/tracks?limit=50"))),
-    safe("B", async () => parseBillboard(await getText("https://www.billboard.com/charts/hot-100/"))),
-    safe("Y", async () => parseYouTube(await postJson(YT_CHARTS, {
-      context: {
-        client: {
-          clientName: "WEB_MUSIC_ANALYTICS",
-          clientVersion: "2.0",
-          hl: "en",
-          gl: "US",
-          theme: "MUSIC",
-        },
-      },
-      browseId: "FEmusic_analytics_charts_home",
-      query: JSON.stringify({ region: "global" }),
-    }))),
+    safe("D", async () => parseDeezerWorldwide(await getJson(DEEZER_GLOBAL_URL))),
   ]);
-  let appleOrigin="live";
-  if(apple.length<SOURCE_MIN_ROWS){
-    apple=await freshAppleRanking(env,origin);
-    appleOrigin=apple.length===SIZE?"github-current-day":"unavailable";
+  let apple=appleChart?.tracks || [];
+  let appleOrigin="official-global-live",deezerOrigin="official-worldwide-live";
+  let appleDate=appleChart?.date || "",deezerDate=new Date().toISOString().slice(0,10);
+  if(apple.length!==SIZE){
+    const snapshot=await freshDailyRanking(env,origin,"A");
+    apple=snapshot?.tracks || [];
+    appleDate=snapshot?.sourceDate || "";
+    appleOrigin=snapshot ? "github-current-day-global" : "unavailable";
+  }
+  if(deezer.length!==SIZE){
+    const snapshot=await freshDailyRanking(env,origin,"D");
+    deezer=snapshot?.tracks || [];
+    deezerDate=snapshot?.sourceDate || "";
+    deezerOrigin=snapshot ? "github-current-day-worldwide" : "unavailable";
   }
   const independent=verifiedSpotifySnapshot(spotifySeed ||
     await readSeed(env,origin,"spotify-chart.json"));
@@ -790,12 +682,12 @@ export async function buildTop50(origin, env, spotifySeed) {
       spotifyOrigin="kworb-crosschecked-"+independent.source;
     }else spotify=independent.tracks;
   }else spotify=independent.tracks;
-  const sources={A:apple.length,S:spotify.length,D:deezer.length,B:billboard.length,Y:youtube.length};
+  const sources={A:apple.length,S:spotify.length,D:deezer.length};
   if(!completeChartSources(sources))
     throw new Error("incomplete_chart_sources:"+JSON.stringify(sources));
   /* Each platform must contribute ranks 1 through 50, without duplicate
      song identities. A source that looks like 50 rows may still skip a rank. */
-  for(const [label,rows] of [["A",apple],["S",spotify],["D",deezer],["B",billboard],["Y",youtube]]){
+  for(const [label,rows] of [["A",apple],["S",spotify],["D",deezer]]){
     const identities=new Set();
     for(let i=0;i<SIZE;i++){
       const row=rows[i],identity=mergeKey(row?.title,row?.artist);
@@ -808,8 +700,6 @@ export async function buildTop50(origin, env, spotifySeed) {
   ingest(bucket, "A", apple);
   ingest(bucket, "S", spotify);
   ingest(bucket, "D", deezer);
-  ingest(bucket, "B", billboard);
-  ingest(bucket, "Y", youtube);
   const ranked = [...bucket.values()]
     .sort((a, b) => {
       const sa = SOURCES.reduce((n, k) => n + points(a.ranks[k]), 0);
@@ -854,10 +744,13 @@ export async function buildTop50(origin, env, spotifySeed) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "verified-spotify-v36",
+    rev: "daily-global-v37",
+    methodology: DAILY_CHART_METHOD,
+    sourceDetails: DAILY_SOURCE_DETAILS,
     sources,
-    sourceOrigin:{A:appleOrigin,S:spotifyOrigin},
-    sourceDates:{S:independent.date},
+    sourceOrigin:{A:appleOrigin,S:spotifyOrigin,D:deezerOrigin},
+    sourceDates:{A:appleDate,S:independent.date,D:deezerDate},
+    sourceDateKinds:{A:"published",S:"chart-day",D:"capture"},
     spotifyFingerprint:independent.fingerprint,
     complete:true,
     seed: {
@@ -898,10 +791,7 @@ async function itunesLookup(title, artist) {
 async function enrichApple(tracks) {
   await Promise.all(tracks.map(async (t) => {
     if (t.url && isApplePreview(t.prev) && t.art) return;
-    const grab = (title, artist) => Promise.race([
-      itunesLookup(title, artist),
-      new Promise((_, reject) => setTimeout(() => reject(new Error("itunes-timeout")), 6000)),
-    ]);
+    const grab = (title, artist) => withTimeout(itunesLookup(title, artist),6000);
     try {
       const exact = await grab(t.title, t.artist);
       if (exact.art && isAppleArt(exact.art) &&
@@ -948,11 +838,14 @@ async function bakedTop50(request) {
   return null;
 }
 
-function withTimeout(promise, ms) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
-  ]);
+async function withTimeout(promise, ms) {
+  let timer;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise((_, reject) => { timer=setTimeout(() => reject(new Error("timeout")), ms); }),
+    ]);
+  } finally { clearTimeout(timer); }
 }
 
 /* Reject the 2026-10-01 failure mode before serving a poisoned daily KV
@@ -1000,8 +893,10 @@ async function verifiedBackupTop50(env, origin, backup) {
   tracks.forEach(t => { t.url = appleAff(t.url); if (!isApplePreview(t.prev)) t.prev = ""; });
   return {
     updated: snap.updated, launch:"2026-09-17", week:Number(snap.week)+1,
-    rev:"verified-backup-v36", fallback:"verified-snapshot", complete:true,
+    rev:"daily-global-backup-v37", methodology:snap.methodology,
+    sourceDetails:DAILY_SOURCE_DETAILS, fallback:"verified-snapshot", complete:true,
     sources:snap.sources, sourceDates:snap.sourceDates||{},
+    sourceDateKinds:snap.sourceDateKinds||{}, spotifyFingerprint:snap.spotifyFingerprint,
     sourceOrigin:snap.sourceOrigin||{}, tracks,
     covers:{ missing:tracks.filter(t=>!t.art).length }
   };
@@ -1014,8 +909,7 @@ async function lastGood(env, backup) {
   if (!env || !env.DESK) return null;
   try {
     const v = await env.DESK.get(TOP50_KV, { type: "json" });
-    if (v && v.complete===true && completeChartSources(v.sources) &&
-        Array.isArray(v.tracks) && v.tracks.length === SIZE &&
+    if (verifiedSourceSnapshot(v) &&
         !cachedTenureRegressed(v, backup)) return v;
   } catch {}
   return null;
@@ -1057,6 +951,10 @@ async function decorateCachedTop50(env, payload, origin) {
       await applyCovers(env, payload.tracks, origin);
       const healed = await healMissingArtwork(env, payload.tracks, origin);
       await applyLoudness(env, payload.tracks, origin);
+      payload.tracks.forEach(t => {
+        t.url=appleAff(t.url);
+        if (!isApplePreview(t.prev)) t.prev="";
+      });
       payload.covers = {
         ...(payload.covers || {}),
         missing: healed.after,
@@ -1072,14 +970,23 @@ async function decorateCachedTop50(env, payload, origin) {
    immutable 17 September launch chart and silently label it as current. */
 async function bestVerifiedFallback(env, origin, backup) {
   const good = await lastGood(env, backup);
+  // Full verified daily edition supports an empty/reset KV on first deployment.
+  // Keep legacy tenure snapshots for history recovery without relabelling them.
+  let daily = null;
+  try {
+    const saved = await readSeed(env, origin, "daily-top50-backup.json");
+    if (verifiedSourceSnapshot(saved) && saved.arrows?.ok === true &&
+        !cachedTenureRegressed(saved, backup)) daily = saved;
+  } catch {}
+  const healthy = good && (!daily || String(good.updated) >= String(daily.updated)) ? good : daily;
   const savedDay = backup && backup.current && backup.current.updated || "";
-  if (good && String(good.updated) >= savedDay)
-    return decorateCachedTop50(env, good, origin);
+  if (healthy && String(healthy.updated) >= savedDay)
+    return decorateCachedTop50(env, {...healthy,fallback:healthy === good ? "last-verified" : "verified-daily-snapshot"}, origin);
   try {
     const saved = await verifiedBackupTop50(env, origin, backup);
     if (saved) return saved;
   } catch {}
-  return good ? decorateCachedTop50(env, good, origin) : null;
+  return healthy ? decorateCachedTop50(env, {...healthy,fallback:healthy === good ? "last-verified" : "verified-daily-snapshot"}, origin) : null;
 }
 
 async function fallbackOrUnavailable(env,origin,backup) {
@@ -1092,28 +999,37 @@ async function fallbackOrUnavailable(env,origin,backup) {
 export async function onRequestGet({env,request}) {
   const today=new Date().toISOString().slice(0,10);
   const origin=new URL(request.url).origin;
-  const [backup,spotifySeed]=await Promise.all([
+  const [backup,spotifySeed,appleSeed,deezerSeed]=await Promise.all([
     readSeed(env,origin,"chart-tenure-backup.json"),
-    readSeed(env,origin,"spotify-chart.json")
+    readSeed(env,origin,"spotify-chart.json"),
+    readSeed(env,origin,"apple-chart.json"),
+    readSeed(env,origin,"deezer-chart.json")
   ]);
+  // A newly deployed source snapshot must unblock a failed refresh immediately,
+  // even when Spotify has not changed. Keep the existing retry delay otherwise.
+  const seedEdition=JSON.stringify([["A",appleSeed],["D",deezerSeed]].map(([id,raw])=>{
+    const seed=verifiedDailySeed(raw,id);
+    return seed ? [id,seed.capturedAt||seed.updated,seed.sourceDate] : [id,""];
+  }));
   const verified=verifiedSpotifySnapshot(spotifySeed);
   if(!verified)return fallbackOrUnavailable(env,origin,backup);
   if(env?.DESK)try{
     const cached=await env.DESK.get(TOP50_KV,{type:"json"});
-    if(cached?.updated===today && cached.complete===true &&
-       completeChartSources(cached.sources) && cached.tracks?.length===SIZE &&
+    if(cached?.updated===today && verifiedSourceSnapshot(cached) &&
+       cached.seedEdition===seedEdition &&
        cached.sourceDates?.S===verified.date &&
        cached.spotifyFingerprint===verified.fingerprint &&
        !cachedTenureRegressed(cached,backup))
       return top50Response(await decorateCachedTop50(env, cached, origin));
     const retry=await env.DESK.get(TOP50_RETRY_KV,{type:"json"});
-    if(retry?.fingerprint===verified.fingerprint)
+    if(retry?.fingerprint===verified.fingerprint && retry.seedEdition===seedEdition)
       return fallbackOrUnavailable(env,origin,backup);
   }catch{}
   try{
     const payload=await withTimeout(buildTop50(origin,env,spotifySeed),14000);
     if(payload.complete!==true || !completeChartSources(payload.sources) ||
        payload.tracks?.length!==SIZE)throw new Error("incomplete_chart_sources");
+    payload.seedEdition=seedEdition;
     const memory={deferPersist:true};
     payload.tracks=await applyTenure(env,payload.tracks,memory,origin);
     payload.arrows=arrowCheck(payload.tracks);
@@ -1134,7 +1050,7 @@ export async function onRequestGet({env,request}) {
   }catch(err){
     if(env?.DESK)try{
       await env.DESK.put(TOP50_RETRY_KV,JSON.stringify({
-        failedAt:new Date().toISOString(),fingerprint:verified.fingerprint,
+        failedAt:new Date().toISOString(),fingerprint:verified.fingerprint,seedEdition,
         detail:String(err?.message||"unavailable").slice(0,160)
       }),{expirationTtl:1800});
     }catch{}

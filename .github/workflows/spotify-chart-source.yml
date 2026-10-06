@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Compare public Spotify Top 50 sources (or validate Musicrank independently)
+      - name: Require matching dated Top 50 from both Spotify mirrors
         run: node scripts/refresh-spotify-ranking.mjs
       - name: Publish only completely validated source edition
         env:

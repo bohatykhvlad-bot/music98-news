@@ -1,26 +1,30 @@
 import fs from "node:fs";
 import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
+import {DAILY_CHART_METHOD,completeDailySources} from "../functions/lib/daily-chart-sources.js";
 /* Production and GitHub's independent Spotify reference must match exactly.
    Wait briefly for Workers Builds to deploy when a new snapshot is committed. */
 const mirror=JSON.parse(fs.readFileSync(new URL("../public/data/spotify-chart.json",import.meta.url),"utf8"));
 const verified=verifiedSpotifySnapshot(mirror);
 if(!verified)throw new Error("Spotify reference is missing, unverified or too old");
 let j=null,reason="";
-for(let attempt=0;attempt<5;attempt++){
+const attempts=20;
+for(let attempt=0;attempt<attempts;attempt++){
+ try{
  const res=await fetch("https://music98.news/api/top50?audit="+Date.now()+"&try="+attempt,
-   {headers:{"user-agent":"music98-chart-audit/2.0","cache-control":"no-cache"}});
+   {headers:{"user-agent":"music98-chart-audit/2.0","cache-control":"no-cache"},signal:AbortSignal.timeout(15000)});
  if(res.ok){
    j=await res.json();
    if(!j.fallback && j.complete===true &&
-     ["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])===50) &&
+     j.methodology===DAILY_CHART_METHOD && completeDailySources(j.sources) &&
      j.sourceDates?.S===verified.date && j.spotifyFingerprint===verified.fingerprint)break;
  }
  reason=JSON.stringify({status:res.status,updated:j?.updated,rev:j?.rev,
   fallback:j?.fallback,sources:j?.sources,spotifyDate:j?.sourceDates?.S});
- if(attempt<4)await new Promise(done=>setTimeout(done,14000));
+ }catch(error){reason=String(error?.message||error);}
+ if(attempt<attempts-1)await new Promise(done=>setTimeout(done,15000));
 }
 if(!j || j.fallback || j.complete!==true ||
-  !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])===50) ||
+  j.methodology!==DAILY_CHART_METHOD || !completeDailySources(j.sources) ||
   j.sourceDates?.S!==verified.date || j.spotifyFingerprint!==verified.fingerprint)
   throw new Error("Published chart differs from the verified source: "+reason);
 console.log("SPOTIFY_SOURCE_AUDIT",JSON.stringify({date:verified.date,provider:verified.source,

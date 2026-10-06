@@ -15,6 +15,7 @@ function classes(attrs){
 function dateISO(s) {
  const d=String(s||"").replace(/\//g,"-");
  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||Number.isNaN(Date.parse(d+"T00:00:00Z")))return "";
+ if(new Date(d+"T00:00:00Z").toISOString().slice(0,10)!==d)return "";
  return d;
 }
 export function spotifyDateCurrent(day,now=Date.now(),maxAge=SPOTIFY_MAX_LAG_DAYS){
@@ -92,6 +93,8 @@ export function parseMusicrankSpotify(html){
 }
 export function compareSpotifyRankings(a,b){
  if(!a||!b||a.date!==b.date)return {ok:false,dateMatch:false,mismatchPositions:[]};
+ try{validatedSpotifyRows(a.tracks);validatedSpotifyRows(b.tracks);}
+ catch{return {ok:false,dateMatch:true,mismatchPositions:[]};}
  const mismatchPositions=[];
  for(let i=0;i<SPOTIFY_TOP_SIZE;i++)
   if(mergeKey(a.tracks?.[i]?.title,a.tracks?.[i]?.artist)!==
@@ -100,9 +103,7 @@ export function compareSpotifyRankings(a,b){
 }
 export function verifiedSpotifySnapshot(s,now=Date.now()){
  if(s?.schema!==1||s.verified!==true||!spotifyDateCurrent(s.chartDate,now))return null;
- if(s.provider==="kworb+musicrank"&&s.mirrorMatched!==SPOTIFY_TOP_SIZE)return null;
- if(s.provider==="musicrank-self-validated"&&Number(s.ldConfirmed)<20)return null;
- if(!["kworb+musicrank","musicrank-self-validated"].includes(s.provider))return null;
+ if(s.provider!=="kworb+musicrank"||s.mirrorMatched!==SPOTIFY_TOP_SIZE)return null;
  if(!/^[a-f0-9]{64}$/.test(String(s.fingerprint||"")))return null;
  try{return {date:s.chartDate,source:s.provider,fingerprint:s.fingerprint,tracks:validatedSpotifyRows(s.tracks)};}
  catch{return null;}

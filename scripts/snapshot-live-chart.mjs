@@ -1,8 +1,10 @@
 import fs from "node:fs";
 import {mergeKey} from "../functions/lib/chart-identity.js";
 import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
+import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,completeDailySources} from "../functions/lib/daily-chart-sources.js";
 
 const OUT = new URL("../public/data/chart-tenure-backup.json", import.meta.url);
+const DAILY_OUT = new URL("../public/data/daily-top50-backup.json", import.meta.url);
 const liveUrl = "https://music98.news/api/top50?tenureSnapshot=" + Date.now();
 const r = await fetch(liveUrl, {
   headers: {
@@ -16,9 +18,9 @@ const j = await r.json();
 const spotifyRef=verifiedSpotifySnapshot(JSON.parse(fs.readFileSync(
   new URL("../public/data/spotify-chart.json",import.meta.url),"utf8")));
 if(!spotifyRef || j.fallback || j.complete!==true ||
-   !["A","S","D","B","Y"].every(k=>Number(j.sources?.[k])===50) ||
+   j.methodology!==DAILY_CHART_METHOD || !completeDailySources(j.sources) ||
    j.sourceDates?.S!==spotifyRef.date || j.spotifyFingerprint!==spotifyRef.fingerprint)
-  throw new Error("refusing snapshot unless all five are complete and Spotify edition matches");
+  throw new Error("refusing snapshot unless all daily sources are complete and Spotify edition matches");
 const tracks = Array.isArray(j.tracks) ? j.tracks : [];
 if (tracks.length !== 50) throw new Error("refusing tenure snapshot: expected 50 rows, got " + tracks.length);
 if (j.arrows && j.arrows.ok === false) throw new Error("refusing tenure snapshot: live arrow/tenure self-check failed");
@@ -74,7 +76,9 @@ const snapshot = {
   week: Number.isFinite(memoryWeek) ? memoryWeek : (Number.isFinite(payloadWeek) ? payloadWeek - 1 : null),
   rev: String(j.rev || ""),
   complete:true,
-  sources:Object.fromEntries(["A","S","D","B","Y"].map(k=>[k,Number(j.sources[k])])),
+  methodology:j.methodology,
+  sources:Object.fromEntries(DAILY_SOURCE_IDS.map(k=>[k,Number(j.sources[k])])),
+  sourceDateKinds:j.sourceDateKinds,
   sourceDates:j.sourceDates,
   sourceOrigin:j.sourceOrigin,
   spotifyFingerprint:j.spotifyFingerprint,
@@ -99,6 +103,8 @@ if (current && current.updated === snapshot.updated) {
 }
 backup.schema = 1;
 fs.writeFileSync(OUT, JSON.stringify(backup, null, 2) + "\n");
+// The same audited edition, with its Apple media, survives a reset of Worker KV.
+fs.writeFileSync(DAILY_OUT, JSON.stringify(j, null, 2) + "\n");
 console.log("TENURE_SNAPSHOT_SAVED", JSON.stringify({
   updated:snapshot.updated,
   week:snapshot.week,

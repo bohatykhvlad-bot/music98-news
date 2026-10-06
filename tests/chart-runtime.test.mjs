@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
+import {completeDailySources,DAILY_SOURCE_IDS} from "../functions/lib/daily-chart-sources.js";
 
 const top50=readFileSync(new URL("../functions/api/top50.js",import.meta.url),"utf8");
 
@@ -74,10 +75,8 @@ test("verified chart recovery rejects mass day-one resets and old launch snapsho
 });
 
 test("every source must supply all 50 positions",()=>{
-  const start=top50.indexOf("function completeChartSources(s) {");
-  const end=top50.indexOf("function verifiedSourceSnapshot(s)",start);
-  const gate=new Function("SOURCES","SIZE",top50.slice(start,end)+"return completeChartSources;")(["A","S","D","B","Y"],50);
-  const complete={A:50,S:50,D:50,B:50,Y:50};
+  const gate=completeDailySources;
+  const complete=Object.fromEntries(DAILY_SOURCE_IDS.map(k=>[k,50]));
   assert.equal(gate(complete),true);
   for(const key of Object.keys(complete)){
     assert.equal(gate({...complete,[key]:49}),false,key);
@@ -89,18 +88,17 @@ test("every source must supply all 50 positions",()=>{
   assert.match(top50,/const memory=\{deferPersist:true\}/);
 });
 test("fresh Apple fallback also requires an intact Top 50",()=>{
- assert.match(top50,/async function freshAppleRanking\(env,origin\)/);
- assert.match(top50,/snap.updated!==today/);
- assert.match(top50,/snap.source!=="official-apple-rss"/);
- assert.match(top50,/rows.length===SIZE && rows.every/);
+ assert.match(top50,/async function freshDailyRanking\(env,origin,source\)/);
+ assert.match(top50,/verifiedDailySeed\(await readSeed/);
+ assert.doesNotMatch(top50,/rss.applemarketingtools.com/);
 });
 test("the Worker uses tested shared parsing and rejects unverified KV cache",()=>{
  assert.match(top50,/function parseSpotify\(html\) \{ return parseKworbSpotify\(html\); \}/);
  assert.match(top50,/const verified=verifiedSpotifySnapshot\(spotifySeed\)/);
  assert.match(top50,/cached.sourceDates\?\.S===verified.date/);
  assert.match(top50,/cached.spotifyFingerprint===verified.fingerprint/);
- assert.match(top50,/const TOP50_KV = "top50v36"/);
- assert.match(top50,/TOP50_RETRY_KV="top50v36:retry"/);
+ assert.match(top50,/const TOP50_KV = "top50v37"/);
+ assert.match(top50,/TOP50_RETRY_KV="top50v37:retry"/);
 });
 
 test("verified source publisher dispatches downstream chart audit after bot commits",()=>{

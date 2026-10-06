@@ -37,12 +37,8 @@ if(kw.ok&&mr.ok&&kw.data.date===mr.data.date){
     position:p,kworb:kw.data.tracks[p-1],musicrank:mr.data.tracks[p-1]
    }))));
  chosen=kw.data;provider="kworb+musicrank";mirrorMatched=50;ldConfirmed=mr.data.ldConfirmed;
-}else if(mr.ok&&(!kw.ok||mr.data.date>kw.data.date)){
- /* Musicrank has 50 visible ranks plus a separate agreeing top-20 JSON-LD.
-    This is the alternative when Kworb is down or its edition is delayed. */
- chosen=mr.data;provider="musicrank-self-validated";ldConfirmed=mr.data.ldConfirmed;
 }else if(kw.ok&&mr.ok&&kw.data.date!==mr.data.date){
- throw new Error("Kworb is newer than the independent mirror: await same-date verification");
+ throw new Error("Spotify mirrors have different dates: await same-date verification");
 }else{
  throw new Error("No independently verified Spotify source: "+
    JSON.stringify({kworb:kw.ok?kw.data.date:kw.error,musicrank:mr.ok?mr.data.date:mr.error}));
@@ -53,8 +49,7 @@ let old=null;try{old=JSON.parse(fs.readFileSync(OUT,"utf8"));}catch{}
 if(old?.chartDate&&old.chartDate>chosen.date)
  throw new Error("Refusing older Spotify edition "+chosen.date+" after "+old.chartDate);
 if(old?.chartDate===chosen.date&&old.fingerprint===fingerprint){
- /* A one-provider outage must not downgrade the existing two-provider audit. */
- if(old.provider==="kworb+musicrank"||old.provider===provider){
+ if(verifiedSpotifySnapshot(old)){
   console.log("SPOTIFY_SOURCE_UNCHANGED",JSON.stringify({date:chosen.date,provider:old.provider,
    rows:tracks.length,kw:kw.ok,mr:mr.ok}));
   process.exit(0);
