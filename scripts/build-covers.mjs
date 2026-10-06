@@ -9,6 +9,7 @@ import path from "node:path";
 import dns from "node:dns";
 import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen } from "../functions/lib/chart-identity.js";
 import { candidateCompatible, classifyCandidate, normalizedRelease, rankArtworkCandidates, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
+import {retainedArtworkHistory} from "../functions/lib/artwork-history.js";
 dns.setDefaultResultOrder("ipv4first");
 
 const OUT=path.resolve("public/data/covers.json");
@@ -182,11 +183,11 @@ async function recoverMissingCreditsByConsensus(track){
   track.artist=String(canonical.artist||track.artist);
   return group.candidates.filter(c=>candidateCompatible(track,c));
 }
-function readAudit(){ try{const j=JSON.parse(fs.readFileSync(OUT_AUDIT,"utf8"));return j?.entries&&typeof j.entries==="object"?j.entries:{};}catch{return {};}}
+function readAudit(){ try{return retainedArtworkHistory(JSON.parse(fs.readFileSync(OUT_AUDIT,"utf8")));}catch{return {};}}
 function readNames(){ try{const j=JSON.parse(fs.readFileSync(OUT_NAMES,"utf8"));return j&&typeof j==="object"?j:{};}catch{return {};}}
 function safePrevious(track,p){
   if(!p||p.verified!==true||!p.art||p.identity!==artworkKey(track.title,track.artist)) return null;
-  if(["generic","derivative"].includes(p.releaseClass)||Number(p.confidence||0)<92) return null;
+  if(["generic","derivative"].includes(p.releaseClass)||Number(p.confidence||0)<91) return null;
   return p;
 }
 function publicCandidate(c){ if(!c)return null; return {provider:c.provider,id:c.id,collectionId:c.collectionId,releaseTitle:c.releaseTitle,releaseArtist:c.releaseArtist,releaseDate:c.releaseDate,releaseClass:c.releaseClass,art:c.art,url:c.url,score:c.score,confidence:c.confidence,consensus:c.consensus,earliestReleaseYear:c.earliestReleaseYear}; }
@@ -214,7 +215,9 @@ const tracks=Array.isArray(chart?.tracks)?chart.tracks:[];
 if(!tracks.length) throw new Error("chart is empty");
 console.log("ARTWORK_AUDIT chart",chart.updated||"-",chart.rev||"-","rows",tracks.length);
 let feed=[]; try{feed=await appleFeedCandidates();console.log("ARTWORK_AUDIT apple-feed candidates",feed.length);}catch(e){console.log("ARTWORK_AUDIT apple-feed unavailable",String(e.message||e));}
-const oldAudit=readAudit(), oldNames=readNames(), covers={}, auditEntries={}, names={}, unresolved=[], sourceCounts={};
+const oldAudit=readAudit(), oldNames=readNames();
+const covers=Object.fromEntries(Object.entries(oldAudit).map(([key,entry])=>[key,entry.art]));
+const auditEntries={}, names={...oldNames}, unresolved=[], sourceCounts={};
 const mergeCounts=new Map(); for(const t of tracks){const k=mergeKey(t.title,t.artist);mergeCounts.set(k,(mergeCounts.get(k)||0)+1);}
 
 for(let i=0;i<tracks.length;i++){
@@ -285,7 +288,8 @@ const sortedAudit=Object.fromEntries(Object.entries(auditEntries).sort(([a],[b])
 const sortedNames=Object.fromEntries(Object.entries(names).sort(([a],[b])=>a.localeCompare(b)));
 fs.mkdirSync(path.dirname(OUT),{recursive:true});
 fs.writeFileSync(OUT,JSON.stringify(sortedCovers,null,2)+"\n");
-fs.writeFileSync(OUT_AUDIT,JSON.stringify({schema:2,updatedAt:new Date().toISOString(),chartUpdated:String(chart.updated||""),chartRev:String(chart.rev||""),rows:tracks.length,verified:Object.keys(sortedAudit).length,unresolved,sourceCounts,entries:sortedAudit},null,2)+"\n");
+const history=Object.fromEntries(Object.entries(oldAudit).filter(([key])=>!auditEntries[key]));
+fs.writeFileSync(OUT_AUDIT,JSON.stringify({schema:2,updatedAt:new Date().toISOString(),chartUpdated:String(chart.updated||""),chartRev:String(chart.rev||""),rows:tracks.length,verified:Object.keys(sortedAudit).length,unresolved,sourceCounts,entries:sortedAudit,history},null,2)+"\n");
 fs.writeFileSync(OUT_NAMES,JSON.stringify(sortedNames,null,2)+"\n");
 // The next scheduled run re-checks the full current Top 50; this summary is the publish invariant used by CI.
 console.log("ARTWORK_AUDIT_SUMMARY",JSON.stringify({rows:tracks.length,verified:Object.keys(sortedAudit).length,unresolved:unresolved.length,sourceCounts,covers:Object.keys(sortedCovers).length}));

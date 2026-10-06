@@ -1,13 +1,15 @@
 {
   "schema": 2,
-  "updated": "2026-10-05",
-  "capturedAt": "2026-10-05T23:39:06.943Z",
-  "sourceDate": "2026-10-05",
+  "updated": "2026-10-06",
+  "capturedAt": "2026-10-06T01:00:51.513Z",
+  "sourceDate": "2026-10-06",
   "dateKind": "capture",
   "source": "official-deezer-worldwide-playlist",
   "region": "global",
   "cadence": "daily",
   "sourceUrl": "https://api.deezer.com/playlist/3155776842",
+  "checksum": "db30d75c29e5aa1bda68567e0e37dd66",
+  "fingerprint": "4d611e35c16a07bd017452da599284e0389ad9c46bf880bfc8aa077ce14f4247",
   "tracks": [
     {
       "pos": 1,

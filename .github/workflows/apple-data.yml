@@ -58,24 +58,6 @@ jobs:
         run: |
           cp public/data/top50.json /tmp/top50-before.json
           cp public/index.html /tmp/index-before.html
-      - name: Проверить live tenure
-        run: node scripts/audit-live-chart.mjs
-      - name: Сохранить здоровый tenure snapshot
-        run: |
-          node scripts/snapshot-live-chart.mjs
-          if git diff --quiet -- public/data/chart-tenure-backup.json public/data/daily-top50-backup.json; then
-            echo "tenure snapshot без изменений"
-          else
-            git config user.name "music98 chart tenure bot"
-            git config user.email "actions@users.noreply.github.com"
-            git add public/data/chart-tenure-backup.json public/data/daily-top50-backup.json
-            git commit -m "chart: snapshot healthy live tenure"
-            git push || {
-              echo "main успел измениться — ребейзим tenure snapshot и повторяем push"
-              git pull --rebase origin main
-              git push
-            }
-          fi
       - name: Проверить resolver до сетевого аудита
         run: node scripts/chart-artwork-regression.mjs
       - name: Собрать и перепроверить artwork registry
@@ -178,3 +160,22 @@ jobs:
           print("ARTWORK_PRODUCTION_FAIL",json.dumps(last,ensure_ascii=False))
           raise SystemExit(1)
           PY
+      # Repair media before the source-version audit: a slow Worker deployment
+      # must not skip cover recovery for the chart already visible to visitors.
+      - name: Проверить live tenure после восстановления обложек
+        run: node scripts/audit-live-chart.mjs
+      - name: Сохранить здоровый tenure snapshot
+        run: |
+          node scripts/snapshot-live-chart.mjs
+          if git diff --quiet -- public/data/chart-tenure-backup.json public/data/daily-top50-backup.json; then
+            echo "tenure snapshot без изменений"
+          else
+            git config user.name "music98 chart tenure bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add public/data/chart-tenure-backup.json public/data/daily-top50-backup.json
+            git commit -m "chart: snapshot healthy live tenure"
+            git push || {
+              git pull --rebase origin main
+              git push
+            }
+          fi
