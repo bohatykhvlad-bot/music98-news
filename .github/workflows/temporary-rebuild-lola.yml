@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - .github/workflows/temporary-rebuild-lola.yml
+      - .github/candidates/lola-final.json
 permissions:
   contents: read
 jobs:
