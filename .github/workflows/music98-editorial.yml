@@ -1,9 +1,9 @@
-name: music98 editorial check
+name: music98 mechanical draft check
 on:
   workflow_dispatch:
     inputs:
       post_id:
-        description: Existing post ID to check
+        description: Existing draft ID to check mechanically
         required: true
         type: string
 permissions:
@@ -24,7 +24,15 @@ jobs:
         run: |
           test -n "$ADMIN_PASSWORD"
           printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
-      - name: Validate the requested post
+      - name: Mechanical gate
         env:
           POST_ID: ${{ inputs.post_id }}
         run: python scripts/post.py gate "$POST_ID"
+      - name: Payload/state preflight
+        env:
+          POST_ID: ${{ inputs.post_id }}
+        run: python scripts/post.py preflight "$POST_ID"
+      - name: Editorial warning
+        run: |
+          echo "PASS here does NOT mean the prose is editorially ready."
+          echo "A current POST_EDIT_FULL_READ + HUMAN QUALITY PASS is still mandatory before write/publish."
