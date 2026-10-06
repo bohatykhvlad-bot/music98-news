@@ -1,35 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""gate.py - the single deterministic pre-publish check for music98 posts.
+"""Deterministic mechanical/editorial safety gate for music98 posts.
 
-WHY THIS EXISTS
-Checking a longread by re-reading it does not converge: every pass finds a
-smaller thing, because each read is done by the same head that wrote the text
-and because every fix creates new surface. This script replaces the reading
-pass with a machine pass. It is deterministic: the same post either fails or
-passes, and it cannot "find something new" on the third run.
+This gate runs AFTER editorial_readthrough.py. It does not replace a full read
+and a PASS is not proof that prose is good.
 
-USAGE
-  python scripts/gate.py                       # every post in the desk, table view
-  python scripts/gate.py --post aubp23feat1    # one post, full report, exit 1 on FAIL
-  python scripts/gate.py --post aubp23feat1 --json
-  python scripts/gate.py --delta --post aubp23feat1   # only paragraphs changed since last run
-  python scripts/gate.py --render https://music98.news/news/slug   # check the live page too
+What it checks deterministically:
+- registered/risky dates and claims,
+- quote/title handling,
+- repetition, tautology and known fog patterns,
+- credits and media structure,
+- publication state and selected field invariants.
 
-WORKFLOW IT BELONGS TO (private editorial rules are stored outside this public repository)
-  1. edit freely while the owner is still giving notes
-  2. FREEZE - owner says "готово"
-  3. run this gate: it must be clean
-  4. one human-style read for FACTS only, against a claim list (this script
-     cannot know that a fact is true, only that a rule is kept)
-  5. publish on the owner's explicit word, then `--render` the live URL
-  6. any edit after step 3 means step 3 and step 4 run again, on the delta only
+What it does NOT certify:
+- truth without sources,
+- natural human voice,
+- whether the story is interesting,
+- whether the ending works,
+- whether the article sounds like PR/AI.
 
-WHAT IT CANNOT DO
-Truth. It checks form, structure, credits, publication state and house style.
-Facts still need sources, and that check is human.
+Those reader-facing judgments belong to editorial_readthrough.py and the
+mandatory HUMAN QUALITY BARRIER in music98-agent-operating-canon.md.
 
-No third-party dependencies.
+Usage:
+  python scripts/gate.py
+  python scripts/gate.py --post POST_ID
+  python scripts/gate.py --post POST_ID --json
+  python scripts/gate.py --delta --post POST_ID
+  python scripts/gate.py --render https://music98.news/slug
+
+Any body edit after a clean run invalidates the result and requires the full
+post-edit read plus gate/preflight again.
 """
 import argparse, hashlib, json, os, re, ssl, sys, time
 import urllib.error, urllib.parse, urllib.request
@@ -38,7 +39,7 @@ PROD = os.environ.get("MUSIC98_PROD", "https://music98.news")
 KEY = (os.environ.get("MUSIC98_KEY") or os.environ.get("ADMIN_PASSWORD") or "").strip()
 STATE = os.path.join(os.environ.get("TEMP", "/tmp"), "music98-gate-state.json")
 
-LEAD_MIN_WORDS = 100          # hard floor for the paragraph in front of media
+LEAD_MIN_WORDS = 100          # guideline for prose immediately before a media carrier
 ECHO_FAIL = 4                 # a 4-gram this many times is a defect (2-3 is a warning)
 NEG_SENT_FAIL = 3             # negations inside one sentence
 COLON_FAIL = 5                # colons in prose (house norm is 2-4)
