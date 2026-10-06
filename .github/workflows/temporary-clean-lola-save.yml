@@ -1,4 +1,4 @@
-name: Temporary clean Lola guarded save
+name: Temporary clean Lola guarded save 
 on:
   push:
     paths:
