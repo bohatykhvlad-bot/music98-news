@@ -73,4 +73,5 @@ jobs:
           path: |
             public/data/apple-chart.json
             public/data/deezer-chart.json
+            public/data/spotify-chart.json
             /tmp/daily-top50.json
