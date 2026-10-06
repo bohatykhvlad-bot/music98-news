@@ -104,6 +104,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/66/22/09/66220922-80bd-7758-f9ab-601dcfae9077/mzaf_17552938916380030049.plus.aac.p.m4a",
     "year": "2016"
   },
+  "classicpt2|drake": {
+    "title": "Classic PT2",
+    "artist": "Drake",
+    "url": "https://music.apple.com/us/album/6818059268?i=6818059601",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/bf/18/34bf1898-cc51-c915-a00a-05bd8febaeaa/mzaf_12302555311102118914.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "cleveland|taylorswift": {
     "title": "Cleveland!",
     "artist": "Taylor Swift",
@@ -116,6 +123,13 @@
     "artist": "Drake, Don Toliver & Yebba",
     "url": "https://music.apple.com/us/album/6818059268?i=6818059600",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9f/6c/2f/9f6c2f1f-715a-1a72-67a3-aae6384b0d91/mzaf_2697844743270254538.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "cowgirl|shaboozey": {
+    "title": "Cowgirl",
+    "artist": "Shaboozey",
+    "url": "https://music.apple.com/us/album/6776926206?i=6776926215",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/24/86/ba/2486bac6-1542-71f9-d0d5-8cedb9d1b655/mzaf_5306327764683785332.plus.aac.p.m4a",
     "year": "2026"
   },
   "daidai|shakira": {
@@ -131,6 +145,20 @@
     "url": "https://music.apple.com/us/album/6790569132?i=6790569133",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/bc/af/cd/bcafcda2-80cb-d6e0-eae2-f7fc0cd5eec1/mzaf_14248251972507839184.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "diewithasmile|ladygaga": {
+    "title": "Die With A Smile",
+    "artist": "Lady Gaga & Bruno Mars",
+    "url": "https://music.apple.com/us/album/1762656724?i=1762656732",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/07/6a/99/076a99ed-b946-431b-6f1f-54fa187ca5bd/mzaf_8102882277995122875.plus.aac.p.m4a",
+    "year": "2024"
+  },
+  "dontwe|morganwallen": {
+    "title": "Don't We",
+    "artist": "Morgan Wallen",
+    "url": "https://music.apple.com/us/album/1802103958?i=1802104400",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/84/f2/ad/84f2adc3-c2e2-5bd1-14a6-3ca9256326a3/mzaf_7493570463891681462.plus.aac.p.m4a",
+    "year": "2025"
   },
   "dracula|tameimpala": {
     "title": "Dracula",
@@ -151,6 +179,13 @@
     "artist": "Malcolm Todd",
     "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/d4/97/06/d4970622-b87b-9af3-b375-21af92396852/mzaf_1443470814230920096.plus.aac.p.m4a",
+    "year": "2024"
+  },
+  "endofbeginning|djo": {
+    "title": "End of Beginning",
+    "artist": "Djo",
+    "url": "https://music.apple.com/us/album/1632447652?i=1632448108",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6e/df/af/6edfaf58-f901-e9b5-840b-9ac9e37f34b7/mzaf_8465065510938624101.plus.aac.p.m4a",
     "year": "2024"
   },
   "golden|huntr": {
@@ -202,6 +237,20 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/73/76/42/737642e6-c478-bed7-f11f-efee96072450/mzaf_5163950318414409594.plus.aac.p.m4a",
     "year": "2026"
   },
+  "iris|thegoogoodolls": {
+    "title": "Iris",
+    "artist": "The Goo Goo Dolls",
+    "url": "https://music.apple.com/us/album/1109658139?i=1109658204",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/60/17/35/60173512-3d5c-1d6f-549e-d8ddafa93e07/mzaf_5281658494050788067.plus.aac.p.m4a",
+    "year": "1998"
+  },
+  "jaded|koewetzel": {
+    "title": "Jaded",
+    "artist": "Koe Wetzel & Ella Langley",
+    "url": "https://music.apple.com/us/album/6801235413?i=6801235870",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/92/71/49/927149e8-cfa5-7ec2-9b3b-6403b944fc03/mzaf_17324147609717658464.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "janicestfu|drake": {
     "title": "Janice STFU",
     "artist": "Drake",
@@ -223,6 +272,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/96/3c/93/963c93ce-93b1-40c6-ed8d-04bb8cc27c82/mzaf_4401986005887392953.plus.aac.p.m4a",
     "year": "2025"
   },
+  "lovemenot|ravynlenae": {
+    "title": "Love Me Not",
+    "artist": "Ravyn Lenae",
+    "url": "https://music.apple.com/us/album/1743852410?i=1743852427",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e4/56/cd/e456cd7c-d289-553a-9c39-98ca08ca0b4b/mzaf_14810478461288819548.plus.aac.p.m4a",
+    "year": "2024"
+  },
   "manineed|oliviadean": {
     "title": "Man I Need",
     "artist": "Olivia Dean",
@@ -230,12 +286,33 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/42/bb/5b/42bb5b21-2550-6205-bf3c-334b0e7d6199/mzaf_17462928687872215879.plus.aac.p.m4a",
     "year": "2025"
   },
+  "medicine|meganmoroney": {
+    "title": "Medicine",
+    "artist": "Megan Moroney",
+    "url": "https://music.apple.com/us/album/1880181535?i=1880181810",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ec/ca/9f/ecca9fb3-b4e5-beaf-0a5d-f74bc342f3ba/mzaf_15848400997996634838.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "mexicohoney|kaceymusgraves": {
+    "title": "Mexico Honey",
+    "artist": "Kacey Musgraves",
+    "url": "https://music.apple.com/us/album/6764160788?i=6764160889",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1d/85/ff/1d85ffc4-80fd-2af8-6593-52c624137da4/mzaf_17863848624619371692.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "midnightsun|zaralarsson": {
     "title": "Midnight Sun",
     "artist": "Zara Larsson",
     "url": "https://music.apple.com/us/album/1817499239?i=1817499251",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/59/bb/60/59bb60aa-1a0b-ff4c-3343-d7cb9e7d375a/mzaf_16759827430963483039.plus.aac.p.m4a",
     "year": "2025"
+  },
+  "musubi|ayumuimazu": {
+    "title": "musubi",
+    "artist": "Ayumu Imazu",
+    "url": "https://music.apple.com/us/album/6817260750?i=6817260751",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/43/28/75/432875fe-9cd0-9cbf-10e8-41cfbc0511c9/mzaf_11004965626723182029.plus.aac.p.m4a",
+    "year": "2026"
   },
   "nicolekidman|adla": {
     "title": "Nicole Kidman",
@@ -249,6 +326,13 @@
     "artist": "Taylor Swift",
     "url": "https://music.apple.com/us/album/6814997249?i=6814997425",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0b/be/8c/0bbe8c0a-dc77-af41-97a5-c745cc43d38c/mzaf_11790447166833591507.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "pinkclouding|taylorswift": {
+    "title": "Pink Clouding",
+    "artist": "Taylor Swift",
+    "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/88/d5/1e88d560-253f-3fa2-87a0-2f83b9681948/mzaf_11928544907491655022.plus.aac.p.m4a",
     "year": "2026"
   },
   "quebec|drake": {
@@ -286,6 +370,20 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/b2/bc/1eb2bc0d-28e0-cc09-e24f-85b47358a773/mzaf_13880485937262246167.plus.aac.p.m4a",
     "year": "2026"
   },
+  "stargazing|mylessmith": {
+    "title": "Stargazing",
+    "artist": "Myles Smith",
+    "url": "https://music.apple.com/us/album/1742275516?i=1742275653",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fc/9f/38/fc9f3868-52f1-bb3b-f692-1dca6d78c0df/mzaf_1462205118009470155.plus.aac.p.m4a",
+    "year": "2024"
+  },
+  "stopthewedding|ashe": {
+    "title": "Stop The Wedding!",
+    "artist": "Ashe",
+    "url": "https://music.apple.com/us/album/6805240956?i=6805240960",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bc/cb/18/bccb18e2-3e77-d357-2160-30d1cce2a684/mzaf_14390412322974564559.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "stupidsong|oliviarodrigo": {
     "title": "stupid song",
     "artist": "Olivia Rodrigo",
@@ -299,6 +397,13 @@
     "url": "https://music.apple.com/us/album/1477880265?i=1477880764",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/89/dd/38/89dd38a1-9e5d-f924-41a1-585f67870ca7/mzaf_17506666060631337235.plus.aac.p.m4a",
     "year": "2018"
+  },
+  "sweaterweather|theneighbourhood": {
+    "title": "Sweater Weather",
+    "artist": "The Neighbourhood",
+    "url": "https://music.apple.com/us/album/635016635?i=635016640",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8c/37/20/8c372047-2727-8054-9411-0e4867643dd8/mzaf_10169659262182214119.plus.aac.p.m4a",
+    "year": "2012"
   },
   "thecure|oliviarodrigo": {
     "title": "the cure",
@@ -328,123 +433,18 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7e/3c/25/7e3c2565-b83d-e690-49c1-92298bd2a244/mzaf_2428036131779969369.plus.aac.p.m4a",
     "year": "2025"
   },
-  "wtfgoin|bellygangkushington": {
-    "title": "WTF GOIN",
-    "artist": "Belly Gang Kushington & 21 Savage",
-    "url": "https://music.apple.com/us/album/6779378647?i=6779378648",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e8/ba/6b/e8ba6b93-410e-86ab-9e60-fec68da95702/mzaf_13004185619102517044.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "classicpt2|drake": {
-    "title": "Classic PT2",
-    "artist": "Drake",
-    "url": "https://music.apple.com/us/album/6818059268?i=6818059601",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/bf/18/34bf1898-cc51-c915-a00a-05bd8febaeaa/mzaf_12302555311102118914.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "cowgirl|shaboozey": {
-    "title": "Cowgirl",
-    "artist": "Shaboozey",
-    "url": "https://music.apple.com/us/album/6776926206?i=6776926215",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/24/86/ba/2486bac6-1542-71f9-d0d5-8cedb9d1b655/mzaf_5306327764683785332.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "diewithasmile|ladygaga": {
-    "title": "Die With A Smile",
-    "artist": "Lady Gaga & Bruno Mars",
-    "url": "https://music.apple.com/us/album/1762656724?i=1762656732",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/07/6a/99/076a99ed-b946-431b-6f1f-54fa187ca5bd/mzaf_8102882277995122875.plus.aac.p.m4a",
-    "year": "2024"
-  },
-  "dontwe|morganwallen": {
-    "title": "Don't We",
-    "artist": "Morgan Wallen",
-    "url": "https://music.apple.com/us/album/1802103958?i=1802104400",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/84/f2/ad/84f2adc3-c2e2-5bd1-14a6-3ca9256326a3/mzaf_7493570463891681462.plus.aac.p.m4a",
-    "year": "2025"
-  },
-  "endofbeginning|djo": {
-    "title": "End of Beginning",
-    "artist": "Djo",
-    "url": "https://music.apple.com/us/album/1740299592?i=1740299854",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/52/11/db/5211db15-adab-13a2-a885-248df141ddcf/mzaf_17440124819506716945.plus.aac.p.m4a",
-    "year": "2024"
-  },
-  "iris|thegoogoodolls": {
-    "title": "Iris",
-    "artist": "The Goo Goo Dolls",
-    "url": "https://music.apple.com/us/album/1109658139?i=1109658204",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/60/17/35/60173512-3d5c-1d6f-549e-d8ddafa93e07/mzaf_5281658494050788067.plus.aac.p.m4a",
-    "year": "1998"
-  },
-  "jaded|koewetzel": {
-    "title": "Jaded",
-    "artist": "Koe Wetzel & Ella Langley",
-    "url": "https://music.apple.com/us/album/6801235413?i=6801235870",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/92/71/49/927149e8-cfa5-7ec2-9b3b-6403b944fc03/mzaf_17324147609717658464.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "lovemenot|ravynlenae": {
-    "title": "Love Me Not",
-    "artist": "Ravyn Lenae",
-    "url": "https://music.apple.com/us/album/1743852410?i=1743852427",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e4/56/cd/e456cd7c-d289-553a-9c39-98ca08ca0b4b/mzaf_14810478461288819548.plus.aac.p.m4a",
-    "year": "2024"
-  },
-  "medicine|meganmoroney": {
-    "title": "Medicine",
-    "artist": "Megan Moroney",
-    "url": "https://music.apple.com/us/album/1880181535?i=1880181810",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ec/ca/9f/ecca9fb3-b4e5-beaf-0a5d-f74bc342f3ba/mzaf_15848400997996634838.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "mexicohoney|kaceymusgraves": {
-    "title": "Mexico Honey",
-    "artist": "Kacey Musgraves",
-    "url": "https://music.apple.com/us/album/6764160788?i=6764160889",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1d/85/ff/1d85ffc4-80fd-2af8-6593-52c624137da4/mzaf_17863848624619371692.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "musubi|ayumuimazu": {
-    "title": "musubi",
-    "artist": "Ayumu Imazu",
-    "url": "https://music.apple.com/us/album/6817260750?i=6817260751",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/43/28/75/432875fe-9cd0-9cbf-10e8-41cfbc0511c9/mzaf_11004965626723182029.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "pinkclouding|taylorswift": {
-    "title": "Pink Clouding",
-    "artist": "Taylor Swift",
-    "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/88/d5/1e88d560-253f-3fa2-87a0-2f83b9681948/mzaf_11928544907491655022.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "stargazing|mylessmith": {
-    "title": "Stargazing",
-    "artist": "Myles Smith",
-    "url": "https://music.apple.com/us/album/1742275516?i=1742275653",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fc/9f/38/fc9f3868-52f1-bb3b-f692-1dca6d78c0df/mzaf_1462205118009470155.plus.aac.p.m4a",
-    "year": "2024"
-  },
-  "stopthewedding|ashe": {
-    "title": "Stop The Wedding!",
-    "artist": "Ashe",
-    "url": "https://music.apple.com/us/album/6805240956?i=6805240960",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bc/cb/18/bccb18e2-3e77-d357-2160-30d1cce2a684/mzaf_14390412322974564559.plus.aac.p.m4a",
-    "year": "2026"
-  },
-  "sweaterweather|theneighbourhood": {
-    "title": "Sweater Weather",
-    "artist": "The Neighbourhood",
-    "url": "https://music.apple.com/us/album/635016635?i=635016640",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8c/37/20/8c372047-2727-8054-9411-0e4867643dd8/mzaf_10169659262182214119.plus.aac.p.m4a",
-    "year": "2012"
-  },
   "woman|kanebrown": {
     "title": "Woman",
     "artist": "Kane Brown",
     "url": "https://music.apple.com/us/album/1882549705?i=1882549709",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/25/24/85/252485ef-d834-08f9-1061-dc6fb44b3b86/mzaf_667886181363622809.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "wtfgoin|bellygangkushington": {
+    "title": "WTF GOIN",
+    "artist": "Belly Gang Kushington & 21 Savage",
+    "url": "https://music.apple.com/us/album/6779378647?i=6779378648",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e8/ba/6b/e8ba6b93-410e-86ab-9e60-fec68da95702/mzaf_13004185619102517044.plus.aac.p.m4a",
     "year": "2026"
   }
 }
