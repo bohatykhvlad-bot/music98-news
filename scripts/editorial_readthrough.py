@@ -124,6 +124,8 @@ ENDING_RECAP = (
     re.compile(r"\bat a point where\b", re.I),
     re.compile(r"\b(?:new|next) (?:chapter|phase|era|direction)\b", re.I),
     re.compile(r"\bmoving forward\b", re.I),
+    re.compile(r"\bwhat (?:comes|happens) next\b", re.I),
+    re.compile(r"\bwhat (?:he|she|they) (?:is|are) doing next\b", re.I),
 )
 
 WAIVER_CHOICES = {"technical-credit", "physical-format", "source-attribution", "single-sentence"}
@@ -222,6 +224,22 @@ def inspect(post, allows):
         return ["no prose paragraphs"], []
 
     _name_checks(post, body, paras, fails)
+
+    # Mechanical artist-name rhythm can survive paragraph-level checks. Three
+    # consecutive sentences naming the same artist is almost always synthetic.
+    primary = (post.get("artist") or "").strip()
+    if primary:
+        token = primary if " " not in primary else primary.split(" ", 1)[1]
+        mention = re.compile(r"\b" + re.escape(token) + r"\b", re.I)
+        all_sentences = [sentence for para in paras for sentence in sentences(para)]
+        for i in range(len(all_sentences) - 2):
+            if all(mention.search(x) for x in all_sentences[i:i + 3]):
+                fails.append(
+                    "name rhythm: main artist is named in three consecutive sentences; "
+                    "use pronouns or restructure instead of repeating the name/surname"
+                )
+                break
+
     awards_mode = "[awards]" in body.lower()
 
     for idx, p in enumerate(paras, 1):
