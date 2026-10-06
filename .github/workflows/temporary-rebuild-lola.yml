@@ -22,12 +22,17 @@ jobs:
         run: printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
       - name: Pre-edit full read stamp on exact current Lola draft
         run: python scripts/post.py editorial lola27everythingbegins --phase pre-edit
-      - name: Build reviewed Lola candidate
-        run: cp .github/candidates/lola-final.json /tmp/lola.json
-      - name: Final complete read stamp on exact candidate
-        run: python scripts/editorial_readthrough.py --post lola27everythingbegins --file /tmp/lola.json --phase post-edit --confirm-full-read
-      - name: Replace draft only through gated writer
-        run: python scripts/post.py replace-draft lola27everythingbegins --file /tmp/lola.json
+      - name: Extract reviewed Lola body without touching media fields
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          post=json.loads(Path(".github/candidates/lola-final.json").read_text(encoding="utf-8"))
+          Path("/tmp/lola-body.txt").write_text(post["body"],encoding="utf-8")
+      - name: Final complete read stamp on exact candidate body
+        run: python scripts/post.py editorial lola27everythingbegins --body-file /tmp/lola-body.txt --phase post-edit
+      - name: Update text only through guarded writer
+        run: python scripts/post.py set lola27everythingbegins --body-file /tmp/lola-body.txt
       - name: Re-run saved draft gates
         run: |
           python scripts/post.py gate lola27everythingbegins
