@@ -26,12 +26,24 @@ jobs:
           python scripts/post.py --help | grep -q -- "create"
           python scripts/post.py --help | grep -q -- "preflight"
           python scripts/test_editorial_readthrough.py
-          test "$(wc -l < music98-agent-operating-canon.md)" -le 300
+          test "$(wc -l < music98-agent-operating-canon.md)" -le 280
           grep -q "HUMAN QUALITY BARRIER" music98-agent-operating-canon.md
           grep -q "ENDINGS" music98-agent-operating-canon.md
           for f in AGENTS.md CLAUDE.md GEMINI.md .github/copilot-instructions.md; do
             grep -q "music98-agent-operating-canon.md" "$f"
           done
+          python - <<'PY'
+          import ast
+          from pathlib import Path
+          tree=ast.parse(Path("scripts/gate.py").read_text(encoding="utf-8"))
+          for node in ast.walk(tree):
+              if isinstance(node,ast.Assign) and any(isinstance(t,ast.Name) and t.id=="VERIFIED_DATES" for t in node.targets):
+                  keys=[k.value for k in node.value.keys if isinstance(k,ast.Constant) and isinstance(k.value,str)]
+                  assert len(keys)==len(set(keys)), "duplicate VERIFIED_DATES keys"
+                  break
+          else:
+              raise AssertionError("VERIFIED_DATES registry missing")
+          PY
       - uses: actions/setup-node@v4
         with:
           node-version: 22
