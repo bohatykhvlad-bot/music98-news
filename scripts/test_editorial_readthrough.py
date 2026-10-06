@@ -32,6 +32,18 @@ Artist presales begin October 7 before the general sale. Tickets are available t
 The interruption remains part of the context, but the announcement is finally about what comes next. The tour, larger rooms and new material together tell the story of a new chapter."""
 }
 
+BAD_SURNAME_BRIDGE = {
+    "id": "bad-surname-bridge",
+    "type": "news",
+    "artist": "Lola Young",
+    "title": "Lola Young Announces a Tour",
+    "body": """Lola Young has announced a new tour after returning to live work. The article establishes her name once and then continues with ordinary context about the schedule and the year that led to it.
+
+The first major marker came at the Grammys. "Messy" won Best Pop Solo Performance and Young performed the song on the broadcast before returning to headline shows later in the year.
+
+The closing paragraph contains enough additional reporting to keep this fixture structurally valid. It ends on a different factual point and is intentionally written without another surname bridge so the test isolates the exact construction."""
+}
+
 BAD_NAME_RHYTHM = {
     "id": "bad-name-rhythm",
     "type": "news",
@@ -102,6 +114,9 @@ def assert_quality_regressions():
     assert "administrative/release-format metadata" in joined
     assert "canned recap construction" in joined
     assert "canned transition" in joined or "generic PR abstraction" in joined
+
+    bridge_fails, _ = er.inspect(BAD_SURNAME_BRIDGE, set())
+    assert "mechanical surname bridge" in "\n".join(bridge_fails)
 
     name_fails, _ = er.inspect(BAD_NAME_RHYTHM, set())
     assert "three consecutive sentences" in "\n".join(name_fails)
