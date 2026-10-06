@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-06T16:18:58.981Z",
+  "updatedAt": "2026-10-06T21:55:18.662Z",
   "chartUpdated": "2026-10-06",
   "chartRev": "daily-global-v37",
   "rows": 50,
@@ -8,10 +8,8 @@
   "unresolved": [],
   "sourceCounts": {
     "apple-feed": 26,
-    "apple-chart": 20,
-    "previous-audit": 1,
-    "apple": 2,
-    "deezer": 1
+    "apple-chart": 23,
+    "previous-audit": 1
   },
   "entries": {
     "aintinla|adela": {
@@ -31,7 +29,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.378Z",
+      "checkedAt": "2026-10-06T21:54:15.051Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -67,7 +65,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:31.955Z",
+      "checkedAt": "2026-10-06T21:54:42.685Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -163,7 +161,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:17.893Z",
+      "checkedAt": "2026-10-06T21:54:28.942Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -199,7 +197,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:17.892Z",
+      "checkedAt": "2026-10-06T21:54:28.941Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -280,7 +278,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.372Z",
+      "checkedAt": "2026-10-06T21:54:15.047Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -316,7 +314,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:58.625Z",
+      "checkedAt": "2026-10-06T21:54:17.342Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -382,7 +380,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:52.079Z",
+      "checkedAt": "2026-10-06T21:55:09.644Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -448,7 +446,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.379Z",
+      "checkedAt": "2026-10-06T21:54:15.052Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -484,7 +482,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:00.689Z",
+      "checkedAt": "2026-10-06T21:54:18.021Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -520,7 +518,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:49.011Z",
+      "checkedAt": "2026-10-06T21:55:04.394Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -616,7 +614,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:00.690Z",
+      "checkedAt": "2026-10-06T21:54:18.022Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -652,7 +650,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.374Z",
+      "checkedAt": "2026-10-06T21:54:15.049Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -688,7 +686,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:17.892Z",
+      "checkedAt": "2026-10-06T21:54:28.942Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -724,7 +722,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:58.979Z",
+      "checkedAt": "2026-10-06T21:55:18.661Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -760,7 +758,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:04.138Z",
+      "checkedAt": "2026-10-06T21:54:19.554Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -796,7 +794,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:56.545Z",
+      "checkedAt": "2026-10-06T21:55:16.455Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -892,7 +890,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:39.567Z",
+      "checkedAt": "2026-10-06T21:54:49.880Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -988,7 +986,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:05.785Z",
+      "checkedAt": "2026-10-06T21:54:21.674Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1054,7 +1052,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:00.688Z",
+      "checkedAt": "2026-10-06T21:54:18.021Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1150,7 +1148,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:05.785Z",
+      "checkedAt": "2026-10-06T21:54:21.674Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1186,7 +1184,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:00.690Z",
+      "checkedAt": "2026-10-06T21:54:18.022Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1222,7 +1220,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.375Z",
+      "checkedAt": "2026-10-06T21:54:15.049Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1258,7 +1256,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:00.692Z",
+      "checkedAt": "2026-10-06T21:54:18.024Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1294,7 +1292,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:04.137Z",
+      "checkedAt": "2026-10-06T21:54:19.553Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1375,7 +1373,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:28.820Z",
+      "checkedAt": "2026-10-06T21:54:40.022Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1456,7 +1454,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:42.754Z",
+      "checkedAt": "2026-10-06T21:54:55.626Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1492,7 +1490,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:09.813Z",
+      "checkedAt": "2026-10-06T21:54:23.936Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1528,7 +1526,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:21.114Z",
+      "checkedAt": "2026-10-06T21:54:33.739Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1548,7 +1546,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:53.366Z",
+      "checkedAt": "2026-10-06T21:55:12.063Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1614,7 +1612,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:23.208Z",
+      "checkedAt": "2026-10-06T21:54:34.878Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1680,7 +1678,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.376Z",
+      "checkedAt": "2026-10-06T21:54:15.050Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1716,7 +1714,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:24.164Z",
+      "checkedAt": "2026-10-06T21:54:35.828Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1782,7 +1780,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:13.865Z",
+      "checkedAt": "2026-10-06T21:54:27.478Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1878,7 +1876,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:29.739Z",
+      "checkedAt": "2026-10-06T21:54:41.423Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1929,7 +1927,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.377Z",
+      "checkedAt": "2026-10-06T21:54:15.050Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1953,7 +1951,7 @@
       "title": "Ordinary",
       "artist": "Alex Warren",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "Ordinary - Single",
       "releaseArtist": "Alex Warren",
       "releaseDate": "2024-09-26T12:00:00Z",
@@ -1962,11 +1960,26 @@
       "collectionId": "1793663382",
       "trackId": "1793663645",
       "confidence": 98,
-      "score": 965,
+      "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:42.754Z",
+      "checkedAt": "2026-10-06T21:54:55.625Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1793663645",
+          "collectionId": "1793663382",
+          "releaseTitle": "Ordinary - Single",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2024-09-26T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
         {
           "provider": "apple",
           "id": "1793663645",
@@ -2046,7 +2059,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.376Z",
+      "checkedAt": "2026-10-06T21:54:15.050Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2082,7 +2095,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:56.546Z",
+      "checkedAt": "2026-10-06T21:55:16.456Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2118,7 +2131,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:04.138Z",
+      "checkedAt": "2026-10-06T21:54:19.554Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2154,7 +2167,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:15.378Z",
+      "checkedAt": "2026-10-06T21:54:28.256Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2220,7 +2233,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:19.880Z",
+      "checkedAt": "2026-10-06T21:54:29.950Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2301,7 +2314,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:00.691Z",
+      "checkedAt": "2026-10-06T21:54:18.023Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2337,7 +2350,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:44.843Z",
+      "checkedAt": "2026-10-06T21:54:58.222Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2418,7 +2431,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.373Z",
+      "checkedAt": "2026-10-06T21:54:15.048Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2454,7 +2467,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:21.114Z",
+      "checkedAt": "2026-10-06T21:54:33.740Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2478,7 +2491,7 @@
       "title": "Take Me Back (Leave Me There)",
       "artist": "Cody Johnson",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/d9/7a/e2d97a87-6ec6-99de-9a1f-31b86ce6e7c4/093624826613.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "Banks Of The Trinity",
       "releaseArtist": "Cody Johnson",
       "releaseDate": "2026-05-29T12:00:00Z",
@@ -2487,11 +2500,26 @@
       "collectionId": "1892465981",
       "trackId": "1892466278",
       "confidence": 98,
-      "score": 885,
+      "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:35.394Z",
+      "checkedAt": "2026-10-06T21:54:46.528Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1892466278",
+          "collectionId": "1892465981",
+          "releaseTitle": "Banks Of The Trinity",
+          "releaseArtist": "Cody Johnson",
+          "releaseDate": "2026-05-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/d9/7a/e2d97a87-6ec6-99de-9a1f-31b86ce6e7c4/093624826613.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1892465981?i=1892466278",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
         {
           "provider": "apple",
           "id": "1892466278",
@@ -2541,7 +2569,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:17:52.377Z",
+      "checkedAt": "2026-10-06T21:54:15.051Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2577,7 +2605,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:00.691Z",
+      "checkedAt": "2026-10-06T21:54:18.023Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2613,7 +2641,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:09.812Z",
+      "checkedAt": "2026-10-06T21:54:23.935Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2696,21 +2724,36 @@
       "identity": "thinkasyoudrunk|greenriley",
       "title": "Think As You Drunk",
       "artist": "Riley Green",
-      "art": "https://cdn-images.dzcdn.net/images/cover/f60fbc8095587535e45c27151413b26e/1000x1000-000000-80-0-0.jpg",
-      "provider": "deezer",
-      "releaseTitle": "Think As You Drunk",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "That's Just Me",
       "releaseArtist": "Riley Green",
-      "releaseDate": "2026-05-28",
-      "releaseClass": "dedicated",
-      "url": "https://www.deezer.com/track/4039612441",
-      "collectionId": "989245831",
-      "trackId": "4039612441",
-      "confidence": 91,
-      "score": 670,
+      "releaseDate": "2026-05-28T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+      "collectionId": "6770725355",
+      "trackId": "6770725979",
+      "confidence": 96,
+      "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-06T16:18:58.978Z",
+      "checkedAt": "2026-10-06T21:55:18.660Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6770725979",
+          "collectionId": "6770725355",
+          "releaseTitle": "That's Just Me",
+          "releaseArtist": "Riley Green",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
         {
           "provider": "deezer",
           "id": "4039612441",
