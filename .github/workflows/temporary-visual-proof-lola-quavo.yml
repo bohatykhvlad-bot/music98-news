@@ -15,6 +15,7 @@ jobs:
           mkdir -p /tmp/proof
           curl -fL --retry 3 -o /tmp/proof/quavo-cover.jpg https://music98.news/photos/quavo-qromelife-official-architecture.jpg
           curl -fL --retry 3 -o /tmp/proof/lola-cover.jpg https://music98.news/photos/lola-young-from-down-here-nicole-ngai-original.jpg
+          curl -fL --retry 3 -o /tmp/proof/lola-conor.jpg https://music98.news/photos/lola-young-conor-cunningham-press.jpg
           file /tmp/proof/*
           wc -c /tmp/proof/*
       - uses: actions/upload-artifact@v4
