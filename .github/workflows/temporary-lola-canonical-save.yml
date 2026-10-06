@@ -22,10 +22,17 @@ jobs:
         run: printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
       - name: PRE-EDIT full read of current Lola draft
         run: python scripts/post.py editorial lola26ebtour --phase pre-edit
-      - name: POST-EDIT full read of reviewed Lola candidate
-        run: python scripts/editorial_readthrough.py --post lola26ebtour --file .github/candidates/lola-final.json --phase post-edit --confirm-full-read
-      - name: Replace Lola draft while preserving omitted cover
-        run: python scripts/post.py replace-draft lola26ebtour --file .github/candidates/lola-final.json
+      - name: Extract reviewed Lola text
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          p=json.loads(Path(".github/candidates/lola-final.json").read_text(encoding="utf-8"))
+          Path("/tmp/lola-body.txt").write_text(p["body"],encoding="utf-8")
+      - name: POST-EDIT full read of reviewed Lola text
+        run: python scripts/post.py editorial lola26ebtour --body-file /tmp/lola-body.txt --title "Lola Young Announces 2027 Everything Begins Tour" --phase post-edit
+      - name: Update Lola text only
+        run: python scripts/post.py set lola26ebtour --body-file /tmp/lola-body.txt --title "Lola Young Announces 2027 Everything Begins Tour" --excerpt "Lola Young has announced the Everything Begins Tour, a 17-date North American headline run scheduled for spring 2027."
       - name: Verify saved Lola draft
         run: |
           python scripts/post.py gate lola26ebtour
