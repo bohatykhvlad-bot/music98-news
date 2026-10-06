@@ -4,7 +4,7 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": "2026-10-06T09:17:34.507Z"
+    "measuredAt": "2026-10-06T13:27:28.374Z"
   },
   "aintinla|adla": {
     "integratedLufs": -6.2,
@@ -101,8 +101,8 @@
     "integratedLufs": -8.7,
     "truePeakDbtp": 0.6,
     "gainDb": -7.3,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9f/6c/2f/9f6c2f1f-715a-1a72-67a3-aae6384b0d91/mzaf_2697844743270254538.plus.aac.p.m4a",
-    "measuredAt": "2026-10-05T23:47:51.444Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/2b/e7/90/2be79044-e886-61c2-db0a-d74ca25fb408/mzaf_3222422080615506204.plus.aac.p.m4a",
+    "measuredAt": "2026-10-06T13:27:28.836Z"
   },
   "cowgirl|shaboozey": {
     "integratedLufs": -6.1,
@@ -192,8 +192,8 @@
     "integratedLufs": -7.1,
     "truePeakDbtp": 1,
     "gainDb": -8.9,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/92/71/49/927149e8-cfa5-7ec2-9b3b-6403b944fc03/mzaf_17324147609717658464.plus.aac.p.m4a",
-    "measuredAt": "2026-10-05T23:47:54.238Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/94/f7/e2/94f7e2cc-b182-cb75-7a31-7e88eee2191e/mzaf_12920756836197900992.plus.aac.p.m4a",
+    "measuredAt": "2026-10-06T13:27:29.104Z"
   },
   "janicestfu|drake": {
     "integratedLufs": -9.9,
@@ -311,8 +311,8 @@
     "integratedLufs": -7.7,
     "truePeakDbtp": 0.2,
     "gainDb": -8.3,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bc/cb/18/bccb18e2-3e77-d357-2160-30d1cce2a684/mzaf_14390412322974564559.plus.aac.p.m4a",
-    "measuredAt": "2026-10-05T23:47:55.514Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f2/5b/f7/f25bf72b-3eaa-4f4e-76bd-00d5fd9ea2b9/mzaf_15368875546218592546.plus.aac.p.m4a",
+    "measuredAt": "2026-10-06T13:27:29.409Z"
   },
   "stupidsong|oliviarodrigo": {
     "integratedLufs": -7.2,
