@@ -262,7 +262,7 @@ def inspect(post, allows):
         if TECH_CREDIT.search(p) and "technical-credit" not in allows:
             fails.append(f"paragraph {idx}: technical production credit needs an explicit editorial reason")
         if PHYSICAL.search(p) and "physical-format" not in allows:
-            fails.append(f"paragraph {idx}: physical/store metadata needs an explicit editorial reason")
+            fails.append(f"paragraph {idx}: physical-format/store metadata needs an explicit editorial reason")
 
         m = SOURCE_PROOF.search(p)
         if m and "source-attribution" not in allows:
