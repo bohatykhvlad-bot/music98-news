@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Validate editorial workflow scripts
+      - name: Validate editorial workflow scripts and canon
         run: |
           python -m py_compile scripts/editorial_readthrough.py scripts/post.py scripts/preflight.py scripts/test_editorial_readthrough.py scripts/check_agent_write_path.py
           python scripts/check_agent_write_path.py
@@ -26,6 +26,12 @@ jobs:
           python scripts/post.py --help | grep -q -- "create"
           python scripts/post.py --help | grep -q -- "preflight"
           python scripts/test_editorial_readthrough.py
+          test "$(wc -l < music98-agent-operating-canon.md)" -le 300
+          grep -q "HUMAN QUALITY BARRIER" music98-agent-operating-canon.md
+          grep -q "ENDINGS" music98-agent-operating-canon.md
+          for f in AGENTS.md CLAUDE.md GEMINI.md .github/copilot-instructions.md; do
+            grep -q "music98-agent-operating-canon.md" "$f"
+          done
       - uses: actions/setup-node@v4
         with:
           node-version: 22
