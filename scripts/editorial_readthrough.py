@@ -223,6 +223,33 @@ def inspect(post, allows):
     if not paras:
         return ["no prose paragraphs"], []
 
+    # Article rhythm: a body can be factually clean and still read like AI if it
+    # is assembled from 2-3 line patch paragraphs. Conversely, one giant block
+    # is not a substitute for developed paragraphs. Apply this only to article-
+    # length bodies so briefs and special formats are not forced into padding.
+    total_prose_words = sum(words(p) for p in paras)
+    if len(paras) >= 4 and total_prose_words >= 300:
+        short_paras = [(i, words(p)) for i, p in enumerate(paras, 1) if words(p) < 55]
+        for i, wc in short_paras:
+            fails.append(
+                f"paragraph {i}: choppy article paragraph is only {wc} words; "
+                "merge it or develop the idea instead of leaving a 2-3 line patch"
+            )
+        under_70 = [(i, words(p)) for i, p in enumerate(paras, 1) if words(p) < 70]
+        if len(under_70) >= 2:
+            detail = ", ".join(f"{i}:{wc}w" for i, wc in under_70)
+            fails.append(
+                f"paragraph rhythm: multiple underdeveloped paragraphs ({detail}); "
+                "the article reads chopped up rather than continuous"
+            )
+        for i, p in enumerate(paras, 1):
+            wc = words(p)
+            if wc > 180:
+                fails.append(
+                    f"paragraph {i}: wall-of-text paragraph is {wc} words; "
+                    "split it at a real change of idea"
+                )
+
     _name_checks(post, body, paras, fails)
 
     # Mechanical artist-name rhythm can survive paragraph-level checks. Three
@@ -319,8 +346,9 @@ def inspect(post, allows):
 
     if len(last_s) == 1 and words(last) < 55 and "single-sentence" not in allows:
         fails.append(f"final paragraph: single-sentence ending is only {words(last)} words")
-    if words(last) < 45:
-        fails.append(f"ending: final paragraph is too thin ({words(last)} words)")
+    ending_floor = 70 if sum(words(p) for p in paras) >= 300 and len(paras) >= 4 else 45
+    if words(last) < ending_floor:
+        fails.append(f"ending: final paragraph is too thin ({words(last)} words; floor {ending_floor})")
     if re.search(r"\b\d+(?:st|nd|rd|th)?[.!?]?[\"'’”]?$", last.strip()):
         fails.append("ending: article ends on a bare number/ordinal")
 
