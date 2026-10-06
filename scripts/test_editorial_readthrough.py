@@ -32,6 +32,16 @@ Artist presales begin October 7 before the general sale. Tickets are available t
 The interruption remains part of the context, but the announcement is finally about what comes next. The tour, larger rooms and new material together tell the story of a new chapter."""
 }
 
+BAD_NAME_RHYTHM = {
+    "id": "bad-name-rhythm",
+    "type": "news",
+    "artist": "Lola Young",
+    "title": "Lola Young Announces a Tour",
+    "body": """Lola Young has announced a tour for next year. Young will return to North America after a break from touring. Young will bring new material to the shows before returning to Europe later in the year.
+
+The second paragraph contains enough context to keep this fixture structurally valid while the name-rhythm check isolates the actual defect. It adds reporting rather than another repetition of the artist's surname and closes on a different factual point."""
+}
+
 BAD_QUAVO = {
     "id": "bad-quavo",
     "type": "release",
@@ -75,6 +85,9 @@ def assert_quality_regressions():
     assert "administrative/release-format metadata" in joined
     assert "canned recap construction" in joined
     assert "canned transition" in joined or "generic PR abstraction" in joined
+
+    name_fails, _ = er.inspect(BAD_NAME_RHYTHM, set())
+    assert "three consecutive sentences" in "\n".join(name_fails)
 
 
 def main():
