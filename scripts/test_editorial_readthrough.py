@@ -32,6 +32,18 @@ Artist presales begin October 7 before the general sale. Tickets are available t
 The interruption remains part of the context, but the announcement is finally about what comes next. The tour, larger rooms and new material together tell the story of a new chapter."""
 }
 
+BAD_REPEAT_TITLE = {
+    "id": "bad-repeat-title",
+    "type": "news",
+    "artist": "Lola Young",
+    "title": "Lola Young Announces Everything Begins Tour",
+    "body": """Lola Young has announced the Everything Begins Tour after returning to live work. The article establishes the news and gives enough context to make this a normal editorial paragraph rather than a stub.
+
+The tour title comes from her tattoo and the phrase Everything Begins appears here as the subject. The following sentence repeats Everything Begins again without adding anything, creating the visible echo the checker should reject.
+
+The final paragraph contains separate reporting and enough detail to keep the fixture structurally valid. It ends on a different fact so the repeated title phrase remains the isolated defect under test."""
+}
+
 BAD_SURNAME_BRIDGE = {
     "id": "bad-surname-bridge",
     "type": "news",
@@ -114,6 +126,9 @@ def assert_quality_regressions():
     assert "administrative/release-format metadata" in joined
     assert "canned recap construction" in joined
     assert "canned transition" in joined or "generic PR abstraction" in joined
+
+    repeat_fails, _ = er.inspect(BAD_REPEAT_TITLE, set())
+    assert "repeated title/proper-name phrase" in "\n".join(repeat_fails)
 
     bridge_fails, _ = er.inspect(BAD_SURNAME_BRIDGE, set())
     assert "mechanical surname bridge" in "\n".join(bridge_fails)
