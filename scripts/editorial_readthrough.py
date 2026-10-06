@@ -197,6 +197,19 @@ def _name_checks(post, body, paras, fails):
                 "rewrite with pronouns or sentence restructuring"
             )
 
+        # Once the full name is established, conjunction-led surname subjects
+        # are a common AI/wire-copy tic: "and Young performed", "while Swift
+        # said", "where Eilish appeared". Prefer a pronoun or recast the clause.
+        bridge = re.compile(
+            r"\b(?:and|but|while|where|as)\s+" + re.escape(surname) + r"\s+[a-z]",
+            re.I,
+        )
+        if bridge.search(tail):
+            fails.append(
+                f"name rhythm: mechanical surname bridge after first mention ('{surname}'); "
+                "use a pronoun or restructure the clause"
+            )
+
     for full in GUEST_SHORT_FORMS:
         if full == primary or full not in body:
             continue
