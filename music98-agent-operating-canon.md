@@ -199,6 +199,7 @@ Do not shorten a post merely to make it “cleaner.” Preserve useful reporting
 
 Paragraph rules:
 - no one-line patch paragraphs unless truly necessary;
+- do not chop a normal news/release article into repeated 2–3-line paragraphs; merge or develop them;
 - no text walls;
 - each paragraph has one clear job;
 - adjacent paragraphs must not do the same job;
