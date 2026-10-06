@@ -4,6 +4,7 @@ on:
     paths:
       - .github/workflows/temporary-rebuild-lola.yml
       - .github/candidates/lola-final.json
+      - scripts/post.py
 permissions:
   contents: read
 jobs:
@@ -20,6 +21,8 @@ jobs:
           python-version: "3.12"
       - name: Configure editor key
         run: printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+      - name: Repair accidental duplicate draft row
+        run: python scripts/post.py dedupe-draft lola27everythingbegins
       - name: Pre-edit full read stamp on exact current Lola draft
         run: python scripts/post.py editorial lola27everythingbegins --phase pre-edit
       - name: Extract reviewed Lola body without touching media fields
