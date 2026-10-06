@@ -42,6 +42,23 @@ BAD_NAME_RHYTHM = {
 The second paragraph contains enough context to keep this fixture structurally valid while the name-rhythm check isolates the actual defect. It adds reporting rather than another repetition of the artist's surname and closes on a different factual point."""
 }
 
+BAD_CHOPPY = {
+    "id": "bad-choppy",
+    "type": "news",
+    "artist": "Example Artist",
+    "title": "Example Artist Announces New Project",
+    "body": """Example Artist has announced a new project after a long period of writing and recording, with the first part of the article explaining what changed and why the new work matters. The opening has enough reporting and context to function as a proper paragraph instead of a teaser stretched into the body. It establishes the subject without turning the article into a list of dates or credits.
+
+This paragraph is deliberately short even though the article around it is substantial. It behaves like a patch rather than a developed idea and should be rejected by the rhythm check.
+
+The middle section contains another full paragraph with enough detail to carry its own editorial job. It develops a separate part of the story, adds context the reader did not already have and avoids repeating the opening in different words. The point of this fixture is not style but structure, so this paragraph stays deliberately conventional while giving the checker enough article-length material to evaluate rhythm across the complete body.
+
+Another short paragraph interrupts the flow and exists mainly to prove that repeated two-or-three-line blocks should not pass just because each individual sentence is grammatical and factual.
+
+The final section is again fully developed, adding a concrete closing detail that has not already been stated and giving the piece a natural end. It is long enough to show that the problem is the repeated short blocks in the middle, not a globally short article or an artificially low word count. The checker should identify the chopped rhythm even though the surrounding paragraphs are healthy."""
+}
+
+
 BAD_QUAVO = {
     "id": "bad-quavo",
     "type": "release",
@@ -88,6 +105,11 @@ def assert_quality_regressions():
 
     name_fails, _ = er.inspect(BAD_NAME_RHYTHM, set())
     assert "three consecutive sentences" in "\n".join(name_fails)
+
+    choppy_fails, _ = er.inspect(BAD_CHOPPY, set())
+    joined = "\n".join(choppy_fails)
+    assert "choppy article paragraph" in joined
+    assert "paragraph rhythm" in joined
 
 
 def main():
