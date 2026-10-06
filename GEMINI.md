@@ -1,0 +1,1 @@
+For all music98 editorial work, read and obey `music98-agent-operating-canon.md` first. It is mandatory and overrides older local writing notes. Never treat gate/preflight PASS as proof of prose quality.
