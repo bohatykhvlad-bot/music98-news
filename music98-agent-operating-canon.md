@@ -1,297 +1,270 @@
-# music98 — Agent Operating Canon
+# music98 — Mandatory AI Editorial Canon
 
 Version: 2026-10-06  
-This is the mandatory working instruction for any AI editing music98.news.
+This file is the single mandatory instruction for AI editorial work on music98.news.
 
-## 0. READ THIS BEFORE TOUCHING A POST
+## 1. Priority
 
-Priority:
 1. Owner's latest instruction in the current conversation.
 2. This canon.
 3. Existing desk conventions.
 4. General editorial judgment.
 
-A script PASS is never proof that an article is good. **Write for the reader first. Checks are a safety net, not a target.**
+**Write for the reader, not for the checks.**  
+Gate/preflight PASS never proves that prose is good.
 
-If a draft sounds like AI, a press release, research notes, a ticket listing, a tracklist, or a recap of itself, it is NOT READY even when every automated check passes.
+If a post sounds like AI, PR copy, research notes, a ticket page, a tracklist, or a recap of itself, it is NOT READY.
 
----
+## 2. Required workflow
 
-## 1. REQUIRED PIPELINE
+Existing post:
 
-### Existing post
 `BODY_LOADED → PRE_EDIT_FULL_READ → ISSUE_MAP → EDIT → POST_EDIT_FULL_READ → HUMAN_QUALITY_PASS → GATE → PREFLIGHT → WRITE → POST_SAVE_VERIFY`
 
-### New post
+New post:
+
 `RESEARCH → FACTS_LOCKED → DRAFT → POST_EDIT_FULL_READ → HUMAN_QUALITY_PASS → GATE → PREFLIGHT → WRITE → POST_SAVE_VERIFY`
 
-Hard rules:
-- Read the exact current body from top to bottom before editing an existing post.
-- After the final body change, read the entire final body again from top to bottom.
-- Any body change invalidates the final read, gate, preflight and ready state.
-- Never claim a check was run unless the real command produced output.
-- Never bypass `scripts/post.py` with a direct desk POST.
-- If a required check fails, fix the text. Do not write around the check.
-- If the owner catches a defect, convert it into a reusable rule/check before continuing.
+Rules:
+- Read the exact current body top to bottom before editing it.
+- After the last body change, reread the exact final body top to bottom.
+- Any body edit invalidates the final read, gate, preflight and READY state.
+- Never claim a check ran unless the command actually produced output.
+- Never bypass `scripts/post.py` with a direct desk write.
+- If the owner catches a defect, turn it into a reusable rule/check before continuing.
 
 Canonical writes:
 - new draft: `python scripts/post.py create --file <post.json>`
-- existing text edit: `python scripts/post.py set ...`
+- text edit: `python scripts/post.py set ...`
 - full draft replacement: `python scripts/post.py replace-draft ...`
 - publish: `python scripts/post.py publish <id>`
 
----
+## 3. Human quality barrier
 
-## 2. HUMAN QUALITY BARRIER — MOST IMPORTANT
+Before any gate/preflight, read as a music-magazine editor.
 
-Before gate/preflight, read the article as a magazine editor and ask:
+A post fails if:
+- a paragraph adds no new fact, context, reporting or useful interpretation;
+- a sentence only explains what the previous sentence already showed;
+- research residue becomes prose: names, dates, venues, tracks, guests, credits;
+- the same artist name/surname is repeated mechanically;
+- the article follows a press-release template instead of an editorial idea;
+- the ending summarizes the article instead of ending it;
+- minor metadata appears after the story has already peaked;
+- the copy sounds like it was written to satisfy a checker.
 
-1. Does every paragraph add NEW information, reporting, context or interpretation?
-2. Can any sentence be removed without losing anything? If yes, remove it.
-3. Is any paragraph merely explaining what the previous paragraph already showed? Remove/rewrite it.
-4. Does the article sound like a press release, ticket page, research memo or AI summary? Rewrite it.
-5. Does the ending actually end the story, or merely repeat the lede/body? If it repeats, rewrite it.
-6. Are names, venues, tracks, dates or credits being listed because research found them, rather than because the reader needs them? Cut them.
-7. Is the main artist's name/surname repeated mechanically? Rewrite for natural rhythm.
-8. Are abstract phrases doing work that a concrete fact could do better? Replace them.
-9. Does the final paragraph introduce a minor technical detail (deluxe/extended edition, track count, ticket sale, physical format) after the story has already peaked? Move it or delete it.
-10. Would a competent music editor publish this exact wording without apologizing for "AI tone"? If not, it is not ready.
+If a sentence can be removed without losing anything useful, remove it.
 
-### Hard anti-AI / anti-PR rules
+## 4. Hard anti-AI / anti-PR rules
 
-Do NOT write sentences whose main purpose is to explain the prose itself.
+Do not write prose whose job is to explain the prose itself.
 
-Bad patterns:
+Bad shapes:
 - `This makes the change clear.`
-- `That already tells the story.`
-- `This gives the announcement a connection...`
+- `That tells the story.`
 - `The result is...`
-- `This does not need to be spelled out...`
+- `This gives the announcement...`
 - `That makes it a natural bridge...`
 - `The range becomes clear...`
-- `The interruption remains part of the context...`
 - `It catches the artist at a point where...`
+- `The interruption remains part of the context...`
+- `It matters because...`
 
-Avoid generic PR abstractions unless a concrete fact immediately earns them:
-- `new chapter`
+Avoid generic PR abstractions unless a concrete fact earns them:
+- `new chapter / next phase / new direction`
 - `broader / more expansive sound`
 - `polished`
 - `moving forward`
-- `next phase`
-- `new direction`
 - `standout booking`
 - `announced run`
 - `official tour channels`
 
-Do not copy the press-release structure:
-`announcement → venue/guest list → background dump → sales metadata → summary recap`.
+Do not copy this structure:
+`announcement → venue/guest list → background dump → sales/format metadata → recap`.
 
-Rebuild the story around the strongest editorial idea instead.
+## 5. Endings
 
----
+The final paragraph must add meaning, not summarize previous paragraphs.
 
-## 3. ENDINGS
+Do not end on:
+- ticket sales or presales;
+- deluxe/extended editions or track counts;
+- CD/vinyl/physical formats;
+- a bare date;
+- a list of earlier themes;
+- `X does not try to...`;
+- `the past remains visible...`;
+- `new chapter / moving forward / what comes next`.
 
-The ending must add a final piece of meaning, not summarize the article.
+Good endings:
+- land on the strongest reported fact;
+- return to one concrete detail with new meaning;
+- make one restrained observation not already stated.
 
-Forbidden ending behavior:
-- repeating the lede in different words;
-- collecting earlier themes into one "AI summary";
-- ending on ticket sales, presales, track counts, deluxe/extended editions, CD/vinyl, release formats, or a bare date unless that detail IS the story;
-- `X does not try to...` followed by a recap of the album;
-- `the past remains visible...`, `a new chapter...`, `moving forward...` as a generic closer;
-- restating `tour + bigger rooms + new music + return` after those points were already made.
+No recap, slogan, aphorism or fake profundity.
 
-A good ending should either:
-- land on the strongest reported fact,
-- return to one concrete image/detail with new meaning,
-- or make one restrained observation that has not already been stated.
-
-No slogan, aphorism, recap or fake profundity.
-
----
-
-## 4. LISTS, NAMES, VENUES, TRACKS
+## 6. Names, venues, tracks, lists
 
 Research is not prose.
 
-### Tours
-- Do not enumerate routes.
-- Do not stack venue names.
-- Normally use at most 1–2 illustrative venues in a paragraph and only if they prove something important.
-- Never write a paragraph whose function is "here are the notable stops."
-- Ticketing terminology belongs only when readers actually need it.
-- Prefer `Presales begin...` over platform language such as `Artist presales...`.
-- Do not write `official tour channels`, `announced run`, or equivalent PR filler.
+Main artist:
+- full public/stage name on first mention;
+- then use surname, pronoun or sentence restructuring naturally;
+- never repeat the surname sentence after sentence.
 
-### Releases
-- Do not turn an article into a tracklist.
-- Do not run through guests/producers/engineers.
-- Name a track only when the article says something useful about that track.
-- Routine deluxe/extended/physical-edition metadata is expendable.
-- Producer/engineer credits belong only when central to the story.
+Guests:
+- use the full public name when naming them again, or use a pronoun/restructure.
 
-### Names
-- First mention: full public/stage name.
-- Main artist: after first mention, use surname/pronoun/restructure naturally.
-- Never repeat the surname sentence after sentence just to avoid pronouns.
-- Guest artists keep their full public name when named again unless a pronoun/restructure is clearer.
-- Avoid paragraphs opening repeatedly with the artist name/surname.
+Tours:
+- do not enumerate routes;
+- do not stack venue names;
+- normally use at most 1–2 illustrative venues in a paragraph;
+- no paragraph whose purpose is “notable stops”;
+- write `Presales begin...`, not `Artist presales...`;
+- avoid platform/PR ticket language.
 
----
+Releases:
+- do not write tracklist prose;
+- do not enumerate guests/producers/engineers;
+- name a track only when the text says something useful about it;
+- routine deluxe/extended/physical metadata is expendable;
+- technical credits appear only when central to the story.
 
-## 5. FACTS AND SOURCES
+## 7. Facts
 
-Before prose, lock every checkable detail in a fact registry:
-- name/styling,
-- title,
-- date,
-- venue/city,
-- collaborator,
-- producer when editorially relevant,
-- chart position,
-- quote,
-- release/tour fact,
-- factual comparison,
-- "first/only/biggest" claim.
+Lock every checkable detail before prose:
+- names/styling;
+- title;
+- date;
+- venue/city;
+- collaborator;
+- producer when editorially relevant;
+- chart position;
+- quote;
+- release/tour fact;
+- factual comparison;
+- `first / only / biggest` claim.
 
 Rules:
-- Primary sources first for announcements, dates, tracklists, credits and quotes.
-- Do not fill gaps from memory.
-- Do not strengthen a source.
-- Rumor stays rumor. Teaser stays teaser. Announcement is not a completed event.
-- Quotes require verified wording and attribution.
-- No external outlet links in article body.
-- Do not leak verification language into prose (`Apple lists...`, `the release material says...`) unless the source itself is the story.
+- primary sources first;
+- do not fill gaps from memory;
+- do not strengthen a source;
+- rumor stays rumor;
+- teaser stays teaser;
+- announcement is not a completed event;
+- quotes require verified wording and attribution;
+- no external outlet links in article body;
+- do not leak verification language into prose.
 
----
+## 8. Lede, title, excerpt
 
-## 6. LEDE, TITLE, EXCERPT
+News sentence 1:
+`ARTIST + ACTION + NEWS`.
 
-### News lede
-Sentence 1 = `ARTIST + ACTION + NEWS`.
+Do not open news with scene-setting, a date, quote fragment or detached context.
 
-Do not open with scene-setting, a date, quote fragment or detached context.
+Release lede:
+- start with the artist/release;
+- do not lead with metadata.
 
-### Release lede
-Start with the artist/release itself. Do not lead with metadata.
+Excerpt:
+- literal prefix of body;
+- 1–2 complete sentences;
+- never write a separate stronger teaser.
 
-### Excerpt
-- Literal prefix of the body.
-- Prefer 1–2 complete sentences.
-- Do not write a separate stronger teaser.
+Title:
+- only verified facts;
+- news = artist + actual news;
+- release page may use release-title convention;
+- no colon-heavy headline style.
 
-### Title
-- News title: artist + actual news.
-- Release page may use the release title according to site convention.
-- No unverified claim in a title.
-
----
-
-## 7. LANGUAGE
+## 9. Language and rhythm
 
 Use natural journalistic American English.
 
 Avoid:
 - semicolons;
 - colon-heavy prose;
-- hype;
-- clichés;
+- hype and clichés;
 - corporate/label language;
-- "reader guidance" that explains obvious implications;
+- obvious explanation;
 - repetitive sentence openings;
 - tautology;
 - empty evaluative adjectives;
-- abstract nouns where a concrete fact is available.
+- abstract nouns when a concrete fact exists.
 
-Song titles use quotation marks. Albums/releases use the site's established formatting.
+Song titles use quotation marks. Albums/releases use site convention.
 
-Do not shorten a post merely to make it "cleaner." Preserve useful reporting and context.
+Do not shorten a post merely to make it “cleaner.” Preserve useful reporting and context.
 
----
+Paragraph rules:
+- no one-line patch paragraphs unless truly necessary;
+- no text walls;
+- each paragraph has one clear job;
+- adjacent paragraphs must not do the same job;
+- media cannot hide weak structure.
 
-## 8. PARAGRAPHS AND RHYTHM
+Final rhythm check:
+- read only the first sentence of every paragraph;
+- then only the final sentence of every paragraph;
+- rewrite template-like transitions and sentences that merely explain what a paragraph “means.”
 
-- No one-line patch paragraphs unless genuinely necessary.
-- No text walls.
-- Paragraphs should have a clear job.
-- Adjacent paragraphs must not do the same job.
-- Merge or cut paragraphs that merely restate a prior point.
-- Media must not be used to hide weak structure.
+## 10. Photos and media
 
-Before final approval, read only the first sentence of every paragraph in order. If they sound like a sequence of template transitions, rewrite.
-
-Then read only the final sentence of every paragraph. If they repeatedly explain what the paragraph "means," rewrite.
-
----
-
-## 9. MEDIA / PHOTOS
-
-Non-negotiable:
 - Prefer official hi-res press/promo originals.
-- Do not substitute compressed grabs when an original exists.
+- Do not replace an available original with a compressed grab.
 - Credit the photographer, not the outlet where the image was found.
 - Credit URL = photographer portfolio/official site/legitimate profile.
 - No `Courtesy` default.
-- Do not change an existing photo/crop/position during a text-only edit unless the owner explicitly asks.
-- Never call an image visually approved from dimensions/HTTP status alone.
+- Do not change an existing photo, crop or position during a text-only edit unless the owner asks.
+- Dimensions/HTTP status do not prove visual quality.
 - Visual approval requires inspecting the actual rendered image/crop.
+- Do not put two media items back-to-back without prose.
 
----
+## 11. What each check means
 
-## 10. RESPONSIBILITY OF THE THREE CHECKS
-
-### `editorial_readthrough.py`
-Human-quality barrier:
-- AI/PR language,
-- obvious explanation,
-- list-like prose,
-- name/venue/track overload,
-- recap endings,
-- weak/technical endings,
+`editorial_readthrough.py`
+- human-quality barrier;
+- AI/PR language;
+- list-like prose;
+- name/venue/track overload;
+- recap or technical endings;
+- encoding/format residue;
 - paragraph rhythm.
 
-A POST_EDIT failure blocks writing.
+POST_EDIT failure blocks writing.
 
-### `gate.py`
-Mechanical/editorial safety:
-- registered dates and claims,
-- quote/title handling,
-- factual-risk language,
-- repetition/tautology,
-- credits,
-- structure/media rules,
-- state checks.
+`gate.py`
+- deterministic safety net;
+- risky/registered dates and claims;
+- quote/title handling;
+- repetition/tautology/fog;
+- credits/media structure;
+- publication state.
 
-Do not use gate as a writing target.
+Gate does not replace a full read.
 
-### `preflight.py`
-Payload/state safety:
-- required fields,
-- excerpt/body consistency,
-- media presence/order,
-- cover presence,
-- status,
+`preflight.py`
+- payload/state safety only;
+- required fields;
+- excerpt/body consistency;
+- media/cover;
+- minimum format length;
 - mutation regressions.
 
-Preflight does not judge whether prose is good.
+Preflight does not judge prose quality.
 
----
+## 12. READY
 
-## 11. FINAL APPROVAL
+A post is READY only when:
+- facts are verified;
+- the exact final body was fully reread;
+- human-quality barrier is clean;
+- no AI/PR/list/recap residue remains;
+- ending works;
+- gate passes;
+- preflight passes;
+- saved draft is read back successfully;
+- visual check is complete when media changed.
 
-A post is READY only when ALL are true:
-- facts verified;
-- exact final body fully reread;
-- no human-quality finding;
-- no press-release/AI residue;
-- ending is not a recap;
-- names/tracks/venues are not list-like;
-- gate passed;
-- preflight passed;
-- saved draft read back successfully;
-- visual check completed when media changed.
-
-If any statement above is uncertain, the post is NOT READY.
-
-**Never tell the owner "you should not need to edit this" unless the exact saved version has passed this entire sequence.**
+Never tell the owner “you should not need to edit this” unless the exact saved version passed this entire sequence.
