@@ -272,6 +272,52 @@ def guarded_write(mutate):
     return now
 
 
+def cmd_dedupe_draft(pid):
+    """Remove accidental duplicate draft rows while preserving the first row byte-for-byte.
+
+    This is a repair command for desk corruption only. It refuses to touch live or
+    scheduled duplicates and verifies that every non-target post remains unchanged.
+    """
+    before = desk_read()
+    posts = before["posts"]
+    matches = [(i, p) for i, p in enumerate(posts) if str(p.get("id")) == pid]
+    if len(matches) < 2:
+        print("dedupe    no-op: %s has %d row" % (pid, len(matches)))
+        return find_post(posts, pid) if matches else None
+    if any((p.get("status") or "live") != "draft" for _, p in matches):
+        die("dedupe refuses duplicate set containing non-draft rows")
+    keep_index, survivor = matches[0]
+    survivor_snapshot = json.loads(json.dumps(survivor))
+    other_ids_snapshot = [
+        json.dumps(p, sort_keys=True, ensure_ascii=False)
+        for i, p in enumerate(posts) if str(p.get("id")) != pid
+    ]
+    cleaned = []
+    kept = False
+    for p in posts:
+        if str(p.get("id")) != pid:
+            cleaned.append(p)
+        elif not kept:
+            cleaned.append(p)
+            kept = True
+    http(DESK_API, desk_key(), {"posts": cleaned}, method="POST")
+    after = desk_read()
+    remaining = [p for p in after["posts"] if str(p.get("id")) == pid]
+    if len(remaining) != 1:
+        die("dedupe post-save verification failed: %d target rows remain" % len(remaining))
+    if remaining[0] != survivor_snapshot:
+        die("dedupe changed the surviving draft")
+    other_ids_after = [
+        json.dumps(p, sort_keys=True, ensure_ascii=False)
+        for p in after["posts"] if str(p.get("id")) != pid
+    ]
+    if other_ids_after != other_ids_snapshot:
+        die("dedupe changed non-target posts")
+    print("dedupe    ok: %s removed=%d survivor_status=%s" %
+          (pid, len(matches)-1, remaining[0].get("status")))
+    return remaining[0]
+
+
 def cmd_photo(url, name):
     """Download one source image and store the exact bytes in site photo storage."""
     req=urllib.request.Request(url,headers={"User-Agent":UA,"Accept":"image/jpeg,image/png,image/webp,image/*"})
@@ -786,7 +832,7 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("list")
-    for name in ("show", "gate", "preflight", "publish", "verify"):
+    for name in ("show", "gate", "preflight", "publish", "verify", "dedupe-draft"):
         sp = sub.add_parser(name)
         sp.add_argument("id")
 
@@ -855,6 +901,8 @@ def main():
         cmd_list()
     elif a.cmd == "show":
         cmd_show(a.id)
+    elif a.cmd == "dedupe-draft":
+        cmd_dedupe_draft(a.id)
     elif a.cmd == "dump":
         cmd_dump(a.id, a.out)
     elif a.cmd == "photo":
