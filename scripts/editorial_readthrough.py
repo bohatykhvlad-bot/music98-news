@@ -328,6 +328,36 @@ def inspect(post, allows):
             if brand not in title.lower():
                 fails.append(f"paragraph {idx}: source/checking language leaked into prose")
 
+        # Repeating the same capitalized multi-word phrase across sentences
+        # in one paragraph often creates exactly the kind of visible AI echo
+        # seen in "Everything Begins ... Everything Begins".
+        phrase_sets = []
+        for sentence in ss:
+            phrases = set(
+                m.group(0).strip()
+                for m in re.finditer(
+                    r"\b(?:[A-Z][A-Za-z0-9'’*-]+)(?:\s+[A-Z][A-Za-z0-9'’*-]+){1,4}\b",
+                    sentence,
+                )
+            )
+            phrase_sets.append(phrases)
+        for a in range(len(phrase_sets)):
+            for b in range(a + 1, len(phrase_sets)):
+                repeated = {
+                    x for x in (phrase_sets[a] & phrase_sets[b])
+                    if x.lower() != (post.get("artist") or "").strip().lower()
+                    and len(x) >= 12
+                }
+                if repeated:
+                    fails.append(
+                        f"paragraph {idx}: repeated title/proper-name phrase across sentences: "
+                        + ", ".join(sorted(repeated))
+                    )
+                    break
+            else:
+                continue
+            break
+
         for sentence in ss:
             if OBVIOUS_EXPLAINER.search(sentence):
                 fails.append(
