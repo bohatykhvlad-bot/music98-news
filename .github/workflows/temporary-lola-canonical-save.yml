@@ -1,0 +1,33 @@
+name: Temporary Lola canonical save
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-lola-canonical-save.yml
+      - .github/candidates/lola-final.json
+permissions:
+  contents: read
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure canonical runner
+        run: printf 'ADMIN_PASSWORD=%s\n' "$ADMIN_PASSWORD" > .env
+      - name: PRE-EDIT full read of current Lola draft
+        run: python scripts/post.py editorial lola26ebtour --phase pre-edit
+      - name: POST-EDIT full read of reviewed Lola candidate
+        run: python scripts/editorial_readthrough.py --post lola26ebtour --file .github/candidates/lola-final.json --phase post-edit --confirm-full-read
+      - name: Replace Lola draft while preserving omitted cover
+        run: python scripts/post.py replace-draft lola26ebtour --file .github/candidates/lola-final.json
+      - name: Verify saved Lola draft
+        run: |
+          python scripts/post.py gate lola26ebtour
+          python scripts/post.py preflight lola26ebtour
+          python scripts/post.py show lola26ebtour
