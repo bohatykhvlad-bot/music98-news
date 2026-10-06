@@ -12,7 +12,7 @@ import editorial_readthrough as er
 
 SOURCE = """The opening section explains how the project changed during writing and recording, keeping the focus on the choices that matter to the listener rather than on every available production detail. The paragraph then connects those choices to the finished songs, giving the article a clear reason to move forward without repeating the same factual point in a second form.
 
-The closing section adds a final piece of context about how the artist approached the finished work. It avoids a list of dates, credits, formats or administrative details and ends on information the reader has not already been given in the opening paragraph."""
+The closing section adds a final piece of context about how the artist approached the finished work and why one late decision changed the final sequence. It avoids a list of dates, credits, formats or administrative details, and it ends on information the reader has not already been given in the opening paragraph."""
 FINAL = SOURCE.replace(
     "changed during writing and recording",
     "took shape during writing and recording",
