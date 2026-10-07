@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "verified": true,
-  "chartDate": "2026-10-05",
+  "chartDate": "2026-10-06",
   "provider": "kworb+musicrank",
   "mirrorMatched": 50,
   "ldConfirmed": 20,
-  "fingerprint": "49a5d5542e6116764f327329d78dca056f99e055fa16f18e48051dec24b2b688",
+  "fingerprint": "54f97b641b2c888cb7208c6ffedcf8159e812c293a57ba1baa3c72f17d0f43d6",
   "tracks": [
     {
       "pos": 1,
@@ -63,8 +63,8 @@
     },
     {
       "pos": 7,
-      "title": "Self Aware",
-      "artist": "Temper City",
+      "title": "Stop The Wedding!",
+      "artist": "Ashe",
       "url": "",
       "art": "",
       "year": "",
@@ -72,15 +72,6 @@
     },
     {
       "pos": 8,
-      "title": "stupid song",
-      "artist": "Olivia Rodrigo",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 9,
       "title": "The One That Got Away",
       "artist": "Katy Perry",
       "url": "",
@@ -89,9 +80,18 @@
       "prev": ""
     },
     {
+      "pos": 9,
+      "title": "Self Aware",
+      "artist": "Temper City",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 10,
-      "title": "Stop The Wedding!",
-      "artist": "Ashe",
+      "title": "stupid song",
+      "artist": "Olivia Rodrigo",
       "url": "",
       "art": "",
       "year": "",
@@ -126,15 +126,6 @@
     },
     {
       "pos": 14,
-      "title": "Loser",
-      "artist": "Tame Impala",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 15,
       "title": "Sweater Weather",
       "artist": "The Neighbourhood",
       "url": "",
@@ -143,34 +134,16 @@
       "prev": ""
     },
     {
+      "pos": 15,
+      "title": "Loser",
+      "artist": "Tame Impala",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 16,
-      "title": "Training Season",
-      "artist": "Dua Lipa",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 17,
-      "title": "Babydoll",
-      "artist": "Dominic Fike",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 18,
-      "title": "SWIM",
-      "artist": "BTS",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 19,
       "title": "Great Expectation",
       "artist": "SIENNA SPIRO",
       "url": "",
@@ -179,9 +152,36 @@
       "prev": ""
     },
     {
-      "pos": 20,
+      "pos": 17,
+      "title": "Training Season",
+      "artist": "Dua Lipa",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 18,
       "title": "Die With A Smile (w/ Bruno Mars)",
       "artist": "Lady Gaga",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 19,
+      "title": "SWIM",
+      "artist": "BTS",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 20,
+      "title": "Babydoll",
+      "artist": "Dominic Fike",
       "url": "",
       "art": "",
       "year": "",
@@ -261,15 +261,6 @@
     },
     {
       "pos": 29,
-      "title": "Dai Dai (w/ Burna Boy)",
-      "artist": "Shakira",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 30,
       "title": "End of Beginning",
       "artist": "Djo",
       "url": "",
@@ -278,7 +269,7 @@
       "prev": ""
     },
     {
-      "pos": 31,
+      "pos": 30,
       "title": "Ordinary",
       "artist": "Alex Warren",
       "url": "",
@@ -287,16 +278,16 @@
       "prev": ""
     },
     {
-      "pos": 32,
-      "title": "Raindance (w/ Tems)",
-      "artist": "Dave",
+      "pos": 31,
+      "title": "Dai Dai (w/ Burna Boy)",
+      "artist": "Shakira",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 33,
+      "pos": 32,
       "title": "Wonderwall - Remastered",
       "artist": "Oasis",
       "url": "",
@@ -305,7 +296,7 @@
       "prev": ""
     },
     {
-      "pos": 34,
+      "pos": 33,
       "title": "Mr. Brightside",
       "artist": "The Killers",
       "url": "",
@@ -314,25 +305,7 @@
       "prev": ""
     },
     {
-      "pos": 35,
-      "title": "The Fate of Ophelia",
-      "artist": "Taylor Swift",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 36,
-      "title": "drop dead",
-      "artist": "Olivia Rodrigo",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 37,
+      "pos": 34,
       "title": "Every Breath You Take",
       "artist": "The Police",
       "url": "",
@@ -341,7 +314,7 @@
       "prev": ""
     },
     {
-      "pos": 38,
+      "pos": 35,
       "title": "Sure Thing",
       "artist": "Miguel",
       "url": "",
@@ -350,9 +323,36 @@
       "prev": ""
     },
     {
+      "pos": 36,
+      "title": "Raindance (w/ Tems)",
+      "artist": "Dave",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 37,
+      "title": "drop dead",
+      "artist": "Olivia Rodrigo",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 38,
+      "title": "The Fate of Ophelia",
+      "artist": "Taylor Swift",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 39,
-      "title": "Creep",
-      "artist": "Radiohead",
+      "title": "One Of The Girls (w/ JENNIE, Lily-Rose Depp)",
+      "artist": "The Weeknd",
       "url": "",
       "art": "",
       "year": "",
@@ -360,8 +360,8 @@
     },
     {
       "pos": 40,
-      "title": "One Of The Girls (w/ JENNIE, Lily-Rose Depp)",
-      "artist": "The Weeknd",
+      "title": "Creep",
+      "artist": "Radiohead",
       "url": "",
       "art": "",
       "year": "",
@@ -387,8 +387,8 @@
     },
     {
       "pos": 43,
-      "title": "I Wanna Be Yours",
-      "artist": "Arctic Monkeys",
+      "title": "Yellow",
+      "artist": "Coldplay",
       "url": "",
       "art": "",
       "year": "",
@@ -405,8 +405,8 @@
     },
     {
       "pos": 45,
-      "title": "Yellow",
-      "artist": "Coldplay",
+      "title": "I Wanna Be Yours",
+      "artist": "Arctic Monkeys",
       "url": "",
       "art": "",
       "year": "",
@@ -423,15 +423,6 @@
     },
     {
       "pos": 47,
-      "title": "Solar Eclipse (w/ Don Toliver)",
-      "artist": "Drake",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 48,
       "title": "Sign of the Times",
       "artist": "Harry Styles",
       "url": "",
@@ -440,7 +431,7 @@
       "prev": ""
     },
     {
-      "pos": 49,
+      "pos": 48,
       "title": "505",
       "artist": "Arctic Monkeys",
       "url": "",
@@ -449,14 +440,23 @@
       "prev": ""
     },
     {
+      "pos": 49,
+      "title": "So Easy (To Fall In Love)",
+      "artist": "Olivia Dean",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 50,
-      "title": "Animal",
-      "artist": "KATSEYE",
+      "title": "In the End",
+      "artist": "Linkin Park",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     }
   ],
-  "capturedAt": "2026-10-07T01:02:49.386Z"
+  "capturedAt": "2026-10-07T22:18:02.326Z"
 }
