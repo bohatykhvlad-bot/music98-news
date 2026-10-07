@@ -1,0 +1,39 @@
+name: Temporary exact Quavo Lola final review
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-quavo-lola-final-review.yml
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Fetch exact current drafts
+        shell: bash
+        run: |
+          mkdir -p /tmp/review
+          node <<'NODE'
+          const fs=require('node:fs');
+          (async()=>{
+            const key=process.env.ADMIN_PASSWORD||'';
+            const r=await fetch('https://music98.news/api/desk',{headers:{'X-Admin-Key':key,'Accept':'application/json','User-Agent':'Mozilla/5.0'},cache:'no-store'});
+            if(!r.ok) throw Error('HTTP_'+r.status);
+            const j=await r.json();
+            const ids=new Set(['quavo26qromelife','lola26ebtour']);
+            const posts=(j.posts||[]).filter(p=>ids.has(String(p.id)));
+            if(posts.length!==2) throw Error('MATCH_'+posts.length);
+            fs.writeFileSync('/tmp/review/drafts.json',JSON.stringify(posts,null,2));
+          })().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
+      - name: Fetch current Quavo cover
+        run: |
+          curl -fL --retry 3 -A "Mozilla/5.0" -o /tmp/review/quavo-current.jpg https://music98.news/photos/quavo-qromelife-official-world-02.jpg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exact-quavo-lola-final-review
+          path: /tmp/review/*
+          retention-days: 1
