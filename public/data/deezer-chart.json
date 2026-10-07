@@ -1,27 +1,18 @@
 {
   "schema": 2,
   "updated": "2026-10-07",
-  "capturedAt": "2026-10-07T07:43:00.152Z",
+  "capturedAt": "2026-10-07T22:16:54.608Z",
   "sourceDate": "2026-10-07",
   "dateKind": "capture",
   "source": "official-deezer-worldwide-playlist",
   "region": "global",
   "cadence": "daily",
   "sourceUrl": "https://api.deezer.com/playlist/3155776842",
-  "checksum": "970895cb724511603ce07f8f08c8177b",
-  "fingerprint": "f80cdaae10b17eee7c31fa88920937fe04482f39c37f6c880de8320477745a7b",
+  "checksum": "745c3c0d925f3bbfd57d323cbcfafe3f",
+  "fingerprint": "47924f5e327ce63df9d5c563a0d95aa7e4f5d8597b279d117aad93ddc6ea4bee",
   "tracks": [
     {
       "pos": 1,
-      "title": "Choosin' Texas",
-      "artist": "Ella Langley",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 2,
       "title": "Boston",
       "artist": "STELLA LEFTY",
       "url": "",
@@ -30,9 +21,18 @@
       "prev": ""
     },
     {
-      "pos": 3,
+      "pos": 2,
       "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
       "artist": "Taylor Swift",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 3,
+      "title": "Choosin' Texas",
+      "artist": "Ella Langley",
       "url": "",
       "art": "",
       "year": "",
@@ -76,8 +76,8 @@
     },
     {
       "pos": 8,
-      "title": "drop dead",
-      "artist": "Olivia Rodrigo",
+      "title": "Midnight Sun",
+      "artist": "Zara Larsson",
       "url": "",
       "art": "",
       "year": "",
@@ -85,8 +85,8 @@
     },
     {
       "pos": 9,
-      "title": "Midnight Sun",
-      "artist": "Zara Larsson",
+      "title": "So Easy (To Fall In Love)",
+      "artist": "Olivia Dean",
       "url": "",
       "art": "",
       "year": "",
@@ -103,8 +103,8 @@
     },
     {
       "pos": 11,
-      "title": "So Easy (To Fall In Love)",
-      "artist": "Olivia Dean",
+      "title": "drop dead",
+      "artist": "Olivia Rodrigo",
       "url": "",
       "art": "",
       "year": "",
@@ -130,8 +130,8 @@
     },
     {
       "pos": 14,
-      "title": "Been By Now",
-      "artist": "Morgan Wallen",
+      "title": "Jaded",
+      "artist": "Koe Wetzel",
       "url": "",
       "art": "",
       "year": "",
@@ -139,8 +139,8 @@
     },
     {
       "pos": 15,
-      "title": "Take Me Back (Leave Me There)",
-      "artist": "Cody Johnson",
+      "title": "Think As You Drunk",
+      "artist": "Riley Green",
       "url": "",
       "art": "",
       "year": "",
@@ -148,8 +148,8 @@
     },
     {
       "pos": 16,
-      "title": "Jaded",
-      "artist": "Koe Wetzel",
+      "title": "Been By Now",
+      "artist": "Morgan Wallen",
       "url": "",
       "art": "",
       "year": "",
@@ -166,42 +166,6 @@
     },
     {
       "pos": 18,
-      "title": "I Can't Love You Anymore",
-      "artist": "Ella Langley",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 19,
-      "title": "Think As You Drunk",
-      "artist": "Riley Green",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 20,
-      "title": "Rethink Some Things",
-      "artist": "Luke Combs",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 21,
-      "title": "Woman",
-      "artist": "Kane Brown",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 22,
       "title": "Empty Words",
       "artist": "Corey Kent",
       "url": "",
@@ -210,25 +174,16 @@
       "prev": ""
     },
     {
-      "pos": 23,
-      "title": "Phone, Keys, Wallet",
-      "artist": "Lainey Wilson",
+      "pos": 19,
+      "title": "Cowgirl",
+      "artist": "Shaboozey",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 24,
-      "title": "Something To Lose",
-      "artist": "STELLA LEFTY",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 25,
+      "pos": 20,
       "title": "Loving Life Again",
       "artist": "Ella Langley",
       "url": "",
@@ -237,9 +192,54 @@
       "prev": ""
     },
     {
+      "pos": 21,
+      "title": "Carry On",
+      "artist": "Kenny Chesney",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 22,
+      "title": "Phone, Keys, Wallet",
+      "artist": "Lainey Wilson",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 23,
+      "title": "Something To Lose",
+      "artist": "STELLA LEFTY",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 24,
+      "title": "I Can't Love You Anymore",
+      "artist": "Ella Langley",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 25,
+      "title": "Woman",
+      "artist": "Kane Brown",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 26,
-      "title": "McArthur",
-      "artist": "HARDY",
+      "title": "Take Me Back (Leave Me There)",
+      "artist": "Cody Johnson",
       "url": "",
       "art": "",
       "year": "",
@@ -256,42 +256,6 @@
     },
     {
       "pos": 28,
-      "title": "Country And She Knows It",
-      "artist": "Luke Bryan",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 29,
-      "title": "Don't We",
-      "artist": "Morgan Wallen",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 30,
-      "title": "Medicine",
-      "artist": "Megan Moroney",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 31,
-      "title": "Cowgirl",
-      "artist": "Shaboozey",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 32,
       "title": "Good News",
       "artist": "Shaboozey",
       "url": "",
@@ -300,16 +264,25 @@
       "prev": ""
     },
     {
-      "pos": 33,
-      "title": "All My Exes",
-      "artist": "Lauren Alaina",
+      "pos": 29,
+      "title": "McArthur",
+      "artist": "HARDY",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 34,
+      "pos": 30,
+      "title": "Rethink Some Things",
+      "artist": "Luke Combs",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 31,
       "title": "Overrated",
       "artist": "Warren Zeiders",
       "url": "",
@@ -318,34 +291,16 @@
       "prev": ""
     },
     {
-      "pos": 35,
-      "title": "What You Want",
-      "artist": "Vincent Mason",
+      "pos": 32,
+      "title": "Don't We",
+      "artist": "Morgan Wallen",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 36,
-      "title": "Another Drink",
-      "artist": "Marshmello",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 37,
-      "title": "Ordinary",
-      "artist": "Alex Warren",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 38,
+      "pos": 33,
       "title": "Hands Up",
       "artist": "Jelly Roll",
       "url": "",
@@ -354,88 +309,34 @@
       "prev": ""
     },
     {
-      "pos": 39,
-      "title": "Go Again",
-      "artist": "Riley Green",
+      "pos": 34,
+      "title": "Medicine",
+      "artist": "Megan Moroney",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 40,
-      "title": "Carry On",
-      "artist": "Kenny Chesney",
+      "pos": 35,
+      "title": "Another Drink",
+      "artist": "Marshmello",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 41,
-      "title": "Manchild",
-      "artist": "Sabrina Carpenter",
+      "pos": 36,
+      "title": "All My Exes",
+      "artist": "Lauren Alaina",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 42,
-      "title": "Dancing In the Dark",
-      "artist": "Bruce Springsteen",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 43,
-      "title": "The Fate of Ophelia",
-      "artist": "Taylor Swift",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 44,
-      "title": "Ride, Ride, Ride",
-      "artist": "George Birge",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 45,
-      "title": "BIRDS OF A FEATHER",
-      "artist": "Billie Eilish",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 46,
-      "title": "TEXAS HOLD 'EM",
-      "artist": "Beyoncé",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 47,
-      "title": "Killin’ Me",
-      "artist": "Parker McCollum",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 48,
+      "pos": 37,
       "title": "Better Me For You (Brown Eyes)",
       "artist": "Max McNown",
       "url": "",
@@ -444,9 +345,108 @@
       "prev": ""
     },
     {
+      "pos": 38,
+      "title": "What I Want",
+      "artist": "Morgan Wallen",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 39,
+      "title": "Am I Okay?",
+      "artist": "Megan Moroney",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 40,
+      "title": "Dai Dai",
+      "artist": "Shakira",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 41,
+      "title": "Move On",
+      "artist": "Kevin Powers",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 42,
+      "title": "Folded",
+      "artist": "Kehlani",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 43,
+      "title": "Ordinary",
+      "artist": "Alex Warren",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 44,
+      "title": "What You Want",
+      "artist": "Vincent Mason",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 45,
+      "title": "Country And She Knows It",
+      "artist": "Luke Bryan",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 46,
+      "title": "BIRDS OF A FEATHER",
+      "artist": "Billie Eilish",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 47,
+      "title": "My Love Mine All Mine",
+      "artist": "Mitski",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 48,
+      "title": "Opalite",
+      "artist": "Taylor Swift",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 49,
-      "title": "Livin' On A Prayer",
-      "artist": "Bon Jovi",
+      "title": "Africa",
+      "artist": "Toto",
       "url": "",
       "art": "",
       "year": "",
@@ -454,8 +454,8 @@
     },
     {
       "pos": 50,
-      "title": "Juna",
-      "artist": "Clairo",
+      "title": "Good Girls & Cowgirls",
+      "artist": "Zach Top",
       "url": "",
       "art": "",
       "year": "",
