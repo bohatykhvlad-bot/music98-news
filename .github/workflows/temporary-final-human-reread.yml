@@ -33,7 +33,7 @@ jobs:
           python scripts/post.py set quavo26qromelife \
             --body-file .github/staging/quavo-human-final.txt \
             --title "QRÖMELIFE" \
-            --excerpt "Quavo has released *QRÖMELIFE*, his third solo album and the follow-up to 2023's *Rocket Power*."
+            --excerpt "Quavo has released *QRÖMELIFE*, his third solo album and the follow-up to 2023's *Rocket Power*. That record stayed close to the grief after Takeoff's death."
       - run: sleep 70
       - name: Refresh Lola stamps after Quavo propagation
         run: |
