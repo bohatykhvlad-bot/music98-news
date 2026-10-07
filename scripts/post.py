@@ -572,7 +572,12 @@ def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
     candidate["excerpt"]=exc
     if title:
         candidate["title"]=title
-    if not _local_preflight(candidate, baseline=current):
+    # preflight.py intentionally validates draft payloads. A text-only edit to an
+    # already-live article should still get the same payload/media/cover checks
+    # without forcing the public post through a temporary draft state.
+    preflight_candidate=json.loads(json.dumps(candidate))
+    preflight_candidate["status"]="draft"
+    if not _local_preflight(preflight_candidate, baseline=current):
         die("set refused: staged body failed preflight before desk write")
 
     def mutate(posts):
