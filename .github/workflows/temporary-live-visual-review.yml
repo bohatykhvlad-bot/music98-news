@@ -1,0 +1,34 @@
+name: Temporary live visual review
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-live-visual-review.yml
+permissions:
+  contents: read
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install browser
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install chromium
+      - name: Capture live pages
+        shell: bash
+        run: |
+          mkdir -p /tmp/live-review
+          npx playwright screenshot --browser chromium --viewport-size "1440,1100" --wait-for-timeout 7000 --full-page "https://music98.news/releases/quavo-qromelife" /tmp/live-review/quavo-full.png
+          npx playwright screenshot --browser chromium --viewport-size "1440,1100" --wait-for-timeout 7000 "https://music98.news/releases/quavo-qromelife" /tmp/live-review/quavo-top.png
+          npx playwright screenshot --browser chromium --viewport-size "1440,1100" --wait-for-timeout 7000 --full-page "https://music98.news/lola-young-announces-2027-everything-begins-tour" /tmp/live-review/lola-full.png
+          npx playwright screenshot --browser chromium --viewport-size "1440,1100" --wait-for-timeout 7000 "https://music98.news/lola-young-announces-2027-everything-begins-tour" /tmp/live-review/lola-top.png
+          npx playwright screenshot --browser chromium --viewport-size "1440,1100" --wait-for-timeout 7000 "https://music98.news/releases" /tmp/live-review/releases-top.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: music98-live-final-visual-review
+          path: /tmp/live-review/*
+          retention-days: 1
