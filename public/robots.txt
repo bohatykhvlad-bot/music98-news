@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
+Allow: /api/desk
+Allow: /api/top50
+Allow: /api/concerts
 Disallow: /admin-desk
 Disallow: /admin-desk.html
 Disallow: /m98desk

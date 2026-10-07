@@ -132,6 +132,26 @@ function rep(html, re, to) {
   return re.test(html) ? html.replace(re, to) : html;
 }
 
+function notFoundHtml() {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<title>Article not found — music98.news</title>
+<link rel="canonical" href="${SITE}/">
+</head>
+<body>
+<main>
+<h1>Article not found</h1>
+<p>This music98.news article is no longer available or the address is incorrect.</p>
+<p><a href="/">Go to music98.news</a></p>
+</main>
+</body>
+</html>`;
+}
+
 /* Inject per-article meta into the index.html shell */
 export function articleHtml(shell, p, slug, origin) {
   const title = escapeHtml(String(p.title || "music98.news"));
@@ -189,9 +209,13 @@ export async function serveArticle(request, env) {
   const p = posts.find((x) => slugs[x.id] === slug);
 
   if (!p || (!legacy && p.type === "release")) {
-    return new Response(shell, {
+    return new Response(notFoundHtml(), {
       status: 404,
-      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store, max-age=0" },
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "no-store, max-age=0",
+        "X-Robots-Tag": "noindex, follow",
+      },
     });
   }
 

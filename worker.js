@@ -171,6 +171,12 @@ function noStoreHeaders(input) {
   return headers;
 }
 
+function noindexResponse(res, value = "noindex") {
+  const headers = new Headers(res.headers);
+  headers.set("X-Robots-Tag", value);
+  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+}
+
 async function serveConcertsShell(request, env) {
   const u=new URL("/index.html",request.url);
   const assetRequest=new Request(u.toString(),{method:"GET",headers:request.headers});
@@ -187,6 +193,10 @@ async function serveConcertsShell(request, env) {
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    if (url.hostname === "www.music98.news") {
+      url.hostname = "music98.news";
+      return Response.redirect(url.toString(), 301);
+    }
     const rawPath = url.pathname;
     const path = rawPath.replace(/\/+$/, "") || "/";
     const c = { request, env, waitUntil: (p) => ctx.waitUntil(p) };
@@ -199,10 +209,10 @@ export default {
     if (rawPath.startsWith("/apple-gw/")) {
       return proxyAppleGw(request, rawPath);
     }
-    if (path === "/api/top50" && request.method === "GET") return top50(c);
-    if (path === "/api/concerts" && request.method === "GET") return concerts(c);
-    if (path === "/api/preview" && (request.method === "GET" || request.method === "HEAD")) return preview(c);
-    if (path === "/api/desk") return desk(c);
+    if (path === "/api/top50" && request.method === "GET") return noindexResponse(await top50(c));
+    if (path === "/api/concerts" && request.method === "GET") return noindexResponse(await concerts(c));
+    if (path === "/api/preview" && (request.method === "GET" || request.method === "HEAD")) return noindexResponse(await preview(c));
+    if (path === "/api/desk") return noindexResponse(await desk(c));
     if (path === "/api/subscribe" && request.method === "POST") return subscribe(c);
     if (path === "/api/subscribers" && request.method === "GET") return subscribers(c);
     if (path === "/api/subscribers" && request.method === "DELETE") return subscribersRemove(c);
