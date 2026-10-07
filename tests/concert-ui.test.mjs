@@ -255,7 +255,10 @@ test("direct /concerts is worker-first, no-store and rewrites index metadata wit
   const wrangler=fs.readFileSync(new URL("../wrangler.toml",import.meta.url),"utf8");
   const headers=fs.readFileSync(new URL("../public/_headers",import.meta.url),"utf8");
   const legacy=fs.readFileSync(new URL("../public/concerts.html",import.meta.url),"utf8");
-  assert.match(wrangler,/run_worker_first = \[[^\]]*"\/concerts"[^\]]*"\/concerts-app\.js"/);
+  assert.ok(
+    /run_worker_first = true/.test(wrangler) ||
+    /run_worker_first = \[[^\]]*"\/concerts"[^\]]*"\/concerts-app\.js"/.test(wrangler)
+  );
   assert.match(worker,/path === "\/concerts"[\s\S]*serveConcertsShell\(request, env\)/);
   assert.match(worker,/X-M98-Concerts-Shell","index"/);
   assert.match(worker,/Concerts Near You - music98\.news/);
