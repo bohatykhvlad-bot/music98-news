@@ -74,6 +74,7 @@ jobs:
               if not isinstance(cover,dict) or cover.get("kind")!="img":
                   raise SystemExit(f"{pid}: image cover missing")
               src=str(cover.get("src") or "")
+              print(f"CURRENT_COVER {pid} src={src} pos={cover.get('pos')} zoom={cover.get('zoom')} cardZoom={cover.get('cardZoom')} cardX={cover.get('cardX')} cardY={cover.get('cardY')} credit={cover.get('credit')}")
               if not src.endswith(cfg["cover_file"]):
                   raise SystemExit(f"{pid}: unexpected cover source")
               for k,v in cfg["crop"].items():
