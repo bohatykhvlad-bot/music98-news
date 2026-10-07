@@ -1,16 +1,15 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-07T07:43:58.608Z",
+  "updatedAt": "2026-10-07T13:37:35.945Z",
   "chartUpdated": "2026-10-07",
   "chartRev": "daily-global-v37",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 27,
-    "apple-chart": 20,
-    "previous-audit": 1,
-    "apple": 2
+    "apple-feed": 25,
+    "apple-chart": 24,
+    "previous-audit": 1
   },
   "entries": {
     "aintinla|adela": {
@@ -30,7 +29,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.754Z",
+      "checkedAt": "2026-10-07T13:36:18.841Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -66,7 +65,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:51.334Z",
+      "checkedAt": "2026-10-07T13:37:26.154Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -162,7 +161,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:30.977Z",
+      "checkedAt": "2026-10-07T13:37:01.626Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -198,7 +197,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:31.639Z",
+      "checkedAt": "2026-10-07T13:36:52.132Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -279,7 +278,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.748Z",
+      "checkedAt": "2026-10-07T13:36:18.834Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -315,7 +314,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:20.517Z",
+      "checkedAt": "2026-10-07T13:36:26.609Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -381,7 +380,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:51.982Z",
+      "checkedAt": "2026-10-07T13:37:26.908Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -447,7 +446,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.755Z",
+      "checkedAt": "2026-10-07T13:36:18.841Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -483,7 +482,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:18.464Z",
+      "checkedAt": "2026-10-07T13:36:20.741Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -519,7 +518,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:20.518Z",
+      "checkedAt": "2026-10-07T13:36:26.610Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -555,7 +554,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.751Z",
+      "checkedAt": "2026-10-07T13:36:18.837Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -591,7 +590,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:30.331Z",
+      "checkedAt": "2026-10-07T13:36:35.524Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -607,42 +606,6 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2016
-        }
-      ]
-    },
-    "classicpt2|drake": {
-      "identity": "classicpt2|drake",
-      "title": "Classic PT2",
-      "artist": "Drake",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/62/58/98/62589807-decc-d418-eb07-5060de9a2d3e/26UMGIM63617.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
-      "releaseTitle": "HABIBTI (FOMO)",
-      "releaseArtist": "Drake",
-      "releaseDate": "2026-10-02T07:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/6818059268?i=6818059601",
-      "collectionId": "6818059268",
-      "trackId": "6818059601",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-07T07:43:57.320Z",
-      "alternatives": [
-        {
-          "provider": "apple-feed",
-          "id": "6818059601",
-          "collectionId": "6818059268",
-          "releaseTitle": "HABIBTI (FOMO)",
-          "releaseArtist": "Drake",
-          "releaseDate": "2026-10-02T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/62/58/98/62589807-decc-d418-eb07-5060de9a2d3e/26UMGIM63617.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6818059268?i=6818059601",
-          "score": 1270,
-          "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
         }
       ]
     },
@@ -663,7 +626,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:21.751Z",
+      "checkedAt": "2026-10-07T13:36:30.228Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -699,7 +662,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:42.027Z",
+      "checkedAt": "2026-10-07T13:36:50.261Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -795,7 +758,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:23.503Z",
+      "checkedAt": "2026-10-07T13:36:33.094Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -861,7 +824,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:18.463Z",
+      "checkedAt": "2026-10-07T13:36:20.741Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -957,7 +920,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:23.504Z",
+      "checkedAt": "2026-10-07T13:36:33.094Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -993,7 +956,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:20.517Z",
+      "checkedAt": "2026-10-07T13:36:26.609Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1029,7 +992,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.751Z",
+      "checkedAt": "2026-10-07T13:36:18.838Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1065,7 +1028,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:20.520Z",
+      "checkedAt": "2026-10-07T13:36:26.611Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1101,7 +1064,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:21.750Z",
+      "checkedAt": "2026-10-07T13:36:30.227Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1182,7 +1145,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:37.417Z",
+      "checkedAt": "2026-10-07T13:37:07.485Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1263,7 +1226,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:42.028Z",
+      "checkedAt": "2026-10-07T13:37:13.707Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1299,7 +1262,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:24.107Z",
+      "checkedAt": "2026-10-07T13:36:35.524Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1335,7 +1298,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:33.754Z",
+      "checkedAt": "2026-10-07T13:37:01.625Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1355,7 +1318,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:39.069Z",
+      "checkedAt": "2026-10-07T13:37:11.300Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1421,7 +1384,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.752Z",
+      "checkedAt": "2026-10-07T13:36:18.838Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1457,7 +1420,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:38.031Z",
+      "checkedAt": "2026-10-07T13:37:08.728Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1523,7 +1486,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:27.684Z",
+      "checkedAt": "2026-10-07T13:36:42.367Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1619,7 +1582,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:39.871Z",
+      "checkedAt": "2026-10-07T13:37:14.776Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1670,7 +1633,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.753Z",
+      "checkedAt": "2026-10-07T13:36:18.840Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1706,7 +1669,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:50.308Z",
+      "checkedAt": "2026-10-07T13:37:24.079Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1802,7 +1765,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.752Z",
+      "checkedAt": "2026-10-07T13:36:18.839Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1838,7 +1801,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:51.982Z",
+      "checkedAt": "2026-10-07T13:37:29.510Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1874,7 +1837,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:21.751Z",
+      "checkedAt": "2026-10-07T13:36:30.228Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1898,7 +1861,7 @@
       "title": "Rethink Some Things",
       "artist": "Luke Combs",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "The Way I Am",
       "releaseArtist": "Luke Combs",
       "releaseDate": "2026-03-20T12:00:00Z",
@@ -1907,11 +1870,26 @@
       "collectionId": "1862634688",
       "trackId": "1862634795",
       "confidence": 98,
-      "score": 885,
+      "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:58.606Z",
+      "checkedAt": "2026-10-07T13:37:31.340Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1862634795",
+          "collectionId": "1862634688",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
         {
           "provider": "apple",
           "id": "1862634795",
@@ -1961,7 +1939,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:24.106Z",
+      "checkedAt": "2026-10-07T13:36:35.523Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2027,7 +2005,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:32.331Z",
+      "checkedAt": "2026-10-07T13:36:55.815Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2108,7 +2086,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:20.519Z",
+      "checkedAt": "2026-10-07T13:36:26.612Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2144,7 +2122,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:30.977Z",
+      "checkedAt": "2026-10-07T13:36:51.276Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2225,7 +2203,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.749Z",
+      "checkedAt": "2026-10-07T13:36:18.835Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2261,7 +2239,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:39.871Z",
+      "checkedAt": "2026-10-07T13:37:11.300Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2297,7 +2275,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:56.180Z",
+      "checkedAt": "2026-10-07T13:37:29.509Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2381,7 +2359,7 @@
       "title": "Take Me Back (Leave Me There)",
       "artist": "Cody Johnson",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/d9/7a/e2d97a87-6ec6-99de-9a1f-31b86ce6e7c4/093624826613.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
+      "provider": "apple-chart",
       "releaseTitle": "Banks Of The Trinity",
       "releaseArtist": "Cody Johnson",
       "releaseDate": "2026-05-29T12:00:00Z",
@@ -2389,14 +2367,14 @@
       "url": "https://music.apple.com/us/album/1892465981?i=1892466278",
       "collectionId": "1892465981",
       "trackId": "1892466278",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:39.872Z",
+      "checkedAt": "2026-10-07T13:37:13.707Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
+          "provider": "apple-chart",
           "id": "1892466278",
           "collectionId": "1892465981",
           "releaseTitle": "Banks Of The Trinity",
@@ -2405,9 +2383,39 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/d9/7a/e2d97a87-6ec6-99de-9a1f-31b86ce6e7c4/093624826613.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1892465981?i=1892466278",
-          "score": 1270,
-          "confidence": 99,
-          "consensus": 1,
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1892466278",
+          "collectionId": "1892465981",
+          "releaseTitle": "Banks Of The Trinity",
+          "releaseArtist": "Cody Johnson",
+          "releaseDate": "2026-05-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/d9/7a/e2d97a87-6ec6-99de-9a1f-31b86ce6e7c4/093624826613.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1892465981?i=1892466278",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "3954011381",
+          "collectionId": "958933391",
+          "releaseTitle": "Banks Of The Trinity",
+          "releaseArtist": "Cody Johnson",
+          "releaseDate": "2026-06-26",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/84a5a5efcb2544418ff704da80e1cc0f/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3954011381",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
           "earliestReleaseYear": 2026
         }
       ]
@@ -2429,7 +2437,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:17.753Z",
+      "checkedAt": "2026-10-07T13:36:18.840Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2465,7 +2473,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:20.518Z",
+      "checkedAt": "2026-10-07T13:36:26.611Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2501,7 +2509,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:30.331Z",
+      "checkedAt": "2026-10-07T13:36:45.984Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2597,7 +2605,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:57.320Z",
+      "checkedAt": "2026-10-07T13:37:30.183Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2651,7 +2659,7 @@
       "title": "Training Season",
       "artist": "Dua Lipa",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/82/89/15/828915ea-d716-61c4-3de7-ef00c1f800fb/5054197853630.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "Training Season - Single",
       "releaseArtist": "Dua Lipa",
       "releaseDate": "2024-02-16T08:00:00Z",
@@ -2660,11 +2668,26 @@
       "collectionId": "1727526670",
       "trackId": "1727526894",
       "confidence": 98,
-      "score": 965,
+      "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T07:43:47.094Z",
+      "checkedAt": "2026-10-07T13:37:20.870Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1727526894",
+          "collectionId": "1727526670",
+          "releaseTitle": "Training Season - Single",
+          "releaseArtist": "Dua Lipa",
+          "releaseDate": "2024-02-16T08:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/82/89/15/828915ea-d716-61c4-3de7-ef00c1f800fb/5054197853630.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1727526670?i=1727526894",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
         {
           "provider": "apple",
           "id": "1727526894",
@@ -2724,21 +2747,72 @@
           "confidence": 98,
           "consensus": 2,
           "earliestReleaseYear": 2024
+        }
+      ]
+    },
+    "woman|brownkane": {
+      "identity": "woman|brownkane",
+      "title": "Woman",
+      "artist": "Kane Brown",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8a/70/3f/8a703f6a-1878-6e9f-6cfa-b01a97eac71c/196874109106.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Woman - Single",
+      "releaseArtist": "Kane Brown",
+      "releaseDate": "2026-03-13T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/1882549705?i=1882549709",
+      "collectionId": "1882549705",
+      "trackId": "1882549709",
+      "confidence": 98,
+      "score": 1090,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-07T13:37:35.944Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1882549709",
+          "collectionId": "1882549705",
+          "releaseTitle": "Woman - Single",
+          "releaseArtist": "Kane Brown",
+          "releaseDate": "2026-03-13T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8a/70/3f/8a703f6a-1878-6e9f-6cfa-b01a97eac71c/196874109106.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1882549705?i=1882549709",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
         },
         {
           "provider": "apple",
-          "id": "6805877537",
-          "collectionId": "6805877220",
-          "releaseTitle": "Training Season's Over - EP",
-          "releaseArtist": "Dua Lipa",
-          "releaseDate": "2024-03-15T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2d/1d/86/2d1d8629-34d0-f8f6-ffe8-2eca20741d33/1200214922771.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6805877220?i=6805877537",
-          "score": 885,
+          "id": "1882549709",
+          "collectionId": "1882549705",
+          "releaseTitle": "Woman - Single",
+          "releaseArtist": "Kane Brown",
+          "releaseDate": "2026-03-13T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8a/70/3f/8a703f6a-1878-6e9f-6cfa-b01a97eac71c/196874109106.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1882549705?i=1882549709",
+          "score": 965,
           "confidence": 98,
           "consensus": 2,
-          "earliestReleaseYear": 2024
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "3884901601",
+          "collectionId": "933879421",
+          "releaseTitle": "Woman",
+          "releaseArtist": "Kane Brown",
+          "releaseDate": "2026-03-13",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/84c14dd8a664136f0cf35d54faaed9c2/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3884901601",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
         }
       ]
     }
@@ -4073,72 +4147,6 @@
         }
       ]
     },
-    "woman|brownkane": {
-      "identity": "woman|brownkane",
-      "title": "Woman",
-      "artist": "Kane Brown",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8a/70/3f/8a703f6a-1878-6e9f-6cfa-b01a97eac71c/196874109106.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Woman - Single",
-      "releaseArtist": "Kane Brown",
-      "releaseDate": "2026-03-13T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/1882549705?i=1882549709",
-      "collectionId": "1882549705",
-      "trackId": "1882549709",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-06T13:26:50.469Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1882549709",
-          "collectionId": "1882549705",
-          "releaseTitle": "Woman - Single",
-          "releaseArtist": "Kane Brown",
-          "releaseDate": "2026-03-13T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8a/70/3f/8a703f6a-1878-6e9f-6cfa-b01a97eac71c/196874109106.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1882549705?i=1882549709",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "1882549709",
-          "collectionId": "1882549705",
-          "releaseTitle": "Woman - Single",
-          "releaseArtist": "Kane Brown",
-          "releaseDate": "2026-03-13T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8a/70/3f/8a703f6a-1878-6e9f-6cfa-b01a97eac71c/196874109106.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1882549705?i=1882549709",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "3884901601",
-          "collectionId": "933879421",
-          "releaseTitle": "Woman",
-          "releaseArtist": "Kane Brown",
-          "releaseDate": "2026-03-13",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/84c14dd8a664136f0cf35d54faaed9c2/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3884901601",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
     "billiejean|jacksonmichael": {
       "identity": "billiejean|jacksonmichael",
       "title": "Billie Jean",
@@ -4394,6 +4402,42 @@
           "confidence": 91,
           "consensus": 1,
           "earliestReleaseYear": 2024
+        }
+      ]
+    },
+    "classicpt2|drake": {
+      "identity": "classicpt2|drake",
+      "title": "Classic PT2",
+      "artist": "Drake",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/62/58/98/62589807-decc-d418-eb07-5060de9a2d3e/26UMGIM63617.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "HABIBTI (FOMO)",
+      "releaseArtist": "Drake",
+      "releaseDate": "2026-10-02T07:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6818059268?i=6818059601",
+      "collectionId": "6818059268",
+      "trackId": "6818059601",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-07T07:43:57.320Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "6818059601",
+          "collectionId": "6818059268",
+          "releaseTitle": "HABIBTI (FOMO)",
+          "releaseArtist": "Drake",
+          "releaseDate": "2026-10-02T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/62/58/98/62589807-decc-d418-eb07-5060de9a2d3e/26UMGIM63617.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6818059268?i=6818059601",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
         }
       ]
     }
