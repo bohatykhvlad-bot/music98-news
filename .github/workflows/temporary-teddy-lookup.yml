@@ -1,0 +1,22 @@
+name: Temporary Teddy lookup
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/temporary-teddy-lookup.yml
+jobs:
+  lookup:
+    runs-on: ubuntu-latest
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Find Teddy card
+        shell: python
+        run: |
+          import json,os,urllib.request
+          req=urllib.request.Request("https://music98.news/api/desk",headers={"X-Admin-Key":os.environ["ADMIN_PASSWORD"],"User-Agent":"Mozilla/5.0"})
+          with urllib.request.urlopen(req,timeout=30) as r: d=json.loads(r.read().decode())
+          for p in d.get("posts",[]):
+              if "Teddy Swims" in json.dumps(p,ensure_ascii=False):
+                  keep={k:p.get(k) for k in ("id","type","rtype","tag","artist","title","excerpt","body","status","date")}
+                  print(json.dumps(keep,ensure_ascii=False))
