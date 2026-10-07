@@ -37,7 +37,7 @@ jobs:
           key=os.environ["ADMIN_PASSWORD"].strip()
           req=urllib.request.Request(
               "https://music98.news/api/desk",
-              headers={"X-Admin-Key":key,"Accept":"application/json","Cache-Control":"no-cache"})
+              headers={"X-Admin-Key":key,"Accept":"application/json","Cache-Control":"no-cache","User-Agent":"Mozilla/5.0"})
           with urllib.request.urlopen(req,timeout=60) as r:
               desk=json.loads(r.read().decode("utf-8"))
           posts=desk.get("posts") or []
@@ -101,7 +101,7 @@ jobs:
           import hashlib, json, os, urllib.request
           from pathlib import Path
           key=os.environ["ADMIN_PASSWORD"].strip()
-          req=urllib.request.Request("https://music98.news/api/desk",headers={"X-Admin-Key":key,"Accept":"application/json","Cache-Control":"no-cache"})
+          req=urllib.request.Request("https://music98.news/api/desk",headers={"X-Admin-Key":key,"Accept":"application/json","Cache-Control":"no-cache","User-Agent":"Mozilla/5.0"})
           with urllib.request.urlopen(req,timeout=60) as r:
               desk=json.loads(r.read().decode("utf-8"))
           for pid,path in [("quavo26qromelife","/tmp/quavo-candidate.json"),("lola26ebtour","/tmp/lola-candidate.json")]:
