@@ -40,6 +40,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -265,8 +266,19 @@ def guarded_write(mutate):
     pid = target["id"]
     others_before = {p["id"]: p for p in posts if p.get("id") != pid}
     http(DESK_API, desk_key(), {"posts": posts}, method="POST")
-    after = desk_read()
-    now = find_post(after["posts"], pid)
+    # Cloudflare KV can briefly return the pre-write value from another edge.
+    # Treat that as propagation lag, not as a failed write. Retry the fresh GET
+    # for a few seconds before declaring a post-save mismatch.
+    wanted = json.dumps(target, sort_keys=True, ensure_ascii=False)
+    after = None
+    now = None
+    for attempt in range(8):
+        after = desk_read()
+        now = find_post(after["posts"], pid)
+        if json.dumps(now, sort_keys=True, ensure_ascii=False) == wanted:
+            break
+        if attempt < 7:
+            time.sleep(0.35 * (attempt + 1))
     others_after = {p["id"]: p for p in after["posts"] if p.get("id") != pid}
     changed = [i for i in others_before
                if json.dumps(others_before[i], sort_keys=True, ensure_ascii=False)
