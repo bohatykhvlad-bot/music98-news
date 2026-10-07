@@ -75,13 +75,9 @@ jobs:
                   raise SystemExit(f"{pid}: image cover missing")
               src=str(cover.get("src") or "")
               print(f"CURRENT_COVER {pid} src={src} pos={cover.get('pos')} zoom={cover.get('zoom')} cardZoom={cover.get('cardZoom')} cardX={cover.get('cardX')} cardY={cover.get('cardY')} credit={cover.get('credit')}")
-              if not src.endswith(cfg["cover_file"]):
-                  raise SystemExit(f"{pid}: unexpected cover source")
-              for k,v in cfg["crop"].items():
-                  cover[k]=v
               Path(cfg["out"]).write_text(json.dumps(p,ensure_ascii=False,indent=2),encoding="utf-8")
               wc=len(re.findall(r"\b[\w'’-]+\b",re.sub(r"\[[^\]]+\]"," ",p["body"])))
-              print(f"STAGED {pid} words={wc} sha={hashlib.sha256(p['body'].encode()).hexdigest()[:12]} cover={cfg['cover_file']} crop={cfg['crop']}")
+              print(f"STAGED {pid} words={wc} sha={hashlib.sha256(p['body'].encode()).hexdigest()[:12]} cover_preserved=true")
       - name: POST-EDIT full reads on exact final bodies
         run: |
           python scripts/editorial_readthrough.py --post quavo26qromelife --file /tmp/quavo-candidate.json --phase post-edit --confirm-full-read
