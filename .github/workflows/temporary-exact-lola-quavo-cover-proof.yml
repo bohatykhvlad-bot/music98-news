@@ -1,0 +1,25 @@
+name: Temporary exact Lola Quavo cover proof
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-exact-lola-quavo-cover-proof.yml
+permissions:
+  contents: read
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Download exact current cover candidates
+        run: |
+          mkdir -p /tmp/proof
+          curl -fL --retry 3 -o /tmp/proof/lola-current.jpg https://music98.news/photos/lola-young-everything-begins-2027-hr.jpg
+          curl -fL --retry 3 -o /tmp/proof/quavo-current.jpg https://music98.news/photos/quavo-qromelife-tariq-mcallister-cover.jpg
+          file /tmp/proof/*
+          wc -c /tmp/proof/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exact-lola-quavo-cover-proof
+          path: /tmp/proof/*
+          if-no-files-found: error
+          retention-days: 1
