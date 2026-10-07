@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "verified": true,
-  "chartDate": "2026-10-04",
+  "chartDate": "2026-10-05",
   "provider": "kworb+musicrank",
   "mirrorMatched": 50,
   "ldConfirmed": 20,
-  "fingerprint": "dcf3873fac162ce5f37024414fb2e6436a574a3e8e24bf0874278fb99077ceac",
+  "fingerprint": "49a5d5542e6116764f327329d78dca056f99e055fa16f18e48051dec24b2b688",
   "tracks": [
     {
       "pos": 1,
@@ -18,8 +18,8 @@
     },
     {
       "pos": 2,
-      "title": "Patient Zero",
-      "artist": "Taylor Swift",
+      "title": "Nicole Kidman",
+      "artist": "ADÉLA",
       "url": "",
       "art": "",
       "year": "",
@@ -27,8 +27,8 @@
     },
     {
       "pos": 3,
-      "title": "Nicole Kidman",
-      "artist": "ADÉLA",
+      "title": "Patient Zero",
+      "artist": "Taylor Swift",
       "url": "",
       "art": "",
       "year": "",
@@ -63,24 +63,6 @@
     },
     {
       "pos": 7,
-      "title": "The One That Got Away",
-      "artist": "Katy Perry",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 8,
-      "title": "Beauty And A Beat (w/ Nicki Minaj)",
-      "artist": "Justin Bieber",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 9,
       "title": "Self Aware",
       "artist": "Temper City",
       "url": "",
@@ -89,16 +71,7 @@
       "prev": ""
     },
     {
-      "pos": 10,
-      "title": "back to friends",
-      "artist": "sombr",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 11,
+      "pos": 8,
       "title": "stupid song",
       "artist": "Olivia Rodrigo",
       "url": "",
@@ -107,43 +80,16 @@
       "prev": ""
     },
     {
-      "pos": 12,
-      "title": "Sweater Weather",
-      "artist": "The Neighbourhood",
+      "pos": 9,
+      "title": "The One That Got Away",
+      "artist": "Katy Perry",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 13,
-      "title": "Love Me Not",
-      "artist": "Ravyn Lenae",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 14,
-      "title": "Iris",
-      "artist": "The Goo Goo Dolls",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 15,
-      "title": "Babydoll",
-      "artist": "Dominic Fike",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 16,
+      "pos": 10,
       "title": "Stop The Wedding!",
       "artist": "Ashe",
       "url": "",
@@ -152,7 +98,34 @@
       "prev": ""
     },
     {
-      "pos": 17,
+      "pos": 11,
+      "title": "back to friends",
+      "artist": "sombr",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 12,
+      "title": "Beauty And A Beat (w/ Nicki Minaj)",
+      "artist": "Justin Bieber",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 13,
+      "title": "Iris",
+      "artist": "The Goo Goo Dolls",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 14,
       "title": "Loser",
       "artist": "Tame Impala",
       "url": "",
@@ -161,9 +134,36 @@
       "prev": ""
     },
     {
+      "pos": 15,
+      "title": "Sweater Weather",
+      "artist": "The Neighbourhood",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 16,
+      "title": "Training Season",
+      "artist": "Dua Lipa",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 17,
+      "title": "Babydoll",
+      "artist": "Dominic Fike",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 18,
-      "title": "Dai Dai (w/ Burna Boy)",
-      "artist": "Shakira",
+      "title": "SWIM",
+      "artist": "BTS",
       "url": "",
       "art": "",
       "year": "",
@@ -198,8 +198,8 @@
     },
     {
       "pos": 22,
-      "title": "Training Season",
-      "artist": "Dua Lipa",
+      "title": "Love Me Not",
+      "artist": "Ravyn Lenae",
       "url": "",
       "art": "",
       "year": "",
@@ -207,33 +207,6 @@
     },
     {
       "pos": 23,
-      "title": "Billie Jean",
-      "artist": "Michael Jackson",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 24,
-      "title": "SWIM",
-      "artist": "BTS",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 25,
-      "title": "Treat You Better",
-      "artist": "Shawn Mendes",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 26,
       "title": "Choosin' Texas",
       "artist": "Ella Langley",
       "url": "",
@@ -242,9 +215,36 @@
       "prev": ""
     },
     {
-      "pos": 27,
+      "pos": 24,
+      "title": "Treat You Better",
+      "artist": "Shawn Mendes",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 25,
+      "title": "Man I Need",
+      "artist": "Olivia Dean",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 26,
       "title": "Cinderella (w/ Ty Dolla $ign)",
       "artist": "Mac Miller",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 27,
+      "title": "Billie Jean",
+      "artist": "Michael Jackson",
       "url": "",
       "art": "",
       "year": "",
@@ -261,8 +261,8 @@
     },
     {
       "pos": 29,
-      "title": "Man I Need",
-      "artist": "Olivia Dean",
+      "title": "Dai Dai (w/ Burna Boy)",
+      "artist": "Shakira",
       "url": "",
       "art": "",
       "year": "",
@@ -270,15 +270,6 @@
     },
     {
       "pos": 30,
-      "title": "Ordinary",
-      "artist": "Alex Warren",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 31,
       "title": "End of Beginning",
       "artist": "Djo",
       "url": "",
@@ -287,9 +278,18 @@
       "prev": ""
     },
     {
+      "pos": 31,
+      "title": "Ordinary",
+      "artist": "Alex Warren",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 32,
-      "title": "Wonderwall - Remastered",
-      "artist": "Oasis",
+      "title": "Raindance (w/ Tems)",
+      "artist": "Dave",
       "url": "",
       "art": "",
       "year": "",
@@ -297,8 +297,8 @@
     },
     {
       "pos": 33,
-      "title": "Raindance (w/ Tems)",
-      "artist": "Dave",
+      "title": "Wonderwall - Remastered",
+      "artist": "Oasis",
       "url": "",
       "art": "",
       "year": "",
@@ -333,15 +333,6 @@
     },
     {
       "pos": 37,
-      "title": "Sure Thing",
-      "artist": "Miguel",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 38,
       "title": "Every Breath You Take",
       "artist": "The Police",
       "url": "",
@@ -350,9 +341,18 @@
       "prev": ""
     },
     {
+      "pos": 38,
+      "title": "Sure Thing",
+      "artist": "Miguel",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 39,
-      "title": "Animal",
-      "artist": "KATSEYE",
+      "title": "Creep",
+      "artist": "Radiohead",
       "url": "",
       "art": "",
       "year": "",
@@ -360,8 +360,8 @@
     },
     {
       "pos": 40,
-      "title": "I Wanna Be Yours",
-      "artist": "Arctic Monkeys",
+      "title": "One Of The Girls (w/ JENNIE, Lily-Rose Depp)",
+      "artist": "The Weeknd",
       "url": "",
       "art": "",
       "year": "",
@@ -378,15 +378,6 @@
     },
     {
       "pos": 42,
-      "title": "One Of The Girls (w/ JENNIE, Lily-Rose Depp)",
-      "artist": "The Weeknd",
-      "url": "",
-      "art": "",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 43,
       "title": "Just Give Me a Reason (w/ Nate Ruess)",
       "artist": "P!nk",
       "url": "",
@@ -395,9 +386,18 @@
       "prev": ""
     },
     {
+      "pos": 43,
+      "title": "I Wanna Be Yours",
+      "artist": "Arctic Monkeys",
+      "url": "",
+      "art": "",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 44,
-      "title": "Creep",
-      "artist": "Radiohead",
+      "title": "Starboy (w/ Daft Punk)",
+      "artist": "The Weeknd",
       "url": "",
       "art": "",
       "year": "",
@@ -405,8 +405,8 @@
     },
     {
       "pos": 45,
-      "title": "Starboy (w/ Daft Punk)",
-      "artist": "The Weeknd",
+      "title": "Yellow",
+      "artist": "Coldplay",
       "url": "",
       "art": "",
       "year": "",
@@ -432,8 +432,8 @@
     },
     {
       "pos": 48,
-      "title": "Yellow",
-      "artist": "Coldplay",
+      "title": "Sign of the Times",
+      "artist": "Harry Styles",
       "url": "",
       "art": "",
       "year": "",
@@ -441,8 +441,8 @@
     },
     {
       "pos": 49,
-      "title": "OLIVIA LA FLAKA (w/ Tito Double P, Victor Mendivil, Ovi)",
-      "artist": "Natanael Cano",
+      "title": "505",
+      "artist": "Arctic Monkeys",
       "url": "",
       "art": "",
       "year": "",
@@ -450,13 +450,13 @@
     },
     {
       "pos": 50,
-      "title": "Dunia Yang Nanti",
-      "artist": "Raim Laode",
+      "title": "Animal",
+      "artist": "KATSEYE",
       "url": "",
       "art": "",
       "year": "",
       "prev": ""
     }
   ],
-  "capturedAt": "2026-10-06T01:56:33.927Z"
+  "capturedAt": "2026-10-07T01:02:49.386Z"
 }
