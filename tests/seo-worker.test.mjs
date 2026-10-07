@@ -51,5 +51,8 @@ test("unknown article routes return a real noindex 404 instead of the home shell
   assert.equal(response.status, 404);
   assert.equal(response.headers.get("x-robots-tag"), "noindex, follow");
   assert.match(body, /Article not found/);
+  assert.match(body, /music98\.news/);
+  assert.match(body, /This page slipped off the setlist/);
+  assert.match(body, /href="\/concerts"/);
   assert.doesNotMatch(body, /home shell/);
 });
