@@ -255,6 +255,15 @@ export async function serveArticle(request, env) {
   const slugs = buildSlugMap(posts);
   const p = posts.find((x) => slugs[x.id] === slug);
 
+  /* Preserve the original Teddy Swims URL after correcting the release title
+     from the album name (UGLY) to the actual single (Perfect Man). */
+  if (!p && slug === "teddy-swims-ugly") {
+    const legacyPost = posts.find((x) => x.id === "aurts21r1");
+    if (legacyPost) {
+      return Response.redirect(origin + articlePath(legacyPost, slugs[legacyPost.id]), 301);
+    }
+  }
+
   if (!p || (!legacy && p.type === "release")) {
     return new Response(notFoundHtml(), {
       status: 404,
