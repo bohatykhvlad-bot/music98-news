@@ -1,5 +1,5 @@
 name: Temporary final Lola Quavo editorial publish
-# rerun after Lola closing-paragraph correction
+# rerun after Lola gate-language correction
 on:
   push:
     paths:
