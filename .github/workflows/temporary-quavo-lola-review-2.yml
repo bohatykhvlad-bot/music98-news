@@ -1,0 +1,39 @@
+name: Temporary encrypted Quavo Lola draft review 2
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-quavo-lola-review-2.yml
+permissions:
+  contents: read
+jobs:
+  retrieve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Securely export matching drafts
+        shell: bash
+        run: |
+          node <<'NODE'
+          const { publicEncrypt, constants, randomBytes, createCipheriv } = require('node:crypto');
+          const { brotliCompressSync } = require('node:zlib');
+          const pub = "-----BEGIN PUBLIC KEY-----\nMIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEAlPeX6WkPEWqLHTGzQ3g6\nAooy0sNgeel1nyURF7nBlQ8IOZWjT/vHa3vWu/83GPhdek1BC5cCKblUqkfQJ1FR\n6MH+zM8txpA0Un1QQSCg2TS+kyCzyQQ5GLVUu/anLTcC5Cy9Jkm8H15S4ARLfVEA\nvSg+66XtsD4g6GIbA/63pzIOIFzGILLGC3T2nfdwoisUnTy6w2RDhPyvLMX7EXTb\nNLkIHZFuhxusX5aLmvoAXa4cGndY/J3WemqwQhjDh3wz3EiFC9ujjk+mSNfAJlJx\nZdmCC9QVEkx3ci1seexoLo0aA7phUShq5yrTaHmHXQCyJzXdVUWrpCs+cz81RU/r\nWHcTBWSo2kcmRaDAfRS+vGM2z/eNIQyCyNeOo+1ey/E0ggoTA2AX/tPXichjwL3l\n1cm8n8brPdpBCimix2OACKD+oXyX4ers9rHjCyYY2mtH6mSHS9ZKJozCe6UeNKss\nOROglD+ik4Rc09Oht/5gKQVQrf4DCVh86vXBtKBT/NUfAgMBAAE=\n-----END PUBLIC KEY-----";
+          (async () => {
+            const key = process.env.ADMIN_PASSWORD || '';
+            if (!key) throw Error('ADMIN_PASSWORD_UNCONFIGURED');
+            const r = await fetch('https://music98.news/api/desk', {headers:{'X-Admin-Key':key,'Accept':'application/json'},cache:'no-store'});
+            if (!r.ok) throw Error('DESK_HTTP_' + r.status);
+            const j = await r.json(); if(!Array.isArray(j.posts)) throw Error('INVALID_RESPONSE');
+            const matched = j.posts.filter(p => p.status === 'draft' && /quavo|lola young/i.test([p.artist,p.title,p.body].filter(Boolean).join(' ')));
+            if (!matched.length) throw Error('NO_MATCHING_DRAFTS');
+            const fields = matched.map(p => ({id:p.id,type:p.type,tag:p.tag,rtype:p.rtype,title:p.title,status:p.status,date:p.date,publishAt:p.publishAt,artist:p.artist,excerpt:p.excerpt,body:p.body,cover:p.cover,media:p.media,photos:p.photos,pinned:p.pinned}));
+            const packed = brotliCompressSync(Buffer.from(JSON.stringify(fields),'utf8'));
+            const secret = randomBytes(32), iv = randomBytes(12), cipher = createCipheriv('aes-256-gcm',secret,iv);
+            const ciphertext = Buffer.concat([cipher.update(packed),cipher.final()]), tag = cipher.getAuthTag();
+            const wrapped = publicEncrypt({key:pub,padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},secret);
+            console.log('M98_READER: ENCRYPTED_OK MATCHES_' + matched.length);
+            const output = Buffer.concat([Buffer.from('M98QL02'),wrapped,iv,tag,ciphertext]).toString('base64');
+            console.log('M98_ENCRYPTED_DRAFTS=' + output);
+          })().catch(e=>{console.error('M98_READER_FAIL ' + e.message);process.exit(1)});
+          NODE
