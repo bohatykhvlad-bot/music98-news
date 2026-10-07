@@ -1,15 +1,16 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-07T01:04:26.336Z",
-  "chartUpdated": "2026-10-06",
+  "updatedAt": "2026-10-07T07:43:58.608Z",
+  "chartUpdated": "2026-10-07",
   "chartRev": "daily-global-v37",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 26,
-    "apple-chart": 23,
-    "previous-audit": 1
+    "apple-feed": 27,
+    "apple-chart": 20,
+    "previous-audit": 1,
+    "apple": 2
   },
   "entries": {
     "aintinla|adela": {
@@ -29,7 +30,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.175Z",
+      "checkedAt": "2026-10-07T07:43:17.754Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -65,7 +66,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:56.414Z",
+      "checkedAt": "2026-10-07T07:43:51.334Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -161,7 +162,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:37.769Z",
+      "checkedAt": "2026-10-07T07:43:30.977Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -197,7 +198,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:37.768Z",
+      "checkedAt": "2026-10-07T07:43:31.639Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -278,7 +279,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.169Z",
+      "checkedAt": "2026-10-07T07:43:17.748Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -314,7 +315,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:12.932Z",
+      "checkedAt": "2026-10-07T07:43:20.517Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -380,7 +381,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:04:17.294Z",
+      "checkedAt": "2026-10-07T07:43:51.982Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -446,7 +447,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.177Z",
+      "checkedAt": "2026-10-07T07:43:17.755Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -482,7 +483,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:15.092Z",
+      "checkedAt": "2026-10-07T07:43:18.464Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -498,102 +499,6 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "billiejean|jacksonmichael": {
-      "identity": "billiejean|jacksonmichael",
-      "title": "Billie Jean",
-      "artist": "Michael Jackson",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Thriller 40",
-      "releaseArtist": "Michael Jackson",
-      "releaseDate": "1982-11-29T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
-      "collectionId": "1641780996",
-      "trackId": "1641781004",
-      "confidence": 96,
-      "score": 880,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-07T01:04:14.513Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1641781004",
-          "collectionId": "1641780996",
-          "releaseTitle": "Thriller 40",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
-          "score": 880,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
-        },
-        {
-          "provider": "apple",
-          "id": "1641781004",
-          "collectionId": "1641780996",
-          "releaseTitle": "Thriller 40",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
-        },
-        {
-          "provider": "apple",
-          "id": "1883770432",
-          "collectionId": "1883769984",
-          "releaseTitle": "Michael: Songs From The Motion Picture",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/54/f2/ef/54f2ef79-c668-8d6f-28cd-ae48c45009b7/196874193211.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1883769984?i=1883770432",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
-        },
-        {
-          "provider": "apple",
-          "id": "269573364",
-          "collectionId": "269572838",
-          "releaseTitle": "Thriller",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T08:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/269572838?i=269573364",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
-        },
-        {
-          "provider": "apple",
-          "id": "273048789",
-          "collectionId": "273048762",
-          "releaseTitle": "Thriller (25th Anniversary) [Deluxe Edition]",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/b5/58/d3/b558d32f-24fd-c889-d544-bc4c96f6113e/dj.oinzmlgt.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/273048762?i=273048789",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
         }
       ]
     },
@@ -614,7 +519,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:15.093Z",
+      "checkedAt": "2026-10-07T07:43:20.518Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -650,7 +555,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.171Z",
+      "checkedAt": "2026-10-07T07:43:17.751Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -686,7 +591,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:37.768Z",
+      "checkedAt": "2026-10-07T07:43:30.331Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -722,7 +627,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:04:26.334Z",
+      "checkedAt": "2026-10-07T07:43:57.320Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -758,7 +663,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:21.621Z",
+      "checkedAt": "2026-10-07T07:43:21.751Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -772,102 +677,6 @@
           "url": "https://music.apple.com/us/album/6818209777?i=6818209992",
           "score": 1270,
           "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "daidai|boyburnashakira": {
-      "identity": "daidai|boyburnashakira",
-      "title": "Dai Dai",
-      "artist": "Shakira & Burna Boy",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Dai Dai - Single",
-      "releaseArtist": "Shakira & Burna Boy",
-      "releaseDate": "2026-05-14T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
-      "collectionId": "6768469975",
-      "trackId": "6768469976",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-07T01:04:24.432Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "6768469976",
-          "collectionId": "6768469975",
-          "releaseTitle": "Dai Dai - Single",
-          "releaseArtist": "Shakira & Burna Boy",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6768469976",
-          "collectionId": "6768469975",
-          "releaseTitle": "Dai Dai - Single",
-          "releaseArtist": "Shakira & Burna Boy",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "4015341011",
-          "collectionId": "980745831",
-          "releaseTitle": "Dai Dai",
-          "releaseArtist": "Shakira",
-          "releaseDate": "2026-05-14",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/a7f9bae0243c512059298a68d09f45a1/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4015341011",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "4210621702",
-          "collectionId": "1048886412",
-          "releaseTitle": "Dai Dai",
-          "releaseArtist": "Shakira",
-          "releaseDate": "2026-08-07",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/e35dc7a41abff9ff8636fafec6736472/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4210621702",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6776010744",
-          "collectionId": "6776010591",
-          "releaseTitle": "Official FIFA World Cup 2026™ Album",
-          "releaseArtist": "FIFA Sound",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/68/4a/84/684a84c9-f6e3-ca17-d516-ee01a88c32ca/26UMGIM68511.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6776010591?i=6776010744",
-          "score": 645,
-          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -890,7 +699,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:04:03.754Z",
+      "checkedAt": "2026-10-07T07:43:42.027Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -986,7 +795,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:23.776Z",
+      "checkedAt": "2026-10-07T07:43:23.503Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1052,7 +861,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:15.091Z",
+      "checkedAt": "2026-10-07T07:43:18.463Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1136,7 +945,7 @@
       "title": "Earrings",
       "artist": "Malcolm Todd",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
+      "provider": "apple-feed",
       "releaseTitle": "Sweet Boy",
       "releaseArtist": "Malcolm Todd",
       "releaseDate": "2024-04-05T12:00:00Z",
@@ -1144,14 +953,14 @@
       "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
       "collectionId": "1738257523",
       "trackId": "1738257931",
-      "confidence": 98,
-      "score": 1010,
-      "consensus": 2,
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:25.412Z",
+      "checkedAt": "2026-10-07T07:43:23.504Z",
       "alternatives": [
         {
-          "provider": "apple-chart",
+          "provider": "apple-feed",
           "id": "1738257931",
           "collectionId": "1738257523",
           "releaseTitle": "Sweet Boy",
@@ -1160,39 +969,9 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
-          "score": 1010,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1738257931",
-          "collectionId": "1738257523",
-          "releaseTitle": "Sweet Boy",
-          "releaseArtist": "Malcolm Todd",
-          "releaseDate": "2024-04-05T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/06/1f/d0061f04-bcae-f9a1-8126-830c04fa32db/196871971188.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1738257523?i=1738257931",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "deezer",
-          "id": "2732302771",
-          "collectionId": "567736181",
-          "releaseTitle": "Sweet Boy",
-          "releaseArtist": "Malcolm Todd",
-          "releaseDate": "2024-04-05",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/bee99e8730b8fb1ad941bbe2607a5a99/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/2732302771",
-          "score": 830,
-          "confidence": 98,
-          "consensus": 2,
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
           "earliestReleaseYear": 2024
         }
       ]
@@ -1214,7 +993,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:15.093Z",
+      "checkedAt": "2026-10-07T07:43:20.517Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1250,7 +1029,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.172Z",
+      "checkedAt": "2026-10-07T07:43:17.751Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1286,7 +1065,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:15.095Z",
+      "checkedAt": "2026-10-07T07:43:20.520Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1322,7 +1101,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:21.619Z",
+      "checkedAt": "2026-10-07T07:43:21.750Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1403,7 +1182,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:53.079Z",
+      "checkedAt": "2026-10-07T07:43:37.417Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1484,7 +1263,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:04:08.654Z",
+      "checkedAt": "2026-10-07T07:43:42.028Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1520,7 +1299,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:29.737Z",
+      "checkedAt": "2026-10-07T07:43:24.107Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1556,7 +1335,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:43.977Z",
+      "checkedAt": "2026-10-07T07:43:33.754Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1576,7 +1355,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:04:20.382Z",
+      "checkedAt": "2026-10-07T07:43:39.069Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1625,72 +1404,6 @@
         }
       ]
     },
-    "lovemenot|lenaeravyn": {
-      "identity": "lovemenot|lenaeravyn",
-      "title": "Love Me Not",
-      "artist": "Ravyn Lenae",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/8c/6c/078c6c94-d38d-0451-d57b-23e957b569f8/075679660893.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Bird's Eye",
-      "releaseArtist": "Ravyn Lenae",
-      "releaseDate": "2024-05-03T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1743852410?i=1743852427",
-      "collectionId": "1743852410",
-      "trackId": "1743852427",
-      "confidence": 96,
-      "score": 770,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-07T01:03:45.737Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1743852427",
-          "collectionId": "1743852410",
-          "releaseTitle": "Bird's Eye",
-          "releaseArtist": "Ravyn Lenae",
-          "releaseDate": "2024-05-03T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/8c/6c/078c6c94-d38d-0451-d57b-23e957b569f8/075679660893.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1743852410?i=1743852427",
-          "score": 770,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1743852427",
-          "collectionId": "1743852410",
-          "releaseTitle": "Bird's Eye",
-          "releaseArtist": "Ravyn Lenae",
-          "releaseDate": "2024-05-03T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/8c/6c/078c6c94-d38d-0451-d57b-23e957b569f8/075679660893.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1743852410?i=1743852427",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "deezer",
-          "id": "2755315691",
-          "collectionId": "574707311",
-          "releaseTitle": "Love Me Not / Love Is Blind",
-          "releaseArtist": "Ravyn Lenae",
-          "releaseDate": "2024-05-03",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/9801ef458ad49afbc613ca2abeb79734/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/2755315691",
-          "score": 590,
-          "confidence": 91,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        }
-      ]
-    },
     "manineed|deanolivia": {
       "identity": "manineed|deanolivia",
       "title": "Man I Need",
@@ -1708,7 +1421,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.173Z",
+      "checkedAt": "2026-10-07T07:43:17.752Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1744,7 +1457,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:47.090Z",
+      "checkedAt": "2026-10-07T07:43:38.031Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1810,7 +1523,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:35.454Z",
+      "checkedAt": "2026-10-07T07:43:27.684Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1906,7 +1619,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:54.251Z",
+      "checkedAt": "2026-10-07T07:43:39.871Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1957,7 +1670,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.174Z",
+      "checkedAt": "2026-10-07T07:43:17.753Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1993,7 +1706,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:04:08.653Z",
+      "checkedAt": "2026-10-07T07:43:50.308Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2089,7 +1802,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.173Z",
+      "checkedAt": "2026-10-07T07:43:17.752Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2125,7 +1838,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:04:24.434Z",
+      "checkedAt": "2026-10-07T07:43:51.982Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2161,7 +1874,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:21.621Z",
+      "checkedAt": "2026-10-07T07:43:21.751Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2176,6 +1889,57 @@
           "score": 1270,
           "confidence": 99,
           "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "rethinksomethings|combsluke": {
+      "identity": "rethinksomethings|combsluke",
+      "title": "Rethink Some Things",
+      "artist": "Luke Combs",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+      "provider": "apple",
+      "releaseTitle": "The Way I Am",
+      "releaseArtist": "Luke Combs",
+      "releaseDate": "2026-03-20T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
+      "collectionId": "1862634688",
+      "trackId": "1862634795",
+      "confidence": 98,
+      "score": 885,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-07T07:43:58.606Z",
+      "alternatives": [
+        {
+          "provider": "apple",
+          "id": "1862634795",
+          "collectionId": "1862634688",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "3899622791",
+          "collectionId": "939327001",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-03-20",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/644133900f1391ee0a7e8f84c6572e3a/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3899622791",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
           "earliestReleaseYear": 2026
         }
       ]
@@ -2197,7 +1961,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:36.912Z",
+      "checkedAt": "2026-10-07T07:43:24.106Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2263,7 +2027,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:39.942Z",
+      "checkedAt": "2026-10-07T07:43:32.331Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2344,7 +2108,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:15.095Z",
+      "checkedAt": "2026-10-07T07:43:20.519Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2380,7 +2144,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:04:09.725Z",
+      "checkedAt": "2026-10-07T07:43:30.977Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2461,7 +2225,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.171Z",
+      "checkedAt": "2026-10-07T07:43:17.749Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2497,7 +2261,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:43.977Z",
+      "checkedAt": "2026-10-07T07:43:39.871Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2513,6 +2277,102 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2012
+        }
+      ]
+    },
+    "swim|bts": {
+      "identity": "swim|bts",
+      "title": "SWIM",
+      "artist": "BTS",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e0/a2/b4/e0a2b443-7969-b57a-a591-cb6172c10aa7/198704943959_Cover.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "ARIRANG",
+      "releaseArtist": "BTS",
+      "releaseDate": "2026-03-20T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1868481904?i=1868482073",
+      "collectionId": "1868481904",
+      "trackId": "1868482073",
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-07T07:43:56.180Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1868482073",
+          "collectionId": "1868481904",
+          "releaseTitle": "ARIRANG",
+          "releaseArtist": "BTS",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e0/a2/b4/e0a2b443-7969-b57a-a591-cb6172c10aa7/198704943959_Cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1868481904?i=1868482073",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1868482073",
+          "collectionId": "1868481904",
+          "releaseTitle": "ARIRANG",
+          "releaseArtist": "BTS",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e0/a2/b4/e0a2b443-7969-b57a-a591-cb6172c10aa7/198704943959_Cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1868481904?i=1868482073",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1885720396",
+          "collectionId": "1885720384",
+          "releaseTitle": "ARIRANG",
+          "releaseArtist": "BTS",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/69/0a/7b/690a7bb3-4483-2418-158c-9276d7d98f81/823375049500_Cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1885720384?i=1885720396",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "3907717261",
+          "collectionId": "942227361",
+          "releaseTitle": "ARIRANG",
+          "releaseArtist": "BTS",
+          "releaseDate": "2026-03-20",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/a3b8e9462db0c02e082c706c624f9811/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3907717261",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1887155574",
+          "collectionId": "1887155571",
+          "releaseTitle": "SWIM - Single",
+          "releaseArtist": "BTS",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/43/6a/79/436a7932-7dd0-6493-1143-09c1f3da4359/198704935459_Cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1887155571?i=1887155574",
+          "score": 725,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
         }
       ]
     },
@@ -2533,7 +2393,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:56.415Z",
+      "checkedAt": "2026-10-07T07:43:39.872Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2569,7 +2429,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:08.175Z",
+      "checkedAt": "2026-10-07T07:43:17.753Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2605,7 +2465,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:15.094Z",
+      "checkedAt": "2026-10-07T07:43:20.518Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2641,7 +2501,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-07T01:03:29.736Z",
+      "checkedAt": "2026-10-07T07:43:30.331Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2737,7 +2597,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-07T01:04:26.333Z",
+      "checkedAt": "2026-10-07T07:43:57.320Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2783,6 +2643,102 @@
           "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "trainingseason|dualipa": {
+      "identity": "trainingseason|dualipa",
+      "title": "Training Season",
+      "artist": "Dua Lipa",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/82/89/15/828915ea-d716-61c4-3de7-ef00c1f800fb/5054197853630.jpg/600x600bb.jpg",
+      "provider": "apple",
+      "releaseTitle": "Training Season - Single",
+      "releaseArtist": "Dua Lipa",
+      "releaseDate": "2024-02-16T08:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/1727526670?i=1727526894",
+      "collectionId": "1727526670",
+      "trackId": "1727526894",
+      "confidence": 98,
+      "score": 965,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-07T07:43:47.094Z",
+      "alternatives": [
+        {
+          "provider": "apple",
+          "id": "1727526894",
+          "collectionId": "1727526670",
+          "releaseTitle": "Training Season - Single",
+          "releaseArtist": "Dua Lipa",
+          "releaseDate": "2024-02-16T08:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/82/89/15/828915ea-d716-61c4-3de7-ef00c1f800fb/5054197853630.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1727526670?i=1727526894",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1735022316",
+          "collectionId": "1735022314",
+          "releaseTitle": "Training Season (London Sessions) - Single",
+          "releaseArtist": "Dua Lipa",
+          "releaseDate": "2024-03-15T07:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/8f/d2/47/8fd2470f-6acc-6b82-44be-66cca94030ba/5021732254047.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1735022314?i=1735022316",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "deezer",
+          "id": "2661514912",
+          "collectionId": "547520122",
+          "releaseTitle": "Training Season",
+          "releaseArtist": "Dua Lipa",
+          "releaseDate": "2024-02-15",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/d2d717350a1f2fcc7ef9fb01eb84163f/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/2661514912",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "6805877227",
+          "collectionId": "6805877220",
+          "releaseTitle": "Training Season's Over - EP",
+          "releaseArtist": "Dua Lipa",
+          "releaseDate": "2024-02-15T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2d/1d/86/2d1d8629-34d0-f8f6-ffe8-2eca20741d33/1200214922771.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6805877220?i=6805877227",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "6805877537",
+          "collectionId": "6805877220",
+          "releaseTitle": "Training Season's Over - EP",
+          "releaseArtist": "Dua Lipa",
+          "releaseDate": "2024-03-15T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2d/1d/86/2d1d8629-34d0-f8f6-ffe8-2eca20741d33/1200214922771.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6805877220?i=6805877537",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
         }
       ]
     }
@@ -4180,6 +4136,264 @@
           "confidence": 98,
           "consensus": 2,
           "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "billiejean|jacksonmichael": {
+      "identity": "billiejean|jacksonmichael",
+      "title": "Billie Jean",
+      "artist": "Michael Jackson",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Thriller 40",
+      "releaseArtist": "Michael Jackson",
+      "releaseDate": "1982-11-29T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
+      "collectionId": "1641780996",
+      "trackId": "1641781004",
+      "confidence": 96,
+      "score": 880,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-07T01:04:14.513Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1641781004",
+          "collectionId": "1641780996",
+          "releaseTitle": "Thriller 40",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
+          "score": 880,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        },
+        {
+          "provider": "apple",
+          "id": "1641781004",
+          "collectionId": "1641780996",
+          "releaseTitle": "Thriller 40",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        },
+        {
+          "provider": "apple",
+          "id": "1883770432",
+          "collectionId": "1883769984",
+          "releaseTitle": "Michael: Songs From The Motion Picture",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/54/f2/ef/54f2ef79-c668-8d6f-28cd-ae48c45009b7/196874193211.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1883769984?i=1883770432",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        },
+        {
+          "provider": "apple",
+          "id": "269573364",
+          "collectionId": "269572838",
+          "releaseTitle": "Thriller",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T08:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/269572838?i=269573364",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        },
+        {
+          "provider": "apple",
+          "id": "273048789",
+          "collectionId": "273048762",
+          "releaseTitle": "Thriller (25th Anniversary) [Deluxe Edition]",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/b5/58/d3/b558d32f-24fd-c889-d544-bc4c96f6113e/dj.oinzmlgt.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/273048762?i=273048789",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        }
+      ]
+    },
+    "daidai|boyburnashakira": {
+      "identity": "daidai|boyburnashakira",
+      "title": "Dai Dai",
+      "artist": "Shakira & Burna Boy",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Dai Dai - Single",
+      "releaseArtist": "Shakira & Burna Boy",
+      "releaseDate": "2026-05-14T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
+      "collectionId": "6768469975",
+      "trackId": "6768469976",
+      "confidence": 98,
+      "score": 1090,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-07T01:04:24.432Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6768469976",
+          "collectionId": "6768469975",
+          "releaseTitle": "Dai Dai - Single",
+          "releaseArtist": "Shakira & Burna Boy",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6768469976",
+          "collectionId": "6768469975",
+          "releaseTitle": "Dai Dai - Single",
+          "releaseArtist": "Shakira & Burna Boy",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4015341011",
+          "collectionId": "980745831",
+          "releaseTitle": "Dai Dai",
+          "releaseArtist": "Shakira",
+          "releaseDate": "2026-05-14",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/a7f9bae0243c512059298a68d09f45a1/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4015341011",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4210621702",
+          "collectionId": "1048886412",
+          "releaseTitle": "Dai Dai",
+          "releaseArtist": "Shakira",
+          "releaseDate": "2026-08-07",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/e35dc7a41abff9ff8636fafec6736472/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4210621702",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6776010744",
+          "collectionId": "6776010591",
+          "releaseTitle": "Official FIFA World Cup 2026™ Album",
+          "releaseArtist": "FIFA Sound",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/68/4a/84/684a84c9-f6e3-ca17-d516-ee01a88c32ca/26UMGIM68511.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6776010591?i=6776010744",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "lovemenot|lenaeravyn": {
+      "identity": "lovemenot|lenaeravyn",
+      "title": "Love Me Not",
+      "artist": "Ravyn Lenae",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/8c/6c/078c6c94-d38d-0451-d57b-23e957b569f8/075679660893.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Bird's Eye",
+      "releaseArtist": "Ravyn Lenae",
+      "releaseDate": "2024-05-03T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1743852410?i=1743852427",
+      "collectionId": "1743852410",
+      "trackId": "1743852427",
+      "confidence": 96,
+      "score": 770,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-07T01:03:45.737Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1743852427",
+          "collectionId": "1743852410",
+          "releaseTitle": "Bird's Eye",
+          "releaseArtist": "Ravyn Lenae",
+          "releaseDate": "2024-05-03T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/8c/6c/078c6c94-d38d-0451-d57b-23e957b569f8/075679660893.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1743852410?i=1743852427",
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1743852427",
+          "collectionId": "1743852410",
+          "releaseTitle": "Bird's Eye",
+          "releaseArtist": "Ravyn Lenae",
+          "releaseDate": "2024-05-03T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/07/8c/6c/078c6c94-d38d-0451-d57b-23e957b569f8/075679660893.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1743852410?i=1743852427",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "deezer",
+          "id": "2755315691",
+          "collectionId": "574707311",
+          "releaseTitle": "Love Me Not / Love Is Blind",
+          "releaseArtist": "Ravyn Lenae",
+          "releaseDate": "2024-05-03",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/9801ef458ad49afbc613ca2abeb79734/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/2755315691",
+          "score": 590,
+          "confidence": 91,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
         }
       ]
     }

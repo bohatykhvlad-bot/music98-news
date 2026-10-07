@@ -4,7 +4,7 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": "2026-10-07T01:04:52.104Z"
+    "measuredAt": "2026-10-07T07:44:28.010Z"
   },
   "aintinla|adla": {
     "integratedLufs": -6.2,
@@ -89,13 +89,6 @@
     "gainDb": -7.2,
     "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/66/22/09/66220922-80bd-7758-f9ab-601dcfae9077/mzaf_17552938916380030049.plus.aac.p.m4a",
     "measuredAt": "2026-09-29T22:00:06.215Z"
-  },
-  "classicpt2|drake": {
-    "integratedLufs": -11.4,
-    "truePeakDbtp": 0.4,
-    "gainDb": -4.6,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/bf/18/34bf1898-cc51-c915-a00a-05bd8febaeaa/mzaf_12302555311102118914.plus.aac.p.m4a",
-    "measuredAt": "2026-10-06T16:19:41.333Z"
   },
   "coldshoulder|drake": {
     "integratedLufs": -8.7,
@@ -258,6 +251,13 @@
     "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e3/0d/16/e30d1691-e062-60cc-fd56-8cf7a93e243e/mzaf_12506259548484800381.plus.aac.p.m4a",
     "measuredAt": "2026-10-03T11:50:47.003Z"
   },
+  "rethinksomethings|lukecombs": {
+    "integratedLufs": -10.5,
+    "truePeakDbtp": -0.6,
+    "gainDb": -5.5,
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/49/ce/73/49ce738a-7556-ac41-2a7e-8694d37dd6c6/mzaf_6620799861359714788.plus.aac.p.m4a",
+    "measuredAt": "2026-10-07T07:44:28.866Z"
+  },
   "selfaware|tempercity": {
     "integratedLufs": -4.3,
     "truePeakDbtp": 0.9,
@@ -341,5 +341,19 @@
     "gainDb": -8,
     "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5d/69/c3/5d69c3c4-41a0-de72-8000-7a02b3f23efa/mzaf_3384433737540977086.plus.aac.p.m4a",
     "measuredAt": "2026-10-06T16:19:40.848Z"
+  },
+  "trainingseason|dualipa": {
+    "integratedLufs": -7,
+    "truePeakDbtp": 0.6,
+    "gainDb": -9,
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a8/87/16/a88716e2-9474-ec4e-06d6-d3a9a3ba96c8/mzaf_6258558385119267725.plus.aac.p.m4a",
+    "measuredAt": "2026-10-07T07:44:28.506Z"
+  },
+  "woman|kanebrown": {
+    "integratedLufs": -7.5,
+    "truePeakDbtp": -0.6,
+    "gainDb": -8.5,
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/25/24/85/252485ef-d834-08f9-1061-dc6fb44b3b86/mzaf_667886181363622809.plus.aac.p.m4a",
+    "measuredAt": "2026-10-07T07:44:29.219Z"
   }
 }
