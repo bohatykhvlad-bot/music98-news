@@ -146,68 +146,55 @@ function notFoundHtml() {
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
-:root{
-  --bg:#ffffff;--bg2:#f4f6f7;--card:#ffffff;--line:#e2e8ea;
-  --text:#15181a;--muted:#5c6a70;--muted2:#8a969b;--accent:#00fdfb;
-  --shadow:0 0 22px rgba(15,45,55,.14);
-  --font:"Pretendard",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-}
-*{box-sizing:border-box}
-html{min-height:100%;background:var(--bg);-webkit-text-size-adjust:100%}
-body{min-height:100svh;margin:0;background:linear-gradient(180deg,#fff 0%,#f7f9fa 100%);color:var(--text);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
-.topbar{height:55px;border-bottom:1px solid rgba(226,232,234,.85);background:rgba(255,255,255,.82);backdrop-filter:blur(14px) saturate(170%);-webkit-backdrop-filter:blur(14px) saturate(170%)}
-.topbar-in{max-width:1132px;height:55px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;gap:18px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.015em}
-.brand img{width:40px;height:40px;border-radius:50%;display:block}
-.eyebrow{color:var(--muted);font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-main{min-height:calc(100svh - 55px);display:grid;place-items:center;padding:44px 20px 64px}
-.card{width:min(100%,650px);border:1px solid var(--line);border-radius:16px;background:var(--card);box-shadow:var(--shadow);padding:clamp(26px,6vw,46px)}
-.code{width:max-content;max-width:100%;margin:0 0 18px;padding:7px 12px;border:1px solid rgba(15,60,64,.14);border-radius:999px;background:var(--bg2);color:var(--muted);font-size:13px;font-weight:700;line-height:1}
-h1{margin:0;font-size:clamp(34px,8vw,58px);line-height:.98;letter-spacing:-.055em}
-.lead{margin:18px 0 0;color:var(--muted);font-size:clamp(16px,2.7vw,19px);max-width:530px}
-.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
-.btn{height:42px;display:inline-flex;align-items:center;justify-content:center;padding:0 18px;border-radius:999px;border:1px solid var(--line);font-size:14px;font-weight:700;white-space:nowrap}
-.btn.primary{border-color:var(--accent);background:var(--accent);color:#03282b}
-.btn.secondary{background:#fff;color:var(--text)}
-.links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:30px;padding-top:22px;border-top:1px solid var(--line)}
-.links a{min-height:38px;display:grid;place-items:center;border:1px solid var(--line);border-radius:999px;background:var(--bg2);color:var(--muted);font-size:13px;font-weight:700}
-.links a:hover,.btn.secondary:hover{border-color:var(--accent);color:var(--text)}
-.btn.primary:hover{filter:saturate(1.08)}
-@media(max-width:640px){
-  .topbar-in{padding:0 14px}
-  .eyebrow{display:none}
-  main{align-items:start;padding:34px 14px 42px}
-  .card{border-radius:15px;padding:26px 22px}
-  .actions{display:grid;grid-template-columns:1fr}
-  .links{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
+  :root{--bg:#ffffff;--bg2:#f4f6f7;--card:#ffffff;--line:#e2e8ea;--text:#15181a;--muted:#5c6a70;--muted2:#93a0a6;--accent:#00fdfb;--font:"Pretendard",Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+  *{box-sizing:border-box}
+  html{scrollbar-gutter:stable;-webkit-text-size-adjust:100%}
+  html,body{margin:0}
+  body{min-height:100svh;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;line-height:1.55}
+  a{color:inherit;text-decoration:none}
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:60}
+  .topbar-in{position:relative;z-index:1;max-width:1132px;margin:0 auto;padding:0 20px;height:55px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;background:transparent;border:0;overflow:visible}
+  .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none;justify-self:start}
+  .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
+  .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+  .content{max-width:780px;margin:0 auto;padding:clamp(54px,12vh,118px) 20px 0;width:100%}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted2);margin:0 0 10px}
+  h1{margin:0 0 14px;font-size:clamp(30px,5vw,40px);letter-spacing:-.02em;line-height:1.1}
+  .lead{font-size:17.5px;line-height:1.65;color:var(--muted);margin:0 0 24px;max-width:610px}
+  .home-button{height:42px;display:inline-flex;align-items:center;justify-content:center;padding:0 18px;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:#03282b;font-size:14px;font-weight:700;white-space:nowrap}
+  .home-button:hover{filter:saturate(1.08)}
+  @media(max-width:640px){
+    .wrap{padding:0}
+    .content{padding:46px 16px 0}
+    .brand{height:36px}
+    .brand-logo{width:32px;height:32px}
+    .brand-name{font-size:17px}
+    .home-button{width:100%}
+  }
 </style>
+<link rel="stylesheet" href="/legal-header.css?v=20261004-9">
 </head>
 <body>
 <header class="topbar">
+  <div class="topbar-glass topbar-glass-full" aria-hidden="true"></div>
+  <div class="topbar-glass topbar-glass-isle" aria-hidden="true"></div>
   <div class="topbar-in">
-    <a class="brand" href="/" aria-label="music98.news home"><img src="/logo.png" alt=""><span>music98.news</span></a>
-    <div class="eyebrow">404</div>
+    <a class="brand" href="/" title="music98.news — home">
+      <img class="brand-logo" src="/logo.png" alt="music98.news" width="44" height="44">
+      <span class="brand-name">music98.news</span>
+    </a>
   </div>
 </header>
-<main>
-  <section class="card" aria-labelledby="not-found-title">
-    <div class="code">404 · Article not found</div>
-    <h1 id="not-found-title">This page slipped off the setlist.</h1>
-    <p class="lead">The article may have moved, been removed, or the address may be incorrect. Head back to music98.news and keep reading.</p>
-    <div class="actions">
-      <a class="btn primary" href="/">Go to homepage</a>
-      <a class="btn secondary" href="/releases">Browse releases</a>
-    </div>
-    <nav class="links" aria-label="Main sections">
-      <a href="/">News</a>
-      <a href="/releases">Releases</a>
-      <a href="/chart">Chart</a>
-      <a href="/concerts">Concerts</a>
-    </nav>
-  </section>
-</main>
+<div class="wrap">
+  <main class="content" aria-labelledby="not-found-title">
+    <p class="kicker">Error 404</p>
+    <h1 id="not-found-title">Article not found</h1>
+    <p class="lead">This music98.news page is no longer available or the address is incorrect.</p>
+    <a class="home-button" href="/">Back to homepage</a>
+  </main>
+</div>
+<script src="/legal-header.js?v=20261003-1" defer></script>
 </body>
 </html>`;
 }
