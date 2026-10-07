@@ -75,6 +75,10 @@ def load_env() -> None:
     import os
     path = REPO / ".env"
     if not path.exists():
+        # CI already provides ADMIN_PASSWORD as an environment secret. Do not
+        # force workflows to copy that credential into a repository-local file.
+        if os.environ.get("ADMIN_PASSWORD", "").strip():
+            return
         die("no .env in %s - copy .env.example and set ADMIN_PASSWORD" % REPO)
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
