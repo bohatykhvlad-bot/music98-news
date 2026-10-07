@@ -1,4 +1,5 @@
 name: Temporary final Quavo Lola publish
+# rerun after KV verification retry
 on:
   push:
     paths:
