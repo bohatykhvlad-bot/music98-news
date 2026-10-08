@@ -247,6 +247,16 @@ function locationLine(e){
     }).join(", ");
 }
 function artistKey(a){ return String(a.id||a.attractionId||a.name||"").toLowerCase(); }
+function scopedArtistEvents(events,item){
+  const id=String(item?.id||item?.attractionId||"").trim();
+  const cleanName=value=>String(value||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/&/g,"and").replace(/[^a-z0-9]+/gi," ").trim().toLowerCase();
+  const name=cleanName(item?.name);
+  return (Array.isArray(events)?events:[]).filter(e=>
+    (!id || String(e?.attractionId||"").trim()===id) &&
+    (!name || cleanName(e?.artist)===name) &&
+    !!String(e?.attractionId||"").trim()
+  );
+}
 
 function setLayerVisible(id,visible){
   if(map.getLayer(id)) map.setLayoutProperty(id,"visibility",visible?"visible":"none");
@@ -1093,7 +1103,7 @@ function setTourBoxHeight(box,open){
   requestAnimationFrame(()=>{ box.style.maxHeight="0px"; });
 }
 
-function renderEventList(box,events){
+function renderEventList(box,events,artistImage=""){
   box.textContent="";
   const sorted=events.slice().sort((a,b)=>String(a.date||"9999").localeCompare(String(b.date||"9999")));
   if(!sorted.length){
@@ -1111,7 +1121,7 @@ function renderEventList(box,events){
       const b=document.createElement("button"); b.type="button"; b.className="event-link";
       const d=document.createElement("span"); d.className="event-date"; d.textContent=shortDate(e);
       const img=document.createElement("img"); img.className="event-art"; img.alt=""; img.loading="lazy";
-      applyConcertArt(img,e.artistImage||e.image||"/logo.png","icon");
+      applyConcertArt(img,artistImage||e.artistImage||e.image||"/logo.png","icon");
         const p=document.createElement("span"); p.className="event-place";
       const city=document.createElement("span"); city.className="event-city"; city.textContent=[e.city,e.countryCode].filter(Boolean).join(", ")||"Venue TBA";
       const venue=document.createElement("span"); venue.className="event-venue"; venue.textContent=e.venue||e.name||"";
@@ -1158,7 +1168,7 @@ async function eventsForArtist(item,mode){
   const params=item.id ? {attractionId:item.id} : {artist:item.name};
   const payload=await getPayload(params);
   const data={
-    events:Array.isArray(payload?.events)?payload.events:[],
+    events:scopedArtistEvents(payload?.events,item),
     total:Number(payload?.page?.totalElements ?? payload?.events?.length ?? 0)||0,
     partial:!!payload?.partial
   };
@@ -1189,7 +1199,7 @@ function restoreArtistSide(){
   if(card){
     expandedKey=key;
     card.classList.add("open");
-    renderEventList(card.querySelector(".tour-events"),ctx.events||[]);
+    renderEventList(card.querySelector(".tour-events"),ctx.events||[],ctx.item?.image||"");
   }
   sideSub.textContent="";
 }
@@ -1297,7 +1307,7 @@ async function toggleArtist(item,card,mode){
     let events=stabilizeArtistCoordinates(result.events);
     events=await hydrateArtistMapCoordinates(events);
     if(requestId!==areaRequestSeq || expandedKey!==key || activeMode!=="artist" || !artistContext || artistKey(artistContext.item)!==key) return;
-    renderEventList(box,events);
+    renderEventList(box,events,item.image||"");
     setTourBoxHeight(box,true);
     if(artistContext && artistKey(artistContext.item)===key) artistContext.events=events;
     setMode("artist");
