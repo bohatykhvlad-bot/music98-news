@@ -1,4 +1,5 @@
 import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
+import {hasCompleteChartArtwork,isTrustedChartArtwork,missingChartArtwork} from "../lib/chart-artwork-gate.js";
 import {compareSpotifyRankings,parseKworbSpotify,spotifyDateCurrent,verifiedSpotifySnapshot} from "../lib/spotify-chart.js";
 import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,DAILY_SOURCE_DETAILS,APPLE_GLOBAL_URL,DEEZER_GLOBAL_URL,
   completeDailySources,parseAppleGlobal,parseDeezerWorldwide,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
@@ -121,17 +122,17 @@ async function applyLoudness(env, tracks, origin) {
   }
   return tracks;
 }
-async function applyCovers(env, tracks, origin) {
+async function applyCovers(env, tracks, origin, {retainTrusted = false} = {}) {
   const seed = await coverSeed(env, origin);
   for (const t of tracks) {
     const strict = artworkKey(t.title, t.artist);
     const legacy = mergeKey(t.title, t.artist); // rollout compatibility alias
     const chosen = seed[strict] || seed[legacy] || "";
-    const temporary = !chosen && isAppleArt(t.art) ? t.art : "";
-    /* Never persist artwork in KV. A bad runtime match must disappear instead of
-       becoming a permanent lock. The checked-in audited registry is the only
-       persistent artwork authority. */
-    t.art = chosen || temporary || "";
+    /* During a NEW build only Apple-provided art can bridge a lagging audited
+       registry. An already published, complete snapshot may also preserve its
+       previously verified Deezer artwork instead of losing it on redecorate. */
+    const temporary = !chosen && (retainTrusted ? isTrustedChartArtwork(t.art) : isAppleArt(t.art)) ? t.art : "";
+    t.art = chosen && isTrustedChartArtwork(chosen) ? chosen : temporary;
   }
   return tracks;
 }
@@ -909,7 +910,7 @@ async function lastGood(env, backup) {
   if (!env || !env.DESK) return null;
   try {
     const v = await env.DESK.get(TOP50_KV, { type: "json" });
-    if (verifiedSourceSnapshot(v) &&
+    if (verifiedSourceSnapshot(v) && hasCompleteChartArtwork(v.tracks) &&
         !cachedTenureRegressed(v, backup)) return v;
   } catch {}
   return null;
@@ -927,7 +928,7 @@ async function healMissingArtwork(env, tracks, origin) {
     await enrichApple(stillMissing);
     await enrichArtByIds(stillMissing);
   }
-  await applyCovers(env, tracks, origin);
+  await applyCovers(env, tracks, origin, {retainTrusted:true});
   const after = tracks.filter((t) => !t.art).length;
   return { before, after, filled: Math.max(0, before - after) };
 }
@@ -936,7 +937,7 @@ async function bakedWithCovers(env, baked, origin) {
   if (baked && Array.isArray(baked.tracks) && baked.tracks.length) {
     try {
       await applyNames(env, baked.tracks, origin);
-      await applyCovers(env, baked.tracks, origin);
+      await applyCovers(env, baked.tracks, origin, {retainTrusted:true});
       await healMissingArtwork(env, baked.tracks, origin);
       await applyLoudness(env, baked.tracks, origin);
     } catch {}
@@ -948,7 +949,7 @@ async function decorateCachedTop50(env, payload, origin) {
   if (payload && Array.isArray(payload.tracks) && payload.tracks.length) {
     try {
       await applyNames(env, payload.tracks, origin);
-      await applyCovers(env, payload.tracks, origin);
+      await applyCovers(env, payload.tracks, origin, {retainTrusted:true});
       const healed = await healMissingArtwork(env, payload.tracks, origin);
       await applyLoudness(env, payload.tracks, origin);
       payload.tracks.forEach(t => {
@@ -975,23 +976,29 @@ async function bestVerifiedFallback(env, origin, backup) {
   let daily = null;
   try {
     const saved = await readSeed(env, origin, "daily-top50-backup.json");
-    if (verifiedSourceSnapshot(saved) && saved.arrows?.ok === true &&
-        !cachedTenureRegressed(saved, backup)) daily = saved;
+    if (verifiedSourceSnapshot(saved) && hasCompleteChartArtwork(saved.tracks) &&
+        saved.arrows?.ok === true && !cachedTenureRegressed(saved, backup)) daily = saved;
   } catch {}
   const healthy = good && (!daily || String(good.updated) >= String(daily.updated)) ? good : daily;
   const savedDay = backup && backup.current && backup.current.updated || "";
-  if (healthy && String(healthy.updated) >= savedDay)
-    return decorateCachedTop50(env, {...healthy,fallback:healthy === good ? "last-verified" : "verified-daily-snapshot"}, origin);
+  if (healthy && String(healthy.updated) >= savedDay) {
+    const decorated = await decorateCachedTop50(env, {...healthy,fallback:healthy === good ? "last-verified" : "verified-daily-snapshot"}, origin);
+    if (hasCompleteChartArtwork(decorated.tracks)) return decorated;
+  }
   try {
     const saved = await verifiedBackupTop50(env, origin, backup);
-    if (saved) return saved;
+    if (saved && hasCompleteChartArtwork(saved.tracks)) return saved;
   } catch {}
-  return healthy ? decorateCachedTop50(env, {...healthy,fallback:healthy === good ? "last-verified" : "verified-daily-snapshot"}, origin) : null;
+  if (healthy) {
+    const decorated = await decorateCachedTop50(env, {...healthy,fallback:healthy === good ? "last-verified" : "verified-daily-snapshot"}, origin);
+    if (hasCompleteChartArtwork(decorated.tracks)) return decorated;
+  }
+  return null;
 }
 
 async function fallbackOrUnavailable(env,origin,backup) {
   const fallback=await bestVerifiedFallback(env,origin,backup);
-  if(fallback)return top50Response(fallback);
+  if(fallback && hasCompleteChartArtwork(fallback.tracks))return top50Response(fallback);
   return new Response(JSON.stringify({error:"chart_temporarily_unavailable"}),{
     status:503,headers:{"Content-Type":"application/json","Cache-Control":"no-store"}
   });
@@ -1013,6 +1020,16 @@ export async function onRequestGet({env,request}) {
   }));
   const verified=verifiedSpotifySnapshot(spotifySeed);
   if(!verified)return fallbackOrUnavailable(env,origin,backup);
+  /* Read-only edition preview for the scheduled independent artwork audit.
+     It exposes the prospective source-verified chart without publishing it or
+     altering tenure/rank KV. The ordinary endpoint never serves missing art. */
+  if(new URL(request.url).searchParams.get("artworkAudit")==="1"){
+    try{
+      const candidate=await withTimeout(buildTop50(origin,env,spotifySeed),45000);
+      if(!verifiedSourceSnapshot(candidate))throw new Error("invalid_artwork_audit_edition");
+      return top50Response({...candidate,artworkAuditOnly:true});
+    }catch{return fallbackOrUnavailable(env,origin,backup);}
+  }
   if(env?.DESK)try{
     const cached=await env.DESK.get(TOP50_KV,{type:"json"});
     if(cached?.updated===today && verifiedSourceSnapshot(cached) &&
@@ -1020,7 +1037,10 @@ export async function onRequestGet({env,request}) {
        cached.sourceDates?.S===verified.date &&
        cached.spotifyFingerprint===verified.fingerprint &&
        !cachedTenureRegressed(cached,backup))
-      return top50Response(await decorateCachedTop50(env, cached, origin));
+    {
+      const decorated=await decorateCachedTop50(env, cached, origin);
+      if(hasCompleteChartArtwork(decorated.tracks))return top50Response(decorated);
+    }
     const retry=await env.DESK.get(TOP50_RETRY_KV,{type:"json"});
     if(retry?.fingerprint===verified.fingerprint && retry.seedEdition===seedEdition)
       return fallbackOrUnavailable(env,origin,backup);
@@ -1029,6 +1049,10 @@ export async function onRequestGet({env,request}) {
     const payload=await withTimeout(buildTop50(origin,env,spotifySeed),14000);
     if(payload.complete!==true || !completeChartSources(payload.sources) ||
        payload.tracks?.length!==SIZE)throw new Error("incomplete_chart_sources");
+    /* Block ranking publication and KV writes until every one of the 50
+       current rows has a trustworthy image URL. Never publish SVG initials. */
+    if(!hasCompleteChartArtwork(payload.tracks))
+      throw new Error("incomplete_chart_artwork:"+JSON.stringify(missingChartArtwork(payload.tracks).slice(0,8)));
     payload.seedEdition=seedEdition;
     const memory={deferPersist:true};
     payload.tracks=await applyTenure(env,payload.tracks,memory,origin);
