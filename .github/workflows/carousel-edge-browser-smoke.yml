@@ -136,3 +136,29 @@ jobs:
             throw Error('BUY_TICKETS_CENTERING_REGRESSION '+JSON.stringify(metrics.ticket));
           console.log('CAROUSEL_EDGE_AND_TICKET_BUTTON_PASS');
           JS
+      - name: Verify Cloudflare live News and Releases boundary fix
+        shell: bash
+        run: |
+          python - <<'PY'
+          import time, urllib.request
+          for attempt in range(16):
+              request=urllib.request.Request(
+                  "https://music98.news/?carouselEdgeAudit="+str(int(time.time()*1000)),
+                  headers={"User-Agent":"music98-carousel-edge-live-check/1.0",
+                           "Cache-Control":"no-cache","Pragma":"no-cache"})
+              try:
+                  with urllib.request.urlopen(request,timeout=25) as response:
+                      page=response.read().decode("utf-8","replace")
+                  css=".rail-wrap.rail-scrolled{clip-path:inset(-40px -40px -40px 0)}" in page
+                  scroll='wrap.classList.toggle("rail-scrolled", x > 0.5 || !!rail.style.transform)' in page
+                  elastic='rail.parentElement.classList.toggle("rail-scrolled",rail.scrollLeft > 0.5 || !!rail.style.transform)' in page
+                  arrows=".rail-wrap .rail-btn.prev{right:calc(100% - 66px)}" in page and ".rail-wrap .rail-btn.next{right:0}" in page
+                  print("LIVE_CAROUSEL_DEPLOY",attempt+1,{"css":css,"scroll":scroll,"elastic":elastic,"arrows":arrows})
+                  if css and scroll and elastic and arrows:
+                      print("LIVE_CAROUSEL_DEPLOY_PASS")
+                      break
+              except Exception as err:
+                  print("LIVE_CAROUSEL_DEPLOY_RETRY",attempt+1,repr(err))
+              if attempt==15: raise SystemExit("LIVE_CAROUSEL_DEPLOY_NOT_CONFIRMED")
+              time.sleep(10)
+          PY
