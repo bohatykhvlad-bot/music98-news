@@ -17,6 +17,7 @@ import {
   snapshotFromState,
 } from "../lib/concert-hotspots.js";
 import { MAP_MARKET_SEEDS } from "../lib/concert-map-seeds.js";
+import { impactTicketUrl } from "../lib/ticketmaster-impact.js";
 
 const TM_EVENTS_ROOT = "https://app.ticketmaster.com/discovery/v2/events.json";
 const TM_ATTRACTIONS_ROOT = "https://app.ticketmaster.com/discovery/v2/attractions.json";
@@ -322,12 +323,16 @@ function sanitizeNormalizedEvents(events) {
   const now=Date.now();
   return collapseDuplicateEvents((Array.isArray(events)?events:[])
     .filter(e=>e && !normalizedEventIsBlocked(e) && normalizedEventIsUpcoming(e,now))
-    .map(e=>({
-      ...e,
-      ticketOptions:Array.isArray(e.ticketOptions)&&e.ticketOptions.length
+    .map(e=>{
+      const options=Array.isArray(e.ticketOptions)&&e.ticketOptions.length
         ? e.ticketOptions
-        : (e.url?[{url:String(e.url),name:String(e.name||"Ticket"),eventId:String(e.id||"")}]:[])
-    })));
+        : (e.url?[{url:String(e.url),name:String(e.name||"Ticket"),eventId:String(e.id||"")}]:[]);
+      return {
+        ...e,
+        url:impactTicketUrl(e.url),
+        ticketOptions:options.map(option=>({...option,url:impactTicketUrl(option.url)})),
+      };
+    }));
 }
 function normalizeEvents(events) {
   return sanitizeNormalizedEvents((Array.isArray(events)?events:[]).map(normalizeEvent).filter(Boolean));
@@ -1812,7 +1817,7 @@ function snapCoord(value, step) {
 function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,stateCode,radius}) {
   const out = new URL(requestUrl);
   out.search = "";
-  out.searchParams.set("__cachev","concerts-global-v24");
+  out.searchParams.set("__cachev","concerts-global-v25-impact");
 
   if(mode==="artist-search"){
     out.searchParams.set("mode","artist-search");
