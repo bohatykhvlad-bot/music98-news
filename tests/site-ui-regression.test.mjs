@@ -82,9 +82,9 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 test("daily chart checks server freshness before painting browser cache",()=>{
  assert.match(page,/const DAILYKEY = "music98news_daily_v46"/);
- assert.match(page,/const hasFreshCache=!!\(cached/);
+ assert.match(page,/const hasVerifiedCache=!!\(cached && chartHasCompleteArtwork\(cached\.tracks\)/);
  assert.match(page,/sourceDates\?\.S && cached.spotifyFingerprint/);
- assert.doesNotMatch(page,/if\(hasFreshCache\) applyDaily\(cached.tracks, "cache"\)/);
+ assert.doesNotMatch(page,/if\(hasVerifiedCache\) applyDaily\(cached.tracks, "cache"\)/);
  assert.match(page,/fetch\("\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=46"/);
  assert.match(page,/cache:"no-store"/);
 });
@@ -170,8 +170,9 @@ test("site text stays off persistent compositor transforms and whole-button filt
 
 
 test("daily chart caches only complete, source-stamped rows with artwork",()=>{
- assert.match(page,/cached.tracks.every\(t=>String\(t.art\|\|""\).trim\(\)\)/);
- assert.match(page,/if\(fresh && tracks.every\(t=>String\(t.art\|\|""\).trim\(\)\)\)/);
+ assert.match(page,/cached && chartHasCompleteArtwork\(cached\.tracks\)/);
+ assert.match(page,/if\(!chartHasCompleteArtwork\(tracks\)\) throw new Error\("incomplete_chart_artwork"\)/);
+ assert.match(page,/if\(fresh && chartHasCompleteArtwork\(tracks\)\)/);
  assert.match(page,/spotifyFingerprint:j.spotifyFingerprint/);
  assert.match(page,/sourceDates:j.sourceDates/);
 });

@@ -8,8 +8,9 @@ const top50=readFileSync(new URL("../functions/api/top50.js",import.meta.url),"u
 test("cached Top 50 refreshes only display metadata/artwork before response",()=>{
   assert.match(top50,/async function decorateCachedTop50\(env, payload, origin\)/);
   assert.match(top50,/await applyNames\(env, payload\.tracks, origin\)/);
-  assert.match(top50,/await applyCovers\(env, payload\.tracks, origin\)/);
-  assert.match(top50,/return top50Response\(await decorateCachedTop50\(env, cached, origin\)\)/);
+  assert.match(top50,/await applyCovers\(env, payload\.tracks, origin, \{retainTrusted:true\}\)/);
+  assert.match(top50,/const decorated=await decorateCachedTop50\(env, cached, origin\)/);
+  assert.match(top50,/if\(hasCompleteChartArtwork\(decorated\.tracks\)\)return top50Response\(decorated\)/);
   assert.doesNotMatch(top50,/decorateCachedTop50[\s\S]{0,600}sort\(/);
   assert.doesNotMatch(top50,/decorateCachedTop50[\s\S]{0,600}rank\s*=/);
 });
@@ -108,4 +109,30 @@ test("verified source publisher dispatches downstream chart audit after bot comm
  assert.match(spotifyWorkflow,/GH_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}/);
  assert.match(spotifyWorkflow,/git push origin HEAD:main; then[\s\S]*gh workflow run apple-data\.yml --ref main/);
  assert.match(auditWorkflow,/group: apple-data/);
+});
+
+test("all 50 covers are a hard publication gate, including current-day KV and fallback",()=>{
+  assert.match(top50,/if\(!hasCompleteChartArtwork\(payload\.tracks\)\)/);
+  assert.match(top50,/throw new Error\("incomplete_chart_artwork:"/);
+  assert.match(top50,/if\(fallback && hasCompleteChartArtwork\(fallback\.tracks\)\)/);
+  assert.match(top50,/if\s*\(hasCompleteChartArtwork\(v\.tracks\)\) return v/);
+  assert.match(top50,/hasCompleteChartArtwork\(saved\.tracks\) \? saved/);
+  assert.match(top50,/if\(hasCompleteChartArtwork\(decorated\.tracks\)\)return top50Response\(decorated\)/);
+});
+
+test("artwork audit can inspect future chart without publishing it to KV",()=>{
+  assert.match(top50,/searchParams\.get\("artworkAudit"\)==="1"/);
+  assert.match(top50,/artworkAuditOnly:true/);
+  const preview=top50.indexOf('searchParams.get("artworkAudit")');
+  const caching=top50.indexOf('if(env?.DESK)try{',preview);
+  assert.ok(preview>=0 && caching>preview);
+  assert.doesNotMatch(top50.slice(preview,caching),/await applyTenure|TOP50_KV,JSON\.stringify/);
+});
+
+test("browser accepts only fully imaged chart editions and can retain a prior verified edition",()=>{
+  const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
+  assert.match(html,/function chartHasCompleteArtwork\(tracks\)/);
+  assert.match(html,/if\(!chartHasCompleteArtwork\(tracks\)\) throw new Error\("incomplete_chart_artwork"\)/);
+  assert.match(html,/if\(hasVerifiedCache\) applyDaily\(cached\.tracks,"backup",cached\.date\)/);
+  assert.match(html,/if\(fresh && chartHasCompleteArtwork\(tracks\)\)/);
 });
