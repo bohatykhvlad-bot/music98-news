@@ -27,7 +27,7 @@ jobs:
               const index=results[0],direct=results[1],app=results[2];
               const newsReady=index.status===200&&index.body.includes('const hero = (query || narrow.matches) ? null')&&index.body.includes('concerts-app.js?v=20261008-02');
               const directReady=direct.status===200&&direct.body.includes('concerts-app.js?v=20261008-02');
-              const concertsReady=app.status===200&&app.body.includes('align-items:flex-start;justify-content:flex-start;text-align:left;margin-bottom:18px')&&/no-store/.test(app.cache);
+              const concertsReady=app.status===200&&app.body.includes('POPULAR_IDENTITY_VALIDATION="primary-attraction-v3"')&&app.body.includes('music98:concert-popular:v13')&&/no-store/.test(app.cache);
               if(newsReady&&directReady&&concertsReady){
                 console.log('LIVE_MOBILE_NEWS_READY=true LIVE_CONCERTS_DIRECT_READY=true LIVE_CONCERTS_APP_READY=true JS_NO_STORE=true');
                 process.exit(0);
