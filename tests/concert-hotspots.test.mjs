@@ -27,6 +27,7 @@ import {
 } from "../functions/lib/concert-hotspots.js";
 import {
   isPlaceholderConcertArtist,
+  artistScopedEvents,
   refreshHotspotSnapshot,
   refreshPopularSnapshot,
   refreshPopularTourSnapshots,
@@ -1137,7 +1138,7 @@ test("tour prewarm skips a fresh validation cache without spending its origin-ca
   }));
   await kv.put("concert-popular:v4:tour:artist-1",JSON.stringify({
     ok:true,builtAt:new Date().toISOString(),evidence:"popular_validation_first_page",
-    events:[{id:"cached",artist:"Artist One",lat:1,lng:1}],page:{totalElements:1}
+    events:[{id:"cached",artist:"Artist One",attractionId:"artist-1",lat:1,lng:1}],page:{totalElements:1}
   }));
 
   const oldFetch=globalThis.fetch;
@@ -1738,4 +1739,68 @@ test("interactive area paging uses chronological event order without raising fiv
   assert.match(source,/const merged = await tmEventPages\(tm, env, 5\)/);
   assert.match(source,/Math\.min\(Math\.max\(1, Number\(maxPages \|\| 1\)\), 5, totalPages\)/);
   assert.doesNotMatch(source,/tm\.searchParams\.set\("sort", "distance,date,asc"\)/);
+});
+
+test("artist tours exclude unrelated club dates even if the requested attraction was tagged",()=>{
+  const events=[
+    {id:"noto-drake",name:"Drake Night",artist:"Drake",attractionId:"drake",
+      attractionIds:["drake","bad-bunny"],venue:"NOTO",city:"Philadelphia",
+      image:"https://test.invalid/drake.jpg",date:"2099-10-31"},
+    {id:"bad-bunny",name:"Bad Bunny Live",artist:"Bad Bunny",attractionId:"bad-bunny",
+      attractionIds:["bad-bunny"],venue:"Stadium",city:"New York",
+      artistImage:"https://test.invalid/bad-bunny.jpg",date:"2099-11-01"},
+    {id:"ambiguous",name:"Drake",artist:"Drake",attractionId:"bad-bunny",
+      attractionIds:["bad-bunny"],venue:"NOTO",date:"2099-11-02"},
+    {id:"unattributed",name:"Bad Bunny",artist:"Bad Bunny",attractionId:"",
+      attractionIds:[],date:"2099-11-03"},
+  ];
+  assert.deepEqual(artistScopedEvents(events,"bad-bunny","Bad Bunny").map(e=>e.id),["bad-bunny"]);
+  assert.deepEqual(artistScopedEvents(events,"drake","Drake").map(e=>e.id),["noto-drake"]);
+  assert.deepEqual(artistScopedEvents(events,"","Bad Bunny").map(e=>e.id),["bad-bunny"]);
+});
+
+test("stale cross-artist tour cache is ignored, and Ticketmaster responses are identity-filtered",async()=>{
+  const kv=memoryKv();
+  await kv.put("concert-popular:v4:tour:bad-bunny",JSON.stringify({
+    ok:true,builtAt:new Date().toISOString(),artistId:"bad-bunny",
+    events:[{id:"noto",artist:"Drake",attractionId:"drake",attractionIds:["drake","bad-bunny"],
+      venue:"NOTO",city:"Philadelphia",date:"2099-10-31"}],
+    page:{totalElements:1}
+  }));
+  const oldFetch=globalThis.fetch,oldCaches=globalThis.caches;
+  let calls=0;
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  globalThis.fetch=async input=>{
+    const url=new URL(String(input));
+    assert.equal(url.searchParams.get("attractionId"),"bad-bunny");
+    calls++;
+    const mk=(id,name,primary,secondary)=>({
+      id,name,url:"https://example.com/"+id,
+      dates:{start:{dateTime:"2099-10-31T20:00:00Z",localDate:"2099-10-31"}},
+      _embedded:{
+        attractions:[{id:primary,name:primary==="drake"?"Drake":"Bad Bunny",images:[]},
+          ...(secondary?[{id:secondary,name:"Bad Bunny",images:[]}]:[])],
+        venues:[{id:"v1",name:"NOTO",city:{name:"Philadelphia"},
+          country:{countryCode:"US"},location:{latitude:"39.95",longitude:"-75.16"}}]
+      },
+      images:[]
+    });
+    return new Response(JSON.stringify({
+      _embedded:{events:[mk("drake-club","Drake Party","drake","bad-bunny"),
+        mk("real-bad-bunny","Bad Bunny Live","bad-bunny","")]},
+      page:{totalElements:2,totalPages:1,size:200,number:0}
+    }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+  };
+  try{
+    const response=await onRequestGet({
+      request:new Request("https://music98.news/api/concerts?attractionId=bad-bunny"),
+      env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}
+    });
+    const data=await response.json();
+    assert.equal(calls,1,"invalid prewarm must not be served");
+    assert.deepEqual(data.events.map(e=>e.id),["real-bad-bunny"]);
+    assert.equal(data.events[0].artist,"Bad Bunny");
+  }finally{
+    globalThis.fetch=oldFetch;globalThis.caches=oldCaches;
+  }
 });
