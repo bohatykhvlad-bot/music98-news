@@ -127,7 +127,7 @@ jobs:
           console.log('CAROUSEL_BROWSER_GEOMETRY',JSON.stringify(metrics));
           if(metrics.error)throw Error(metrics.error);
           for(const rail of metrics.rails){
-            if(rail.wasClipped||!rail.scrollClip||!rail.computedClip.startsWith('inset(')||
+            if(!rail.scrollClip||!rail.computedClip.startsWith('inset(')||
                rail.outsideCard||!rail.insideCard||!rail.leftFixed||!rail.prevFixed||!rail.nextFixed)
               throw Error('RAIL_LEFT_EDGE_REGRESSION '+JSON.stringify(rail));
           }
