@@ -1,5 +1,6 @@
-google.com, pub-9555543001162953, DIRECT, f08c47fec0942fa0
+#PurpleAds Start
 purpleads.io, 6ac78db7eeb9d805dbfe64a1, DIRECT
+#adg
 152media.info, 152M5, RESELLER
 33across.com, 0015a00002oUk4aAAC, RESELLER, bbea06d9c4d2853c
 adagio.io, 1263, RESELLER
@@ -52,6 +53,7 @@ video.unrulymedia.com, 2564526802, RESELLER
 video.unrulymedia.com, 5672421953199218469, RESELLER
 xad.com, 958, RESELLER, 81cbf0a75a5e0e9a
 yahoo.com, 57289, RESELLER, e1a5b5b6e3255540
+#amx
 adform.com, 2865, RESELLER
 amxrtb.com, 26595957, DIRECT
 appnexus.com, 11786, RESELLER, f5ab79cb980f11d1
@@ -66,6 +68,7 @@ pubmatic.com, 161527, RESELLER, 5d62403b186f2ace
 rubiconproject.com, 23844, RESELLER, 0bfd66d529a55807
 smartadserver.com, 3056, RESELLER, 060d053dcf45cbf3
 yahoo.com, 49648, RESELLER
+#adtelligent
 152media.info, 152M10, RESELLER
 33across.com, 0010b00002T3JniAAF, RESELLER, bbea06d9c4d2853c
 adform.com, 2656, RESELLER, 9f5210a2f0999e32
@@ -80,6 +83,7 @@ pubmatic.com, 161562, RESELLER, 5d62403b186f2ace
 video.unrulymedia.com, 3139274702404301777, RESELLER, 6f752381ad5ec0e5
 xandr.com, 11924, RESELLER, f5ab79cb980f11d1
 xandr.com, 3153, RESELLER, f5ab79cb980f11d1
+#ayl
 33across.com, 0010b00002Xbn7QAAR, RESELLER, bbea06d9c4d2853c
 adform.com, 3296, RESELLER, 9f5210a2f0999e32
 adipolosolutions.com, 23015084430, RESELLER
@@ -116,12 +120,14 @@ video.unrulymedia.com, 639501697, RESELLER
 videoheroes.tv, 212690, RESELLER, 064bc410192443d8
 vistarsagency.com, cqqccatc23j9v5bv3fv0, RESELLER, 8db795910158017c
 yieldmo.com, 3482865003332051270, RESELLER
+#ep
 amxrtb.com, 105199731, DIRECT
 appnexus.com, 15941, RESELLER, f5ab79cb980f11d1
 e-planning.net, c0cf28d2f6e6cba1, RESELLER, c1ba615865ed87b2
 sharethrough.com, 23830661, DIRECT, d53b998a7bd4ecd2
 video.unrulymedia.com, 703273072, RESELLER
 zetaglobal.net, 891, DIRECT
+#nb
 33across.com, 0010b00002Mq2FYAAZ, DIRECT, bbea06d9c4d2853c
 33across.com, 001Pg00000HgK4BIAV, RESELLER, bbea06d9c4d2853c
 33across.com, 001Pg000019IbWWIA0, RESELLER, bbea06d9c4d2853c
@@ -204,12 +210,14 @@ video.unrulymedia.com, 449400134, RESELLER
 video.unrulymedia.com, 467599570, RESELLER
 zetaglobal.net, 693, DIRECT
 zetaglobal.net, 927, RESELLER
+#ot
 freewheel.tv, 20393, RESELLER
 freewheel.tv, 24377, RESELLER
 google.com, pub-3769010358500643, RESELLER, f08c47fec0942fa0
 onetag.com, 775d62a935ce32d, DIRECT
 smartadserver.com, 4111, RESELLER, 060d053dcf45cbf3
 yahoo.com, 58905, RESELLER, e1a5b5b6e3255540
+#richaudience
 adform.com, 1942, RESELLER
 adform.com, 2631, RESELLER, 9f5210a2f0999e32
 adyoulike.com, f1dfbb7f133fbdb25c96e7d85a5e628b, DIRECT, 4ad745ead2958bf7
@@ -240,8 +248,11 @@ telaria.com, cpu32-92xut, RESELLER, 1a4e959a1b50034a
 tremorhub.com, cpu32-92xut, RESELLER, 1a4e959a1b50034a
 triplelift.com, 8683, RESELLER, 6c33edb13117fd86
 video.unrulymedia.com, 592728597, RESELLER
+#rtbhouse
 rtbhouse.com, vVmlLd9Yd4kOdFS977Qt, RESELLER, 4f3b94578e85950c
+#sonobi
 sonobi.com, 2fc5fedd37, RESELLER, d1a215d9eb5aee9e
+#zt
 amxrtb.com, 105199574, DIRECT
 appnexus.com, 14246, RESELLER, f5ab79cb980f11d1
 bizzclick.com, 286, RESELLER, 7e936b1feafdaa61
@@ -251,3 +262,4 @@ rubiconproject.com, 13380, RESELLER, 0bfd66d529a55807
 sonobi.com, 296bf9795d, DIRECT, d1a215d9eb5aee9e
 streamkey.tv, 18715, DIRECT, f5ab793he40f11d1
 zetaglobal.net, 762, RESELLER
+#PurpleAds End

@@ -190,35 +190,6 @@ async function serveConcertsShell(request, env) {
   return new Response(html,{status:res.status,statusText:res.statusText,headers});
 }
 
-async function serveAdsTxt(request, env) {
-  // Ezoic's default manager starts serving this URL after dashboard setup.
-  // Keep the current valid file available while setup is pending or upstream
-  // is unavailable; never replace it with an upstream HTML/error response.
-  // Preserve local sellers alongside the managed entries when Ezoic is ready.
-  try {
-    const upstream = await fetch("https://srv.adstxtmanager.com/19390/music98.news", {
-      headers: { Accept: "text/plain" },
-      signal: AbortSignal.timeout(3000),
-      cf: { cacheEverything: true, cacheTtlByStatus: { "200-299": 3600, "300-599": 0 } },
-    });
-    if (upstream.ok) {
-      const text = await upstream.text();
-      if (!text.trimStart().startsWith("<") &&
-          /^\s*[a-z0-9.-]+,\s*[^,\s]+,\s*(DIRECT|RESELLER)(\s*,|\s*$)/mi.test(text)) {
-        const local = await env.ASSETS.fetch(new Request(new URL("/ads.txt", request.url)));
-        if (!local.ok) throw new Error("Local ads.txt is unavailable");
-        const lines = [...new Set(`${await local.text()}\n${text}`.split(/\r?\n/).map(line => line.trim()).filter(Boolean))];
-        return new Response(request.method === "HEAD" ? null : `${lines.join("\n")}\n`, {
-          headers: { "Content-Type": "text/plain; charset=utf-8" },
-        });
-      }
-    }
-  } catch {
-    // The checked-in ads.txt remains the fallback for timeouts and outages.
-  }
-  return env.ASSETS.fetch(new Request(new URL("/ads.txt", request.url), request));
-}
-
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -230,7 +201,7 @@ export default {
     const path = rawPath.replace(/\/+$/, "") || "/";
     const c = { request, env, waitUntil: (p) => ctx.waitUntil(p) };
     if (path === "/ads.txt" && (request.method === "GET" || request.method === "HEAD")) {
-      const response = await serveAdsTxt(request, env);
+      const response = await env.ASSETS.fetch(new Request(new URL("/ads.txt", request.url), request));
       const headers = new Headers(response.headers);
       headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
       headers.set("CDN-Cache-Control", "no-store");
