@@ -35,7 +35,7 @@ jobs:
             `<a class="${type}" href="#" style="min-height:480px;background:white;border:1px solid #eee"><div style="height:310px;background:#ddd"></div><div style="padding:20px">Card ${i+1}</div></a>`).join('');
           const html=`<!doctype html><html><head><meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1">
-          <style>${css}</style><style>${JSON.parse(appCss)}</style></head>
+          <style>${css}</style></head>
           <body><main class="wrap">
             <section class="tab active" id="tab-news">
               <div class="rail-wrap">
@@ -51,13 +51,13 @@ jobs:
                 <button class="rail-btn next" id="relNext"><svg></svg></button>
               </div>
             </section>
-            <div class="pop-card" style="width:330px;margin-top:60px">
-              <div class="pop-actions"><a class="buy"><span class="buy-label">Buy Tickets</span></a></div>
-            </div>
+            <div id="concertButton" style="width:330px;margin-top:60px"></div>
             <pre id="metrics"></pre>
           </main>
           <script>
           function $(selector){return document.querySelector(selector)}
+          const concertRoot=document.getElementById("concertButton").attachShadow({mode:"open"});
+          concertRoot.innerHTML=${JSON.stringify("<style>"+JSON.parse(appCss)+"</style><div class=\"pop-card\"><div class=\"pop-actions\"><a class=\"buy\"><span class=\"buy-label\">Buy Tickets</span></a></div></div>")};
           ${page.slice(start,end)}
           function check(){
             const results=[];
@@ -97,9 +97,9 @@ jobs:
                 nextFixed:Math.abs(next.right-wrap.querySelector('.next').getBoundingClientRect().right)<.1
               });
             }
-            const buy=document.querySelector('.pop-actions .buy').getBoundingClientRect();
-            const label=document.querySelector('.buy-label').getBoundingClientRect();
-            const ls=getComputedStyle(document.querySelector('.buy-label'));
+            const buy=concertRoot.querySelector('.pop-actions .buy').getBoundingClientRect();
+            const label=concertRoot.querySelector('.buy-label').getBoundingClientRect();
+            const ls=getComputedStyle(concertRoot.querySelector('.buy-label'));
             const metric={
               rails:results,
               ticket:{
