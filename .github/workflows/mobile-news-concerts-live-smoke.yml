@@ -19,14 +19,14 @@ jobs:
           const root='https://music98.news';
           for(let n=0;n<12;n++){
             try{
-              const urls=['/','/concerts','/concerts-app.js?v=20261008-01'];
+              const urls=['/','/concerts','/concerts-app.js?v=20261008-02'];
               const results=await Promise.all(urls.map(async path=>{
                 const res=await fetch(root+path+'?mobileaudit='+Date.now(),{headers:agent,cache:'no-store',signal:AbortSignal.timeout(15000)});
                 return {path,status:res.status,cache:res.headers.get('cache-control')||'',body:await res.text()};
               }));
               const index=results[0],direct=results[1],app=results[2];
-              const newsReady=index.status===200&&index.body.includes('const hero = (query || narrow.matches) ? null')&&index.body.includes('concerts-app.js?v=20261008-01');
-              const directReady=direct.status===200&&direct.body.includes('concerts-app.js?v=20261008-01');
+              const newsReady=index.status===200&&index.body.includes('const hero = (query || narrow.matches) ? null')&&index.body.includes('concerts-app.js?v=20261008-02');
+              const directReady=direct.status===200&&direct.body.includes('concerts-app.js?v=20261008-02');
               const concertsReady=app.status===200&&app.body.includes('align-items:flex-start;justify-content:flex-start;text-align:left;margin-bottom:18px')&&/no-store/.test(app.cache);
               if(newsReady&&directReady&&concertsReady){
                 console.log('LIVE_MOBILE_NEWS_READY=true LIVE_CONCERTS_DIRECT_READY=true LIVE_CONCERTS_APP_READY=true JS_NO_STORE=true');
