@@ -242,12 +242,6 @@ export default {
       headers.set("Expires", "0");
       return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
     }
-    /* legal/info pages: clean URLs -> /about, /contacts, /privacy, /terms */
-    const legal = path.match(/^(\/about|\/contacts|\/privacy|\/terms)\/?$/);
-    if (legal) {
-      const u = new URL(request.url);
-      return env.ASSETS.fetch(new Request(u.origin + legal[1] + ".html", request));
-    }
     /* Article URLs:
        - news canonical: /<slug>
        - release canonical: /releases/<slug>
@@ -269,6 +263,7 @@ export default {
       if (fromKV.status !== 404) return fromKV;
       /* fall through to the git asset (pre-deploy photos in public/photos/) */
     }
+    /* Keep clean info-page URLs: ASSETS redirects .html requests back to them. */
     const res = await env.ASSETS.fetch(request);
     const type = (res.headers.get("content-type") || "").toLowerCase();
     const headers = new Headers(res.headers);

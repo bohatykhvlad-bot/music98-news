@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import worker from "../worker.js";
 import { serveArticle } from "../functions/lib/seo.js";
 
@@ -20,6 +21,30 @@ function envWith(posts = []) {
 }
 
 const ctx = { waitUntil() {} };
+
+for (const page of ["about", "contacts", "privacy", "terms"]) {
+  test(`${page} serves its clean URL without looping through the asset .html redirect`, async () => {
+    const env = envWith();
+    const html = readFileSync(new URL(`../public/${page}.html`, import.meta.url), "utf8");
+    env.ASSETS.fetch = async (request) => {
+      const url = new URL(request.url);
+      // Cloudflare's automatic HTML handling redirects .html URLs to clean URLs.
+      if (url.pathname.endsWith(".html")) {
+        url.pathname = url.pathname.slice(0, -5);
+        return Response.redirect(url, 307);
+      }
+      assert.equal(url.pathname, `/${page}`);
+      assert.equal(url.search, "?from=footer");
+      return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+    };
+    const response = await worker.fetch(
+      new Request(`https://music98.news/${page}?from=footer`), env, ctx,
+    );
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("location"), null);
+    assert.equal(await response.text(), html);
+  });
+}
 
 test("www host redirects to the canonical apex domain", async () => {
   const response = await worker.fetch(
