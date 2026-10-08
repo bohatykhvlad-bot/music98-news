@@ -97,6 +97,18 @@ async function coverSeed(env, origin) {
      deployed independently from the chart KV and must become visible quickly. */
   return COVER_SEED || {};
 }
+/* Seed edition must change whenever an audited cover is added or corrected.
+ * Otherwise a failed build is held in TOP50_RETRY_KV for 30 minutes even after
+ * a newly deployed artwork registry could make all 50 rows publishable. */
+function coverSeedEdition(seed) {
+  const entries = Object.entries(seed || {}).sort(([a],[b])=>a.localeCompare(b));
+  let hash=2166136261;
+  for (const [key,url] of entries) {
+    const record=key+"="+String(url)+"\\n";
+    for(let i=0;i<record.length;i++) hash=Math.imul(hash ^ record.charCodeAt(i),16777619)>>>0;
+  }
+  return entries.length+":"+hash.toString(16);
+}
 async function nameSeed(env, origin) {
   if (NAME_SEED) return NAME_SEED;
   const v = await readSeed(env, origin, "apple-names.json");
@@ -1025,10 +1037,13 @@ export async function onRequestGet({env,request}) {
   ]);
   // A newly deployed source snapshot must unblock a failed refresh immediately,
   // even when Spotify has not changed. Keep the existing retry delay otherwise.
-  const seedEdition=JSON.stringify([["A",appleSeed],["D",deezerSeed]].map(([id,raw])=>{
-    const seed=verifiedDailySeed(raw,id);
-    return seed ? [id,seed.capturedAt||seed.updated,seed.sourceDate] : [id,""];
-  }));
+  const seedEdition=JSON.stringify([
+    ...[["A",appleSeed],["D",deezerSeed]].map(([id,raw])=>{
+      const seed=verifiedDailySeed(raw,id);
+      return seed ? [id,seed.capturedAt||seed.updated,seed.sourceDate] : [id,""];
+    }),
+    ["C",coverSeedEdition(await coverSeed(env,origin))]
+  ]);
   const verified=verifiedSpotifySnapshot(spotifySeed);
   if(!verified)return fallbackOrUnavailable(env,origin,backup);
   /* Read-only edition preview for the scheduled independent artwork audit.
