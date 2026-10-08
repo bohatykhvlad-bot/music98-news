@@ -23,3 +23,19 @@ export function missingChartArtwork(tracks, size = 50) {
 export function hasCompleteChartArtwork(tracks, size = 50) {
   return missingChartArtwork(tracks, size).length === 0;
 }
+
+/* A 50/50 nonempty count is not proof that the CDN deploy contains the
+ * newly audited releases. Check each exact current song identity against the
+ * independently committed artwork registry before reporting success. */
+export function artworkRegistryMismatches(tracks, registry, keyForTrack, legacyKeyForTrack){
+  if (!Array.isArray(tracks)) return [{reason:"invalid_tracks"}];
+  return tracks.flatMap((track,i)=>{
+    const primary=keyForTrack(track.title,track.artist);
+    const legacy=legacyKeyForTrack(track.title,track.artist);
+    const expected=registry?.[primary] || registry?.[legacy] || "";
+    return !isTrustedChartArtwork(expected) || track.art!==expected ?
+      [{rank:i+1,title:track.title,artist:track.artist,
+        reason:!expected?"not_in_registry":"artwork_not_deployed",
+        expected,actual:String(track.art||"")}] : [];
+  });
+}
