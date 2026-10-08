@@ -325,6 +325,21 @@ function normalizeEvents(events) {
   return sanitizeNormalizedEvents((Array.isArray(events)?events:[]).map(normalizeEvent).filter(Boolean));
 }
 
+// Ticketmaster's attractionId search can include unrelated themed or club
+// events. Only the primary non-package performer may satisfy an artist tour.
+export function artistScopedEvents(events,attractionId="",artistName=""){
+  const id=String(attractionId||"").trim();
+  const name=normName(artistName);
+  if(!id && !name) return [];
+  return sanitizeNormalizedEvents(events).filter(event=>{
+    const primaryId=String(event?.attractionId||"").trim();
+    const primaryName=normName(event?.artist);
+    if(id && primaryId!==id) return false;
+    if(name && primaryName!==name) return false;
+    return !!primaryId && !!primaryName;
+  });
+}
+
 function upcomingIso() {
   return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 }
@@ -635,7 +650,7 @@ async function popularValidationEventsForAttraction(env, attractionId) {
   const eventsRaw = await tmJson(eventsUrl, env, "scheduled");
   const events = eventsRaw?._embedded?.events || [];
   const rawTotal = Number(eventsRaw?.page?.totalElements ?? events.length) || 0;
-  return {eventsRaw,rawTotal,normalizedEvents:normalizeEvents(events)};
+  return {eventsRaw,rawTotal,normalizedEvents:artistScopedEvents(normalizeEvents(events),attractionId)};
 }
 
 async function popularValidationKeywordFallback(env,name,wanted){
@@ -650,7 +665,7 @@ async function popularValidationKeywordFallback(env,name,wanted){
     (Array.isArray(e?._embedded?.attractions)?e._embedded.attractions:[])
       .some(a=>normName(a?.name)===wanted)
   );
-  const normalizedEvents=normalizeEvents(matchingRaw);
+  const normalizedEvents=artistScopedEvents(normalizeEvents(matchingRaw),"",name);
   const exactEventAttraction=matchingRaw
     .flatMap(e=>Array.isArray(e?._embedded?.attractions)?e._embedded.attractions:[])
     .find(a=>normName(a?.name)===wanted);
@@ -796,7 +811,7 @@ async function cachedPopularEventEvidence(env,existing){
     await kvGetJson(env,popularTourCacheKey(artist.id))
   ]));
   for(const [artist,payload] of tourRows){
-    const events=sanitizeNormalizedEvents(payload?.events);
+    const events=artistScopedEvents(payload?.events,artist.id,artist.name);
     if(!prewarmFresh(payload) || !events.length) continue;
     const first=events[0]||{};
     put(artist.name,{
@@ -1061,7 +1076,9 @@ async function scheduledEventPayload(env,params){
     tm.searchParams.set("countryCode",params.countryCode);
   }
   const merged=await tmEventPages(tm,env,5,"scheduled");
-  const events=normalizeEvents(merged.events);
+  const events=params.attractionId
+    ? artistScopedEvents(normalizeEvents(merged.events),params.attractionId)
+    : normalizeEvents(merged.events);
   return {
     ok:true,
     events,
@@ -1094,7 +1111,7 @@ export async function refreshPopularTourSnapshots(env,budget=4){
     const cached=await kvGetJson(env,key);
     // A fresh validation-seeded tour cache is just as useful as a later
     // prewarm. Skipping it must not consume the one-origin-call cron budget.
-    const cachedEvents=sanitizeNormalizedEvents(cached?.events);
+    const cachedEvents=artistScopedEvents(cached?.events,artist.id,artist.name);
     if(prewarmFresh(cached) && cachedEvents.length) continue;
     processed++;
     try{
@@ -1768,7 +1785,7 @@ function snapCoord(value, step) {
 function canonicalConcertCacheUrl(requestUrl, {mode,q,lat,lng,artist,attractionId,city,countryCode,stateCode,radius}) {
   const out = new URL(requestUrl);
   out.search = "";
-  out.searchParams.set("__cachev","concerts-global-v23");
+  out.searchParams.set("__cachev","concerts-global-v24");
 
   if(mode==="artist-search"){
     out.searchParams.set("mode","artist-search");
@@ -1855,7 +1872,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   if(attractionId){
     const prewarmed=await kvGetJson(env,popularTourCacheKey(attractionId));
     if(prewarmFresh(prewarmed)){
-      const events=sanitizeNormalizedEvents(prewarmed.events);
+      const events=artistScopedEvents(prewarmed.events,attractionId);
       if(events.length){
         return json({...prewarmed,events},200,{"Cache-Control":"public, max-age=600, s-maxage=3600"});
       }
@@ -1924,7 +1941,12 @@ export async function onRequestGet({ request, env, waitUntil }) {
     }
 
     const merged = await tmEventPages(tm, env, 5);
-    const events = normalizeEvents(merged.events);
+    const normalized=normalizeEvents(merged.events);
+    const events=attractionId
+      ? artistScopedEvents(normalized,attractionId)
+      : artist
+        ? artistScopedEvents(normalized,"",artist)
+        : normalized;
     const payload = {
       ok: true,
       events,
