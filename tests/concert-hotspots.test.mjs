@@ -1337,7 +1337,7 @@ test("interactive events keep one primary ticket and exclude non-live rows", asy
 test("concert cache version bypasses event payloads created before hygiene filtering", async()=>{
   const fs=await import("node:fs");
   const src=fs.readFileSync(new URL("../functions/api/concerts.js",import.meta.url),"utf8");
-  assert.match(src,/__cachev","concerts-global-v23"/);
+  assert.match(src,/__cachev","concerts-global-v24"/);
   assert.match(src,/sanitizeNormalizedEvents\(prewarmed\.events\)/);
 });
 
