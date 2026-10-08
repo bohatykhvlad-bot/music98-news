@@ -7,7 +7,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import dns from "node:dns";
-import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen } from "../functions/lib/chart-identity.js";
+import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen, versionSignature } from "../functions/lib/chart-identity.js";
 import { candidateCompatible, classifyCandidate, isDerivativeRelease, isGenericRelease, normalizedRelease, rankArtworkCandidates, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
 import {retainedArtworkHistory} from "../functions/lib/artwork-history.js";
 dns.setDefaultResultOrder("ipv4first");
@@ -187,7 +187,8 @@ function readAudit(){ try{return retainedArtworkHistory(JSON.parse(fs.readFileSy
 function readNames(){ try{const j=JSON.parse(fs.readFileSync(OUT_NAMES,"utf8"));return j&&typeof j==="object"?j:{};}catch{return {};}}
 function safePrevious(track,p){
   if(!p||p.verified!==true||!p.art||p.identity!==artworkKey(track.title,track.artist)) return null;
-  if(["generic","derivative"].includes(p.releaseClass)||Number(p.confidence||0)<91) return null;
+  if(["generic","derivative"].includes(p.releaseClass)||Number(p.confidence||0)<91 ||
+     (!versionSignature(track.title) && isDerivativeRelease(p.releaseTitle))) return null;
   return p;
 }
 function publicCandidate(c){ if(!c)return null; return {provider:c.provider,id:c.id,collectionId:c.collectionId,releaseTitle:c.releaseTitle,releaseArtist:c.releaseArtist,releaseDate:c.releaseDate,releaseClass:c.releaseClass,art:c.art,url:c.url,score:c.score,confidence:c.confidence,consensus:c.consensus,earliestReleaseYear:c.earliestReleaseYear}; }
