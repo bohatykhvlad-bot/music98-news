@@ -28,6 +28,7 @@ import {
 import {
   isPlaceholderConcertArtist,
   artistScopedEvents,
+  isNonPerformanceConcertEvent,
   refreshHotspotSnapshot,
   refreshPopularSnapshot,
   refreshPopularTourSnapshots,
@@ -499,7 +500,7 @@ test("public Popular read serves only a complete Top 30 and spends no Ticketmast
     id:"a"+(i+1),name:"Artist "+(i+1),image:"",rank:i+1,popularityRank:i+1,shows:2,eventConfirmed:true
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",builtAt:new Date().toISOString(),
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v2",builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",eligibility:"ticketmaster_event_payload_gt_0",artists,targetCount:30
   }));
   const oldFetch=globalThis.fetch;
@@ -702,7 +703,7 @@ test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30"
     firstDate:""
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v1",
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v2",
     builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",
     ranking:"Spotify monthly listeners",
@@ -1054,13 +1055,13 @@ test("current exhausted 27-row Popular state expands to the new candidate depth 
     name:"Artist "+(i+1),rank:i+1,listeners:100000000-i*1000
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v1",builtAt:new Date().toISOString(),
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v2",builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
     eligibility:"ticketmaster_event_payload_gt_0",candidateCount:30,
     eligibleCount:27,targetCount:30,artists:found
   }));
   await kv.put("concert-popular:v4:state",JSON.stringify({
-    version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v1",startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+    version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v2",startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
     candidates:oldCandidates,index:30,found:found.map(x=>({...x})),errors:0
   }));
@@ -1832,4 +1833,69 @@ test("legacy Popular Top 30 is revalidated without wiping the published snapshot
   }finally{
     globalThis.fetch=oldFetch;
   }
+});
+
+test("themed Drake and Bad Bunny dance nights cannot be counted as concerts",()=>{
+  assert.equal(isNonPerformanceConcertEvent("Drake vs Bad Bunny Dance Night: Nightmare on Vine Street"),true);
+  assert.equal(isNonPerformanceConcertEvent("Taylor Swift Tribute Night"),true);
+  assert.equal(isNonPerformanceConcertEvent("Bad Bunny Fan Party"),true);
+  assert.equal(isNonPerformanceConcertEvent("Drake Live at Madison Square Garden"),false);
+  assert.equal(isNonPerformanceConcertEvent("Bad Bunny - DeBÍ TiRAR MáS FOToS World Tour"),false);
+  const rows=[
+    {id:"club",name:"Drake vs Bad Bunny Dance Night: Nightmare on Vine Street",
+      artist:"Drake",attractionId:"drake",attractionIds:["drake","bunny"],date:"2099-10-31"},
+    {id:"concert",name:"Bad Bunny - World Tour",
+      artist:"Bad Bunny",attractionId:"bunny",attractionIds:["bunny"],date:"2099-11-01"},
+  ];
+  assert.deepEqual(artistScopedEvents(rows,"bunny","Bad Bunny").map(e=>e.id),["concert"]);
+  assert.deepEqual(artistScopedEvents(rows,"drake","Drake").map(e=>e.id),[]);
+});
+
+test("Popular read refuses unverified legacy snapshots but reuses genuine cached concerts",async()=>{
+  const kv=memoryKv();
+  const artists=Array.from({length:30},(_,i)=>({
+    id:"id-"+i,name:"Artist "+i,rank:i+1,popularityRank:i+1,shows:1,eventConfirmed:true
+  }));
+  artists[0]={id:"drake",name:"Drake",rank:1,popularityRank:1,shows:1,eventConfirmed:true};
+  artists[1]={id:"bunny",name:"Bad Bunny",rank:2,popularityRank:2,shows:1,eventConfirmed:true};
+  await kv.put("concert-popular:v4",JSON.stringify({
+    ok:true,version:"popular-v4",algorithm:"rank-ordered-event-query-v2",
+    identityValidation:"primary-attraction-v1",source:"spotify_monthly_listeners",
+    eligibility:"ticketmaster_event_payload_gt_0",
+    builtAt:new Date().toISOString(),artists
+  }));
+  const builtAt=new Date().toISOString();
+  const dance={id:"dance",name:"Drake vs Bad Bunny Dance Night: Nightmare on Vine Street",
+    artist:"Drake",attractionId:"drake",attractionIds:["drake","bunny"],date:"2099-10-31"};
+  await kv.put("concert-popular:v4:tour:drake",JSON.stringify({builtAt,events:[dance]}));
+  await kv.put("concert-popular:v4:tour:bunny",JSON.stringify({builtAt,events:[dance]}));
+  await kv.put("concert-popular:v4:tour:id-2",JSON.stringify({builtAt,events:[{
+    id:"live",name:"Artist 2 live",artist:"Artist 2",attractionId:"id-2",date:"2099-11-05"
+  }]}));
+  const response=await onRequestGet({
+    request:new Request("https://music98.news/api/concerts?mode=popular&v=popular-v12"),
+    env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}
+  });
+  const data=await response.json();
+  assert.deepEqual(data.artists.map(a=>a.name),["Artist 2"]);
+  assert.equal(data.warming,true);
+  assert.equal(data.identityValidation,"primary-attraction-v2");
+});
+
+test("completed correctly validated Popular snapshot keeps its full 30 items",async()=>{
+  const kv=memoryKv();
+  const artists=Array.from({length:30},(_,i)=>({
+    id:"id-"+i,name:"Artist "+i,rank:i+1,popularityRank:i+1,shows:1,eventConfirmed:true
+  }));
+  await kv.put("concert-popular:v4",JSON.stringify({
+    ok:true,version:"popular-v4",algorithm:"rank-ordered-event-query-v2",
+    identityValidation:"primary-attraction-v2",source:"spotify_monthly_listeners",
+    eligibility:"ticketmaster_event_payload_gt_0",
+    builtAt:new Date().toISOString(),artists
+  }));
+  const res=await onRequestGet({request:new Request("https://music98.news/api/concerts?mode=popular&v=popular-v12"),
+    env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}});
+  const data=await res.json();
+  assert.equal(data.artists.length,30);
+  assert.equal(data.warming,false);
 });
