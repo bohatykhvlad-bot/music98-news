@@ -778,6 +778,7 @@ async function kvDelete(env,key){
 }
 
 const POPULAR_BUILD_ALGORITHM="rank-ordered-event-query-v2";
+const POPULAR_IDENTITY_VALIDATION="primary-attraction-v1";
 function newPopularBuildState(ranking,now=Date.now()){
   return {
     version:"popular-v4",
@@ -786,6 +787,7 @@ function newPopularBuildState(ranking,now=Date.now()){
     updatedAt:new Date(now).toISOString(),
     source:ranking.source,
     ranking:"Spotify monthly listeners",
+    identityValidation:POPULAR_IDENTITY_VALIDATION,
     candidates:ranking.artists.slice(0,POPULAR_CANDIDATE_LIMIT),
     index:0,
     found:[],
@@ -872,6 +874,7 @@ export async function refreshPopularSnapshot(env, force = false) {
 
   if(!force && !state && existing?.version==="popular-v4" &&
      existing?.algorithm===POPULAR_BUILD_ALGORITHM &&
+     existing?.identityValidation===POPULAR_IDENTITY_VALIDATION &&
      existing?.source==="spotify_monthly_listeners" &&
      existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
      existing?.artists?.length>=POPULAR_LIMIT &&
@@ -882,6 +885,7 @@ export async function refreshPopularSnapshot(env, force = false) {
 
   if(force || !state || state.version!=="popular-v4" ||
      state.algorithm!==POPULAR_BUILD_ALGORITHM ||
+     state.identityValidation!==POPULAR_IDENTITY_VALIDATION ||
      !Array.isArray(state.candidates) || !Array.isArray(state.found)){
     const ranking=await kworbArtists();
     if(ranking.source!=="spotify_monthly_listeners"){
@@ -906,6 +910,7 @@ export async function refreshPopularSnapshot(env, force = false) {
     // for the rest of the day or repeatedly restart from rank 1.
     if(!force &&
        existing?.version==="popular-v4" &&
+       existing?.identityValidation===POPULAR_IDENTITY_VALIDATION &&
        existing?.eligibility==="ticketmaster_event_payload_gt_0" &&
        existing?.source===ranking.source &&
        existing?.algorithm===POPULAR_BUILD_ALGORITHM &&
@@ -1033,6 +1038,7 @@ export async function refreshPopularSnapshot(env, force = false) {
   const snapshot={
     ok:true,mode:"popular",version:"popular-v4",
     algorithm:POPULAR_BUILD_ALGORITHM,
+    identityValidation:POPULAR_IDENTITY_VALIDATION,
     builtAt:new Date().toISOString(),
     artists,
     source:state.source,
