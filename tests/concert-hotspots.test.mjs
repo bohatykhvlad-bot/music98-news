@@ -1904,3 +1904,54 @@ test("completed correctly validated Popular snapshot keeps its full 30 items",as
   assert.equal(data.artists.length,30);
   assert.equal(data.warming,false);
 });
+
+test("Ticketmaster cannot expose a themed dance night as Bad Bunny or Drake live dates",async()=>{
+  const kv=memoryKv();
+  const oldFetch=globalThis.fetch,oldCaches=globalThis.caches;
+  globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
+  const queried=[];
+  globalThis.fetch=async input=>{
+    const url=new URL(String(input));
+    const id=url.searchParams.get("attractionId");
+    queried.push(id);
+    const venue={id:"noto",name:"NOTO",city:{name:"Philadelphia"},
+      country:{name:"United States",countryCode:"US"},
+      location:{latitude:"39.95",longitude:"-75.16"}};
+    const themed={
+      id:"drake-vs-bad-bunny-party",
+      name:"Drake vs Bad Bunny Dance Night: Nightmare on Vine Street",
+      url:"https://example.com/party",
+      dates:{start:{dateTime:"2026-10-31T20:00:00Z",localDate:"2026-10-31"}},
+      _embedded:{attractions:[
+        {id:"bad-bunny",name:"Bad Bunny",images:[]},
+        {id:"drake",name:"Drake",images:[]}
+      ],venues:[venue]},images:[]
+    };
+    const real={
+      id:"genuine-show",
+      name:"Bad Bunny Live",
+      url:"https://example.com/real",
+      dates:{start:{dateTime:"2026-11-14T20:00:00Z",localDate:"2026-11-14"}},
+      _embedded:{attractions:[{id:"bad-bunny",name:"Bad Bunny",images:[]}],venues:[venue]},images:[]
+    };
+    return new Response(JSON.stringify({
+      _embedded:{events:id==="bad-bunny"?[themed,real]:[themed]},
+      page:{totalElements:id==="bad-bunny"?2:1,totalPages:1,size:200,number:0}
+    }),{status:200,headers:{"content-type":"application/json","Rate-Limit-Available":"4900"}});
+  };
+  try{
+    for(const [id,expected] of [["bad-bunny",["genuine-show"]],["drake",[]]]){
+      const response=await onRequestGet({
+        request:new Request("https://music98.news/api/concerts?attractionId="+id),
+        env:{TICKETMASTER_API_KEY:"test",DESK:kv},waitUntil:()=>{}
+      });
+      assert.equal(response.status,200);
+      const data=await response.json();
+      assert.deepEqual(data.events.map(e=>e.id),expected);
+    }
+    assert.deepEqual(queried,["bad-bunny","drake"]);
+  }finally{
+    globalThis.fetch=oldFetch;
+    globalThis.caches=oldCaches;
+  }
+});
