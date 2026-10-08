@@ -58,3 +58,18 @@ test("never accepts an unrelated artist's recording or stripped release artwork"
  },{countries:["US"]});
  assert.deepEqual(found,[]);
 });
+
+test("artist top-songs lookup restores original without searching every album",async()=>{
+ const calls=[];
+ const found=await run(u=>{
+   const id=u.searchParams.get("id"),entity=u.searchParams.get("entity");
+   calls.push(entity+":"+id);
+   if(entity==="musicArtist")return {results:[{artistId:1578753790,artistName:"John Morgan"}]};
+   if(entity==="song" && id==="1578753790")return {results:[{artistId:1578753790,artistName:"John Morgan"},song]};
+   return {results:[]};
+ },{countries:["US"]});
+ assert.equal(found.length,1);
+ assert.equal(found[0].releaseTitle,"Carolina Blue");
+ assert.ok(calls.includes("song:1578753790"));
+ assert.ok(!calls.includes("album:1578753790"),"artist's original song avoids expensive album scan");
+});
