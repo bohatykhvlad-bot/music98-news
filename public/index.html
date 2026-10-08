@@ -2355,6 +2355,17 @@ function applyDaily(tracks, tag, updated){
   if($("#ef_rows")) renderChartRows();
   setChartStatus({},tag);
 }
+function chartHasCompleteArtwork(tracks){
+  return Array.isArray(tracks) && tracks.length===50 && tracks.every(t=>{
+    try {
+      const u=new URL(String(t.art||""));
+      const h=u.hostname.toLowerCase();
+      return u.protocol==="https:" && u.pathname.length>1 &&
+        (h==="mzstatic.com" || h.endsWith(".mzstatic.com") ||
+         h==="dzcdn.net" || h.endsWith(".dzcdn.net"));
+    } catch(e){ return false; }
+  });
+}
 function refreshDailyTop50(){
   if(S.autoChart === false){
     autoRows = null;
@@ -2365,11 +2376,11 @@ function refreshDailyTop50(){
   }
   let cached = null;
   try{ cached = JSON.parse(lsGetRaw(DAILYKEY)||"null"); }catch(e){ cached = null; }
-  const hasFreshCache=!!(cached && cached.date===todayUTC() &&
-    cached.tracks?.length===50 &&
+  const hasVerifiedCache=!!(cached && chartHasCompleteArtwork(cached.tracks) &&
+    isDailySourceEdition(cached) && cached.sourceDates?.S && cached.spotifyFingerprint);
+  const hasFreshCache=!!(hasVerifiedCache && cached.date===todayUTC() &&
     isDailySourceEdition(cached) &&
-    cached.sourceDates?.S && cached.spotifyFingerprint &&
-    cached.tracks.every(t=>String(t.art||"").trim()));
+    cached.sourceDates?.S && cached.spotifyFingerprint);
   /* Never paint a locally cached ranking as today's chart before checking
      the latest independently verified source fingerprint with the server. */
   autoRows=null;
@@ -2383,18 +2394,18 @@ function refreshDailyTop50(){
     .then(r=>{ if(!r.ok) throw 0; return r.json(); })
     .then(j=>{
       const tracks = (j && j.tracks) || [];
-      if(tracks.length !== 50) throw 0;
+      if(!chartHasCompleteArtwork(tracks)) throw new Error("incomplete_chart_artwork");
       const fresh = j.updated === todayUTC() && !j.fallback && j.complete === true &&
         isDailySourceEdition(j) &&
         !!j.sourceDates?.S && !!j.spotifyFingerprint;
       /* Preserve yesterday's verified rank/tenure without calling it today's.
          Only fully decorated fresh results may be kept as today's browser cache. */
-      if(fresh && tracks.every(t=>String(t.art||"").trim()))
+      if(fresh && chartHasCompleteArtwork(tracks))
         lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks,
           methodology:j.methodology,sources:j.sources,sourceDates:j.sourceDates,spotifyFingerprint:j.spotifyFingerprint}));
       applyDaily(tracks, fresh ? "live" : "backup", j.updated);
     })
-    .catch(()=>{ if(hasFreshCache) applyDaily(cached.tracks,"backup",cached.date);
+    .catch(()=>{ if(hasVerifiedCache) applyDaily(cached.tracks,"backup",cached.date);
       else setChartStatus({}, "fail"); });
 }
 function syncAutoChart(feedId){
