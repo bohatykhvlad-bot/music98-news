@@ -377,6 +377,15 @@ test("Concerts mobile heading remains left-aligned after final CSS overrides and
     "embedded Concerts inherits the main site's shared horizontal page padding");
 });
 
+test("desktop scroll snapport excludes the 32px shadow bleed on both carousels",()=>{
+  assert.match(page,/#tab-news #newsGrid,#tab-releases #relGrid\{scroll-padding-left:32px\}/,
+    "Chromium must snap cards to the visible content boundary, not the -32px rail bleed");
+  assert.match(page,/const moveOneCard=dir=>\{/,
+    "short clicks must use absolute aligned card destinations");
+  assert.match(page,/rail\.scrollTo\(\{left:target,behavior:"smooth"\}\)/,
+    "arrows must not use relative scrollBy from a partial card offset");
+});
+
 test("scrolling News and Releases clips cards at the original content edge without moving their glass arrows",()=>{
   assert.match(page,/\.rail-wrap\.rail-scrolled\{clip-path:inset\(-40px 0 -40px 0\)\}/,
     "stationary wrapper must clip departing and arriving cards at identical edges");
