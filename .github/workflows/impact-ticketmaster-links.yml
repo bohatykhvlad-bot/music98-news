@@ -60,26 +60,15 @@ jobs:
                   elif host.startswith("ticketmaster.") or ".ticketmaster." in host: kind="direct_ticketmaster"
                   else: kind="other"
                   counts[kind]+=1
-                  if len(examples)<18:
-                      examples.append({"city":city,"kind":kind,"host":host,
+                  if len(examples)<18 or (affiliate and not any(x.get("kind")=="affiliate" for x in examples)):
+                      example={"city":city,"kind":kind,"host":host,
                           "publisher_id_matches":affiliate,
-                          "path_family":"/c/..." if p.path.startswith("/c/") else p.path[:48],
-                          "query_keys":sorted(urllib.parse.parse_qs(p.query).keys())})
+                          "path_family":p.path if affiliate else p.path[:48],
+                          "query_keys":sorted(urllib.parse.parse_qs(p.query).keys())}
+                      examples.append(example)
           print("IMPACT_AUDIT",json.dumps({
               "counts":counts,"hosts":dict(hosts),"examples":examples,
               "sampled_unique_urls":len(seen)},ensure_ascii=False))
-          for city,country in [("New York","US"),("Berlin","DE")]:
-              url="https://music98.news/api/concerts?"+urllib.parse.urlencode({"city":city,"countryCode":country})
-              req=urllib.request.Request(url,headers={"Accept":"application/json"})
-              with urllib.request.urlopen(req,timeout=28) as response:
-                  subset=json.load(response).get("events") or []
-              affiliate_urls=[x.get("url") for x in subset if (x.get("url") or "").startswith("https://ticketmaster.evyy.net/c/4932692/")]
-              if affiliate_urls:
-                  track=urllib.parse.urlsplit(affiliate_urls[0])
-                  params=urllib.parse.parse_qs(track.query)
-                  dest=urllib.parse.urlsplit(params.get("u",[""])[0])
-                  print("KNOWN_TRACKING_TEMPLATE",json.dumps({"market":country,"host":track.netloc,"path":track.path,
-                    "query_keys":sorted(params),"deep_link_host":dest.netloc,"deep_link_protocol":dest.scheme}))
           if counts["direct_ticketmaster"]:
               print("::warning::Affiliate tracking missing for",counts["direct_ticketmaster"],
                 "Ticketmaster destinations. Verify local Impact contracts and API link wrapping.")
