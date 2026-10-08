@@ -112,11 +112,37 @@ jobs:
             exit 0
           fi
           git commit -m "artwork/audio: verified provider audit"
-          git push || {
-            echo "main успел измениться — ребейзим сгенерированные данные и повторяем push"
-            git pull --rebase origin main
-            git push
-          }
+          if git push origin HEAD:main; then
+            echo "Проверенные обложки сохранены"
+          else
+            # Another workflow may have committed new snapshots meanwhile.
+            # Rebasing generated JSON causes merge conflicts. Regenerate from
+            # current main instead, so no older audit can overwrite newer data.
+            pushed=0
+            for attempt in 1 2 3; do
+              echo "Artwork push conflicted; refreshing main and re-auditing (attempt $attempt/3)"
+              git fetch origin main
+              git reset --hard origin/main
+              node scripts/build-covers.mjs
+              node scripts/chart-artwork-regression.mjs
+              node scripts/build-loudness.mjs
+              git add public/data/covers.json public/data/artwork-audit.json public/data/apple-names.json public/data/cover-corrections.json public/data/loudness.json
+              if git diff --cached --quiet; then
+                echo "Current main already has the latest verified registry"
+                pushed=1
+                break
+              fi
+              git commit -m "artwork/audio: verified provider audit (rebuilt after race)"
+              if git push origin HEAD:main; then
+                pushed=1
+                break
+              fi
+            done
+            if [ "$pushed" -ne 1 ]; then
+              echo "::error::Failed to publish the regenerated verified artwork registry"
+              exit 1
+            fi
+          fi
 
       - name: Дождаться точного совпадения всех 50 live обложек с проверенным реестром
         run: node scripts/verify-live-artwork.mjs
@@ -134,8 +160,28 @@ jobs:
             git config user.email "actions@users.noreply.github.com"
             git add public/data/chart-tenure-backup.json public/data/daily-top50-backup.json
             git commit -m "chart: snapshot healthy live tenure"
-            git push || {
-              git pull --rebase origin main
-              git push
-            }
+            if ! git push origin HEAD:main; then
+              published=0
+              for attempt in 1 2 3; do
+                echo "Tenure snapshot push conflicted; refreshing main (attempt $attempt/3)"
+                git fetch origin main
+                git reset --hard origin/main
+                node scripts/snapshot-live-chart.mjs
+                if git diff --quiet -- public/data/chart-tenure-backup.json public/data/daily-top50-backup.json; then
+                  echo "Newest main already contains the verified snapshot"
+                  published=1
+                  break
+                fi
+                git add public/data/chart-tenure-backup.json public/data/daily-top50-backup.json
+                git commit -m "chart: snapshot healthy live tenure (rebuilt after race)"
+                if git push origin HEAD:main; then
+                  published=1
+                  break
+                fi
+              done
+              if [ "$published" -ne 1 ]; then
+                echo "::error::Failed to publish healthy snapshot after concurrent updates"
+                exit 1
+              fi
+            fi
           fi
