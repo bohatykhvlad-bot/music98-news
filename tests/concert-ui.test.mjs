@@ -850,3 +850,9 @@ test("Buy Tickets records independent ticket_click events in GA4 without changin
   assert.match(app,/a\.href=e\.url; a\.target="_blank"/);
   assert.match(app,/a\.addEventListener\("click",\(\)=>trackTicketClick\(e\)\)/);
 });
+
+test("Buy Tickets popup label has centered optical ink and no uneven horizontal padding",()=>{
+  assert.match(app,/\.buy\{[^}]*display:flex;align-items:center;justify-content:center/);
+  assert.match(app,/\.buy-label\{[^}]*margin:0;padding:1px 0 0;box-sizing:border-box;display:grid;place-items:center;text-align:center;text-indent:var\(--ink-x,0px\)/);
+  assert.match(app,/\.pop-card \.pop-actions \.buy\{width:min\(150px,100%\);margin:0\}/);
+});
