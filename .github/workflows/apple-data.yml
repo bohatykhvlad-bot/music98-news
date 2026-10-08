@@ -26,6 +26,7 @@ on:
       - ".github/workflows/apple-data.yml"
       - "functions/lib/chart-identity.js"
       - "functions/lib/artwork-resolver.js"
+      - "functions/lib/apple-album-discovery.js"
       - "scripts/build-covers.mjs"
       - "scripts/build-loudness.mjs"
       - "public/data/cover-corrections.json"
@@ -95,23 +96,16 @@ jobs:
             echo "ERROR: artwork audit modified embedded Top 50/site markup"
             exit 1
           }
-      - name: Установить ffmpeg для loudness audit
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg
-          ffmpeg -version | head -n 1
-      - name: Измерить громкость Apple previews
-        run: node scripts/build-loudness.mjs
       - name: Закоммитить, если изменилось
         run: |
           git config user.name "music98 apple-data bot"
           git config user.email "actions@users.noreply.github.com"
-          git add public/data/covers.json public/data/artwork-audit.json public/data/apple-names.json public/data/cover-corrections.json public/data/loudness.json
+          git add public/data/covers.json public/data/artwork-audit.json public/data/apple-names.json public/data/cover-corrections.json
           if git diff --cached --quiet; then
             echo "данные Apple без изменений"
             exit 0
           fi
-          git commit -m "artwork/audio: verified provider audit"
+          git commit -m "artwork: verified provider audit"
           if git push origin HEAD:main; then
             echo "Проверенные обложки сохранены"
           else
@@ -125,14 +119,13 @@ jobs:
               git reset --hard origin/main
               node scripts/build-covers.mjs
               node scripts/chart-artwork-regression.mjs
-              node scripts/build-loudness.mjs
-              git add public/data/covers.json public/data/artwork-audit.json public/data/apple-names.json public/data/cover-corrections.json public/data/loudness.json
+              git add public/data/covers.json public/data/artwork-audit.json public/data/apple-names.json public/data/cover-corrections.json
               if git diff --cached --quiet; then
                 echo "Current main already has the latest verified registry"
                 pushed=1
                 break
               fi
-              git commit -m "artwork/audio: verified provider audit (rebuilt after race)"
+              git commit -m "artwork: verified provider audit (rebuilt after race)"
               if git push origin HEAD:main; then
                 pushed=1
                 break
@@ -182,6 +175,37 @@ jobs:
               if [ "$published" -ne 1 ]; then
                 echo "::error::Failed to publish healthy snapshot after concurrent updates"
                 exit 1
+              fi
+            fi
+          fi
+
+      # Artwork must already be live and verified before optional preview
+      # normalization starts. A slow ffmpeg install cannot hold back the covers.
+      - name: Установить ffmpeg для loudness audit
+        continue-on-error: true
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version | head -n 1
+      - name: Измерить громкость Apple previews
+        continue-on-error: true
+        run: node scripts/build-loudness.mjs
+      - name: Сохранить loudness независимо от обложек
+        continue-on-error: true
+        run: |
+          git add public/data/loudness.json
+          if git diff --cached --quiet; then
+            echo "loudness без изменений"
+          else
+            git commit -m "audio: update preview loudness"
+            if ! git push origin HEAD:main; then
+              git fetch origin main
+              git reset --hard origin/main
+              node scripts/build-loudness.mjs
+              git add public/data/loudness.json
+              if ! git diff --cached --quiet; then
+                git commit -m "audio: update preview loudness after retry"
+                git push origin HEAD:main
               fi
             fi
           fi
