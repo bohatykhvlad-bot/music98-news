@@ -194,8 +194,10 @@ jobs:
                   scroll='wrap.classList.toggle("rail-scrolled", x > 0.5 || !!rail.style.transform)' in page
                   elastic='rail.parentElement.classList.toggle("rail-scrolled",rail.scrollLeft > 0.5 || !!rail.style.transform)' in page
                   arrows=".rail-wrap .rail-btn.prev{left:6px;right:auto}" in page and ".rail-wrap .rail-btn.next{right:6px}" in page
-                  print("LIVE_CAROUSEL_DEPLOY",attempt+1,{"css":css,"scroll":scroll,"elastic":elastic,"arrows":arrows})
-                  if css and scroll and elastic and arrows:
+                  snapport="#tab-news #newsGrid,#tab-releases #relGrid{scroll-padding-left:32px}" in page
+                  aligned_click="const moveOneCard=dir=>" in page and 'rail.scrollTo({left:target,behavior:"smooth"})' in page
+                  print("LIVE_CAROUSEL_DEPLOY",attempt+1,{"css":css,"scroll":scroll,"elastic":elastic,"arrows":arrows,"snapport":snapport,"aligned_click":aligned_click})
+                  if css and scroll and elastic and arrows and snapport and aligned_click:
                       print("LIVE_CAROUSEL_DEPLOY_PASS")
                       break
               except Exception as err:
