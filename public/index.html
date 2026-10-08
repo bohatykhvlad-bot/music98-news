@@ -210,22 +210,20 @@ main{position:relative;z-index:1}
    wrap (no -22px bleed past the content edge), same paddings, same pill
    anchors. Every card slider on the site clips at the content edge. */
 .rail-wrap{position:relative;margin-top:0}
-/* During horizontal scroll, clip cards at the fixed content-left boundary.
-   The rail itself has a -32px bleed for first-card shadows. Without this
-   stationary viewport clip, scrolled cards become visible in that margin
-   underneath the left arrow. Keep the full shadow bleed at scrollLeft=0
-   and don't move, resize or restyle either arrow. */
+/* The horizontal rail's -32px left shadow bleed must never reveal a
+   partially departed card. While scrolling, clip to BOTH fixed section
+   edges: the outgoing left card and incoming right card disappear at
+   symmetrical boundaries. Keep the original first-card shadow at x=0. */
 @media (min-width:641px){
-  .rail-wrap.rail-scrolled{clip-path:inset(-40px -40px -40px 0)}
+  .rail-wrap.rail-scrolled{clip-path:inset(-40px 0 -40px 0)}
 }
 /* Releases has no hero above its rail; don't add another 2px to the shared heading gap. */
 #tab-releases .rail-wrap{margin-top:0}
-.rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
-.rail-wrap .rail-btn.next{right:0}
-/* end clearance follows the slimmer pill (44px wide): next arrow sits 6px in
-   from the edge, the 44px tail inside the rail lets the last card park clear
-   of it at full scroll - same geometry on both rails */
-.rail-wrap .rail-btn.next{margin-right:6px}
+.rail-wrap .rail-btn.prev{left:6px;right:auto}
+.rail-wrap .rail-btn.next{right:6px}
+/* Both arrows are anchored 6px from their respective content edges. The
+   44px right tail in the scroll rail still clears the final card. */
+.rail-wrap .rail-btn.next{margin-right:0}
 .rail{display:grid;grid-auto-flow:column;grid-auto-columns:var(--cardw,255px);gap:18px;overflow-x:auto;scroll-padding-left:0;overscroll-behavior-x:contain;padding:12px 44px 12px 0;margin:-12px 0;scrollbar-width:none;-ms-overflow-style:none;will-change:scroll-position;contain:layout style}
 /* end-of-scroll clearance: the 44px tail lets the last card park left of the
    floating pill at full scroll (owner: text must be readable in the final
