@@ -47,6 +47,7 @@ console.log("OLIVIA_DROP_DEAD", JSON.stringify(olivia || null));
 console.log("NEW_ROWS", JSON.stringify(news.map(x => ({rank:x.rank,title:x.title,artist:x.artist,weeks:x.weeks,delta:x.delta}))));
 const missingArtwork=(j.tracks||[]).map((t,i)=>({rank:i+1,title:t.title,artist:t.artist,url:t.url||""})).filter((_,i)=>!String(j.tracks[i]?.art||"").trim());
 console.log("ARTWORK_STATUS", JSON.stringify({missing:missingArtwork.length,rows:(j.tracks||[]).length,missingRows:missingArtwork}));
+if(missingArtwork.length) throw new Error("BLOCKED: published Top 50 has missing artwork: "+JSON.stringify(missingArtwork));
 const near=(j.memory && j.memory.nearMiss) || [];
 if (olivia) {
   const hit=near.find(x => /dropdead/i.test(String(x.key||"").replace(/[^a-z0-9]/gi,"")));
