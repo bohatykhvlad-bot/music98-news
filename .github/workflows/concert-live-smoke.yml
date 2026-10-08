@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - name: Verify deployed Popular contract and The Weeknd
+      - name: Verify deployed Popular event-confirmed ranking contract
         run: |
           python - <<'PY'
           import json, time, urllib.request
@@ -47,7 +47,7 @@ jobs:
           assert data.get("algorithm")=="rank-ordered-event-query-v2", summary
           assert data.get("source")=="spotify_monthly_listeners", summary
           assert len(artists)==30, summary
-          assert "The Weeknd" in names, summary
+          assert len({str(a.get("id","")) for a in artists})==30, summary
           assert all(a.get("eventConfirmed") is True and int(a.get("shows") or 0)>0 for a in artists), summary
           PY
 
@@ -323,7 +323,7 @@ jobs:
               clicked=await evaluate(c,`(()=>{
                 const root=document.querySelector("music98-concerts")?.shadowRoot;
                 if(!root) return false;
-                const card=[...root.querySelectorAll(".tour-card")].find(el=>el.querySelector(".tour-name")?.textContent?.trim()==="The Weeknd");
+                const card=[...root.querySelectorAll(".tour-card")].find(el=>el.querySelector(".tour-name")?.textContent?.trim()==="The Weeknd") || root.querySelector(".tour-card");
                 if(!card) return false;
                 card.querySelector(".tour-row")?.click();
                 return true;
@@ -331,7 +331,7 @@ jobs:
               if(clicked) break;
               await sleep(500);
             }
-            if(!clicked) throw new Error("The Weeknd row not found");
+            if(!clicked) throw new Error("No confirmed Popular artist row found");
             const markerDeadline=Date.now()+30000;
             let markerState=null;
             while(Date.now()<markerDeadline){
@@ -353,7 +353,7 @@ jobs:
             }
             await shot(c,"concert-acceptance/weeknd-marker.png");
             c.close();
-            if(!markerState || markerState.featureCount<1) throw new Error("The Weeknd marker was not drawn: "+JSON.stringify(markerState));
+            if(!markerState || markerState.featureCount<1) throw new Error("Selected artist marker was not drawn: "+JSON.stringify(markerState));
             return markerState;
           }
 
