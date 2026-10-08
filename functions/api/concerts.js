@@ -285,6 +285,13 @@ function collapseDuplicateEvents(events) {
   }
   return order.map(key=>byKey.get(key));
 }
+// A Ticketmaster artist tag does not prove that the artist is performing.
+// Artist-themed dance nights and tribute shows are not live performances.
+export function isNonPerformanceConcertEvent(name){
+  const title=String(name||"").trim();
+  return /\b(?:dance\s*nights?|fan\s*(?:party|night|event)s?|listening\s*part(?:y|ies)|sing\s*alongs?|karaoke|tribute\s*(?:night|show|party|concert|band|act|experience)?|look\s*alike\s*(?:night|party)|themed?\s*(?:night|party))\b/i.test(title) ||
+    /\b(?:vs\.?|versus)\b[^\n]{0,80}\b(?:party|night|dj\s*set)\b/i.test(title);
+}
 function normalizedEventIsBlocked(e) {
   const status=String(e?.status||"").trim().toLowerCase();
   if(["cancelled","canceled","postponed","rescheduled"].includes(status)) return true;
@@ -292,6 +299,7 @@ function normalizedEventIsBlocked(e) {
   const venue=String(e?.venue||"");
   const qaText=name.toLowerCase();
   return isPlaceholderConcertArtist(e?.artist) ||
+    isNonPerformanceConcertEvent(name) ||
     /do\s+not\s+purchase/i.test(qaText) ||
     /\bqa\b[^\n]{0,40}\b(?:test|testing|festival)\b/i.test(qaText) ||
     /\b(?:test|testing)\b[^\n]{0,30}\b(?:event|festival)\b/i.test(qaText) ||
@@ -778,7 +786,7 @@ async function kvDelete(env,key){
 }
 
 const POPULAR_BUILD_ALGORITHM="rank-ordered-event-query-v2";
-const POPULAR_IDENTITY_VALIDATION="primary-attraction-v1";
+const POPULAR_IDENTITY_VALIDATION="primary-attraction-v2";
 function newPopularBuildState(ranking,now=Date.now()){
   return {
     version:"popular-v4",
@@ -1400,45 +1408,58 @@ async function popularSnapshotPayload(env) {
     kvGetJson(env, POPULAR_SNAPSHOT_KEY),
     kvGetJson(env, POPULAR_STATE_KEY),
   ]);
-
   const strict=(list)=>Array.isArray(list)
-    ? list.filter(a=>a?.eventConfirmed===true && Number(a?.shows||0)>0)
+    ? list.filter(a=>a?.id && a?.name && a?.eventConfirmed===true && Number(a?.shows||0)>0)
         .sort((a,b)=>Number(a?.popularityRank||a?.rank||999999)-Number(b?.popularityRank||b?.rank||999999))
         .slice(0,POPULAR_LIMIT)
         .map((a,i)=>({...a,rank:i+1,shows:Number(a.shows||0),eventConfirmed:true}))
     : [];
-
-  const published=snapshot?.version==="popular-v4" &&
+  const identityReady=snapshot?.version==="popular-v4" &&
     snapshot?.algorithm===POPULAR_BUILD_ALGORITHM &&
+    snapshot?.identityValidation===POPULAR_IDENTITY_VALIDATION &&
     snapshot?.source==="spotify_monthly_listeners" &&
-    snapshot?.eligibility==="ticketmaster_event_payload_gt_0"
-      ? strict(snapshot.artists)
-      : [];
-
-  // Public UI is atomic: never expose 27/28/29 while the scheduled builder is
-  // still working. Keep the last complete Top 30, or show a warming state.
+    snapshot?.eligibility==="ticketmaster_event_payload_gt_0";
+  const published=identityReady ? strict(snapshot.artists) : [];
   if(published.length>=POPULAR_LIMIT){
     const age=Date.now()-(Date.parse(snapshot?.builtAt||0)||0);
-    return {
-      ...snapshot,
-      ok:true,
-      mode:"popular",
-      version:"popular-v4",
-      eligibility:"ticketmaster_event_payload_gt_0",
-      artists:published,
-      targetCount:POPULAR_LIMIT,
-      stale:age>30*60*60*1000,
-      warming:false,
-    };
+    return {...snapshot,ok:true,mode:"popular",artists:published,
+      targetCount:POPULAR_LIMIT,stale:age>30*60*60*1000,warming:false};
   }
 
-  const validated=state?.version==="popular-v4" && state?.algorithm===POPULAR_BUILD_ALGORITHM ? strict(state.found).length : 0;
+  // During a rebuild, NEVER serve the older Top 30 just because a previous
+  // snapshot recorded shows>0. Verify each legacy row against its still-fresh
+  // Ticketmaster event payload; invalid dance-night tags are discarded.
+  // The scheduled worker fills gaps from source-ranked candidates. This
+  // endpoint is KV-only and makes no on-demand Ticketmaster requests.
+  const legacyArtists=!identityReady && snapshot?.source==="spotify_monthly_listeners" &&
+    snapshot?.algorithm===POPULAR_BUILD_ALGORITHM &&
+    snapshot?.eligibility==="ticketmaster_event_payload_gt_0" &&
+    Array.isArray(snapshot.artists) ? snapshot.artists : [];
+  const legacyProven=await Promise.all(legacyArtists.map(async artist=>{
+    const payload=await kvGetJson(env,popularTourCacheKey(artist.id));
+    if(!prewarmFresh(payload)) return null;
+    const events=artistScopedEvents(payload.events,artist.id,artist.name);
+    if(!events.length) return null;
+    return {...artist,shows:events.length,eventConfirmed:true};
+  }));
+  const progress=state?.version==="popular-v4" &&
+    state?.algorithm===POPULAR_BUILD_ALGORITHM &&
+    state?.identityValidation===POPULAR_IDENTITY_VALIDATION
+      ? strict(state.found) : [];
+  const byId=new Map();
+  for(const artist of legacyProven.filter(Boolean)) byId.set(String(artist.id),artist);
+  for(const artist of progress) byId.set(String(artist.id),artist);
+  const verified=strict([...byId.values()]);
   return {
-    ok:true,mode:"popular",version:"popular-v4",builtAt:"",
-    artists:[],source:"scheduled",ranking:"Spotify monthly listeners",
+    ok:true,mode:"popular",version:"popular-v4",
+    builtAt:String(snapshot?.builtAt||""),
+    artists:verified,source:"spotify_monthly_listeners",
+    ranking:"Spotify monthly listeners",
     algorithm:POPULAR_BUILD_ALGORITHM,
+    identityValidation:POPULAR_IDENTITY_VALIDATION,
     eligibility:"ticketmaster_event_payload_gt_0",
-    targetCount:POPULAR_LIMIT,validatedCount:validated,stale:false,warming:true
+    targetCount:POPULAR_LIMIT,validatedCount:verified.length,
+    stale:false,warming:true,
   };
 }
 
