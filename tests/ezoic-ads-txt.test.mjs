@@ -29,15 +29,18 @@ test("ad crawlers receive the existing seller file while Ezoic setup is pending 
   ]) {
     await t.test(name, async t => {
       t.mock.method(globalThis, "fetch", result);
-      const response = await worker.fetch(new Request("https://music98.news/ads.txt"), envWithFallback(), ctx);
-      assert.equal(response.status, 200);
-      assert.equal(await response.text(), existing);
+      for (const method of ["GET", "HEAD"]) {
+        const response = await worker.fetch(new Request("https://music98.news/ads.txt", { method }), envWithFallback(), ctx);
+        assert.equal(response.status, 200);
+        assert.equal(await response.text(), method === "GET" ? existing : "");
+      }
     });
   }
 });
 
-test("the configured Ezoic seller file is served automatically to GET and HEAD crawlers", async t => {
-  const managed = "# Managed by Ezoic\ngoogle.com, pub-1234567890123456, RESELLER, f08c47fec0942fa0\n";
+test("GET and HEAD crawlers retain local sellers when Ezoic is configured, without duplicate entries", async t => {
+  const duplicate = "purpleads.io, 6ac78db7eeb9d805dbfe64a1, DIRECT";
+  const managed = `# Managed by Ezoic\ngoogle.com, pub-1234567890123456, RESELLER, f08c47fec0942fa0\n${duplicate}\n`;
   t.mock.method(globalThis, "fetch", (url, options) => {
     assert.equal(url, "https://srv.adstxtmanager.com/19390/music98.news");
     assert.equal(options.headers.Accept, "text/plain");
@@ -45,11 +48,15 @@ test("the configured Ezoic seller file is served automatically to GET and HEAD c
     return Promise.resolve(new Response(managed));
   });
   for (const method of ["GET", "HEAD"]) {
-    const response = await worker.fetch(new Request("https://music98.news/ads.txt", { method }), {
-      ASSETS: { fetch() { throw new Error("The managed file should be used"); } },
-    }, ctx);
+    const response = await worker.fetch(new Request("https://music98.news/ads.txt", { method }), envWithFallback(), ctx);
     assert.equal(response.status, 200);
     assert.match(response.headers.get("content-type"), /^text\/plain/);
-    assert.equal(await response.text(), method === "GET" ? managed : "");
+    const body = await response.text();
+    if (method === "GET") {
+      assert.equal(body, `${existing}# Managed by Ezoic\ngoogle.com, pub-1234567890123456, RESELLER, f08c47fec0942fa0\n`);
+      assert.equal(body.split("\n").filter(line => line === duplicate).length, 1);
+    } else {
+      assert.equal(body, "");
+    }
   }
 });

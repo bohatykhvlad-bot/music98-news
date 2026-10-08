@@ -194,6 +194,7 @@ async function serveAdsTxt(request, env) {
   // Ezoic's default manager starts serving this URL after dashboard setup.
   // Keep the current valid file available while setup is pending or upstream
   // is unavailable; never replace it with an upstream HTML/error response.
+  // Preserve local sellers alongside the managed entries when Ezoic is ready.
   try {
     const upstream = await fetch("https://srv.adstxtmanager.com/19390/music98.news", {
       headers: { Accept: "text/plain" },
@@ -204,7 +205,10 @@ async function serveAdsTxt(request, env) {
       const text = await upstream.text();
       if (!text.trimStart().startsWith("<") &&
           /^\s*[a-z0-9.-]+,\s*[^,\s]+,\s*(DIRECT|RESELLER)(\s*,|\s*$)/mi.test(text)) {
-        return new Response(request.method === "HEAD" ? null : text, {
+        const local = await env.ASSETS.fetch(new Request(new URL("/ads.txt", request.url)));
+        if (!local.ok) throw new Error("Local ads.txt is unavailable");
+        const lines = [...new Set(`${await local.text()}\n${text}`.split(/\r?\n/).map(line => line.trim()).filter(Boolean))];
+        return new Response(request.method === "HEAD" ? null : `${lines.join("\n")}\n`, {
           headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=300" },
         });
       }
