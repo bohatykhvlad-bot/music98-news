@@ -1804,3 +1804,32 @@ test("stale cross-artist tour cache is ignored, and Ticketmaster responses are i
     globalThis.fetch=oldFetch;globalThis.caches=oldCaches;
   }
 });
+
+test("legacy Popular Top 30 is revalidated without wiping the published snapshot",async()=>{
+  const kv=memoryKv();
+  const artists=Array.from({length:30},(_,i)=>({
+    id:"old-"+i,name:"Artist "+i,rank:i+1,popularityRank:i+1,
+    shows:1,eventConfirmed:true
+  }));
+  const old={
+    version:"popular-v4",algorithm:"rank-ordered-event-query-v2",
+    source:"spotify_monthly_listeners",eligibility:"ticketmaster_event_payload_gt_0",
+    builtAt:new Date().toISOString(),artists
+  };
+  await kv.put("concert-popular:v4",JSON.stringify(old));
+  const oldFetch=globalThis.fetch;
+  let called=false;
+  globalThis.fetch=async()=>{
+    called=true;
+    return new Response("ranking temporarily unavailable",{status:503});
+  };
+  try{
+    const result=await refreshPopularSnapshot({TICKETMASTER_API_KEY:"test",DESK:kv},false);
+    assert.equal(called,true,"legacy cache must trigger a fresh identity-aware rebuild");
+    assert.equal(result.reason,"popular_ranking_source_unavailable");
+    const stillPublished=JSON.parse(kv.raw("concert-popular:v4"));
+    assert.equal(stillPublished.artists.length,30,"never blank Popular during rebuilding");
+  }finally{
+    globalThis.fetch=oldFetch;
+  }
+});
