@@ -83,7 +83,7 @@ jobs:
             throw new Error("artwork audit accounting is incomplete");
           }
           if (unresolved.length) {
-            console.log("::warning::Artwork unresolved for " + unresolved.length + " current chart row(s): " + unresolved.map(x=>x.artist+" - "+x.title).join("; "));
+            throw new Error("BLOCKED: cannot deploy an incomplete artwork registry: " + unresolved.map(x=>x.artist+" - "+x.title).join("; "));
           }
           console.log("cover registry updates:", changed.length, "verified rows:", verified, "unresolved rows:", unresolved.length);
           NODE
@@ -150,7 +150,7 @@ jobs:
                       "cfCacheStatus":headers.get("cf-cache-status"),
                   }
                   print("ARTWORK_PRODUCTION_CHECK",json.dumps(last,ensure_ascii=False))
-                  if len(tracks)==50 and not missing and not bad and "no-store" in str(last["cacheControl"] or ""):
+                  if len(tracks)==50 and not missing and not bad and not data.get("fallback") and data.get("complete") is True and "no-store" in str(last["cacheControl"] or ""):
                       raise SystemExit(0)
               except Exception as e:
                   last={"attempt":attempt+1,"error":repr(e)}
