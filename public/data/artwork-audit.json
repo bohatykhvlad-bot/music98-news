@@ -1,14 +1,14 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-08T08:00:38.458Z",
+  "updatedAt": "2026-10-08T11:02:40.512Z",
   "chartUpdated": "2026-10-08",
   "chartRev": "daily-global-v37",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 25,
-    "apple-chart": 23,
+    "apple-feed": 22,
+    "apple-chart": 26,
     "previous-audit": 1,
     "apple": 1
   },
@@ -30,7 +30,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.795Z",
+      "checkedAt": "2026-10-08T11:01:21.087Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -66,7 +66,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:35.923Z",
+      "checkedAt": "2026-10-08T11:02:39.212Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -162,7 +162,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:13.842Z",
+      "checkedAt": "2026-10-08T11:02:07.947Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -198,7 +198,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:07.940Z",
+      "checkedAt": "2026-10-08T11:01:55.150Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -279,7 +279,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.791Z",
+      "checkedAt": "2026-10-08T11:01:21.081Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -315,7 +315,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:35.421Z",
+      "checkedAt": "2026-10-08T11:01:25.975Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -369,7 +369,7 @@
       "title": "Be By You",
       "artist": "Luke Combs",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
+      "provider": "apple-chart",
       "releaseTitle": "The Way I Am",
       "releaseArtist": "Luke Combs",
       "releaseDate": "2026-02-13T12:00:00Z",
@@ -377,14 +377,14 @@
       "url": "https://music.apple.com/us/album/1862634688?i=1862634805",
       "collectionId": "1862634688",
       "trackId": "1862634805",
-      "confidence": 99,
-      "score": 1270,
+      "confidence": 96,
+      "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:24.863Z",
+      "checkedAt": "2026-10-08T11:02:19.030Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
+          "provider": "apple-chart",
           "id": "1862634805",
           "collectionId": "1862634688",
           "releaseTitle": "The Way I Am",
@@ -393,8 +393,38 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1862634688?i=1862634805",
-          "score": 1270,
-          "confidence": 99,
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "3838327301",
+          "collectionId": "917051721",
+          "releaseTitle": "Be By You",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-05-22",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/644133900f1391ee0a7e8f84c6572e3a/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3838327301",
+          "score": 670,
+          "confidence": 91,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1862634805",
+          "collectionId": "1862634688",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-02-13T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1862634688?i=1862634805",
+          "score": 645,
+          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -417,7 +447,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.795Z",
+      "checkedAt": "2026-10-08T11:01:21.087Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -453,7 +483,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.795Z",
+      "checkedAt": "2026-10-08T11:01:21.088Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -469,6 +499,102 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "billiejean|jacksonmichael": {
+      "identity": "billiejean|jacksonmichael",
+      "title": "Billie Jean",
+      "artist": "Michael Jackson",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Thriller 40",
+      "releaseArtist": "Michael Jackson",
+      "releaseDate": "1982-11-29T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
+      "collectionId": "1641780996",
+      "trackId": "1641781004",
+      "confidence": 96,
+      "score": 880,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-08T11:02:37.840Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1641781004",
+          "collectionId": "1641780996",
+          "releaseTitle": "Thriller 40",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
+          "score": 880,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        },
+        {
+          "provider": "apple",
+          "id": "1641781004",
+          "collectionId": "1641780996",
+          "releaseTitle": "Thriller 40",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        },
+        {
+          "provider": "apple",
+          "id": "1883770432",
+          "collectionId": "1883769984",
+          "releaseTitle": "Michael: Songs From The Motion Picture",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/54/f2/ef/54f2ef79-c668-8d6f-28cd-ae48c45009b7/196874193211.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1883769984?i=1883770432",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        },
+        {
+          "provider": "apple",
+          "id": "269573364",
+          "collectionId": "269572838",
+          "releaseTitle": "Thriller",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T08:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/269572838?i=269573364",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
+        },
+        {
+          "provider": "apple",
+          "id": "273048789",
+          "collectionId": "273048762",
+          "releaseTitle": "Thriller (25th Anniversary) [Deluxe Edition]",
+          "releaseArtist": "Michael Jackson",
+          "releaseDate": "1982-11-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/b5/58/d3/b558d32f-24fd-c889-d544-bc4c96f6113e/dj.oinzmlgt.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/273048762?i=273048789",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 1982
         }
       ]
     },
@@ -489,7 +615,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:37.300Z",
+      "checkedAt": "2026-10-08T11:01:28.262Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -525,7 +651,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.792Z",
+      "checkedAt": "2026-10-08T11:01:21.082Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -561,7 +687,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:02.877Z",
+      "checkedAt": "2026-10-08T11:01:52.889Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -597,7 +723,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:42.501Z",
+      "checkedAt": "2026-10-08T11:01:41.054Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -633,7 +759,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:29.635Z",
+      "checkedAt": "2026-10-08T11:02:14.317Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -697,102 +823,6 @@
         }
       ]
     },
-    "daidai|boyburnashakira": {
-      "identity": "daidai|boyburnashakira",
-      "title": "Dai Dai",
-      "artist": "Shakira & Burna Boy",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Dai Dai - Single",
-      "releaseArtist": "Shakira & Burna Boy",
-      "releaseDate": "2026-05-14T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
-      "collectionId": "6768469975",
-      "trackId": "6768469976",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-08T08:00:34.171Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "6768469976",
-          "collectionId": "6768469975",
-          "releaseTitle": "Dai Dai - Single",
-          "releaseArtist": "Shakira & Burna Boy",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6768469976",
-          "collectionId": "6768469975",
-          "releaseTitle": "Dai Dai - Single",
-          "releaseArtist": "Shakira & Burna Boy",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "4015341011",
-          "collectionId": "980745831",
-          "releaseTitle": "Dai Dai",
-          "releaseArtist": "Shakira",
-          "releaseDate": "2026-05-14",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/a7f9bae0243c512059298a68d09f45a1/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4015341011",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "4210621702",
-          "collectionId": "1048886412",
-          "releaseTitle": "Dai Dai",
-          "releaseArtist": "Shakira",
-          "releaseDate": "2026-08-07",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/e35dc7a41abff9ff8636fafec6736472/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4210621702",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6776010744",
-          "collectionId": "6776010591",
-          "releaseTitle": "Official FIFA World Cup 2026™ Album",
-          "releaseArtist": "FIFA Sound",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/68/4a/84/684a84c9-f6e3-ca17-d516-ee01a88c32ca/26UMGIM68511.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6776010591?i=6776010744",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
     "diewithasmile|brunogagaladymars": {
       "identity": "diewithasmile|brunogagaladymars",
       "title": "Die With A Smile",
@@ -810,7 +840,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:55.300Z",
+      "checkedAt": "2026-10-08T11:01:39.639Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -906,7 +936,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:43.974Z",
+      "checkedAt": "2026-10-08T11:01:57.449Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -972,7 +1002,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:37.299Z",
+      "checkedAt": "2026-10-08T11:01:28.261Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1068,7 +1098,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:45.236Z",
+      "checkedAt": "2026-10-08T11:01:41.053Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1122,7 +1152,7 @@
       "title": "Empty Words",
       "artist": "Corey Kent",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bd/79/87/bd7987fa-bb0d-148d-ab35-deece7c24de5/196874101148.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "Empty Words - Single",
       "releaseArtist": "Corey Kent",
       "releaseDate": "2026-02-20T12:00:00Z",
@@ -1131,11 +1161,26 @@
       "collectionId": "1876625197",
       "trackId": "1876625198",
       "confidence": 98,
-      "score": 965,
+      "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:28.726Z",
+      "checkedAt": "2026-10-08T11:02:25.751Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1876625198",
+          "collectionId": "1876625197",
+          "releaseTitle": "Empty Words - Single",
+          "releaseArtist": "Corey Kent",
+          "releaseDate": "2026-02-20T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/bd/79/87/bd7987fa-bb0d-148d-ab35-deece7c24de5/196874101148.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1876625197?i=1876625198",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
         {
           "provider": "apple",
           "id": "1876625198",
@@ -1215,7 +1260,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.796Z",
+      "checkedAt": "2026-10-08T11:01:21.089Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1251,7 +1296,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.793Z",
+      "checkedAt": "2026-10-08T11:01:21.083Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1287,7 +1332,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:37.301Z",
+      "checkedAt": "2026-10-08T11:01:39.641Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1323,7 +1368,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:42.499Z",
+      "checkedAt": "2026-10-08T11:01:35.690Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1404,7 +1449,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:18.593Z",
+      "checkedAt": "2026-10-08T11:02:06.006Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1468,42 +1513,6 @@
         }
       ]
     },
-    "jaded|ellakoelangleywetzel": {
-      "identity": "jaded|ellakoelangleywetzel",
-      "title": "Jaded",
-      "artist": "Koe Wetzel & Ella Langley",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
-      "releaseTitle": "Jaded - Single",
-      "releaseArtist": "Koe Wetzel & Ella Langley",
-      "releaseDate": "2026-06-12T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
-      "collectionId": "6798042820",
-      "trackId": "6798042825",
-      "confidence": 99,
-      "score": 1350,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-08T08:00:19.746Z",
-      "alternatives": [
-        {
-          "provider": "apple-feed",
-          "id": "6798042825",
-          "collectionId": "6798042820",
-          "releaseTitle": "Jaded - Single",
-          "releaseArtist": "Koe Wetzel & Ella Langley",
-          "releaseDate": "2026-06-12T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
-          "score": 1350,
-          "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
     "janicestfu|drake": {
       "identity": "janicestfu|drake",
       "title": "Janice STFU",
@@ -1521,7 +1530,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:55.301Z",
+      "checkedAt": "2026-10-08T11:01:48.512Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1537,6 +1546,102 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "kidmyself|johnmorgan": {
+      "identity": "kidmyself|johnmorgan",
+      "title": "Kid Myself",
+      "artist": "John Morgan",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cd/75/83/cd7583d8-08ce-0f17-6a73-03ddc3385dc4/4099964286243.jpg/600x600bb.jpg",
+      "provider": "apple",
+      "releaseTitle": "Kid Myself (Stripped) - Single",
+      "releaseArtist": "John Morgan",
+      "releaseDate": "2025-04-25T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/6796527394?i=6796527400",
+      "collectionId": "6796527394",
+      "trackId": "6796527400",
+      "confidence": 98,
+      "score": 965,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-08T11:02:40.509Z",
+      "alternatives": [
+        {
+          "provider": "apple",
+          "id": "6796527400",
+          "collectionId": "6796527394",
+          "releaseTitle": "Kid Myself (Stripped) - Single",
+          "releaseArtist": "John Morgan",
+          "releaseDate": "2025-04-25T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cd/75/83/cd7583d8-08ce-0f17-6a73-03ddc3385dc4/4099964286243.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6796527394?i=6796527400",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "apple",
+          "id": "6789747377",
+          "collectionId": "6789747371",
+          "releaseTitle": "Kid Myself (Stripped) - Single",
+          "releaseArtist": "John Morgan",
+          "releaseDate": "2026-07-31T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/52/d3/f7/52d3f7c0-90da-6da8-cc96-96c38c9b70cb/4099964281620.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6789747371?i=6789747377",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "apple",
+          "id": "6796527398",
+          "collectionId": "6796527394",
+          "releaseTitle": "Kid Myself (Stripped) - Single",
+          "releaseArtist": "John Morgan",
+          "releaseDate": "2026-07-31T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cd/75/83/cd7583d8-08ce-0f17-6a73-03ddc3385dc4/4099964286243.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6796527394?i=6796527398",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "deezer",
+          "id": "3697436932",
+          "collectionId": "870709212",
+          "releaseTitle": "Kid Myself",
+          "releaseArtist": "John Morgan",
+          "releaseDate": "2026-01-28",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/d86f9db9d0d128de55171015517dfd9c/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3697436932",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "deezer",
+          "id": "4173638902",
+          "collectionId": "1036714262",
+          "releaseTitle": "Kid Myself (Stripped)",
+          "releaseArtist": "John Morgan",
+          "releaseDate": "2026-07-31",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/c85707afe526daa81cd599b9cbf7a5dd/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4173638902",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
         }
       ]
     },
@@ -1557,7 +1662,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:13.842Z",
+      "checkedAt": "2026-10-08T11:02:00.732Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1577,7 +1682,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:22.263Z",
+      "checkedAt": "2026-10-08T11:02:10.676Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1626,87 +1731,6 @@
         }
       ]
     },
-    "lovinglifeagain|ellalangley": {
-      "identity": "lovinglifeagain|ellalangley",
-      "title": "Loving Life Again",
-      "artist": "Ella Langley",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Dandelion",
-      "releaseArtist": "Ella Langley",
-      "releaseDate": "2026-03-20T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1869436835?i=1869436847",
-      "collectionId": "1869436835",
-      "trackId": "1869436847",
-      "confidence": 96,
-      "score": 770,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-08T08:00:38.455Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1869436847",
-          "collectionId": "1869436835",
-          "releaseTitle": "Dandelion",
-          "releaseArtist": "Ella Langley",
-          "releaseDate": "2026-03-20T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1869436835?i=1869436847",
-          "score": 770,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "3904211281",
-          "collectionId": "941086691",
-          "releaseTitle": "Loving Life Again",
-          "releaseArtist": "Ella Langley",
-          "releaseDate": "2026-03-20",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/b1bde069e57968a190b0506aef2b6e3e/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3904211281",
-          "score": 670,
-          "confidence": 91,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "1869436847",
-          "collectionId": "1869436835",
-          "releaseTitle": "Dandelion",
-          "releaseArtist": "Ella Langley",
-          "releaseDate": "2026-03-20T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1869436835?i=1869436847",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6763094348",
-          "collectionId": "1895159736",
-          "releaseTitle": "Dandelion",
-          "releaseArtist": "Ella Langley",
-          "releaseDate": "2026-03-20T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/26/35/03/26350323-d656-4817-49e6-4d658af8363a/196874332917.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1895159736?i=6763094348",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
     "manineed|deanolivia": {
       "identity": "manineed|deanolivia",
       "title": "Man I Need",
@@ -1724,7 +1748,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.793Z",
+      "checkedAt": "2026-10-08T11:01:21.084Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1760,7 +1784,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:19.745Z",
+      "checkedAt": "2026-10-08T11:02:09.141Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1826,7 +1850,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:59.141Z",
+      "checkedAt": "2026-10-08T11:01:46.920Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1922,7 +1946,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:24.862Z",
+      "checkedAt": "2026-10-08T11:02:26.866Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1973,7 +1997,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.794Z",
+      "checkedAt": "2026-10-08T11:01:21.085Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1989,6 +2013,102 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "ordinary|alexwarren": {
+      "identity": "ordinary|alexwarren",
+      "title": "Ordinary",
+      "artist": "Alex Warren",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Ordinary - Single",
+      "releaseArtist": "Alex Warren",
+      "releaseDate": "2024-09-26T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
+      "collectionId": "1793663382",
+      "trackId": "1793663645",
+      "confidence": 98,
+      "score": 1090,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-08T11:02:07.947Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1793663645",
+          "collectionId": "1793663382",
+          "releaseTitle": "Ordinary - Single",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2024-09-26T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1793663645",
+          "collectionId": "1793663382",
+          "releaseTitle": "Ordinary - Single",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2024-09-26T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "deezer",
+          "id": "3210709941",
+          "collectionId": "705691371",
+          "releaseTitle": "Ordinary",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2025-02-07",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/f4246416b5e3e71a35adf1e2cbe98bfb/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3210709941",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1804419953",
+          "collectionId": "1804419951",
+          "releaseTitle": "You'll Be Alright, Kid (Chapter 1)",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2024-09-26T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f1/91/6e/f1916ecb-0b21-57da-7d60-cd21ae0ff40b/075679614797.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1804419951?i=1804419953",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1817735163",
+          "collectionId": "1817735146",
+          "releaseTitle": "You'll Be Alright, Kid",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2024-09-26T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c7/1e/c9/c71ec9f8-f6fd-5374-0e5c-3419539618f4/075679607942.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1817735146?i=1817735163",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
         }
       ]
     },
@@ -2009,7 +2129,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.793Z",
+      "checkedAt": "2026-10-08T11:01:21.085Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2021,42 +2141,6 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/6814997249?i=6814997425",
-          "score": 1270,
-          "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "pinkclouding|swifttaylor": {
-      "identity": "pinkclouding|swifttaylor",
-      "title": "Pink Clouding",
-      "artist": "Taylor Swift",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
-      "releaseTitle": "The Life of a Showgirl: The Encore",
-      "releaseArtist": "Taylor Swift",
-      "releaseDate": "2026-09-24T07:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
-      "collectionId": "6814997249",
-      "trackId": "6814997428",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-08T08:00:29.635Z",
-      "alternatives": [
-        {
-          "provider": "apple-feed",
-          "id": "6814997428",
-          "collectionId": "6814997249",
-          "releaseTitle": "The Life of a Showgirl: The Encore",
-          "releaseArtist": "Taylor Swift",
-          "releaseDate": "2026-09-24T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
           "score": 1270,
           "confidence": 99,
           "consensus": 1,
@@ -2081,7 +2165,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:42.501Z",
+      "checkedAt": "2026-10-08T11:01:35.691Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2096,6 +2180,72 @@
           "score": 1270,
           "confidence": 99,
           "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "rethinksomethings|combsluke": {
+      "identity": "rethinksomethings|combsluke",
+      "title": "Rethink Some Things",
+      "artist": "Luke Combs",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "The Way I Am",
+      "releaseArtist": "Luke Combs",
+      "releaseDate": "2026-03-20T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
+      "collectionId": "1862634688",
+      "trackId": "1862634795",
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-08T11:02:27.697Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1862634795",
+          "collectionId": "1862634688",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1862634795",
+          "collectionId": "1862634688",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "3899622791",
+          "collectionId": "939327001",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-03-20",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/644133900f1391ee0a7e8f84c6572e3a/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3899622791",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
           "earliestReleaseYear": 2026
         }
       ]
@@ -2117,7 +2267,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:04.818Z",
+      "checkedAt": "2026-10-08T11:01:52.889Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2183,7 +2333,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:48.183Z",
+      "checkedAt": "2026-10-08T11:01:30.249Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2264,7 +2414,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:37.300Z",
+      "checkedAt": "2026-10-08T11:01:30.250Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2278,6 +2428,102 @@
           "url": "https://music.apple.com/us/album/6818209777?i=6818209989",
           "score": 1270,
           "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "somethingtolose|leftymasonstellavincent": {
+      "identity": "somethingtolose|leftymasonstellavincent",
+      "title": "Something To Lose",
+      "artist": "STELLA LEFTY & Vincent Mason",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Is This Heaven? - EP",
+      "releaseArtist": "STELLA LEFTY",
+      "releaseDate": "2026-05-14T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+      "collectionId": "6766964604",
+      "trackId": "6766964605",
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-08T11:02:13.310Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6766964605",
+          "collectionId": "6766964604",
+          "releaseTitle": "Is This Heaven? - EP",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6766964605",
+          "collectionId": "6766964604",
+          "releaseTitle": "Is This Heaven? - EP",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6783994835",
+          "collectionId": "6783994651",
+          "releaseTitle": "Is This Heaven? (Extended)",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a5/bd/a9/a5bda9ec-a7d8-f812-442a-72a2a6158415/075679569011.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6783994651?i=6783994835",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4020643591",
+          "collectionId": "982409841",
+          "releaseTitle": "Is This Heaven?",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-15",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/30c36833c1fe5b5c398139a4622b65f4/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4020643591",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6796823831",
+          "collectionId": "6796823160",
+          "releaseTitle": "Long Way Home",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/4b/9b/ed4b9bb0-8670-db21-e48c-9e874a6dc3e1/075679562654.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6796823160?i=6796823831",
+          "score": 645,
+          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -2300,7 +2546,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:49.617Z",
+      "checkedAt": "2026-10-08T11:01:48.511Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2381,7 +2627,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.792Z",
+      "checkedAt": "2026-10-08T11:01:21.082Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2417,7 +2663,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:19.746Z",
+      "checkedAt": "2026-10-08T11:02:09.142Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2453,7 +2699,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:31.076Z",
+      "checkedAt": "2026-10-08T11:02:31.603Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2549,7 +2795,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:31.794Z",
+      "checkedAt": "2026-10-08T11:01:21.086Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2585,7 +2831,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T07:59:42.500Z",
+      "checkedAt": "2026-10-08T11:01:35.691Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2621,7 +2867,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:02.877Z",
+      "checkedAt": "2026-10-08T11:01:51.255Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2700,72 +2946,6 @@
         }
       ]
     },
-    "thinkasyoudrunk|greenriley": {
-      "identity": "thinkasyoudrunk|greenriley",
-      "title": "Think As You Drunk",
-      "artist": "Riley Green",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "That's Just Me",
-      "releaseArtist": "Riley Green",
-      "releaseDate": "2026-05-28T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
-      "collectionId": "6770725355",
-      "trackId": "6770725979",
-      "confidence": 96,
-      "score": 770,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-08T08:00:23.874Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "6770725979",
-          "collectionId": "6770725355",
-          "releaseTitle": "That's Just Me",
-          "releaseArtist": "Riley Green",
-          "releaseDate": "2026-05-28T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
-          "score": 770,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "4039612441",
-          "collectionId": "989245831",
-          "releaseTitle": "Think As You Drunk",
-          "releaseArtist": "Riley Green",
-          "releaseDate": "2026-05-28",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/f60fbc8095587535e45c27151413b26e/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4039612441",
-          "score": 670,
-          "confidence": 91,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6770725979",
-          "collectionId": "6770725355",
-          "releaseTitle": "That's Just Me",
-          "releaseArtist": "Riley Green",
-          "releaseDate": "2026-05-28T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
     "trainingseason|dualipa": {
       "identity": "trainingseason|dualipa",
       "title": "Training Season",
@@ -2783,7 +2963,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T08:00:27.815Z",
+      "checkedAt": "2026-10-08T11:02:24.701Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -4112,102 +4292,6 @@
         }
       ]
     },
-    "billiejean|jacksonmichael": {
-      "identity": "billiejean|jacksonmichael",
-      "title": "Billie Jean",
-      "artist": "Michael Jackson",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Thriller 40",
-      "releaseArtist": "Michael Jackson",
-      "releaseDate": "1982-11-29T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
-      "collectionId": "1641780996",
-      "trackId": "1641781004",
-      "confidence": 96,
-      "score": 880,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-07T01:04:14.513Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1641781004",
-          "collectionId": "1641780996",
-          "releaseTitle": "Thriller 40",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
-          "score": 880,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
-        },
-        {
-          "provider": "apple",
-          "id": "1641781004",
-          "collectionId": "1641780996",
-          "releaseTitle": "Thriller 40",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/73/8c/e1/738ce1db-60bd-eb25-0059-18778c1ca9b3/196589412409.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1641780996?i=1641781004",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
-        },
-        {
-          "provider": "apple",
-          "id": "1883770432",
-          "collectionId": "1883769984",
-          "releaseTitle": "Michael: Songs From The Motion Picture",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/54/f2/ef/54f2ef79-c668-8d6f-28cd-ae48c45009b7/196874193211.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1883769984?i=1883770432",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
-        },
-        {
-          "provider": "apple",
-          "id": "269573364",
-          "collectionId": "269572838",
-          "releaseTitle": "Thriller",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T08:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/269572838?i=269573364",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
-        },
-        {
-          "provider": "apple",
-          "id": "273048789",
-          "collectionId": "273048762",
-          "releaseTitle": "Thriller (25th Anniversary) [Deluxe Edition]",
-          "releaseArtist": "Michael Jackson",
-          "releaseDate": "1982-11-29T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/b5/58/d3/b558d32f-24fd-c889-d544-bc4c96f6113e/dj.oinzmlgt.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/273048762?i=273048789",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 1982
-        }
-      ]
-    },
     "lovemenot|lenaeravyn": {
       "identity": "lovemenot|lenaeravyn",
       "title": "Love Me Not",
@@ -4310,168 +4394,6 @@
         }
       ]
     },
-    "ordinary|alexwarren": {
-      "identity": "ordinary|alexwarren",
-      "title": "Ordinary",
-      "artist": "Alex Warren",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Ordinary - Single",
-      "releaseArtist": "Alex Warren",
-      "releaseDate": "2024-09-26T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
-      "collectionId": "1793663382",
-      "trackId": "1793663645",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-07T22:18:06.531Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1793663645",
-          "collectionId": "1793663382",
-          "releaseTitle": "Ordinary - Single",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2024-09-26T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1793663645",
-          "collectionId": "1793663382",
-          "releaseTitle": "Ordinary - Single",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2024-09-26T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "deezer",
-          "id": "3210709941",
-          "collectionId": "705691371",
-          "releaseTitle": "Ordinary",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2025-02-07",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/f4246416b5e3e71a35adf1e2cbe98bfb/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3210709941",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1804419953",
-          "collectionId": "1804419951",
-          "releaseTitle": "You'll Be Alright, Kid (Chapter 1)",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2024-09-26T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f1/91/6e/f1916ecb-0b21-57da-7d60-cd21ae0ff40b/075679614797.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1804419951?i=1804419953",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1817735163",
-          "collectionId": "1817735146",
-          "releaseTitle": "You'll Be Alright, Kid",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2024-09-26T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c7/1e/c9/c71ec9f8-f6fd-5374-0e5c-3419539618f4/075679607942.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1817735146?i=1817735163",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        }
-      ]
-    },
-    "rethinksomethings|combsluke": {
-      "identity": "rethinksomethings|combsluke",
-      "title": "Rethink Some Things",
-      "artist": "Luke Combs",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "The Way I Am",
-      "releaseArtist": "Luke Combs",
-      "releaseDate": "2026-03-20T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
-      "collectionId": "1862634688",
-      "trackId": "1862634795",
-      "confidence": 98,
-      "score": 1010,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-07T22:18:14.574Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1862634795",
-          "collectionId": "1862634688",
-          "releaseTitle": "The Way I Am",
-          "releaseArtist": "Luke Combs",
-          "releaseDate": "2026-03-20T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
-          "score": 1010,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "1862634795",
-          "collectionId": "1862634688",
-          "releaseTitle": "The Way I Am",
-          "releaseArtist": "Luke Combs",
-          "releaseDate": "2026-03-20T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "3899622791",
-          "collectionId": "939327001",
-          "releaseTitle": "The Way I Am",
-          "releaseArtist": "Luke Combs",
-          "releaseDate": "2026-03-20",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/644133900f1391ee0a7e8f84c6572e3a/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3899622791",
-          "score": 830,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
     "takemeback|codyjohnson": {
       "identity": "takemeback|codyjohnson",
       "title": "Take Me Back (Leave Me There)",
@@ -4570,6 +4492,321 @@
           "score": 910,
           "confidence": 98,
           "consensus": 2,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "daidai|boyburnashakira": {
+      "identity": "daidai|boyburnashakira",
+      "title": "Dai Dai",
+      "artist": "Shakira & Burna Boy",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Dai Dai - Single",
+      "releaseArtist": "Shakira & Burna Boy",
+      "releaseDate": "2026-05-14T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
+      "collectionId": "6768469975",
+      "trackId": "6768469976",
+      "confidence": 98,
+      "score": 1090,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-08T08:00:34.171Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6768469976",
+          "collectionId": "6768469975",
+          "releaseTitle": "Dai Dai - Single",
+          "releaseArtist": "Shakira & Burna Boy",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6768469976",
+          "collectionId": "6768469975",
+          "releaseTitle": "Dai Dai - Single",
+          "releaseArtist": "Shakira & Burna Boy",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/61/49/8d/61498ded-f0dc-227d-cd1d-2051b5d9f195/196874328590.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6768469975?i=6768469976",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4015341011",
+          "collectionId": "980745831",
+          "releaseTitle": "Dai Dai",
+          "releaseArtist": "Shakira",
+          "releaseDate": "2026-05-14",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/a7f9bae0243c512059298a68d09f45a1/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4015341011",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4210621702",
+          "collectionId": "1048886412",
+          "releaseTitle": "Dai Dai",
+          "releaseArtist": "Shakira",
+          "releaseDate": "2026-08-07",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/e35dc7a41abff9ff8636fafec6736472/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4210621702",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6776010744",
+          "collectionId": "6776010591",
+          "releaseTitle": "Official FIFA World Cup 2026™ Album",
+          "releaseArtist": "FIFA Sound",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/68/4a/84/684a84c9-f6e3-ca17-d516-ee01a88c32ca/26UMGIM68511.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6776010591?i=6776010744",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "jaded|ellakoelangleywetzel": {
+      "identity": "jaded|ellakoelangleywetzel",
+      "title": "Jaded",
+      "artist": "Koe Wetzel & Ella Langley",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "Jaded - Single",
+      "releaseArtist": "Koe Wetzel & Ella Langley",
+      "releaseDate": "2026-06-12T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
+      "collectionId": "6798042820",
+      "trackId": "6798042825",
+      "confidence": 99,
+      "score": 1350,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-08T08:00:19.746Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "6798042825",
+          "collectionId": "6798042820",
+          "releaseTitle": "Jaded - Single",
+          "releaseArtist": "Koe Wetzel & Ella Langley",
+          "releaseDate": "2026-06-12T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
+          "score": 1350,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "lovinglifeagain|ellalangley": {
+      "identity": "lovinglifeagain|ellalangley",
+      "title": "Loving Life Again",
+      "artist": "Ella Langley",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Dandelion",
+      "releaseArtist": "Ella Langley",
+      "releaseDate": "2026-03-20T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1869436835?i=1869436847",
+      "collectionId": "1869436835",
+      "trackId": "1869436847",
+      "confidence": 96,
+      "score": 770,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-08T08:00:38.455Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1869436847",
+          "collectionId": "1869436835",
+          "releaseTitle": "Dandelion",
+          "releaseArtist": "Ella Langley",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1869436835?i=1869436847",
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "3904211281",
+          "collectionId": "941086691",
+          "releaseTitle": "Loving Life Again",
+          "releaseArtist": "Ella Langley",
+          "releaseDate": "2026-03-20",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/b1bde069e57968a190b0506aef2b6e3e/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3904211281",
+          "score": 670,
+          "confidence": 91,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1869436847",
+          "collectionId": "1869436835",
+          "releaseTitle": "Dandelion",
+          "releaseArtist": "Ella Langley",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1869436835?i=1869436847",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6763094348",
+          "collectionId": "1895159736",
+          "releaseTitle": "Dandelion",
+          "releaseArtist": "Ella Langley",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/26/35/03/26350323-d656-4817-49e6-4d658af8363a/196874332917.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1895159736?i=6763094348",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "pinkclouding|swifttaylor": {
+      "identity": "pinkclouding|swifttaylor",
+      "title": "Pink Clouding",
+      "artist": "Taylor Swift",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "The Life of a Showgirl: The Encore",
+      "releaseArtist": "Taylor Swift",
+      "releaseDate": "2026-09-24T07:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
+      "collectionId": "6814997249",
+      "trackId": "6814997428",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-08T08:00:29.635Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "6814997428",
+          "collectionId": "6814997249",
+          "releaseTitle": "The Life of a Showgirl: The Encore",
+          "releaseArtist": "Taylor Swift",
+          "releaseDate": "2026-09-24T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "thinkasyoudrunk|greenriley": {
+      "identity": "thinkasyoudrunk|greenriley",
+      "title": "Think As You Drunk",
+      "artist": "Riley Green",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "That's Just Me",
+      "releaseArtist": "Riley Green",
+      "releaseDate": "2026-05-28T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+      "collectionId": "6770725355",
+      "trackId": "6770725979",
+      "confidence": 96,
+      "score": 770,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-08T08:00:23.874Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6770725979",
+          "collectionId": "6770725355",
+          "releaseTitle": "That's Just Me",
+          "releaseArtist": "Riley Green",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4039612441",
+          "collectionId": "989245831",
+          "releaseTitle": "Think As You Drunk",
+          "releaseArtist": "Riley Green",
+          "releaseDate": "2026-05-28",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/f60fbc8095587535e45c27151413b26e/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4039612441",
+          "score": 670,
+          "confidence": 91,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6770725979",
+          "collectionId": "6770725355",
+          "releaseTitle": "That's Just Me",
+          "releaseArtist": "Riley Green",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
           "earliestReleaseYear": 2026
         }
       ]
