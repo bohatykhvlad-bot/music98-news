@@ -79,14 +79,22 @@ jobs:
               const cardRect=rail.firstElementChild.getBoundingClientRect();
               const y=cardRect.top+80;
               const protrusion=document.elementFromPoint(wrapRect.left-12,y);
+              const rightProtrusion=document.elementFromPoint(wrapRect.right+12,y);
               const inside=document.elementFromPoint(wrapRect.left+12,y);
               const centerInside=document.elementFromPoint(wrapRect.left+100,y);
+              const leftButton=wrap.querySelector('.prev').getBoundingClientRect();
+              const rightButton=wrap.querySelector('.next').getBoundingClientRect();
+              const leftInset=leftButton.left-wrapRect.left;
+              const rightInset=wrapRect.right-rightButton.right;
+              const symmetricArrowInset=Math.abs(leftInset-rightInset);
               results.push({
                 id,wasClipped,scrollLeft:rail.scrollLeft,
                 scrollClip:wrap.classList.contains('rail-scrolled'),
                 computedClip:getComputedStyle(wrap).clipPath,
                 outsideCard:!!protrusion?.closest('.card,.rcard'),
+                rightOutsideCard:!!rightProtrusion?.closest('.card,.rcard'),
                 insideCard:!!inside?.closest('.card,.rcard')||!!centerInside?.closest('.card,.rcard'),
+                leftInset,rightInset,symmetricArrowInset,
                 insideAt12:inside?.className||inside?.tagName||'',
                 insideAt100:centerInside?.className||centerInside?.tagName||'',
                 wrapperX:wrapRect.left,
@@ -127,8 +135,11 @@ jobs:
           console.log('CAROUSEL_BROWSER_GEOMETRY',JSON.stringify(metrics));
           if(metrics.error)throw Error(metrics.error);
           for(const rail of metrics.rails){
-            if(!rail.scrollClip||!rail.computedClip.startsWith('inset(')||
-               rail.outsideCard||!rail.insideCard||!rail.leftFixed||!rail.prevFixed||!rail.nextFixed)
+            if(!rail.scrollClip||rail.computedClip!=='inset(-40px 0px -40px 0px)'||
+               rail.outsideCard||rail.rightOutsideCard||!rail.insideCard||
+               Math.abs(rail.leftInset-6)>0.5||Math.abs(rail.rightInset-6)>0.5||
+               rail.symmetricArrowInset>0.5||
+               !rail.leftFixed||!rail.prevFixed||!rail.nextFixed)
               throw Error('RAIL_LEFT_EDGE_REGRESSION '+JSON.stringify(rail));
           }
           if(metrics.ticket.horizontalCenterDelta>1||metrics.ticket.verticalCenterDelta>1||
@@ -149,10 +160,10 @@ jobs:
               try:
                   with urllib.request.urlopen(request,timeout=25) as response:
                       page=response.read().decode("utf-8","replace")
-                  css=".rail-wrap.rail-scrolled{clip-path:inset(-40px -40px -40px 0)}" in page
+                  css=".rail-wrap.rail-scrolled{clip-path:inset(-40px 0 -40px 0)}" in page
                   scroll='wrap.classList.toggle("rail-scrolled", x > 0.5 || !!rail.style.transform)' in page
                   elastic='rail.parentElement.classList.toggle("rail-scrolled",rail.scrollLeft > 0.5 || !!rail.style.transform)' in page
-                  arrows=".rail-wrap .rail-btn.prev{right:calc(100% - 66px)}" in page and ".rail-wrap .rail-btn.next{right:0}" in page
+                  arrows=".rail-wrap .rail-btn.prev{left:6px;right:auto}" in page and ".rail-wrap .rail-btn.next{right:6px}" in page
                   print("LIVE_CAROUSEL_DEPLOY",attempt+1,{"css":css,"scroll":scroll,"elastic":elastic,"arrows":arrows})
                   if css and scroll and elastic and arrows:
                       print("LIVE_CAROUSEL_DEPLOY_PASS")
