@@ -29,6 +29,7 @@ export function versionSignature(s) {
   add("remix", /\b(?:remix|rmx)\b/);
   add("live", /\blive\b/);
   add("acoustic", /\bacoustic\b/);
+  add("stripped", /\bstripped\b/);
   add("instrumental", /\binstrumental\b/);
   add("karaoke", /\bkaraoke\b/);
   add("demo", /\bdemo\b/);

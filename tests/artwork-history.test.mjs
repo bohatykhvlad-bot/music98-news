@@ -15,6 +15,14 @@ test("verified covers survive leaving and re-entering the daily chart",()=>{
   const repaired={...old,art:"https://is1-ssl.mzstatic.com/repaired.jpg"};
   assert.equal(retainedArtworkHistory({history,entries:{[old.identity]:repaired}})[old.identity].art,repaired.art);
 });
+test("previously certified stripped sleeves never survive as original artwork",()=>{
+  const original={...row("Kid Myself","John Morgan"),releaseTitle:"Kid Myself (Stripped) - Single"};
+  assert.deepEqual(retainedArtworkHistory({entries:{[original.identity]:original}}),{});
+  const studio={...original,releaseTitle:"Carolina Blue"};
+  assert.equal(retainedArtworkHistory({entries:{[studio.identity]:studio}})[studio.identity].art,studio.art);
+  const stripped={...row("Kid Myself (Stripped)","John Morgan"),releaseTitle:"Kid Myself (Stripped) - Single"};
+  assert.equal(retainedArtworkHistory({entries:{[stripped.identity]:stripped}})[stripped.identity].art,stripped.art);
+});
 test("historical artwork cannot cross identities or preserve unsafe matches",()=>{
   const good=row("Song","Artist & Guest");
   for(const bad of [{...good,verified:false},{...good,confidence:70},{...good,releaseClass:"generic"},

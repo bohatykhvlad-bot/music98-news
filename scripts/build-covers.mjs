@@ -7,8 +7,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import dns from "node:dns";
-import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen } from "../functions/lib/chart-identity.js";
-import { candidateCompatible, classifyCandidate, normalizedRelease, rankArtworkCandidates, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
+import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen, versionSignature } from "../functions/lib/chart-identity.js";
+import { candidateCompatible, classifyCandidate, isDerivativeRelease, isGenericRelease, normalizedRelease, rankArtworkCandidates, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
 import {retainedArtworkHistory} from "../functions/lib/artwork-history.js";
 dns.setDefaultResultOrder("ipv4first");
 
@@ -113,6 +113,33 @@ async function searchApple(track){
   }
   return [...out.values()];
 }
+/* New Deezer-led entries can be absent from Apple's song-search index even
+ * when the original album is available by album ID. Search official studio
+ * albums of the EXACT lead artist and inspect their track lists, rather than
+ * accepting a recently issued stripped/live single as the original artwork. */
+async function searchAppleArtistAlbums(track){
+  const lead=primaryArtist(track.artist);
+  if(!lead) return [];
+  const data=await json(`https://itunes.apple.com/search?term=${encodeURIComponent(track.artist)}&entity=album&limit=100&country=US`,2);
+  const albums=(data.results||[]).filter(a=>
+    a.collectionId && Number(a.trackCount||0)>=6 &&
+    primaryArtist(a.artistName||a.collectionArtistName)===lead &&
+    !isDerivativeRelease(a.collectionName) &&
+    !isGenericRelease(a.collectionName,a.collectionArtistName||a.artistName,a.primaryGenreName))
+    .sort((a,b)=>String(b.releaseDate||"").localeCompare(String(a.releaseDate||"")))
+    .slice(0,12);
+  const out=[];
+  for(const album of albums){
+    try{
+      const data=await json(`https://itunes.apple.com/lookup?id=${encodeURIComponent(album.collectionId)}&entity=song&limit=200&country=US`,2);
+      for(const raw of data.results||[]){
+        const candidate=appleCandidate(raw,"apple",{catalogAlbumDiscovery:true});
+        if(candidate?.art && candidateCompatible(track,candidate))out.push(candidate);
+      }
+    }catch{}
+  }
+  return out;
+}
 async function searchDeezer(track){
   let search;
   try{ search=await json(`https://api.deezer.com/search/track?q=${encodeURIComponent(stripParen(track.title)+" "+track.artist)}&limit=50`,2); }catch{return [];}
@@ -187,7 +214,8 @@ function readAudit(){ try{return retainedArtworkHistory(JSON.parse(fs.readFileSy
 function readNames(){ try{const j=JSON.parse(fs.readFileSync(OUT_NAMES,"utf8"));return j&&typeof j==="object"?j:{};}catch{return {};}}
 function safePrevious(track,p){
   if(!p||p.verified!==true||!p.art||p.identity!==artworkKey(track.title,track.artist)) return null;
-  if(["generic","derivative"].includes(p.releaseClass)||Number(p.confidence||0)<91) return null;
+  if(["generic","derivative"].includes(p.releaseClass)||Number(p.confidence||0)<91 ||
+     (!versionSignature(track.title) && isDerivativeRelease(p.releaseTitle))) return null;
   return p;
 }
 function publicCandidate(c){ if(!c)return null; return {provider:c.provider,id:c.id,collectionId:c.collectionId,releaseTitle:c.releaseTitle,releaseArtist:c.releaseArtist,releaseDate:c.releaseDate,releaseClass:c.releaseClass,art:c.art,url:c.url,score:c.score,confidence:c.confidence,consensus:c.consensus,earliestReleaseYear:c.earliestReleaseYear}; }
@@ -246,6 +274,10 @@ for(let i=0;i<tracks.length;i++){
     const currentApple=await currentAppleCandidate(t);
     if(currentApple) candidates.push(currentApple);
     try{candidates.push(...await searchApple(t));}catch(e){console.log("ARTWORK_AUDIT apple-search fail",i+1,t.artist,"-",t.title,String(e.message||e));}
+    if(!rankArtworkCandidates(t,candidates).some(c=>String(c.provider).startsWith("apple"))){
+      try{candidates.push(...await searchAppleArtistAlbums(t));}
+      catch(e){console.log("ARTWORK_AUDIT apple-album fail",i+1,t.artist,"-",t.title,String(e.message||e));}
+    }
     try{candidates.push(...await searchDeezer(t));}catch(e){console.log("ARTWORK_AUDIT deezer fail",i+1,t.artist,"-",t.title,String(e.message||e));}
   }
   let identity=artworkKey(t.title,t.artist);

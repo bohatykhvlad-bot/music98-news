@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import { artworkArtistSignature, artworkCreditSignature, artworkKey, mergeKey, versionSignature } from "../functions/lib/chart-identity.js";
-import { candidateCompatible, isGenericRelease, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
+import { candidateCompatible, isDerivativeRelease, isGenericRelease, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
 const track=(title,artist)=>({title,artist});
 const c=o=>({provider:"apple",id:"1",collectionId:"10",trackTitle:"Song",artist:"Artist",releaseTitle:"Album",releaseArtist:"Artist",releaseDate:"2026-01-01",trackCount:10,genre:"Pop",art:"https://is1-ssl.mzstatic.com/a.jpg",url:"",...o});
 
@@ -33,6 +33,14 @@ const bby=track("BbY WOW","KAROL G, Judeline & rusowsky");
 const album=c({provider:"apple-feed",id:"6796864754",trackTitle:bby.title,artist:bby.artist,releaseTitle:"NO ME ARREPIENTO DE SENTIR TANTO",releaseArtist:"KAROL G",releaseDate:"2026-08-07",trackCount:14});
 const single=c({provider:"apple",id:"6816228072",trackTitle:bby.title,artist:bby.artist,releaseTitle:"BbY WOW - Single",releaseArtist:bby.artist,releaseDate:"2026-08-05",trackCount:1,art:"https://is1-ssl.mzstatic.com/c.jpg"});
 assert.equal(selectArtworkCandidate(bby,[single,album]).selected.provider,"apple-feed");
+
+assert.equal(versionSignature("Kid Myself (Stripped)"),"stripped");
+assert.equal(isDerivativeRelease("Kid Myself (Stripped) - Single"),true);
+const john=track("Kid Myself","John Morgan");
+const stripped=c({trackTitle:"Kid Myself",artist:"John Morgan",releaseTitle:"Kid Myself (Stripped) - Single",releaseArtist:"John Morgan",releaseDate:"2026-07-31",trackCount:2});
+const studio=c({trackTitle:"Kid Myself",artist:"John Morgan",releaseTitle:"Carolina Blue",releaseArtist:"John Morgan",releaseDate:"2025-04-25",trackCount:12});
+assert.equal(selectArtworkCandidate(john,[stripped,studio]).selected.releaseTitle,"Carolina Blue");
+assert.equal(selectArtworkCandidate(john,[stripped]).selected,null);
 
 const source=fs.readFileSync(new URL("./build-covers.mjs",import.meta.url),"utf8");
 assert.match(source,/APPLE_FEED/);

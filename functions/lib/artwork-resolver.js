@@ -14,7 +14,7 @@ export function releaseYear(value) {
 }
 export function isDerivativeRelease(name) {
   const s=String(name||"").toLowerCase();
-  return /\b(?:remix(?:es)?|rmx|live|acoustic|instrumental|karaoke|demo|sped\s*up|slowed|reverb(?:ed)?|isolated\s+vocals?|singalong|track\s+by\s+track|commentary|alternate\s+(?:cover|version)|radio\s+edit|extended\s+(?:mix|version)|dj\s+mix|bootleg|mashup|rework(?:ed)?)\b/.test(s);
+  return /\b(?:remix(?:es)?|rmx|live|acoustic|stripped|instrumental|karaoke|demo|sped\s*up|slowed|reverb(?:ed)?|isolated\s+vocals?|singalong|track\s+by\s+track|commentary|alternate\s+(?:cover|version)|radio\s+edit|extended\s+(?:mix|version)|dj\s+mix|bootleg|mashup|rework(?:ed)?)\b/.test(s);
 }
 export function isGenericRelease(name, releaseArtist="", genre="") {
   const s=String(name||"").toLowerCase();
