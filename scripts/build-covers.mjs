@@ -15,7 +15,7 @@ dns.setDefaultResultOrder("ipv4first");
 const OUT=path.resolve("public/data/covers.json");
 const OUT_AUDIT=path.resolve("public/data/artwork-audit.json");
 const OUT_NAMES=path.resolve("public/data/apple-names.json");
-const CHART=process.env.CHART_URL||"https://music98.news/api/top50";
+const CHART=process.env.CHART_URL||"https://music98.news/api/top50?artworkAudit=1";
 const APPLE_FEED="https://rss.applemarketingtools.com/api/v2/us/music/most-played/100/songs.json";
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const art600=u=>String(u||"").replace("100x100bb.jpg","600x600bb.jpg").replace("100x100bb","600x600bb");
@@ -212,7 +212,8 @@ function runtimeAppleCandidate(track){
 
 const chart=await json(CHART+(CHART.includes("?")?"&":"?")+"artworkAudit="+Date.now());
 const tracks=Array.isArray(chart?.tracks)?chart.tracks:[];
-if(!tracks.length) throw new Error("chart is empty");
+if(tracks.length!==50 || chart.complete!==true || !chart.artworkAuditOnly)
+  throw new Error("artwork audit must inspect the prospective verified 50-song edition, not an older published fallback");
 console.log("ARTWORK_AUDIT chart",chart.updated||"-",chart.rev||"-","rows",tracks.length);
 let feed=[]; try{feed=await appleFeedCandidates();console.log("ARTWORK_AUDIT apple-feed candidates",feed.length);}catch(e){console.log("ARTWORK_AUDIT apple-feed unavailable",String(e.message||e));}
 const oldAudit=readAudit(), oldNames=readNames();
