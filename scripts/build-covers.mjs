@@ -274,7 +274,7 @@ for(let i=0;i<tracks.length;i++){
     const currentApple=await currentAppleCandidate(t);
     if(currentApple) candidates.push(currentApple);
     try{candidates.push(...await searchApple(t));}catch(e){console.log("ARTWORK_AUDIT apple-search fail",i+1,t.artist,"-",t.title,String(e.message||e));}
-    if(!rankArtworkCandidates(t,candidates).some(c=>c.provider==="apple")){
+    if(!rankArtworkCandidates(t,candidates).some(c=>String(c.provider).startsWith("apple"))){
       try{candidates.push(...await searchAppleArtistAlbums(t));}
       catch(e){console.log("ARTWORK_AUDIT apple-album fail",i+1,t.artist,"-",t.title,String(e.message||e));}
     }
