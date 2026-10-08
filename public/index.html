@@ -2721,6 +2721,24 @@ function wireRail(gridSel, prevSel, nextSel){
   const rail = $(gridSel);
   if(!rail) return;
   const step = ()=> (rail.firstElementChild ? rail.firstElementChild.getBoundingClientRect().width + 18 : 300);
+  // A short arrow click must end at the exact next CARD boundary, never a
+  // relative scrollLeft increment. Relative scrollBy drifts whenever a prior
+  // drag, fractional CSS pixel or still-running smooth scroll left the rail
+  // between cards. Retain the queued destination for rapid successive taps.
+  let tapTarget=null, tapAt=-Infinity;
+  const moveOneCard=dir=>{
+    const unit=step();
+    if(!(unit>0)) return;
+    const now=performance.now();
+    const actual=rail.scrollLeft;
+    const from=tapTarget!=null && now-tapAt<700 && Math.abs(actual-tapTarget)>0.5
+      ? tapTarget : actual;
+    const max=Math.max(0,rail.scrollWidth-rail.clientWidth);
+    const target=Math.max(0,Math.min(max,(Math.round(from/unit)+dir)*unit));
+    tapTarget=target;
+    tapAt=now;
+    rail.scrollTo({left:target,behavior:"smooth"});
+  };
   const hold = {raf:0, v:0, dir:0, pressedAt:0, frameAt:0, button:null};
   const stopHold = ()=>{
     if(hold.raf) cancelAnimationFrame(hold.raf);
@@ -2787,8 +2805,9 @@ function wireRail(gridSel, prevSel, nextSel){
       const held = performance.now() - hold.pressedAt;
       if(held < 240){
         stopHold();
-        rail.scrollBy({left: dir * step(), behavior:"smooth"});
+        moveOneCard(dir);
       }else{
+        tapTarget=null; // held-arrow inertia intentionally stays free-scrolling
         hold.frameAt = performance.now();
         hold.raf = requestAnimationFrame(inertia);
       }
@@ -2930,6 +2949,7 @@ function wireRail(gridSel, prevSel, nextSel){
        our CSS snap), links stay plain anchors, and the custom grab/lift/
        velocity/momentum code remains a mouse/pen-only feature. */
     if((e.pointerType || "mouse") === "touch"){ dragStop(); if(drag.over){ drag.over = 0; drag.springing = false; setOver(0); } return; }
+    tapTarget=null; // mouse drag takes over from any queued arrow snap
     drag.on = true; drag.id = e.pointerId; drag.moved = false; drag.pt = e.pointerType || "mouse";
     drag.x = e.clientX; drag.sl = rail.scrollLeft;
     drag.vx = 0; drag.lx = e.clientX; drag.lt = performance.now();
