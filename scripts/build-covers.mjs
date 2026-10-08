@@ -10,6 +10,7 @@ import dns from "node:dns";
 import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen, versionSignature } from "../functions/lib/chart-identity.js";
 import { candidateCompatible, classifyCandidate, isDerivativeRelease, isGenericRelease, normalizedRelease, rankArtworkCandidates, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
 import {retainedArtworkHistory} from "../functions/lib/artwork-history.js";
+import {discoverAppleAlbumTracks} from "../functions/lib/apple-album-discovery.js";
 dns.setDefaultResultOrder("ipv4first");
 
 const OUT=path.resolve("public/data/covers.json");
@@ -105,40 +106,31 @@ async function currentAppleCandidate(track){
   }
 }
 async function searchApple(track){
-  const terms=[`${stripParen(track.title)} ${track.artist}`,`${track.artist} ${stripParen(track.title)}`], out=new Map();
-  for(const term0 of [...new Set(terms)]){
-    const d=await json(`https://itunes.apple.com/search?term=${encodeURIComponent(term0.trim())}&entity=song&limit=200&country=US`);
-    for(const raw of d.results||[]){ const c=appleCandidate(raw,"apple"); if(c?.id&&candidateCompatible(track,c)) out.set(c.id,c); }
-    if(out.size>=12) break;
+  const terms=[`${track.title} ${track.artist}`,`${stripParen(track.title)} ${track.artist}`,`${track.artist} ${stripParen(track.title)}`];
+  const out=new Map();
+  for(const country of ["US","GB","CA"]){
+    for(const term0 of [...new Set(terms)]){
+      try{
+        const d=await json(`https://itunes.apple.com/search?term=${encodeURIComponent(term0.trim())}&entity=song&limit=200&country=${country}`,2);
+        for(const raw of d.results||[]){
+          const c=appleCandidate(raw,"apple");
+          if(c?.id&&candidateCompatible(track,c))out.set(c.id,c);
+        }
+      }catch(e){console.warn("APPLE_SONG_SEARCH_RETRY",country,String(e.message||e));}
+      if(rankArtworkCandidates(track,[...out.values()]).length>=8)break;
+    }
+    // A stripped/reworked release with the same song title is not a match.
+    if(rankArtworkCandidates(track,[...out.values()]).length)break;
   }
   return [...out.values()];
 }
-/* New Deezer-led entries can be absent from Apple's song-search index even
- * when the original album is available by album ID. Search official studio
- * albums of the EXACT lead artist and inspect their track lists, rather than
- * accepting a recently issued stripped/live single as the original artwork. */
+/* Check the original artist's Apple catalog (not merely the first 25 search
+   results). Discover artist IDs, enumerate clean albums, then inspect their
+   actual songs; try other storefronts if a release isn't indexed in US. */
 async function searchAppleArtistAlbums(track){
-  const lead=primaryArtist(track.artist);
-  if(!lead) return [];
-  const data=await json(`https://itunes.apple.com/search?term=${encodeURIComponent(track.artist)}&entity=album&limit=100&country=US`,2);
-  const albums=(data.results||[]).filter(a=>
-    a.collectionId && Number(a.trackCount||0)>=6 &&
-    primaryArtist(a.artistName||a.collectionArtistName)===lead &&
-    !isDerivativeRelease(a.collectionName) &&
-    !isGenericRelease(a.collectionName,a.collectionArtistName||a.artistName,a.primaryGenreName))
-    .sort((a,b)=>String(b.releaseDate||"").localeCompare(String(a.releaseDate||"")))
-    .slice(0,12);
-  const out=[];
-  for(const album of albums){
-    try{
-      const data=await json(`https://itunes.apple.com/lookup?id=${encodeURIComponent(album.collectionId)}&entity=song&limit=200&country=US`,2);
-      for(const raw of data.results||[]){
-        const candidate=appleCandidate(raw,"apple",{catalogAlbumDiscovery:true});
-        if(candidate?.art && candidateCompatible(track,candidate))out.push(candidate);
-      }
-    }catch{}
-  }
-  return out;
+  return discoverAppleAlbumTracks(track,{
+    json,appleCandidate,candidateCompatible,primaryArtist,isDerivativeRelease,isGenericRelease
+  });
 }
 async function searchDeezer(track){
   let search;
