@@ -42,11 +42,11 @@ test("concert popup keeps fixed geometry and only dismisses after reaching the w
 });
 
 test("Popular UI renders strict confirmed cache immediately without an explanatory banner",()=>{
-  assert.match(app,/music98:concert-popular:v11/);
+  assert.match(app,/music98:concert-popular:v12/);
   assert.match(app,/cached\?\.version==="popular-v4"/);
   assert.match(app,/ticketmaster_event_payload_gt_0/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/mode:"popular",v:"popular-v11"/);
+  assert.match(app,/mode:"popular",v:"popular-v12"/);
   assert.match(app,/cached\?\.algorithm===POPULAR_ALGORITHM/);
   assert.match(app,/cached\?\.source==="spotify_monthly_listeners"/);
   assert.match(app,/sideSub\.textContent="";/);
@@ -121,13 +121,14 @@ test("Buy Tickets uses the shared site press binder",()=>{
 });
 
 
-test("concert snapshot requests bypass browser cache and Popular never renders a partial list",()=>{
+test("concert snapshots bypass browser cache, never render unverified artists and refresh during rebuilding",()=>{
   assert.match(app,/cache:"no-store"/);
   assert.match(app,/signal:controller\.signal/);
   assert.match(app,/cached\.artists\.length>=30/);
-  assert.match(app,/Array\.isArray\(data\.artists\) && data\.artists\.length>=30/);
-  assert.match(app,/popularArtists=data\.artists\.slice\(0,30\)/);
-  assert.match(app,/if\(popularArtists\.length>=30\)/);
+  assert.match(app,/data\?\.identityValidation===POPULAR_IDENTITY_VALIDATION/);
+  assert.match(app,/popularArtists=data\.artists\.filter\(a=>a\?\.id && a\?\.eventConfirmed===true/);
+  assert.match(app,/if\(popularArtists\.length\)/);
+  assert.match(app,/if\(data\?\.warming\) schedulePopularWarmRetry\(\)/);
   assert.match(app,/sideEmpty\.textContent=data\?\.warming \? "Updating popular artists\.\.\."/);
 });
 
@@ -200,7 +201,7 @@ test("Popular warming state polls only the precomputed KV snapshot",()=>{
   assert.match(app,/loadPopular\(true\)/);
   assert.match(app,/if\(data\?\.warming\) schedulePopularWarmRetry\(\)/);
   assert.match(app,/POPULAR_ALGORITHM="rank-ordered-event-query-v2"/);
-  assert.match(app,/mode:"popular",v:"popular-v11"/);
+  assert.match(app,/mode:"popular",v:"popular-v12"/);
 });
 
 
@@ -815,4 +816,12 @@ test("expanded artist tours cannot render mismatched performer events from brows
   assert.deepEqual([...result],["genuine"]);
   assert.match(app,/events:scopedArtistEvents\(payload\?\.events,item\)/);
   assert.match(app,/applyConcertArt\(img,artistImage\|\|e\.artistImage\|\|e\.image\|\|"\/logo\.png","icon"\)/);
+});
+
+test("Popular browser cache rejects an old attraction identity validator",()=>{
+  assert.match(app,/POPULAR_CACHE_KEY="music98:concert-popular:v12"/);
+  assert.match(app,/cached\?\.identityValidation===POPULAR_IDENTITY_VALIDATION/);
+  assert.match(app,/data\?\.identityValidation!==POPULAR_IDENTITY_VALIDATION/);
+  assert.match(app,/getPayload\(\{mode:"popular",v:"popular-v12"\},force\)/);
+  assert.match(app,/!force && cached && Date\.now\(\)-cached\.at<PAYLOAD_CACHE_MS/);
 });
