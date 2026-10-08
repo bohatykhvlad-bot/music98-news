@@ -135,7 +135,7 @@ jobs:
           console.log('CAROUSEL_BROWSER_GEOMETRY',JSON.stringify(metrics));
           if(metrics.error)throw Error(metrics.error);
           for(const rail of metrics.rails){
-            if(!rail.scrollClip||rail.computedClip!=='inset(-40px 0px -40px 0px)'||
+            if(!rail.scrollClip||!['inset(-40px 0px)','inset(-40px 0px -40px 0px)'].includes(rail.computedClip)||
                rail.outsideCard||rail.rightOutsideCard||!rail.insideCard||
                Math.abs(rail.leftInset-6)>0.5||Math.abs(rail.rightInset-6)>0.5||
                rail.symmetricArrowInset>0.5||
