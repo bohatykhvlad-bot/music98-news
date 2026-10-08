@@ -1,5 +1,7 @@
 import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
 import {hasCompleteChartArtwork,isTrustedChartArtwork,missingChartArtwork} from "../lib/chart-artwork-gate.js";
+import {discoverAppleAlbumTracks} from "../lib/apple-album-discovery.js";
+import {candidateCompatible,isDerivativeRelease,isGenericRelease,rankArtworkCandidates} from "../lib/artwork-resolver.js";
 import {compareSpotifyRankings,parseKworbSpotify,spotifyDateCurrent,verifiedSpotifySnapshot} from "../lib/spotify-chart.js";
 import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,DAILY_SOURCE_DETAILS,APPLE_GLOBAL_URL,DEEZER_GLOBAL_URL,
   completeDailySources,parseAppleGlobal,parseDeezerWorldwide,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
@@ -747,6 +749,7 @@ export async function buildTop50(origin, env, spotifySeed) {
   await enrichArtByIds(tracks, coverStats); /* точный релиз по Apple-ID из ссылки */
   await enrichApple(tracks);               /* добор Apple URL/preview + safe exact artwork */
   await enrichArtByIds(tracks, coverStats);/* URL мог появиться только на предыдущем шаге */
+  await enrichAppleFromAlbums(tracks); /* original album catalog, never a stripped stand-in */
   await applyCovers(env, tracks, origin);  /* registry wins; exact Apple art is a safe bridge */
   await applyLoudness(env, tracks, origin);
   tracks.forEach((t) => {
@@ -824,6 +827,41 @@ async function enrichApple(tracks) {
       if (extra.url && !t.url) t.url = extra.url;
       if (extra.year && !t.year) t.year = extra.year;
     } catch {}
+  }));
+}
+
+/* Apple catalog rescue: a chart song may exist on the original album even
+   when public iTunes song search only shows a stripped/reworked single. */
+async function enrichAppleFromAlbums(tracks) {
+  const missing=(tracks||[]).filter(t=>!t.art);
+  if(!missing.length)return;
+  await Promise.all(missing.map(async t=>{
+    try{
+      const candidates=await withTimeout(discoverAppleAlbumTracks(t,{
+        json:getJson,
+        primaryArtist,
+        candidateCompatible,
+        isDerivativeRelease,
+        isGenericRelease,
+        appleCandidate:(raw,provider)=>{
+          const album=String(raw.collectionId||""),id=String(raw.trackId||"");
+          return {provider,id,collectionId:album,trackTitle:String(raw.trackName||""),
+            artist:String(raw.artistName||""),releaseTitle:String(raw.collectionName||""),
+            releaseArtist:String(raw.collectionArtistName||raw.artistName||""),
+            releaseDate:String(raw.releaseDate||""),trackCount:Number(raw.trackCount||0),
+            genre:String(raw.primaryGenreName||""),
+            art:String(raw.artworkUrl100||"").replace("100x100bb","600x600bb"),
+            url:album&&id?"https://music.apple.com/us/album/"+album+"?i="+id:"",
+            preview:String(raw.previewUrl||"")};
+        }
+      },{countries:["US","GB"],maxAlbums:18}),9000);
+      const chosen=rankArtworkCandidates(t,candidates)[0];
+      if(!chosen||!isAppleArt(chosen.art)||!candidateCompatible(t,chosen))return;
+      t.art=chosen.art;
+      if(!t.url&&chosen.url)t.url=chosen.url;
+      if(!isApplePreview(t.prev)&&isApplePreview(chosen.preview))t.prev=chosen.preview;
+      if(!t.year&&chosen.releaseDate)t.year=String(chosen.releaseDate).slice(0,4);
+    }catch{}
   }));
 }
 
@@ -945,6 +983,7 @@ async function healMissingArtwork(env, tracks, origin) {
   if (stillMissing.length) {
     await enrichApple(stillMissing);
     await enrichArtByIds(stillMissing);
+    await enrichAppleFromAlbums(stillMissing);
   }
   await applyCovers(env, tracks, origin, {retainTrusted:true});
   const after = tracks.filter((t) => !t.art).length;
