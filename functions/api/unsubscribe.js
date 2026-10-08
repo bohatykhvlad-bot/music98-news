@@ -6,8 +6,17 @@ import { json, readDesk, writeDesk } from "../lib/store.js";
 
 function page(msg, ok) {
   const color = ok ? "#111" : "#b91c1c";
+  // The unsubscribe query contains the subscriber's email; never send it to Analytics.
+  const analytics = `<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TCLEVYQ4L2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TCLEVYQ4L2', {page_location: location.origin + location.pathname});
+</script>`;
   return new Response(
-    "<!doctype html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>music98.news</title></head>" +
+    "<!doctype html><html><head>" + analytics + "<meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>music98.news</title></head>" +
     "<body style=\"margin:0;font-family:Arial,Helvetica,sans-serif;background:#fafafa;color:" + color + ";display:flex;align-items:center;justify-content:center;min-height:100vh\">" +
     "<div style=\"text-align:center;padding:32px\"><div style=\"font-weight:700;font-size:20px;margin-bottom:12px\">music98.news</div><div style=\"font-size:15px\">" + msg + "</div></div></body></html>",
     { status: ok ? 200 : 400, headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store" } },
