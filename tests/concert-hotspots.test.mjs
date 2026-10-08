@@ -702,7 +702,7 @@ test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30"
     firstDate:""
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v1",
     builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",
     ranking:"Spotify monthly listeners",
@@ -1054,13 +1054,13 @@ test("current exhausted 27-row Popular state expands to the new candidate depth 
     name:"Artist "+(i+1),rank:i+1,listeners:100000000-i*1000
   }));
   await kv.put("concert-popular:v4",JSON.stringify({
-    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",builtAt:new Date().toISOString(),
+    ok:true,mode:"popular",version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v1",builtAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
     eligibility:"ticketmaster_event_payload_gt_0",candidateCount:30,
     eligibleCount:27,targetCount:30,artists:found
   }));
   await kv.put("concert-popular:v4:state",JSON.stringify({
-    version:"popular-v4",algorithm:"rank-ordered-event-query-v2",startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+    version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v1",startedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
     source:"spotify_monthly_listeners",ranking:"Spotify monthly listeners",
     candidates:oldCandidates,index:30,found:found.map(x=>({...x})),errors:0
   }));
