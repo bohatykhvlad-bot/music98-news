@@ -2378,9 +2378,6 @@ function refreshDailyTop50(){
   try{ cached = JSON.parse(lsGetRaw(DAILYKEY)||"null"); }catch(e){ cached = null; }
   const hasVerifiedCache=!!(cached && chartHasCompleteArtwork(cached.tracks) &&
     isDailySourceEdition(cached) && cached.sourceDates?.S && cached.spotifyFingerprint);
-  const hasFreshCache=!!(hasVerifiedCache && cached.date===todayUTC() &&
-    isDailySourceEdition(cached) &&
-    cached.sourceDates?.S && cached.spotifyFingerprint);
   /* Never paint a locally cached ranking as today's chart before checking
      the latest independently verified source fingerprint with the server. */
   autoRows=null;
