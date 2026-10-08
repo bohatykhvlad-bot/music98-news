@@ -289,7 +289,7 @@ function collapseDuplicateEvents(events) {
 // Artist-themed dance nights and tribute shows are not live performances.
 export function isNonPerformanceConcertEvent(name){
   const title=String(name||"").trim();
-  return /\b(?:dance\s*nights?|fan\s*(?:party|night|event)s?|listening\s*part(?:y|ies)|sing\s*alongs?|karaoke|tribute\s*(?:night|show|party|concert|band|act|experience)?|look\s*alike\s*(?:night|party)|themed?\s*(?:night|party))\b/i.test(title) ||
+  return /\b(?:dance\s*(?:nights?|part(?:y|ies))|fan\s*(?:party|night|event)s?|listening\s*part(?:y|ies)|sing\s*alongs?|karaoke|tribute\s*(?:to\b|night|show|party|concert|band|act|experience)?|look\s*alike\s*(?:night|party)|themed?\s*(?:night|party)|club\s*nights?|after\s*part(?:y|ies))\b/i.test(title) ||
     /\b(?:vs\.?|versus)\b[^\n]{0,80}\b(?:party|night|dj\s*set)\b/i.test(title);
 }
 function normalizedEventIsBlocked(e) {
@@ -786,7 +786,7 @@ async function kvDelete(env,key){
 }
 
 const POPULAR_BUILD_ALGORITHM="rank-ordered-event-query-v2";
-const POPULAR_IDENTITY_VALIDATION="primary-attraction-v2";
+const POPULAR_IDENTITY_VALIDATION="primary-attraction-v3";
 function newPopularBuildState(ranking,now=Date.now()){
   return {
     version:"popular-v4",
