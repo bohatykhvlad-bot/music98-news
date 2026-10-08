@@ -247,6 +247,7 @@ async function prospectiveChart(){
     try{
       const candidate=await json(CHART+(CHART.includes("?")?"&":"?")+"artworkAudit="+Date.now());
       if(candidate?.artworkAuditOnly===true && candidate.complete===true &&
+         candidate.updated===new Date().toISOString().slice(0,10) &&
          candidate.tracks?.length===50) return candidate;
       last=JSON.stringify({updated:candidate?.updated,rev:candidate?.rev,
         fallback:candidate?.fallback,auditOnly:candidate?.artworkAuditOnly,
