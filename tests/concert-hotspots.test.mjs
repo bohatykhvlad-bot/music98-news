@@ -782,7 +782,7 @@ test("fresh partial Popular snapshot resumes from its cursor and reaches Top 30"
   }
 });
 
-test("public Popular keeps in-progress validated artists private until Top 30 is complete", async () => {
+test("public Popular exposes only identity-validated in-progress artists without showing unverified leftovers", async () => {
   const kv=memoryKv();
   const snapshotArtists=Array.from({length:8},(_,i)=>({
     id:"artist-"+(i+1),name:"Artist "+(i+1),rank:i+1,popularityRank:i+1,shows:3,eventConfirmed:true
@@ -795,7 +795,7 @@ test("public Popular keeps in-progress validated artists private until Top 30 is
     source:"spotify_monthly_listeners",eligibility:"ticketmaster_event_payload_gt_0",artists:snapshotArtists,targetCount:30
   }));
   await kv.put("concert-popular:v4:state",JSON.stringify({
-    version:"popular-v4",algorithm:"rank-ordered-event-query-v2",source:"spotify_monthly_listeners",
+    version:"popular-v4",algorithm:"rank-ordered-event-query-v2",identityValidation:"primary-attraction-v2",source:"spotify_monthly_listeners",
     candidates:[],index:12,found:stateArtists,errors:0
   }));
 
@@ -810,7 +810,8 @@ test("public Popular keeps in-progress validated artists private until Top 30 is
     });
     assert.equal(response.status,200);
     const data=await response.json();
-    assert.deepEqual(data.artists,[]);
+    assert.deepEqual(data.artists.map(a=>a.name),stateArtists.map(a=>a.name));
+    assert.equal(data.identityValidation,"primary-attraction-v2");
     assert.equal(data.validatedCount,12);
     assert.equal(data.warming,true);
     assert.equal(data.targetCount,30);
