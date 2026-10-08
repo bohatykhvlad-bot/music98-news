@@ -1,6 +1,26 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta charset="utf-8">
+<!-- Ezoic JavaScript integration: consent scripts must load first. -->
+<script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
+<script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
+<script async src="https://www.ezojs.com/ezoic/sa.min.js"></script>
+<script>
+  window.ezstandalone = window.ezstandalone || {};
+  window.ezstandalone.cmd = window.ezstandalone.cmd || [];
+  window.ezstandalone.cmd.push(function () {
+    window.ezstandalone.config({
+      disableInterstitial: true,
+      disableVideo: true,
+      disableLeftSideRail: true,
+      disableRightSideRail: true,
+      disableSidebarFloating: true
+    });
+    window.ezstandalone.setEzoicAnchorAd(false);
+  });
+</script>
+<script src="https://ezoicanalytics.com/analytics.js"></script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TCLEVYQ4L2"></script>
 <script>
@@ -9,10 +29,8 @@
   gtag('js', new Date());
   gtag('config', 'G-TCLEVYQ4L2');
 </script>
-<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>if(new URLSearchParams(location.search).get("embed")==="1")document.documentElement.classList.add("embedded");</script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9555543001162953" crossorigin="anonymous"></script>
 <title>Concerts Near You - music98.news</title>
 <meta name="description" content="Find concerts around the world, explore tour dates on an interactive map and buy tickets.">
 <meta name="theme-color" content="#ffffff">
@@ -184,6 +202,8 @@ html.embedded .hero{margin:0 0 14px}
 html.embedded .hero h1{font-size:clamp(26px,4vw,38px);line-height:1.15;letter-spacing:-.03em;margin:0 0 6px}
 html.embedded .hero p{font-size:15px}
 </style>
+<link rel="stylesheet" href="/ezoic-ads.css?v=20261008-1">
+<script src="/ezoic-ads.js?v=20261008-1" defer></script>
 </head>
 <body>
 <header class="topbar">
@@ -239,6 +259,7 @@ html.embedded .hero p{font-size:15px}
     </aside>
   </div>
 </main>
+<div id="m98DisplayAd" aria-label="Advertisement"></div>
 
 <script>
 const MAPBOX_TOKEN = "pk.eyJ1IjoibXVzaWM5OCIsImEiOiJjbXVsaWM1M2kxbm4xMnpxeW83bWR5aHg5In0.8Y56YcxjJ3kpa5g51Yl3aw";

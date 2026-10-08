@@ -1,6 +1,26 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta charset="utf-8">
+<!-- Ezoic JavaScript integration: consent scripts must load first. -->
+<script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js"></script>
+<script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js"></script>
+<script async src="https://www.ezojs.com/ezoic/sa.min.js"></script>
+<script>
+  window.ezstandalone = window.ezstandalone || {};
+  window.ezstandalone.cmd = window.ezstandalone.cmd || [];
+  window.ezstandalone.cmd.push(function () {
+    window.ezstandalone.config({
+      disableInterstitial: true,
+      disableVideo: true,
+      disableLeftSideRail: true,
+      disableRightSideRail: true,
+      disableSidebarFloating: true
+    });
+    window.ezstandalone.setEzoicAnchorAd(false);
+  });
+</script>
+<script src="https://ezoicanalytics.com/analytics.js"></script>
 <meta name="clckd" content="2b8e0bd3455c405f05211878349de311" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TCLEVYQ4L2"></script>
@@ -10,11 +30,8 @@
   gtag('js', new Date());
   gtag('config', 'G-TCLEVYQ4L2');
 </script>
-<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-adsense-account" content="ca-pub-9555543001162953">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9555543001162953"
-    crossorigin="anonymous"></script>
 <title>music98.news — Music News, Releases & Charts</title>
 <meta name="m98-build" content="header-geometry-73">
 <meta name="description" content="music98.news — music news, new releases and a weekly Top 50.">
@@ -834,6 +851,8 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 </style>
+<link rel="stylesheet" href="/ezoic-ads.css?v=20261008-1">
+<script src="/ezoic-ads.js?v=20261008-1" defer></script>
 </head>
 <body>
 
@@ -900,6 +919,7 @@ textarea{resize:vertical;min-height:64px}
     <music98-concerts></music98-concerts>
   </section>
 </main>
+<div id="m98DisplayAd" aria-label="Advertisement"></div>
 
 <section class="subscribe">
   <div class="sub-in">
@@ -3198,6 +3218,7 @@ function setTab(t){
      a frame later it has real geometry, so re-evaluate the arrows */
   requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
   if(t==="concerts") resizeConcertsTab();
+  window.dispatchEvent(new Event("music98:pagechange"));
 }
 $("#nav").addEventListener("click", e=>{ const b=e.target.closest(".nav-btn"); if(b && b.dataset.tab){ e.preventDefault(); goTab(b.dataset.tab); } });
 $("#brandHome").addEventListener("click", e=>{
@@ -3612,6 +3633,7 @@ function showArticle(p){
   page.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
   parkAppleEmbeds(page);
   $("#aback").addEventListener("click", e=>{ e.preventDefault(); closeArticle(); });
+  window.dispatchEvent(new Event("music98:pagechange"));
 }
 function jumpY(y){
   y = Math.max(0, y || 0);
@@ -3630,6 +3652,7 @@ function hideArticle(){
   page.innerHTML = "";
   page.hidden = true;
   document.body.classList.remove("articlepage");
+  window.dispatchEvent(new Event("music98:pagechange"));
 }
 function closeArticle(){
   hideArticle();

@@ -1,0 +1,4 @@
+/* Keep unfilled ads from reserving empty space or covering page content. */
+#m98DisplayAd{width:min(100% - 40px,1092px);margin:0 auto;text-align:center;overflow:clip}
+#m98DisplayAd.is-filled{margin:24px auto}
+#m98DisplayAd .m98-ezoic-slot{max-width:100%}

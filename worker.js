@@ -190,6 +190,31 @@ async function serveConcertsShell(request, env) {
   return new Response(html,{status:res.status,statusText:res.statusText,headers});
 }
 
+async function serveAdsTxt(request, env) {
+  // Ezoic's default manager starts serving this URL after dashboard setup.
+  // Keep the current valid file available while setup is pending or upstream
+  // is unavailable; never replace it with an upstream HTML/error response.
+  try {
+    const upstream = await fetch("https://srv.adstxtmanager.com/19390/music98.news", {
+      headers: { Accept: "text/plain" },
+      signal: AbortSignal.timeout(3000),
+      cf: { cacheEverything: true, cacheTtlByStatus: { "200-299": 3600, "300-599": 0 } },
+    });
+    if (upstream.ok) {
+      const text = await upstream.text();
+      if (!text.trimStart().startsWith("<") &&
+          /^\s*[a-z0-9.-]+,\s*[^,\s]+,\s*(DIRECT|RESELLER)(\s*,|\s*$)/mi.test(text)) {
+        return new Response(request.method === "HEAD" ? null : text, {
+          headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=300" },
+        });
+      }
+    }
+  } catch {
+    // The checked-in ads.txt remains the fallback for timeouts and outages.
+  }
+  return env.ASSETS.fetch(new Request(new URL("/ads.txt", request.url), request));
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -200,6 +225,9 @@ export default {
     const rawPath = url.pathname;
     const path = rawPath.replace(/\/+$/, "") || "/";
     const c = { request, env, waitUntil: (p) => ctx.waitUntil(p) };
+    if (path === "/ads.txt" && (request.method === "GET" || request.method === "HEAD")) {
+      return serveAdsTxt(request, env);
+    }
     if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/apple-embed/")) {
       return proxyAppleAlbum(request, path);
     }
