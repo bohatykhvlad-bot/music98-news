@@ -729,6 +729,19 @@ function applyConcertArt(img,original,preset){
   img.src=originalSrc;
 }
 
+// Record the outbound ticket intent independently of Impact attribution.
+// The popup lives in a shadow root, where GA4's automatic outbound-link
+// detector may not see the underlying anchor as an <a> element.
+function trackTicketClick(e){
+  if(typeof window.gtag!=="function") return;
+  let destinationHost="";
+  try{ destinationHost=new URL(String(e?.url||"")).hostname; }catch{}
+  window.gtag("event","ticket_click",{
+    concert_artist:String(e?.artist||e?.name||""),
+    concert_event_id:String(e?.id||""),
+    destination_host:destinationHost
+  });
+}
 function popupContent(e){
   const root=document.createElement("div"); root.className="pop-card";
   const body=document.createElement("div"); body.className="pop-body";
@@ -765,6 +778,7 @@ function popupContent(e){
   if(e.url){
     const actions=document.createElement("div"); actions.className="pop-actions";
     const a=document.createElement("a"); a.className="buy"; a.href=e.url; a.target="_blank"; a.rel="sponsored noopener";
+    a.addEventListener("click",()=>trackTicketClick(e));
     const label=document.createElement("span");
     label.className="buy-label";
     label.dataset.label="Buy Tickets";
