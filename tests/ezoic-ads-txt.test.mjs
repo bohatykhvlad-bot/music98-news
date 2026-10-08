@@ -32,6 +32,9 @@ test("ad crawlers receive the existing seller file while Ezoic setup is pending 
       for (const method of ["GET", "HEAD"]) {
         const response = await worker.fetch(new Request("https://music98.news/ads.txt", { method }), envWithFallback(), ctx);
         assert.equal(response.status, 200);
+        assert.match(response.headers.get("cache-control"), /no-store/);
+        assert.equal(response.headers.get("cdn-cache-control"), "no-store");
+        assert.equal(response.headers.get("cloudflare-cdn-cache-control"), "no-store");
         assert.equal(await response.text(), method === "GET" ? existing : "");
       }
     });
@@ -50,6 +53,9 @@ test("GET and HEAD crawlers retain local sellers when Ezoic is configured, witho
   for (const method of ["GET", "HEAD"]) {
     const response = await worker.fetch(new Request("https://music98.news/ads.txt", { method }), envWithFallback(), ctx);
     assert.equal(response.status, 200);
+    assert.match(response.headers.get("cache-control"), /no-store/);
+    assert.equal(response.headers.get("cdn-cache-control"), "no-store");
+    assert.equal(response.headers.get("cloudflare-cdn-cache-control"), "no-store");
     assert.match(response.headers.get("content-type"), /^text\/plain/);
     const body = await response.text();
     if (method === "GET") {

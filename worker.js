@@ -209,7 +209,7 @@ async function serveAdsTxt(request, env) {
         if (!local.ok) throw new Error("Local ads.txt is unavailable");
         const lines = [...new Set(`${await local.text()}\n${text}`.split(/\r?\n/).map(line => line.trim()).filter(Boolean))];
         return new Response(request.method === "HEAD" ? null : `${lines.join("\n")}\n`, {
-          headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "public, max-age=300" },
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
         });
       }
     }
@@ -230,7 +230,12 @@ export default {
     const path = rawPath.replace(/\/+$/, "") || "/";
     const c = { request, env, waitUntil: (p) => ctx.waitUntil(p) };
     if (path === "/ads.txt" && (request.method === "GET" || request.method === "HEAD")) {
-      return serveAdsTxt(request, env);
+      const response = await serveAdsTxt(request, env);
+      const headers = new Headers(response.headers);
+      headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+      headers.set("CDN-Cache-Control", "no-store");
+      headers.set("Cloudflare-CDN-Cache-Control", "no-store");
+      return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
     }
     if ((request.method === "GET" || request.method === "HEAD") && path.startsWith("/apple-embed/")) {
       return proxyAppleAlbum(request, path);
