@@ -59,7 +59,7 @@ jobs:
           <script>
           function $(selector){return document.querySelector(selector)}
           ${page.slice(start,end)}
-          async function check(){
+          function check(){
             const results=[];
             for(const id of ['newsGrid','relGrid']){
               const rail=document.getElementById(id);
@@ -71,7 +71,7 @@ jobs:
               const wasClipped=wrap.classList.contains('rail-scrolled');
               rail.scrollLeft=337;
               rail.dispatchEvent(new Event('scroll'));
-              await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+              rail._refreshRail();
               const wrapRect=wrap.getBoundingClientRect();
               const cardRect=rail.firstElementChild.getBoundingClientRect();
               const y=cardRect.top+80;
@@ -102,7 +102,7 @@ jobs:
             };
             document.getElementById('metrics').textContent=JSON.stringify(metric);
           }
-          check().catch(err=>{document.getElementById('metrics').textContent=JSON.stringify({error:err.message})});
+          try{check();}catch(err){document.getElementById('metrics').textContent=JSON.stringify({error:err.message})}
           </script></body></html>`;
           fs.writeFileSync('/tmp/music98-carousel-edge.html',html);
           const browser=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(x=>fs.existsSync(x));
