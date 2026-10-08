@@ -57,7 +57,7 @@
   "spotifyFingerprint": "03a09012da7371c2b0b468e9c68a56d241155c6d81226700b676d6a38dbab361",
   "complete": true,
   "seed": {
-    "covers": 103,
+    "covers": 104,
     "names": 75,
     "namesWithUrl": 75,
     "loudness": 50
@@ -667,7 +667,10 @@
       "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e4/56/cd/e456cd7c-d289-553a-9c39-98ca08ca0b4b/mzaf_14810478461288819548.plus.aac.p.m4a",
       "year": "2024",
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -7.4,
+      "lufs": -8.6,
+      "truePeakDbtp": 0.7
     },
     {
       "rank": 44,
@@ -762,10 +765,13 @@
       "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/94/f7/e2/94f7e2cc-b182-cb75-7a31-7e88eee2191e/mzaf_12920756836197900992.plus.aac.p.m4a",
       "year": "2026",
       "delta": "-10",
-      "weeks": 3
+      "weeks": 3,
+      "gainDb": -8.9,
+      "lufs": -7.1,
+      "truePeakDbtp": 1
     }
   ],
-  "seedEdition": "[[\"A\",\"2026-10-08T22:28:31.743Z\",\"2026-10-08\"],[\"D\",\"2026-10-08T22:28:32.464Z\",\"2026-10-08\"],[\"C\",\"103:a3988df8\"]]",
+  "seedEdition": "[[\"A\",\"2026-10-08T22:28:31.743Z\",\"2026-10-08\"],[\"D\",\"2026-10-08T22:28:32.464Z\",\"2026-10-08\"],[\"C\",\"104:b5dda22b\"]]",
   "arrows": {
     "ok": true,
     "bad": 0,
