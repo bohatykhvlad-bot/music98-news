@@ -1,0 +1,128 @@
+name: News and Releases carousel edge browser smoke
+on:
+  push:
+    paths:
+      - "public/index.html"
+      - "public/concerts-app.js"
+      - ".github/workflows/carousel-edge-browser-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Inspect actual desktop rail clipping and Buy Tickets centering in headless Chrome
+        run: |
+          node <<'JS'
+          const fs=require('node:fs');
+          const {execFileSync}=require('node:child_process');
+          const page=fs.readFileSync('public/index.html','utf8');
+          const app=fs.readFileSync('public/concerts-app.js','utf8');
+          const css=page.match(/<style>([\s\S]*?)<\/style>/i)?.[1];
+          const appCss=app.match(/^const CONCERTS_CSS=("(?:\\.|[^"\\])*");/m)?.[1];
+          const start=page.indexOf('function syncRail(sel){');
+          const end=page.indexOf('function wireRail(',start);
+          if(!css||!appCss||start<0||end<0)throw Error('SOURCE_EXTRACTION_FAILED');
+          const cards=type=>Array.from({length:10},(_,i)=>
+            `<a class="${type}" href="#" style="min-height:480px;background:white;border:1px solid #eee"><div style="height:310px;background:#ddd"></div><div style="padding:20px">Card ${i+1}</div></a>`).join('');
+          const html=`<!doctype html><html><head><meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>${css}</style><style>${JSON.parse(appCss)}</style></head>
+          <body><main class="wrap">
+            <section class="tab active" id="tab-news">
+              <div class="rail-wrap">
+                <button class="rail-btn prev" id="newsPrev"><svg></svg></button>
+                <div class="rail grid-rail" id="newsGrid">${cards('card')}</div>
+                <button class="rail-btn next" id="newsNext"><svg></svg></button>
+              </div>
+            </section>
+            <section class="tab active" id="tab-releases" style="margin-top:72px">
+              <div class="rail-wrap">
+                <button class="rail-btn prev" id="relPrev"><svg></svg></button>
+                <div class="rail grid-rail" id="relGrid">${cards('rcard')}</div>
+                <button class="rail-btn next" id="relNext"><svg></svg></button>
+              </div>
+            </section>
+            <div class="pop-card" style="width:330px;margin-top:60px">
+              <div class="pop-actions"><a class="buy"><span class="buy-label">Buy Tickets</span></a></div>
+            </div>
+            <pre id="metrics"></pre>
+          </main>
+          <script>
+          function $(selector){return document.querySelector(selector)}
+          ${page.slice(start,end)}
+          async function check(){
+            const results=[];
+            for(const id of ['newsGrid','relGrid']){
+              const rail=document.getElementById(id);
+              const wrap=rail.parentElement;
+              syncRail('#'+id);
+              const prev=wrap.querySelector('.prev').getBoundingClientRect();
+              const next=wrap.querySelector('.next').getBoundingClientRect();
+              const beforeLeft=wrap.getBoundingClientRect().left;
+              const wasClipped=wrap.classList.contains('rail-scrolled');
+              rail.scrollLeft=337;
+              rail.dispatchEvent(new Event('scroll'));
+              await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+              const wrapRect=wrap.getBoundingClientRect();
+              const cardRect=rail.firstElementChild.getBoundingClientRect();
+              const y=cardRect.top+80;
+              const protrusion=document.elementFromPoint(wrapRect.left-12,y);
+              const inside=document.elementFromPoint(wrapRect.left+12,y);
+              results.push({
+                id,wasClipped,scrollLeft:rail.scrollLeft,
+                scrollClip:wrap.classList.contains('rail-scrolled'),
+                computedClip:getComputedStyle(wrap).clipPath,
+                outsideCard:!!protrusion?.closest('.card,.rcard'),
+                insideCard:!!inside?.closest('.card,.rcard'),
+                leftFixed:Math.abs(beforeLeft-wrapRect.left)<.1,
+                prevFixed:Math.abs(prev.left-wrap.querySelector('.prev').getBoundingClientRect().left)<.1,
+                nextFixed:Math.abs(next.right-wrap.querySelector('.next').getBoundingClientRect().right)<.1
+              });
+            }
+            const buy=document.querySelector('.pop-actions .buy').getBoundingClientRect();
+            const label=document.querySelector('.buy-label').getBoundingClientRect();
+            const ls=getComputedStyle(document.querySelector('.buy-label'));
+            const metric={
+              rails:results,
+              ticket:{
+                horizontalCenterDelta:Math.abs((buy.left+buy.right)/2-(label.left+label.right)/2),
+                verticalCenterDelta:Math.abs((buy.top+buy.bottom)/2-(label.top+label.bottom)/2),
+                paddingLeft:ls.paddingLeft,paddingRight:ls.paddingRight,
+                paddingTop:ls.paddingTop,paddingBottom:ls.paddingBottom
+              }
+            };
+            document.getElementById('metrics').textContent=JSON.stringify(metric);
+          }
+          check().catch(err=>{document.getElementById('metrics').textContent=JSON.stringify({error:err.message})});
+          </script></body></html>`;
+          fs.writeFileSync('/tmp/music98-carousel-edge.html',html);
+          const browser=['/usr/bin/google-chrome','/usr/bin/chromium','/usr/bin/chromium-browser'].find(x=>fs.existsSync(x));
+          if(!browser)throw Error('CHROME_NOT_INSTALLED');
+          const dump=execFileSync(browser,[
+            '--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage',
+            '--virtual-time-budget=3000','--dump-dom','file:///tmp/music98-carousel-edge.html'
+          ],{encoding:'utf8',timeout:40000,stdio:['ignore','pipe','ignore']});
+          const match=dump.match(/<pre id="metrics">([\s\S]*?)<\/pre>/);
+          if(!match)throw Error('BROWSER_METRICS_MISSING');
+          const metrics=JSON.parse(match[1]);
+          console.log('CAROUSEL_BROWSER_GEOMETRY',JSON.stringify(metrics));
+          if(metrics.error)throw Error(metrics.error);
+          for(const rail of metrics.rails){
+            if(rail.wasClipped||!rail.scrollClip||!rail.computedClip.startsWith('inset(')||
+               rail.outsideCard||!rail.insideCard||!rail.leftFixed||!rail.prevFixed||!rail.nextFixed)
+              throw Error('RAIL_LEFT_EDGE_REGRESSION '+JSON.stringify(rail));
+          }
+          if(metrics.ticket.horizontalCenterDelta>1||metrics.ticket.verticalCenterDelta>1||
+            metrics.ticket.paddingLeft!=='0px'||metrics.ticket.paddingRight!=='0px')
+            throw Error('BUY_TICKETS_CENTERING_REGRESSION '+JSON.stringify(metrics.ticket));
+          console.log('CAROUSEL_EDGE_AND_TICKET_BUTTON_PASS');
+          JS
