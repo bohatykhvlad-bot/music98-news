@@ -28,7 +28,8 @@ function rig(){
       addEventListener(name,handler){(handlers[name]??=[]).push(handler)},
       emit(name,event){for(const handler of handlers[name]||[])handler(event)},
       scrollBy(args){this.steps.push(args);this.scrollLeft+=args.left;this.emit("scroll",{})},
-      steps:[],
+      scrollTo(args){this.steps.push(args);if(!this.deferScrollTo){this.scrollLeft=args.left;this.emit("scroll",{})}},
+      steps:[],deferScrollTo:false,
       get scrollWidth(){reads++;return scrollWidth},
       set scrollWidth(value){scrollWidth=value},
       get clientWidth(){return width},
@@ -131,6 +132,42 @@ test("brief arrow tap steps one card; cancelled press never triggers a step",()=
   next.handlers.pointerdown[0]({button:0,pointerId:3,preventDefault(){}});
   next.handlers.pointercancel[0]({pointerId:3});
   assert.equal(rail.steps.length,1);
+});
+
+test("short arrows align the first AND second card exactly, including from a fractional scroll offset",()=>{
+  for(const which of ["a","b"]){
+    const env=rig(),{rail,prev,next}=env[which];
+    const tap=button=>{
+      button.handlers.pointerdown[0]({button:0,pointerId:27,preventDefault(){}});
+      button.handlers.pointerup[0]({pointerId:27});
+    };
+    tap(next);
+    assert.equal(rail.scrollLeft,261,"first click must align the second card to the fixed left boundary");
+    tap(next);
+    assert.equal(rail.scrollLeft,522,"second click must have EXACTLY the same 261px stride");
+    tap(prev);
+    assert.equal(rail.scrollLeft,261,"back click must return to exactly the first click's position");
+    rail.scrollLeft=41.75;
+    env.frame(1000);
+    tap(next);
+    assert.equal(rail.scrollLeft,261,"first click after a freehand drag must snap to a card start, not add a relative offset");
+    env.frame(1000);
+    tap(prev);
+    assert.equal(rail.scrollLeft,0,"back click must land flush to the original first card");
+  }
+});
+
+test("rapid short arrow taps queue distinct aligned destinations while smooth scrolling is still in progress",()=>{
+  const env=rig(),{rail,next}=env.a;
+  rail.deferScrollTo=true;
+  const tap=()=>{
+    next.handlers.pointerdown[0]({button:0,pointerId:6,preventDefault(){}});
+    next.handlers.pointerup[0]({pointerId:6});
+  };
+  tap();
+  tap();
+  assert.deepEqual(rail.steps.map(x=>x.left),[261,522],"second tap must not repeat the pending first target");
+  assert.deepEqual(rail.steps.map(x=>x.behavior),["smooth","smooth"]);
 });
 
 test("scroll events avoid layout width reads and coalesce to a single frame",()=>{
