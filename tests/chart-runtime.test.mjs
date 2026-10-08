@@ -136,3 +136,11 @@ test("browser accepts only fully imaged chart editions and can retain a prior ve
   assert.match(html,/if\(hasVerifiedCache\) applyDaily\(cached\.tracks,"backup",cached\.date\)/);
   assert.match(html,/if\(fresh && chartHasCompleteArtwork\(tracks\)\)/);
 });
+
+test("artwork audit refuses stale prospective chart and live audit rejects any missing cover",()=>{
+  const build=readFileSync(new URL("../scripts/build-covers.mjs",import.meta.url),"utf8");
+  const live=readFileSync(new URL("../scripts/audit-live-chart.mjs",import.meta.url),"utf8");
+  assert.match(build,/candidate\.updated===new Date\(\)\.toISOString\(\)\.slice\(0,10\)/);
+  assert.match(build,/candidate\?\.artworkAuditOnly===true/);
+  assert.match(live,/if\(missingArtwork\.length\) throw new Error\("BLOCKED: published Top 50 has missing artwork:/);
+});
