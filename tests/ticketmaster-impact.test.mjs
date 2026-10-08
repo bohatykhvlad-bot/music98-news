@@ -12,6 +12,7 @@ function check(source,host,ad,campaign){
   assert.equal(result.pathname,`/c/${publisher}/${ad}/${campaign}`);
   assert.equal(result.searchParams.get("u"),source);
   assert.equal(result.searchParams.get("utm_medium"),"affiliate");
+  assert.equal(result.searchParams.get("subId3"),"music98_concerts");
   assert.equal(impactTicketUrl(result.toString()),result.toString(),"avoid nested affiliate wrapping");
 }
 test("each supported Ticketmaster market uses its own ad/campaign, not a US-only wrapper",()=>{
@@ -51,7 +52,11 @@ test("unknown or unrelated ticketing sites never inherit Ticketmaster's Impact c
 test("preserves original affiliate tracking and replaces other publishers only for eligible Ticketmaster landings",()=>{
   const dest="https://www.ticketmaster.fr/event/abc?lang=fr&seat=1";
   const existing="https://ticketmaster-fr.tm7516.net/c/4932692/427761/7516?u="+encodeURIComponent(dest)+"&subId1=map";
-  assert.equal(impactTicketUrl(existing),new URL(existing).toString());
+  const preserved=new URL(impactTicketUrl(existing));
+  assert.equal(preserved.pathname,"/c/4932692/427761/7516");
+  assert.equal(preserved.searchParams.get("u"),dest);
+  assert.equal(preserved.searchParams.get("subId1"),"map");
+  assert.equal(preserved.searchParams.get("subId3"),"music98_concerts");
   const wrongPublisher="https://ticketmaster-fr.tm7516.net/c/1209822/427761/7516?u="+encodeURIComponent(dest);
   assert.equal(new URL(impactTicketUrl(wrongPublisher)).pathname,"/c/4932692/427761/7516");
   assert.equal(new URL(impactTicketUrl(wrongPublisher)).searchParams.get("u"),dest);
