@@ -48,7 +48,7 @@ test("embedded Concerts matches page-heading rhythm and has no fractional pill s
   assert.ok(embedded.includes("height:40px;gap:4px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:3px;"));
   assert.ok(embedded.includes("top:0}"));
   assert.ok(!embedded.includes("top:.5px"));
-  assert.match(home,/concerts-app\.js\?v=20261004-37/);
+  assert.match(home,/concerts-app\.js\?v=20261008-01/);
 });
 
 test("standalone Concerts fallback uses the same full desktop and mobile navigation geometry",()=>{
