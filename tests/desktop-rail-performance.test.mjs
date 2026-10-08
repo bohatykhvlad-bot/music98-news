@@ -23,7 +23,7 @@ function rig(){
     let scroll=0,reads=0,scrollWidth=9000,width=400;
     const rail={
       id,classList:list(),style:{},handlers,
-      parentElement:{querySelector:s=>s.includes(".prev")?prev:next},
+      parentElement:{querySelector:s=>s.includes(".prev")?prev:next,classList:list()},
       firstElementChild:{getBoundingClientRect:()=>({width:243})},
       addEventListener(name,handler){(handlers[name]??=[]).push(handler)},
       emit(name,event){for(const handler of handlers[name]||[])handler(event)},
@@ -80,6 +80,24 @@ test("News and Releases install exactly one scroll handler and mutation observer
   assert.equal(env.mutationObservers.length,2);
   assert.equal(env.resizeObservers.length,2);
   assert.equal(env.winHandlers.resize.length,2);
+});
+
+test("News and Releases switch on the stationary viewport clip only during scrolling",()=>{
+  const env=rig();
+  for(const {rail,prev} of [env.a,env.b]){
+    assert.equal(rail.parentElement.classList.has("rail-scrolled"),false);
+    assert.equal(prev.classList.has("ok"),false);
+    rail.scrollLeft=100;
+    rail.emit("scroll",{});
+    env.frame(1000/60);
+    assert.equal(rail.parentElement.classList.has("rail-scrolled"),true);
+    assert.equal(prev.classList.has("ok"),true);
+    rail.scrollLeft=0;
+    rail.emit("scroll",{});
+    env.frame(1000/60);
+    assert.equal(rail.parentElement.classList.has("rail-scrolled"),false);
+    assert.equal(prev.classList.has("ok"),false);
+  }
 });
 
 test("60Hz and 120Hz held arrows preserve press duration and nearly identical inertia",()=>{
