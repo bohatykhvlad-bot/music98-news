@@ -378,15 +378,15 @@ test("Concerts mobile heading remains left-aligned after final CSS overrides and
 });
 
 test("scrolling News and Releases clips cards at the original content edge without moving their glass arrows",()=>{
-  assert.match(page,/\.rail-wrap\.rail-scrolled\{clip-path:inset\(-40px -40px -40px 0\)\}/,
-    "only the stationary wrapper may clip scrolled cards, not a moving rail");
+  assert.match(page,/\.rail-wrap\.rail-scrolled\{clip-path:inset\(-40px 0 -40px 0\)\}/,
+    "stationary wrapper must clip departing and arriving cards at identical edges");
   assert.match(page,/@media \(min-width:641px\)\{\s*\.rail-wrap\.rail-scrolled/,
     "desktop clipping must not affect the mobile card stack");
   assert.match(page,/wrap\.classList\.toggle\("rail-scrolled", x > 0\.5 \|\| !!rail\.style\.transform\)/,
     "scroll should clip whenever any card can enter left bleed");
   assert.match(page,/rail\.parentElement\.classList\.toggle\("rail-scrolled",rail\.scrollLeft > 0\.5 \|\| !!rail\.style\.transform\)/,
     "elastic overscroll should also clip to fixed section boundary");
-  assert.match(page,/\.rail-wrap \.rail-btn\.prev\{right:calc\(100% - 66px\)\}/);
-  assert.match(page,/\.rail-wrap \.rail-btn\.next\{right:0\}/);
-  assert.match(page,/\.rail-wrap \.rail-btn\.next\{margin-right:6px\}/);
+  assert.match(page,/\.rail-wrap \.rail-btn\.prev\{left:6px;right:auto\}/);
+  assert.match(page,/\.rail-wrap \.rail-btn\.next\{right:6px\}/);
+  assert.match(page,/\.rail-wrap \.rail-btn\.next\{margin-right:0\}/);
 });
