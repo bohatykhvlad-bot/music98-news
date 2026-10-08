@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-08T11:02:40.512Z",
+  "updatedAt": "2026-10-08T11:10:28.342Z",
   "chartUpdated": "2026-10-08",
   "chartRev": "daily-global-v37",
   "rows": 50,
@@ -10,7 +10,7 @@
     "apple-feed": 22,
     "apple-chart": 26,
     "previous-audit": 1,
-    "apple": 1
+    "deezer": 1
   },
   "entries": {
     "aintinla|adela": {
@@ -30,7 +30,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.087Z",
+      "checkedAt": "2026-10-08T11:08:55.635Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -66,7 +66,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:39.212Z",
+      "checkedAt": "2026-10-08T11:10:26.835Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -162,7 +162,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:07.947Z",
+      "checkedAt": "2026-10-08T11:09:55.627Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -198,7 +198,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:55.150Z",
+      "checkedAt": "2026-10-08T11:09:37.541Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -279,7 +279,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.081Z",
+      "checkedAt": "2026-10-08T11:08:55.628Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -315,7 +315,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:25.975Z",
+      "checkedAt": "2026-10-08T11:09:02.224Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -381,7 +381,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:19.030Z",
+      "checkedAt": "2026-10-08T11:10:07.845Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -447,7 +447,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.087Z",
+      "checkedAt": "2026-10-08T11:08:55.636Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -483,7 +483,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.088Z",
+      "checkedAt": "2026-10-08T11:08:55.637Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -519,7 +519,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:37.840Z",
+      "checkedAt": "2026-10-08T11:10:24.918Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -615,7 +615,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:28.262Z",
+      "checkedAt": "2026-10-08T11:09:04.401Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -651,7 +651,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.082Z",
+      "checkedAt": "2026-10-08T11:08:55.630Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -687,7 +687,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:52.889Z",
+      "checkedAt": "2026-10-08T11:09:34.331Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -723,7 +723,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:41.054Z",
+      "checkedAt": "2026-10-08T11:09:17.790Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -759,7 +759,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:14.317Z",
+      "checkedAt": "2026-10-08T11:10:03.364Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -840,7 +840,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:39.639Z",
+      "checkedAt": "2026-10-08T11:09:16.250Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -936,7 +936,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:57.449Z",
+      "checkedAt": "2026-10-08T11:09:39.991Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1002,7 +1002,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:28.261Z",
+      "checkedAt": "2026-10-08T11:09:04.400Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1098,7 +1098,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:41.053Z",
+      "checkedAt": "2026-10-08T11:09:17.788Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1164,7 +1164,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:25.751Z",
+      "checkedAt": "2026-10-08T11:10:13.791Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1260,7 +1260,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.089Z",
+      "checkedAt": "2026-10-08T11:08:55.638Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1296,7 +1296,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.083Z",
+      "checkedAt": "2026-10-08T11:08:55.631Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1332,7 +1332,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:39.641Z",
+      "checkedAt": "2026-10-08T11:09:16.251Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1368,7 +1368,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:35.690Z",
+      "checkedAt": "2026-10-08T11:09:13.707Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1449,7 +1449,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:06.006Z",
+      "checkedAt": "2026-10-08T11:09:53.332Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1530,7 +1530,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:48.512Z",
+      "checkedAt": "2026-10-08T11:09:25.165Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1553,66 +1553,21 @@
       "identity": "kidmyself|johnmorgan",
       "title": "Kid Myself",
       "artist": "John Morgan",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cd/75/83/cd7583d8-08ce-0f17-6a73-03ddc3385dc4/4099964286243.jpg/600x600bb.jpg",
-      "provider": "apple",
-      "releaseTitle": "Kid Myself (Stripped) - Single",
+      "art": "https://cdn-images.dzcdn.net/images/cover/d86f9db9d0d128de55171015517dfd9c/1000x1000-000000-80-0-0.jpg",
+      "provider": "deezer",
+      "releaseTitle": "Kid Myself",
       "releaseArtist": "John Morgan",
-      "releaseDate": "2025-04-25T12:00:00Z",
+      "releaseDate": "2026-01-28",
       "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/6796527394?i=6796527400",
-      "collectionId": "6796527394",
-      "trackId": "6796527400",
-      "confidence": 98,
-      "score": 965,
-      "consensus": 2,
+      "url": "https://www.deezer.com/track/3697436932",
+      "collectionId": "870709212",
+      "trackId": "3697436932",
+      "confidence": 91,
+      "score": 670,
+      "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:40.509Z",
+      "checkedAt": "2026-10-08T11:10:28.340Z",
       "alternatives": [
-        {
-          "provider": "apple",
-          "id": "6796527400",
-          "collectionId": "6796527394",
-          "releaseTitle": "Kid Myself (Stripped) - Single",
-          "releaseArtist": "John Morgan",
-          "releaseDate": "2025-04-25T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cd/75/83/cd7583d8-08ce-0f17-6a73-03ddc3385dc4/4099964286243.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6796527394?i=6796527400",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "6789747377",
-          "collectionId": "6789747371",
-          "releaseTitle": "Kid Myself (Stripped) - Single",
-          "releaseArtist": "John Morgan",
-          "releaseDate": "2026-07-31T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/52/d3/f7/52d3f7c0-90da-6da8-cc96-96c38c9b70cb/4099964281620.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6789747371?i=6789747377",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "6796527398",
-          "collectionId": "6796527394",
-          "releaseTitle": "Kid Myself (Stripped) - Single",
-          "releaseArtist": "John Morgan",
-          "releaseDate": "2026-07-31T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cd/75/83/cd7583d8-08ce-0f17-6a73-03ddc3385dc4/4099964286243.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6796527394?i=6796527398",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
         {
           "provider": "deezer",
           "id": "3697436932",
@@ -1623,24 +1578,24 @@
           "releaseClass": "dedicated",
           "art": "https://cdn-images.dzcdn.net/images/cover/d86f9db9d0d128de55171015517dfd9c/1000x1000-000000-80-0-0.jpg",
           "url": "https://www.deezer.com/track/3697436932",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
+          "score": 670,
+          "confidence": 91,
+          "consensus": 1,
           "earliestReleaseYear": 2025
         },
         {
-          "provider": "deezer",
-          "id": "4173638902",
-          "collectionId": "1036714262",
-          "releaseTitle": "Kid Myself (Stripped)",
+          "provider": "apple",
+          "id": "1786450277",
+          "collectionId": "1786449460",
+          "releaseTitle": "Carolina Blue",
           "releaseArtist": "John Morgan",
-          "releaseDate": "2026-07-31",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/c85707afe526daa81cd599b9cbf7a5dd/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4173638902",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
+          "releaseDate": "2025-04-25T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d2/ae/65/d2ae65e8-9a14-061e-1165-b5351ef994a6/4099964145403.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1786449460?i=1786450277",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
           "earliestReleaseYear": 2025
         }
       ]
@@ -1662,7 +1617,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:00.732Z",
+      "checkedAt": "2026-10-08T11:09:46.019Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1682,7 +1637,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:10.676Z",
+      "checkedAt": "2026-10-08T11:09:59.737Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1748,7 +1703,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.084Z",
+      "checkedAt": "2026-10-08T11:08:55.632Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1784,7 +1739,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:09.141Z",
+      "checkedAt": "2026-10-08T11:09:56.725Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1850,7 +1805,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:46.920Z",
+      "checkedAt": "2026-10-08T11:09:24.102Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1946,7 +1901,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:26.866Z",
+      "checkedAt": "2026-10-08T11:10:15.173Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1997,7 +1952,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.085Z",
+      "checkedAt": "2026-10-08T11:08:55.633Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2033,7 +1988,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:07.947Z",
+      "checkedAt": "2026-10-08T11:09:55.626Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2129,7 +2084,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.085Z",
+      "checkedAt": "2026-10-08T11:08:55.633Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2165,7 +2120,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:35.691Z",
+      "checkedAt": "2026-10-08T11:09:13.708Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2201,7 +2156,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:27.697Z",
+      "checkedAt": "2026-10-08T11:10:16.127Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2267,7 +2222,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:52.889Z",
+      "checkedAt": "2026-10-08T11:09:34.331Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2333,7 +2288,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:30.249Z",
+      "checkedAt": "2026-10-08T11:09:07.601Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2414,7 +2369,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:30.250Z",
+      "checkedAt": "2026-10-08T11:09:07.601Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2450,7 +2405,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:13.310Z",
+      "checkedAt": "2026-10-08T11:10:02.243Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2546,7 +2501,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:48.511Z",
+      "checkedAt": "2026-10-08T11:09:25.165Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2627,7 +2582,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.082Z",
+      "checkedAt": "2026-10-08T11:08:55.631Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2663,7 +2618,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:09.142Z",
+      "checkedAt": "2026-10-08T11:09:56.725Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2699,7 +2654,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:31.603Z",
+      "checkedAt": "2026-10-08T11:10:18.548Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2795,7 +2750,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:21.086Z",
+      "checkedAt": "2026-10-08T11:08:55.634Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2831,7 +2786,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:35.691Z",
+      "checkedAt": "2026-10-08T11:09:13.707Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2867,7 +2822,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:01:51.255Z",
+      "checkedAt": "2026-10-08T11:09:30.711Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2963,7 +2918,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T11:02:24.701Z",
+      "checkedAt": "2026-10-08T11:10:12.665Z",
       "alternatives": [
         {
           "provider": "apple-chart",
