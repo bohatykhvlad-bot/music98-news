@@ -18,7 +18,7 @@
     },
     "sourceDates": {
       "A": "2026-10-08",
-      "S": "2026-10-06",
+      "S": "2026-10-07",
       "D": "2026-10-08"
     },
     "sourceOrigin": {
@@ -26,7 +26,7 @@
       "S": "kworb-crosschecked-kworb+musicrank",
       "D": "official-worldwide-live"
     },
-    "spotifyFingerprint": "54f97b641b2c888cb7208c6ffedcf8159e812c293a57ba1baa3c72f17d0f43d6",
+    "spotifyFingerprint": "03a09012da7371c2b0b468e9c68a56d241155c6d81226700b676d6a38dbab361",
     "tracks": [
       {
         "rank": 1,
@@ -37,17 +37,17 @@
       },
       {
         "rank": 2,
-        "title": "Choosin' Texas",
-        "artist": "Ella Langley",
-        "weeks": 19,
-        "delta": "1"
-      },
-      {
-        "rank": 3,
         "title": "stupid song",
         "artist": "Olivia Rodrigo",
         "weeks": 19,
-        "delta": "-1"
+        "delta": "0"
+      },
+      {
+        "rank": 3,
+        "title": "Choosin' Texas",
+        "artist": "Ella Langley",
+        "weeks": 19,
+        "delta": "0"
       },
       {
         "rank": 4,
@@ -65,17 +65,17 @@
       },
       {
         "rank": 6,
-        "title": "Patient Zero",
-        "artist": "Taylor Swift",
-        "weeks": 12,
-        "delta": "0"
-      },
-      {
-        "rank": 7,
         "title": "Nicole Kidman",
         "artist": "ADÉLA",
         "weeks": 19,
-        "delta": "0"
+        "delta": "1"
+      },
+      {
+        "rank": 7,
+        "title": "Patient Zero",
+        "artist": "Taylor Swift",
+        "weeks": 12,
+        "delta": "-1"
       },
       {
         "rank": 8,
@@ -107,24 +107,24 @@
       },
       {
         "rank": 12,
-        "title": "Great Expectation",
-        "artist": "SIENNA SPIRO",
-        "weeks": 6,
-        "delta": "2"
-      },
-      {
-        "rank": 13,
         "title": "Beauty and a Beat",
         "artist": "Justin Bieber, Nicki Minaj",
         "weeks": 10,
-        "delta": "0"
+        "delta": "1"
       },
       {
-        "rank": 14,
+        "rank": 13,
         "title": "drop dead",
         "artist": "Olivia Rodrigo",
         "weeks": 10,
-        "delta": "-3"
+        "delta": "-2"
+      },
+      {
+        "rank": 14,
+        "title": "Great Expectation",
+        "artist": "SIENNA SPIRO",
+        "weeks": 6,
+        "delta": "0"
       },
       {
         "rank": 15,
@@ -142,38 +142,38 @@
       },
       {
         "rank": 17,
-        "title": "Solar Eclipse",
-        "artist": "Drake & Don Toliver",
-        "weeks": 5,
-        "delta": "1"
-      },
-      {
-        "rank": 18,
-        "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
-        "artist": "Taylor Swift",
-        "weeks": 16,
-        "delta": "1"
-      },
-      {
-        "rank": 19,
         "title": "The Fate of Ophelia",
         "artist": "Taylor Swift",
         "weeks": 12,
-        "delta": "-3"
+        "delta": "-1"
       },
       {
-        "rank": 20,
-        "title": "Quebec",
-        "artist": "Drake",
+        "rank": 18,
+        "title": "Solar Eclipse",
+        "artist": "Drake & Don Toliver",
         "weeks": 5,
         "delta": "0"
       },
       {
-        "rank": 21,
+        "rank": 19,
         "title": "Die With A Smile",
         "artist": "Lady Gaga & Bruno Mars",
         "weeks": 3,
-        "delta": "8"
+        "delta": "10"
+      },
+      {
+        "rank": 20,
+        "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
+        "artist": "Taylor Swift",
+        "weeks": 16,
+        "delta": "-1"
+      },
+      {
+        "rank": 21,
+        "title": "Quebec",
+        "artist": "Drake",
+        "weeks": 5,
+        "delta": "-1"
       },
       {
         "rank": 22,
@@ -226,38 +226,38 @@
       },
       {
         "rank": 29,
-        "title": "Self Aware",
-        "artist": "Temper City",
-        "weeks": 19,
-        "delta": "-5"
-      },
-      {
-        "rank": 30,
         "title": "Cinderella",
         "artist": "Mac Miller, Ty Dolla $ign",
         "weeks": 10,
-        "delta": "-4"
+        "delta": "-3"
       },
       {
-        "rank": 31,
+        "rank": 30,
         "title": "back to friends",
         "artist": "sombr",
         "weeks": 4,
-        "delta": "0"
+        "delta": "1"
       },
       {
-        "rank": 32,
+        "rank": 31,
         "title": "Dracula",
         "artist": "Tame Impala",
         "weeks": 19,
-        "delta": "-10"
+        "delta": "-9"
       },
       {
-        "rank": 33,
+        "rank": 32,
         "title": "Last Thing You Need",
         "artist": "Morgan Wallen",
         "weeks": 12,
-        "delta": "0"
+        "delta": "1"
+      },
+      {
+        "rank": 33,
+        "title": "Self Aware",
+        "artist": "Temper City",
+        "weeks": 19,
+        "delta": "-9"
       },
       {
         "rank": 34,
@@ -289,24 +289,24 @@
       },
       {
         "rank": 38,
-        "title": "Sweater Weather",
-        "artist": "The Neighbourhood",
-        "weeks": 3,
-        "delta": "0"
-      },
-      {
-        "rank": 39,
-        "title": "Loser",
-        "artist": "Tame Impala",
-        "weeks": 19,
-        "delta": "-2"
-      },
-      {
-        "rank": 40,
         "title": "Something To Lose",
         "artist": "STELLA LEFTY & Vincent Mason",
         "weeks": 1,
         "delta": "re-entry"
+      },
+      {
+        "rank": 39,
+        "title": "Sweater Weather",
+        "artist": "The Neighbourhood",
+        "weeks": 3,
+        "delta": "-1"
+      },
+      {
+        "rank": 40,
+        "title": "Babydoll",
+        "artist": "Dominic Fike",
+        "weeks": 19,
+        "delta": "4"
       },
       {
         "rank": 41,
@@ -324,10 +324,10 @@
       },
       {
         "rank": 43,
-        "title": "Training Season",
-        "artist": "Dua Lipa",
-        "weeks": 2,
-        "delta": "-1"
+        "title": "Love Me Not",
+        "artist": "Ravyn Lenae",
+        "weeks": 1,
+        "delta": "re-entry"
       },
       {
         "rank": 44,
@@ -345,38 +345,38 @@
       },
       {
         "rank": 46,
-        "title": "Rethink Some Things",
-        "artist": "Luke Combs",
-        "weeks": 2,
-        "delta": "3"
-      },
-      {
-        "rank": 47,
         "title": "SWIM",
         "artist": "BTS",
         "weeks": 2,
-        "delta": "-1"
+        "delta": "0"
+      },
+      {
+        "rank": 47,
+        "title": "Loser",
+        "artist": "Tame Impala",
+        "weeks": 19,
+        "delta": "-10"
       },
       {
         "rank": 48,
-        "title": "Billie Jean",
-        "artist": "Michael Jackson",
-        "weeks": 1,
-        "delta": "re-entry"
+        "title": "Rethink Some Things",
+        "artist": "Luke Combs",
+        "weeks": 2,
+        "delta": "1"
       },
       {
         "rank": 49,
-        "title": "Babydoll",
-        "artist": "Dominic Fike",
-        "weeks": 19,
-        "delta": "-5"
-      },
-      {
-        "rank": 50,
         "title": "Kid Myself",
         "artist": "John Morgan",
         "weeks": 1,
         "delta": "new"
+      },
+      {
+        "rank": 50,
+        "title": "Jaded",
+        "artist": "Koe Wetzel & Ella Langley",
+        "weeks": 3,
+        "delta": "-10"
       }
     ]
   },
