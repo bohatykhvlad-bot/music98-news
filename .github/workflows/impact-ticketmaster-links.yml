@@ -54,7 +54,8 @@ jobs:
                       result["ticketmaster"]+=1
                       correct=(p.hostname==host and p.path==f"/c/{expected_publisher}/{ad}/{campaign}"
                           and dest.scheme=="https" and dest.hostname
-                          and urllib.parse.parse_qs(p.query).get("utm_medium",[""])[0]=="affiliate")
+                          and urllib.parse.parse_qs(p.query).get("utm_medium",[""])[0]=="affiliate"
+                          and urllib.parse.parse_qs(p.query).get("subId3",[""])[0]=="music98_concerts")
                       if correct: result["correct"]+=1
                       elif len(result["bad"])<3:
                           result["bad"].append({"host":p.hostname,"path":p.path[:80]})
