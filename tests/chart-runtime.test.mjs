@@ -115,7 +115,7 @@ test("all 50 covers are a hard publication gate, including current-day KV and fa
   assert.match(top50,/if\(!hasCompleteChartArtwork\(payload\.tracks\)\)/);
   assert.match(top50,/throw new Error\("incomplete_chart_artwork:"/);
   assert.match(top50,/if\(fallback && hasCompleteChartArtwork\(fallback\.tracks\)\)/);
-  assert.match(top50,/if\(hasCompleteChartArtwork\(v\.tracks\)\) return v/);
+  assert.match(top50,/if\s*\(hasCompleteChartArtwork\(v\.tracks\)\) return v/);
   assert.match(top50,/hasCompleteChartArtwork\(saved\.tracks\) \? saved/);
   assert.match(top50,/if\(hasCompleteChartArtwork\(decorated\.tracks\)\)return top50Response\(decorated\)/);
 });
