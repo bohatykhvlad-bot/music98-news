@@ -906,12 +906,18 @@ async function verifiedBackupTop50(env, origin, backup) {
 /* Последний удачный сбор лежит в памяти по ключу дня. Если сегодняшняя сборка не
    удалась, показать вчерашний настоящий чарт честнее, чем запечённый снапшот первого
    дня: в нём и места, и счётчик дней давно не те (он писался 17.09). */
-async function lastGood(env, backup) {
+async function lastGood(env, backup, origin) {
   if (!env || !env.DESK) return null;
   try {
     const v = await env.DESK.get(TOP50_KV, { type: "json" });
-    if (verifiedSourceSnapshot(v) && hasCompleteChartArtwork(v.tracks) &&
-        !cachedTenureRegressed(v, backup)) return v;
+    if (verifiedSourceSnapshot(v) && !cachedTenureRegressed(v, backup)) {
+      if (hasCompleteChartArtwork(v.tracks)) return v;
+      /* Old KV editions may predate the full-artwork gate. Repair every row
+         from the verified cover registry before accepting the fallback. */
+      const healed = await decorateCachedTop50(env,
+        {...v, tracks:v.tracks.map(t=>({...t}))}, origin);
+      if (hasCompleteChartArtwork(healed.tracks)) return healed;
+    }
   } catch {}
   return null;
 }
@@ -970,14 +976,19 @@ async function decorateCachedTop50(env, payload, origin) {
    snapshot if KV was reset or its only chart is older. Never fall back to the
    immutable 17 September launch chart and silently label it as current. */
 async function bestVerifiedFallback(env, origin, backup) {
-  const good = await lastGood(env, backup);
+  const good = await lastGood(env, backup, origin);
   // Full verified daily edition supports an empty/reset KV on first deployment.
   // Keep legacy tenure snapshots for history recovery without relabelling them.
   let daily = null;
   try {
     const saved = await readSeed(env, origin, "daily-top50-backup.json");
-    if (verifiedSourceSnapshot(saved) && hasCompleteChartArtwork(saved.tracks) &&
-        saved.arrows?.ok === true && !cachedTenureRegressed(saved, backup)) daily = saved;
+    if (verifiedSourceSnapshot(saved) && saved.arrows?.ok === true &&
+        !cachedTenureRegressed(saved, backup)) {
+      const candidate = hasCompleteChartArtwork(saved.tracks) ? saved :
+        await decorateCachedTop50(env,
+          {...saved, tracks:saved.tracks.map(t=>({...t}))}, origin);
+      if (hasCompleteChartArtwork(candidate.tracks)) daily = candidate;
+    }
   } catch {}
   const healthy = good && (!daily || String(good.updated) >= String(daily.updated)) ? good : daily;
   const savedDay = backup && backup.current && backup.current.updated || "";
