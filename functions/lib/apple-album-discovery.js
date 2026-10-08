@@ -35,6 +35,17 @@ export async function discoverAppleAlbumTracks(track, {
       ...(albumsResult.results||[]).filter(a=>primaryArtist(a.artistName||a.collectionArtistName)===artistKey).map(a=>a.artistId),
     ].filter(Boolean).map(String))].slice(0,2);
     for(const id of artistIds) {
+      // The artist's own top-songs endpoint often includes the original album
+      // recording even while generic title search only indexes a new remix.
+      const topSongs=await request("https://itunes.apple.com/lookup?id="+encodeURIComponent(id)+"&entity=song&limit=200"+suffix);
+      const originalSongs=(topSongs.results||[]).flatMap(raw=>{
+        const candidate=appleCandidate(raw,"apple",{artistSongDiscovery:true});
+        return candidate?.art && candidateCompatible(track,candidate) &&
+          !isDerivativeRelease(candidate.releaseTitle) &&
+          !isGenericRelease(candidate.releaseTitle,candidate.releaseArtist,candidate.genre)
+          ? [candidate] : [];
+      });
+      if(originalSongs.length)return originalSongs;
       const catalog = await request("https://itunes.apple.com/lookup?id="+encodeURIComponent(id)+"&entity=album&limit=200"+suffix);
       (catalog.results||[]).forEach(keep);
     }
