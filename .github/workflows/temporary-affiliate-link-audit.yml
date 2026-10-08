@@ -1,0 +1,57 @@
+name: Affiliate destination audit (read only)
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-affiliate-link-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Read public event URLs without opening or counting clicks
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,urllib.request,urllib.parse,time
+          def get(path):
+              req=urllib.request.Request("https://music98.news"+path,headers={
+                  "User-Agent":"music98-affiliate-readonly-audit/1.0",
+                  "Accept":"application/json",
+                  "Cache-Control":"no-cache"
+              })
+              with urllib.request.urlopen(req,timeout=22) as r:
+                  return json.load(r)
+          popular=get("/api/concerts?mode=popular&v=popular-v13&read_audit="+str(int(time.time())))
+          artists=popular.get("artists") or []
+          print("POPULAR",json.dumps({"count":len(artists),"warming":popular.get("warming"),"identity":popular.get("identityValidation")}))
+          samples=[]
+          for artist in artists[:10]:
+              if len(samples)>=8: break
+              artistId=str(artist.get("id") or "")
+              if not artistId: continue
+              try:
+                  data=get("/api/concerts?attractionId="+urllib.parse.quote(artistId,safe=""))
+              except Exception as e:
+                  print("LOOKUP_ERROR",json.dumps({"artist":artist.get("name"),"error":str(e)[:130]}))
+                  continue
+              for event in (data.get("events") or [])[:2]:
+                  link=str(event.get("url") or "")
+                  if not link: continue
+                  u=urllib.parse.urlsplit(link)
+                  params=urllib.parse.parse_qs(u.query)
+                  keys=sorted(k.lower() for k in params)
+                  host=(u.hostname or "").lower()
+                  impact_host=any(s in host for s in ["impact","pxf.io","sjv.io","tkqlhce","anrdoezrs","qksrv.net","jdoqocy"])
+                  impact_fields=any(k in keys for k in ["irgwc","irpid","iradid","irmpname","irclickid","clickid"])
+                  has_affiliate_medium=(params.get("utm_medium",[""])[0].lower()=="affiliate")
+                  samples.append({"artist":artist.get("name"),"event_id":event.get("id"),
+                      "host":host,"query_keys":keys,"impact_host":impact_host,
+                      "impact_fields":impact_fields,"affiliate_medium":has_affiliate_medium})
+                  if len(samples)>=8: break
+          print("DESTINATION_AUDIT",json.dumps(samples,ensure_ascii=False))
+          print("SAMPLES",len(samples),"IMPACT_MARKERS",sum(x["impact_host"] or x["impact_fields"] for x in samples))
+          assert samples,"Could not retrieve any ticket destinations for inspection"
+          PY
