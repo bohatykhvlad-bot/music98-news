@@ -210,6 +210,14 @@ main{position:relative;z-index:1}
    wrap (no -22px bleed past the content edge), same paddings, same pill
    anchors. Every card slider on the site clips at the content edge. */
 .rail-wrap{position:relative;margin-top:0}
+/* During horizontal scroll, clip cards at the fixed content-left boundary.
+   The rail itself has a -32px bleed for first-card shadows. Without this
+   stationary viewport clip, scrolled cards become visible in that margin
+   underneath the left arrow. Keep the full shadow bleed at scrollLeft=0
+   and don't move, resize or restyle either arrow. */
+@media (min-width:641px){
+  .rail-wrap.rail-scrolled{clip-path:inset(-40px -40px -40px 0)}
+}
 /* Releases has no hero above its rail; don't add another 2px to the shared heading gap. */
 #tab-releases .rail-wrap{margin-top:0}
 .rail-wrap .rail-btn.prev{right:calc(100% - 66px)}
@@ -2679,11 +2687,13 @@ function syncRail(sel){
              setTab() will refresh both rails when the tab becomes visible. */
           prev.classList.remove("ok");
           next.classList.remove("ok");
+          wrap.classList.remove("rail-scrolled");
           return;
         }
         rail._max = Math.max(0, rail.scrollWidth - width - 1);
       }
       const x = rail.scrollLeft;
+      wrap.classList.toggle("rail-scrolled", x > 0.5 || !!rail.style.transform);
       prev.classList.toggle("ok", rail._max > 0 && x > 4);
       next.classList.toggle("ok", rail._max > 0 && x < rail._max);
     };
@@ -2822,6 +2832,7 @@ function wireRail(gridSel, prevSel, nextSel){
        accumulated into a visible left shift on touch (owner bug 2026-09-24) */
     if(tx && Math.abs(tx) > 0.5){ rail.style.willChange = "transform"; rail.style.transform = "translate3d(" + tx.toFixed(2) + "px,0,0)"; }
     else { rail.style.transform = ""; rail.style.willChange = ""; }
+    rail.parentElement.classList.toggle("rail-scrolled",rail.scrollLeft > 0.5 || !!rail.style.transform);
   };
   const springBack = tx0 =>{
     /* long, fully smooth ease-out return (owner: jerky before): no velocity
