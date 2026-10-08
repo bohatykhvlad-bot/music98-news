@@ -825,3 +825,27 @@ test("Popular browser cache rejects an old attraction identity validator",()=>{
   assert.match(app,/getPayload\(\{mode:"popular",v:"popular-v13"\},force\)/);
   assert.match(app,/!force && cached && Date\.now\(\)-cached\.at<PAYLOAD_CACHE_MS/);
 });
+
+test("Buy Tickets records independent ticket_click events in GA4 without changing affiliate URLs",()=>{
+  const start=app.indexOf("function trackTicketClick(e){");
+  const end=app.indexOf("\nfunction popupContent(e){",start);
+  assert.ok(start>=0&&end>start,"the tracking function is present");
+  const script=app.slice(start,end);
+  const calls=[];
+  const event={
+    id:"G5test",artist:"Bruno Mars",
+    url:"https://ticketmaster.evyy.net/c/example?u=https%3A%2F%2Fwww.ticketmaster.com%2F"
+  };
+  runInNewContext(script+"\ntrackTicketClick(event);",{
+    URL,event,window:{gtag:(...args)=>calls.push(args)}
+  });
+  assert.equal(calls.length,1);
+  assert.equal(calls[0][0],"event");
+  assert.equal(calls[0][1],"ticket_click");
+  assert.equal(calls[0][2].concert_artist,"Bruno Mars");
+  assert.equal(calls[0][2].concert_event_id,"G5test");
+  assert.equal(calls[0][2].destination_host,"ticketmaster.evyy.net");
+  runInNewContext(script+"\ntrackTicketClick(event);",{URL,event,window:{}});
+  assert.match(app,/a\.href=e\.url; a\.target="_blank"/);
+  assert.match(app,/a\.addEventListener\("click",\(\)=>trackTicketClick\(e\)\)/);
+});
