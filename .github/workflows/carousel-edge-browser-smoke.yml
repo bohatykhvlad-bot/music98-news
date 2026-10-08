@@ -65,6 +65,9 @@ jobs:
               const rail=document.getElementById(id);
               const wrap=rail.parentElement;
               syncRail('#'+id);
+              rail.style.scrollBehavior='auto';
+              rail.scrollLeft=0;
+              rail._refreshRail();
               const prev=wrap.querySelector('.prev').getBoundingClientRect();
               const next=wrap.querySelector('.next').getBoundingClientRect();
               const beforeLeft=wrap.getBoundingClientRect().left;
@@ -77,12 +80,18 @@ jobs:
               const y=cardRect.top+80;
               const protrusion=document.elementFromPoint(wrapRect.left-12,y);
               const inside=document.elementFromPoint(wrapRect.left+12,y);
+              const centerInside=document.elementFromPoint(wrapRect.left+100,y);
               results.push({
                 id,wasClipped,scrollLeft:rail.scrollLeft,
                 scrollClip:wrap.classList.contains('rail-scrolled'),
                 computedClip:getComputedStyle(wrap).clipPath,
                 outsideCard:!!protrusion?.closest('.card,.rcard'),
-                insideCard:!!inside?.closest('.card,.rcard'),
+                insideCard:!!inside?.closest('.card,.rcard')||!!centerInside?.closest('.card,.rcard'),
+                insideAt12:inside?.className||inside?.tagName||'',
+                insideAt100:centerInside?.className||centerInside?.tagName||'',
+                wrapperX:wrapRect.left,
+                cardTop:cardRect.top,
+                cardHeight:cardRect.height,
                 leftFixed:Math.abs(beforeLeft-wrapRect.left)<.1,
                 prevFixed:Math.abs(prev.left-wrap.querySelector('.prev').getBoundingClientRect().left)<.1,
                 nextFixed:Math.abs(next.right-wrap.querySelector('.next').getBoundingClientRect().right)<.1
@@ -109,6 +118,7 @@ jobs:
           if(!browser)throw Error('CHROME_NOT_INSTALLED');
           const dump=execFileSync(browser,[
             '--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage',
+            '--window-size=1440,1200','--force-device-scale-factor=1',
             '--virtual-time-budget=3000','--dump-dom','file:///tmp/music98-carousel-edge.html'
           ],{encoding:'utf8',timeout:40000,stdio:['ignore','pipe','ignore']});
           const match=dump.match(/<pre id="metrics">([\s\S]*?)<\/pre>/);
