@@ -799,3 +799,20 @@ test("Mapbox GL constructor failure retains concert data and starts a real non-W
   assert.match(raster,/map\.on\("zoomend",render\)/);
   assert.doesNotMatch(raster,/WebGLRenderingContext|mapboxgl\.Map/);
 });
+
+test("expanded artist tours cannot render mismatched performer events from browser caches",()=>{
+  const start=app.indexOf("function scopedArtistEvents(events,item){");
+  const end=app.indexOf("\nfunction setLayerVisible(",start);
+  assert.ok(start>=0 && end>start);
+  const src=app.slice(start,end);
+  const events=[
+    {id:"noto",artist:"Drake",attractionId:"drake",attractionIds:["drake","bad-bunny"],venue:"NOTO"},
+    {id:"genuine",artist:"Bad Bunny",attractionId:"bad-bunny",venue:"Stadium"},
+    {id:"wrong-name",artist:"Drake",attractionId:"bad-bunny",venue:"NOTO"},
+  ];
+  const result=runInNewContext(`${src};scopedArtistEvents(events,item).map(e=>e.id)`,
+    {events,item:{id:"bad-bunny",name:"Bad Bunny"}});
+  assert.deepEqual([...result],["genuine"]);
+  assert.match(app,/events:scopedArtistEvents\(payload\?\.events,item\)/);
+  assert.match(app,/applyConcertArt\(img,artistImage\|\|e\.artistImage\|\|e\.image\|\|"\/logo\.png","icon"\)/);
+});
