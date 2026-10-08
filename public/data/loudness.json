@@ -4,7 +4,7 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": "2026-10-08T16:59:38.429Z"
+    "measuredAt": "2026-10-08T22:33:41.072Z"
   },
   "aintinla|adla": {
     "integratedLufs": -6.2,
@@ -68,13 +68,6 @@
     "gainDb": -7.4,
     "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c8/7c/d4/c87cd4df-1197-1d1d-a07c-c5139d59a58f/mzaf_8671653320488087674.plus.aac.p.m4a",
     "measuredAt": "2026-09-29T20:57:25.402Z"
-  },
-  "billiejean|michaeljackson": {
-    "integratedLufs": -9.6,
-    "truePeakDbtp": 0.8,
-    "gainDb": -6.4,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/6f/e6/1f6fe6c2-15b6-ed27-5c5f-0e63273cf167/mzaf_12076627970141246810.plus.aac.p.m4a",
-    "measuredAt": "2026-10-08T08:01:01.553Z"
   },
   "boston|stellalefty": {
     "integratedLufs": -9,
@@ -181,6 +174,13 @@
     "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/60/17/35/60173512-3d5c-1d6f-549e-d8ddafa93e07/mzaf_5281658494050788067.plus.aac.p.m4a",
     "measuredAt": "2026-10-05T23:47:53.846Z"
   },
+  "jaded|koewetzel": {
+    "integratedLufs": -7.1,
+    "truePeakDbtp": 1,
+    "gainDb": -8.9,
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/94/f7/e2/94f7e2cc-b182-cb75-7a31-7e88eee2191e/mzaf_12920756836197900992.plus.aac.p.m4a",
+    "measuredAt": "2026-10-08T22:33:41.741Z"
+  },
   "janicestfu|drake": {
     "integratedLufs": -9.9,
     "truePeakDbtp": 0.3,
@@ -208,6 +208,13 @@
     "gainDb": -9.6,
     "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/96/3c/93/963c93ce-93b1-40c6-ed8d-04bb8cc27c82/mzaf_4401986005887392953.plus.aac.p.m4a",
     "measuredAt": "2026-09-29T20:57:23.751Z"
+  },
+  "lovemenot|ravynlenae": {
+    "integratedLufs": -8.6,
+    "truePeakDbtp": 0.7,
+    "gainDb": -7.4,
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e4/56/cd/e456cd7c-d289-553a-9c39-98ca08ca0b4b/mzaf_14810478461288819548.plus.aac.p.m4a",
+    "measuredAt": "2026-10-08T22:33:41.446Z"
   },
   "manineed|oliviadean": {
     "integratedLufs": -7.9,
@@ -348,12 +355,5 @@
     "gainDb": -6.5,
     "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c1/65/e0/c165e08a-84ab-a71a-f212-f686ebe868f8/mzaf_10188871424072181738.plus.aac.p.m4a",
     "measuredAt": "2026-09-29T20:57:34.132Z"
-  },
-  "trainingseason|dualipa": {
-    "integratedLufs": -7,
-    "truePeakDbtp": 0.6,
-    "gainDb": -9,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a8/87/16/a88716e2-9474-ec4e-06d6-d3a9a3ba96c8/mzaf_6258558385119267725.plus.aac.p.m4a",
-    "measuredAt": "2026-10-07T07:44:28.506Z"
   }
 }
