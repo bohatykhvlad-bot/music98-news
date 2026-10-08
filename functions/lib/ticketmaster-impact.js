@@ -7,6 +7,7 @@
 // Do not substitute the US campaign for an international Ticketmaster domain.
 // Unlisted or third-party sellers keep their original URLs.
 export const IMPACT_PUBLISHER_ID="4932692";
+export const IMPACT_CONCERTS_SUBID="music98_concerts";
 
 const MARKET_TEMPLATES=Object.freeze({
   "com":    ["ticketmaster.evyy.net","264167","4272"],
@@ -33,6 +34,13 @@ const MARKET_TEMPLATES=Object.freeze({
 // Tracking hosts are explicit to prevent accidentally wrapping arbitrary links.
 const REGIONAL_HOSTS=new Set(Object.values(MARKET_TEMPLATES).map(row=>row[0]));
 
+function addMapAttribution(url){
+  // Impact supports subId1..subId3; using subId3 keeps any existing partner
+  // values intact and makes map clicks identifiable in Impact reporting.
+  if(!url.searchParams.has("subId3")) url.searchParams.set("subId3",IMPACT_CONCERTS_SUBID);
+  return url.toString();
+}
+
 function sourceURL(raw){
   try{
     const u=new URL(String(raw||""));
@@ -58,7 +66,7 @@ export function impactTicketUrl(original){
   if(REGIONAL_HOSTS.has(input.hostname.toLowerCase()) &&
      /^\/c\/\d+\/\d+\/\d+\/?$/.test(input.pathname)){
     const matched=input.pathname.match(/^\/c\/(\d+)\//);
-    if(matched?.[1]===IMPACT_PUBLISHER_ID) return input.toString();
+    if(matched?.[1]===IMPACT_PUBLISHER_ID) return addMapAttribution(input);
     const nested=sourceURL(input.searchParams.get("u"));
     if(!nested) return input.toString();
     landing=nested;
@@ -69,7 +77,7 @@ export function impactTicketUrl(original){
   const output=new URL(`https://${host}/c/${IMPACT_PUBLISHER_ID}/${adId}/${campaignId}`);
   output.searchParams.set("u",landing.toString());
   output.searchParams.set("utm_medium","affiliate");
-  return output.toString();
+  return addMapAttribution(output);
 }
 
 export function impactTicketMarket(original){
