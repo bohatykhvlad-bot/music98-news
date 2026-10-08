@@ -210,10 +210,26 @@ function runtimeAppleCandidate(track){
   };
 }
 
-const chart=await json(CHART+(CHART.includes("?")?"&":"?")+"artworkAudit="+Date.now());
-const tracks=Array.isArray(chart?.tracks)?chart.tracks:[];
-if(tracks.length!==50 || chart.complete!==true || !chart.artworkAuditOnly)
-  throw new Error("artwork audit must inspect the prospective verified 50-song edition, not an older published fallback");
+/* The chart Worker deploy and this workflow can start from the same push.
+ * Wait for the preview endpoint to deploy, and never accidentally audit the
+ * older complete fallback while the prospective edition is still incomplete. */
+async function prospectiveChart(){
+  let last="not yet deployed";
+  for(let attempt=0;attempt<20;attempt++){
+    try{
+      const candidate=await json(CHART+(CHART.includes("?")?"&":"?")+"artworkAudit="+Date.now());
+      if(candidate?.artworkAuditOnly===true && candidate.complete===true &&
+         candidate.tracks?.length===50) return candidate;
+      last=JSON.stringify({updated:candidate?.updated,rev:candidate?.rev,
+        fallback:candidate?.fallback,auditOnly:candidate?.artworkAuditOnly,
+        rows:candidate?.tracks?.length});
+    }catch(error){last=String(error?.message||error);}
+    if(attempt<19)await sleep(15000);
+  }
+  throw new Error("prospective artwork edition unavailable after retries: "+last);
+}
+const chart=await prospectiveChart();
+const tracks=chart.tracks;
 console.log("ARTWORK_AUDIT chart",chart.updated||"-",chart.rev||"-","rows",tracks.length);
 let feed=[]; try{feed=await appleFeedCandidates();console.log("ARTWORK_AUDIT apple-feed candidates",feed.length);}catch(e){console.log("ARTWORK_AUDIT apple-feed unavailable",String(e.message||e));}
 const oldAudit=readAudit(), oldNames=readNames();
