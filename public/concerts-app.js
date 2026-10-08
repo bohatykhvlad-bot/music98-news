@@ -1380,12 +1380,12 @@ function restoreModeMap(){
   }
 }
 
-async function getPayload(params){
+async function getPayload(params,force=false){
   const u=new URL("/api/concerts",location.origin);
   Object.entries(params).forEach(([k,v])=>{ if(v!==""&&v!=null) u.searchParams.set(k,v); });
   const key=u.pathname+"?"+[...u.searchParams.entries()].sort(([a],[b])=>a.localeCompare(b)).map(([k,v])=>k+"="+v).join("&");
   const cached=payloadCache.get(key);
-  if(cached && Date.now()-cached.at<PAYLOAD_CACHE_MS) return cached.data;
+  if(!force && cached && Date.now()-cached.at<PAYLOAD_CACHE_MS) return cached.data;
   if(payloadInflight.has(key)) return payloadInflight.get(key);
 
   const work=(async()=>{
@@ -1425,12 +1425,14 @@ function mergeHotspots(rows){
 }
 
 const POPULAR_ALGORITHM="rank-ordered-event-query-v2";
-const POPULAR_CACHE_KEY="music98:concert-popular:v11";
+const POPULAR_CACHE_KEY="music98:concert-popular:v12";
+const POPULAR_IDENTITY_VALIDATION="primary-attraction-v2";
 function readPopularCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(POPULAR_CACHE_KEY)||"null");
     const age=Date.now()-(Date.parse(cached?.builtAt||0)||0);
     if(cached?.version==="popular-v4" &&
+       cached?.identityValidation===POPULAR_IDENTITY_VALIDATION &&
        cached?.algorithm===POPULAR_ALGORITHM &&
        cached?.source==="spotify_monthly_listeners" &&
        cached?.eligibility==="ticketmaster_event_payload_gt_0" &&
@@ -1444,6 +1446,7 @@ function readPopularCache(){
 function writePopularCache(data){
   if(data?.stale ||
      data?.version!=="popular-v4" ||
+     data?.identityValidation!==POPULAR_IDENTITY_VALIDATION ||
      data?.algorithm!==POPULAR_ALGORITHM ||
      data?.source!=="spotify_monthly_listeners" ||
      data?.eligibility!=="ticketmaster_event_payload_gt_0" ||
@@ -1527,15 +1530,16 @@ async function loadPopular(force=false){
   }
 
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v11"});
-    if(data?.algorithm===POPULAR_ALGORITHM && data?.source==="spotify_monthly_listeners" && Array.isArray(data.artists) && data.artists.length>=30){
-      popularArtists=data.artists.slice(0,30);
+    const data=await getPayload({mode:"popular",v:"popular-v12"},force);
+    if(data?.algorithm===POPULAR_ALGORITHM && data?.identityValidation===POPULAR_IDENTITY_VALIDATION && data?.source==="spotify_monthly_listeners" && Array.isArray(data.artists)){
+      popularArtists=data.artists.filter(a=>a?.id && a?.eventConfirmed===true && Number(a?.shows||0)>0).slice(0,30);
     }
     popularEvents=[];
     writePopularCache(data);
     if(requestId!==popularRequestSeq || activeMode!=="popular" || artistContext) return;
-    if(popularArtists.length>=30){
-      clearPopularWarmRetry();
+    if(popularArtists.length){
+      if(data?.warming) schedulePopularWarmRetry();
+      else clearPopularWarmRetry();
       renderArtists(popularArtists.slice(0,30),"popular");
       sideEmpty.hidden=true;
     }else{
