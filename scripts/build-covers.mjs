@@ -8,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import dns from "node:dns";
 import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen } from "../functions/lib/chart-identity.js";
-import { candidateCompatible, classifyCandidate, normalizedRelease, rankArtworkCandidates, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
+import { candidateCompatible, classifyCandidate, isDerivativeRelease, isGenericRelease, normalizedRelease, rankArtworkCandidates, selectArtworkCandidate } from "../functions/lib/artwork-resolver.js";
 import {retainedArtworkHistory} from "../functions/lib/artwork-history.js";
 dns.setDefaultResultOrder("ipv4first");
 
