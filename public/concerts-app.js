@@ -1425,8 +1425,8 @@ function mergeHotspots(rows){
 }
 
 const POPULAR_ALGORITHM="rank-ordered-event-query-v2";
-const POPULAR_CACHE_KEY="music98:concert-popular:v12";
-const POPULAR_IDENTITY_VALIDATION="primary-attraction-v2";
+const POPULAR_CACHE_KEY="music98:concert-popular:v13";
+const POPULAR_IDENTITY_VALIDATION="primary-attraction-v3";
 function readPopularCache(){
   try{
     const cached=JSON.parse(localStorage.getItem(POPULAR_CACHE_KEY)||"null");
@@ -1530,7 +1530,7 @@ async function loadPopular(force=false){
   }
 
   try{
-    const data=await getPayload({mode:"popular",v:"popular-v12"},force);
+    const data=await getPayload({mode:"popular",v:"popular-v13"},force);
     if(data?.algorithm===POPULAR_ALGORITHM && data?.identityValidation===POPULAR_IDENTITY_VALIDATION && data?.source==="spotify_monthly_listeners" && Array.isArray(data.artists)){
       popularArtists=data.artists.filter(a=>a?.id && a?.eventConfirmed===true && Number(a?.shows||0)>0).slice(0,30);
     }
