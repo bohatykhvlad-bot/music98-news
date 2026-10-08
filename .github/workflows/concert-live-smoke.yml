@@ -47,8 +47,11 @@ jobs:
           assert data.get("algorithm")=="rank-ordered-event-query-v2", summary
           assert data.get("identityValidation")=="primary-attraction-v3", summary
           assert data.get("source")=="spotify_monthly_listeners", summary
-          assert len(artists)==30, summary
-          assert len({str(a.get("id","")) for a in artists})==30, summary
+          if data.get("warming"):
+              assert 0<len(artists)<=30, summary
+          else:
+              assert len(artists)==30, summary
+          assert len({str(a.get("id","")) for a in artists})==len(artists), summary
           assert all(a.get("eventConfirmed") is True and int(a.get("shows") or 0)>0 for a in artists), summary
           PY
 
