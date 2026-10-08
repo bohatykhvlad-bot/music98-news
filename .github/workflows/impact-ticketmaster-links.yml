@@ -3,8 +3,8 @@ on:
   push:
     paths:
       - "functions/api/concerts.js"
+      - "functions/lib/ticketmaster-impact.js"
       - "public/concerts-app.js"
-      - "public/concerts-raster-fallback.js"
       - ".github/workflows/impact-ticketmaster-links.yml"
   workflow_dispatch:
 
@@ -14,64 +14,57 @@ permissions:
 jobs:
   inspect-affiliate-links:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 7
     steps:
-      - name: Check live Buy Tickets destinations for Impact tracking
+      - name: Verify regional Impact attribution in live Concerts API
         shell: bash
         run: |
           python - <<'PY'
-          import json, urllib.parse, urllib.request, collections, time
-          queries=[
-              ("Berlin","DE"),
-              ("Paris","FR"),
-              ("New York","US"),
-          ]
-          publisher="4932692"
-          seen=set()
-          hosts=collections.Counter()
-          examples=[]
-          counts={"affiliate":0,"direct_ticketmaster":0,"other":0}
-          for city,country in queries:
-              url="https://music98.news/api/concerts?"+urllib.parse.urlencode(
-                  {"city":city,"countryCode":country,"impactAudit":str(int(time.time()))})
-              req=urllib.request.Request(url,headers={
-                  "Accept":"application/json","Cache-Control":"no-cache",
-                  "User-Agent":"music98-impact-audit/1.0"
-              })
-              try:
-                  with urllib.request.urlopen(req,timeout=28) as response:
-                      data=json.load(response)
-              except Exception as err:
-                  print("AUDIT_FETCH_FAILED",city,str(err))
-                  continue
-              rows=data.get("events") or []
-              print("AUDIT_CITY",city,"events",len(rows))
-              for row in rows:
-                  raw=str(row.get("url") or "").strip()
-                  if not raw or raw in seen:
-                      continue
-                  seen.add(raw)
-                  p=urllib.parse.urlsplit(raw)
-                  host=(p.hostname or "").lower()
-                  hosts[host]+=1
-                  affiliate=host.endswith(".evyy.net") and (
-                      "/c/"+publisher+"/" in p.path or p.path.startswith("/c/"+publisher))
-                  if affiliate: kind="affiliate"
-                  elif host.startswith("ticketmaster.") or ".ticketmaster." in host: kind="direct_ticketmaster"
-                  else: kind="other"
-                  counts[kind]+=1
-                  if len(examples)<18 or (affiliate and not any(x.get("kind")=="affiliate" for x in examples)):
-                      example={"city":city,"kind":kind,"host":host,
-                          "publisher_id_matches":affiliate,
-                          "path_family":p.path if affiliate else p.path[:48],
-                          "query_keys":sorted(urllib.parse.parse_qs(p.query).keys())}
-                      examples.append(example)
-          print("IMPACT_AUDIT",json.dumps({
-              "counts":counts,"hosts":dict(hosts),"examples":examples,
-              "sampled_unique_urls":len(seen)},ensure_ascii=False))
-          if counts["direct_ticketmaster"]:
-              print("::warning::Affiliate tracking missing for",counts["direct_ticketmaster"],
-                "Ticketmaster destinations. Verify local Impact contracts and API link wrapping.")
-          assert len(seen)>0,"no concert URLs were sampled"
-          assert counts["affiliate"]>0,"no Impact tracking links found in live concert event URLs"
+          import json, urllib.parse, urllib.request, urllib.error, time
+          markets={
+              "DE":("Berlin","ticketmaster-de.tm7514.net","427757","7514"),
+              "FR":("Paris","ticketmaster-fr.tm7516.net","427761","7516"),
+              "US":("New York","ticketmaster.evyy.net","264167","4272")
+          }
+          expected_publisher="4932692"
+          for attempt in range(14):
+              summary={}
+              errors=[]
+              for country,(city,host,ad,campaign) in markets.items():
+                  url="https://music98.news/api/concerts?"+urllib.parse.urlencode({
+                      "city":city,"countryCode":country,"impactAudit":"region-v2-"+str(attempt)})
+                  req=urllib.request.Request(url,headers={"Accept":"application/json",
+                      "Cache-Control":"no-cache","User-Agent":"music98-affiliate-coverage-audit/1.0"})
+                  try:
+                      with urllib.request.urlopen(req,timeout=28) as res:
+                          events=json.load(res).get("events") or []
+                  except Exception as exc:
+                      errors.append(country+":"+str(exc));continue
+                  result={"events":len(events),"ticketmaster":0,"correct":0,"bad":[],"other":0}
+                  for event in events:
+                      raw=str(event.get("url") or "")
+                      if not raw: continue
+                      p=urllib.parse.urlsplit(raw)
+                      destination=urllib.parse.parse_qs(p.query).get("u",[""])[0]
+                      dest=urllib.parse.urlsplit(destination)
+                      original_country=dest.hostname or p.hostname or ""
+                      if "ticketmaster." not in original_country:
+                          result["other"]+=1
+                          continue
+                      result["ticketmaster"]+=1
+                      correct=(p.hostname==host and p.path==f"/c/{expected_publisher}/{ad}/{campaign}"
+                          and dest.scheme=="https" and dest.hostname
+                          and urllib.parse.parse_qs(p.query).get("utm_medium",[""])[0]=="affiliate")
+                      if correct: result["correct"]+=1
+                      elif len(result["bad"])<3:
+                          result["bad"].append({"host":p.hostname,"path":p.path[:80]})
+                  summary[country]=result
+              print("IMPACT_COVERAGE",json.dumps({"attempt":attempt+1,"markets":summary,"errors":errors}))
+              if not errors and len(summary)==3 and all(
+                  x["ticketmaster"]>0 and x["ticketmaster"]==x["correct"]
+                  for x in summary.values()):
+                  print("IMPACT_COVERAGE_PASS")
+                  break
+              if attempt==13: raise SystemExit("IMPACT_COVERAGE_FAILED")
+              time.sleep(12)
           PY
