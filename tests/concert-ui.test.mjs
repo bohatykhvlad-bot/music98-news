@@ -301,6 +301,7 @@ test("concert popup dynamically assembles full photo and event details, includin
   const constructed=[];
   const doc={createElement(tag){
     const node={tag,className:"",children:[],dataset:{},textContent:"",
+      addEventListener(){},
       append(...children){this.children.push(...children);},
       appendChild(child){this.children.push(child);return child;}};
     constructed.push(node);return node;
