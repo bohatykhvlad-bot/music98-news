@@ -1,13 +1,13 @@
 name: Refresh album discovery catalog
 on:
   schedule:
-    - cron: '15 4 * * *'
+    - cron: '30 2 * * 1'
   workflow_dispatch:
     inputs:
       batch:
-        description: 'Number of Apple artist searches (1-500, initially up to 500)'
+        description: 'Maximum new/stale artists to check this week (1-500)'
         required: false
-        default: '35'
+        default: '500'
 permissions:
   contents: write
 concurrency:
@@ -24,7 +24,7 @@ jobs:
           node-version: '22'
       - name: Prepare and validate album catalog
         env:
-          BATCH: ${{ github.event.inputs.batch || '35' }}
+          BATCH: ${{ github.event.inputs.batch || '500' }}
         run: node scripts/build-discover-albums.mjs --batch="$BATCH"
       - name: Commit refreshed catalog if changed
         run: |
