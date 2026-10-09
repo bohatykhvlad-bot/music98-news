@@ -151,11 +151,13 @@ test("mobile cards keep desktop title-teaser spacing and equalize only whole-car
   assert.doesNotMatch(page,/p\.style\.minHeight\s*=\s*maxP/);
 });
 
-test("direct Concerts route is applied before editorial desk fetch finishes",()=>{
-  const routeAt=page.lastIndexOf('if(initialCleanPath==="/concerts" || initialCleanPath==="/discover" || location.hash==="#concerts" || location.hash==="#discover") route();');
+test("all section deep links activate before editorial desk fetch finishes",()=>{
+  const routeAt=page.lastIndexOf("if(initialSectionPath || initialSectionHash){");
   const deskAt=page.lastIndexOf("loadPublishedDesk();");
   assert.ok(routeAt>=0);
   assert.ok(deskAt>routeAt);
+  assert.match(page,/initialSectionPath=\/\^\\\/\(\?:news\|releases\|chart\|charts\|discover\|concerts\)\$/);
+  assert.match(page,/initialSectionHash=\/\^#\(\?:news\|releases\|charts\|discover\|concerts\)\$/);
 });
 
 
