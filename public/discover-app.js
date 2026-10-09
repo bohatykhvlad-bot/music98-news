@@ -81,7 +81,7 @@
     byId("discoverGenre").textContent = album.genre || "";
     selection.hidden = false;
     button.textContent = "Find another album";
-    status.textContent = album.artist + " — " + album.title;
+    status.textContent = ""; // The artist and album are already displayed above.
     renderPlayer();
   }
 
