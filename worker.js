@@ -242,7 +242,10 @@ export default {
       return serveConcertsShell(request, env);
     }
     if (path === "/discover" && (request.method === "GET" || request.method === "HEAD")) {
-      return env.ASSETS.fetch(new Request(new URL("/discover.html", request.url), request));
+      // With html_handling="auto-trailing-slash", "/discover" resolves to
+      // public/discover.html; requesting "/discover.html" causes a 307 back
+      // to "/discover" and a redirect loop.
+      return env.ASSETS.fetch(request);
     }
     if (/^\/(?:releases|chart|charts)\/?$/.test(path) &&
         (request.method === "GET" || request.method === "HEAD")) {
