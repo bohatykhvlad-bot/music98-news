@@ -158,6 +158,7 @@ main{position:relative;z-index:1}
 #tab-news .news-heading-row{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 var(--section-heading-gap)}
 #tab-news .news-heading-row .hd{margin:0;min-width:0}
 .m98-home-banner{flex:0 0 728px;min-width:0;text-align:center}
+#tab-news .m98-home-banner.m98-ad-unfilled{display:none}
 .m98-home-banner-slot{width:728px;height:90px;margin:0 auto}
 @media (min-width:800px) and (max-width:1049px){
   .m98-home-banner{flex-basis:468px}
@@ -867,8 +868,15 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 </style>
-<link rel="stylesheet" href="/display-ads.css?v=20261009-3">
-<script src="/display-ads.js?v=20261009-3" defer></script>
+<!-- One PurpleAds banner only; the former multi-placement module is retired. -->
+<script>
+  window.purpleDisplay = window.purpleDisplay || {};
+  window.purpleDisplay.onUnfilled = function (placement) {
+    var el = placement && placement.element;
+    var banner = el && el.closest && el.closest(".m98-home-banner");
+    if (banner) banner.classList.add("m98-ad-unfilled");
+  };
+</script>
 </head>
 <body>
 

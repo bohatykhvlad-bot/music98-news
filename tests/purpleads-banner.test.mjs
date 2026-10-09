@@ -34,6 +34,15 @@ test("banner CSS provides documented desktop and mobile ad dimensions", () => {
   assert.match(html, /body\.articlepage main \.tab\{display:none!important\}/);
 });
 
+test("only the live banner handles no-fill; stale multi-placement scripts never load", () => {
+  assert.doesNotMatch(html, /<script[^>]+src="\/display-ads\.js/);
+  assert.doesNotMatch(html, /<link[^>]+href="\/display-ads\.css/);
+  assert.match(html, /window\.purpleDisplay\.onUnfilled = function \(placement\)/);
+  assert.match(html, /banner\.classList\.add\("m98-ad-unfilled"\)/);
+  assert.match(html, /#tab-news \.m98-home-banner\.m98-ad-unfilled\{display:none\}/);
+  assert.equal((html.match(/data-pa-tag\b/g) || []).length, 1);
+});
+
 test("PurpleAds verification and ads.txt declarations remain intact", () => {
   assert.match(html, /name="purpleads-verification"/);
   assert.match(adsTxt, /^purpleads\.io,\s*[^\n]+,\s*DIRECT/m);
