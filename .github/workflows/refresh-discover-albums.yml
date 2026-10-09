@@ -1,0 +1,38 @@
+name: Refresh album discovery catalog
+on:
+  schedule:
+    - cron: '15 4 * * *'
+  workflow_dispatch:
+    inputs:
+      batch:
+        description: 'Number of Apple artist searches (1-500, initially up to 500)'
+        required: false
+        default: '35'
+permissions:
+  contents: write
+concurrency:
+  group: discover-catalog
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare and validate album catalog
+        env:
+          BATCH: ${{ github.event.inputs.batch || '35' }}
+        run: node scripts/build-discover-albums.mjs --batch="$BATCH"
+      - name: Commit refreshed catalog if changed
+        run: |
+          if git diff --quiet -- public/data/discover-albums.json; then
+            echo 'No updates'; exit 0
+          fi
+          git config user.name 'music98-catalog-bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/data/discover-albums.json
+          git commit -m 'Refresh cached album discovery catalog'
+          git push
