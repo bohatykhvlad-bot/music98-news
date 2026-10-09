@@ -84,18 +84,19 @@
       // Fronts begin on the card boundary, then bend gradually as they spread.
       float edgeBend=smoothstep(0.,.12,max(distance,0.));
       float waveDistance=distance+edgeBend*(bend+.025*sin(p.x*4.+p.y*3.-time*.3));
-      float lanes=fbm(vec2(waveDistance*12.-time*.72,(p.x+p.y)*2.)+warp*.6);
+      float lanes=fbm(vec2(waveDistance*8.-time*.46,(p.x+p.y)*2.)+warp*.6);
       float volume=fbm(transport*4.8+warp*.9);
       float detail=noise(transport*26.+warp*2.);
-      float ripple=.5+.5*sin(waveDistance*28.-time*1.65+(volume-.5)*.8*edgeBend);
+      float ripple=.5+.5*sin(waveDistance*20.-time*1.+(volume-.5)*.8*edgeBend);
       // Equal distances from the player share the same base coverage. This
       // removes the old asymmetric edge clouds and their white clearings.
       float envelope=.60+.40*exp(-max(distance,0.)*1.5);
-      float density=volume*.38+lanes*.35+ripple*.32+detail*.05;
+      float density=.08+volume*.62+lanes*.18+ripple*.10+detail*.05;
       float body=envelope*(.10+smoothstep(.25,.80,density)*.8);
-      // Soft, textured crests break up the diffuse cloud into flowing waves.
+      // Keep the outward fronts within the diffuse texture so repeating
+      // rings don't dominate the player or become a high-contrast pulse.
       float crests=smoothstep(.55,.98,ripple)*(.45+.55*smoothstep(.25,.75,volume));
-      body+=envelope*crests*.20;
+      body+=envelope*crests*.055;
       float haze=.04+envelope*.035;
       // Interpolated grain moves continuously instead of jumping between
       // random pixel cells as the current advances.
@@ -105,7 +106,7 @@
       float depth=smoothstep(.30,.8,volume);
       vec3 blue=vec3(.18,.66,.90), cyan=vec3(.0,.83,.81), mineral=vec3(.02,.59,.64);
       vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23));
-      colour=mix(colour,mineral,clamp(smoothstep(.48,.86,lanes)*.46+crests*.16,0.,.65));
+      colour=mix(colour,mineral,clamp(smoothstep(.48,.86,lanes)*.25+crests*.04,0.,.65));
       // Lit grains sit within the volume, with a wider glow beneath it.
       colour=mix(colour,vec3(.80,1.,.98),clamp(dots.x*.45+dots.y*.3+depth*.14,0.,.8));
       colour=mix(colour,vec3(.15,.67,.88),motes.x*.4);
@@ -175,11 +176,11 @@
         glow.addColorStop(.45,"rgba(40,232,209,.08)");glow.addColorStop(1,"rgba(0,220,225,0)");
         ctx.fillStyle=glow;ctx.fillRect(-1,-1,2,2);ctx.restore();
       }
-      ctx.save();ctx.shadowBlur=24;ctx.shadowColor="rgba(0,220,215,.25)";
+      ctx.save();ctx.shadowBlur=32;ctx.shadowColor="rgba(0,220,215,.12)";
       for(let i=0;i<3;i++){
-        const travel=(clock*.065+i/3)%1,spread=travel*Math.max(width,height)*.5;
-        ctx.strokeStyle=`rgba(0,178,194,${(1-travel)*(.06+energy*.04)})`;
-        ctx.lineWidth=24+spread*.06;ctx.beginPath();
+        const travel=(clock*.045+i/3)%1,spread=travel*Math.max(width,height)*.5;
+        ctx.strokeStyle=`rgba(0,178,194,${(1-travel)*(.02+energy*.015)})`;
+        ctx.lineWidth=32+spread*.06;ctx.beginPath();
         if(ctx.roundRect)ctx.roundRect(sourceX-halfWidth-spread,sourceY-halfHeight-spread,
           (halfWidth+spread)*2,(halfHeight+spread)*2,24+spread);
         else ctx.ellipse(sourceX,sourceY,halfWidth+spread,halfHeight+spread,0,0,Math.PI*2);
