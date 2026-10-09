@@ -1,5 +1,10 @@
 name: Refresh album discovery catalog
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refresh-discover-albums.yml'
+      - 'scripts/build-discover-albums.mjs'
   schedule:
     - cron: '30 2 * * 1'
   workflow_dispatch:
