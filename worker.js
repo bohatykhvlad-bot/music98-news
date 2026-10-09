@@ -241,13 +241,8 @@ export default {
     if (path === "/concerts" && (request.method === "GET" || request.method === "HEAD")) {
       return serveConcertsShell(request, env);
     }
-    if (path === "/discover" && (request.method === "GET" || request.method === "HEAD")) {
-      // With html_handling="auto-trailing-slash", "/discover" resolves to
-      // public/discover.html; requesting "/discover.html" causes a 307 back
-      // to "/discover" and a redirect loop.
-      return env.ASSETS.fetch(request);
-    }
-    if (/^\/(?:releases|chart|charts)\/?$/.test(path) &&
+    // Discover is a real tab of the homepage, not a stand-alone document.
+    if (/^\/(?:releases|discover|chart|charts)\/?$/.test(path) &&
         (request.method === "GET" || request.method === "HEAD")) {
       const u = new URL(request.url);
       const res = await env.ASSETS.fetch(new Request(u.origin + "/index.html", request));
