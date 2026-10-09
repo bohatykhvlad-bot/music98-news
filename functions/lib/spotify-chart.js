@@ -1,5 +1,5 @@
 import {mergeKey} from "./chart-identity.js";
-export const SPOTIFY_TOP_SIZE=50;
+export const SPOTIFY_TOP_SIZE=100;
 export const SPOTIFY_MAX_LAG_DAYS=2;
 function textOf(html){
  return String(html||"").replace(/<[^>]*>/g,"")
