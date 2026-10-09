@@ -1,0 +1,40 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import test from "node:test";
+
+const html = readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+const adsTxt = readFileSync(new URL("../public/ads.txt", import.meta.url), "utf8");
+
+test("PurpleAds has exactly one responsive ad unit", () => {
+  assert.equal((html.match(/cdn\.prplads\.com\/agent\.js\?/g) || []).length, 1);
+  assert.equal((html.match(/data-pa-tag\b/g) || []).length, 1);
+  assert.equal((html.match(/data-ad-position=/g) || []).length, 1);
+  assert.match(html, /<script src="https:\/\/cdn\.prplads\.com\/agent\.js\?publisherId=[0-9a-f]+:[0-9a-f]+" data-pa-tag async><\/script>/);
+});
+
+test("the single banner sits above the News hero and nowhere else", () => {
+  const newsStart = html.indexOf('<section class="tab active" id="tab-news">');
+  const placement = html.indexOf('<aside class="m98-home-banner"');
+  const hero = html.indexOf('<div id="heroSlot">');
+  const newsEnd = html.indexOf('<section class="tab" id="tab-releases">');
+  const row = html.indexOf('<div class="news-heading-row">');
+  const heading = html.indexOf('<h1 class="hd-t">Latest stories</h1>');
+  assert.ok(newsStart !== -1 && newsStart < row && row < heading && heading < placement && placement < hero && hero < newsEnd);
+  assert.doesNotMatch(html, /m98-ad-placement|m98DisplayAd|data-ad-position="news-between"|data-ad-position="news-bottom"/);
+});
+
+test("banner CSS provides documented desktop and mobile ad dimensions", () => {
+  assert.match(html, /\.m98-home-banner-slot\{width:728px;height:90px;/);
+  assert.match(html, /#tab-news \.news-heading-row\{display:flex;align-items:center;justify-content:space-between;/);
+  assert.match(html, /@media \(max-width:559px\)\{/);
+  assert.match(html, /\.m98-home-banner-slot\{width:468px;height:60px\}/);
+  assert.match(html, /\.m98-home-banner-slot\{width:320px;max-width:100%;height:100px\}/);
+  assert.match(html, /\.m98-home-banner-slot\{width:250px;height:250px\}/);
+  assert.match(html, /\.tab\{display:none;/);
+  assert.match(html, /body\.articlepage main \.tab\{display:none!important\}/);
+});
+
+test("PurpleAds verification and ads.txt declarations remain intact", () => {
+  assert.match(html, /name="purpleads-verification"/);
+  assert.match(adsTxt, /^purpleads\.io,\s*[^\n]+,\s*DIRECT/m);
+});

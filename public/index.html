@@ -152,6 +152,29 @@ main{position:relative;z-index:1}
 /* equal breathing around section headings (owner: blocks higher + equal gaps
    to the header above and the content below) */
 .tab .hd{margin:0 0 var(--section-heading-gap)}
+/* PurpleAds: exactly one ad to the RIGHT of the Latest stories title.
+   Width changes by breakpoint to avoid collisions. On narrow phones, the
+   slot stacks because no supported rectangular ad fits beside the title. */
+#tab-news .news-heading-row{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 var(--section-heading-gap)}
+#tab-news .news-heading-row .hd{margin:0;min-width:0}
+.m98-home-banner{flex:0 0 728px;min-width:0;text-align:center}
+.m98-home-banner-slot{width:728px;height:90px;margin:0 auto}
+@media (min-width:800px) and (max-width:1049px){
+  .m98-home-banner{flex-basis:468px}
+  .m98-home-banner-slot{width:468px;height:60px}
+}
+@media (min-width:560px) and (max-width:799px){
+  .m98-home-banner{flex-basis:320px}
+  .m98-home-banner-slot{width:320px;height:100px}
+}
+@media (max-width:559px){
+  #tab-news .news-heading-row{flex-wrap:wrap;gap:var(--section-heading-gap)}
+  .m98-home-banner{flex:0 0 100%}
+  .m98-home-banner-slot{width:320px;max-width:100%;height:100px}
+}
+@media (max-width:351px){
+  .m98-home-banner-slot{width:250px;height:250px}
+}
 .tab.active{display:block}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
@@ -879,17 +902,19 @@ textarea{resize:vertical;min-height:64px}
 
 <main class="wrap">
   <section class="tab active" id="tab-news">
-    <div class="hd"><h1 class="hd-t">Latest stories</h1></div>
-    <aside class="m98-ad-placement m98-ad-horizontal" data-ad-position="news-top" aria-label="Advertisement" hidden></aside>
+    <div class="news-heading-row">
+      <div class="hd"><h1 class="hd-t">Latest stories</h1></div>
+      <aside class="m98-home-banner" data-ad-position="news-top" aria-label="Advertisement">
+        <div class="m98-home-banner-slot"><script src="https://cdn.prplads.com/agent.js?publisherId=9690ead840831dca7bd8c39a8fe8319a:4798082d134821c8b1738f0f10eaaf23f3efe05cb7d35fb352e8ff6b890246d887780d2f11b33c3dcff58e9a3450f86af6cd880a62390b7ff083fdd94f3563bc" data-pa-tag async></script></div>
+      </aside>
+    </div>
     <div id="heroSlot"></div>
-    <aside class="m98-ad-placement m98-ad-horizontal" data-ad-position="news-between" aria-label="Advertisement" hidden></aside>
     <div class="rail-wrap">
       <button class="rail-btn prev" id="newsPrev" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 5.5 9 12l6.5 6.5"/></svg></button>
       <div class="rail grid-rail" id="newsGrid" tabindex="0"></div>
       <button class="rail-btn next" id="newsNext" aria-label="Scroll forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 5.5 15 12l-6.5 6.5"/></svg></button>
     </div>
     <div class="empty" id="newsEmpty" hidden>Nothing found for your query. Try another search.</div>
-    <aside class="m98-ad-placement m98-ad-horizontal" data-ad-position="news-bottom" aria-label="Advertisement" hidden></aside>
   </section>
 
   <section class="tab" id="tab-releases">
@@ -915,7 +940,6 @@ textarea{resize:vertical;min-height:64px}
     <music98-concerts></music98-concerts>
   </section>
 </main>
-<div id="m98DisplayAd" aria-label="Advertisement"></div>
 
 <section class="subscribe">
   <div class="sub-in">
