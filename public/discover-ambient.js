@@ -39,9 +39,9 @@
                  mix(hash(i+vec2(0.,1.)),hash(i+1.),f.x),f.y);
     }
     float fbm(vec2 p) {
-      float v=0.; float a=.53;
+      float v=0.; float a=.565;
       mat2 turn=mat2(.80,-.60,.60,.80);
-      for(int i=0;i<4;i++) { v+=a*noise(p); p=turn*p*2.04+7.3; a*=.49; }
+      for(int i=0;i<3;i++) { v+=a*noise(p); p=turn*p*2.04+7.3; a*=.49; }
       return v;
     }
     float playerDistance(vec2 p, vec2 centre, vec2 size) {
@@ -49,16 +49,19 @@
       vec2 q=abs(p-centre)-size+rounding;
       return length(max(q,0.))+min(max(q.x,q.y),0.)-rounding;
     }
-    vec2 sand(vec2 p, float scale, float seed) {
+    vec2 sparkle(vec2 p, float scale, float seed) {
       vec2 cell=p*scale+seed;
       vec2 id=floor(cell), f=fract(cell);
       vec2 center=.22+.56*vec2(hash(id+seed),hash(id+seed+23.));
-      float d=length(f-center);
-      float radius=.055+.05*hash(id+71.);
-      float dotLight=1.-smoothstep(radius*.3,radius,d);
-      float halo=exp(-d*d*110.)*.22;
-      float twinkle=.65+.35*sin(time*.8+hash(id+11.)*6.283);
-      return vec2(dotLight,halo)*twinkle;
+      vec2 offset=f-center;
+      float d2=dot(offset,offset);
+      // Rounded light with no hard core or trail. An undistorted sampling
+      // field keeps the glow circular while the larger currents bend.
+      float core=exp(-d2*240.);
+      float halo=exp(-d2*42.);
+      float presence=smoothstep(.52,.85,hash(id+71.));
+      float twinkle=.48+.22*sin(time*.65+hash(id+11.)*6.283);
+      return vec2(core,halo)*presence*twinkle;
     }
     void main() {
       float aspect=viewport.x/viewport.y;
@@ -105,18 +108,18 @@
       // Interpolated grain moves continuously instead of jumping between
       // random pixel cells as the current advances.
       float grain=noise(transport*viewport.y/3.5+17.);
-      vec2 dots=sand(transport,viewport.y/7.,3.)+sand(transport,viewport.y/12.,41.)*.65;
-      vec2 motes=sand(transport,viewport.y/24.,89.);
+      vec2 lights=p+vec2(time*.008,-time*.005);
+      vec2 dots=sparkle(lights,viewport.y/15.,3.);
+      vec2 motes=sparkle(lights,viewport.y/28.,89.);
       float depth=smoothstep(.30,.8,volume);
       vec3 blue=vec3(.18,.66,.90), cyan=vec3(.0,.83,.81), mineral=vec3(.02,.59,.64);
       vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23));
       colour=mix(colour,mineral,clamp(smoothstep(.48,.86,lanes)*.25+crests*.04,0.,.65));
       // Lit grains sit within the volume, with a wider glow beneath it.
-      colour=mix(colour,vec3(.80,1.,.98),clamp(dots.x*.45+dots.y*.3+depth*.14,0.,.8));
-      colour=mix(colour,vec3(.15,.67,.88),motes.x*.4);
+      colour=mix(colour,vec3(.86,1.,.99),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.14,0.,.8));
       float breathing=1.+.025*sin(time*.55);
       float alpha=(body*(.405+grain*.03)+haze+dots.y*body*.12)*(1.+energy*.18)*breathing;
-      alpha+=(dots.x*.10+motes.x*.22+motes.y*.04)*body;
+      alpha+=(dots.x*.025+dots.y*.04+motes.x*.035+motes.y*.04)*body;
       gl_FragColor=vec4(colour,clamp(alpha,0.,.65));
     }
   `;
@@ -164,7 +167,16 @@
   function fallbackRenderer(surface) {
     const ctx=surface.getContext("2d",{alpha:true});
     if (!ctx) return null;
-    const grains=Array.from({length:1400},()=>({x:Math.random(),y:Math.random(),phase:Math.random()*6.28,size:.4+Math.random()*.8}));
+    // Reuse one blurred light sprite instead of drawing hundreds of sharp
+    // grains or applying a canvas shadow separately to every particle.
+    const light=document.createElement("canvas");light.width=light.height=24;
+    const lightContext=light.getContext("2d");
+    const lightGlow=lightContext.createRadialGradient(12,12,0,12,12,12);
+    lightGlow.addColorStop(0,"rgba(225,255,253,.65)");
+    lightGlow.addColorStop(.3,"rgba(175,249,246,.28)");
+    lightGlow.addColorStop(1,"rgba(175,249,246,0)");
+    lightContext.fillStyle=lightGlow;lightContext.fillRect(0,0,24,24);
+    const grains=Array.from({length:320},()=>({x:Math.random(),y:Math.random(),phase:Math.random()*6.28,size:3+Math.random()*3}));
     return { surface, draw() {
       if(surface.width!==canvas.width||surface.height!==canvas.height){surface.width=canvas.width;surface.height=canvas.height;}
       ctx.setTransform(surface.width/width,0,0,surface.height/height,0,0);
@@ -191,7 +203,7 @@
         ctx.stroke();
       }
       ctx.restore();
-      const count=width<760?700:grains.length;
+      const count=width<760?160:grains.length;
       for(let i=0;i<count;i++){
         const p=grains[i];
         // Curved outward paths start at the actual player boundary.
@@ -206,11 +218,10 @@
         x+=Math.sin(clock*.25+p.phase)*22;y+=Math.cos(clock*.2+p.phase)*18;
         const dx=x-pointer.x,dy=y-pointer.y,near=Math.exp(-(dx*dx+dy*dy)/32000)*pointer.strength;
         x-=dy*near*.17;y+=dx*near*.17;
-        let density=.35;
-        for(const [cx,cy,rx,ry] of centres)density+=Math.exp(-2*((x-cx)**2/rx**2+(y-cy)**2/ry**2));
-        ctx.fillStyle=`rgba(0,168,196,${Math.min(.24,density*.16)*(1+energy*.3)})`;
-        ctx.fillRect(x,y,p.size,p.size);
+        ctx.globalAlpha=(.25+.15*Math.sin(clock*.65+p.phase))*(1+energy*.15);
+        ctx.drawImage(light,x-p.size,y-p.size,p.size*2,p.size*2);
       }
+      ctx.globalAlpha=1;
     }};
   }
 
@@ -231,7 +242,7 @@
     }
     const surface=renderer?.surface || canvas;
     surface.style.height=height+"px";
-    const maxPixels=width<760?480000:1000000;
+    const maxPixels=width<760?360000:850000;
     const scale=Math.min(devicePixelRatio||1,1.5,Math.sqrt(maxPixels/(width*height)));
     const w=Math.round(width*scale),h=Math.round(height*scale);
     if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
@@ -254,7 +265,10 @@
   function loop(ts) {
     frame=0;
     if(!active||document.hidden||lost||!inView||scrolling)return;
-    const interval=1000/(width<760?24:30);
+    // Quiet drift needs fewer full-surface draws. Playback and pointer motion
+    // retain the existing cadence; neither requires a layout read per frame.
+    const lively=playing||energy>.05||pointer.targetStrength>0||pointer.strength>.05;
+    const interval=1000/(width<760?(lively?24:15):(lively?30:18));
     if(!last)last=ts-interval;
     if(ts-last>=interval){
       const elapsed=(ts-last)/1000,dt=Math.min(elapsed,.1);last=ts;
