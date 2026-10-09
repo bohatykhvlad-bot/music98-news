@@ -73,7 +73,7 @@ test("verified server artwork is enforced at final row render",()=>{
 
 test("clean Chart and Concerts routes are no-store",()=>{
   assert.match(worker,/path === "\/concerts"[\s\S]*serveConcertsShell\(request, env\)/);
-  assert.match(worker,/\^\\\/\(\?:releases\|chart\|charts\)/);
+  assert.match(worker,/\^\\\/\(\?:releases\|discover\|chart\|charts\)/);
   assert.match(worker,/no-store, no-cache, must-revalidate, max-age=0/);
   assert.match(worker,/Cloudflare-CDN-Cache-Control/);
   assert.match(worker,/X-M98-Concerts-Shell/);
@@ -152,7 +152,7 @@ test("mobile cards keep desktop title-teaser spacing and equalize only whole-car
 });
 
 test("direct Concerts route is applied before editorial desk fetch finishes",()=>{
-  const routeAt=page.lastIndexOf('if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();');
+  const routeAt=page.lastIndexOf('if(initialCleanPath==="/concerts" || initialCleanPath==="/discover" || location.hash==="#concerts" || location.hash==="#discover") route();');
   const deskAt=page.lastIndexOf("loadPublishedDesk();");
   assert.ok(routeAt>=0);
   assert.ok(deskAt>routeAt);
