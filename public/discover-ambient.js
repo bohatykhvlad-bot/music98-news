@@ -7,7 +7,29 @@
   const ctx = canvas?.getContext("2d", { alpha: true });
   if (!canvas || !ctx) return;
   const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const precisePointer = window.matchMedia("(hover:hover) and (pointer:fine)");
   const TAU = Math.PI * 2;
+  const pointer = { x:0, y:0, targetX:0, targetY:0, strength:0, targetStrength:0 };
+  const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
+  let pointerLastMove = 0;
+  function setPointer(x,y){
+    if(!active || motion.matches || !precisePointer.matches) return;
+    if(!Number.isFinite(x) || !Number.isFinite(y)) return;
+    pointer.targetX=clamp(x,0,window.innerWidth);
+    pointer.targetY=clamp(y,0,window.innerHeight);
+    if(pointer.strength === 0 && pointer.targetStrength === 0){
+      pointer.x=pointer.targetX;pointer.y=pointer.targetY;
+    }
+    pointer.targetStrength=1;
+    pointerLastMove=performance.now();
+  }
+  function field(x,y){
+    if(pointer.strength < .006) return [x,y];
+    const dx=x-pointer.x,dy=y-pointer.y;
+    const range=Math.max(205,Math.min(width,height)*.43);
+    const pull=Math.exp(-(dx*dx+dy*dy)/(2*range*range))*pointer.strength*.24;
+    return [x-dx*pull,y-dy*pull];
+  }
   const particles = Array.from({ length: 85 }, (_, i) => {
     const h = n => {
       const x = Math.sin(n * 127.1 + 78.233) * 43758.5453123;
@@ -55,18 +77,24 @@
       const base=axis==="top"?h*.13:h*.92;
       const sway=Math.sin(t*.24+seed)*h*.038;
       ctx.moveTo(-w*.14,base+sway);
-      ctx.bezierCurveTo(w*.18,base+h*.12*Math.sin(t*.29+seed),
-        w*.30,base-h*.13*Math.cos(t*.23+seed),w*.54,base+h*.018);
-      ctx.bezierCurveTo(w*.75,base+h*.13*Math.sin(t*.27+seed+2),
-        w*.92,base-h*.08*Math.cos(t*.2+seed),w*1.12,base-sway);
+      const a=field(w*.18,base+h*.12*Math.sin(t*.29+seed));
+      const b=field(w*.30,base-h*.13*Math.cos(t*.23+seed));
+      const mid=field(w*.54,base+h*.018);
+      const d=field(w*.75,base+h*.13*Math.sin(t*.27+seed+2));
+      const e=field(w*.92,base-h*.08*Math.cos(t*.2+seed));
+      ctx.bezierCurveTo(...a,...b,...mid);
+      ctx.bezierCurveTo(...d,...e,w*1.12,base-sway);
     } else {
       const base=axis==="left"?w*.055:w*.96;
       const sway=Math.sin(t*.25+seed)*w*.018;
       ctx.moveTo(base+sway,-h*.12);
-      ctx.bezierCurveTo(base+w*.12*Math.sin(t*.22+seed),h*.23,
-        base-w*.11*Math.cos(t*.28+seed),h*.40,base+w*.01,h*.56);
-      ctx.bezierCurveTo(base+w*.10*Math.sin(t*.21+seed+1),h*.70,
-        base-w*.08*Math.cos(t*.19+seed),h*.88,base-sway,h*1.13);
+      const a=field(base+w*.12*Math.sin(t*.22+seed),h*.23);
+      const b=field(base-w*.11*Math.cos(t*.28+seed),h*.40);
+      const mid=field(base+w*.01,h*.56);
+      const d=field(base+w*.10*Math.sin(t*.21+seed+1),h*.70);
+      const e=field(base-w*.08*Math.cos(t*.19+seed),h*.88);
+      ctx.bezierCurveTo(...a,...b,...mid);
+      ctx.bezierCurveTo(...d,...e,base-sway,h*1.13);
     }
     const gradient=(axis==="top"||axis==="bottom")
       ?ctx.createLinearGradient(0,0,width,0)
@@ -94,14 +122,21 @@
     const limit=width<760?37:particles.length;
     for(let i=0;i<limit;i++){
       const p=particles[i];
-      const x=p.x*width+Math.sin(clock*p.speed+p.phase)*15;
-      const y=p.y*height+Math.cos(clock*p.speed*.79+p.phase)*18;
+      let x=p.x*width+Math.sin(clock*p.speed+p.phase)*15;
+      let y=p.y*height+Math.cos(clock*p.speed*.79+p.phase)*18;
+      const dx=x-pointer.x,dy=y-pointer.y;
+      const distance=Math.hypot(dx,dy);
+      const near=pointer.strength*Math.max(0,1-distance/235);
+      if(distance>1 && near>0){
+        x+=(dx/distance)*near*28;
+        y+=(dy/distance)*near*28;
+      }
       /* Concentrate subtle grain in the glow around the viewport edges. */
       const edge=Math.min(x/width,1-x/width,y/height,1-y/height);
       const weight=Math.max(0,1-edge*2.35);
       if(weight<.12)continue;
       const blink=.67+.33*Math.sin(clock*(.45+p.speed)+p.phase);
-      const alpha=p.a*weight*blink*intensity;
+      const alpha=p.a*weight*blink*intensity*(1+near*.75);
       if(alpha<.025)continue;
       cloud(x,y,p.size*3.8,p.size*3.8,"0,220,214",alpha*.22);
       ctx.fillStyle=`rgba(15,192,197,${Math.min(.48,alpha).toFixed(4)})`;
@@ -125,6 +160,12 @@
       "24,208,230",.12*live);
     cloud(width*.33+Math.sin(clock*.11)*width*.035,height*.47,width*.29,height*.36,
       "91,242,212",.035*live);
+    if(pointer.strength>.01){
+      cloud(pointer.x,pointer.y,Math.max(160,width*.16),Math.max(135,height*.22),
+        "0,217,218",.105*pointer.strength*live);
+      cloud(pointer.x+45,pointer.y-26,Math.max(110,width*.105),Math.max(95,height*.13),
+        "85,255,218",.062*pointer.strength*live);
+    }
     ribbon("top",.7,live);
     ribbon("right",1.8,live);
     ribbon("bottom",3.2,live);
@@ -137,11 +178,15 @@
     frame=0;
     if(!active || document.hidden) return;
     const interval=1000/(playing?36:24);
+    if(!last)last=ts-interval;
     if (ts-last>=interval) {
       clock+=Math.min((ts-last)/1000,.08);
-      if (!last) clock=0;
       last=ts;
       energy+=(Number(playing)-energy)*.065;
+      if(pointer.targetStrength && performance.now()-pointerLastMove>5000)pointer.targetStrength=.40;
+      pointer.x+=(pointer.targetX-pointer.x)*.095;
+      pointer.y+=(pointer.targetY-pointer.y)*.095;
+      pointer.strength+=(pointer.targetStrength-pointer.strength)*.075;
       render();
     }
     if (!motion.matches) frame=requestAnimationFrame(loop);
@@ -158,7 +203,7 @@
   function setVisible(value){
     active=!!value;
     document.body.classList.toggle("discover-ambient-visible",active);
-    if(!active){playing=false;energy=0;}
+    if(!active){playing=false;energy=0;pointer.targetStrength=0;pointer.strength=0;}
     if(active)start();
     else if(frame){cancelAnimationFrame(frame);frame=0;}
   }
@@ -167,7 +212,12 @@
     if(active && motion.matches)render();
   }
 
-  window.music98DiscoverAmbient={setVisible,setPlaying};
+  window.music98DiscoverAmbient={setVisible,setPlaying,setPointer};
+  window.addEventListener("pointermove",e=>{
+    if(e.pointerType==="mouse"||e.pointerType==="pen")setPointer(e.clientX,e.clientY);
+  },{passive:true});
+  window.addEventListener("blur",()=>{pointer.targetStrength=0;});
+  window.addEventListener("pointerout",e=>{if(!e.relatedTarget)pointer.targetStrength=0;});
   window.addEventListener("resize",()=>{if(active)start();});
   document.addEventListener("visibilitychange",()=>{if(active)start();});
   if(motion.addEventListener)motion.addEventListener("change",()=>{if(active)start();});
