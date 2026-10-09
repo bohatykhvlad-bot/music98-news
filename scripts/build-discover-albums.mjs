@@ -57,6 +57,10 @@ export function albumCandidates(items,artist){
  }
  return out;
 }
+export function albumLookupStale(old, now=Date.now()){
+ const checkedAt=old?.checkedAt?Date.parse(old.checkedAt):NaN;
+ return !Number.isFinite(checkedAt)||(now-checkedAt)>6*86400_000;
+}
 // iTunes Search API guidance is about 20 requests/minute, including lookups.
 // Pacing is global rather than per-artist: search + lookup both count.
 let lastAppleRequest=0;
@@ -122,10 +126,8 @@ export async function build({batch=500}={}){
  for(const item of ranking){
   const old=previousByName.get(normalize(item.name));
   const valid=Boolean(old&&Array.isArray(old.albums)&&old.albums.length);
-  // Empty Apple results are also a completed lookup. Cache that negative
-  // finding for this weekly cycle instead of re-querying it on every push.
-  const checkedAt=old?.checkedAt?Date.parse(old.checkedAt):NaN;
-  const outdated=!Number.isFinite(checkedAt)||(Date.now()-checkedAt)>6*86400_000;
+  // Both positive and negative Apple album lookups are cached for one week.
+  const outdated=albumLookupStale(old);
   if(outdated&&fetched<batch){
    fetched++;
    try{
