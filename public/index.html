@@ -880,10 +880,10 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 
-/* Discover: equal header-to-heading and player-to-newsletter space.
-   The global .subscribe margin is 24px on desktop, 18px below 1100px. */
-#tab-discover{padding:24px 0 0}
-@media(max-width:1099px){#tab-discover{padding-top:18px}}
+/* Match the vertical breathing above Discover and Concerts to the
+   following subscribe section (24px desktop, 18px under 1100px). */
+#tab-discover,#tab-concerts{padding:24px 0 0}
+@media(max-width:1099px){#tab-discover,#tab-concerts{padding-top:18px}}
 #tab-discover .discover-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,660px);align-items:start;gap:32px;width:100%;margin:0;padding:0}
 #tab-discover .discover-copy{min-width:0;max-width:445px;text-align:left}
 #tab-discover .discover-selected{margin-top:var(--section-heading-gap);display:flex;flex-direction:column;gap:4px}
