@@ -1,4 +1,4 @@
-/* Discover's sand-textured, luminous fluid. Playback changes its energy, not
+/* Discover's flowing mineral-textured currents. Playback changes their energy, not
    its spectrum: the Apple iframe does not expose decoded audio to this page. */
 (() => {
   "use strict";
@@ -19,7 +19,7 @@
   const fragment = `
     precision highp float;
     varying vec2 uv;
-        uniform vec2 viewport;
+    uniform vec2 viewport;
     uniform vec3 pointer;
     uniform float time;
     uniform float energy;
@@ -43,7 +43,7 @@
       vec2 d=(p-center)/size; return exp(-dot(d,d)*2.);
     }
     vec2 sand(vec2 p, float scale, float seed) {
-      vec2 cell=p*scale+vec2(time*.55,-time*.36)+seed;
+      vec2 cell=p*scale+seed;
       vec2 id=floor(cell), f=fract(cell);
       vec2 center=.22+.56*vec2(hash(id+seed),hash(id+seed+23.));
       float d=length(f-center);
@@ -59,33 +59,48 @@
       vec2 mouse=vec2(pointer.x/viewport.y,pointer.y/viewport.y);
       vec2 delta=p-mouse;
       float influence=exp(-dot(delta,delta)/.085)*pointer.z;
-      // A local vortex bends the volume and its grains together.
-      p+=vec2(-delta.y,delta.x)*influence*.65-delta*influence*.16;
-      float t=time*.12;
-      vec2 warp=vec2(fbm(p*2.4+vec2(t,-t*.7)),fbm(p*2.4+vec2(-t*.6,t)+19.));
-      vec2 flow=p+(warp-.5)*.24;
-      float volume=fbm(flow*5.3+vec2(t*.6,-t*.8));
-      float detail=noise(flow*24.+warp*3.-t);
-      float left=cloud(flow,vec2(aspect*.035+.04*sin(t),.56+.09*cos(t*.7)),vec2(.24,.52));
-      float right=cloud(flow,vec2(aspect*.97+.025*cos(t*.8),.42+.09*sin(t)),vec2(.26,.52));
-      float top=cloud(flow,vec2(aspect*(.48+.11*sin(t*.6)),.015),vec2(aspect*.44,.22));
-      float bottom=cloud(flow,vec2(aspect*(.48+.13*cos(t*.7)),1.02),vec2(aspect*.46,.26));
-      float mass=left+right+top*.8+bottom*.95;
-      float envelope=clamp(mass,0.,1.5);
-      float body=envelope*smoothstep(.22,.77,volume+.13*detail);
-      float haze=envelope*.075;
-      float grain=hash(floor(gl_FragCoord.xy)+floor(flow*73.)+17.);
-      vec2 dots=sand(flow,viewport.y/7.,3.)+sand(flow,viewport.y/12.,41.)*.65;
-      vec2 motes=sand(flow,viewport.y/24.,89.);
+      // A small, slow nudge of the existing current, never a cursor cloud.
+      vec2 nudge=(vec2(-delta.y,delta.x)*.025-delta*.008)*influence;
+      p+=clamp(nudge,vec2(-1./viewport.y),vec2(1./viewport.y));
+      float t=time*.25;
+      vec2 centre=vec2(aspect*.54,.51);
+      vec2 outward=(p-centre)/max(length(p-centre),.15);
+      // Sampling against an outward offset carries the texture inward.
+      vec2 transport=p+outward*time*.042;
+      vec2 warp=vec2(fbm(transport*2.1+vec2(t*.15,0.)),fbm(transport*2.1+19.));
+      vec2 flow=p+(warp-.5)*.12;
+      float sideDistance=min(p.x,aspect-p.x);
+      float capDistance=min(p.y,1.-p.y);
+      vec2 stream=sideDistance<capDistance?vec2(sideDistance,p.y):vec2(capDistance,p.x);
+      float lanes=fbm(vec2(stream.x*10.-time*.42,stream.y*2.)+warp*.6);
+      float volume=fbm(transport*4.8+warp*.9);
+      float detail=noise(transport*26.+warp*2.);
+      // Unequal, tapering wave fronts give music98 its own silhouette.
+      float left=cloud(flow,vec2(aspect*.015+.035*sin(p.y*6.-t),.58),vec2(.24,.58));
+      float right=cloud(flow,vec2(aspect*.99-.045*sin(p.y*4.+t+1.),.43),vec2(.27,.48));
+      float top=cloud(flow,vec2(aspect*.61,.005+.02*sin(p.x*4.-t)),vec2(aspect*.41,.21));
+      float bottom=cloud(flow,vec2(aspect*.36,1.015+.025*sin(p.x*3.+t)),vec2(aspect*.50,.24));
+      float envelope=clamp(left+right*.9+top*.78+bottom,0.,1.5);
+      float density=volume*.47+lanes*.63+detail*.08;
+      float body=envelope*smoothstep(.25,.76,density);
+      // Soft, textured crests break up the diffuse cloud into flowing waves.
+      float leftCrest=exp(-pow((flow.x-.13-.04*sin(flow.y*6.-t))/.065,2.));
+      float rightCrest=exp(-pow((aspect-flow.x-.15-.05*sin(flow.y*5.+t+1.))/.075,2.));
+      float crests=(leftCrest+rightCrest)*smoothstep(.25,.75,volume);
+      body+=crests*.20;
+      float haze=envelope*.05;
+      float grain=hash(floor(transport*viewport.y/1.25)+17.);
+      vec2 dots=sand(transport,viewport.y/7.,3.)+sand(transport,viewport.y/12.,41.)*.65;
+      vec2 motes=sand(transport,viewport.y/24.,89.);
       float depth=smoothstep(.30,.8,volume);
-      vec3 blue=vec3(.12,.60,.94), cyan=vec3(.0,.86,.85), mint=vec3(.46,.97,.79);
+      vec3 blue=vec3(.18,.66,.90), cyan=vec3(.0,.83,.81), mineral=vec3(.02,.59,.64);
       vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23));
-      colour=mix(colour,mint,smoothstep(.52,.92,warp.y+volume*.2)*.65);
+      colour=mix(colour,mineral,clamp(smoothstep(.48,.86,lanes)*.46+crests*.16,0.,.65));
       // Lit grains sit within the volume, with a wider glow beneath it.
       colour=mix(colour,vec3(.80,1.,.98),clamp(dots.x*.62+dots.y*.4+depth*.14,0.,.8));
       colour=mix(colour,vec3(.15,.67,.88),motes.x*.4);
-      float breathing=1.+.055*sin(time*.65);
-      float alpha=(body*(.30+grain*.24)+haze+dots.y*body*.18)*(1.+energy*.36)*breathing;
+      float breathing=1.+.025*sin(time*.55);
+      float alpha=(body*(.30+grain*.24)+haze+dots.y*body*.18)*(1.+energy*.18)*breathing;
       alpha+=(dots.x*.18+motes.x*.32+motes.y*.06)*body;
       gl_FragColor=vec4(colour,clamp(alpha,0.,.65));
     }
@@ -149,9 +164,14 @@
       }
       const count=width<760?1300:grains.length;
       for(let i=0;i<count;i++){
-        const p=grains[i];let x=p.x*width+Math.sin(clock*.18+p.phase)*18,y=p.y*height+Math.cos(clock*.14+p.phase)*16;
+        const p=grains[i];
+        // Looping inward travel for the lightweight renderer as well.
+        const travel=(p.x+clock*.014)%1, angle=p.phase;
+        let x=width*.54+Math.cos(angle)*(1-travel)*width*.66;
+        let y=height*.51+Math.sin(angle)*(1-travel)*height*.66;
+        x+=Math.sin(clock*.25+p.phase)*12;y+=Math.cos(clock*.2+p.phase)*10;
         const dx=x-pointer.x,dy=y-pointer.y,near=Math.exp(-(dx*dx+dy*dy)/32000)*pointer.strength;
-        x-=dy*near*.24;y+=dx*near*.24;
+        x-=dy*near*.008;y+=dx*near*.008;
         let density=0;
         for(const [cx,cy,rx,ry] of centres)density+=Math.exp(-2*((x-cx)**2/rx**2+(y-cy)**2/ry**2));
         ctx.fillStyle=`rgba(0,168,196,${Math.min(.35,density*.22)*(1+energy*.3)})`;
@@ -172,7 +192,7 @@
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
     pointer.targetX=clamp(x,0,innerWidth);pointer.targetY=clamp(y,0,innerHeight);
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
-    pointer.targetStrength=1;pointerLastMove=performance.now();
+    pointer.targetStrength=.2;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;
@@ -180,13 +200,15 @@
     const interval=1000/(width<760?24:30);
     if(!last)last=ts-interval;
     if(ts-last>=interval){
-      const dt=Math.min((ts-last)/1000,.1);last=ts;
-      clock+=dt*(.65+energy*.65);
-      const smooth=1-Math.exp(-dt*4);
-      energy+=(Number(playing)-energy)*smooth;
+      const elapsed=(ts-last)/1000,dt=Math.min(elapsed,.1);last=ts;
+      // Around 15 times more transport during playback, with a soft coast
+      // into pause; the remaining motion is only a quiet background drift.
+      energy+=(Number(playing)-energy)*(1-Math.exp(-elapsed*(playing?2.4:1.5)));
+      clock+=dt*(.07+energy*.95);
+      const smooth=1-Math.exp(-dt*.9);
       if(ts-pointerLastMove>2500)pointer.targetStrength=0;
-      pointer.x+=(pointer.targetX-pointer.x)*(1-Math.exp(-dt*9));
-      pointer.y+=(pointer.targetY-pointer.y)*(1-Math.exp(-dt*9));
+      pointer.x+=(pointer.targetX-pointer.x)*(1-Math.exp(-dt*.6));
+      pointer.y+=(pointer.targetY-pointer.y)*(1-Math.exp(-dt*.6));
       pointer.strength+=(pointer.targetStrength-pointer.strength)*smooth;
       render();
     }
