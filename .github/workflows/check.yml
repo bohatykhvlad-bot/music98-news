@@ -64,7 +64,7 @@ jobs:
         run: node scripts/refresh-spotify-ranking.mjs
       - name: Validate generated source fingerprint and all ranked rows
         run: |
-          node --input-type=module -e 'import fs from "node:fs"; import {verifiedSpotifySnapshot} from "./functions/lib/spotify-chart.js"; const j=JSON.parse(fs.readFileSync("public/data/spotify-chart.json","utf8")); const v=verifiedSpotifySnapshot(j); if(!v || v.tracks.length!==50)process.exit(1); console.log("VERIFIED_LIVE_SOURCE",j.chartDate,j.provider,j.mirrorMatched,j.fingerprint);'
+          node --input-type=module -e 'import fs from "node:fs"; import {verifiedSpotifySnapshot} from "./functions/lib/spotify-chart.js"; const j=JSON.parse(fs.readFileSync("public/data/spotify-chart.json","utf8")); const v=verifiedSpotifySnapshot(j); if(!v || v.tracks.length!==100)process.exit(1); console.log("VERIFIED_LIVE_SOURCE",j.chartDate,j.provider,j.mirrorMatched,j.fingerprint);'
 
   verify-daily-global-live:
     if: github.event_name == 'pull_request'
@@ -81,6 +81,23 @@ jobs:
         run: |
           node scripts/refresh-apple-ranking.mjs
           node scripts/refresh-deezer-ranking.mjs
+      - name: Check live Top 100 overlap across all three platforms
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          import {mergeKey} from "./functions/lib/chart-identity.js";
+          const sources=["apple-chart.json","spotify-chart.json","deezer-chart.json"].map(f=>
+            JSON.parse(fs.readFileSync("public/data/"+f,"utf8")));
+          const [a,s,d]=sources.map(x=>new Set(x.tracks.map(t=>mergeKey(t.title,t.artist))));
+          const triple=[...a].filter(k=>s.has(k)&&d.has(k));
+          const pairs=[...new Set([...a,...s,...d])].filter(k=>[a,s,d].filter(set=>set.has(k)).length===2);
+          console.log("FULL_TOP100_INTERSECTION",JSON.stringify({
+            dates:sources.map(x=>x.chartDate||x.sourceDate),
+            sourceLengths:sources.map(x=>x.tracks.length),
+            triple:triple.length,double:pairs.length,
+            triplePreview:triple.slice(0,12)
+          }));
+          NODE
       - name: Build a daily edition using isolated in-memory history
         run: |
           node scripts/refresh-spotify-ranking.mjs
