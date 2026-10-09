@@ -112,7 +112,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent-dim);box-shado
 .brand{display:flex;align-items:center;gap:10px;height:40px;text-decoration:none;color:var(--text);user-select:none;justify-self:start}
 .brand-logo{width:40px;height:40px;border-radius:50%;object-fit:cover;border:0;background:transparent}
 .brand-name{font-size:20px;line-height:1;font-weight:700;letter-spacing:-.015em;color:var(--text);white-space:nowrap}
-.nav{justify-self:center;width:410px;max-width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;height:40px;gap:4px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:3px;border-radius:999px}
+.nav{justify-self:center;width:480px;max-width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;height:40px;gap:4px;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14);padding:3px;border-radius:999px}
 .nav-btn{width:100%;text-indent:var(--ink-x,0px);border:0;background:transparent;color:var(--muted);font-size:14px;font-weight:600;text-decoration:none;padding:0 8px;height:32px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1;text-box:trim-both cap alphabetic;border-radius:999px;cursor:pointer;transition:background-color .18s ease,color .18s ease;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 /* Keep pill text on the untransformed center line. A fractional optical
    offset would blur the glyphs under the site's compact desktop zoom. */
@@ -788,7 +788,7 @@ textarea{resize:vertical;min-height:64px}
   .brand-name{font-size:17px}
   .top-actions{flex:1;min-width:0;overflow:visible}
   .nav{order:3;width:100%;height:48px;gap:4px;padding:4px;justify-content:stretch;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14)}
-  .nav-btn{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0}
+  .nav-btn{flex:1;height:38px;padding:0 3px;font-size:12px;justify-content:center;top:0}
   .search{width:auto;flex:1;height:36px;overflow:visible}
   .search input{height:36px;font-size:16px;background:rgba(255,255,255,.7);-webkit-appearance:none;appearance:none}
   .search input:focus,
@@ -897,6 +897,7 @@ textarea{resize:vertical;min-height:64px}
     <nav class="nav" id="nav">
       <a class="nav-btn active" data-tab="news" href="/">News</a>
       <a class="nav-btn" data-tab="releases" href="/releases">Releases</a>
+      <a class="nav-btn" href="/discover">Discover</a>
       <a class="nav-btn" data-tab="charts" href="/chart">Chart</a>
       <a class="nav-btn" data-tab="concerts" href="/concerts">Concerts</a>
     </nav>
@@ -972,6 +973,7 @@ textarea{resize:vertical;min-height:64px}
       <h3>Sections</h3>
       <a class="flink" href="/" data-goto="news">News</a>
       <a class="flink" href="/releases" data-goto="releases">Releases</a>
+      <a class="flink" href="/discover">Discover</a>
       <a class="flink" href="/chart" data-goto="charts">Chart</a>
       <a class="flink" href="/concerts" data-goto="concerts">Concerts</a>
     </div>

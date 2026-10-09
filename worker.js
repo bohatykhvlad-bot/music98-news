@@ -18,7 +18,7 @@ import { serveArticle, serveSitemap, serveRss, serveNewsSitemap } from "./functi
 const APPLE_ALBUM = /^\/apple-embed\/([a-z]{2})\/album\/(\d+)$/;
 const PHOTO_FILE = /^\/photos\/([a-z0-9._-]+)\.(jpe?g|png|webp)$/;
 const ROOT_ARTICLE_RESERVED = new Set([
-  "news","releases","chart","charts","concerts","about","contacts","privacy","terms",
+  "news","releases","chart","charts","concerts","discover","about","contacts","privacy","terms",
   "admin-desk","m98desk","sitemap","rss","robots","favicon"
 ]);
 const APPLE_STATIC = /^\/apple-static\/(build|assets)\/([A-Za-z0-9._/-]+)$/;
@@ -240,6 +240,9 @@ export default {
     }
     if (path === "/concerts" && (request.method === "GET" || request.method === "HEAD")) {
       return serveConcertsShell(request, env);
+    }
+    if (path === "/discover" && (request.method === "GET" || request.method === "HEAD")) {
+      return env.ASSETS.fetch(new Request(new URL("/discover.html", request.url), request));
     }
     if (/^\/(?:releases|chart|charts)\/?$/.test(path) &&
         (request.method === "GET" || request.method === "HEAD")) {
