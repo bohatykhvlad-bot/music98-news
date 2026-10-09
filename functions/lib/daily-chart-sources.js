@@ -1,8 +1,10 @@
 import {mergeKey} from "./chart-identity.js";
 
-export const DAILY_CHART_METHOD = "daily-global-v1";
+export const DAILY_CHART_METHOD = "daily-global-consensus-v2";
 export const DAILY_SOURCE_IDS = ["A", "S", "D"];
 export const CHART_SIZE = 50;
+export const SOURCE_INPUT_SIZE = 100;
+export const SOURCE_INPUT_COUNTS = Object.freeze({A:SOURCE_INPUT_SIZE,S:SOURCE_INPUT_SIZE,D:SOURCE_INPUT_SIZE});
 export const APPLE_GLOBAL_ID = "pl.d25f5d1181894928af76c85c967f8f31";
 export const APPLE_GLOBAL_URL = "https://music.apple.com/us/playlist/top-100-global/" + APPLE_GLOBAL_ID;
 export const DEEZER_GLOBAL_ID = "3155776842";
@@ -17,7 +19,23 @@ export const DAILY_SOURCE_DETAILS = {
 
 export function completeDailySources(counts) {
   return !!counts && Object.keys(counts).length === DAILY_SOURCE_IDS.length &&
-    DAILY_SOURCE_IDS.every(id => counts[id] === CHART_SIZE);
+    DAILY_SOURCE_IDS.every(id => counts[id] === SOURCE_INPUT_COUNTS[id]);
+}
+
+/* Every published song must appear in all three independent Top 100 inputs.
+   This is also checked when loading a KV or backup edition. */
+export function verifiedConsensusTracks(tracks, counts) {
+  if (!completeDailySources(counts) || !Array.isArray(tracks) || tracks.length !== CHART_SIZE) return false;
+  const seen=new Set();
+  for (let i=0;i<tracks.length;i++) {
+    const t=tracks[i], id=mergeKey(t?.title,t?.artist), ranks=t?.sourceRanks;
+    if (!id || seen.has(id) || Number(t?.rank)!==i+1 || !ranks || typeof ranks!=="object" ||
+        Array.isArray(ranks) || Object.keys(ranks).length!==DAILY_SOURCE_IDS.length) return false;
+    seen.add(id);
+    if (!DAILY_SOURCE_IDS.every(k=>Number.isInteger(ranks[k]) &&
+         ranks[k]>=1 && ranks[k]<=SOURCE_INPUT_COUNTS[k])) return false;
+  }
+  return true;
 }
 
 export function currentSourceDate(day, now=Date.now(), maxLagDays=1) {
@@ -28,7 +46,7 @@ export function currentSourceDate(day, now=Date.now(), maxLagDays=1) {
 }
 
 export function validatedDailyRows(rows, source) {
-  if (!Array.isArray(rows) || rows.length !== CHART_SIZE)
+  if (!Array.isArray(rows) || rows.length !== SOURCE_INPUT_COUNTS[source])
     throw new Error("incomplete_chart_sources:"+source);
   const identities=new Set();
   return rows.map((row,i) => {
@@ -67,7 +85,7 @@ export function parseAppleGlobal(html) {
     throw new Error("apple_wrong_or_partial_global_playlist");
   const publishedAt=String(schema.datePublished || ""), date=publishedAt.slice(0,10);
   if (!currentSourceDate(date)) throw new Error("apple_global_date_stale_or_missing");
-  const tracks=validatedDailyRows(items.slice(0,CHART_SIZE).map((item,i) => {
+  const tracks=validatedDailyRows(items.slice(0,SOURCE_INPUT_SIZE).map((item,i) => {
     const descriptor=item?.contentDescriptor;
     if (descriptor?.kind!=="song" || Number(item.rankingText)!==i+1)
       throw new Error("apple_global_rank_missing_"+(i+1));
@@ -81,9 +99,9 @@ export function parseAppleGlobal(html) {
 
 export function parseDeezerWorldwide(data) {
   if (String(data?.id)!==DEEZER_GLOBAL_ID || data?.title!=="Top Worldwide" ||
-      data?.creator?.name!=="Deezer Charts" || data?.nb_tracks<CHART_SIZE)
+      data?.creator?.name!=="Deezer Charts" || data?.nb_tracks<SOURCE_INPUT_SIZE)
     throw new Error("deezer_wrong_or_partial_worldwide_playlist");
-  return validatedDailyRows((data.tracks?.data || []).slice(0,CHART_SIZE).map((item,i) => ({
+  return validatedDailyRows((data.tracks?.data || []).slice(0,SOURCE_INPUT_SIZE).map((item,i) => ({
     pos:i+1, title:item.title,
     artist:(item.contributors || []).map(a => a?.name).filter(Boolean).join(", ") || item.artist?.name,
     // Playback, artwork and listen links continue to use the existing Apple resolver.
@@ -103,7 +121,12 @@ export function verifiedDailySeed(snapshot, source, now=Date.now()) {
    under the new methodology. This keeps existing day counts through migration. */
 export function verifiedTenureEdition(snapshot) {
   if (!snapshot || snapshot.complete!==true || snapshot.tracks?.length!==CHART_SIZE) return false;
-  if (snapshot.methodology===DAILY_CHART_METHOD) return completeDailySources(snapshot.sources);
+  if (snapshot.methodology===DAILY_CHART_METHOD)
+    return verifiedConsensusTracks(snapshot.tracks,snapshot.sources);
+  // Older daily editions are history-only. Their Top 50 did not use consensus.
+  if (snapshot.methodology==="daily-global-v1")
+    return ["A","S","D"].every(k=>snapshot.sources?.[k]===50) &&
+      Object.keys(snapshot.sources||{}).length===3;
   return !snapshot.methodology && Object.keys(snapshot.sources || {}).length===5 &&
     ["A","S","D","B","Y"].every(id => snapshot.sources[id]===CHART_SIZE);
 }
