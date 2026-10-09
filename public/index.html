@@ -868,7 +868,11 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 </style>
-<!-- One PurpleAds banner only; the former multi-placement module is retired. -->
+<!-- PurpleAds automatic sticky placements: load on every route, even when News is hidden.
+     This head tag has no inline banner container. The sole in-content banner
+     remains next to Latest stories, with the same publisher ID. -->
+<script src="https://cdn.prplads.com/agent.js?publisherId=9690ead840831dca7bd8c39a8fe8319a:4798082d134821c8b1738f0f10eaaf23f3efe05cb7d35fb352e8ff6b890246d887780d2f11b33c3dcff58e9a3450f86af6cd880a62390b7ff083fdd94f3563bc" data-pa-tag async></script>
+<!-- PurpleAds callback applies to the inline News banner only. -->
 <script>
   window.purpleDisplay = window.purpleDisplay || {};
   window.purpleDisplay.onUnfilled = function (placement) {
