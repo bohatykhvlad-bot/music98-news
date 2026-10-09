@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "source": "verified-apple-music-seed",
+  "isSample": true,
+  "updatedAt": "2026-10-09T00:00:00Z",
+  "artists": [
+    {"name":"Bruno Mars","rank":1,"albums":[{"id":1161503945,"title":"24K Magic","year":2016,"genre":"Pop"},{"id":1866732792,"title":"The Romantic","year":2026,"genre":"Pop"}]},
+    {"name":"Rihanna","rank":2,"albums":[{"id":1440933547,"title":"ANTI","year":2016,"genre":"Pop"}]},
+    {"name":"The Weeknd","rank":3,"albums":[{"id":1499378108,"title":"After Hours","year":2020,"genre":"R&B/Soul"},{"id":1440871397,"title":"Starboy","year":2016,"genre":"R&B/Soul"}]},
+    {"name":"Taylor Swift","rank":5,"albums":[{"id":1708308989,"title":"1989 (Taylor's Version)","year":2023,"genre":"Pop"}]},
+    {"name":"Lady Gaga","rank":6,"albums":[{"id":1500951604,"title":"Chromatica","year":2020,"genre":"Pop"}]},
+    {"name":"Ariana Grande","rank":9,"albums":[{"id":1537486662,"title":"Positions","year":2020,"genre":"Pop"}]},
+    {"name":"Dua Lipa","rank":15,"albums":[{"id":1538003494,"title":"Future Nostalgia","year":2020,"genre":"Pop"}]},
+    {"name":"Billie Eilish","rank":17,"albums":[{"id":1739659134,"title":"HIT ME HARD AND SOFT","year":2024,"genre":"Alternative"}]},
+    {"name":"Olivia Rodrigo","rank":40,"albums":[{"id":1694767605,"title":"GUTS","year":2023,"genre":"Pop"}]},
+    {"name":"Beyoncé","rank":35,"albums":[{"id":1630005298,"title":"RENAISSANCE","year":2022,"genre":"Pop"}]},
+    {"name":"Harry Styles","rank":23,"albums":[{"id":1485802965,"title":"Fine Line","year":2019,"genre":"Pop"}]}
+  ]
+}
