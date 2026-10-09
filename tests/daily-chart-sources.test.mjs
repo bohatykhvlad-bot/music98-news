@@ -5,13 +5,13 @@ import {DAILY_CHART_METHOD,completeDailySources,currentSourceDate,parseAppleGlob
 import {appleHTML,fakeDailySource} from "./fixtures/daily-chart.mjs";
 
 test("only the three daily song sources form a complete ranking",()=>{
-  assert.equal(completeDailySources({A:50,S:50,D:50}),true);
-  assert.equal(completeDailySources({A:50,S:50,D:49}),false);
-  assert.equal(completeDailySources({A:50,S:50,D:50,Y:50}),false);
+  assert.equal(completeDailySources({A:100,S:100,D:100}),true);
+  assert.equal(completeDailySources({A:100,S:100,D:99}),false);
+  assert.equal(completeDailySources({A:100,S:100,D:100,Y:50}),false);
 });
 test("official global Apple playlist supplies ordered songs and Apple media identity",()=>{
   const {apple,rows}=fakeDailySource(),result=parseAppleGlobal(apple);
-  assert.equal(result.tracks.length,50);
+  assert.equal(result.tracks.length,100);
   assert.deepEqual(result.tracks.map(t=>[t.pos,t.title,t.artist]),rows.map(t=>[t.pos,t.title,t.artist]));
   assert.match(result.tracks[0].url,/music\.apple\.com\/us\/album\//);
   assert.match(result.tracks[0].art,/600x600bb\.jpg$/);
@@ -22,10 +22,10 @@ test("official global Apple playlist supplies ordered songs and Apple media iden
 });
 test("Deezer uses the named worldwide playlist and rejects partial or local charts",()=>{
   const {deezer}=fakeDailySource();
-  assert.equal(parseDeezerWorldwide(deezer).length,50);
+  assert.equal(parseDeezerWorldwide(deezer).length,100);
   assert.throws(()=>parseDeezerWorldwide({...deezer,id:123}),/wrong_or_partial/);
   assert.throws(()=>parseDeezerWorldwide({data:deezer.tracks.data}),/wrong_or_partial/);
-  assert.throws(()=>parseDeezerWorldwide({...deezer,tracks:{data:deezer.tracks.data.slice(0,49)}}),/incomplete_chart_sources/);
+  assert.throws(()=>parseDeezerWorldwide({...deezer,tracks:{data:deezer.tracks.data.slice(0,99)}}),/incomplete_chart_sources/);
 });
 test("daily recovery seeds reject US RSS, weekly data and stale captures",()=>{
   const {apple}=fakeDailySource(),chart=parseAppleGlobal(apple),today=new Date().toISOString().slice(0,10);
@@ -38,10 +38,11 @@ test("daily recovery seeds reject US RSS, weekly data and stale captures",()=>{
   assert.equal(currentSourceDate("2026-10-06",Date.parse("2026-10-05T12:00:00Z")),false);
 });
 test("legacy editions recover day-count history without satisfying the new ranking gate",()=>{
-  const tracks=fakeDailySource().rows;
+  const tracks=fakeDailySource().rows.slice(0,50).map(t=>({...t,rank:t.pos,sourceRanks:{A:t.pos,S:t.pos,D:t.pos}}));
   const old={complete:true,sources:{A:50,S:50,D:50,B:50,Y:50},tracks};
   assert.equal(verifiedTenureEdition(old),true);
   assert.equal(completeDailySources(old.sources),false);
-  assert.equal(verifiedTenureEdition({...old,sources:{A:50,S:50,D:50}}),false);
-  assert.equal(verifiedTenureEdition({...old,methodology:DAILY_CHART_METHOD,sources:{A:50,S:50,D:50}}),true);
+  assert.equal(verifiedTenureEdition({...old,sources:{A:100,S:100,D:100}}),false);
+  assert.equal(verifiedTenureEdition({...old,methodology:DAILY_CHART_METHOD,sources:{A:100,S:100,D:100}}),true);
+  assert.equal(verifiedTenureEdition({...old,methodology:"daily-global-v1",sources:{A:50,S:50,D:50}}),true);
 });
