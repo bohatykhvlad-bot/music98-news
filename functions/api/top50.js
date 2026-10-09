@@ -700,11 +700,11 @@ export async function buildTop50(origin, env, spotifySeed) {
   const sources={A:apple.length,S:spotify.length,D:deezer.length};
   if(!completeChartSources(sources))
     throw new Error("incomplete_chart_sources:"+JSON.stringify(sources));
-  /* Each platform must contribute ranks 1 through 50, without duplicate
-     song identities. A source that looks like 50 rows may still skip a rank. */
+  /* Validate each input's complete Top 100 and reject duplicate identities
+     before intersecting platforms; never confuse input size with published Top 50. */
   for(const [label,rows] of [["A",apple],["S",spotify],["D",deezer]]){
     const identities=new Set();
-    for(let i=0;i<SIZE;i++){
+    for(let i=0;i<SOURCE_INPUT_COUNTS[label];i++){
       const row=rows[i],identity=mergeKey(row?.title,row?.artist);
       if(Number(row?.pos)!==i+1||!identity||identities.has(identity))
         throw new Error("invalid_rank_or_duplicate_source_"+label+"_at_"+(i+1));
@@ -728,8 +728,8 @@ export async function buildTop50(origin, env, spotifySeed) {
       const ca = SOURCES.filter((k) => a.ranks[k]).length;
       const cb = SOURCES.filter((k) => b.ranks[k]).length;
       if (cb !== ca) return cb - ca;
-      const ba = Math.min(...SOURCES.map((k) => a.ranks[k]).filter(Boolean), 99);
-      const bb = Math.min(...SOURCES.map((k) => b.ranks[k]).filter(Boolean), 99);
+      const ba = Math.min(...SOURCES.map((k) => a.ranks[k]).filter(Boolean), 101);
+      const bb = Math.min(...SOURCES.map((k) => b.ranks[k]).filter(Boolean), 101);
       if (ba !== bb) return ba - bb;
       return a.title.localeCompare(b.title);
     })
