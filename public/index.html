@@ -880,11 +880,9 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 
-/* Match the vertical breathing above Discover and Concerts to the
-   following subscribe section (24px desktop, 18px under 1100px). */
-#tab-discover,#tab-concerts{padding:24px 0 0}
+/* All section headings use the same .tab top padding and .hd typography.
+   The desktop Releases / Discover white-area height is synchronized in JS. */
 #tab-discover{padding-bottom:12px}
-@media(max-width:1099px){#tab-discover,#tab-concerts{padding-top:18px}}
 #tab-discover .discover-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,660px);align-items:start;gap:32px;width:100%;margin:0;padding:0}
 #tab-discover .discover-copy{min-width:0;width:100%;min-height:450px;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
 #tab-discover .discover-selected{margin-top:20px;display:flex;flex-direction:column;gap:4px;width:100%}
@@ -2779,7 +2777,44 @@ function renderReleases(){
   equalizeCards("#relGrid");
   bindCovers($("#relGrid"));
   syncRail("#relGrid");
+  queueEqualizeBrowsePanels();
 }
+/* Releases and Discover must occupy the EXACT same white-panel height on
+   desktop, including when releases change or fonts finish loading. Measure
+   their natural content heights with the inactive tab offscreen, then make
+   both panels as tall as the larger one. Never crop either panel or stretch
+   the Apple Music iframe. Mobile rails are vertically stacked and deliberately
+   retain natural document height rather than thousands of pixels of whitespace. */
+let browsePanelSyncPending = false;
+function queueEqualizeBrowsePanels(){
+  if (browsePanelSyncPending) return;
+  browsePanelSyncPending = true;
+  requestAnimationFrame(()=>{
+    browsePanelSyncPending = false;
+    const panes = [document.getElementById("tab-releases"), document.getElementById("tab-discover")];
+    if (panes.some(p=>!p)) return;
+    panes.forEach(p=>p.style.removeProperty("min-height"));
+    if (window.matchMedia("(max-width:1100px)").matches) return;
+    const measure = (panel)=>{
+      if (getComputedStyle(panel).display !== "none") return panel.getBoundingClientRect().height;
+      const original = panel.getAttribute("style");
+      panel.style.setProperty("display", "block", "important");
+      panel.style.setProperty("position", "absolute", "important");
+      panel.style.setProperty("visibility", "hidden", "important");
+      panel.style.setProperty("pointer-events", "none", "important");
+      panel.style.setProperty("width", "100%", "important");
+      const height = panel.getBoundingClientRect().height;
+      if (original === null) panel.removeAttribute("style");
+      else panel.setAttribute("style", original);
+      return height;
+    };
+    const height = Math.ceil(Math.max(...panes.map(measure)));
+    if (height > 0) panes.forEach(p=>p.style.minHeight = height + "px");
+  });
+}
+window.addEventListener("resize", queueEqualizeBrowsePanels);
+if (document.fonts) document.fonts.ready.then(queueEqualizeBrowsePanels);
+queueEqualizeBrowsePanels();
 /* --- rails: arrows with press-and-hold auto-scroll + inertia ----------
    A short click steps one card; holding the button accelerates the glide;
    on release the remaining velocity decays smoothly (inertia). Arrows only
@@ -3399,7 +3434,7 @@ function setTab(t){
   window.scrollTo(0, 0);
   /* the newly shown rail had zero size while hidden - its .ok state is stale;
      a frame later it has real geometry, so re-evaluate the arrows */
-  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); });
+  requestAnimationFrame(()=>{ syncRail("#newsGrid"); syncRail("#relGrid"); equalizeCards("#newsGrid"); equalizeCards("#relGrid"); queueEqualizeBrowsePanels(); });
   if(t==="concerts") resizeConcertsTab();
   window.dispatchEvent(new Event("music98:pagechange"));
 }
