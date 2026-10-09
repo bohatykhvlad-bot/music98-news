@@ -11,9 +11,9 @@ const match=concertsScript.match(/const CONCERTS_CSS=("(?:[^"\\]|\\.)*");/);
 assert.ok(match,"Concerts must declare embedded stylesheet");
 const embedded=JSON.parse(match[1]);
 
-test("desktop nav uses four equal centered cells with matching pill insets",()=>{
+test("desktop nav uses five equal centered cells with matching pill insets",()=>{
   assert.match(home,/\.topbar-in\{[^}]*grid-template-columns:1fr auto 1fr;align-items:center/);
-  assert.match(home,/\.nav\{justify-self:center;width:410px;max-width:100%;display:grid;grid-template-columns:repeat\(4,minmax\(0,1fr\)\);align-items:center;height:40px;gap:4px;[^}]*padding:3px/);
+  assert.match(home,/\.nav\{justify-self:center;width:480px;max-width:100%;display:grid;grid-template-columns:repeat\(5,minmax\(0,1fr\)\);align-items:center;height:40px;gap:4px;[^}]*padding:3px/);
   assert.match(home,/\.nav-btn\{width:100%;text-indent:var\(--ink-x,0px\);[^}]*height:32px;display:inline-flex;align-items:center;justify-content:center/);
   assert.match(home,/\.nav-btn\{position:relative;top:0\}/);
   // Border-box: 40 - 2*1 border - 2*3 inset == 32px segment.
@@ -23,7 +23,7 @@ test("desktop nav uses four equal centered cells with matching pill insets",()=>
 test("mobile nav, logo row and safe header space are symmetrical",()=>{
   assert.match(home,/\.topbar-in\{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:9px 16px;/);
   assert.match(home,/\.nav\{order:3;width:100%;height:48px;gap:4px;padding:4px;/);
-  assert.match(home,/\.nav-btn\{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0\}/);
+  assert.match(home,/\.nav-btn\{flex:1;height:38px;padding:0 3px;font-size:12px;justify-content:center;top:0\}/);
   assert.match(home,/body\{padding-top:var\(--header-h, 110px\)\}/);
   assert.doesNotMatch(home,/padding-top:calc\(var\(--header-h,[^;]*\+\s*8px/);
   assert.ok(legal.includes("padding:9px 16px"),"legal headers must match the main site");
