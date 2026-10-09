@@ -59,11 +59,13 @@ test("onUnfilled collapses only the News banner, never a sticky placement", () =
   assert.match(html, /#tab-news \.m98-home-banner\.m98-ad-unfilled\{display:none\}/);
 });
 
-test("retired ad loader and alternate publisher ID are absent from public assets", () => {
-  for (const name of ["display-ads.js", "display-ads.css", "concerts.html"]) {
+test("retired ad loader and alternate publisher ID are absent from served pages", () => {
+  for (const name of ["display-ads.js", "display-ads.css"]) {
     assert.equal(existsSync(new URL("../public/" + name, import.meta.url)), false, name);
   }
+  const legacyConcerts = readFileSync(new URL("../public/concerts.html", import.meta.url), "utf8");
   assert.doesNotMatch(html, /m98DisplayAd|src="\/display-ads\.js|href="\/display-ads\.css/);
+  assert.doesNotMatch(legacyConcerts, /m98DisplayAd|display-ads\.js|display-ads\.css|cdn\.prplads\.com/);
   assert.match(worker, /path === "\/concerts\.html"[\s\S]*?Response\.redirect\(new URL\("\/concerts", request\.url\), 301\)/);
 });
 
