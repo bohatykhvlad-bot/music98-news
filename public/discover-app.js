@@ -29,29 +29,46 @@
   });
 
   const byId = id => document.getElementById(id);
-  let artists = [], current = null, recentIds = [], loaded = false;
+  let artists = [], current = null, recentIds = [], loaded = false, loadTask = null;
+  const policy = window.music98DiscoverCatalogPolicy;
 
   const validId = n => Number.isSafeInteger(n) && n > 0 && n < 1e12;
   const usable = d => (Array.isArray(d?.artists) ? d.artists : [])
+    .map(a => ({ ...a, albums: policy.eligibleAlbums(a) }))
     .filter(a => typeof a?.name === "string" && a.name.trim()
       && Array.isArray(a.albums) && a.albums.some(v => validId(v.id) && typeof v.title === "string"));
 
   async function loadCatalog() {
-    if (loaded) return;
-    loaded = true;
-    button.disabled = true;
-    status.textContent = "Loading albums…";
-    try {
-      const response = await fetch("/data/discover-albums.json", { cache: "default" });
-      if (!response.ok) throw new Error("Catalog HTTP " + response.status);
-      artists = usable(await response.json());
-      if (!artists.length) throw new Error("Empty album catalog");
-      button.disabled = false;
-      status.textContent = "";
-    } catch (error) {
-      status.textContent = "Albums are unavailable right now. Please try again later.";
-      console.warn("[music98 Discover]", error);
-    }
+    if (loaded) return true;
+    if (loadTask) return loadTask;
+    loadTask = (async () => {
+      button.disabled = true;
+      status.textContent = "Loading albums…";
+      try {
+        const response = await fetch("/data/discover-albums.json", {
+          cache: "default", signal: AbortSignal.timeout(15000)
+        });
+        if (!response.ok) throw new Error("Catalog HTTP " + response.status);
+        const catalog = usable(await response.json());
+        if (!catalog.length) throw new Error("Empty album catalog");
+        artists = catalog;
+        loaded = true;
+        button.textContent = current ? "Try another" : "Pick for me";
+        status.textContent = "";
+        return true;
+      } catch (error) {
+        // A failed first request must not permanently lock Discover. The next
+        // button click or tab visit retries; concurrent requests share a task.
+        button.textContent = "Try again";
+        status.textContent = "Albums could not load. Select Try again to retry.";
+        console.warn("[music98 Discover]", error);
+        return false;
+      } finally {
+        button.disabled = false;
+      }
+    })();
+    try { return await loadTask; }
+    finally { loadTask = null; }
   }
 
   function randomIndex(length) {
@@ -118,7 +135,8 @@
     if (current && !stage.querySelector("iframe")) renderPlayer();
   }
 
-  button.addEventListener("click", () => {
+  button.addEventListener("click", async () => {
+    if (!await loadCatalog()) return;
     const album = choose();
     if (album) select(album);
   });
