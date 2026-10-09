@@ -1,14 +1,14 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-09T13:30:11.620Z",
+  "updatedAt": "2026-10-09T16:37:29.460Z",
   "chartUpdated": "2026-10-09",
   "chartRev": "daily-global-v37",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 26,
-    "apple-chart": 23,
+    "apple-feed": 25,
+    "apple-chart": 24,
     "previous-audit": 1
   },
   "entries": {
@@ -29,7 +29,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.173Z",
+      "checkedAt": "2026-10-09T16:35:48.045Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -65,7 +65,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:03.930Z",
+      "checkedAt": "2026-10-09T16:37:08.247Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -161,7 +161,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:03.931Z",
+      "checkedAt": "2026-10-09T16:37:08.248Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -197,7 +197,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:55.905Z",
+      "checkedAt": "2026-10-09T16:36:30.417Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -278,7 +278,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.167Z",
+      "checkedAt": "2026-10-09T16:35:48.039Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -314,7 +314,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:42.328Z",
+      "checkedAt": "2026-10-09T16:35:55.638Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -380,7 +380,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:04.517Z",
+      "checkedAt": "2026-10-09T16:37:11.178Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -446,7 +446,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.173Z",
+      "checkedAt": "2026-10-09T16:35:48.046Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -482,7 +482,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.175Z",
+      "checkedAt": "2026-10-09T16:35:48.047Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -518,7 +518,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:42.942Z",
+      "checkedAt": "2026-10-09T16:35:57.039Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -554,7 +554,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.169Z",
+      "checkedAt": "2026-10-09T16:35:48.041Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -590,7 +590,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:48.864Z",
+      "checkedAt": "2026-10-09T16:36:15.680Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -626,7 +626,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:48.864Z",
+      "checkedAt": "2026-10-09T16:36:15.681Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -662,7 +662,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:45.946Z",
+      "checkedAt": "2026-10-09T16:36:06.734Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -758,7 +758,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:10.966Z",
+      "checkedAt": "2026-10-09T16:37:27.390Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -794,7 +794,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:48.862Z",
+      "checkedAt": "2026-10-09T16:36:15.678Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -860,7 +860,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:42.941Z",
+      "checkedAt": "2026-10-09T16:35:57.038Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -956,7 +956,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:48.863Z",
+      "checkedAt": "2026-10-09T16:36:15.679Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -992,7 +992,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:06.038Z",
+      "checkedAt": "2026-10-09T16:37:15.520Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1088,7 +1088,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:11.618Z",
+      "checkedAt": "2026-10-09T16:37:29.458Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1184,7 +1184,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:42.329Z",
+      "checkedAt": "2026-10-09T16:35:55.639Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1220,7 +1220,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.171Z",
+      "checkedAt": "2026-10-09T16:35:48.043Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1256,7 +1256,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:42.942Z",
+      "checkedAt": "2026-10-09T16:35:57.040Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1292,7 +1292,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:47.148Z",
+      "checkedAt": "2026-10-09T16:36:12.951Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1373,7 +1373,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:00.650Z",
+      "checkedAt": "2026-10-09T16:36:37.251Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1442,7 +1442,7 @@
       "title": "Jaded",
       "artist": "Koe Wetzel & Ella Langley",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
+      "provider": "apple-chart",
       "releaseTitle": "Jaded - Single",
       "releaseArtist": "Koe Wetzel & Ella Langley",
       "releaseDate": "2026-06-12T12:00:00Z",
@@ -1450,14 +1450,14 @@
       "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
       "collectionId": "6798042820",
       "trackId": "6798042825",
-      "confidence": 99,
-      "score": 1350,
-      "consensus": 1,
+      "confidence": 98,
+      "score": 1090,
+      "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:02.975Z",
+      "checkedAt": "2026-10-09T16:37:05.993Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
+          "provider": "apple-chart",
           "id": "6798042825",
           "collectionId": "6798042820",
           "releaseTitle": "Jaded - Single",
@@ -1466,8 +1466,53 @@
           "releaseClass": "dedicated",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
-          "score": 1350,
-          "confidence": 99,
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6798042825",
+          "collectionId": "6798042820",
+          "releaseTitle": "Jaded - Single",
+          "releaseArtist": "Koe Wetzel & Ella Langley",
+          "releaseDate": "2026-06-12T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6798042820?i=6798042825",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4203392972",
+          "collectionId": "1046393742",
+          "releaseTitle": "Jaded",
+          "releaseArtist": "Koe Wetzel",
+          "releaseDate": "2026-08-07",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/04e9b4edc5c20eac15d3f1edb0b6c18c/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4203392972",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6801235870",
+          "collectionId": "6801235413",
+          "releaseTitle": "The Night Champion",
+          "releaseArtist": "Koe Wetzel",
+          "releaseDate": "2026-06-12T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b7/97/c1/b797c1fb-2e88-00a8-cf99-74af3ef13b6f/196874698624.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6801235413?i=6801235870",
+          "score": 645,
+          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -1490,7 +1535,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:49.568Z",
+      "checkedAt": "2026-10-09T16:36:17.543Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1526,7 +1571,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:02.278Z",
+      "checkedAt": "2026-10-09T16:37:02.604Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1546,7 +1591,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:08.934Z",
+      "checkedAt": "2026-10-09T16:37:21.728Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1612,7 +1657,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:05.474Z",
+      "checkedAt": "2026-10-09T16:37:14.215Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1678,7 +1723,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.171Z",
+      "checkedAt": "2026-10-09T16:35:48.044Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1714,7 +1759,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:02.974Z",
+      "checkedAt": "2026-10-09T16:37:03.982Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1780,7 +1825,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:55.299Z",
+      "checkedAt": "2026-10-09T16:36:26.894Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1876,7 +1921,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:10.965Z",
+      "checkedAt": "2026-10-09T16:37:27.389Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1912,7 +1957,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:09.672Z",
+      "checkedAt": "2026-10-09T16:37:24.200Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1978,7 +2023,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.168Z",
+      "checkedAt": "2026-10-09T16:35:48.040Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2014,7 +2059,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.170Z",
+      "checkedAt": "2026-10-09T16:35:48.042Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2050,7 +2095,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:10.329Z",
+      "checkedAt": "2026-10-09T16:37:25.413Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2146,7 +2191,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:47.148Z",
+      "checkedAt": "2026-10-09T16:36:12.952Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2182,7 +2227,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:56.542Z",
+      "checkedAt": "2026-10-09T16:36:32.912Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2248,7 +2293,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:43.609Z",
+      "checkedAt": "2026-10-09T16:35:59.849Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2329,7 +2374,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:42.942Z",
+      "checkedAt": "2026-10-09T16:35:57.040Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2365,7 +2410,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:49.567Z",
+      "checkedAt": "2026-10-09T16:36:17.543Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2446,7 +2491,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.169Z",
+      "checkedAt": "2026-10-09T16:35:48.041Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2482,7 +2527,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:02.975Z",
+      "checkedAt": "2026-10-09T16:37:05.994Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2518,7 +2563,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:07.889Z",
+      "checkedAt": "2026-10-09T16:37:18.502Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2614,7 +2659,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:40.172Z",
+      "checkedAt": "2026-10-09T16:35:48.044Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2650,7 +2695,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:45.946Z",
+      "checkedAt": "2026-10-09T16:36:06.734Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2686,7 +2731,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-09T13:29:52.162Z",
+      "checkedAt": "2026-10-09T16:36:22.166Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2782,7 +2827,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-09T13:30:10.965Z",
+      "checkedAt": "2026-10-09T16:37:27.388Z",
       "alternatives": [
         {
           "provider": "apple-chart",
