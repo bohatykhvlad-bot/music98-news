@@ -926,6 +926,25 @@
     mo.observe(document.documentElement, { childList: true, subtree: true });
   })();
 
+  /* Native iframe handles pointer gestures internally. Forward ONLY the
+     cursor coordinates to the parent Discover canvas, with no audio access
+     and no prevention of Apple's default interactions. */
+  (function forwardAmbientPointer(){
+    if(window.parent === window) return;
+    var last=0;
+    document.addEventListener("pointermove",function(ev){
+      if(ev.pointerType!=="mouse" && ev.pointerType!=="pen")return;
+      var now=performance.now();
+      if(now-last<35)return;
+      last=now;
+      try{
+        window.parent.postMessage({
+          type:"music98:apple-pointer",x:ev.clientX,y:ev.clientY
+        },location.origin);
+      }catch(err){}
+    },{passive:true});
+  })();
+
   function watch() {
     var mk = music();
     if (mk) patch(mk);
