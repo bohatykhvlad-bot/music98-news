@@ -20,6 +20,7 @@
     precision highp float;
     varying vec2 uv;
     uniform vec2 viewport;
+    uniform vec4 source;
     uniform vec3 pointer;
     uniform float time;
     uniform float energy;
@@ -42,6 +43,11 @@
     float cloud(vec2 p, vec2 center, vec2 size) {
       vec2 d=(p-center)/size; return exp(-dot(d,d)*2.);
     }
+    float playerDistance(vec2 p, vec2 centre, vec2 size) {
+      float rounding=min(24./viewport.y,min(size.x,size.y));
+      vec2 q=abs(p-centre)-size+rounding;
+      return length(max(q,0.))+min(max(q.x,q.y),0.)-rounding;
+    }
     vec2 sand(vec2 p, float scale, float seed) {
       vec2 cell=p*scale+seed;
       vec2 id=floor(cell), f=fract(cell);
@@ -62,30 +68,28 @@
       // Bend the existing current with a softened version of the original
       // vortex. Its bounded displacement never creates a separate cloud.
       vec2 nudge=(vec2(-delta.y,delta.x)*.48-delta*.12)*influence;
-      p+=clamp(nudge,vec2(-33.6/viewport.y),vec2(33.6/viewport.y));
+      p+=clamp(nudge,vec2(-30.24/viewport.y),vec2(30.24/viewport.y));
       float t=time*.25;
-      vec2 centre=vec2(aspect*.54,.51);
-      vec2 outward=(p-centre)/max(length(p-centre),.15);
-      // Carry the texture inward along undulating paths rather than straight
-      // rays. Both swells accelerate with the playback-driven clock.
+      vec2 centre=source.xy/viewport.y, size=source.zw/viewport.y;
+      vec2 nearest=clamp(p,centre-size,centre+size);
+      vec2 outward=(p-nearest)/max(length(p-nearest),.03);
+      float distance=playerDistance(p,centre,size);
+      // A decreasing phase sends curved fronts away from the player. Keep
+      // the texture displacement bounded so long playback cannot stretch it
+      // into straight rays converging on a fixed point.
       vec2 tangent=vec2(-outward.y,outward.x);
-      float radius=length(p-centre);
-      float swell=.045*sin(radius*9.-time*.85+p.y*2.)
-                 +.020*sin(radius*16.+time*.55-p.x*1.8);
-      vec2 transport=p+outward*time*.042+tangent*swell;
+      float swell=.045*sin(distance*9.-time*.85+p.y*2.)
+                 +.020*sin(distance*16.+time*.55-p.x*1.8);
+      vec2 transport=p+tangent*swell+outward*.035*sin(distance*16.-time*.95)
+                     +vec2(time*.012,-time*.008);
       vec2 warp=vec2(fbm(transport*2.1+vec2(t*.15,0.)),fbm(transport*2.1+19.));
       vec2 flow=p+(warp-.5)*.18+tangent*swell*.4;
-      float sideDistance=min(p.x,aspect-p.x);
-      float capDistance=min(p.y,1.-p.y);
-      // Blend the two edge fields across a broad corner: selecting the
-      // nearest edge with a branch left a visible diagonal seam.
-      float sideSwell=.055*sin(p.y*5.5-time*.38)+.025*sin(p.y*10.+time*.22);
-      float capSwell=.055*sin(p.x*5.-time*.34)+.025*sin(p.x*9.+time*.25);
-      float sideLanes=fbm(vec2((sideDistance+sideSwell)*10.-time*.42,p.y*2.)+warp*.6);
-      float capLanes=fbm(vec2((capDistance+capSwell)*10.-time*.42,p.x*2.)+warp*.6);
-      float lanes=mix(sideLanes,capLanes,smoothstep(-.14,.14,sideDistance-capDistance));
+      float bend=(fbm(p*2.6+vec2(time*.04,-time*.02))-.5)*.10;
+      float waveDistance=distance+bend+.025*sin(p.x*4.+p.y*3.-time*.3);
+      float lanes=fbm(vec2(waveDistance*8.-time*.42,(p.x+p.y)*2.)+warp*.6);
       float volume=fbm(transport*4.8+warp*.9);
       float detail=noise(transport*26.+warp*2.);
+      float ripple=.5+.5*sin(waveDistance*16.-time*.95+(volume-.5)*2.2);
       // Unequal, tapering wave fronts give music98 its own silhouette.
       float left=cloud(flow,vec2(aspect*.015+.035*sin(p.y*6.-t),.58),vec2(.24,.58));
       float right=cloud(flow,vec2(aspect*.99-.045*sin(p.y*4.+t+1.),.43),vec2(.27,.48));
@@ -95,13 +99,11 @@
       // envelope otherwise leaves a large, sharply white clearing.
       float edgeEnvelope=clamp(left+right*.9+top*.78+bottom,0.,1.5);
       float envelope=mix(.22,1.5,edgeEnvelope/1.5);
-      float density=volume*.47+lanes*.63+detail*.05;
+      float density=volume*.47+lanes*.50+ripple*.17+detail*.05;
       float body=envelope*smoothstep(.25,.76,density);
       // Soft, textured crests break up the diffuse cloud into flowing waves.
-      float leftCrest=exp(-pow((flow.x-.13-.04*sin(flow.y*6.-t))/.065,2.));
-      float rightCrest=exp(-pow((aspect-flow.x-.15-.05*sin(flow.y*5.+t+1.))/.075,2.));
-      float crests=(leftCrest+rightCrest)*smoothstep(.25,.75,volume);
-      body+=crests*.20;
+      float crests=smoothstep(.65,.98,ripple)*smoothstep(.30,.75,volume);
+      body+=envelope*crests*.12;
       float haze=.015+envelope*.04;
       // Interpolated grain moves continuously instead of jumping between
       // random pixel cells as the current advances.
@@ -142,11 +144,12 @@
           gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
           const position=gl.getAttribLocation(program,"position");
           gl.enableVertexAttribArray(position); gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
-          const locations=Object.fromEntries(["viewport","pointer","time","energy"]
+          const locations=Object.fromEntries(["viewport","source","pointer","time","energy"]
             .map(key=>[key,gl.getUniformLocation(program,key)]));
           return { draw() {
             gl.viewport(0,0,canvas.width,canvas.height);
             gl.uniform2f(locations.viewport,width,height);
+            gl.uniform4fv(locations.source,playerSource());
             gl.uniform3f(locations.pointer,pointer.x,pointer.y,pointer.strength);
             gl.uniform1f(locations.time,clock); gl.uniform1f(locations.energy,energy);
             gl.drawArrays(gl.TRIANGLES,0,6);
@@ -181,14 +184,18 @@
         ctx.fillStyle=glow;ctx.fillRect(-1,-1,2,2);ctx.restore();
       }
       const count=width<760?700:grains.length;
+      const [sourceX,sourceY,halfWidth,halfHeight]=playerSource();
       for(let i=0;i<count;i++){
         const p=grains[i];
-        // Inward travel follows curved paths in the lightweight renderer too.
-        const travel=(p.x+clock*.014)%1;
+        // Curved outward paths start at the actual player boundary.
+        const travel=(p.x+clock*.04)%1;
         const angle=p.phase+Math.sin(travel*6.28-clock*.28+p.phase)*.13
           +Math.sin(travel*11.-clock*.17)*.06;
-        let x=width*.54+Math.cos(angle)*(1-travel)*width*.66;
-        let y=height*.51+Math.sin(angle)*(1-travel)*height*.66;
+        const cos=Math.cos(angle),sin=Math.sin(angle);
+        const edge=Math.min(halfWidth/Math.max(Math.abs(cos),.001),halfHeight/Math.max(Math.abs(sin),.001));
+        const radius=edge+travel*Math.max(width,height)*.7;
+        let x=sourceX+cos*radius;
+        let y=sourceY+sin*radius;
         x+=Math.sin(clock*.25+p.phase)*22;y+=Math.cos(clock*.2+p.phase)*18;
         const dx=x-pointer.x,dy=y-pointer.y,near=Math.exp(-(dx*dx+dy*dy)/32000)*pointer.strength;
         x-=dy*near*.17;y+=dx*near*.17;
@@ -198,6 +205,14 @@
         ctx.fillRect(x,y,p.size,p.size);
       }
     }};
+  }
+
+  function playerSource() {
+    const stage=document.getElementById("discoverPlayerStage");
+    const rect=stage?.getBoundingClientRect();
+    return rect?.width&&rect.height
+      ?[rect.left+rect.width/2,rect.top+rect.height/2,rect.width/2,rect.height/2]
+      :[width/2,height/2,Math.min(width*.3,330),225];
   }
 
   function resize() {
@@ -212,7 +227,7 @@
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
     pointer.targetX=clamp(x,0,innerWidth);pointer.targetY=clamp(y,0,innerHeight);
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
-    pointer.targetStrength=.68;pointerLastMove=performance.now();
+    pointer.targetStrength=.612;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;

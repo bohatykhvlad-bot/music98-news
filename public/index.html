@@ -882,18 +882,18 @@ textarea{resize:vertical;min-height:64px}
 
 /* All section headings use the same .tab top padding and .hd typography.
    The desktop Releases / Discover white-area height is synchronized in JS. */
-#tab-discover{padding-bottom:12px}
+#tab-discover{--discover-player-shift:clamp(0px,calc((100vw - 1100px)*.56),100px);padding-bottom:12px}
 #tab-discover .discover-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,660px);align-items:start;gap:32px;width:100%;margin:0;padding:0}
 #tab-discover .discover-copy{--discover-button-gap:calc(var(--section-heading-gap) + 12px);min-width:0;width:100%;min-height:450px;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
 #tab-discover .discover-intro{display:flex;flex-direction:column;align-items:center;width:max-content;max-width:100%}
 #tab-discover .discover-intro .hd{align-self:stretch;margin-bottom:var(--discover-button-gap)}
-#tab-discover .discover-selected{margin-top:var(--discover-button-gap);display:flex;flex-direction:column;gap:4px;width:100%}
+#tab-discover .discover-selected{margin-top:var(--discover-button-gap);display:flex;flex-direction:column;gap:4px;width:100%;max-width:calc(100% - var(--discover-player-shift))}
 #tab-discover .discover-selected[hidden]{display:none!important}
 #tab-discover .discover-artist{font-size:clamp(23px,2.6vw,32px);font-weight:800;color:var(--text);line-height:1.16;letter-spacing:-.035em;margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-album{font-size:17px;font-weight:500;line-height:1.3;color:var(--muted);margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-details{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);margin:6px 0 0}
 #tab-discover .discover-details span+span:not(:empty):before{content:"·";margin-right:9px}
-#tab-discover .discover-stage{position:relative;isolation:isolate;min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px;padding-top:calc(clamp(26px,4vw,38px)*1.15 + var(--section-heading-gap))}
+#tab-discover .discover-stage{position:relative;isolation:isolate;min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px;padding-top:calc(clamp(26px,4vw,38px)*1.15 + var(--section-heading-gap));transform:translateX(calc(0px - var(--discover-player-shift)))}
 #tab-discover .discover-card{z-index:1}
 /* Discover-only viewport ambience. The canvas is always click-through and
    sits behind the site UI; it never shifts the player or affects other tabs. */
@@ -910,6 +910,7 @@ body.discover-ambient-visible #discoverAmbient{opacity:1;visibility:visible}
 #tab-discover #discoverFind{color:var(--text);font-weight:600;align-self:center;margin-top:0;min-width:200px}
 @media(hover:hover) and (pointer:fine){#tab-discover #discoverFind:hover{color:#03282b}#tab-discover #discoverFind:hover::before{background:var(--accent);border-color:var(--accent)}}
 @media(max-width:1100px){
+  #tab-discover{--discover-player-shift:0px}
   #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px}
   #tab-discover .discover-copy{--discover-button-gap:var(--section-heading-gap);max-width:none;min-height:0;width:100%}
   #tab-discover .discover-selected{margin-top:var(--section-heading-gap)}
@@ -4343,7 +4344,7 @@ window.music98DiscoverPlayer={
   pause: () => pauseAllMedia()
 };
 </script>
-<script src="/discover-ambient.js?v=20261010-flow05" defer></script>
+<script src="/discover-ambient.js?v=20261010-flow06" defer></script>
 <script src="/discover-catalog-policy.js?v=20261010-genres02" defer></script>
 <script src="/discover-app.js?v=20261010-catalog-retry01" defer></script>
 <script src="/concerts-app.js?v=20261008-03" defer></script>
