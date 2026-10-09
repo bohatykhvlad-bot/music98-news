@@ -30,7 +30,7 @@
     const pull=Math.exp(-(dx*dx+dy*dy)/(2*range*range))*pointer.strength*.24;
     return [x-dx*pull,y-dy*pull];
   }
-  const particles = Array.from({ length: 85 }, (_, i) => {
+  const particles = Array.from({ length: 64 }, (_, i) => {
     const h = n => {
       const x = Math.sin(n * 127.1 + 78.233) * 43758.5453123;
       return x - Math.floor(x);
@@ -106,20 +106,20 @@
     gradient.addColorStop(1,"rgba(79,255,223,.07)");
     ctx.strokeStyle=gradient;
     ctx.lineJoin="round"; ctx.lineCap="round";
-    ctx.globalAlpha=.075*intensity;
+    ctx.globalAlpha=.14*intensity;
     ctx.lineWidth=182;
     ctx.stroke();
-    ctx.globalAlpha=.095*intensity;
+    ctx.globalAlpha=.155*intensity;
     ctx.lineWidth=95;
     ctx.stroke();
-    ctx.globalAlpha=.10*intensity;
+    ctx.globalAlpha=.165*intensity;
     ctx.lineWidth=37;
     ctx.stroke();
     ctx.globalAlpha=1;
   }
 
   function dust(intensity) {
-    const limit=width<760?37:particles.length;
+    const limit=width<760?24:particles.length;
     for(let i=0;i<limit;i++){
       const p=particles[i];
       let x=p.x*width+Math.sin(clock*p.speed+p.phase)*15;
@@ -151,18 +151,18 @@
     const breath=1+.10*Math.sin(clock*.72);
     ctx.globalCompositeOperation="screen";
     cloud(width*.04+Math.sin(clock*.25)*width*.025,height*.46,width*.29,height*.53,
-      "0,205,219",.11*live*breath);
+      "0,205,219",.145*live*breath);
     cloud(width*.97+Math.sin(clock*.19+1)*width*.018,height*.54,width*.31,height*.56,
-      "0,217,202",.115*live);
+      "0,217,202",.15*live);
     cloud(width*.60,height*.035+Math.cos(clock*.20)*height*.03,width*.47,height*.27,
-      "5,222,224",.098*live);
+      "5,222,224",.125*live);
     cloud(width*.48,height*.99+Math.cos(clock*.25)*height*.02,width*.50,height*.28,
-      "24,208,230",.12*live);
+      "24,208,230",.15*live);
     cloud(width*.33+Math.sin(clock*.11)*width*.035,height*.47,width*.29,height*.36,
-      "91,242,212",.035*live);
+      "91,242,212",.05*live);
     if(pointer.strength>.01){
       cloud(pointer.x,pointer.y,Math.max(160,width*.16),Math.max(135,height*.22),
-        "0,217,218",.105*pointer.strength*live);
+        "0,217,218",.14*pointer.strength*live);
       cloud(pointer.x+45,pointer.y-26,Math.max(110,width*.105),Math.max(95,height*.13),
         "85,255,218",.062*pointer.strength*live);
     }
@@ -177,10 +177,10 @@
   function loop(ts){
     frame=0;
     if(!active || document.hidden) return;
-    const interval=1000/(playing?36:24);
+    const interval=1000/(width<760 ? (playing?26:18) : (playing?36:24));
     if(!last)last=ts-interval;
     if (ts-last>=interval) {
-      clock+=Math.min((ts-last)/1000,.08);
+      clock+=Math.min((ts-last)/1000,.08)*(1+energy*.48);
       last=ts;
       energy+=(Number(playing)-energy)*.065;
       if(pointer.targetStrength && performance.now()-pointerLastMove>5000)pointer.targetStrength=.40;
