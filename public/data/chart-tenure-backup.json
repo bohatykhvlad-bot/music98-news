@@ -18,7 +18,7 @@
     },
     "sourceDates": {
       "A": "2026-10-09",
-      "S": "2026-10-07",
+      "S": "2026-10-08",
       "D": "2026-10-09"
     },
     "sourceOrigin": {
@@ -26,7 +26,7 @@
       "S": "kworb-crosschecked-kworb+musicrank",
       "D": "official-worldwide-live"
     },
-    "spotifyFingerprint": "03a09012da7371c2b0b468e9c68a56d241155c6d81226700b676d6a38dbab361",
+    "spotifyFingerprint": "5c7124e2e83dc8ba11c21e62d9c6a12bbd56aaed5f9161a4f5f5c2284fde7df0",
     "tracks": [
       {
         "rank": 1,
@@ -51,31 +51,31 @@
       },
       {
         "rank": 4,
+        "title": "Patient Zero",
+        "artist": "Taylor Swift",
+        "weeks": 13,
+        "delta": "3"
+      },
+      {
+        "rank": 5,
         "title": "Choosin' Texas",
         "artist": "Ella Langley",
+        "weeks": 20,
+        "delta": "-2"
+      },
+      {
+        "rank": 6,
+        "title": "Man I Need",
+        "artist": "Olivia Dean",
         "weeks": 20,
         "delta": "-1"
       },
       {
-        "rank": 5,
-        "title": "Patient Zero",
-        "artist": "Taylor Swift",
-        "weeks": 13,
-        "delta": "2"
-      },
-      {
-        "rank": 6,
+        "rank": 7,
         "title": "hate that i made you love me",
         "artist": "Ariana Grande",
         "weeks": 20,
-        "delta": "-2"
-      },
-      {
-        "rank": 7,
-        "title": "Man I Need",
-        "artist": "Olivia Dean",
-        "weeks": 20,
-        "delta": "-2"
+        "delta": "-3"
       },
       {
         "rank": 8,
@@ -121,31 +121,31 @@
       },
       {
         "rank": 14,
-        "title": "drop dead",
-        "artist": "Olivia Rodrigo",
-        "weeks": 11,
-        "delta": "-1"
-      },
-      {
-        "rank": 15,
         "title": "Boston",
         "artist": "STELLA LEFTY",
         "weeks": 20,
-        "delta": "0"
+        "delta": "1"
+      },
+      {
+        "rank": 15,
+        "title": "drop dead",
+        "artist": "Olivia Rodrigo",
+        "weeks": 11,
+        "delta": "-2"
       },
       {
         "rank": 16,
-        "title": "I Can't Love You Anymore",
-        "artist": "Ella Langley & Morgan Wallen",
-        "weeks": 20,
-        "delta": "6"
+        "title": "Die With A Smile",
+        "artist": "Lady Gaga & Bruno Mars",
+        "weeks": 4,
+        "delta": "3"
       },
       {
         "rank": 17,
-        "title": "Solar Eclipse",
-        "artist": "Drake & Don Toliver",
-        "weeks": 6,
-        "delta": "1"
+        "title": "I Can't Love You Anymore",
+        "artist": "Ella Langley & Morgan Wallen",
+        "weeks": 20,
+        "delta": "5"
       },
       {
         "rank": 18,
@@ -156,10 +156,10 @@
       },
       {
         "rank": 19,
-        "title": "Die With A Smile",
-        "artist": "Lady Gaga & Bruno Mars",
-        "weeks": 4,
-        "delta": "0"
+        "title": "Solar Eclipse",
+        "artist": "Drake & Don Toliver",
+        "weeks": 6,
+        "delta": "-1"
       },
       {
         "rank": 20,
@@ -170,38 +170,38 @@
       },
       {
         "rank": 21,
-        "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
-        "artist": "Taylor Swift",
-        "weeks": 17,
-        "delta": "-1"
-      },
-      {
-        "rank": 22,
-        "title": "Quebec",
-        "artist": "Drake",
-        "weeks": 6,
-        "delta": "-1"
-      },
-      {
-        "rank": 23,
-        "title": "Dracula",
-        "artist": "Tame Impala",
-        "weeks": 20,
-        "delta": "8"
-      },
-      {
-        "rank": 24,
-        "title": "Earrings",
-        "artist": "Malcolm Todd",
-        "weeks": 20,
-        "delta": "-1"
-      },
-      {
-        "rank": 25,
         "title": "Cinderella",
         "artist": "Mac Miller, Ty Dolla $ign",
         "weeks": 11,
-        "delta": "4"
+        "delta": "8"
+      },
+      {
+        "rank": 22,
+        "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
+        "artist": "Taylor Swift",
+        "weeks": 17,
+        "delta": "-2"
+      },
+      {
+        "rank": 23,
+        "title": "Earrings",
+        "artist": "Malcolm Todd",
+        "weeks": 20,
+        "delta": "0"
+      },
+      {
+        "rank": 24,
+        "title": "Quebec",
+        "artist": "Drake",
+        "weeks": 6,
+        "delta": "-3"
+      },
+      {
+        "rank": 25,
+        "title": "Dracula",
+        "artist": "Tame Impala",
+        "weeks": 20,
+        "delta": "6"
       },
       {
         "rank": 26,
@@ -212,17 +212,17 @@
       },
       {
         "rank": 27,
-        "title": "Stop The Wedding!",
-        "artist": "Ashe",
-        "weeks": 4,
-        "delta": "-1"
-      },
-      {
-        "rank": 28,
         "title": "Janice STFU",
         "artist": "Drake",
         "weeks": 20,
-        "delta": "-1"
+        "delta": "0"
+      },
+      {
+        "rank": 28,
+        "title": "Midnight Sun",
+        "artist": "Zara Larsson",
+        "weeks": 20,
+        "delta": "-3"
       },
       {
         "rank": 29,
@@ -233,10 +233,10 @@
       },
       {
         "rank": 30,
-        "title": "Midnight Sun",
-        "artist": "Zara Larsson",
-        "weeks": 20,
-        "delta": "-5"
+        "title": "Stop The Wedding!",
+        "artist": "Ashe",
+        "weeks": 4,
+        "delta": "-4"
       },
       {
         "rank": 31,
@@ -247,10 +247,10 @@
       },
       {
         "rank": 32,
-        "title": "Self Aware",
-        "artist": "Temper City",
-        "weeks": 20,
-        "delta": "1"
+        "title": "Last Thing You Need",
+        "artist": "Morgan Wallen",
+        "weeks": 13,
+        "delta": "0"
       },
       {
         "rank": 33,
@@ -261,31 +261,31 @@
       },
       {
         "rank": 34,
-        "title": "Last Thing You Need",
-        "artist": "Morgan Wallen",
-        "weeks": 13,
-        "delta": "-2"
-      },
-      {
-        "rank": 35,
         "title": "Mexico Honey",
         "artist": "Kacey Musgraves",
         "weeks": 4,
-        "delta": "2"
+        "delta": "3"
       },
       {
-        "rank": 36,
+        "rank": 35,
         "title": "Jaded",
         "artist": "Koe Wetzel & Ella Langley",
         "weeks": 4,
-        "delta": "14"
+        "delta": "15"
       },
       {
-        "rank": 37,
+        "rank": 36,
         "title": "Sweater Weather",
         "artist": "The Neighbourhood",
         "weeks": 4,
-        "delta": "2"
+        "delta": "3"
+      },
+      {
+        "rank": 37,
+        "title": "Love Me Not",
+        "artist": "Ravyn Lenae",
+        "weeks": 2,
+        "delta": "6"
       },
       {
         "rank": 38,
@@ -310,71 +310,71 @@
       },
       {
         "rank": 41,
-        "title": "Love Me Not",
-        "artist": "Ravyn Lenae",
-        "weeks": 2,
-        "delta": "2"
-      },
-      {
-        "rank": 42,
         "title": "Empty Words",
         "artist": "Corey Kent",
         "weeks": 2,
-        "delta": "2"
-      },
-      {
-        "rank": 43,
-        "title": "SWIM",
-        "artist": "BTS",
-        "weeks": 3,
         "delta": "3"
       },
       {
-        "rank": 44,
-        "title": "Loser",
-        "artist": "Tame Impala",
-        "weeks": 20,
-        "delta": "3"
-      },
-      {
-        "rank": 45,
+        "rank": 42,
         "title": "musubi",
         "artist": "Ayumu Imazu",
         "weeks": 4,
-        "delta": "0"
+        "delta": "3"
       },
       {
-        "rank": 46,
+        "rank": 43,
         "title": "Phone, Keys, Wallet",
         "artist": "Lainey Wilson & John Mayer",
         "weeks": 1,
         "delta": "new"
       },
       {
-        "rank": 47,
+        "rank": 44,
+        "title": "Self Aware",
+        "artist": "Temper City",
+        "weeks": 20,
+        "delta": "-11"
+      },
+      {
+        "rank": 45,
+        "title": "Loser",
+        "artist": "Tame Impala",
+        "weeks": 20,
+        "delta": "2"
+      },
+      {
+        "rank": 46,
         "title": "Think As You Drunk",
         "artist": "Riley Green",
         "weeks": 1,
         "delta": "re-entry"
       },
       {
-        "rank": 48,
-        "title": "Mr. Brightside",
-        "artist": "The Killers",
-        "weeks": 1,
-        "delta": "new"
-      },
-      {
-        "rank": 49,
+        "rank": 47,
         "title": "Don't We",
         "artist": "Morgan Wallen",
         "weeks": 1,
         "delta": "new"
       },
       {
-        "rank": 50,
+        "rank": 48,
+        "title": "SWIM",
+        "artist": "BTS",
+        "weeks": 3,
+        "delta": "-2"
+      },
+      {
+        "rank": 49,
         "title": "Good News",
         "artist": "Shaboozey",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 50,
+        "title": "Mr. Brightside",
+        "artist": "The Killers",
         "weeks": 1,
         "delta": "new"
       }
