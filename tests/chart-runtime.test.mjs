@@ -143,7 +143,7 @@ test("artwork audit can inspect future chart without publishing it to KV",()=>{
 test("browser accepts only fully imaged chart editions and can retain a prior verified edition",()=>{
   const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
   assert.match(html,/function chartHasCompleteArtwork\(tracks\)/);
-  assert.match(html,/if\(!chartHasCompleteArtwork\(tracks\)\) throw new Error\("incomplete_chart_artwork"\)/);
+  assert.match(html,/if\(!chartHasCompleteArtwork\(tracks\) \|\| !hasThreePlatformConsensus\(tracks\) \|\| !isDailySourceEdition\(j\)\)/);
   assert.match(html,/if\(hasVerifiedCache\) applyDaily\(cached\.tracks,"backup",cached\.date\)/);
   assert.match(html,/if\(fresh && chartHasCompleteArtwork\(tracks\)\)/);
 });
