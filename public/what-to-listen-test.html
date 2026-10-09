@@ -20,31 +20,108 @@
 @media(max-width:820px){.hero{gap:25px;grid-template-columns:1fr 1fr;min-height:470px}.suggestion{gap:24px;grid-template-columns:1fr 1fr}.headline{font-size:clamp(36px,5vw,51px)}}
 @media(max-width:660px){body{padding-top:106px}.topbar{height:106px}.bar-inner{height:106px;display:flex;flex-wrap:wrap;justify-content:center;gap:3px;padding:8px 14px}.brand{width:100%;justify-content:center;font-size:18px}.brand img{width:30px;height:30px}.nav{width:100%;justify-content:center}.nav a{font-size:12px;padding:6px 12px}.section{display:none}.wrap{padding:25px 16px 45px}.hero{grid-template-columns:1fr;gap:16px;min-height:0}.intro{padding:0}.headline{font-size:clamp(37px,10vw,48px);margin:11px 0}.desc{font-size:14px}.stage{gap:16px}.cover-shell{width:min(100%,330px)}.suggestion{grid-template-columns:1fr;gap:22px;margin-top:25px}.apple-shell iframe{height:430px}.apple-shell{min-height:430px}.fineprint{margin-top:22px}.surprise{min-width:208px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+.brandmark{width:35px;height:35px;flex:0 0 35px;display:inline-grid;place-items:center;border-radius:50%;background:#00fdfb;color:#15181a;font-size:12px;font-weight:850}.brandmark[hidden]{display:none!important}
+/* DISCOVER 2026-10-09 — match music98.news, keep the entire desktop view above the fold. */
+:root{--ink:#15181a;--muted:#5c6a70;--subtle:#8a969b;--line:#e2e8ea;--surface:#f4f6f7}
+html{overflow-x:clip;scrollbar-gutter:auto}
+body{height:100dvh;min-height:0;overflow:hidden;line-height:1.45}
+.topbar{background:rgba(255,255,255,.82);border-bottom:1px solid rgba(226,232,234,.85)}
+.bar-inner{gap:15px}
+.brand{font-size:20px;letter-spacing:-.015em;font-weight:700}.brand img{height:40px;width:40px}
+.nav{justify-self:center;display:flex;align-items:center;justify-content:center;height:40px;gap:3px;background:rgba(255,255,255,.55);padding:3px;border:1px solid rgba(15,60,64,.14)}
+.nav a{height:32px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;padding:0 12px}
+.nav a.current{color:#03282b;background:var(--cyan)}.nav a:hover{color:var(--ink)}
+.section{font-size:12px;color:var(--muted);letter-spacing:0;font-weight:600;text-transform:none}
+.wrap{height:calc(100dvh - 55px);padding:15px 20px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero{width:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:42px;min-height:0;align-items:center}
+.intro{align-items:flex-start;padding:0;max-width:440px}
+.eyebrow{font-size:11px;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.eyebrow .spot{height:6px;width:6px;box-shadow:none}
+.headline{font-size:clamp(30px,3.1vw,42px);font-weight:800;line-height:1.08;letter-spacing:-.04em;margin:13px 0 12px;max-width:440px}
+.desc{font-size:14px;color:var(--muted);max-width:390px;line-height:1.5}
+.stage{width:100%;height:min(675px,calc(100dvh - 82px));min-height:0;gap:12px;padding:8px;justify-content:center}
+.cover-shell{width:min(100%,min(340px,46dvh));border-radius:16px;box-shadow:var(--shadow);border:1px solid var(--line);flex:0 0 auto}
+.cover-shell.is-ready{box-shadow:var(--shadow);border:1px solid var(--line)}
+.cover-placeholder{font-size:clamp(90px,14vh,135px);color:#b2bec3}
+.album-fallback{background:linear-gradient(135deg,#eef1f2,#ced6d9);padding:18px}
+.album-fallback span{color:#64767d;font-size:10px}.album-fallback strong{color:#233039;text-shadow:none;font-size:20px;overflow-wrap:anywhere}.album-fallback small{color:#55676d;font-size:13px}
+.vinyl{background:none}
+.stage-controls{gap:8px}.surprise{min-width:180px;min-height:42px;height:42px;font-size:14px;padding:0 20px}
+.micro{min-height:0;font-size:11px;color:var(--muted)}
+.suggestion{display:block;border:0;border-top:1px solid var(--line);margin:20px 0 0;padding:18px 0 0;animation:reveal .26s ease both;width:100%;max-width:440px}
+.suggestion .tag{font-size:11px;font-weight:700;letter-spacing:.07em;margin:0 0 9px;color:#76858b}
+.suggestion h2{font-size:clamp(19px,2.4vw,29px);line-height:1.14;letter-spacing:-.035em;margin:0 0 7px;overflow-wrap:anywhere;max-height:2.5em;overflow:hidden}
+.suggestion .artist{font-weight:650;font-size:15px;color:#435157;margin:0 0 10px}
+.details{font-size:12px;color:#77878d}
+.listen-link{margin-top:14px;font-size:12px;color:#4c646d}
+.apple-shell{min-height:0;height:clamp(280px,calc(100dvh - 300px),450px);width:min(100%,490px);border-radius:15px;border:1px solid var(--line);box-shadow:var(--shadow);background:#fff;overflow:hidden;flex-shrink:1}
+.apple-shell iframe{height:100%;width:100%;border:0;display:block}
+body.picked .stage{gap:9px}body.picked .cover-shell{width:min(155px,21dvh)}
+body.picked .micro{display:none}body.picked .desc{display:none}
+.fineprint,.history{display:none!important}
+@media(max-height:730px) and (min-width:661px){
+  .wrap{padding:8px 20px}.stage{height:calc(100dvh - 72px)}
+  body.picked .cover-shell{width:min(128px,18dvh)}
+  .apple-shell{height:clamp(220px,calc(100dvh - 290px),410px)}
+  .hero{gap:28px}
+}
+@media(max-width:900px) and (min-width:661px){.hero{gap:24px}.headline{font-size:34px}.nav a{padding:0 9px}.brand{font-size:18px}}
+@media(max-width:660px){
+  body{padding-top:96px;overflow:hidden}.topbar{height:96px}.bar-inner{height:96px;padding:5px 12px;gap:3px;display:flex;flex-wrap:wrap;justify-content:center}
+  .brand{justify-content:center;width:100%;height:35px;font-size:17px;gap:7px}.brand img{width:30px;height:30px}
+  .nav{width:100%;height:39px;display:flex;gap:1px;padding:2px;justify-content:space-around}
+  .nav a{padding:0 6px;font-size:11px;height:33px;flex:1}
+  .section{display:none}
+  .wrap{height:calc(100dvh - 96px);padding:7px 14px;display:block;overflow:hidden}
+  .hero{height:100%;width:100%;display:flex;flex-direction:column;align-items:stretch;justify-content:space-evenly;gap:4px}
+  .intro{flex:0 0 auto;width:100%;max-width:none;padding:0}
+  .eyebrow{font-size:9px;letter-spacing:.06em}
+  .headline{font-size:clamp(24px,6vw,29px);line-height:1.08;letter-spacing:-.04em;margin:4px 0 4px;max-width:none}
+  .headline br{display:none}.headline br:after{content:' '}
+  .desc{font-size:12px;line-height:1.35}
+  .stage{height:auto;flex:1;gap:8px;min-height:0;padding:2px;justify-content:center}
+  .cover-shell{width:min(265px,42dvh,75vw);border-radius:15px}
+  .surprise{height:39px;min-height:39px;min-width:172px;padding:0 18px;font-size:13px}
+  .micro{font-size:10px}
+  .suggestion{margin:8px 0 0;padding:8px 0 0}
+  .suggestion .tag{font-size:10px;margin-bottom:3px}.suggestion h2{font-size:18px;margin:0 0 2px;max-height:2.4em}
+  .suggestion .artist{font-size:12px;margin:0 0 3px}.details{font-size:10px}.details span+span:before{margin-right:6px}.listen-link{font-size:10px;margin-top:4px}
+  body.picked .stage{gap:5px;justify-content:space-between}
+  body.picked .cover-shell{width:min(92px,14dvh)}
+  .apple-shell{height:clamp(170px,calc(100dvh - 340px),390px);width:100%;border-radius:13px;flex-shrink:1}
+}
+@media(max-width:660px) and (max-height:650px){
+  .headline{font-size:23px}.intro{line-height:1.2}
+  body.picked .cover-shell{width:min(72px,11dvh)}
+  .apple-shell{height:max(155px,calc(100dvh - 325px))}
+}
 </style>
 </head>
 <body>
 <header class="topbar"><div class="bar-inner">
-<a class="brand" href="/" aria-label="music98 home"><img src="/logo.png" alt="">music98.news</a>
-<nav class="nav" aria-label="Sections"><a href="/news">News</a><a href="/releases">Releases</a><a href="/chart">Chart</a><a href="/concerts">Concerts</a></nav>
+<a class="brand" href="/" aria-label="music98 home"><img src="https://music98.news/logo.png" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span hidden class="brandmark">98</span>music98.news</a>
+<nav class="nav" aria-label="Sections"><a href="/news">News</a><a href="/releases">Releases</a><a href="#" class="current" aria-current="page">Discover</a><a href="/chart">Chart</a><a href="/concerts">Concerts</a></nav>
 <span class="section">Discover · Test</span>
 </div></header>
 <main class="wrap">
 <section class="hero" aria-label="Discover a random album">
 <div class="intro">
-<span class="eyebrow"><span class="spot"></span> Music discovery, made simple</span>
+<span class="eyebrow"><span class="spot"></span> Find your next album</span>
 <h1 class="headline">What should<br>I listen to?</h1>
-<p class="desc">One surprise album. No endless scrolling. Find something new, press play, and see where the music takes you.</p>
+<p class="desc">One click. One album to discover.</p>
+<section id="suggestion" class="suggestion hidden" aria-label="Your suggested album"><div class="album-info"><span class="tag">Your next listen</span><h2 id="albumTitle"></h2><p class="artist" id="artistName"></p><div class="details"><span id="albumYear"></span><span id="albumGenre"></span></div><a id="appleLink" class="listen-link" href="https://music.apple.com/" target="_blank" rel="noopener noreferrer">Listen on Apple Music ↗</a></div>
+</section>
 </div>
 <div class="stage">
 <div class="cover-shell" id="coverShell" aria-label="Mystery album cover"><span class="cover-placeholder" id="question">?</span><img id="coverImg" class="cover-img" alt="" referrerpolicy="no-referrer"><div class="album-fallback" id="fallback"><span>YOUR ALBUM PICK</span><strong id="fallbackTitle"></strong><small id="fallbackArtist"></small></div><div class="vinyl"></div></div>
 <div class="stage-controls"><button class="surprise" id="surprise" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg><span id="buttonLabel">Surprise me</span></button></div>
 <div class="micro" id="status" role="status" aria-live="polite">A random album is waiting for you.</div>
+<div class="apple-shell hidden" id="appleShell"><iframe id="applePlayer" title="Apple Music album preview" loading="lazy" allow="autoplay *; encrypted-media *; clipboard-write" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"></iframe></div>
+
 </div>
 </section>
-<section id="suggestion" class="suggestion hidden" aria-label="Your suggested album">
-<div><span class="tag">Your next listen</span><h2 id="albumTitle"></h2><p class="artist" id="artistName"></p><div class="details"><span id="albumYear"></span><span id="albumGenre"></span></div><a id="appleLink" class="listen-link" href="https://music.apple.com/" target="_blank" rel="noopener noreferrer">Open in Apple Music ↗</a></div>
-<div class="apple-shell"><iframe id="applePlayer" title="Apple Music album preview" loading="lazy" allow="autoplay *; encrypted-media *; clipboard-write" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"></iframe></div>
-</section>
+
 <section id="history" class="history hidden" aria-label="Recently discovered albums"><h3>Previously discovered</h3><div class="past-grid" id="pastGrid"></div></section>
 <p class="fineprint">Albums are selected from our discovery catalog and presented through the official Apple Music player. Previews and full-track availability depend on Apple Music and your subscription or region.</p>
 </main>
@@ -52,20 +129,20 @@
 <script>
 (()=>{"use strict";
 const DATA_URL="/data/discover-albums.json",APPLE_AFFILIATE_TOKEN="1001l3aZW",CAMPAIGN="music98_discover";
-const $=id=>document.getElementById(id);let artists=[],lastIds=[],current=null,seq=0,history=[];
+const $=id=>document.getElementById(id);let artists=JSON.parse(document.getElementById("embeddedCatalog").textContent).artists,lastIds=[],current=null,seq=0,history=[];
 const ICON='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 11h8M8 15h6"/></svg>';
 function secureInt(n){return Number.isSafeInteger(n)&&n>0&&n<1e12}
 function verifyEntry(a){return a&&typeof a.name==="string"&&a.name.length>0&&Array.isArray(a.albums)&&a.albums.some(x=>secureInt(x.id)&&typeof x.title==="string")}
 async function load(){try{const r=await fetch(DATA_URL,{cache:"default"});if(!r.ok)throw Error("Album list unavailable");const d=await r.json();artists=(Array.isArray(d.artists)?d.artists:[]).filter(verifyEntry);if(!artists.length)throw Error("Catalog is empty");if(d.isSample)$("status").textContent="Try the prototype with a starter selection of albums.";else $("status").textContent="Ready. Pick a record at random."}catch(e){try{const d=JSON.parse($("embeddedCatalog").textContent);artists=d.artists.filter(verifyEntry);$("status").textContent="Try the prototype with a starter selection of albums."}catch(_){artists=[];$("status").textContent="Album catalog is unavailable. Please try again later.";$("surprise").disabled=true;console.error("Album catalog:",e)}}}
 function rand(max){if(max<=1)return 0;if(crypto&&crypto.getRandomValues){const a=new Uint32Array(1);let x,limit=Math.floor(4294967296/max)*max;do{crypto.getRandomValues(a);x=a[0]}while(x>=limit);return x%max}return Math.floor(Math.random()*max)}
 function pick(){const valid=artists.filter(a=>a.albums.some(x=>secureInt(x.id)));if(!valid.length)return null;const fresh=valid.filter(a=>a.albums.some(x=>!lastIds.includes(x.id)));const pool=fresh.length?fresh:valid;const a=pool[rand(pool.length)];const choices=a.albums.filter(x=>secureInt(x.id)&&(!fresh.length||!lastIds.includes(x.id)));const album=choices[rand(choices.length)] || a.albums[0];lastIds.push(album.id);if(lastIds.length>18)lastIds.shift();return {...album,artist:a.name,rank:a.rank}}
-function embedUrl(id){const u=new URL("https://embed.music.apple.com/us/album/"+id);u.searchParams.set("at",APPLE_AFFILIATE_TOKEN);u.searchParams.set("ct",CAMPAIGN);return u.toString()}
+function embedUrl(id){const u=new URL((location.protocol==="file:"?"https://embed.music.apple.com/us/album/":"https://music98.news/apple-embed/us/album/")+id,location.href);u.searchParams.set("at",APPLE_AFFILIATE_TOKEN);u.searchParams.set("ct",CAMPAIGN);return u.toString()}
 function albumUrl(id){const u=new URL("https://music.apple.com/us/album/"+id);u.searchParams.set("at",APPLE_AFFILIATE_TOKEN);u.searchParams.set("ct",CAMPAIGN);return u.toString()}
 function setArtwork(artwork,token){if(token!==seq)return;const img=$("coverImg");img.onload=()=>{if(token===seq)img.classList.add("loaded")};img.onerror=()=>{};img.src=artwork;img.alt="Album cover: "+current.title+" by "+current.artist}
 async function artworkFor(id,token){try{if(current?.artwork&&/^https:\/\/[^/]*mzstatic\.com\//i.test(current.artwork)){setArtwork(current.artwork,token);return}const lookup=new URL("https://itunes.apple.com/lookup");lookup.searchParams.set("id",String(id));lookup.searchParams.set("entity","album");lookup.searchParams.set("country","us");const res=await fetch(lookup.toString(),{mode:"cors",signal:AbortSignal.timeout(6500)});if(!res.ok)throw Error("Artwork API HTTP "+res.status);const obj=await res.json();const found=(obj.results||[]).find(x=>Number(x.collectionId)===Number(id));if(token!==seq||!found||!found.artworkUrl100)return;const artwork=found.artworkUrl100.replace(/\d+x\d+bb(?:-\d+)?\./,"600x600bb.");setArtwork(artwork,token)}catch(e){/* Decorative fallback deliberately stays visible on network or CORS errors. */}}
 function drawHistory(){const h=$("history"),list=$("pastGrid");list.replaceChildren();h.classList.toggle("hidden",history.length<2);history.slice(0,-1).reverse().slice(0,5).forEach(album=>{const b=document.createElement("button");b.className="past";b.type="button";b.innerHTML=ICON+'<span><strong></strong><small></small></span>';b.querySelector("strong").textContent=album.title;b.querySelector("small").textContent=album.artist;b.addEventListener("click",()=>display(album,false));list.appendChild(b)})}
 function display(album,remember=true){current=album;const token=++seq;const cover=$("coverShell"),img=$("coverImg");img.classList.remove("loaded");img.removeAttribute("src");img.alt="";cover.classList.add("is-ready");$("fallbackTitle").textContent=album.title;$("fallbackArtist").textContent=album.artist;$("albumTitle").textContent=album.title;$("artistName").textContent=album.artist;$("albumYear").textContent=album.year||"Album";$("albumGenre").textContent=album.genre||"Music";$("appleLink").href=albumUrl(album.id);
-const iframe=$("applePlayer");iframe.removeAttribute("src");iframe.src=embedUrl(album.id);$("suggestion").classList.remove("hidden");$("buttonLabel").textContent="Surprise me again";$("status").textContent="Your album is ready. Press play below.";
+const iframe=$("applePlayer");iframe.removeAttribute("src");iframe.src=embedUrl(album.id);$("suggestion").classList.remove("hidden");$("appleShell").classList.remove("hidden");document.body.classList.add("picked");$("buttonLabel").textContent="Surprise me again";$("status").textContent="Album selected. Tap play to listen.";
 if(remember){history.push(album);if(history.length>8)history.shift()}drawHistory();artworkFor(album.id,token)}
 $("surprise").addEventListener("click",()=>{const next=pick();if(next)display(next)});
 load();
