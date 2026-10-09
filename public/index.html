@@ -1451,11 +1451,11 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v46";
-const DAILY_CHART_METHOD = "daily-global-v1";
+const DAILYKEY = "music98news_daily_v47";
+const DAILY_CHART_METHOD = "daily-global-consensus-v2";
 function isDailySourceEdition(j){
   return j?.methodology===DAILY_CHART_METHOD && Object.keys(j.sources||{}).length===3 &&
-    ["A","S","D"].every(k=>j.sources[k]===50);
+    ["A","S","D"].every(k=>j.sources[k]===100);
 }
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
@@ -2525,6 +2525,13 @@ function chartHasCompleteArtwork(tracks){
     } catch(e){ return false; }
   });
 }
+function hasThreePlatformConsensus(tracks){
+  return Array.isArray(tracks) && tracks.length===50 && tracks.every((t,i)=>{
+    const r=t?.sourceRanks;
+    return Number(t?.rank)===i+1 && r && Object.keys(r).length===3 &&
+      ["A","S","D"].every(k=>Number.isInteger(r[k])&&r[k]>=1&&r[k]<=100);
+  });
+}
 function refreshDailyTop50(){
   if(S.autoChart === false){
     autoRows = null;
@@ -2535,7 +2542,7 @@ function refreshDailyTop50(){
   }
   let cached = null;
   try{ cached = JSON.parse(lsGetRaw(DAILYKEY)||"null"); }catch(e){ cached = null; }
-  const hasVerifiedCache=!!(cached && chartHasCompleteArtwork(cached.tracks) &&
+  const hasVerifiedCache=!!(cached && chartHasCompleteArtwork(cached.tracks) && hasThreePlatformConsensus(cached.tracks) &&
     isDailySourceEdition(cached) && cached.sourceDates?.S && cached.spotifyFingerprint);
   /* Never paint a locally cached ranking as today's chart before checking
      the latest independently verified source fingerprint with the server. */
@@ -2545,12 +2552,12 @@ function refreshDailyTop50(){
   setChartStatus({}, "loading");
   // The server checks the latest mirror fingerprint before each chart response.
   // The server returns the latest verified recovery snapshot if live sources fail.
-  fetch("/api/top50?d=" + todayUTC() + "&rev=46",
+  fetch("/api/top50?d=" + todayUTC() + "&rev=47",
     {cache:"no-store",headers:{"Cache-Control":"no-cache"}})
     .then(r=>{ if(!r.ok) throw 0; return r.json(); })
     .then(j=>{
       const tracks = (j && j.tracks) || [];
-      if(!chartHasCompleteArtwork(tracks)) throw new Error("incomplete_chart_artwork");
+      if(!chartHasCompleteArtwork(tracks) || !hasThreePlatformConsensus(tracks) || !isDailySourceEdition(j)) throw new Error("incomplete_or_unverified_chart");
       const fresh = j.updated === todayUTC() && !j.fallback && j.complete === true &&
         isDailySourceEdition(j) &&
         !!j.sourceDates?.S && !!j.spotifyFingerprint;
