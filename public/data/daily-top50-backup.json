@@ -708,11 +708,11 @@
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/43/99/8b/43998b40-7612-a2d7-5a54-da5e7870af99/4099964268270.jpg/600x600bb.jpg",
       "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/34/b2/fc/34b2fc1a-1d25-f743-b795-74e09cb178ee/mzaf_13522404070785250739.plus.aac.p.m4a",
       "year": "2026",
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -9.7,
       "lufs": -6.3,
-      "truePeakDbtp": 1.3
+      "truePeakDbtp": 1.3,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "rank": 47,
@@ -722,11 +722,11 @@
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
       "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5d/69/c3/5d69c3c4-41a0-de72-8000-7a02b3f23efa/mzaf_3384433737540977086.plus.aac.p.m4a",
       "year": "2026",
-      "delta": "re-entry",
-      "weeks": 1,
       "gainDb": -8,
       "lufs": -8,
-      "truePeakDbtp": 0.3
+      "truePeakDbtp": 0.3,
+      "delta": "re-entry",
+      "weeks": 1
     },
     {
       "rank": 48,
@@ -736,11 +736,11 @@
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/1a/5a/071a5aee-6e42-060c-35b9-6a6e45b9ea59/06UMGIM10441.rgb.jpg/600x600bb.jpg",
       "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5b/17/4e/5b174e80-1047-7214-1077-d822ba1f9520/mzaf_5975692497663881329.plus.aac.p.m4a",
       "year": "2003",
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -8.5,
       "lufs": -7.5,
-      "truePeakDbtp": -1.3
+      "truePeakDbtp": -1.3,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "rank": 49,
@@ -750,11 +750,11 @@
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
       "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/84/f2/ad/84f2adc3-c2e2-5bd1-14a6-3ca9256326a3/mzaf_7493570463891681462.plus.aac.p.m4a",
       "year": "2025",
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -8.5,
       "lufs": -7.5,
-      "truePeakDbtp": 0.7
+      "truePeakDbtp": 0.7,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "rank": 50,
@@ -764,14 +764,14 @@
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/23/f2/d9/23f2d96d-b842-5f8b-1a09-bcc9a5cf7032/197342797344_cover.jpg/600x600bb.jpg",
       "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d7/67/14/d7671445-b775-d8c7-f4ae-a24359540149/mzaf_3299917435904421647.plus.aac.p.m4a",
       "year": "2024",
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -5.5,
       "lufs": -10.5,
-      "truePeakDbtp": 0.3
+      "truePeakDbtp": 0.3,
+      "delta": "new",
+      "weeks": 1
     }
   ],
-  "seedEdition": "[[\"A\",\"2026-10-09T08:00:27.476Z\",\"2026-10-09\"],[\"D\",\"2026-10-09T08:00:28.201Z\",\"2026-10-09\"],[\"C\",\"108:eb943f9b\"]]",
+  "seedEdition": "[[\"A\",\"2026-10-09T16:35:28.928Z\",\"2026-10-09\"],[\"D\",\"2026-10-09T16:35:29.473Z\",\"2026-10-09\"],[\"C\",\"108:eb943f9b\"]]",
   "arrows": {
     "ok": true,
     "bad": 0,
