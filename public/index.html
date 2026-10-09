@@ -160,13 +160,6 @@ main{position:relative;z-index:1}
 .m98-home-banner{flex:0 0 728px;min-width:0;text-align:center}
 #tab-news .m98-home-banner.m98-ad-unfilled{display:none}
 .m98-home-banner-slot{width:728px;height:90px;margin:0 auto}
-/* One Adsterra 728x90 test unit, between the News hero and card rail.
-   Fixed-size desktop inventory: do not load or display it on small screens. */
-#tab-news .m98-adsterra-test{margin:0 0 18px;text-align:center}
-#tab-news .m98-adsterra-test-slot{width:728px;max-width:100%;height:90px;margin:0 auto}
-body.searching #tab-news .m98-adsterra-test{display:none}
-@media (max-width:767px){#tab-news .m98-adsterra-test{display:none}}
-
 @media (min-width:800px) and (max-width:1049px){
   .m98-home-banner{flex-basis:468px}
   .m98-home-banner-slot{width:468px;height:60px}
@@ -928,26 +921,6 @@ textarea{resize:vertical;min-height:64px}
       </aside>
     </div>
     <div id="heroSlot"></div>
-    <!-- One Adsterra leaderboard in the News feed only, directly below the hero. -->
-    <aside class="m98-adsterra-test" aria-label="Advertisement">
-      <div class="m98-adsterra-test-slot">
-        <script>
-          /* Parse-time injection keeps Adsterra's document.write inside this slot.
-             Never request this fixed-width ad on phones or direct article routes. */
-          if (window.matchMedia("(min-width: 768px)").matches &&
-              (location.pathname === "/" || location.pathname === "/news")) {
-            window.atOptions = {
-              'key': '1b2bdaf2af56b266a4126700feac4cf2',
-              'format': 'iframe',
-              'height': 90,
-              'width': 728,
-              'params': {}
-            };
-            document.write('<scr' + 'ipt src="https://bauval.org/22/1b2bdaf2af56b266a4126700feac4cf2"></scr' + 'ipt>');
-          }
-        </script>
-      </div>
-    </aside>
     <div class="rail-wrap">
       <button class="rail-btn prev" id="newsPrev" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 5.5 9 12l6.5 6.5"/></svg></button>
       <div class="rail grid-rail" id="newsGrid" tabindex="0"></div>
