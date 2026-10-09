@@ -4,12 +4,16 @@
   "use strict";
   const canvas = document.getElementById("discoverAmbient");
   if (!canvas) return;
+  const panel = document.getElementById("tab-discover");
+  const stage = document.getElementById("discoverPlayerStage");
   const motion = matchMedia("(prefers-reduced-motion: reduce)");
   const precisePointer = matchMedia("(hover:hover) and (pointer:fine)");
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const pointer = { x:0, y:0, targetX:0, targetY:0, strength:0, targetStrength:0 };
   let width=0, height=0, active=false, playing=false, frame=0, last=0;
   let clock=0, energy=0, pointerLastMove=0, renderer=null, lost=false;
+  let sourceBounds=null, layoutFrame=0, inView=true;
+  let scrolling=false, scrollTimer=0;
 
   const vertex = `
     attribute vec2 position;
@@ -211,30 +215,45 @@
   }
 
   function playerSource() {
-    const stage=document.getElementById("discoverPlayerStage");
-    const rect=stage?.getBoundingClientRect();
-    return rect?.width&&rect.height
-      ?[rect.left+rect.width/2,rect.top+rect.height/2,rect.width/2,rect.height/2]
-      :[width/2,height/2,Math.min(width*.3,330),225];
+    return sourceBounds || [width/2,height/2,Math.min(width*.3,330),225];
   }
 
   function resize() {
-    width=Math.max(1,innerWidth);height=Math.max(1,innerHeight);
+    // The texture and its source share document coordinates. Native scrolling
+    // moves the existing canvas with the card instead of rebuilding a fixed
+    // background around a source that jumps through viewport coordinates.
+    const rect=stage?.getBoundingClientRect();
+    const panelRect=panel?.getBoundingClientRect();
+    width=Math.max(1,document.documentElement.clientWidth);
+    height=Math.max(1,innerHeight,panelRect?.height ? panelRect.bottom+scrollY : 0);
+    if(rect?.width&&rect.height){
+      sourceBounds=[rect.left+scrollX+rect.width/2,rect.top+scrollY+rect.height/2,rect.width/2,rect.height/2];
+    }
+    const surface=renderer?.surface || canvas;
+    surface.style.height=height+"px";
     const maxPixels=width<760?480000:1000000;
     const scale=Math.min(devicePixelRatio||1,1.5,Math.sqrt(maxPixels/(width*height)));
     const w=Math.round(width*scale),h=Math.round(height*scale);
     if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
   }
-  function render() { if(lost)return; resize();renderer?.draw(); }
+  function render() { if(lost)return;renderer?.draw(); }
+  function queueLayout() {
+    if(!active||layoutFrame)return;
+    layoutFrame=requestAnimationFrame(()=>{
+      layoutFrame=0;
+      if(!active||lost)return;
+      resize();render();
+    });
+  }
   function setPointer(x,y) {
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
-    pointer.targetX=clamp(x,0,innerWidth);pointer.targetY=clamp(y,0,innerHeight);
+    pointer.targetX=clamp(x,0,innerWidth)+scrollX;pointer.targetY=clamp(y,0,innerHeight)+scrollY;
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
     pointer.targetStrength=.612;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;
-    if(!active||document.hidden||lost)return;
+    if(!active||document.hidden||lost||!inView||scrolling)return;
     const interval=1000/(width<760?24:30);
     if(!last)last=ts-interval;
     if(ts-last>=interval){
@@ -254,7 +273,7 @@
   }
   function start() {
     if(frame)cancelAnimationFrame(frame);frame=0;last=0;
-    if(active&&!document.hidden&&!lost){render();if(!motion.matches)frame=requestAnimationFrame(loop);}
+    if(active&&!document.hidden&&!lost&&inView&&!scrolling){resize();render();if(!motion.matches)frame=requestAnimationFrame(loop);}
   }
   function setVisible(value) {
     active=!!value;document.body.classList.toggle("discover-ambient-visible",active);
@@ -269,7 +288,29 @@
   addEventListener("pointermove",e=>{if(e.pointerType==="mouse"||e.pointerType==="pen")setPointer(e.clientX,e.clientY);},{passive:true});
   addEventListener("blur",()=>{pointer.targetStrength=0;});
   addEventListener("pointerout",e=>{if(!e.relatedTarget)pointer.targetStrength=0;});
-  addEventListener("resize",()=>{if(active)start();});
+  addEventListener("resize",queueLayout,{passive:true});
+  // Let the compositor scroll the cached texture without competing with
+  // full-canvas shader draws. Resume its clock without a catch-up jump.
+  addEventListener("scroll",()=>{
+    if(!active||motion.matches)return;
+    scrolling=true;
+    if(frame)cancelAnimationFrame(frame);frame=0;
+    clearTimeout(scrollTimer);
+    scrollTimer=setTimeout(()=>{scrolling=false;if(active)start();},120);
+  },{passive:true});
+  if(window.ResizeObserver){
+    const layoutObserver=new ResizeObserver(queueLayout);
+    [panel,stage,document.querySelector(".topbar")].forEach(el=>{if(el)layoutObserver.observe(el);});
+  }
+  if(window.IntersectionObserver&&panel){
+    const visibilityObserver=new IntersectionObserver(([entry])=>{
+      if(inView===entry.isIntersecting)return;
+      inView=entry.isIntersecting;
+      if(active)start();
+    });
+    visibilityObserver.observe(panel);
+  }
+  document.fonts?.ready.then(queueLayout);
   document.addEventListener("visibilitychange",()=>{if(active)start();});
   motion.addEventListener?.("change",()=>{pointer.strength=0;pointer.targetStrength=0;if(active)start();});
 })();

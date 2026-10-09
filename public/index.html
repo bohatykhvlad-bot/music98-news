@@ -883,23 +883,23 @@ textarea{resize:vertical;min-height:64px}
 /* All section headings use the same .tab top padding and .hd typography.
    The desktop Releases / Discover white-area height is synchronized in JS. */
 #tab-discover{padding-bottom:12px}
-#tab-discover .discover-layout{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;width:100%;margin:0;padding:0}
-#tab-discover .discover-heading{grid-area:1/1;text-align:center;width:100%}
-#tab-discover .discover-copy{grid-area:2/1;min-width:0;width:calc((100% - 660px)/2 - 16px);min-height:450px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
-#tab-discover .discover-intro{grid-area:3/1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:100%;margin-top:var(--section-heading-gap)}
+#tab-discover.rise{animation:none}
+#tab-discover .discover-layout{--discover-row-inset:30px;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
+#tab-discover .discover-heading{grid-area:1/1;text-align:center;width:100%;margin-bottom:0}
+#tab-discover .discover-copy{grid-area:2/1;align-self:center;min-width:0;width:calc((100% - 660px)/2 - 16px);min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
+#tab-discover .discover-intro{grid-area:2/1;align-self:center;justify-self:end;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:center;width:calc((100% - 660px)/2 - 16px);max-width:100%}
 #tab-discover .discover-selected{display:flex;flex-direction:column;gap:4px;width:100%;max-width:100%}
 #tab-discover .discover-selected[hidden]{display:none!important}
 #tab-discover .discover-artist{font-size:clamp(23px,2.6vw,32px);font-weight:800;color:var(--text);line-height:1.16;letter-spacing:-.035em;margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-album{font-size:17px;font-weight:500;line-height:1.3;color:var(--muted);margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-details{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);margin:6px 0 0}
 #tab-discover .discover-details span+span:not(:empty):before{content:"·";margin-right:9px}
-#tab-discover .discover-stage{grid-area:2/1;justify-self:center;position:relative;isolation:isolate;min-width:0;width:100%;max-width:660px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px}
+#tab-discover .discover-stage{grid-area:2/1;align-self:center;justify-self:center;position:relative;isolation:isolate;min-width:0;width:100%;max-width:660px;padding-top:var(--discover-row-inset);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px}
 #tab-discover .discover-card{z-index:1}
-/* Discover-only viewport ambience. The canvas is always click-through and
+/* Discover-only document ambience. The canvas is always click-through and
    sits behind the site UI; it never shifts the player or affects other tabs. */
-#discoverAmbient{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block;pointer-events:none;user-select:none;opacity:0;visibility:hidden;transition:opacity .65s ease,visibility .65s ease}
+#discoverAmbient{position:absolute;top:0;left:0;z-index:0;width:100%;height:100vh;display:block;pointer-events:none;user-select:none;opacity:0;visibility:hidden}
 body.discover-ambient-visible #discoverAmbient{opacity:1;visibility:visible}
-@media(prefers-reduced-motion:reduce){#discoverAmbient{transition:none}}
 
 #tab-discover .discover-card{position:relative;width:100%;max-width:660px;height:450px;flex:none;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);background:var(--card2);box-shadow:var(--shadow)}
 #tab-discover .discover-question{display:grid;place-items:center;position:absolute;inset:0;font-size:clamp(95px,10vw,130px);font-weight:300;color:#b8c5c9;line-height:1;user-select:none}
@@ -911,11 +911,11 @@ body.discover-ambient-visible #discoverAmbient{opacity:1;visibility:visible}
 @media(hover:hover) and (pointer:fine){#tab-discover #discoverFind:hover{color:#03282b}#tab-discover #discoverFind:hover::before{background:var(--accent);border-color:var(--accent)}}
 @media(min-width:1161px){#tab-discover .discover-artist{font-size:26px}}
 @media(max-width:1160px){
-  #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px}
+  #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px;height:auto}
   #tab-discover .discover-heading{margin-bottom:0}
-  #tab-discover .discover-copy{max-width:none;min-height:0;width:100%}
+  #tab-discover .discover-copy{max-width:none;min-height:0;width:100%;padding-top:0}
   #tab-discover .discover-copy:has(> .discover-selected[hidden]){display:none}
-  #tab-discover .discover-intro{margin-top:calc(var(--section-heading-gap) - 18px)}
+  #tab-discover .discover-intro{min-height:0;width:100%;padding-top:0;margin-top:calc(var(--section-heading-gap) - 18px)}
   #tab-discover #discoverFind{margin-top:0;align-self:center}
   #tab-discover .discover-stage{width:100%;max-width:none;padding-top:0}
 }
@@ -2809,6 +2809,8 @@ function queueEqualizeBrowsePanels(){
     browsePanelSyncPending = false;
     const panes = [document.getElementById("tab-releases"), document.getElementById("tab-discover")];
     if (panes.some(p=>!p)) return;
+    const discoverLayout = panes[1].querySelector(".discover-layout");
+    discoverLayout?.style.removeProperty("--discover-layout-height");
     panes.forEach(p=>p.style.removeProperty("min-height"));
     if (window.matchMedia("(max-width:1100px)").matches) return;
     const measure = (panel)=>{
@@ -2830,7 +2832,18 @@ function queueEqualizeBrowsePanels(){
       return height;
     };
     const height = Math.ceil(Math.max(...panes.map(measure)));
-    if (height > 0) panes.forEach(p=>p.style.minHeight = height + "px");
+    if (height > 0) {
+      panes.forEach(p=>p.style.minHeight = height + "px");
+      if (discoverLayout && window.matchMedia("(min-width:1161px)").matches) {
+        const style = getComputedStyle(panes[1]);
+        const top = parseFloat(style.paddingTop), bottom = parseFloat(style.paddingBottom);
+        const subscribeGap = parseFloat(getComputedStyle(document.querySelector(".subscribe")).marginTop);
+        // Include the white clearance before Subscribe in the lower gap, while
+        // keeping the player and both side columns within the shared panel.
+        discoverLayout.style.setProperty("--discover-row-inset", (bottom + subscribeGap) + "px");
+        discoverLayout.style.setProperty("--discover-layout-height", (height - top - bottom) + "px");
+      }
+    }
   });
 }
 window.addEventListener("resize", queueEqualizeBrowsePanels);
@@ -4359,7 +4372,7 @@ window.music98DiscoverPlayer={
   pause: () => pauseAllMedia()
 };
 </script>
-<script src="/discover-ambient.js?v=20261010-flow08" defer></script>
+<script src="/discover-ambient.js?v=20261010-flow09" defer></script>
 <script src="/discover-catalog-policy.js?v=20261010-genres02" defer></script>
 <script src="/discover-app.js?v=20261010-catalog-retry01" defer></script>
 <script src="/concerts-app.js?v=20261008-03" defer></script>
