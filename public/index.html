@@ -880,7 +880,10 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 
-/* Discover: same shared header, search, newsletter, footer and Apple player as the site. */
+/* Discover: equal header-to-heading and player-to-newsletter space.
+   The global .subscribe margin is 24px on desktop, 18px below 1100px. */
+#tab-discover{padding:24px 0 0}
+@media(max-width:1099px){#tab-discover{padding-top:18px}}
 #tab-discover .discover-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,660px);align-items:start;gap:32px;width:100%;margin:0;padding:0}
 #tab-discover .discover-copy{min-width:0;max-width:445px;text-align:left}
 #tab-discover .discover-selected{margin-top:var(--section-heading-gap);display:flex;flex-direction:column;gap:4px}
@@ -1012,9 +1015,9 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
 
 
   <section class="tab" id="tab-discover">
-    <div class="hd"><h1 class="hd-t">Find what to listen to</h1></div>
     <div class="discover-layout">
       <div class="discover-copy">
+        <div class="hd"><h1 class="hd-t">Find what to listen to</h1></div>
         <button class="loadmore-btn" id="discoverFind" type="button" disabled>Pick for me</button>
         <div class="discover-selected" id="discoverSelection" hidden>
           <h2 class="discover-artist" id="discoverArtist"></h2>
