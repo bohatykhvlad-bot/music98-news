@@ -882,10 +882,9 @@ textarea{resize:vertical;min-height:64px}
 
 /* Discover: same shared header, search, newsletter, footer and Apple player as the site. */
 #tab-discover{padding:0}
-#tab-discover .discover-layout{min-height:calc(100svh - var(--header-h,55px) - 14px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:48px;max-width:1040px;margin:0 auto;padding:18px 0 27px}
+#tab-discover .discover-layout{min-height:calc(100svh - var(--header-h,55px) - 14px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start;gap:48px;max-width:1040px;margin:0 auto;padding:18px 0 27px}
 #tab-discover .discover-copy{min-width:0;max-width:445px;text-align:left}
-#tab-discover .discover-copy h1{font-size:clamp(30px,3.1vw,42px);line-height:1.1;font-weight:800;letter-spacing:-.045em;margin:0 0 11px}
-#tab-discover .discover-copy .discover-desc{font-size:15px;line-height:1.5;color:var(--muted);margin:0}
+#tab-discover .discover-copy h1{font-size:clamp(30px,3.1vw,42px);line-height:1.1;font-weight:800;letter-spacing:-.045em;margin:0}
 #tab-discover .discover-selected{margin-top:30px;display:flex;flex-direction:column;gap:7px}
 #tab-discover .discover-selected[hidden]{display:none!important}
 #tab-discover .discover-artist{font-size:17px;font-weight:600;color:var(--text);margin:0;line-height:1.3}
@@ -902,10 +901,9 @@ textarea{resize:vertical;min-height:64px}
 #tab-discover #discoverFind{color:var(--text);font-weight:600}
 @media(hover:hover) and (pointer:fine){#tab-discover #discoverFind:hover{color:#03282b}#tab-discover #discoverFind:hover::before{background:var(--accent);border-color:var(--accent)}}
 @media(max-width:720px){
-  #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px;min-height:calc(100svh - var(--header-h,110px) - 12px);padding:17px 0 24px;justify-content:center}
+  #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px;min-height:calc(100svh - var(--header-h,110px) - 12px);padding:17px 0 24px;justify-content:flex-start}
   #tab-discover .discover-copy{max-width:490px;width:100%;align-self:center}
-  #tab-discover .discover-copy h1{font-size:clamp(27px,7vw,34px);margin-bottom:6px}
-  #tab-discover .discover-copy .discover-desc{font-size:13px}
+  #tab-discover .discover-copy h1{font-size:clamp(27px,7vw,34px);margin-bottom:0}
   #tab-discover .discover-selected{margin-top:14px;gap:4px}
   #tab-discover .discover-artist{font-size:14px}
   #tab-discover .discover-selected h2{font-size:23px}
@@ -1016,7 +1014,6 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
     <div class="discover-layout">
       <div class="discover-copy">
         <h1>Find what to listen to</h1>
-        <p class="discover-desc">An easy way to find a new album.</p>
         <div class="discover-selected" id="discoverSelection" hidden>
           <p class="discover-artist" id="discoverArtist"></p>
           <h2 id="discoverAlbum"></h2>
@@ -3341,9 +3338,9 @@ const CONCERTS_PAGE_META={
 };
 const DISCOVER_PAGE_META={
   title:"Find what to listen to - music98.news",
-  description:"An easy way to find a new album.",
+  description:"Discover an album to listen to on music98.news.",
   ogTitle:"Find what to listen to - music98.news",
-  ogDescription:"An easy way to find a new album.",
+  ogDescription:"Discover an album to listen to on music98.news.",
   ogUrl:"https://music98.news/discover",
   canonical:"https://music98.news/discover"
 };
