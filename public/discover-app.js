@@ -8,7 +8,20 @@
   const button = document.getElementById("discoverFind");
   const status = document.getElementById("discoverStatus");
   const selection = document.getElementById("discoverSelection");
+  const waveStage = stage && stage.closest(".discover-stage");
   if (!tab || !stage || !button || !selection) return;
+  const setWavesPlaying = active => {
+    if (waveStage) waveStage.classList.toggle("is-playing", !!active);
+  };
+  /* /apple-embed/ is same-origin, so the injected MusicKit hook can report
+     native playback state. Only the currently mounted iframe is trusted. */
+  window.addEventListener("message", event => {
+    if (event.origin !== location.origin || event.data?.type !== "music98:apple-playback") return;
+    const frame = stage.querySelector("iframe");
+    if (!frame || event.source !== frame.contentWindow) return;
+    if (!tab.classList.contains("active") || document.body.classList.contains("articlepage")) return;
+    setWavesPlaying(event.data.playing === true);
+  });
 
   const byId = id => document.getElementById(id);
   let artists = [], current = null, recentIds = [], loaded = false;
@@ -72,6 +85,7 @@
   }
 
   function select(album) {
+    setWavesPlaying(false);
     const site = window.music98DiscoverPlayer;
     if (site?.pause) site.pause();
     current = album;
@@ -88,6 +102,7 @@
   function onPageChange() {
     const visible = tab.classList.contains("active") && !document.body.classList.contains("articlepage");
     if (!visible) {
+      setWavesPlaying(false);
       // pauseAllMedia() is called by the site's existing tab switcher.
       // Remove a hidden iframe so the old album cannot continue playing.
       if (stage.querySelector("iframe")) stage.innerHTML = '<span class="discover-question" aria-hidden="true">?</span>';
