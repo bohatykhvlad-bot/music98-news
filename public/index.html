@@ -2845,7 +2845,7 @@ function syncRail(sel){
     rail._invalidateMax = ()=>{ rail._max = null; schedule(); };
     rail._refreshRail = refresh;
     rail._railWired = true;
-    rail.addEventListener("scroll", ()=>{schedule();warmRailCovers(rail);}, {passive:true});
+    rail.addEventListener("scroll", ()=>{schedule();if(typeof warmRailCovers==="function")warmRailCovers(rail);}, {passive:true});
     window.addEventListener("resize", rail._invalidateMax, {passive:true});
     new MutationObserver(rail._invalidateMax).observe(rail, {childList:true});
     if(typeof ResizeObserver === "function"){
@@ -2856,7 +2856,7 @@ function syncRail(sel){
      The per-frame scroll listener takes the cached, rAF-coalesced path. */
   rail._max = null;
   rail._refreshRail();
-  warmRailCovers(rail);
+  if(typeof warmRailCovers==="function")warmRailCovers(rail);
 }
 function wireRail(gridSel, prevSel, nextSel){
   const rail = $(gridSel);
