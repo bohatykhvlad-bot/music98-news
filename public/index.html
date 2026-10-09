@@ -883,9 +883,10 @@ textarea{resize:vertical;min-height:64px}
 /* Match the vertical breathing above Discover and Concerts to the
    following subscribe section (24px desktop, 18px under 1100px). */
 #tab-discover,#tab-concerts{padding:24px 0 0}
+#tab-discover{padding-bottom:12px}
 @media(max-width:1099px){#tab-discover,#tab-concerts{padding-top:18px}}
 #tab-discover .discover-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,660px);align-items:start;gap:32px;width:100%;margin:0;padding:0}
-#tab-discover .discover-copy{min-width:0;max-width:445px;min-height:450px;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+#tab-discover .discover-copy{min-width:0;width:100%;min-height:450px;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
 #tab-discover .discover-selected{margin-top:20px;display:flex;flex-direction:column;gap:4px;width:100%}
 #tab-discover .discover-selected[hidden]{display:none!important}
 #tab-discover .discover-artist{font-size:clamp(23px,2.6vw,32px);font-weight:800;color:var(--text);line-height:1.16;letter-spacing:-.035em;margin:0;overflow-wrap:anywhere}
@@ -905,7 +906,7 @@ textarea{resize:vertical;min-height:64px}
   #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px}
   #tab-discover .discover-copy{max-width:none;min-height:0;width:100%}
   #tab-discover .discover-selected{margin-top:var(--section-heading-gap)}
-  #tab-discover #discoverFind{margin-top:0;align-self:flex-start;min-width:0}
+  #tab-discover #discoverFind{margin-top:0;align-self:center;min-width:200px}
   #tab-discover .discover-stage{width:100%}
 }
 @media(max-width:720px){
