@@ -25,6 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -35,6 +36,13 @@ jobs:
         env:
           BATCH: ${{ github.event.inputs.batch || '500' }}
         run: node scripts/build-discover-albums.mjs --batch="$BATCH"
+      - name: Back up the complete catalog before pushing
+        uses: actions/upload-artifact@v4
+        with:
+          name: discover-catalog-${{ github.run_id }}
+          path: public/data/discover-albums.json
+          retention-days: 21
+          if-no-files-found: error
       - name: Commit refreshed catalog if changed
         run: |
           if git diff --quiet -- public/data/discover-albums.json; then
@@ -44,6 +52,15 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add public/data/discover-albums.json
           git commit -m 'Refresh cached album discovery catalog'
-          git fetch origin main
-          git rebase origin/main
-          git push origin HEAD:main
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then
+              echo "Catalog published successfully (attempt $attempt)"
+              exit 0
+            fi
+            echo "Concurrent main update; retrying publish: $attempt/5"
+            sleep 5
+          done
+          echo 'Could not publish after five retries; retrieve artifact from this run' >&2
+          exit 1

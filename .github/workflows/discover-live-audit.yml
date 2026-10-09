@@ -1,0 +1,26 @@
+name: Discover live deployment audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - public/index.html
+      - public/discover-app.js
+      - public/data/discover-albums.json
+      - scripts/audit-discover-live.mjs
+      - .github/workflows/discover-live-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Compare live Discover routes and catalog with GitHub
+        run: node scripts/audit-discover-live.mjs

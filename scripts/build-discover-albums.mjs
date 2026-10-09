@@ -3,7 +3,7 @@
  * to randomize. One cached JSON request on page load, then local picks.
  *
  * Run: node scripts/build-discover-albums.mjs --batch=500
- * Initial catalog: --batch=500 (about 30 minutes with Apple request pacing).
+ * Initial catalog: --batch=500 (typically around 60-80 minutes with Apple pacing).
  * The chart is a third-party Kworb estimate, not official Spotify API data.
  */
 import fs from 'node:fs/promises';
@@ -136,6 +136,11 @@ export async function build({batch=500}={}){
    }
   }else if(old)newData.push({...old,...item,albums:Array.isArray(old.albums)?old.albums:[]});
   else newData.push({...item,albums:[],checkedAt:null});
+  if(newData.length%25===0){
+   const ready=newData.filter(a=>a.albums.length).length;
+   const albumsFound=newData.reduce((n,a)=>n+a.albums.length,0);
+   console.log("DISCOVER_PROGRESS",JSON.stringify({ranked:newData.length,total:LIMIT,playable:ready,albums:albumsFound,queries:fetched,errors:failed}));
+  }
  }
  // Keep all 500 ranking entries for audit, even where an artist has no
  // discoverable qualifying album. The browser chooses only playable entries.
@@ -162,7 +167,7 @@ export async function build({batch=500}={}){
   throw Error('Catalog validation failed: preserve previous catalog');
  // The catalog includes 500 ranked artists; only those with validated albums
  // are selectable. Counts make this distinction transparent.
- const output={schema:1,source:'kworb-spotify-monthly-listeners-and-itunes-search',isSample:playable<450,updatedAt:new Date().toISOString(),rankingCount:ranking.length,playableArtistCount:playable,missingArtistCount:LIMIT-playable,artists:newData};
+ const output={schema:1,source:'kworb-spotify-monthly-listeners-and-itunes-search',isSample:false,updatedAt:new Date().toISOString(),rankingCount:ranking.length,playableArtistCount:playable,missingArtistCount:LIMIT-playable,artists:newData};
  const tmp=new URL('../public/data/discover-albums.json.pending',import.meta.url);
  try{await fs.writeFile(tmp,JSON.stringify(output,null,2)+'\n');await fs.rename(tmp,OUT)}
  finally{await fs.rm(tmp,{force:true}).catch(()=>{})}

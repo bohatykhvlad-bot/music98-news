@@ -2711,6 +2711,7 @@ function renderNews(){
   /* mobile (<=640px): the rail becomes a vertical column and shows one batch
      at a time; a Load More pill appends older posts. Desktop: full rail. */
   const shown = narrow.matches ? rest.slice(0, Math.max(RAIL_PAGE, (data._newsShown||RAIL_PAGE))) : rest;
+  $("#newsGrid")._coverWarmNext=0;
   $("#newsGrid").innerHTML = shown.map(p=>`
     <a class="card" href="${postPath(p)}">
       <div class="cover">${coverImg(p,false,true,"card")}</div>
@@ -2747,6 +2748,7 @@ function renderReleases(){
   /* mobile (<=640px): same paged column as news - one batch + Load More; */
   const narrow = window.matchMedia("(max-width: 640px)");
   const shown = narrow.matches ? posts.slice(0, Math.max(RAIL_PAGE, (data._relShown||RAIL_PAGE))) : posts;
+  $("#relGrid")._coverWarmNext=0;
   $("#relGrid").innerHTML = shown.map(p=>`
     <a class="card square" href="${postPath(p)}">
       <div class="cover">${coverImg(p,true,true,"card")}
@@ -2778,6 +2780,33 @@ function renderReleases(){
    A short click steps one card; holding the button accelerates the glide;
    on release the remaining velocity decays smoothly (inertia). Arrows only
    appear when the rail actually overflows. */
+/* Prewarm photo bytes and decode ahead of the horizontal carousel.
+   Native loading="lazy" otherwise waits until the image is near the viewport,
+   making card covers pop in during the glide. Keep mobile column lazy. */
+function warmRailCovers(rail){
+  if(!rail || window.matchMedia("(max-width: 640px)").matches || !rail.clientWidth) return;
+  const first=rail.firstElementChild;
+  if(!first) return;
+  const width=first.getBoundingClientRect().width+18;
+  if(!(width>18)) return;
+  // 2.6 viewports includes the currently visible cards, plus a generous
+  // forward runway (typically 8-12 cards on desktop).
+  const limit=Math.min(rail.children.length,Math.ceil((rail.scrollLeft+2.6*rail.clientWidth)/width));
+  const begin=Math.min(rail._coverWarmNext||0,limit);
+  if(begin>=limit) return;
+  for(let i=begin;i<limit;i++){
+    const img=rail.children[i].querySelector("img.js-cover");
+    if(!img) continue;
+    img.loading="eager";
+    // Trigger decode before the animation reaches the card; CSS fit remains
+    // owned by bindCovers(), which uses each post's saved image framing.
+    if(img.decode && !img._railDecoding){
+      img._railDecoding=true;
+      img.decode().catch(()=>{}).finally(()=>{img._railDecoding=false});
+    }
+  }
+  rail._coverWarmNext=limit;
+}
 function syncRail(sel){
   const rail = $(sel);
   if(!rail) return;
@@ -2816,7 +2845,7 @@ function syncRail(sel){
     rail._invalidateMax = ()=>{ rail._max = null; schedule(); };
     rail._refreshRail = refresh;
     rail._railWired = true;
-    rail.addEventListener("scroll", schedule, {passive:true});
+    rail.addEventListener("scroll", ()=>{schedule();warmRailCovers(rail);}, {passive:true});
     window.addEventListener("resize", rail._invalidateMax, {passive:true});
     new MutationObserver(rail._invalidateMax).observe(rail, {childList:true});
     if(typeof ResizeObserver === "function"){
@@ -2827,6 +2856,7 @@ function syncRail(sel){
      The per-frame scroll listener takes the cached, rAF-coalesced path. */
   rail._max = null;
   rail._refreshRail();
+  warmRailCovers(rail);
 }
 function wireRail(gridSel, prevSel, nextSel){
   const rail = $(gridSel);
