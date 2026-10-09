@@ -3,8 +3,8 @@ import {hasCompleteChartArtwork,isTrustedChartArtwork,missingChartArtwork} from 
 import {discoverAppleAlbumTracks} from "../lib/apple-album-discovery.js";
 import {candidateCompatible,isDerivativeRelease,isGenericRelease,rankArtworkCandidates} from "../lib/artwork-resolver.js";
 import {compareSpotifyRankings,parseKworbSpotify,spotifyDateCurrent,verifiedSpotifySnapshot} from "../lib/spotify-chart.js";
-import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,DAILY_SOURCE_DETAILS,APPLE_GLOBAL_URL,DEEZER_GLOBAL_URL,
-  completeDailySources,parseAppleGlobal,parseDeezerWorldwide,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
+import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,DAILY_SOURCE_DETAILS,SOURCE_INPUT_COUNTS,APPLE_GLOBAL_URL,DEEZER_GLOBAL_URL,
+  completeDailySources,verifiedConsensusTracks,parseAppleGlobal,parseDeezerWorldwide,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
 
 const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
@@ -12,8 +12,8 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Separate ranking cache for daily-only global inputs. Tenure/media registries
    retain their keys, so changing the formula does not reset established songs. */
-const TOP50_KV = "top50v37";
-const TOP50_RETRY_KV="top50v37:retry";
+const TOP50_KV = "top50v38";
+const TOP50_RETRY_KV="top50v38:retry";
 const SOURCES = DAILY_SOURCE_IDS;
 /* A source missing even once changes the scoring scale and fabricates movement. */
 function completeChartSources(s) {
@@ -21,7 +21,7 @@ function completeChartSources(s) {
 }
 function verifiedSourceSnapshot(s) {
   return !!s && s.methodology===DAILY_CHART_METHOD && s.complete===true && completeChartSources(s.sources) &&
-    Array.isArray(s.tracks) && s.tracks.length===SIZE;
+    verifiedConsensusTracks(s.tracks,s.sources);
 }
 
 function isApplePreview(url) {
@@ -583,8 +583,8 @@ const UA = "Mozilla/5.0 (compatible; music98/1.0)";
 
 function points(pos) {
   const n = Number(pos);
-  if (!n || n < 1 || n > SIZE) return 0;
-  return SIZE + 1 - n;
+  if (!Number.isInteger(n) || n < 1 || n > SOURCE_INPUT_COUNTS.S) return 0;
+  return SOURCE_INPUT_COUNTS.S + 1 - n;
 }
 
 async function getText(url) {
@@ -671,13 +671,13 @@ export async function buildTop50(origin, env, spotifySeed) {
   let apple=appleChart?.tracks || [];
   let appleOrigin="official-global-live",deezerOrigin="official-worldwide-live";
   let appleDate=appleChart?.date || "",deezerDate=new Date().toISOString().slice(0,10);
-  if(apple.length!==SIZE){
+  if(apple.length!==SOURCE_INPUT_COUNTS.A){
     const snapshot=await freshDailyRanking(env,origin,"A");
     apple=snapshot?.tracks || [];
     appleDate=snapshot?.sourceDate || "";
     appleOrigin=snapshot ? "github-current-day-global" : "unavailable";
   }
-  if(deezer.length!==SIZE){
+  if(deezer.length!==SOURCE_INPUT_COUNTS.D){
     const snapshot=await freshDailyRanking(env,origin,"D");
     deezer=snapshot?.tracks || [];
     deezerDate=snapshot?.sourceDate || "";
@@ -715,7 +715,12 @@ export async function buildTop50(origin, env, spotifySeed) {
   ingest(bucket, "A", apple);
   ingest(bucket, "S", spotify);
   ingest(bucket, "D", deezer);
-  const ranked = [...bucket.values()]
+  const consensus = [...bucket.values()].filter(t=>SOURCES.every(k=>
+    Number.isInteger(t.ranks[k]) && t.ranks[k]>=1 && t.ranks[k]<=SOURCE_INPUT_COUNTS[k]));
+  // Never manufacture Top 50 filler from a track present on only 1 or 2 platforms.
+  if(consensus.length<SIZE)
+    throw new Error("insufficient_three_platform_consensus:"+consensus.length+"/"+SIZE);
+  const ranked = consensus
     .sort((a, b) => {
       const sa = SOURCES.reduce((n, k) => n + points(a.ranks[k]), 0);
       const sb = SOURCES.reduce((n, k) => n + points(b.ranks[k]), 0);
@@ -731,6 +736,7 @@ export async function buildTop50(origin, env, spotifySeed) {
     .slice(0, SIZE);
   const tracks = ranked.map((rec, i) => ({
     rank: i + 1,
+    sourceRanks: {...rec.ranks},
     title: rec.title,
     artist: rec.artist,
     url: rec.url || "",
@@ -760,7 +766,7 @@ export async function buildTop50(origin, env, spotifySeed) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "daily-global-v37",
+    rev: "daily-global-consensus-v38",
     methodology: DAILY_CHART_METHOD,
     sourceDetails: DAILY_SOURCE_DETAILS,
     sources,
@@ -933,7 +939,7 @@ async function verifiedBackupTop50(env, origin, backup) {
   const tracks = snap.tracks.map((t,i) => {
     const prev = known.get(tenureKey(t.title,t.artist)) || {};
     return {
-      rank: i+1, title: t.title, artist: t.artist,
+      rank: i+1, title: t.title, artist: t.artist, sourceRanks:{...t.sourceRanks},
       weeks: Math.max(1, Number(t.weeks) || 1), delta: String(t.delta ?? "0"),
       url: prev.url || "", prev: prev.prev || "", year: prev.year || "", art: ""
     };
@@ -944,7 +950,7 @@ async function verifiedBackupTop50(env, origin, backup) {
   tracks.forEach(t => { t.url = appleAff(t.url); if (!isApplePreview(t.prev)) t.prev = ""; });
   return {
     updated: snap.updated, launch:"2026-09-17", week:Number(snap.week)+1,
-    rev:"daily-global-backup-v37", methodology:snap.methodology,
+    rev:"daily-global-consensus-backup-v38", methodology:snap.methodology,
     sourceDetails:DAILY_SOURCE_DETAILS, fallback:"verified-snapshot", complete:true,
     sources:snap.sources, sourceDates:snap.sourceDates||{},
     sourceDateKinds:snap.sourceDateKinds||{}, spotifyFingerprint:snap.spotifyFingerprint,
@@ -1113,7 +1119,7 @@ export async function onRequestGet({env,request}) {
   try{
     const payload=await withTimeout(buildTop50(origin,env,spotifySeed),14000);
     if(payload.complete!==true || !completeChartSources(payload.sources) ||
-       payload.tracks?.length!==SIZE)throw new Error("incomplete_chart_sources");
+       !verifiedConsensusTracks(payload.tracks,payload.sources))throw new Error("incomplete_or_unverified_three_platform_chart");
     /* Block ranking publication and KV writes until every one of the 50
        current rows has a trustworthy image URL. Never publish SVG initials. */
     if(!hasCompleteChartArtwork(payload.tracks))
