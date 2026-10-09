@@ -863,8 +863,8 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 </style>
-<link rel="stylesheet" href="/ezoic-ads.css?v=20261008-1">
-<script src="/ezoic-ads.js?v=20261008-1" defer></script>
+<link rel="stylesheet" href="/ezoic-ads.css?v=20261009-1">
+<script src="/ezoic-ads.js?v=20261009-1" defer></script>
 </head>
 <body>
 
@@ -899,13 +899,16 @@ textarea{resize:vertical;min-height:64px}
 <main class="wrap">
   <section class="tab active" id="tab-news">
     <div class="hd"><h1 class="hd-t">Latest stories</h1></div>
+    <aside class="m98-ad-placement m98-ad-horizontal" data-ad-position="news-top" aria-label="Advertisement" hidden></aside>
     <div id="heroSlot"></div>
+    <aside class="m98-ad-placement m98-ad-horizontal" data-ad-position="news-between" aria-label="Advertisement" hidden></aside>
     <div class="rail-wrap">
       <button class="rail-btn prev" id="newsPrev" aria-label="Scroll back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 5.5 9 12l6.5 6.5"/></svg></button>
       <div class="rail grid-rail" id="newsGrid" tabindex="0"></div>
       <button class="rail-btn next" id="newsNext" aria-label="Scroll forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 5.5 15 12l-6.5 6.5"/></svg></button>
     </div>
     <div class="empty" id="newsEmpty" hidden>Nothing found for your query. Try another search.</div>
+    <aside class="m98-ad-placement m98-ad-horizontal" data-ad-position="news-bottom" aria-label="Advertisement" hidden></aside>
   </section>
 
   <section class="tab" id="tab-releases">
@@ -3652,6 +3655,7 @@ function showArticle(p){
   listY = window.scrollY || document.documentElement.scrollTop || 0;
   const page = $("#articlePage");
   document.body.classList.add("articlepage");
+  page.dataset.postType = p.type;
   page.hidden = false;
   page.innerHTML = `
     <a class="aback" href="#" id="aback">Back</a>
