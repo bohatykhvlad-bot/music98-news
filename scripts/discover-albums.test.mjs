@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseTop500,albumCandidates,decodeHtml} from './build-discover-albums.mjs';
+import {parseTop500,albumCandidates,decodeHtml,albumLookupStale} from './build-discover-albums.mjs';
 
 test('parses ranked rows with HTML-encoded artist names',()=>{
  const rows='<tr><th>#</th><th>Artist</th></tr><tr><td>1</td><td><a href="#">Bruno Mars</a></td><td>123,456</td></tr><tr><td>2</td><td>Beyonc&#233; &amp; Friends</td><td>89,000</td></tr>';
@@ -18,3 +18,13 @@ test('rejects singles, remixes, compilation, foreign artist and duplicates',()=>
  assert.deepEqual(albumCandidates(items,'Dua Lipa'),[{id:1,title:'Future Nostalgia',year:2020,genre:'Pop'}]);
 });
 test('Unicode safe decoding',()=>assert.equal(decodeHtml('Beyonc&#233; &amp; Jhen&#xe9;'),'Beyoncé & Jhené'));
+
+test('weekly refresh caches empty Apple results instead of repeating all API lookups',()=>{
+ const now=Date.parse('2026-10-09T19:00:00Z');
+ const recent={albums:[],checkedAt:'2026-10-09T18:00:00Z'};
+ assert.equal(albumLookupStale(recent,now),false);
+ assert.equal(albumLookupStale({albums:[{id:1}],checkedAt:'2026-10-09T18:00:00Z'},now),false);
+ assert.equal(albumLookupStale({albums:[],checkedAt:'2026-10-01T19:00:00Z'},now),true);
+ assert.equal(albumLookupStale({albums:[],checkedAt:null},now),true);
+ assert.equal(albumLookupStale(undefined,now),true);
+});
