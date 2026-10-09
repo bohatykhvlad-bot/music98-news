@@ -87,7 +87,7 @@ export async function build({batch=500}={}){
  for(const item of ranking){
   const old=previousByName.get(normalize(item.name));
   const valid=old&&Array.isArray(old.albums)&&old.albums.length;
-  const outdated=!valid||!old.checkedAt||(Date.now()-Date.parse(old.checkedAt))>28*86400_000;
+  const outdated=!valid||!old.checkedAt||(Date.now()-Date.parse(old.checkedAt))>6*86400_000;
   if(outdated&&fetched<batch){
    // Public iTunes Search API guidance: roughly 20 requests per minute.
    if(fetched)await sleep(3500);
