@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
-import {completeDailySources,DAILY_SOURCE_IDS} from "../functions/lib/daily-chart-sources.js";
+import {completeDailySources,DAILY_SOURCE_IDS,verifiedConsensusTracks} from "../functions/lib/daily-chart-sources.js";
 
 const top50=readFileSync(new URL("../functions/api/top50.js",import.meta.url),"utf8");
 
@@ -75,18 +75,29 @@ test("verified chart recovery rejects mass day-one resets and old launch snapsho
     /bakedTop50\(/);
 });
 
-test("every source must supply all 50 positions",()=>{
+test("every source must supply all 100 positions",()=>{
   const gate=completeDailySources;
-  const complete=Object.fromEntries(DAILY_SOURCE_IDS.map(k=>[k,50]));
+  const complete=Object.fromEntries(DAILY_SOURCE_IDS.map(k=>[k,100]));
   assert.equal(gate(complete),true);
   for(const key of Object.keys(complete)){
-    assert.equal(gate({...complete,[key]:49}),false,key);
+    assert.equal(gate({...complete,[key]:99}),false,key);
     assert.equal(gate({...complete,[key]:0}),false,key);
   }
   assert.match(top50,/invalid_rank_or_duplicate_source_/);
   assert.match(top50,/spotify_mirror_disagreement/);
   assert.match(top50,/spotify_newer_chart_waiting_for_mirror/);
   assert.match(top50,/const memory=\{deferPersist:true\}/);
+});
+test("chart is never published from a single platform or a two-source match",()=>{
+  assert.match(top50,/const consensus = \[\.\.\.bucket\.values\(\)\]\.filter/);
+  assert.match(top50,/SOURCES\.every\(k=>/);
+  assert.match(top50,/insufficient_three_platform_consensus/);
+  const complete={A:100,S:100,D:100};
+  const valid=Array.from({length:50},(_,i)=>({rank:i+1,title:"Song "+i,artist:"Artist "+i,
+    sourceRanks:{A:i+1,S:i+1,D:i+1}}));
+  assert.equal(verifiedConsensusTracks(valid,complete),true);
+  assert.equal(verifiedConsensusTracks(valid.map((t,i)=>i===10?{...t,sourceRanks:{A:11,S:11}}:t),complete),false);
+  assert.equal(verifiedConsensusTracks(valid.map((t,i)=>i===5?{...t,sourceRanks:{A:6,S:6,D:101}}:t),complete),false);
 });
 test("fresh Apple fallback also requires an intact Top 50",()=>{
  assert.match(top50,/async function freshDailyRanking\(env,origin,source\)/);
@@ -98,8 +109,8 @@ test("the Worker uses tested shared parsing and rejects unverified KV cache",()=
  assert.match(top50,/const verified=verifiedSpotifySnapshot\(spotifySeed\)/);
  assert.match(top50,/cached.sourceDates\?\.S===verified.date/);
  assert.match(top50,/cached.spotifyFingerprint===verified.fingerprint/);
- assert.match(top50,/const TOP50_KV = "top50v37"/);
- assert.match(top50,/TOP50_RETRY_KV="top50v37:retry"/);
+ assert.match(top50,/const TOP50_KV = "top50v38"/);
+ assert.match(top50,/TOP50_RETRY_KV="top50v38:retry"/);
 });
 
 test("verified source publisher dispatches downstream chart audit after bot commits",()=>{
