@@ -1,10 +1,8 @@
-/* News placements, paragraph ads and fixed desktop article rails.
-   Add ?ad-preview=1 to inspect the chosen formats without requesting ads. */
+/* Ezoic ads for News: inline placements, fixed side rails and desktop Bottom Leaderboard. */
 (() => {
   "use strict";
   const legacy = document.getElementById("m98DisplayAd");
   if (!legacy) return;
-  const preview = window.M98_AD_PREVIEW === true || new URLSearchParams(location.search).get("ad-preview") === "1";
   window.ezstandalone = window.ezstandalone || {};
   window.ezstandalone.cmd = window.ezstandalone.cmd || [];
   let frame = 0;
@@ -12,7 +10,7 @@
   let displayedPage = "";
   let requested = new Set();
   let observer;
-  let anchorDismissed = false;
+  const fillObservers = [];
 
   function pageKey() {
     const article = document.getElementById("articlePage");
@@ -34,7 +32,7 @@
   }
 
   function anchorPlacement() {
-    if (anchorDismissed || !matchMedia("(min-width:1100px)").matches) return [];
+    if (!matchMedia("(min-width:1100px)").matches) return [];
     let anchor = document.querySelector(".m98-ad-anchor");
     if (!anchor) {
       anchor = makePlacement("news-anchor", "m98-ad-anchor");
@@ -73,7 +71,7 @@
       return width >= 970 ? "970x90,728x90" : "728x90,468x60";
     }
     if (box.classList.contains("m98-ad-side")) {
-      const height = window.innerHeight - (parseFloat(getComputedStyle(document.body).getPropertyValue("--header-h")) || 55) - 52 - (anchorDismissed ? 0 : 111);
+      const height = window.innerHeight - (parseFloat(getComputedStyle(document.body).getPropertyValue("--header-h")) || 55) - 52 - 111;
       return height >= 600 ? "160x600,120x600" : "160x300,120x240";
     }
     const width = box.clientWidth;
@@ -85,46 +83,16 @@
   }
 
   function reset() {
+    fillObservers.splice(0).forEach(observer => observer.disconnect());
     observer?.disconnect();
     observer = undefined;
     requested = new Set();
     document.body.classList.remove("m98-anchor-visible");
     document.querySelectorAll(".m98-ad-placement, #m98DisplayAd").forEach(box => {
       box.hidden = true;
-      box.classList.remove("is-filled", "is-preview");
+      box.classList.remove("is-filled", "is-pending");
       box.replaceChildren();
     });
-  }
-
-  function paintPreview(box, sizes) {
-    const [width, height] = sizes.split(",")[0].split("x").map(Number);
-    const visual = document.createElement("div");
-    visual.className = "m98-ad-preview-box";
-    visual.style.setProperty("--ad-width", width + "px");
-    visual.style.setProperty("--ad-height", height + "px");
-    const label = document.createElement("span");
-    label.textContent = "Advertisement";
-    const format = document.createElement("small");
-    format.textContent = width + " × " + height;
-    visual.append(label, format);
-    box.append(visual);
-    box.classList.add("is-preview");
-  }
-
-  function addAnchorClose(box) {
-    const close = document.createElement("button");
-    close.type = "button";
-    close.className = "m98-ad-anchor-close";
-    close.setAttribute("aria-label", "Close advertisement");
-    close.textContent = "×";
-    close.addEventListener("click", () => {
-      anchorDismissed = true;
-      box.hidden = true;
-      document.body.classList.remove("m98-anchor-visible");
-      observer?.unobserve(box);
-    });
-    box.append(close);
-    document.body.classList.add("m98-anchor-visible");
   }
 
   function requestAd(box, key, currentGeneration) {
@@ -144,14 +112,14 @@
       const currentGeneration = ++generation;
       const wasDisplayed = !!displayedPage;
       reset();
-      if (!preview && wasDisplayed) {
+      if (wasDisplayed) {
         window.ezstandalone.cmd.push(() => {
           if (currentGeneration === generation) window.ezstandalone.destroyAll();
         });
       }
       const boxes = placements();
       displayedPage = key;
-      if (!preview && typeof IntersectionObserver !== "undefined") {
+      if (typeof IntersectionObserver !== "undefined") {
         observer = new IntersectionObserver(entries => {
           for (const entry of entries) if (entry.isIntersecting) {
             observer.unobserve(entry.target);
@@ -162,11 +130,6 @@
       for (const box of boxes) {
         box.hidden = false;
         const sizes = formats(box);
-        if (preview) {
-          paintPreview(box, sizes);
-          if (box.classList.contains("m98-ad-anchor")) addAnchorClose(box);
-          continue;
-        }
         box.dataset.adPosition ||= "page-bottom";
         const slot = document.createElement("div");
         slot.className = "m98-ezoic-slot";
@@ -174,10 +137,21 @@
         slot.dataset.fluid = "false";
         slot.dataset.required = "false";
         box.append(slot);
-        if (box.classList.contains("m98-ad-anchor")) addAnchorClose(box);
+        // Show a fixed unit only after Ezoic inserts its actual creative.
+        const fillObserver = new MutationObserver(() => {
+          if (currentGeneration !== generation || !box.isConnected) return;
+          const creative = slot.querySelector("iframe");
+          if (!creative || !(creative.width || creative.clientWidth)) return;
+          box.hidden = false;
+          box.classList.remove("is-pending");
+          box.classList.add("is-filled");
+          if (box.classList.contains("m98-ad-anchor")) document.body.classList.add("m98-anchor-visible");
+        });
+        fillObserver.observe(slot, { childList: true, subtree: true, attributes: true, attributeFilter: ["src", "width", "height", "style"] });
+        fillObservers.push(fillObserver);
         // Collapse after the network returns no fill; keep a measurable box
         // while waiting so below-the-fold units can be requested lazily.
-        box.classList.add("is-filled");
+        box.classList.add("is-pending");
         if (observer) observer.observe(box);
         else requestAd(box, key, currentGeneration);
       }
@@ -189,7 +163,8 @@
     const slot = detail.slotId && document.getElementById(detail.slotId);
     const box = slot?.closest(".m98-ad-placement, #m98DisplayAd");
     if (box) {
-      box.hidden = detail.filled !== true || (anchorDismissed && box.classList.contains("m98-ad-anchor"));
+      box.hidden = detail.filled !== true;
+      box.classList.remove("is-pending");
       if (box.classList.contains("m98-ad-anchor")) document.body.classList.toggle("m98-anchor-visible", !box.hidden);
       box.classList.toggle("is-filled", detail.filled === true);
     }

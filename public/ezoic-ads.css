@@ -3,13 +3,10 @@
 #m98DisplayAd.is-filled{margin:24px auto}
 #m98DisplayAd .m98-ezoic-slot{max-width:100%}
 .m98-ad-placement{width:100%;margin:0;display:grid;place-items:center;text-align:center;overflow:clip}
-.m98-ad-placement.is-filled,.m98-ad-placement.is-preview{margin:24px auto}
+.m98-ad-placement.is-filled,.m98-ad-placement.is-pending{margin:24px auto}
 .m98-ad-placement .m98-ezoic-slot{max-width:100%;flex:none}
 .m98-ad-horizontal{min-height:90px}
 .m98-ad-inline{min-height:90px}
-.m98-ad-preview-box{width:var(--ad-width);height:var(--ad-height);max-width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1px solid var(--line,#e2e8ea);background:var(--bg2,#f4f6f7);color:var(--muted,#5c6a70)}
-.m98-ad-preview-box span{font-size:12px;letter-spacing:.12em;text-transform:uppercase;line-height:1.4}
-.m98-ad-preview-box small{font-size:12px;line-height:1.4;color:var(--muted2,#8a969b)}
 .m98-ad-side{display:none}
 /* The 780px article has at least 200px of free space on each side here.
    Fixed coordinates are independent of article length and scroll position. */
@@ -17,16 +14,13 @@
   .m98-ad-side{position:fixed;z-index:5;top:calc(var(--header-h,55px) + 26px);width:160px;height:min(600px,calc(100dvh - var(--header-h,55px) - 52px - var(--m98-ad-bottom-space,0px)));margin:0!important;display:grid;align-content:start;background:transparent}
   .m98-ad-side-left{right:calc(50% + 410px)}
   .m98-ad-side-right{left:calc(50% + 410px)}
-  .m98-ad-side .m98-ad-preview-box{min-height:0}
 }
 @media (max-width:767px){
   .m98-ad-horizontal,.m98-ad-inline{min-height:250px}
-  .m98-ad-placement.is-filled,.m98-ad-placement.is-preview{margin:20px auto}
+  .m98-ad-placement.is-filled,.m98-ad-placement.is-pending{margin:20px auto}
 }
-/* A separate fixed bottom unit, with a close control and room to reach the footer. */
+/* Desktop Bottom Leaderboard: fixed to the viewport, no custom controls. */
 .m98-ad-anchor{position:fixed;z-index:40;inset:auto 0 0;width:100%;min-height:0;margin:0!important;padding:10px 12px;background:rgba(255,255,255,.98);border-top:1px solid var(--line,#e2e8ea);box-shadow:0 -4px 18px rgba(15,45,55,.07)}
-.m98-ad-anchor-close{position:absolute;right:max(12px,calc(50% - 523px));top:6px;width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line,#e2e8ea);border-radius:50%;background:#fff;color:var(--muted,#5c6a70);font:22px/1 var(--font,sans-serif);cursor:pointer;padding:0}
-.m98-ad-anchor-close:hover{color:var(--text,#15181a);border-color:var(--accent,#00fdfb)}
-.m98-ad-anchor-close:focus-visible{outline:2px solid var(--accent,#00fdfb);outline-offset:2px}
 body.m98-anchor-visible{--m98-ad-bottom-space:111px;padding-bottom:111px}
 @media (max-width:1099px){.m98-ad-anchor{display:none}body.m98-anchor-visible{padding-bottom:0}}
+ .m98-ad-side.is-pending,.m98-ad-anchor.is-pending{visibility:hidden}
