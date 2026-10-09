@@ -103,9 +103,18 @@ async function albumsFor(name){
  return albumCandidates(entries,name);
 }
 export async function build({batch=500}={}){
- const r=await fetch(RANKING,{signal:AbortSignal.timeout(20000),headers:{'user-agent':'Mozilla/5.0 (compatible; music98-catalog-maintainer/1.0)'}});
- if(!r.ok)throw Error(`Ranking HTTP ${r.status}`);
- const ranking=parseTop500(await r.text());
+ let ranking=[],rankError;
+ for(let attempt=0;attempt<3;attempt++){
+  try{
+   const r=await fetch(RANKING,{signal:AbortSignal.timeout(30000),headers:{'user-agent':'Mozilla/5.0 (compatible; music98-catalog-maintainer/1.0)'}});
+   if(!r.ok)throw Error(`Ranking HTTP ${r.status}`);
+   ranking=parseTop500(await r.text());
+   if(ranking.length!==LIMIT)throw Error(`Parsed ${ranking.length}/500 Kworb artists`);
+   rankError=null;
+   break;
+  }catch(e){rankError=e;if(attempt<2)await sleep(3000*(attempt+1))}
+ }
+ if(rankError)throw Error(`Could not load valid Top 500: ${rankError.message}`);
  if(ranking.length!==LIMIT)throw Error(`Expected 500 ranked artists, got ${ranking.length}. Preserve prior snapshot.`);
  let previous={artists:[]};try{previous=JSON.parse(await fs.readFile(OUT,'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
  const previousByName=new Map((previous.artists||[]).map(a=>[normalize(a.name),a]));
@@ -130,6 +139,20 @@ export async function build({batch=500}={}){
  }
  // Keep all 500 ranking entries for audit, even where an artist has no
  // discoverable qualifying album. The browser chooses only playable entries.
+ // Every rank must be unique, ordered, and associated with a unique name.
+ const rankedIds=new Set(), rankedNames=new Set();
+ for(let i=0;i<newData.length;i++){
+  const a=newData[i], normalized=normalize(a.name);
+  if(a.rank!==i+1 || rankedIds.has(a.rank) || rankedNames.has(normalized))
+   throw Error(`Ranking integrity failed at position ${i+1}: ${a.name}`);
+  rankedIds.add(a.rank);rankedNames.add(normalized);
+  const albums=new Set();
+  for(const album of a.albums){
+   if(!Number.isSafeInteger(album.id) || albums.has(album.id))
+    throw Error(`Duplicate or invalid Apple album ID for ${a.name}: ${album.id}`);
+   albums.add(album.id);
+  }
+ }
  const playable=newData.filter(a=>a.albums?.length).length;
  const priorPlayable=(previous.artists||[]).filter(a=>a.albums?.length).length;
  const minHealthy=priorPlayable>=300?Math.floor(priorPlayable*.8):(batch===500?300:5);
@@ -143,7 +166,13 @@ export async function build({batch=500}={}){
  const tmp=new URL('../public/data/discover-albums.json.pending',import.meta.url);
  try{await fs.writeFile(tmp,JSON.stringify(output,null,2)+'\n');await fs.rename(tmp,OUT)}
  finally{await fs.rm(tmp,{force:true}).catch(()=>{})}
- console.log('DISCOVER_CATALOG',JSON.stringify({artists:newData.length,playable,albums:newData.reduce((n,a)=>n+a.albums.length,0),fetched,failed,source:output.source,isSample:output.isSample}));
+ const albumCount=newData.reduce((n,a)=>n+a.albums.length,0);
+ const stats={rankedArtists:newData.length,playableArtists:playable,artistsWithoutAlbums:LIMIT-playable,albums:albumCount,fetched,failed,source:output.source,isSample:output.isSample,updatedAt:output.updatedAt};
+ console.log('DISCOVER_CATALOG',JSON.stringify(stats));
+ if(process.env.GITHUB_STEP_SUMMARY){
+  const lines=['## music98 Discover catalog audit','',`- Ranked Spotify/Kworb artists: **${stats.rankedArtists}/500**`,`- Artists with qualifying Apple albums: **${playable}**`,`- Apple albums available for randomization: **${albumCount}**`,`- Unmatched artists: **${stats.artistsWithoutAlbums}**`,`- API failures: **${failed}**`,`- Refreshed: ${output.updatedAt}`,''];
+  await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,lines.join('\\n'));
+ }
  return output;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
