@@ -43,7 +43,7 @@
 /* A direct section URL must not paint News before the main SPA boots.
    This marker is temporary; route() removes it once the correct tab is active. */
 (()=>{
-  const p=location.pathname.replace(/\\/+$/,"")||"/";
+  const p=location.pathname.replace(/\/+$/,"")||"/";
   const map={"/releases":"releases","/chart":"charts","/charts":"charts","/discover":"discover","/concerts":"concerts"};
   const hash=location.hash.match(/^#(releases|charts|discover|concerts)$/);
   const tab=hash?.[1]||map[p];
