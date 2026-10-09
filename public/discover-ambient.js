@@ -71,8 +71,7 @@
       float top=cloud(flow,vec2(aspect*(.48+.11*sin(t*.6)),.015),vec2(aspect*.44,.22));
       float bottom=cloud(flow,vec2(aspect*(.48+.13*cos(t*.7)),1.02),vec2(aspect*.46,.26));
       float mass=left+right+top*.8+bottom*.95;
-      float local=cloud(flow,mouse,vec2(.22,.22))*pointer.z*.6;
-      float envelope=clamp(mass+local,0.,1.5);
+      float envelope=clamp(mass,0.,1.5);
       float body=envelope*smoothstep(.22,.77,volume+.13*detail);
       float haze=envelope*.075;
       float grain=hash(floor(gl_FragCoord.xy)+floor(flow*73.)+17.);
@@ -141,7 +140,6 @@
       ctx.clearRect(0,0,width,height);
       const blobs=[[.03,.55,.23,.52],[.97,.42,.23,.52],[.5,0,.44,.22],[.48,1,.46,.26]];
       const centres=blobs.map(([x,y,rx,ry],i)=>[x*width+Math.sin(clock*.12+i)*25,y*height,rx*width,ry*height]);
-      if(pointer.strength>.01)centres.push([pointer.x,pointer.y,180,180]);
       for(const [x,y,rx,ry] of centres){
         ctx.save();ctx.translate(x,y);ctx.scale(rx,ry);
         const glow=ctx.createRadialGradient(0,0,0,0,0,1);
