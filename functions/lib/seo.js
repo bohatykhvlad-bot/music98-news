@@ -207,7 +207,88 @@ function notFoundHtml() {
 </html>`;
 }
 
-/* Inject per-article meta into the index.html shell */
+/* HTML-first article rendering for non-JavaScript visitors and crawlers.
+   Match the text order of the client renderBody(), but do not execute remote
+   media embeds on the server. The existing SPA hydrates this markup from the
+   live desk; without JS, every paragraph is still readable and indexable. */
+function inlineArticleHtml(value) {
+  return escapeHtml(value)
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+}
+
+function publicMediaUrl(input, origin) {
+  const value = String(input || "").trim();
+  if (/^https?:\/\//i.test(value)) return value;
+  if (/^\/(?!\/)/.test(value)) return origin + value;
+  if (/^[a-z0-9][\w./-]*$/i.test(value) && !value.includes("..")) return origin + "/" + value;
+  return "";
+}
+
+export function serverArticleBody(body, origin = SITE) {
+  return String(body || "").split(/\n{2,}/).map(raw => {
+    const t = raw.trim();
+    if (!t) return "";
+    // Media players are hydrated by the normal client renderer.
+    if (/^\[(?:apple:|youtube:|tiktok:|ig:)\S*\]$/i.test(t)) return "";
+    const pic = t.match(/^\[photo:([^|]+)(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?(?:\|([^|]*))?\]$/i);
+    if (pic) {
+      const src = publicMediaUrl(pic[1], origin);
+      if (!src) return "";
+      const credit = String(pic[2] || "").trim();
+      const creditUrl = publicMediaUrl(pic[3] || "", origin);
+      const byline = credit
+        ? `<p class="pcred">Photo: ${creditUrl ? `<a href="${escapeHtml(creditUrl)}" rel="noopener noreferrer">${escapeHtml(credit)}</a>` : escapeHtml(credit)}</p>`
+        : "";
+      return `<figure class="abody-pic"><span class="abody-box"><img src="${escapeHtml(src)}" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover"></span>${byline}</figure>`;
+    }
+    const tickets = t.match(/^\[tickets:(https?:\/\/[^\]]+)\]$/i);
+    if (tickets) {
+      const url = publicMediaUrl(tickets[1], origin);
+      return url ? `<div class="article-ticket"><a href="${escapeHtml(url)}" rel="sponsored noopener noreferrer"><span>Buy Tickets</span></a></div>` : "";
+    }
+    if (/^\[\/?awards\]$/i.test(t)) return "";
+    const cat = t.match(/^\[award:([^\]]+)\]$/i);
+    if (cat) return `<div class="award-cat">${inlineArticleHtml(cat[1].trim())}</div>`;
+    const winner = t.match(/^\[winner:([\s\S]+)\]$/i);
+    if (winner) return `<div class="award-line winner"><strong>${inlineArticleHtml(winner[1].trim())}</strong></div>`;
+    const nominee = t.match(/^\[nominee:([\s\S]+)\]$/i);
+    if (nominee) return `<div class="award-line nominee">${inlineArticleHtml(nominee[1].trim())}</div>`;
+    return `<p>${inlineArticleHtml(raw)}</p>`;
+  }).filter(Boolean).join("\n");
+}
+
+function serverArticleMarkup(p, origin) {
+  const title = String(p.title || "");
+  const heading = p.type === "release"
+    ? `${p.artist ? escapeHtml(p.artist) + " - " : ""}<em>${escapeHtml(title)}</em>`
+    : inlineArticleHtml(title);
+  const published = isoDate(p);
+  const date = new Date(published).toLocaleDateString("en-GB", {
+    day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+  });
+  const cover = escapeHtml(absCover(p, origin));
+  const photoCredit = p.cover && p.cover.credit ? String(p.cover.credit) : "";
+  const creditUrl = publicMediaUrl(p.cover && p.cover.creditUrl, origin);
+  const byline = photoCredit
+    ? `<p class="pcred">Photo: ${creditUrl ? `<a href="${escapeHtml(creditUrl)}" rel="noopener noreferrer">${escapeHtml(photoCredit)}</a>` : escapeHtml(photoCredit)}</p>`
+    : "";
+  const label = p.type === "release"
+    ? `<span class="tag" style="position:static;margin-top:14px">${escapeHtml(p.rtype || p.tag || "Release")}</span>`
+    : "";
+  const paragraphs = serverArticleBody(p.body || p.excerpt || "", origin);
+  return `<section id="articlePage" data-ssr-article="true" data-post-type="${p.type === "release" ? "release" : "news"}">
+    <a class="aback" href="/">Back</a>
+    <div class="acover"><img src="${cover}" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+    ${byline}
+    ${label}
+    <h1>${heading}</h1>
+    <div class="ameta"><time datetime="${published}">${escapeHtml(date)}</time></div>
+    <div class="atext">${paragraphs}</div>
+  </section>`;
+}
+
+/* Inject per-article meta and full visible article body into the HTML shell */
 export function articleHtml(shell, p, slug, origin) {
   const title = escapeHtml(String(p.title || "music98.news"));
   const desc = escapeHtml(plainText(p.excerpt || p.body || "").slice(0, 160));
@@ -245,6 +326,10 @@ export function articleHtml(shell, p, slug, origin) {
     `<script type="application/ld+json">${jsonld}</script>\n` +
     `<script type="application/ld+json">${breadcrumbs}</script>\n`;
   out = rep(out, /<\/head>/i, extra + "</head>");
+  // Preserve the original #articlePage mount for client-side navigation.
+  // Render a real article immediately instead of a hidden, empty shell.
+  out = rep(out, /<section id="articlePage" hidden><\/section>/i, serverArticleMarkup(p, origin));
+  out = rep(out, /<body>/i, '<body class="articlepage" data-ssr-article="true">');
   return out;
 }
 
