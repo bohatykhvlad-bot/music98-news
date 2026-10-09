@@ -59,22 +59,30 @@
       vec2 mouse=vec2(pointer.x/viewport.y,pointer.y/viewport.y);
       vec2 delta=p-mouse;
       float influence=exp(-dot(delta,delta)/.085)*pointer.z;
-      // A small, slow nudge of the existing current, never a cursor cloud.
-      vec2 nudge=(vec2(-delta.y,delta.x)*.06-delta*.02)*influence;
-      p+=clamp(nudge,vec2(-6./viewport.y),vec2(6./viewport.y));
+      // Bend the existing current with a softened version of the original
+      // vortex. Its bounded displacement never creates a separate cloud.
+      vec2 nudge=(vec2(-delta.y,delta.x)*.48-delta*.12)*influence;
+      p+=clamp(nudge,vec2(-42./viewport.y),vec2(42./viewport.y));
       float t=time*.25;
       vec2 centre=vec2(aspect*.54,.51);
       vec2 outward=(p-centre)/max(length(p-centre),.15);
-      // Sampling against an outward offset carries the texture inward.
-      vec2 transport=p+outward*time*.042;
+      // Carry the texture inward along undulating paths rather than straight
+      // rays. Both swells accelerate with the playback-driven clock.
+      vec2 tangent=vec2(-outward.y,outward.x);
+      float radius=length(p-centre);
+      float swell=.045*sin(radius*9.-time*.85+p.y*2.)
+                 +.020*sin(radius*16.+time*.55-p.x*1.8);
+      vec2 transport=p+outward*time*.042+tangent*swell;
       vec2 warp=vec2(fbm(transport*2.1+vec2(t*.15,0.)),fbm(transport*2.1+19.));
-      vec2 flow=p+(warp-.5)*.12;
+      vec2 flow=p+(warp-.5)*.18+tangent*swell*.4;
       float sideDistance=min(p.x,aspect-p.x);
       float capDistance=min(p.y,1.-p.y);
       // Blend the two edge fields across a broad corner: selecting the
       // nearest edge with a branch left a visible diagonal seam.
-      float sideLanes=fbm(vec2(sideDistance*10.-time*.42,p.y*2.)+warp*.6);
-      float capLanes=fbm(vec2(capDistance*10.-time*.42,p.x*2.)+warp*.6);
+      float sideSwell=.055*sin(p.y*5.5-time*.38)+.025*sin(p.y*10.+time*.22);
+      float capSwell=.055*sin(p.x*5.-time*.34)+.025*sin(p.x*9.+time*.25);
+      float sideLanes=fbm(vec2((sideDistance+sideSwell)*10.-time*.42,p.y*2.)+warp*.6);
+      float capLanes=fbm(vec2((capDistance+capSwell)*10.-time*.42,p.x*2.)+warp*.6);
       float lanes=mix(sideLanes,capLanes,smoothstep(-.14,.14,sideDistance-capDistance));
       float volume=fbm(transport*4.8+warp*.9);
       float detail=noise(transport*26.+warp*2.);
@@ -168,13 +176,15 @@
       const count=width<760?700:grains.length;
       for(let i=0;i<count;i++){
         const p=grains[i];
-        // Looping inward travel for the lightweight renderer as well.
-        const travel=(p.x+clock*.014)%1, angle=p.phase;
+        // Inward travel follows curved paths in the lightweight renderer too.
+        const travel=(p.x+clock*.014)%1;
+        const angle=p.phase+Math.sin(travel*6.28-clock*.28+p.phase)*.13
+          +Math.sin(travel*11.-clock*.17)*.06;
         let x=width*.54+Math.cos(angle)*(1-travel)*width*.66;
         let y=height*.51+Math.sin(angle)*(1-travel)*height*.66;
-        x+=Math.sin(clock*.25+p.phase)*12;y+=Math.cos(clock*.2+p.phase)*10;
+        x+=Math.sin(clock*.25+p.phase)*22;y+=Math.cos(clock*.2+p.phase)*18;
         const dx=x-pointer.x,dy=y-pointer.y,near=Math.exp(-(dx*dx+dy*dy)/32000)*pointer.strength;
-        x-=dy*near*.025;y+=dx*near*.025;
+        x-=dy*near*.17;y+=dx*near*.17;
         let density=0;
         for(const [cx,cy,rx,ry] of centres)density+=Math.exp(-2*((x-cx)**2/rx**2+(y-cy)**2/ry**2));
         ctx.fillStyle=`rgba(0,168,196,${Math.min(.35,density*.22)*(1+energy*.3)})`;
@@ -195,7 +205,7 @@
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
     pointer.targetX=clamp(x,0,innerWidth);pointer.targetY=clamp(y,0,innerHeight);
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
-    pointer.targetStrength=.45;pointerLastMove=performance.now();
+    pointer.targetStrength=.85;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;
@@ -208,10 +218,10 @@
       // into pause; the remaining motion is only a quiet background drift.
       energy+=(Number(playing)-energy)*(1-Math.exp(-elapsed*(playing?2.4:1.5)));
       clock+=dt*(.14+energy*.90);
-      const smooth=1-Math.exp(-dt*.9);
+      const smooth=1-Math.exp(-dt*2.6);
       if(ts-pointerLastMove>2500)pointer.targetStrength=0;
-      pointer.x+=(pointer.targetX-pointer.x)*(1-Math.exp(-dt*1.1));
-      pointer.y+=(pointer.targetY-pointer.y)*(1-Math.exp(-dt*1.1));
+      pointer.x+=(pointer.targetX-pointer.x)*(1-Math.exp(-dt*4));
+      pointer.y+=(pointer.targetY-pointer.y)*(1-Math.exp(-dt*4));
       pointer.strength+=(pointer.targetStrength-pointer.strength)*smooth;
       render();
     }
