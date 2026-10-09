@@ -39,6 +39,17 @@
 <link rel="apple-touch-icon" href="/logo.png">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <link rel="icon" href="/logo.png" type="image/png">
+<script>
+/* A direct section URL must not paint News before the main SPA boots.
+   This marker is temporary; route() removes it once the correct tab is active. */
+(()=>{
+  const p=location.pathname.replace(/\/+$/,"")||"/";
+  const map={"/releases":"releases","/chart":"charts","/charts":"charts","/discover":"discover","/concerts":"concerts"};
+  const hash=location.hash.match(/^#(releases|charts|discover|concerts)$/);
+  const tab=hash?.[1]||map[p];
+  if(tab)document.documentElement.dataset.m98InitialTab=tab;
+})();
+</script>
 <style>
 :root{
   --bg:#ffffff; --bg2:#f4f6f7; --card:#ffffff; --card2:#edf1f2; --line:#e2e8ea;
@@ -907,6 +918,17 @@ textarea{resize:vertical;min-height:64px}
   #tab-discover .discover-card{height:max(225px,calc(100svh - var(--header-h,110px) - 225px))}
 }
 
+/* Avoid a News flash for deep links while the shared site scripts initialize. */
+html[data-m98-initial-tab] #tab-news{display:none!important}
+html[data-m98-initial-tab="releases"] #tab-releases,
+html[data-m98-initial-tab="charts"] #tab-charts,
+html[data-m98-initial-tab="discover"] #tab-discover,
+html[data-m98-initial-tab="concerts"] #tab-concerts{display:block!important}
+html[data-m98-initial-tab] #nav [data-tab="news"].active{background:transparent;color:var(--muted)}
+html[data-m98-initial-tab="releases"] #nav [data-tab="releases"],
+html[data-m98-initial-tab="charts"] #nav [data-tab="charts"],
+html[data-m98-initial-tab="discover"] #nav [data-tab="discover"],
+html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(--accent);color:#03282b}
 </style>
 <!-- PurpleAds automatic sticky placements: load on every route, even when News is hidden.
      This head tag has no inline banner container. The sole in-content banner
@@ -4223,10 +4245,15 @@ window.addEventListener("pageshow", e=>{ if(e.persisted) loadPublishedDesk(); })
 })();
 S.feed = "us-songs"; saveS(); setLogos(); renderCharts(); renderSwitch(); refreshDailyTop50();
 if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
-/* Concerts does not depend on editorial desk data. Apply its direct route
-   immediately so a slow /api/desk can never leave the News tab visible first. */
+/* Route every top-level section immediately. The published desk API is
+   needed for content, never to decide which section is active after F5. */
 const initialCleanPath=location.pathname.replace(/\/+$/,"")||"/";
-if(initialCleanPath==="/concerts" || initialCleanPath==="/discover" || location.hash==="#concerts" || location.hash==="#discover") route();
+const initialSectionPath=/^\/(?:news|releases|chart|charts|discover|concerts)$/.test(initialCleanPath);
+const initialSectionHash=/^#(?:news|releases|charts|discover|concerts)$/.test(location.hash);
+if(initialSectionPath || initialSectionHash){
+  try{ route(); }
+  finally{ document.documentElement.removeAttribute("data-m98-initial-tab"); }
+}
 loadPublishedDesk();
 // Same production Apple embed, preloading and pause routines for Discover.
 window.music98DiscoverPlayer={
