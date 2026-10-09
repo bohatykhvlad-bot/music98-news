@@ -868,6 +868,46 @@ textarea{resize:vertical;min-height:64px}
   .crow{grid-template-columns:24px 1fr 1fr 70px;grid-auto-rows:auto}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
+
+/* Discover: same shared header, search, newsletter, footer and Apple player as the site. */
+#tab-discover{padding:0}
+#tab-discover .discover-layout{min-height:calc(100svh - var(--header-h,55px) - 14px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:48px;max-width:1040px;margin:0 auto;padding:18px 0 27px}
+#tab-discover .discover-copy{min-width:0;max-width:445px;text-align:left}
+#tab-discover .discover-copy h1{font-size:clamp(30px,3.1vw,42px);line-height:1.1;font-weight:800;letter-spacing:-.045em;margin:0 0 11px}
+#tab-discover .discover-copy .discover-desc{font-size:15px;line-height:1.5;color:var(--muted);margin:0}
+#tab-discover .discover-selected{margin-top:30px;display:flex;flex-direction:column;gap:7px}
+#tab-discover .discover-selected[hidden]{display:none!important}
+#tab-discover .discover-artist{font-size:17px;font-weight:600;color:var(--muted);margin:0;line-height:1.3}
+#tab-discover .discover-selected h2{font-size:clamp(23px,2.6vw,32px);font-weight:800;line-height:1.16;letter-spacing:-.035em;margin:0;overflow-wrap:anywhere}
+#tab-discover .discover-details{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted2);margin:5px 0 0}
+#tab-discover .discover-details span+span:not(:empty):before{content:"·";margin-right:9px}
+#tab-discover .discover-stage{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px}
+#tab-discover .discover-card{position:relative;width:min(100%,460px);height:min(450px,calc(100svh - 185px));min-height:300px;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);background:var(--card2);box-shadow:var(--shadow)}
+#tab-discover .discover-question{display:grid;place-items:center;position:absolute;inset:0;font-size:clamp(95px,10vw,130px);font-weight:300;color:#b8c5c9;line-height:1;user-select:none}
+#tab-discover .discover-card .aembed{margin:0;width:100%;max-width:none;height:100%;min-height:0!important;overflow:hidden;border-radius:inherit;background:var(--card)}
+#tab-discover .discover-card .aembed iframe{display:block;width:100%;max-width:none;height:100%!important;min-height:100%;border:0;border-radius:0;background:#fff}
+#tab-discover .discover-stage .loadmore-btn{min-width:190px;min-height:43px;text-align:center}
+#tab-discover .discover-stage .loadmore-btn:disabled{opacity:.55;cursor:wait}
+#tab-discover .discover-status{font-size:12px;color:var(--muted);text-align:center;min-height:0}
+#tab-discover .discover-status:empty{display:none}
+@media(max-width:720px){
+  #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px;min-height:calc(100svh - var(--header-h,110px) - 12px);padding:17px 0 24px;justify-content:center}
+  #tab-discover .discover-copy{max-width:490px;width:100%;align-self:center}
+  #tab-discover .discover-copy h1{font-size:clamp(27px,7vw,34px);margin-bottom:6px}
+  #tab-discover .discover-copy .discover-desc{font-size:13px}
+  #tab-discover .discover-selected{margin-top:14px;gap:4px}
+  #tab-discover .discover-artist{font-size:14px}
+  #tab-discover .discover-selected h2{font-size:23px}
+  #tab-discover .discover-details{font-size:12px;margin-top:2px}
+  #tab-discover .discover-stage{width:100%;gap:12px}
+  #tab-discover .discover-card{width:min(100%,450px);height:min(435px,calc(100svh - var(--header-h,110px) - 250px));min-height:250px}
+  #tab-discover .discover-stage .loadmore-btn{min-height:40px}
+}
+@media(max-width:720px) and (max-height:660px){
+  #tab-discover .discover-layout{gap:10px;padding:8px 0 15px}
+  #tab-discover .discover-card{height:max(225px,calc(100svh - var(--header-h,110px) - 225px))}
+}
+
 </style>
 <!-- PurpleAds automatic sticky placements: load on every route, even when News is hidden.
      This head tag has no inline banner container. The sole in-content banner
@@ -897,7 +937,7 @@ textarea{resize:vertical;min-height:64px}
     <nav class="nav" id="nav">
       <a class="nav-btn active" data-tab="news" href="/">News</a>
       <a class="nav-btn" data-tab="releases" href="/releases">Releases</a>
-      <a class="nav-btn" href="/discover">Discover</a>
+      <a class="nav-btn" data-tab="discover" href="/discover">Discover</a>
       <a class="nav-btn" data-tab="charts" href="/chart">Chart</a>
       <a class="nav-btn" data-tab="concerts" href="/concerts">Concerts</a>
     </nav>
@@ -950,6 +990,28 @@ textarea{resize:vertical;min-height:64px}
     <div class="empty" id="chartEmpty" hidden>Nothing found for your query.</div>
   </section>
 
+
+  <section class="tab" id="tab-discover">
+    <div class="discover-layout">
+      <div class="discover-copy">
+        <h1>What should I listen to?</h1>
+        <p class="discover-desc">An easy way to find something to listen to.</p>
+        <div class="discover-selected" id="discoverSelection" hidden>
+          <p class="discover-artist" id="discoverArtist"></p>
+          <h2 id="discoverAlbum"></h2>
+          <p class="discover-details"><span id="discoverYear"></span><span id="discoverGenre"></span></p>
+        </div>
+      </div>
+      <div class="discover-stage">
+        <div class="discover-card" id="discoverPlayerStage" aria-label="Random album">
+          <span class="discover-question" aria-hidden="true">?</span>
+        </div>
+        <button class="loadmore-btn" id="discoverFind" type="button" disabled>Find an album</button>
+        <p class="discover-status" id="discoverStatus" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
   <section class="tab" id="tab-concerts">
     <music98-concerts></music98-concerts>
   </section>
@@ -973,7 +1035,7 @@ textarea{resize:vertical;min-height:64px}
       <h3>Sections</h3>
       <a class="flink" href="/" data-goto="news">News</a>
       <a class="flink" href="/releases" data-goto="releases">Releases</a>
-      <a class="flink" href="/discover">Discover</a>
+      <a class="flink" href="/discover" data-goto="discover">Discover</a>
       <a class="flink" href="/chart" data-goto="charts">Chart</a>
       <a class="flink" href="/concerts" data-goto="concerts">Concerts</a>
     </div>
@@ -3208,7 +3270,7 @@ function renderHints(){
 function renderAll(){ renderNews(); renderReleases(); renderCharts(); renderHints(); updateStorageInfo(); }
 
 /* ============ tabs & search events ============ */
-const TAB_PATHS={news:"/",releases:"/releases",charts:"/chart",concerts:"/concerts"};
+const TAB_PATHS={news:"/",releases:"/releases",discover:"/discover",charts:"/chart",concerts:"/concerts"};
 function tabPath(t){ return TAB_PATHS[t]||"/"; }
 const DEFAULT_PAGE_META={
   title:"music98.news — Music News, Releases & Charts",
@@ -3226,8 +3288,16 @@ const CONCERTS_PAGE_META={
   ogUrl:"https://music98.news/concerts",
   canonical:"https://music98.news/concerts"
 };
+const DISCOVER_PAGE_META={
+  title:"What should I listen to? - music98.news",
+  description:"An easy way to find something to listen to.",
+  ogTitle:"What should I listen to? - music98.news",
+  ogDescription:"An easy way to find something to listen to.",
+  ogUrl:"https://music98.news/discover",
+  canonical:"https://music98.news/discover"
+};
 function syncSectionMeta(tab){
-  const m=tab==="concerts"?CONCERTS_PAGE_META:DEFAULT_PAGE_META;
+  const m=tab==="discover"?DISCOVER_PAGE_META:tab==="concerts"?CONCERTS_PAGE_META:DEFAULT_PAGE_META;
   document.title=m.title;
   const set=(sel,value,attr="content")=>{const el=document.querySelector(sel);if(el)el.setAttribute(attr,value);};
   set('meta[name="description"]',m.description);
@@ -3790,7 +3860,7 @@ document.addEventListener("mouseover", intentBootEvent, {passive:true});
 document.addEventListener("focusin", intentBootEvent);
 function route(){
   const cleanPath=location.pathname.replace(/\/+$/,"")||"/";
-  const tabHash = location.hash.match(/^#(news|releases|charts|concerts)$/);
+  const tabHash = location.hash.match(/^#(news|releases|discover|charts|concerts)$/);
   if(tabHash){
     hideArticle();
     const t=tabHash[1];
@@ -3801,6 +3871,7 @@ function route(){
   const sectionByPath={
     "/news":"news",
     "/releases":"releases",
+    "/discover":"discover",
     "/chart":"charts",
     "/charts":"charts",
     "/concerts":"concerts"
@@ -4156,9 +4227,16 @@ if(/^#post\//.test(location.hash)) document.body.classList.add("articlepage");
 /* Concerts does not depend on editorial desk data. Apply its direct route
    immediately so a slow /api/desk can never leave the News tab visible first. */
 const initialCleanPath=location.pathname.replace(/\/+$/,"")||"/";
-if(initialCleanPath==="/concerts" || location.hash==="#concerts") route();
+if(initialCleanPath==="/concerts" || initialCleanPath==="/discover" || location.hash==="#concerts" || location.hash==="#discover") route();
 loadPublishedDesk();
+// Same production Apple embed, preloading and pause routines for Discover.
+window.music98DiscoverPlayer={
+  render: albumId => appleEmbed(albumId),
+  park: root => parkAppleEmbeds(root),
+  pause: () => pauseAllMedia()
+};
 </script>
+<script src="/discover-app.js?v=20261009-01" defer></script>
 <script src="/concerts-app.js?v=20261008-03" defer></script>
 </body>
 </html>
