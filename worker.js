@@ -245,7 +245,10 @@ export default {
     if (/^\/(?:releases|discover|chart|charts)\/?$/.test(path) &&
         (request.method === "GET" || request.method === "HEAD")) {
       const u = new URL(request.url);
-      const res = await env.ASSETS.fetch(new Request(u.origin + "/index.html", request));
+      // Cloudflare auto-trailing-slash canonicalizes /index.html to /.
+      // Fetch the canonical root asset internally, but return it under the
+      // original section URL (200), so F5 never redirects to News.
+      const res = await env.ASSETS.fetch(new Request(u.origin + "/", request));
       const headers = new Headers(res.headers);
       headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
       headers.set("CDN-Cache-Control", "no-store");
