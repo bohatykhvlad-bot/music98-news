@@ -5,8 +5,8 @@ import {readFileSync} from "node:fs";
 const page=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
 const worker=readFileSync(new URL("../worker.js",import.meta.url),"utf8");
 
-test("desktop navigation uses four equal-width pill segments",()=>{
-  assert.match(page,/\.nav\{[^}]*width:410px;[^}]*grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+test("desktop navigation uses five equal-width pill segments",()=>{
+  assert.match(page,/\.nav\{[^}]*width:480px;[^}]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(page,/\.nav-btn\{width:100%;text-indent:var\(--ink-x,0px\);/);
   assert.match(page,/window\.music98InkShift/);
   assert.match(page,/getImageData\(/);
@@ -16,7 +16,7 @@ test("desktop navigation uses four equal-width pill segments",()=>{
   assert.match(page,/\.nav\{[^}]*height:40px;[^}]*padding:3px/);
   assert.match(page,/\.nav-btn\{position:relative;top:0\}/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
-  assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav-btn\{flex:1;height:38px;padding:0 8px;font-size:13px;justify-content:center;top:0\}/);
+  assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav-btn\{flex:1;height:38px;padding:0 3px;font-size:12px;justify-content:center;top:0\}/);
 });
 
 test("Subscribe only fills cyan on hover and has no press animation",()=>{
