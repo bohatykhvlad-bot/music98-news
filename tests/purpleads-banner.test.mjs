@@ -17,12 +17,16 @@ test("the single banner sits above the News hero and nowhere else", () => {
   const placement = html.indexOf('<aside class="m98-home-banner"');
   const hero = html.indexOf('<div id="heroSlot">');
   const newsEnd = html.indexOf('<section class="tab" id="tab-releases">');
-  assert.ok(newsStart !== -1 && newsStart < placement && placement < hero && hero < newsEnd);
+  const row = html.indexOf('<div class="news-heading-row">');
+  const heading = html.indexOf('<h1 class="hd-t">Latest stories</h1>');
+  assert.ok(newsStart !== -1 && newsStart < row && row < heading && heading < placement && placement < hero && hero < newsEnd);
   assert.doesNotMatch(html, /m98-ad-placement|m98DisplayAd|data-ad-position="news-between"|data-ad-position="news-bottom"/);
 });
 
 test("banner CSS provides documented desktop and mobile ad dimensions", () => {
-  assert.match(html, /\.m98-home-banner-slot\{width:min\(100%,970px\);height:90px;/);
+  assert.match(html, /\.m98-home-banner-slot\{width:728px;height:90px;/);
+  assert.match(html, /#tab-news \.news-heading-row\{display:flex;align-items:center;justify-content:space-between;/);
+  assert.match(html, /@media \(max-width:559px\)\{/);
   assert.match(html, /\.m98-home-banner-slot\{width:468px;height:60px\}/);
   assert.match(html, /\.m98-home-banner-slot\{width:320px;max-width:100%;height:100px\}/);
   assert.match(html, /\.m98-home-banner-slot\{width:250px;height:250px\}/);
