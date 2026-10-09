@@ -893,7 +893,26 @@ textarea{resize:vertical;min-height:64px}
 #tab-discover .discover-album{font-size:17px;font-weight:500;line-height:1.3;color:var(--muted);margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-details{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);margin:6px 0 0}
 #tab-discover .discover-details span+span:not(:empty):before{content:"·";margin-right:9px}
-#tab-discover .discover-stage{min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px;padding-top:calc(clamp(26px,4vw,38px)*1.15 + var(--section-heading-gap))}
+#tab-discover .discover-stage{position:relative;isolation:isolate;min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px;padding-top:calc(clamp(26px,4vw,38px)*1.15 + var(--section-heading-gap))}
+#tab-discover .discover-card{z-index:1}
+#tab-discover .discover-wave{position:absolute;z-index:0;top:calc(clamp(26px,4vw,38px)*1.15 + var(--section-heading-gap) + 18px);width:118px;height:410px;pointer-events:none;user-select:none;opacity:.48;filter:drop-shadow(0 0 11px rgba(0,222,226,.28));transition:opacity .5s ease,filter .5s ease}
+#tab-discover .discover-wave--left{right:calc(100% + 4px)}
+#tab-discover .discover-wave--right{left:calc(100% + 4px);transform:scaleX(-1)}
+#tab-discover .discover-wave svg{display:block;width:100%;height:100%;overflow:visible}
+#tab-discover .discover-wave-line{fill:none;stroke-width:2.4;stroke-linecap:round;transform-box:fill-box;transform-origin:center;animation:m98-wave-float 5.8s ease-in-out infinite}
+#tab-discover .discover-wave-line:nth-of-type(2){stroke-width:1.75;animation-delay:-1.7s;animation-duration:6.6s}
+#tab-discover .discover-wave-line:nth-of-type(3){stroke-width:1.4;animation-delay:-3.1s;animation-duration:7.1s}
+#tab-discover .discover-wave-halo{fill:none;stroke-width:14;stroke-linecap:round;opacity:.17;filter:blur(9px);animation:m98-wave-glow 6s ease-in-out infinite}
+#tab-discover .discover-stage.is-playing .discover-wave{opacity:.84;filter:drop-shadow(0 0 17px rgba(0,239,230,.5))}
+#tab-discover .discover-stage.is-playing .discover-wave-line{animation-duration:1.7s;stroke-width:3.2}
+#tab-discover .discover-stage.is-playing .discover-wave-line:nth-of-type(2){animation-duration:2.1s;stroke-width:2.35}
+#tab-discover .discover-stage.is-playing .discover-wave-line:nth-of-type(3){animation-duration:2.4s;stroke-width:1.9}
+#tab-discover .discover-stage.is-playing .discover-wave-halo{opacity:.34;animation-duration:1.7s}
+@keyframes m98-wave-float{0%,100%{transform:translate3d(-2px,0,0) scaleX(.93)}45%{transform:translate3d(3px,0,0) scaleX(1.12)}70%{transform:translate3d(-4px,0,0) scaleX(.96)}}
+@keyframes m98-wave-glow{0%,100%{opacity:.13}50%{opacity:.28}}
+@media(max-width:1100px){#tab-discover .discover-wave{display:none}}
+@media(prefers-reduced-motion:reduce){#tab-discover .discover-wave-line,#tab-discover .discover-wave-halo{animation:none!important;transition:none}}
+
 #tab-discover .discover-card{position:relative;width:100%;max-width:660px;height:450px;flex:none;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);background:var(--card2);box-shadow:var(--shadow)}
 #tab-discover .discover-question{display:grid;place-items:center;position:absolute;inset:0;font-size:clamp(95px,10vw,130px);font-weight:300;color:#b8c5c9;line-height:1;user-select:none}
 #tab-discover .discover-card .aembed{margin:0;width:100%;max-width:none;height:450px;min-height:450px!important;overflow:hidden;border-radius:inherit;background:var(--card)}
@@ -1031,6 +1050,8 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
         </div>
       </div>
       <div class="discover-stage">
+        <div class="discover-wave discover-wave--left" aria-hidden="true"><svg viewBox="0 0 118 410" aria-hidden="true" focusable="false"><defs><linearGradient id="m98DiscoverWaveLeft" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00fdfb" stop-opacity=".03"/><stop offset="25%" stop-color="#00e8e7" stop-opacity=".87"/><stop offset="60%" stop-color="#00b8d6"/><stop offset="100%" stop-color="#5dfff0" stop-opacity=".08"/></linearGradient></defs><path class="discover-wave-halo" stroke="url(#m98DiscoverWaveLeft)" d="M57 8 C8 62 106 107 60 157 S17 245 62 290 S107 367 50 402"/><path class="discover-wave-line" stroke="url(#m98DiscoverWaveLeft)" d="M57 8 C8 62 106 107 60 157 S17 245 62 290 S107 367 50 402"/><path class="discover-wave-line" stroke="url(#m98DiscoverWaveLeft)" d="M81 14 C27 68 111 114 76 165 S27 238 81 293 S107 363 70 397"/><path class="discover-wave-line" stroke="url(#m98DiscoverWaveLeft)" d="M32 20 C2 93 78 130 40 185 S16 248 42 321 S84 378 29 407"/></svg></div>
+        <div class="discover-wave discover-wave--right" aria-hidden="true"><svg viewBox="0 0 118 410" aria-hidden="true" focusable="false"><defs><linearGradient id="m98DiscoverWaveRight" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00fdfb" stop-opacity=".03"/><stop offset="25%" stop-color="#00e8e7" stop-opacity=".87"/><stop offset="60%" stop-color="#00b8d6"/><stop offset="100%" stop-color="#5dfff0" stop-opacity=".08"/></linearGradient></defs><path class="discover-wave-halo" stroke="url(#m98DiscoverWaveRight)" d="M57 8 C8 62 106 107 60 157 S17 245 62 290 S107 367 50 402"/><path class="discover-wave-line" stroke="url(#m98DiscoverWaveRight)" d="M57 8 C8 62 106 107 60 157 S17 245 62 290 S107 367 50 402"/><path class="discover-wave-line" stroke="url(#m98DiscoverWaveRight)" d="M81 14 C27 68 111 114 76 165 S27 238 81 293 S107 363 70 397"/><path class="discover-wave-line" stroke="url(#m98DiscoverWaveRight)" d="M32 20 C2 93 78 130 40 185 S16 248 42 321 S84 378 29 407"/></svg></div>
         <div class="discover-card" id="discoverPlayerStage" aria-label="Random album">
           <span class="discover-question" aria-hidden="true">?</span>
         </div>
