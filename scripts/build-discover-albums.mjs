@@ -2,8 +2,8 @@
  * Prebuild album suggestions; the website NEVER calls Spotify/Kworb/iTunes
  * to randomize. One cached JSON request on page load, then local picks.
  *
- * Run: node scripts/build-discover-albums.mjs --batch=35
- * Full initial build: --batch=500 (~30 minutes due to Apple's 20/min guidance).
+ * Run: node scripts/build-discover-albums.mjs --batch=500
+ * Initial catalog: --batch=500 (about 30 minutes with Apple request pacing).
  * The chart is a third-party Kworb estimate, not official Spotify API data.
  */
 import fs from 'node:fs/promises';
@@ -76,7 +76,7 @@ async function albumsFor(name){
  }
  throw err;
 }
-export async function build({batch=35}={}){
+export async function build({batch=500}={}){
  const r=await fetch(RANKING,{signal:AbortSignal.timeout(20000),headers:{'user-agent':'Mozilla/5.0 (compatible; music98-catalog-maintainer/1.0)'}});
  if(!r.ok)throw Error(`Ranking HTTP ${r.status}`);
  const ranking=parseTop500(await r.text());
@@ -87,7 +87,7 @@ export async function build({batch=35}={}){
  for(const item of ranking){
   const old=previousByName.get(normalize(item.name));
   const valid=old&&Array.isArray(old.albums)&&old.albums.length;
-  const outdated=!valid||!old.checkedAt||(Date.now()-Date.parse(old.checkedAt))>30*86400_000;
+  const outdated=!valid||!old.checkedAt||(Date.now()-Date.parse(old.checkedAt))>28*86400_000;
   if(outdated&&fetched<batch){
    // Public iTunes Search API guidance: roughly 20 requests per minute.
    if(fetched)await sleep(3500);
@@ -99,16 +99,23 @@ export async function build({batch=35}={}){
    }catch(e){failed++;console.warn('DEFER',item.rank,item.name,e.message);if(valid)newData.push({...old,...item})}
   }else if(valid)newData.push({...old,...item});
  }
- if(newData.length<5)throw Error('Insufficient valid albums: refusing overwrite');
+ // A failed mass refresh must not turn a healthy live catalog into a tiny list.
+ const priorCount=(previous.artists||[]).length;
+ const minHealthy=priorCount>=300?Math.floor(priorCount*.8):(batch===500?300:5);
+ if(newData.length<minHealthy)throw Error(`Insufficient valid artists (${newData.length}/${minHealthy}): preserve previous catalog`);
+ if(newData.some(a=>!a.albums?.length||a.albums.some(x=>!Number.isSafeInteger(x.id))))
+  throw Error('Catalog validation failed: preserve previous catalog');
  // Shuffle happens only in the browser; retain ordered artist ranks for audit.
  const output={schema:1,source:'kworb-spotify-monthly-listeners-and-itunes-search',isSample:newData.length<450,updatedAt:new Date().toISOString(),rankingCount:ranking.length,artists:newData};
- await fs.writeFile(OUT,JSON.stringify(output,null,2)+'\n');
+ const tmp=new URL('../public/data/discover-albums.json.pending',import.meta.url);
+ try{await fs.writeFile(tmp,JSON.stringify(output,null,2)+'\n');await fs.rename(tmp,OUT)}
+ finally{await fs.rm(tmp,{force:true}).catch(()=>{})}
  console.log('DISCOVER_CATALOG',JSON.stringify({artists:newData.length,albums:newData.reduce((n,a)=>n+a.albums.length,0),fetched,failed,source:output.source,isSample:output.isSample}));
  return output;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  const arg=process.argv.find(x=>x.startsWith('--batch='));
- const batch=arg?Number(arg.slice(8)):35;
+ const batch=arg?Number(arg.slice(8)):500;
  if(!Number.isInteger(batch)||batch<1||batch>500)throw Error('Use --batch=1..500');
  build({batch}).catch(e=>{console.error('DISCOVER_FAILED',e.message);process.exitCode=1});
 }
