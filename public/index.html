@@ -920,6 +920,10 @@ body.discover-ambient-visible #discoverAmbient{opacity:1;visibility:visible}
   #tab-discover .discover-stage{width:100%;max-width:none;padding-top:0}
 }
 @media(max-width:720px){
+  /* Centre the button between the player and the Subscribe section. Its
+     existing upper gap already uses the shared section-heading spacing. */
+  #tab-discover{padding-bottom:var(--section-heading-gap)}
+  body.discover-ambient-visible .subscribe{margin-top:0}
   #tab-discover .discover-layout{gap:18px;padding:0}
   #tab-discover .discover-copy{max-width:490px;width:100%;align-self:center}
   #tab-discover .discover-selected{gap:3px}
