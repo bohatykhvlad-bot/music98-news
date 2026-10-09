@@ -55,26 +55,52 @@ export function albumCandidates(items,artist){
   const artwork=String(v.artworkUrl100||'');
   out.push({id:Number(v.collectionId),title,year:year||null,genre:String(v.primaryGenreName||'Music'),...(/^https:\/\/[^/]*mzstatic\.com\//i.test(artwork)?{artwork:artwork.replace(/\d+x\d+bb(?:-\d+)?\./,'600x600bb.')}:{} )});
  }
- return out.slice(0,60);
+ return out;
 }
+// iTunes Search API guidance is about 20 requests/minute, including lookups.
+// Pacing is global rather than per-artist: search + lookup both count.
+let lastAppleRequest=0;
 async function getJSON(url){
- const r=await fetch(url,{headers:{'user-agent':'music98-news-discover/1.0 (music editorial recommendations)'},signal:AbortSignal.timeout(20000)});
+ const wait=Math.max(0,3500-(Date.now()-lastAppleRequest));
+ if(wait)await sleep(wait);
+ lastAppleRequest=Date.now();
+ const r=await fetch(url,{headers:{'user-agent':'music98-news-discover/1.0 (music editorial recommendations)'},signal:AbortSignal.timeout(25000)});
  if(!r.ok)throw Error(`${r.status} ${r.statusText} ${url}`);
  return r.json();
 }
 async function albumsFor(name){
- const url=new URL('https://itunes.apple.com/search');
- url.searchParams.set('term',name);
- url.searchParams.set('country','us');
- url.searchParams.set('media','music');
- url.searchParams.set('entity','album');
- url.searchParams.set('limit','200');
- let err;
+ const search=new URL('https://itunes.apple.com/search');
+ search.searchParams.set('term',name);
+ search.searchParams.set('country','us');
+ search.searchParams.set('media','music');
+ search.searchParams.set('entity','album');
+ search.searchParams.set('limit','200');
+ let entries=[],err;
  for(let attempt=0;attempt<2;attempt++){
-  try{const result=await getJSON(url);return albumCandidates(result.results,name)}
-  catch(e){err=e;if(attempt===0)await sleep(900)}
+  try{const result=await getJSON(search);entries=Array.isArray(result.results)?result.results:[];err=null;break}
+  catch(e){err=e;if(attempt===0)await sleep(1100)}
  }
- throw err;
+ if(err)throw err;
+ // Search returns a relevance-limited window. For each matched artist,
+ // an ID-based lookup often adds older releases the search did not return.
+ const exact=normalize(name);
+ const idCounts=new Map();
+ for(const item of entries){
+  if(normalize(item?.artistName)!==exact)continue;
+  const id=Number(item.artistId);
+  if(Number.isSafeInteger(id)&&id>0)idCounts.set(id,(idCounts.get(id)||0)+1);
+ }
+ const artistId=[...idCounts].sort((a,b)=>b[1]-a[1])[0]?.[0];
+ if(artistId){
+  const lookup=new URL('https://itunes.apple.com/lookup');
+  lookup.searchParams.set('id',String(artistId));
+  lookup.searchParams.set('country','us');
+  lookup.searchParams.set('entity','album');
+  lookup.searchParams.set('limit','200');
+  try{const result=await getJSON(lookup);entries.push(...(Array.isArray(result.results)?result.results:[]))}
+  catch(e){console.warn('ARTIST_LOOKUP_FALLBACK',name,e.message)}
+ }
+ return albumCandidates(entries,name);
 }
 export async function build({batch=500}={}){
  const r=await fetch(RANKING,{signal:AbortSignal.timeout(20000),headers:{'user-agent':'Mozilla/5.0 (compatible; music98-catalog-maintainer/1.0)'}});
@@ -86,31 +112,38 @@ export async function build({batch=500}={}){
  const newData=[];let fetched=0,failed=0;
  for(const item of ranking){
   const old=previousByName.get(normalize(item.name));
-  const valid=old&&Array.isArray(old.albums)&&old.albums.length;
+  const valid=Boolean(old&&Array.isArray(old.albums)&&old.albums.length);
   const outdated=!valid||!old.checkedAt||(Date.now()-Date.parse(old.checkedAt))>6*86400_000;
   if(outdated&&fetched<batch){
-   // Public iTunes Search API guidance: roughly 20 requests per minute.
-   if(fetched)await sleep(3500);
    fetched++;
    try{
     const albums=await albumsFor(item.name);
     if(albums.length)newData.push({...item,albums,checkedAt:new Date().toISOString()});
     else if(valid)newData.push({...old,...item});
-   }catch(e){failed++;console.warn('DEFER',item.rank,item.name,e.message);if(valid)newData.push({...old,...item})}
-  }else if(valid)newData.push({...old,...item});
+    else newData.push({...item,albums:[],checkedAt:new Date().toISOString()});
+   }catch(e){
+    failed++;console.warn('DEFER',item.rank,item.name,e.message);
+    newData.push(valid?{...old,...item}:{...item,albums:[],checkedAt:null});
+   }
+  }else if(old)newData.push({...old,...item,albums:Array.isArray(old.albums)?old.albums:[]});
+  else newData.push({...item,albums:[],checkedAt:null});
  }
- // A failed mass refresh must not turn a healthy live catalog into a tiny list.
- const priorCount=(previous.artists||[]).length;
- const minHealthy=priorCount>=300?Math.floor(priorCount*.8):(batch===500?300:5);
- if(newData.length<minHealthy)throw Error(`Insufficient valid artists (${newData.length}/${minHealthy}): preserve previous catalog`);
- if(newData.some(a=>!a.albums?.length||a.albums.some(x=>!Number.isSafeInteger(x.id))))
+ // Keep all 500 ranking entries for audit, even where an artist has no
+ // discoverable qualifying album. The browser chooses only playable entries.
+ const playable=newData.filter(a=>a.albums?.length).length;
+ const priorPlayable=(previous.artists||[]).filter(a=>a.albums?.length).length;
+ const minHealthy=priorPlayable>=300?Math.floor(priorPlayable*.8):(batch===500?300:5);
+ if(newData.length!==LIMIT||playable<minHealthy)
+  throw Error(`Catalog incomplete: ${newData.length} ranked, ${playable} with albums (minimum ${minHealthy}); preserve prior snapshot`);
+ if(newData.some(a=>!Array.isArray(a.albums)||a.albums.some(x=>!Number.isSafeInteger(x.id))))
   throw Error('Catalog validation failed: preserve previous catalog');
- // Shuffle happens only in the browser; retain ordered artist ranks for audit.
- const output={schema:1,source:'kworb-spotify-monthly-listeners-and-itunes-search',isSample:newData.length<450,updatedAt:new Date().toISOString(),rankingCount:ranking.length,artists:newData};
+ // The catalog includes 500 ranked artists; only those with validated albums
+ // are selectable. Counts make this distinction transparent.
+ const output={schema:1,source:'kworb-spotify-monthly-listeners-and-itunes-search',isSample:playable<450,updatedAt:new Date().toISOString(),rankingCount:ranking.length,playableArtistCount:playable,missingArtistCount:LIMIT-playable,artists:newData};
  const tmp=new URL('../public/data/discover-albums.json.pending',import.meta.url);
  try{await fs.writeFile(tmp,JSON.stringify(output,null,2)+'\n');await fs.rename(tmp,OUT)}
  finally{await fs.rm(tmp,{force:true}).catch(()=>{})}
- console.log('DISCOVER_CATALOG',JSON.stringify({artists:newData.length,albums:newData.reduce((n,a)=>n+a.albums.length,0),fetched,failed,source:output.source,isSample:output.isSample}));
+ console.log('DISCOVER_CATALOG',JSON.stringify({artists:newData.length,playable,albums:newData.reduce((n,a)=>n+a.albums.length,0),fetched,failed,source:output.source,isSample:output.isSample}));
  return output;
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
