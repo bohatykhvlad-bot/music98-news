@@ -1,10 +1,9 @@
-/* Ezoic ads for News: inline placements, fixed side rails and desktop Bottom Leaderboard. */
+/* PurpleAds responsive banners in News, articles and the desktop Bottom Leaderboard. */
 (() => {
   "use strict";
   const legacy = document.getElementById("m98DisplayAd");
   if (!legacy) return;
-  window.ezstandalone = window.ezstandalone || {};
-  window.ezstandalone.cmd = window.ezstandalone.cmd || [];
+  const TAG_SRC = "https://cdn.prplads.com/agent.js?publisherId=a8b5333aef37b2c617460b219f13cfd6:408ff97cad4bc4f8d82425ce9a7f27c99316eb91f427d7d872f4bc7fe74866af4e29bd0a80b151e45396498d349ea060d79ae087af39972417a5318d2578efb";
   let frame = 0;
   let generation = 0;
   let displayedPage = "";
@@ -18,6 +17,7 @@
     if (article && !article.hidden) return path + location.hash + ":article";
     if (article && !/^\/(?:news|releases|charts?|concerts)?$/.test(path)) return "";
     const active = document.querySelector(".tab.active");
+    if (active?.id === "tab-news" && !document.querySelector("#heroSlot .hero, #newsGrid .card") && document.getElementById("newsEmpty")?.hidden) return "";
     const layout = active?.id === "tab-news" ? (document.querySelector("#heroSlot .hero") ? ":hero" : ":cards") : "";
     return path + ":" + (active ? active.id : "page") + layout;
   }
@@ -51,7 +51,7 @@
           if ((i + 1) % 2 === 0) p.after(makePlacement("article-paragraph-" + (i + 1), "m98-ad-inline"));
         });
       }
-      const canFitRails = matchMedia("(min-width:1180px) and (min-height:500px)").matches;
+      const canFitRails = matchMedia("(min-width:1180px) and (min-height:818px)").matches;
       for (const side of ["left", "right"]) {
         if (!article.querySelector(".m98-ad-side-" + side)) article.append(makePlacement("article-" + side, "m98-ad-side m98-ad-side-" + side));
       }
@@ -65,21 +65,21 @@
     return [legacy];
   }
 
-  function formats(box) {
-    if (box.classList.contains("m98-ad-anchor")) {
-      const width = box.clientWidth - 24;
-      return width >= 970 ? "970x90,728x90" : "728x90,468x60";
-    }
-    if (box.classList.contains("m98-ad-side")) {
-      const height = window.innerHeight - (parseFloat(getComputedStyle(document.body).getPropertyValue("--header-h")) || 55) - 52 - 111;
-      return height >= 600 ? "160x600,120x600" : "160x300,120x240";
-    }
+  function format(box) {
+    if (box.classList.contains("m98-ad-anchor")) return [970, 90];
+    if (box.classList.contains("m98-ad-side")) return [160, 600];
     const width = box.clientWidth;
-    if (width >= 728) return "728x90,468x60";
-    if (width >= 468) return "468x60,300x250";
-    if (width >= 336) return "300x250,336x280,320x100";
-    if (width >= 320) return "300x250,320x100,320x50";
-    return width >= 300 ? "300x250,250x250" : "250x250";
+    if (width >= 728) return [728, 90];
+    if (width >= 468) return [468, 60];
+    if (width >= 300) return [300, 250];
+    if (width >= 250) return [250, 250];
+    return [200, 200];
+  }
+
+  function collapse(box) {
+    box.hidden = true;
+    box.classList.remove("is-filled", "is-pending");
+    if (box.classList.contains("m98-ad-anchor")) document.body.classList.remove("m98-anchor-visible");
   }
 
   function reset() {
@@ -96,12 +96,15 @@
   }
 
   function requestAd(box, key, currentGeneration) {
-    if (requested.has(box)) return;
+    if (requested.has(box) || currentGeneration !== generation || key !== pageKey() || !box.isConnected) return;
     requested.add(box);
-    window.ezstandalone.cmd.push(() => {
-      if (currentGeneration !== generation || key !== pageKey() || !box.isConnected) return;
-      window.ezstandalone.showAds("[data-ad-position='" + box.dataset.adPosition + "'] .m98-ezoic-slot");
-    });
+    const slot = box.querySelector(".m98-display-slot");
+    const script = document.createElement("script");
+    script.src = TAG_SRC;
+    script.async = true;
+    script.setAttribute("data-pa-tag", "");
+    script.onerror = () => { if (currentGeneration === generation) collapse(box); };
+    slot.append(script);
   }
 
   function schedule(force = false) {
@@ -110,13 +113,7 @@
       const key = pageKey();
       if (!key || (!force && key === displayedPage)) return;
       const currentGeneration = ++generation;
-      const wasDisplayed = !!displayedPage;
       reset();
-      if (wasDisplayed) {
-        window.ezstandalone.cmd.push(() => {
-          if (currentGeneration === generation) window.ezstandalone.destroyAll();
-        });
-      }
       const boxes = placements();
       displayedPage = key;
       if (typeof IntersectionObserver !== "undefined") {
@@ -129,15 +126,14 @@
       }
       for (const box of boxes) {
         box.hidden = false;
-        const sizes = formats(box);
+        const [width, height] = format(box);
         box.dataset.adPosition ||= "page-bottom";
         const slot = document.createElement("div");
-        slot.className = "m98-ezoic-slot";
-        slot.dataset.sizes = sizes;
-        slot.dataset.fluid = "false";
-        slot.dataset.required = "false";
+        slot.className = "m98-display-slot";
+        slot.style.width = width + "px";
+        slot.style.height = height + "px";
         box.append(slot);
-        // Show a fixed unit only after Ezoic inserts its actual creative.
+        // Reveal fixed units when PurpleAds inserts its creative.
         const fillObserver = new MutationObserver(() => {
           if (currentGeneration !== generation || !box.isConnected) return;
           const creative = slot.querySelector("iframe");
@@ -158,17 +154,13 @@
     });
   }
 
-  document.addEventListener("ezSlotComplete", event => {
-    const detail = event.detail || {};
-    const slot = detail.slotId && document.getElementById(detail.slotId);
-    const box = slot?.closest(".m98-ad-placement, #m98DisplayAd");
-    if (box) {
-      box.hidden = detail.filled !== true;
-      box.classList.remove("is-pending");
-      if (box.classList.contains("m98-ad-anchor")) document.body.classList.toggle("m98-anchor-visible", !box.hidden);
-      box.classList.toggle("is-filled", detail.filled === true);
-    }
-  });
+  window.purpleDisplay = window.purpleDisplay || {};
+  const previousUnfilled = window.purpleDisplay.onUnfilled;
+  window.purpleDisplay.onUnfilled = placement => {
+    const box = placement.element?.closest(".m98-ad-placement, #m98DisplayAd");
+    if (box) collapse(box);
+    else if (typeof previousUnfilled === "function") previousUnfilled(placement);
+  };
   window.addEventListener("music98:pagechange", () => schedule());
   let resize;
   window.addEventListener("resize", () => {
