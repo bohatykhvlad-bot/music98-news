@@ -45,8 +45,8 @@ test('mobile column keeps native lazy-loading and avoids network waterfall',()=>
  assert.equal(pics.filter(x=>x.decodeCalled).length,0);
 });
 test('prewarming is wired to scrolling and both rail renders',()=>{
- assert.match(html,/rail\.addEventListener\("scroll", \(\)=>\{schedule\(\);warmRailCovers\(rail\);\}/);
- assert.match(html,/rail\._refreshRail\(\);\s*warmRailCovers\(rail\)/);
+ assert.match(html,/rail\.addEventListener\("scroll", \(\)=>\{schedule\(\);if\(typeof warmRailCovers==="function"\)warmRailCovers\(rail\);\}/);
+ assert.match(html,/rail\._refreshRail\(\);\s*if\(typeof warmRailCovers==="function"\)warmRailCovers\(rail\)/);
  assert.match(html,/\$\("#newsGrid"\)\._coverWarmNext=0/);
  assert.match(html,/\$\("#relGrid"\)\._coverWarmNext=0/);
 });
