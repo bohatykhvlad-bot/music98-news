@@ -122,7 +122,10 @@ export async function build({batch=500}={}){
  for(const item of ranking){
   const old=previousByName.get(normalize(item.name));
   const valid=Boolean(old&&Array.isArray(old.albums)&&old.albums.length);
-  const outdated=!valid||!old.checkedAt||(Date.now()-Date.parse(old.checkedAt))>6*86400_000;
+  // Empty Apple results are also a completed lookup. Cache that negative
+  // finding for this weekly cycle instead of re-querying it on every push.
+  const checkedAt=old?.checkedAt?Date.parse(old.checkedAt):NaN;
+  const outdated=!Number.isFinite(checkedAt)||(Date.now()-checkedAt)>6*86400_000;
   if(outdated&&fetched<batch){
    fetched++;
    try{
