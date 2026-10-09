@@ -61,6 +61,18 @@ export function albumLookupStale(old, now=Date.now()){
  const checkedAt=old?.checkedAt?Date.parse(old.checkedAt):NaN;
  return !Number.isFinite(checkedAt)||(now-checkedAt)>6*86400_000;
 }
+// Avoid repeating ~1,000 paced Apple calls after a successful full catalog
+// build merely because several code changes queued additional workflow runs.
+export function reusableCatalog(previous,ranking,now=Date.now()){
+ const arr=previous?.artists;
+ if(!Array.isArray(arr)||arr.length!==LIMIT||ranking?.length!==LIMIT)return false;
+ if(arr.filter(a=>Array.isArray(a.albums)&&a.albums.length).length<300)return false;
+ return ranking.every((entry,i)=>{
+  const old=arr[i];
+  return Boolean(old&&old.rank===entry.rank&&normalize(old.name)===normalize(entry.name)
+    &&Array.isArray(old.albums)&&!albumLookupStale(old,now));
+ });
+}
 // iTunes Search API guidance is about 20 requests/minute, including lookups.
 // Pacing is global rather than per-artist: search + lookup both count.
 let lastAppleRequest=0;
@@ -121,6 +133,11 @@ export async function build({batch=500}={}){
  if(rankError)throw Error(`Could not load valid Top 500: ${rankError.message}`);
  if(ranking.length!==LIMIT)throw Error(`Expected 500 ranked artists, got ${ranking.length}. Preserve prior snapshot.`);
  let previous={artists:[]};try{previous=JSON.parse(await fs.readFile(OUT,'utf8'))}catch(e){if(e.code!=='ENOENT')throw e}
+ if(reusableCatalog(previous,ranking)){
+  const albumCount=previous.artists.reduce((n,a)=>n+a.albums.length,0);
+  console.log('DISCOVER_CATALOG_REUSED',JSON.stringify({rankedArtists:500,playableArtists:previous.artists.filter(a=>a.albums.length).length,albums:albumCount,updatedAt:previous.updatedAt}));
+  return previous;
+ }
  const previousByName=new Map((previous.artists||[]).map(a=>[normalize(a.name),a]));
  const newData=[];let fetched=0,failed=0;
  for(const item of ranking){

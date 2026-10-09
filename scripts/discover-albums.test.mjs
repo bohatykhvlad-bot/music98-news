@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseTop500,albumCandidates,decodeHtml,albumLookupStale} from './build-discover-albums.mjs';
+import {parseTop500,albumCandidates,decodeHtml,albumLookupStale,reusableCatalog} from './build-discover-albums.mjs';
 
 test('parses ranked rows with HTML-encoded artist names',()=>{
  const rows='<tr><th>#</th><th>Artist</th></tr><tr><td>1</td><td><a href="#">Bruno Mars</a></td><td>123,456</td></tr><tr><td>2</td><td>Beyonc&#233; &amp; Friends</td><td>89,000</td></tr>';
@@ -27,4 +27,16 @@ test('weekly refresh caches empty Apple results instead of repeating all API loo
  assert.equal(albumLookupStale({albums:[],checkedAt:'2026-10-01T19:00:00Z'},now),true);
  assert.equal(albumLookupStale({albums:[],checkedAt:null},now),true);
  assert.equal(albumLookupStale(undefined,now),true);
+});
+
+test('completed recent Top 500 catalog skips redundant hourly Apple requests',()=>{
+ const now=Date.parse('2026-10-09T19:30:00Z');
+ const ranking=Array.from({length:500},(_,i)=>({rank:i+1,name:'Artist '+(i+1)}));
+ const artists=ranking.map((a,i)=>({...a,albums:i<440?[{id:100000+i}]:[],checkedAt:'2026-10-09T19:00:00Z'}));
+ const previous={updatedAt:'2026-10-09T19:00:00Z',artists};
+ assert.equal(reusableCatalog(previous,ranking,now),true);
+ assert.equal(reusableCatalog({artists:artists.slice(0,499)},ranking,now),false);
+ assert.equal(reusableCatalog({artists:artists.map((a,i)=>i===5?{...a,checkedAt:null}:a)},ranking,now),false);
+ assert.equal(reusableCatalog(previous,ranking.map((a,i)=>i===0?{...a,name:'Different artist'}:a),now),false);
+ assert.equal(reusableCatalog(previous,ranking,now+7*86400_000),false);
 });
