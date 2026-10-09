@@ -383,6 +383,18 @@
      iframe over Apple's own player: every other site just lets it play.
      Decision (owner-approved direction): do not touch mk.volume at all. The
      element path on the chart keeps its WebAudio fade; the embed stays native. */
+  /* State-only signal for the Discover decoration. Never reroute or
+     decode Apple's audio: that can silence cross-origin playback. */
+  function reportMusic98Playback(mk) {
+    if (window.parent === window) return;
+    try {
+      window.parent.postMessage({
+        type: "music98:apple-playback",
+        playing: !!(mk && mk.isPlaying)
+      }, location.origin);
+    } catch (err) {}
+  }
+
   var MK_ANDROID = /Android/i.test(navigator.userAgent);
   var playedOnce = false;   /* narrow-layout grid pin waits for the first real playback */
   setInterval(function () {
@@ -392,15 +404,18 @@
       try {
         mk.addEventListener("playbackStateDidChange", function () {
           if (mk.isPlaying) playedOnce = true;
+          reportMusic98Playback(mk);
           fixOverlaps(); armJumpFix(800);
         });
         mk.addEventListener("mediaItemDidChange", function () {
+          reportMusic98Playback(mk);
           fixOverlaps(); armJumpFix(800);
           holdControls(1500);   /* a natural track advance re-renders the bar too */
           scrub.active = false; setScrubbing(scrub.el, false);
           releaseNatively();   /* Apple re-lays the bar; our stale pins must not fight it */
         });
       } catch (err) {}
+      reportMusic98Playback(mk);
     }
   }, 200);
 
