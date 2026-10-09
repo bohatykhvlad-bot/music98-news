@@ -8,19 +8,24 @@
   const button = document.getElementById("discoverFind");
   const status = document.getElementById("discoverStatus");
   const selection = document.getElementById("discoverSelection");
-  const waveStage = stage && stage.closest(".discover-stage");
   if (!tab || !stage || !button || !selection) return;
-  const setWavesPlaying = active => {
-    if (waveStage) waveStage.classList.toggle("is-playing", !!active);
-  };
+  const setWavesPlaying = active => window.music98DiscoverAmbient?.setPlaying(!!active);
   /* /apple-embed/ is same-origin, so the injected MusicKit hook can report
      native playback state. Only the currently mounted iframe is trusted. */
   window.addEventListener("message", event => {
-    if (event.origin !== location.origin || event.data?.type !== "music98:apple-playback") return;
+    if (event.origin !== location.origin) return;
     const frame = stage.querySelector("iframe");
     if (!frame || event.source !== frame.contentWindow) return;
     if (!tab.classList.contains("active") || document.body.classList.contains("articlepage")) return;
-    setWavesPlaying(event.data.playing === true);
+    if(event.data?.type === "music98:apple-playback"){
+      setWavesPlaying(event.data.playing === true);
+    }else if(event.data?.type === "music98:apple-pointer"){
+      const x=Number(event.data.x),y=Number(event.data.y);
+      if(!Number.isFinite(x)||!Number.isFinite(y))return;
+      const r=frame.getBoundingClientRect();
+      if(x<0||y<0||x>r.width||y>r.height)return;
+      window.music98DiscoverAmbient?.setPointer(r.left+x,r.top+y);
+    }
   });
 
   const byId = id => document.getElementById(id);
@@ -101,6 +106,7 @@
 
   function onPageChange() {
     const visible = tab.classList.contains("active") && !document.body.classList.contains("articlepage");
+    window.music98DiscoverAmbient?.setVisible(visible);
     if (!visible) {
       setWavesPlaying(false);
       // pauseAllMedia() is called by the site's existing tab switcher.
