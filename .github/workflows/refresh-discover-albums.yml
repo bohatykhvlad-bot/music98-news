@@ -3,7 +3,8 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/refresh-discover-albums.yml'
+      # Only changes to the actual builder should queue a rebuild.
+      # Editing this workflow must not enqueue another hour-long task.
       - 'scripts/build-discover-albums.mjs'
   schedule:
     - cron: '30 2 * * 1'
