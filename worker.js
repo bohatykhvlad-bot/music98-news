@@ -150,12 +150,12 @@ async function proxyAppleGw(request, rawPath) {
 
 function rewriteConcertsShellMeta(html) {
   let out=String(html||"");
-  out=out.replace(/<title>[\s\S]*?<\/title>/i,"<title>Concerts Near You - music98.news</title>");
+  out=out.replace(/<title>[\s\S]*?<\/title>/i,"<title>Concerts near you - music98.news</title>");
   out=out.replace(/<meta name="description" content="[^"]*">/i,'<meta name="description" content="Find concerts around the world, explore tour dates on an interactive map and buy tickets.">');
-  out=out.replace(/<meta property="og:title" content="[^"]*">/i,'<meta property="og:title" content="Concerts Near You - music98.news">');
+  out=out.replace(/<meta property="og:title" content="[^"]*">/i,'<meta property="og:title" content="Concerts near you - music98.news">');
   out=out.replace(/<meta property="og:description" content="[^"]*">/i,'<meta property="og:description" content="Find concerts around the world, explore tour dates and buy tickets.">');
   out=out.replace(/<meta property="og:url" content="[^"]*">/i,'<meta property="og:url" content="https://music98.news/concerts">');
-  out=out.replace(/<meta name="twitter:title" content="[^"]*">/i,'<meta name="twitter:title" content="Concerts Near You - music98.news">');
+  out=out.replace(/<meta name="twitter:title" content="[^"]*">/i,'<meta name="twitter:title" content="Concerts near you - music98.news">');
   out=out.replace(/<meta name="twitter:description" content="[^"]*">/i,'<meta name="twitter:description" content="Find concerts around the world, explore tour dates and buy tickets.">');
   out=out.replace(/<link rel="canonical" href="[^"]*">/i,'<link rel="canonical" href="https://music98.news/concerts">');
   return out;
