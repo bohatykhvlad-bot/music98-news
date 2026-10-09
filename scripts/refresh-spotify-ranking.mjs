@@ -36,7 +36,7 @@ if(kw.ok&&mr.ok&&kw.data.date===mr.data.date){
    match.mismatchPositions.slice(0,5).map(p=>({
     position:p,kworb:kw.data.tracks[p-1],musicrank:mr.data.tracks[p-1]
    }))));
- chosen=kw.data;provider="kworb+musicrank";mirrorMatched=50;ldConfirmed=mr.data.ldConfirmed;
+ chosen=kw.data;provider="kworb+musicrank";mirrorMatched=100;ldConfirmed=mr.data.ldConfirmed;
 }else if(kw.ok&&mr.ok&&kw.data.date!==mr.data.date){
  throw new Error("Spotify mirrors have different dates: await same-date verification");
 }else{
