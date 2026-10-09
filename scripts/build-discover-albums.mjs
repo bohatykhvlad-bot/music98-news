@@ -137,8 +137,12 @@ async function albumsFor(name){
 }
 export async function assembleCatalog(ranking,previous,{batch=750,lookup=albumsFor,now=Date.now()}={}){
  const oldRecords=[...(previous?.artists||[])];
- if(previous?.genrePolicyVersion===POLICY_VERSION)
-  oldRecords.push(...(previous.excludedArtists||[]),...(previous.missingArtists||[]));
+ // Empty matches are independent of genre policy. Version 2 only adds genre
+ // exclusions, so version 1's exclusions also remain valid until refreshed.
+ oldRecords.push(...(previous?.missingArtists||[]));
+ if(previous?.genrePolicyVersion===POLICY_VERSION
+    ||previous?.genrePolicyVersion===1&&POLICY_VERSION===2)
+  oldRecords.push(...(previous.excludedArtists||[]));
  const previousByName=new Map(oldRecords.map(a=>[normalize(a.name),a]));
  const artists=[],excludedArtists=[],missingArtists=[];
  const names=new Set();let fetched=0,failed=0,scanned=0;

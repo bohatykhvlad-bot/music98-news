@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseTop500,albumCandidates,decodeHtml,albumLookupStale,reusableCatalog,parseRankedArtists,assembleCatalog,excludedGenre,excludedArtist,eligibleAlbums} from './build-discover-albums.mjs';
+const genrePolicyVersion=globalThis.music98DiscoverCatalogPolicy.version;
 
 test('parses ranked rows with HTML-encoded artist names',()=>{
  const rows='<tr><th>#</th><th>Artist</th></tr><tr><td>1</td><td><a href="#">Bruno Mars</a></td><td>123,456</td></tr><tr><td>2</td><td>Beyonc&#233; &amp; Friends</td><td>89,000</td></tr>';
@@ -35,7 +36,7 @@ test('filtered recent catalog reuses lookups while preserving the source ranks',
  const excludedArtists=[{...ranking[0],reason:'excluded-genre',genres:['Bollywood'],checkedAt:'2026-10-10T00:00:00Z'}];
  const missingArtists=[{...ranking[1],albums:[],checkedAt:'2026-10-10T00:00:00Z'}];
  const artists=ranking.slice(2).map((a,i)=>({...a,position:i+1,albums:[{id:100000+i,genre:'Pop'}],checkedAt:'2026-10-10T00:00:00Z'}));
- const previous={schema:2,genrePolicyVersion:1,artists,excludedArtists,missingArtists};
+ const previous={schema:2,genrePolicyVersion,artists,excludedArtists,missingArtists};
  assert.equal(reusableCatalog(previous,ranking,now),true);
  assert.equal(reusableCatalog({...previous,artists:artists.slice(0,499)},ranking,now),false);
  assert.equal(reusableCatalog({...previous,genrePolicyVersion:0},ranking,now),false);
@@ -93,7 +94,7 @@ test('weekly lookup budget covers excluded ranks and refreshes the last selected
  const ranking=Array.from({length:550},(_,i)=>({rank:i+1,name:'Artist '+(i+1)}));
  const calls=[];
  const oldTime='2026-10-09T01:00:00Z';
- const previous={genrePolicyVersion:1,artists:ranking.slice(30,530).map(a=>({...a,albums:[{id:a.rank,genre:'Pop'}],checkedAt:oldTime})),excludedArtists:ranking.slice(0,30).map(a=>({...a,reason:'excluded-genre',genres:['Bollywood'],checkedAt:oldTime}))};
+ const previous={genrePolicyVersion,artists:ranking.slice(30,530).map(a=>({...a,albums:[{id:a.rank,genre:'Pop'}],checkedAt:oldTime})),excludedArtists:ranking.slice(0,30).map(a=>({...a,reason:'excluded-genre',genres:['Bollywood'],checkedAt:oldTime}))};
  const result=await assembleCatalog(ranking,previous,{now,batch:750,lookup:async name=>{
   const rank=Number(name.split(' ')[1]);calls.push(rank);
   return {albums:[{id:rank,genre:rank<=30?'Bollywood':'Pop'}]};
@@ -102,4 +103,29 @@ test('weekly lookup budget covers excluded ranks and refreshes the last selected
  assert.equal(result.artists.at(-1).rank,530);
  assert.equal(result.artists.at(-1).checkedAt,new Date(now).toISOString());
  assert.equal(result.artists.length,500);
+});
+
+
+test('regional Mexican labels are excluded without removing other Latin genres',()=>{
+ for(const genre of ['Música Mexicana','Musica Mexicana','Regional Mexican','Regional Mexicano','Ranchera','Corridos','Mariachi','Banda','Norteño','Grupero','Tejano','Sierreño'])assert.equal(excludedGenre(genre),true,genre);
+ for(const genre of ['Latin','Urbano latino','Pop Latino','Música tropical','Baladas y Boleros','Banda Sonora'])assert.equal(excludedGenre(genre),false,genre);
+});
+
+test('expanded policy refilters cached albums and backfills without re-querying previous exclusions',async()=>{
+ const now=Date.parse('2026-10-10T01:00:00Z'),checkedAt=new Date(now).toISOString();
+ const ranking=Array.from({length:560},(_,i)=>({rank:i+1,name:'Artist '+(i+1)}));
+ const previous={genrePolicyVersion:1,
+  artists:ranking.slice(2,502).map((a,i)=>({...a,position:i+1,checkedAt,albums:[{id:a.rank,genre:i<10?'Música Mexicana':'Pop'}]})),
+  excludedArtists:[{...ranking[0],reason:'excluded-genre',genres:['Bollywood'],checkedAt}],
+  missingArtists:[{...ranking[1],albums:[],checkedAt}]};
+ const calls=[];
+ const result=await assembleCatalog(ranking,previous,{now,lookup:async name=>{calls.push(name);return {albums:[{id:10000+calls.length,genre:'Rock'}]}}});
+ assert.equal(result.genrePolicyVersion,genrePolicyVersion);
+ assert.equal(result.artists.length,500);
+ assert.equal(result.excludedArtistCount,11);
+ assert.equal(result.unmatchedArtistCount,1);
+ assert.equal(result.artists.at(-1).rank,512);
+ assert.equal(calls.length,10);
+ assert.ok(result.artists.every(a=>a.albums.every(v=>!excludedGenre(v.genre))));
+ assert.equal(reusableCatalog(result,ranking,now),true);
 });
