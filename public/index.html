@@ -885,13 +885,15 @@ textarea{resize:vertical;min-height:64px}
 #tab-discover{padding-bottom:12px}
 #tab-discover .discover-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,660px);align-items:start;gap:32px;width:100%;margin:0;padding:0}
 #tab-discover .discover-copy{min-width:0;width:100%;min-height:450px;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
+#tab-discover .discover-intro{display:flex;flex-direction:column;align-items:center;width:max-content;max-width:100%}
+#tab-discover .discover-intro .hd{align-self:stretch}
 #tab-discover .discover-selected{margin-top:20px;display:flex;flex-direction:column;gap:4px;width:100%}
 #tab-discover .discover-selected[hidden]{display:none!important}
 #tab-discover .discover-artist{font-size:clamp(23px,2.6vw,32px);font-weight:800;color:var(--text);line-height:1.16;letter-spacing:-.035em;margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-album{font-size:17px;font-weight:500;line-height:1.3;color:var(--muted);margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-details{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);margin:6px 0 0}
 #tab-discover .discover-details span+span:not(:empty):before{content:"·";margin-right:9px}
-#tab-discover .discover-stage{min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px}
+#tab-discover .discover-stage{min-width:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px;padding-top:calc(clamp(26px,4vw,38px)*1.15 + var(--section-heading-gap))}
 #tab-discover .discover-card{position:relative;width:100%;max-width:660px;height:450px;flex:none;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);background:var(--card2);box-shadow:var(--shadow)}
 #tab-discover .discover-question{display:grid;place-items:center;position:absolute;inset:0;font-size:clamp(95px,10vw,130px);font-weight:300;color:#b8c5c9;line-height:1;user-select:none}
 #tab-discover .discover-card .aembed{margin:0;width:100%;max-width:none;height:450px;min-height:450px!important;overflow:hidden;border-radius:inherit;background:var(--card)}
@@ -905,7 +907,7 @@ textarea{resize:vertical;min-height:64px}
   #tab-discover .discover-copy{max-width:none;min-height:0;width:100%}
   #tab-discover .discover-selected{margin-top:var(--section-heading-gap)}
   #tab-discover #discoverFind{margin-top:0;align-self:center;min-width:200px}
-  #tab-discover .discover-stage{width:100%}
+  #tab-discover .discover-stage{width:100%;padding-top:0}
 }
 @media(max-width:720px){
   #tab-discover .discover-layout{gap:18px;padding:0}
@@ -1016,10 +1018,12 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
 
 
   <section class="tab" id="tab-discover">
-    <div class="hd"><h1 class="hd-t">Find what to listen to</h1></div>
     <div class="discover-layout">
       <div class="discover-copy">
-        <button class="loadmore-btn" id="discoverFind" type="button" disabled>Pick for me</button>
+        <div class="discover-intro">
+          <div class="hd"><h1 class="hd-t">Find what to listen to</h1></div>
+          <button class="loadmore-btn" id="discoverFind" type="button" disabled>Pick for me</button>
+        </div>
         <div class="discover-selected" id="discoverSelection" hidden>
           <h2 class="discover-artist" id="discoverArtist"></h2>
           <p class="discover-album" id="discoverAlbum"></p>
