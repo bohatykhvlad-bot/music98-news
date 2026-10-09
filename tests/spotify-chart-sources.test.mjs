@@ -63,6 +63,16 @@ test("mismatched ranks and dates block cross-provider verification",()=>{
    {...b,tracks:tracks.slice(0,49)}).ok,false);
  assert.equal(compareSpotifyRankings({date:a.date},{date:a.date}).ok,false);
 });
+test("mirror treats year-specific remasters as the same charted song, never remixes",()=>{
+ const a=parseKworbSpotify(kworb()),b=parseMusicrankSpotify(musicrank());
+ a.tracks[75].title="Dreams - 2001 Remaster";
+ b.tracks[75].title="Dreams - 2004 Remaster";
+ a.tracks[94].title="Smells Like Teen Spirit - Remastered";
+ b.tracks[94].title="Smells Like Teen Spirit";
+ assert.equal(compareSpotifyRankings(a,b).ok,true);
+ b.tracks[94].title="Smells Like Teen Spirit - Remix";
+ assert.deepEqual(compareSpotifyRankings(a,b).mismatchPositions,[95]);
+});
 test("Spotify source dates are checked in UTC and expire after two days",()=>{
  const now=Date.parse("2026-10-02T16:00:00Z");
  assert.equal(spotifyDateCurrent("2026-09-30",now),true);
