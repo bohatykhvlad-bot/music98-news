@@ -80,7 +80,7 @@
     byId("discoverYear").textContent = album.year || "";
     byId("discoverGenre").textContent = album.genre || "";
     selection.hidden = false;
-    button.textContent = "Find another album";
+    button.textContent = "Try another";
     status.textContent = ""; // The artist and album are already displayed above.
     renderPlayer();
   }
