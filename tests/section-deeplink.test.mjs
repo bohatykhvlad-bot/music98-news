@@ -66,3 +66,15 @@ test("preflight styling prevents the default News tab from flashing", () => {
   assert.match(site, /html\[data-m98-initial-tab="charts"\] #tab-charts/);
   assert.match(site, /html\[data-m98-initial-tab="discover"\] #tab-discover/);
 });
+
+test("clean section URLs fetch the canonical root HTML internally, without browser redirects", () => {
+  const worker = readFileSync(new URL("../worker.js", import.meta.url), "utf8");
+  const begin = worker.indexOf('if (/^\\/(?:releases|discover|chart|charts)\\/?$/.test(path)');
+  const end = worker.indexOf('/* Article URLs:', begin);
+  assert.ok(begin >= 0 && end > begin);
+  const shell = worker.slice(begin, end);
+  assert.ok(shell.includes('new Request(u.origin + "/", request)'), "root asset avoids /index.html 307");
+  assert.ok(!shell.includes('new Request(u.origin + "/index.html", request)'), "no redirect-prone HTML filename");
+  assert.ok(shell.includes('return new Response(res.body'), "Worker preserves the original section URL");
+  assert.ok(shell.includes('no-store, no-cache, must-revalidate, max-age=0'));
+});
