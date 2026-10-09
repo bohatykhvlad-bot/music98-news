@@ -91,16 +91,21 @@
       float right=cloud(flow,vec2(aspect*.99-.045*sin(p.y*4.+t+1.),.43),vec2(.27,.48));
       float top=cloud(flow,vec2(aspect*.61,.005+.02*sin(p.x*4.-t)),vec2(aspect*.41,.21));
       float bottom=cloud(flow,vec2(aspect*.36,1.015+.025*sin(p.x*3.+t)),vec2(aspect*.50,.24));
-      float envelope=clamp(left+right*.9+top*.78+bottom,0.,1.5);
-      float density=volume*.47+lanes*.63+detail*.08;
+      // Keep a faint textured current through the interior. An edge-only
+      // envelope otherwise leaves a large, sharply white clearing.
+      float edgeEnvelope=clamp(left+right*.9+top*.78+bottom,0.,1.5);
+      float envelope=mix(.22,1.5,edgeEnvelope/1.5);
+      float density=volume*.47+lanes*.63+detail*.05;
       float body=envelope*smoothstep(.25,.76,density);
       // Soft, textured crests break up the diffuse cloud into flowing waves.
       float leftCrest=exp(-pow((flow.x-.13-.04*sin(flow.y*6.-t))/.065,2.));
       float rightCrest=exp(-pow((aspect-flow.x-.15-.05*sin(flow.y*5.+t+1.))/.075,2.));
       float crests=(leftCrest+rightCrest)*smoothstep(.25,.75,volume);
       body+=crests*.20;
-      float haze=envelope*.05;
-      float grain=hash(floor(transport*viewport.y/1.25)+17.);
+      float haze=.015+envelope*.04;
+      // Interpolated grain moves continuously instead of jumping between
+      // random pixel cells as the current advances.
+      float grain=noise(transport*viewport.y/3.5+17.);
       vec2 dots=sand(transport,viewport.y/7.,3.)+sand(transport,viewport.y/12.,41.)*.65;
       vec2 motes=sand(transport,viewport.y/24.,89.);
       float depth=smoothstep(.30,.8,volume);
@@ -108,11 +113,11 @@
       vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23));
       colour=mix(colour,mineral,clamp(smoothstep(.48,.86,lanes)*.46+crests*.16,0.,.65));
       // Lit grains sit within the volume, with a wider glow beneath it.
-      colour=mix(colour,vec3(.80,1.,.98),clamp(dots.x*.62+dots.y*.4+depth*.14,0.,.8));
+      colour=mix(colour,vec3(.80,1.,.98),clamp(dots.x*.45+dots.y*.3+depth*.14,0.,.8));
       colour=mix(colour,vec3(.15,.67,.88),motes.x*.4);
       float breathing=1.+.025*sin(time*.55);
-      float alpha=(body*(.38+grain*.08)+haze+dots.y*body*.18)*(1.+energy*.18)*breathing;
-      alpha+=(dots.x*.18+motes.x*.32+motes.y*.06)*body;
+      float alpha=(body*(.405+grain*.03)+haze+dots.y*body*.12)*(1.+energy*.18)*breathing;
+      alpha+=(dots.x*.10+motes.x*.22+motes.y*.04)*body;
       gl_FragColor=vec4(colour,clamp(alpha,0.,.65));
     }
   `;
@@ -164,6 +169,8 @@
       if(surface.width!==canvas.width||surface.height!==canvas.height){surface.width=canvas.width;surface.height=canvas.height;}
       ctx.setTransform(surface.width/width,0,0,surface.height/height,0,0);
       ctx.clearRect(0,0,width,height);
+      ctx.fillStyle=`rgba(0,190,207,${.04+.008*Math.sin(clock*.25)})`;
+      ctx.fillRect(0,0,width,height);
       const blobs=[[.03,.55,.23,.52],[.97,.42,.23,.52],[.5,0,.44,.22],[.48,1,.46,.26]];
       const centres=blobs.map(([x,y,rx,ry],i)=>[x*width+Math.sin(clock*.12+i)*25,y*height,rx*width,ry*height]);
       for(const [x,y,rx,ry] of centres){
@@ -185,9 +192,9 @@
         x+=Math.sin(clock*.25+p.phase)*22;y+=Math.cos(clock*.2+p.phase)*18;
         const dx=x-pointer.x,dy=y-pointer.y,near=Math.exp(-(dx*dx+dy*dy)/32000)*pointer.strength;
         x-=dy*near*.17;y+=dx*near*.17;
-        let density=0;
+        let density=.22;
         for(const [cx,cy,rx,ry] of centres)density+=Math.exp(-2*((x-cx)**2/rx**2+(y-cy)**2/ry**2));
-        ctx.fillStyle=`rgba(0,168,196,${Math.min(.35,density*.22)*(1+energy*.3)})`;
+        ctx.fillStyle=`rgba(0,168,196,${Math.min(.24,density*.16)*(1+energy*.3)})`;
         ctx.fillRect(x,y,p.size,p.size);
       }
     }};
