@@ -209,6 +209,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/7c/2b/3a/7c2b3a60-f0b7-3e59-f715-af52e1f2f36d/mzaf_975280973131817811.plus.aac.p.m4a",
     "year": "2025"
   },
+  "goodnews|shaboozey": {
+    "title": "Good News",
+    "artist": "Shaboozey",
+    "url": "https://music.apple.com/us/album/1775307490?i=1775307497",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d7/67/14/d7671445-b775-d8c7-f4ae-a24359540149/mzaf_3299917435904421647.plus.aac.p.m4a",
+    "year": "2024"
+  },
   "greatexpectation|siennaspiro": {
     "title": "Great Expectation",
     "artist": "SIENNA SPIRO",
@@ -335,6 +342,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/59/bb/60/59bb60aa-1a0b-ff4c-3343-d7cb9e7d375a/mzaf_16759827430963483039.plus.aac.p.m4a",
     "year": "2025"
   },
+  "mrbrightside|thekillers": {
+    "title": "Mr. Brightside",
+    "artist": "The Killers",
+    "url": "https://music.apple.com/us/album/1526194184?i=1526194192",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/5b/17/4e/5b174e80-1047-7214-1077-d822ba1f9520/mzaf_5975692497663881329.plus.aac.p.m4a",
+    "year": "2003"
+  },
   "musubi|ayumuimazu": {
     "title": "musubi",
     "artist": "Ayumu Imazu",
@@ -361,6 +375,13 @@
     "artist": "Taylor Swift",
     "url": "https://music.apple.com/us/album/6814997249?i=6814997425",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0b/be/8c/0bbe8c0a-dc77-af41-97a5-c745cc43d38c/mzaf_11790447166833591507.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "phonekeyswallet|laineywilson": {
+    "title": "Phone, Keys, Wallet",
+    "artist": "Lainey Wilson & John Mayer",
+    "url": "https://music.apple.com/us/album/6770622560?i=6770622562",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/34/b2/fc/34b2fc1a-1d25-f743-b795-74e09cb178ee/mzaf_13522404070785250739.plus.aac.p.m4a",
     "year": "2026"
   },
   "pinkclouding|taylorswift": {

@@ -1,15 +1,16 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-08T22:36:00.787Z",
-  "chartUpdated": "2026-10-08",
+  "updatedAt": "2026-10-09T08:02:08.821Z",
+  "chartUpdated": "2026-10-09",
   "chartRev": "daily-global-v37",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 23,
-    "apple-chart": 26,
-    "previous-audit": 1
+    "apple-feed": 25,
+    "apple-chart": 23,
+    "previous-audit": 1,
+    "apple": 1
   },
   "entries": {
     "aintinla|adela": {
@@ -29,7 +30,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.418Z",
+      "checkedAt": "2026-10-09T08:01:16.054Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -65,7 +66,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:49.589Z",
+      "checkedAt": "2026-10-09T08:01:58.610Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -161,7 +162,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:46.728Z",
+      "checkedAt": "2026-10-09T08:01:58.610Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -197,7 +198,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:35.183Z",
+      "checkedAt": "2026-10-09T08:01:38.797Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -278,7 +279,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.413Z",
+      "checkedAt": "2026-10-09T08:01:16.048Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -314,7 +315,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:21.653Z",
+      "checkedAt": "2026-10-09T08:01:17.648Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -380,7 +381,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:51.267Z",
+      "checkedAt": "2026-10-09T08:01:59.119Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -446,7 +447,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.418Z",
+      "checkedAt": "2026-10-09T08:01:16.055Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -482,7 +483,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.419Z",
+      "checkedAt": "2026-10-09T08:01:16.056Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -518,7 +519,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:22.307Z",
+      "checkedAt": "2026-10-09T08:01:18.143Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -554,7 +555,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.414Z",
+      "checkedAt": "2026-10-09T08:01:16.050Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -590,7 +591,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:34.476Z",
+      "checkedAt": "2026-10-09T08:01:31.202Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -626,7 +627,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:27.836Z",
+      "checkedAt": "2026-10-09T08:01:31.202Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -640,87 +641,6 @@
           "url": "https://music.apple.com/us/album/6818059268?i=6818059600",
           "score": 1270,
           "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "cowgirl|shaboozey": {
-      "identity": "cowgirl|shaboozey",
-      "title": "Cowgirl",
-      "artist": "Shaboozey",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a6/25/f1/a625f14b-328e-acab-bd7e-5f6d4d571332/199316643947_cover.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Cowgirl - Single",
-      "releaseArtist": "Shaboozey",
-      "releaseDate": "2026-06-04T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/6776926206?i=6776926215",
-      "collectionId": "6776926206",
-      "trackId": "6776926215",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-08T22:35:50.538Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "6776926215",
-          "collectionId": "6776926206",
-          "releaseTitle": "Cowgirl - Single",
-          "releaseArtist": "Shaboozey",
-          "releaseDate": "2026-06-04T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a6/25/f1/a625f14b-328e-acab-bd7e-5f6d4d571332/199316643947_cover.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6776926206?i=6776926215",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6776926215",
-          "collectionId": "6776926206",
-          "releaseTitle": "Cowgirl - Single",
-          "releaseArtist": "Shaboozey",
-          "releaseDate": "2026-06-04T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a6/25/f1/a625f14b-328e-acab-bd7e-5f6d4d571332/199316643947_cover.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6776926206?i=6776926215",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "4057986201",
-          "collectionId": "996123261",
-          "releaseTitle": "Cowgirl",
-          "releaseArtist": "Shaboozey",
-          "releaseDate": "2026-06-05",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/7d5da87b3a08daa510453962b15fb716/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4057986201",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6795721159",
-          "collectionId": "6795720959",
-          "releaseTitle": "The Outlaw Cherie Lee & Other Western Tales",
-          "releaseArtist": "Shaboozey",
-          "releaseDate": "2026-06-04T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a7/b2/76/a7b27671-54e5-f511-0cc2-08c57373e9d4/199316715569_cover.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6795720959?i=6795721159",
-          "score": 645,
-          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -743,7 +663,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:25.324Z",
+      "checkedAt": "2026-10-09T08:01:23.157Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -822,6 +742,42 @@
         }
       ]
     },
+    "dontwe|morganwallen": {
+      "identity": "dontwe|morganwallen",
+      "title": "Don't We",
+      "artist": "Morgan Wallen",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "I’m The Problem",
+      "releaseArtist": "Morgan Wallen",
+      "releaseDate": "2025-05-16T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1802103958?i=1802104400",
+      "collectionId": "1802103958",
+      "trackId": "1802104400",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-09T08:02:07.079Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "1802104400",
+          "collectionId": "1802103958",
+          "releaseTitle": "I’m The Problem",
+          "releaseArtist": "Morgan Wallen",
+          "releaseDate": "2025-05-16T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1802103958?i=1802104400",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2025
+        }
+      ]
+    },
     "dracula|impalatame": {
       "identity": "dracula|impalatame",
       "title": "Dracula",
@@ -839,7 +795,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:38.031Z",
+      "checkedAt": "2026-10-09T08:01:30.156Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -905,7 +861,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:22.305Z",
+      "checkedAt": "2026-10-09T08:01:18.142Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1001,7 +957,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:27.836Z",
+      "checkedAt": "2026-10-09T08:01:31.201Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1067,7 +1023,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:53.139Z",
+      "checkedAt": "2026-10-09T08:02:01.225Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1146,6 +1102,87 @@
         }
       ]
     },
+    "goodnews|shaboozey": {
+      "identity": "goodnews|shaboozey",
+      "title": "Good News",
+      "artist": "Shaboozey",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/23/f2/d9/23f2d96d-b842-5f8b-1a09-bcc9a5cf7032/197342797344_cover.jpg/600x600bb.jpg",
+      "provider": "apple",
+      "releaseTitle": "Good News - Single",
+      "releaseArtist": "Shaboozey",
+      "releaseDate": "2024-11-15T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/1775307490?i=1775307497",
+      "collectionId": "1775307490",
+      "trackId": "1775307497",
+      "confidence": 98,
+      "score": 965,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-09T08:02:08.819Z",
+      "alternatives": [
+        {
+          "provider": "apple",
+          "id": "1775307497",
+          "collectionId": "1775307490",
+          "releaseTitle": "Good News - Single",
+          "releaseArtist": "Shaboozey",
+          "releaseDate": "2024-11-15T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/23/f2/d9/23f2d96d-b842-5f8b-1a09-bcc9a5cf7032/197342797344_cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1775307490?i=1775307497",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "deezer",
+          "id": "3056032231",
+          "collectionId": "660170121",
+          "releaseTitle": "Good News",
+          "releaseArtist": "Shaboozey",
+          "releaseDate": "2024-11-15",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/d5777636ec076cc1e663183b4c4069e9/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3056032231",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1807395919",
+          "collectionId": "1807395137",
+          "releaseTitle": "Where I've Been, Isn't Where I'm Going: The Complete Edition",
+          "releaseArtist": "Shaboozey",
+          "releaseDate": "2024-11-15T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/35/a5/3b/35a53b45-f944-7a00-717d-a3778f7afb6c/199316020885_cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1807395137?i=1807395919",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1811449012",
+          "collectionId": "1811448288",
+          "releaseTitle": "Where I've Been, Isn't Where I'm Going: The Complete Edition",
+          "releaseArtist": "Shaboozey",
+          "releaseDate": "2024-11-15T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/fa/8c/d3/fa8cd32b-cde8-d216-73ef-44185b6888d5/199316036572_cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1811448288?i=1811449012",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        }
+      ]
+    },
     "greatexpectation|siennaspiro": {
       "identity": "greatexpectation|siennaspiro",
       "title": "Great Expectation",
@@ -1163,7 +1200,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:22.306Z",
+      "checkedAt": "2026-10-09T08:01:17.649Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1199,7 +1236,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.415Z",
+      "checkedAt": "2026-10-09T08:01:16.052Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1235,7 +1272,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:26.717Z",
+      "checkedAt": "2026-10-09T08:01:18.143Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1271,7 +1308,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:26.715Z",
+      "checkedAt": "2026-10-09T08:01:28.766Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1352,7 +1389,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:44.677Z",
+      "checkedAt": "2026-10-09T08:01:42.884Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1433,7 +1470,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:36:00.785Z",
+      "checkedAt": "2026-10-09T08:01:57.823Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1469,7 +1506,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:32.025Z",
+      "checkedAt": "2026-10-09T08:01:32.392Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1485,72 +1522,6 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "kidmyself|johnmorgan": {
-      "identity": "kidmyself|johnmorgan",
-      "title": "Kid Myself",
-      "artist": "John Morgan",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d2/ae/65/d2ae65e8-9a14-061e-1165-b5351ef994a6/4099964145403.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Carolina Blue",
-      "releaseArtist": "John Morgan",
-      "releaseDate": "2025-04-25T07:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1786449460?i=1786450277",
-      "collectionId": "1786449460",
-      "trackId": "1786450277",
-      "confidence": 96,
-      "score": 770,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-08T22:36:00.784Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1786450277",
-          "collectionId": "1786449460",
-          "releaseTitle": "Carolina Blue",
-          "releaseArtist": "John Morgan",
-          "releaseDate": "2025-04-25T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d2/ae/65/d2ae65e8-9a14-061e-1165-b5351ef994a6/4099964145403.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1786449460?i=1786450277",
-          "score": 770,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "deezer",
-          "id": "3697436932",
-          "collectionId": "870709212",
-          "releaseTitle": "Kid Myself",
-          "releaseArtist": "John Morgan",
-          "releaseDate": "2026-01-28",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/d86f9db9d0d128de55171015517dfd9c/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3697436932",
-          "score": 670,
-          "confidence": 91,
-          "consensus": 1,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "1786450277",
-          "collectionId": "1786449460",
-          "releaseTitle": "Carolina Blue",
-          "releaseArtist": "John Morgan",
-          "releaseDate": "2025-04-25T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d2/ae/65/d2ae65e8-9a14-061e-1165-b5351ef994a6/4099964145403.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1786449460?i=1786450277",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2025
         }
       ]
     },
@@ -1571,7 +1542,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:39.881Z",
+      "checkedAt": "2026-10-09T08:01:57.402Z",
       "alternatives": []
     },
     "loser|impalatame": {
@@ -1591,7 +1562,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:58.965Z",
+      "checkedAt": "2026-10-09T08:02:04.145Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1657,7 +1628,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:52.394Z",
+      "checkedAt": "2026-10-09T08:02:00.683Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1723,7 +1694,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.415Z",
+      "checkedAt": "2026-10-09T08:01:16.053Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1759,7 +1730,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:47.471Z",
+      "checkedAt": "2026-10-09T08:01:57.823Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1825,7 +1796,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:31.307Z",
+      "checkedAt": "2026-10-09T08:01:38.266Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1904,6 +1875,42 @@
         }
       ]
     },
+    "mrbrightside|killersthe": {
+      "identity": "mrbrightside|killersthe",
+      "title": "Mr. Brightside",
+      "artist": "The Killers",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/1a/5a/071a5aee-6e42-060c-35b9-6a6e45b9ea59/06UMGIM10441.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "Hot Fuss",
+      "releaseArtist": "The Killers",
+      "releaseDate": "2003-09-29T07:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1526194184?i=1526194192",
+      "collectionId": "1526194184",
+      "trackId": "1526194192",
+      "confidence": 99,
+      "score": 1380,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-09T08:02:07.079Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "1526194192",
+          "collectionId": "1526194184",
+          "releaseTitle": "Hot Fuss",
+          "releaseArtist": "The Killers",
+          "releaseDate": "2003-09-29T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/1a/5a/071a5aee-6e42-060c-35b9-6a6e45b9ea59/06UMGIM10441.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1526194184?i=1526194192",
+          "score": 1380,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2003
+        }
+      ]
+    },
     "musubi|ayumuimazu": {
       "identity": "musubi|ayumuimazu",
       "title": "musubi",
@@ -1921,7 +1928,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:54.105Z",
+      "checkedAt": "2026-10-09T08:02:04.711Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1987,7 +1994,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.416Z",
+      "checkedAt": "2026-10-09T08:01:16.049Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2003,102 +2010,6 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "ordinary|alexwarren": {
-      "identity": "ordinary|alexwarren",
-      "title": "Ordinary",
-      "artist": "Alex Warren",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Ordinary - Single",
-      "releaseArtist": "Alex Warren",
-      "releaseDate": "2024-09-26T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
-      "collectionId": "1793663382",
-      "trackId": "1793663645",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-08T22:35:46.728Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1793663645",
-          "collectionId": "1793663382",
-          "releaseTitle": "Ordinary - Single",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2024-09-26T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1793663645",
-          "collectionId": "1793663382",
-          "releaseTitle": "Ordinary - Single",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2024-09-26T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "deezer",
-          "id": "3210709941",
-          "collectionId": "705691371",
-          "releaseTitle": "Ordinary",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2025-02-07",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/f4246416b5e3e71a35adf1e2cbe98bfb/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3210709941",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1804419953",
-          "collectionId": "1804419951",
-          "releaseTitle": "You'll Be Alright, Kid (Chapter 1)",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2024-09-26T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f1/91/6e/f1916ecb-0b21-57da-7d60-cd21ae0ff40b/075679614797.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1804419951?i=1804419953",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1817735163",
-          "collectionId": "1817735146",
-          "releaseTitle": "You'll Be Alright, Kid",
-          "releaseArtist": "Alex Warren",
-          "releaseDate": "2024-09-26T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c7/1e/c9/c71ec9f8-f6fd-5374-0e5c-3419539618f4/075679607942.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1817735146?i=1817735163",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
         }
       ]
     },
@@ -2119,7 +2030,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.416Z",
+      "checkedAt": "2026-10-09T08:01:16.051Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2133,6 +2044,102 @@
           "url": "https://music.apple.com/us/album/6814997249?i=6814997425",
           "score": 1270,
           "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "phonekeyswallet|johnlaineymayerwilson": {
+      "identity": "phonekeyswallet|johnlaineymayerwilson",
+      "title": "Phone, Keys, Wallet",
+      "artist": "Lainey Wilson & John Mayer",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/43/99/8b/43998b40-7612-a2d7-5a54-da5e7870af99/4099964268270.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Phone, Keys, Wallet - Single",
+      "releaseArtist": "Lainey Wilson & John Mayer",
+      "releaseDate": "2026-06-04T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/6770622560?i=6770622562",
+      "collectionId": "6770622560",
+      "trackId": "6770622562",
+      "confidence": 98,
+      "score": 1090,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-09T08:02:05.488Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6770622562",
+          "collectionId": "6770622560",
+          "releaseTitle": "Phone, Keys, Wallet - Single",
+          "releaseArtist": "Lainey Wilson & John Mayer",
+          "releaseDate": "2026-06-04T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/43/99/8b/43998b40-7612-a2d7-5a54-da5e7870af99/4099964268270.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6770622560?i=6770622562",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6770622562",
+          "collectionId": "6770622560",
+          "releaseTitle": "Phone, Keys, Wallet - Single",
+          "releaseArtist": "Lainey Wilson & John Mayer",
+          "releaseDate": "2026-06-04T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/43/99/8b/43998b40-7612-a2d7-5a54-da5e7870af99/4099964268270.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6770622560?i=6770622562",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6795631790",
+          "collectionId": "6795631608",
+          "releaseTitle": "phone, keys, wallet (from my phone) - Single",
+          "releaseArtist": "Lainey Wilson",
+          "releaseDate": "2026-06-04T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/85/c2/68/85c26861-ae6e-3386-d932-b3a1e6847cb3/4099964284713.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6795631608?i=6795631790",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4049283551",
+          "collectionId": "992806021",
+          "releaseTitle": "Phone, Keys, Wallet",
+          "releaseArtist": "Lainey Wilson",
+          "releaseDate": "2026-06-04",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/07958cab57c8ec4ea2224703afabcb7a/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4049283551",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6817354972",
+          "collectionId": "6817354754",
+          "releaseTitle": "Kinda Love It - Single",
+          "releaseArtist": "Lainey Wilson",
+          "releaseDate": "2026-06-04T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/02/f4/d8/02f4d8bd-ccb6-5d5c-2948-8abb1f31ce34/4099964296273.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6817354754?i=6817354972",
+          "score": 645,
+          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -2155,7 +2162,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:26.717Z",
+      "checkedAt": "2026-10-09T08:01:28.767Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2170,72 +2177,6 @@
           "score": 1270,
           "confidence": 99,
           "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "rethinksomethings|combsluke": {
-      "identity": "rethinksomethings|combsluke",
-      "title": "Rethink Some Things",
-      "artist": "Luke Combs",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "The Way I Am",
-      "releaseArtist": "Luke Combs",
-      "releaseDate": "2026-03-20T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
-      "collectionId": "1862634688",
-      "trackId": "1862634795",
-      "confidence": 98,
-      "score": 1010,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-08T22:35:59.675Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1862634795",
-          "collectionId": "1862634688",
-          "releaseTitle": "The Way I Am",
-          "releaseArtist": "Luke Combs",
-          "releaseDate": "2026-03-20T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
-          "score": 1010,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "1862634795",
-          "collectionId": "1862634688",
-          "releaseTitle": "The Way I Am",
-          "releaseArtist": "Luke Combs",
-          "releaseDate": "2026-03-20T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "3899622791",
-          "collectionId": "939327001",
-          "releaseTitle": "The Way I Am",
-          "releaseArtist": "Luke Combs",
-          "releaseDate": "2026-03-20",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/644133900f1391ee0a7e8f84c6572e3a/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3899622791",
-          "score": 830,
-          "confidence": 98,
-          "consensus": 2,
           "earliestReleaseYear": 2026
         }
       ]
@@ -2257,7 +2198,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:40.514Z",
+      "checkedAt": "2026-10-09T08:01:39.411Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2323,7 +2264,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:23.029Z",
+      "checkedAt": "2026-10-09T08:01:21.375Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2404,7 +2345,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:23.030Z",
+      "checkedAt": "2026-10-09T08:01:18.144Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2418,102 +2359,6 @@
           "url": "https://music.apple.com/us/album/6818209777?i=6818209989",
           "score": 1270,
           "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "somethingtolose|leftymasonstellavincent": {
-      "identity": "somethingtolose|leftymasonstellavincent",
-      "title": "Something To Lose",
-      "artist": "STELLA LEFTY & Vincent Mason",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Is This Heaven? - EP",
-      "releaseArtist": "STELLA LEFTY",
-      "releaseDate": "2026-05-14T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
-      "collectionId": "6766964604",
-      "trackId": "6766964605",
-      "confidence": 98,
-      "score": 1010,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-08T22:35:48.215Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "6766964605",
-          "collectionId": "6766964604",
-          "releaseTitle": "Is This Heaven? - EP",
-          "releaseArtist": "STELLA LEFTY",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
-          "score": 1010,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6766964605",
-          "collectionId": "6766964604",
-          "releaseTitle": "Is This Heaven? - EP",
-          "releaseArtist": "STELLA LEFTY",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6783994835",
-          "collectionId": "6783994651",
-          "releaseTitle": "Is This Heaven? (Extended)",
-          "releaseArtist": "STELLA LEFTY",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a5/bd/a9/a5bda9ec-a7d8-f812-442a-72a2a6158415/075679569011.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6783994651?i=6783994835",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "4020643591",
-          "collectionId": "982409841",
-          "releaseTitle": "Is This Heaven?",
-          "releaseArtist": "STELLA LEFTY",
-          "releaseDate": "2026-05-15",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/30c36833c1fe5b5c398139a4622b65f4/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4020643591",
-          "score": 830,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6796823831",
-          "collectionId": "6796823160",
-          "releaseTitle": "Long Way Home",
-          "releaseArtist": "STELLA LEFTY",
-          "releaseDate": "2026-05-14T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/4b/9b/ed4b9bb0-8670-db21-e48c-9e874a6dc3e1/075679562654.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6796823160?i=6796823831",
-          "score": 645,
-          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -2536,7 +2381,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:32.024Z",
+      "checkedAt": "2026-10-09T08:01:32.392Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2617,7 +2462,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.414Z",
+      "checkedAt": "2026-10-09T08:01:16.049Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2653,7 +2498,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:48.215Z",
+      "checkedAt": "2026-10-09T08:01:57.824Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2689,7 +2534,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:57.828Z",
+      "checkedAt": "2026-10-09T08:02:02.988Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2785,7 +2630,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:19.417Z",
+      "checkedAt": "2026-10-09T08:01:16.053Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2821,7 +2666,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:23.030Z",
+      "checkedAt": "2026-10-09T08:01:23.157Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2857,7 +2702,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-08T22:35:34.474Z",
+      "checkedAt": "2026-10-09T08:01:35.978Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2933,6 +2778,72 @@
           "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2010
+        }
+      ]
+    },
+    "thinkasyoudrunk|greenriley": {
+      "identity": "thinkasyoudrunk|greenriley",
+      "title": "Think As You Drunk",
+      "artist": "Riley Green",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "That's Just Me",
+      "releaseArtist": "Riley Green",
+      "releaseDate": "2026-05-28T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+      "collectionId": "6770725355",
+      "trackId": "6770725979",
+      "confidence": 96,
+      "score": 770,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-09T08:02:07.078Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6770725979",
+          "collectionId": "6770725355",
+          "releaseTitle": "That's Just Me",
+          "releaseArtist": "Riley Green",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4039612441",
+          "collectionId": "989245831",
+          "releaseTitle": "Think As You Drunk",
+          "releaseArtist": "Riley Green",
+          "releaseDate": "2026-05-28",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/f60fbc8095587535e45c27151413b26e/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4039612441",
+          "score": 670,
+          "confidence": 91,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6770725979",
+          "collectionId": "6770725355",
+          "releaseTitle": "That's Just Me",
+          "releaseArtist": "Riley Green",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
         }
       ]
     }
@@ -4069,42 +3980,6 @@
         }
       ]
     },
-    "dontwe|morganwallen": {
-      "identity": "dontwe|morganwallen",
-      "title": "Don't We",
-      "artist": "Morgan Wallen",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
-      "releaseTitle": "I’m The Problem",
-      "releaseArtist": "Morgan Wallen",
-      "releaseDate": "2025-05-16T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1802103958?i=1802104400",
-      "collectionId": "1802103958",
-      "trackId": "1802104400",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-06T13:26:46.775Z",
-      "alternatives": [
-        {
-          "provider": "apple-feed",
-          "id": "1802104400",
-          "collectionId": "1802103958",
-          "releaseTitle": "I’m The Problem",
-          "releaseArtist": "Morgan Wallen",
-          "releaseDate": "2025-05-16T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1802103958?i=1802104400",
-          "score": 1270,
-          "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2025
-        }
-      ]
-    },
     "medicine|meganmoroney": {
       "identity": "medicine|meganmoroney",
       "title": "Medicine",
@@ -4537,72 +4412,6 @@
         }
       ]
     },
-    "thinkasyoudrunk|greenriley": {
-      "identity": "thinkasyoudrunk|greenriley",
-      "title": "Think As You Drunk",
-      "artist": "Riley Green",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "That's Just Me",
-      "releaseArtist": "Riley Green",
-      "releaseDate": "2026-05-28T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
-      "collectionId": "6770725355",
-      "trackId": "6770725979",
-      "confidence": 96,
-      "score": 770,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-08T08:00:23.874Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "6770725979",
-          "collectionId": "6770725355",
-          "releaseTitle": "That's Just Me",
-          "releaseArtist": "Riley Green",
-          "releaseDate": "2026-05-28T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
-          "score": 770,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "4039612441",
-          "collectionId": "989245831",
-          "releaseTitle": "Think As You Drunk",
-          "releaseArtist": "Riley Green",
-          "releaseDate": "2026-05-28",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/f60fbc8095587535e45c27151413b26e/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4039612441",
-          "score": 670,
-          "confidence": 91,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6770725979",
-          "collectionId": "6770725355",
-          "releaseTitle": "That's Just Me",
-          "releaseArtist": "Riley Green",
-          "releaseDate": "2026-05-28T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/16/cf/71/16cf71b7-bda7-9916-3d11-3b60539ace2c/26BMR0008042.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6770725355?i=6770725979",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
     "billiejean|jacksonmichael": {
       "identity": "billiejean|jacksonmichael",
       "title": "Billie Jean",
@@ -4792,6 +4601,411 @@
           "confidence": 98,
           "consensus": 2,
           "earliestReleaseYear": 2024
+        }
+      ]
+    },
+    "cowgirl|shaboozey": {
+      "identity": "cowgirl|shaboozey",
+      "title": "Cowgirl",
+      "artist": "Shaboozey",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a6/25/f1/a625f14b-328e-acab-bd7e-5f6d4d571332/199316643947_cover.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Cowgirl - Single",
+      "releaseArtist": "Shaboozey",
+      "releaseDate": "2026-06-04T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/6776926206?i=6776926215",
+      "collectionId": "6776926206",
+      "trackId": "6776926215",
+      "confidence": 98,
+      "score": 1090,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-08T22:35:50.538Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6776926215",
+          "collectionId": "6776926206",
+          "releaseTitle": "Cowgirl - Single",
+          "releaseArtist": "Shaboozey",
+          "releaseDate": "2026-06-04T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a6/25/f1/a625f14b-328e-acab-bd7e-5f6d4d571332/199316643947_cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6776926206?i=6776926215",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6776926215",
+          "collectionId": "6776926206",
+          "releaseTitle": "Cowgirl - Single",
+          "releaseArtist": "Shaboozey",
+          "releaseDate": "2026-06-04T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a6/25/f1/a625f14b-328e-acab-bd7e-5f6d4d571332/199316643947_cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6776926206?i=6776926215",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4057986201",
+          "collectionId": "996123261",
+          "releaseTitle": "Cowgirl",
+          "releaseArtist": "Shaboozey",
+          "releaseDate": "2026-06-05",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/7d5da87b3a08daa510453962b15fb716/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4057986201",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6795721159",
+          "collectionId": "6795720959",
+          "releaseTitle": "The Outlaw Cherie Lee & Other Western Tales",
+          "releaseArtist": "Shaboozey",
+          "releaseDate": "2026-06-04T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a7/b2/76/a7b27671-54e5-f511-0cc2-08c57373e9d4/199316715569_cover.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6795720959?i=6795721159",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "kidmyself|johnmorgan": {
+      "identity": "kidmyself|johnmorgan",
+      "title": "Kid Myself",
+      "artist": "John Morgan",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d2/ae/65/d2ae65e8-9a14-061e-1165-b5351ef994a6/4099964145403.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Carolina Blue",
+      "releaseArtist": "John Morgan",
+      "releaseDate": "2025-04-25T07:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1786449460?i=1786450277",
+      "collectionId": "1786449460",
+      "trackId": "1786450277",
+      "confidence": 96,
+      "score": 770,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-08T22:36:00.784Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1786450277",
+          "collectionId": "1786449460",
+          "releaseTitle": "Carolina Blue",
+          "releaseArtist": "John Morgan",
+          "releaseDate": "2025-04-25T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d2/ae/65/d2ae65e8-9a14-061e-1165-b5351ef994a6/4099964145403.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1786449460?i=1786450277",
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "deezer",
+          "id": "3697436932",
+          "collectionId": "870709212",
+          "releaseTitle": "Kid Myself",
+          "releaseArtist": "John Morgan",
+          "releaseDate": "2026-01-28",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/d86f9db9d0d128de55171015517dfd9c/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3697436932",
+          "score": 670,
+          "confidence": 91,
+          "consensus": 1,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "apple",
+          "id": "1786450277",
+          "collectionId": "1786449460",
+          "releaseTitle": "Carolina Blue",
+          "releaseArtist": "John Morgan",
+          "releaseDate": "2025-04-25T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d2/ae/65/d2ae65e8-9a14-061e-1165-b5351ef994a6/4099964145403.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1786449460?i=1786450277",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2025
+        }
+      ]
+    },
+    "ordinary|alexwarren": {
+      "identity": "ordinary|alexwarren",
+      "title": "Ordinary",
+      "artist": "Alex Warren",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Ordinary - Single",
+      "releaseArtist": "Alex Warren",
+      "releaseDate": "2024-09-26T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
+      "collectionId": "1793663382",
+      "trackId": "1793663645",
+      "confidence": 98,
+      "score": 1090,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-08T22:35:46.728Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1793663645",
+          "collectionId": "1793663382",
+          "releaseTitle": "Ordinary - Single",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2024-09-26T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1793663645",
+          "collectionId": "1793663382",
+          "releaseTitle": "Ordinary - Single",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2024-09-26T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1793663382?i=1793663645",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "deezer",
+          "id": "3210709941",
+          "collectionId": "705691371",
+          "releaseTitle": "Ordinary",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2025-02-07",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/f4246416b5e3e71a35adf1e2cbe98bfb/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3210709941",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1804419953",
+          "collectionId": "1804419951",
+          "releaseTitle": "You'll Be Alright, Kid (Chapter 1)",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2024-09-26T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f1/91/6e/f1916ecb-0b21-57da-7d60-cd21ae0ff40b/075679614797.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1804419951?i=1804419953",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1817735163",
+          "collectionId": "1817735146",
+          "releaseTitle": "You'll Be Alright, Kid",
+          "releaseArtist": "Alex Warren",
+          "releaseDate": "2024-09-26T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c7/1e/c9/c71ec9f8-f6fd-5374-0e5c-3419539618f4/075679607942.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1817735146?i=1817735163",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        }
+      ]
+    },
+    "rethinksomethings|combsluke": {
+      "identity": "rethinksomethings|combsluke",
+      "title": "Rethink Some Things",
+      "artist": "Luke Combs",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "The Way I Am",
+      "releaseArtist": "Luke Combs",
+      "releaseDate": "2026-03-20T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
+      "collectionId": "1862634688",
+      "trackId": "1862634795",
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-08T22:35:59.675Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1862634795",
+          "collectionId": "1862634688",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "1862634795",
+          "collectionId": "1862634688",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-03-20T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1862634688?i=1862634795",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "3899622791",
+          "collectionId": "939327001",
+          "releaseTitle": "The Way I Am",
+          "releaseArtist": "Luke Combs",
+          "releaseDate": "2026-03-20",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/644133900f1391ee0a7e8f84c6572e3a/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3899622791",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "somethingtolose|leftymasonstellavincent": {
+      "identity": "somethingtolose|leftymasonstellavincent",
+      "title": "Something To Lose",
+      "artist": "STELLA LEFTY & Vincent Mason",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Is This Heaven? - EP",
+      "releaseArtist": "STELLA LEFTY",
+      "releaseDate": "2026-05-14T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+      "collectionId": "6766964604",
+      "trackId": "6766964605",
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-08T22:35:48.215Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6766964605",
+          "collectionId": "6766964604",
+          "releaseTitle": "Is This Heaven? - EP",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6766964605",
+          "collectionId": "6766964604",
+          "releaseTitle": "Is This Heaven? - EP",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/cb/9d/ba/cb9dba19-0847-164f-3cec-32f337918dda/075679578518.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6766964604?i=6766964605",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6783994835",
+          "collectionId": "6783994651",
+          "releaseTitle": "Is This Heaven? (Extended)",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a5/bd/a9/a5bda9ec-a7d8-f812-442a-72a2a6158415/075679569011.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6783994651?i=6783994835",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4020643591",
+          "collectionId": "982409841",
+          "releaseTitle": "Is This Heaven?",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-15",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/30c36833c1fe5b5c398139a4622b65f4/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4020643591",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6796823831",
+          "collectionId": "6796823160",
+          "releaseTitle": "Long Way Home",
+          "releaseArtist": "STELLA LEFTY",
+          "releaseDate": "2026-05-14T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ed/4b/9b/ed4b9bb0-8670-db21-e48c-9e874a6dc3e1/075679562654.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6796823160?i=6796823831",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
         }
       ]
     }
