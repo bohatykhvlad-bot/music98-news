@@ -900,13 +900,13 @@ textarea{resize:vertical;min-height:64px}
 #tab-discover .discover-wave--right{left:calc(100% + 4px);transform:scaleX(-1)}
 #tab-discover .discover-wave svg{display:block;width:100%;height:100%;overflow:visible}
 #tab-discover .discover-wave-line{fill:none;stroke-width:2.4;stroke-linecap:round;transform-box:fill-box;transform-origin:center;animation:m98-wave-float 5.8s ease-in-out infinite}
-#tab-discover .discover-wave-line:nth-of-type(2){stroke-width:1.75;animation-delay:-1.7s;animation-duration:6.6s}
-#tab-discover .discover-wave-line:nth-of-type(3){stroke-width:1.4;animation-delay:-3.1s;animation-duration:7.1s}
+#tab-discover .discover-wave-line:nth-of-type(3){stroke-width:1.75;animation-delay:-1.7s;animation-duration:6.6s}
+#tab-discover .discover-wave-line:nth-of-type(4){stroke-width:1.4;animation-delay:-3.1s;animation-duration:7.1s}
 #tab-discover .discover-wave-halo{fill:none;stroke-width:14;stroke-linecap:round;opacity:.17;filter:blur(9px);animation:m98-wave-glow 6s ease-in-out infinite}
 #tab-discover .discover-stage.is-playing .discover-wave{opacity:.84;filter:drop-shadow(0 0 17px rgba(0,239,230,.5))}
 #tab-discover .discover-stage.is-playing .discover-wave-line{animation-duration:1.7s;stroke-width:3.2}
-#tab-discover .discover-stage.is-playing .discover-wave-line:nth-of-type(2){animation-duration:2.1s;stroke-width:2.35}
-#tab-discover .discover-stage.is-playing .discover-wave-line:nth-of-type(3){animation-duration:2.4s;stroke-width:1.9}
+#tab-discover .discover-stage.is-playing .discover-wave-line:nth-of-type(3){animation-duration:2.1s;stroke-width:2.35}
+#tab-discover .discover-stage.is-playing .discover-wave-line:nth-of-type(4){animation-duration:2.4s;stroke-width:1.9}
 #tab-discover .discover-stage.is-playing .discover-wave-halo{opacity:.34;animation-duration:1.7s}
 @keyframes m98-wave-float{0%,100%{transform:translate3d(-2px,0,0) scaleX(.93)}45%{transform:translate3d(3px,0,0) scaleX(1.12)}70%{transform:translate3d(-4px,0,0) scaleX(.96)}}
 @keyframes m98-wave-glow{0%,100%{opacity:.13}50%{opacity:.28}}
@@ -4356,7 +4356,7 @@ window.music98DiscoverPlayer={
   pause: () => pauseAllMedia()
 };
 </script>
-<script src="/discover-app.js?v=20261009-01" defer></script>
+<script src="/discover-app.js?v=20261010-waves01" defer></script>
 <script src="/concerts-app.js?v=20261008-03" defer></script>
 </body>
 </html>
