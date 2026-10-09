@@ -20,7 +20,7 @@ test("worker rejects a changed Spotify rank even if both mirrors appear complete
 test("worker falls back to verified independent Spotify if the live HTML lost a row",async()=>{
  /* The mirror fallback is allowed, but another incomplete source must still
     block any publication before ranking/tenure mutations. */
- await expectRejected({kworbMissing:[17],deezerCount:49},/incomplete_chart_sources/);
+ await expectRejected({kworbMissing:[17],deezerCount:99},/incomplete_chart_sources/);
 });
 
 function mediaEnvironment(source) {
@@ -70,7 +70,7 @@ test("daily migration preserves Apple audio/artwork, day counts and repeat-reque
 });
 
 test("incomplete daily source does not mutate tenure or publish an old weekly edition",async()=>{
- const source=fakeDailySource({deezerCount:49}),{env,writes}=mediaEnvironment(source),previous=globalThis.fetch;
+ const source=fakeDailySource({deezerCount:99}),{env,writes}=mediaEnvironment(source),previous=globalThis.fetch;
  globalThis.fetch=source.fakeFetch;
  try{
    const response=await onRequestGet({env,request:new Request("https://music98.news/api/top50")});
@@ -194,7 +194,7 @@ test("a recovered third-source snapshot bypasses retry backoff without a Spotify
 });
 
 test("a verified daily backup survives empty KV without rebuilding from two sources",async()=>{
- const source=fakeDailySource({deezerCount:49}),{env,assets,writes}=mediaEnvironment(source),previous=globalThis.fetch;
+ const source=fakeDailySource({deezerCount:99}),{env,assets,writes}=mediaEnvironment(source),previous=globalThis.fetch;
  const old=assets["chart-tenure-backup.json"].current;
  assets["daily-top50-backup.json"]={...old,updated:new Date().toISOString().slice(0,10),
    complete:true,methodology:DAILY_CHART_METHOD,sources:{A:100,S:100,D:100},arrows:{ok:true},
@@ -213,7 +213,7 @@ test("a verified daily backup survives empty KV without rebuilding from two sour
 
 test("daily backup recovery refuses partial sources and regressed day counters",async()=>{
  for(const broken of ["partial","regressed","weekly"]){
-   const source=fakeDailySource({deezerCount:49}),{env,assets}=mediaEnvironment(source),previous=globalThis.fetch;
+   const source=fakeDailySource({deezerCount:99}),{env,assets}=mediaEnvironment(source),previous=globalThis.fetch;
    const old=assets["chart-tenure-backup.json"].current;
    const saved={...old,updated:new Date().toISOString().slice(0,10),methodology:DAILY_CHART_METHOD,
      sources:{A:100,S:100,D:100},arrows:{ok:true},tracks:old.tracks.map(t=>({...t,weeks:8,sourceRanks:{A:t.rank,S:t.rank,D:t.rank}}))};
