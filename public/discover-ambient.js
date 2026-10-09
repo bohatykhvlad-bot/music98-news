@@ -62,7 +62,7 @@
       // Bend the existing current with a softened version of the original
       // vortex. Its bounded displacement never creates a separate cloud.
       vec2 nudge=(vec2(-delta.y,delta.x)*.48-delta*.12)*influence;
-      p+=clamp(nudge,vec2(-42./viewport.y),vec2(42./viewport.y));
+      p+=clamp(nudge,vec2(-33.6/viewport.y),vec2(33.6/viewport.y));
       float t=time*.25;
       vec2 centre=vec2(aspect*.54,.51);
       vec2 outward=(p-centre)/max(length(p-centre),.15);
@@ -205,7 +205,7 @@
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
     pointer.targetX=clamp(x,0,innerWidth);pointer.targetY=clamp(y,0,innerHeight);
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
-    pointer.targetStrength=.85;pointerLastMove=performance.now();
+    pointer.targetStrength=.68;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;
