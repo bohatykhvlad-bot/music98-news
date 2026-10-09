@@ -235,6 +235,9 @@ export default {
     if (path === "/news" && (request.method === "GET" || request.method === "HEAD")) {
       return Response.redirect(new URL("/", request.url), 301);
     }
+    if (path === "/concerts.html" && (request.method === "GET" || request.method === "HEAD")) {
+      return Response.redirect(new URL("/concerts", request.url), 301);
+    }
     if (path === "/concerts" && (request.method === "GET" || request.method === "HEAD")) {
       return serveConcertsShell(request, env);
     }
