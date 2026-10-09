@@ -7,7 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import {compareSpotifyRankings,parseKworbSpotify,parseMusicrankSpotify,spotifyDateCurrent,
  validatedSpotifyRows,verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
-const tracks=Array.from({length:50},(_,i)=>({pos:i+1,title:"Song "+(i+1),artist:"Artist "+(i+1)}));
+const tracks=Array.from({length:100},(_,i)=>({pos:i+1,title:"Song "+(i+1),artist:"Artist "+(i+1)}));
 function kworb(rows=tracks,date="2026-09-30"){
  const markup=rows.map(t=>{
   const styled=[17,36,50].includes(t.pos),open=styled?'<tr class="d2">':"<tr>";
@@ -27,7 +27,7 @@ function musicrank(rows=tracks,date="Sep 30, 2026"){
    date+'. Worldwide"/></head><body><main><script type="application/ld+json">'+JSON.stringify(json)+
    '</script>'+links+'</main></body></html>';
 }
-test("bold/highlighted Kworb rows and all 50 positions are retained",()=>{
+test("bold/highlighted Kworb rows and all 100 positions are retained",()=>{
  const v=parseKworbSpotify(kworb());
  assert.equal(v.date,"2026-09-30");
  assert.deepEqual(v.tracks.map(t=>t.pos),tracks.map(t=>t.pos));
@@ -41,13 +41,13 @@ test("Kworb tolerates alternate class order and nested bold text",()=>{
 test("partial ranks, duplicates and wrong chart markup are rejected",()=>{
  assert.throws(()=>parseKworbSpotify(kworb(tracks.slice(0,49))));
  assert.throws(()=>parseKworbSpotify(kworb().replace('Spotify Daily Chart - Global','Wrong chart')));
- assert.throws(()=>validatedSpotifyRows(tracks.map(t=>({...t,pos:t.pos===50?49:t.pos}))));
+ assert.throws(()=>validatedSpotifyRows(tracks.map(t=>({...t,pos:t.pos===100?99:t.pos}))));
  assert.throws(()=>validatedSpotifyRows(tracks.map(t=>({...t,
-   title:t.pos===50?"Song 1":t.title,artist:t.pos===50?"Artist 1":t.artist}))));
+   title:t.pos===100?"Song 1":t.title,artist:t.pos===100?"Artist 1":t.artist}))));
 });
-test("Musicrank independently confirms visible top 20 and yields all 50",()=>{
+test("Musicrank independently confirms visible top 20 and yields all 100",()=>{
  const mr=parseMusicrankSpotify(musicrank());
- assert.equal(mr.tracks.length,50);
+ assert.equal(mr.tracks.length,100);
  assert.equal(mr.ldConfirmed,20);
  assert.equal(compareSpotifyRankings(parseKworbSpotify(kworb()),mr).ok,true);
  const h=musicrank().replace('>Song 5</a>','>Wrong title</a>');
@@ -71,11 +71,11 @@ test("Spotify source dates are checked in UTC and expire after two days",()=>{
  assert.equal(spotifyDateCurrent("no date",now),false);
  assert.equal(spotifyDateCurrent("2026-02-30",Date.parse("2026-03-02T16:00:00Z")),false);
 });
-test("daily fallback requires verified provenance and all 50 tracks",()=>{
+test("daily fallback requires verified provenance and all 100 tracks",()=>{
  const now=Date.parse("2026-10-02T16:00:00Z");
  const s={schema:1,verified:true,chartDate:"2026-09-30",provider:"kworb+musicrank",
-   mirrorMatched:50,fingerprint:"a".repeat(64),tracks};
- assert.equal(verifiedSpotifySnapshot(s,now)?.tracks.length,50);
+   mirrorMatched:100,fingerprint:"a".repeat(64),tracks};
+ assert.equal(verifiedSpotifySnapshot(s,now)?.tracks.length,100);
  assert.equal(verifiedSpotifySnapshot({...s,mirrorMatched:49},now),null);
  assert.equal(verifiedSpotifySnapshot({...s,fingerprint:"invalid"},now),null);
  assert.equal(verifiedSpotifySnapshot({...s,tracks:tracks.slice(0,49)},now),null);
@@ -113,7 +113,7 @@ async function runCollector({kwDate,mrDate,kwOffline=false,mrOffline=false,initi
 test("collector preserves the last verified snapshot while either mirror is missing or delayed",async()=>{
  const today=new Date().toISOString().slice(0,10),yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
  const initial={schema:1,verified:true,chartDate:yesterday,provider:"kworb+musicrank",
-  mirrorMatched:50,fingerprint:"a".repeat(64),tracks};
+  mirrorMatched:100,fingerprint:"a".repeat(64),tracks};
  const outcomes=await Promise.all([
   {kwDate:today,mrDate:today,kwOffline:true},
   {kwDate:today,mrDate:today,mrOffline:true},
@@ -126,12 +126,12 @@ test("collector preserves the last verified snapshot while either mirror is miss
   assert.equal(outcome.unchanged,true);
  }
 });
-test("collector publishes only after both mirrors agree on the new date and all 50 ranks",async()=>{
+test("collector publishes only after both mirrors agree on the new date and all 100 ranks",async()=>{
  const today=new Date().toISOString().slice(0,10),yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
  const result=await runCollector({kwDate:today,mrDate:today,initial:{chartDate:yesterday}});
  assert.equal(result.status,0,result.stderr);
  assert.equal(result.snapshot.chartDate,today);
  assert.equal(result.snapshot.provider,"kworb+musicrank");
- assert.equal(result.snapshot.mirrorMatched,50);
- assert.equal(verifiedSpotifySnapshot(result.snapshot)?.tracks.length,50);
+ assert.equal(result.snapshot.mirrorMatched,100);
+ assert.equal(verifiedSpotifySnapshot(result.snapshot)?.tracks.length,100);
 });
