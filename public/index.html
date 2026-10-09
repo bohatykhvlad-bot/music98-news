@@ -886,7 +886,7 @@ textarea{resize:vertical;min-height:64px}
 @media(max-width:1099px){#tab-discover,#tab-concerts{padding-top:18px}}
 #tab-discover .discover-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,660px);align-items:start;gap:32px;width:100%;margin:0;padding:0}
 #tab-discover .discover-copy{min-width:0;max-width:445px;min-height:450px;display:flex;flex-direction:column;align-items:flex-start;text-align:left}
-#tab-discover .discover-selected{margin-top:68px;display:flex;flex-direction:column;gap:4px;width:100%}
+#tab-discover .discover-selected{margin-top:20px;display:flex;flex-direction:column;gap:4px;width:100%}
 #tab-discover .discover-selected[hidden]{display:none!important}
 #tab-discover .discover-artist{font-size:clamp(23px,2.6vw,32px);font-weight:800;color:var(--text);line-height:1.16;letter-spacing:-.035em;margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-album{font-size:17px;font-weight:500;line-height:1.3;color:var(--muted);margin:0;overflow-wrap:anywhere}
@@ -899,14 +899,13 @@ textarea{resize:vertical;min-height:64px}
 #tab-discover .discover-card .aembed iframe{display:block;width:100%;max-width:none;height:450px!important;min-height:450px;border:0;border-radius:0;background:#fff}
 #tab-discover #discoverFind:disabled{opacity:.55;cursor:wait}
 #tab-discover .discover-status{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-#tab-discover #discoverFind{color:var(--text);font-weight:600;align-self:flex-start;margin-top:auto}
-#tab-discover .discover-copy:has(.discover-selected[hidden]) #discoverFind{margin-top:0}
+#tab-discover #discoverFind{color:var(--text);font-weight:600;align-self:center;margin-top:12px;min-width:200px}
 @media(hover:hover) and (pointer:fine){#tab-discover #discoverFind:hover{color:#03282b}#tab-discover #discoverFind:hover::before{background:var(--accent);border-color:var(--accent)}}
 @media(max-width:1100px){
   #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px}
   #tab-discover .discover-copy{max-width:none;min-height:0;width:100%}
   #tab-discover .discover-selected{margin-top:var(--section-heading-gap)}
-  #tab-discover #discoverFind{margin-top:var(--section-heading-gap)}
+  #tab-discover #discoverFind{margin-top:0;align-self:flex-start;min-width:0}
   #tab-discover .discover-stage{width:100%}
 }
 @media(max-width:720px){
@@ -1021,12 +1020,12 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
     <div class="hd"><h1 class="hd-t">Find what to listen to</h1></div>
     <div class="discover-layout">
       <div class="discover-copy">
+        <button class="loadmore-btn" id="discoverFind" type="button" disabled>Pick for me</button>
         <div class="discover-selected" id="discoverSelection" hidden>
           <h2 class="discover-artist" id="discoverArtist"></h2>
           <p class="discover-album" id="discoverAlbum"></p>
           <p class="discover-details"><span id="discoverYear"></span><span id="discoverGenre"></span></p>
         </div>
-        <button class="loadmore-btn" id="discoverFind" type="button" disabled>Pick for me</button>
       </div>
       <div class="discover-stage">
         <div class="discover-card" id="discoverPlayerStage" aria-label="Random album">
