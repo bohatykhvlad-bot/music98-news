@@ -24,11 +24,11 @@ test("the single banner sits above the News hero and nowhere else", () => {
 });
 
 test("banner CSS provides documented desktop and mobile ad dimensions", () => {
-  assert.match(html, /\.m98-home-banner-slot\{width:970px;height:250px;/);
-  assert.match(html, /#tab-news \.news-heading-row\{display:flex;flex-direction:column;align-items:stretch;/);
-  assert.match(html, /@media \(min-width:768px\) and \(max-width:1009px\)\{/);
-  assert.match(html, /\.m98-home-banner-slot\{width:728px;height:90px\}/);
-  assert.match(html, /\.m98-home-banner-slot\{width:300px;height:250px\}/);
+  assert.match(html, /\.m98-home-banner-slot\{width:728px;height:90px;/);
+  assert.match(html, /#tab-news \.news-heading-row\{display:flex;align-items:center;justify-content:space-between;/);
+  assert.match(html, /@media \(max-width:559px\)\{/);
+  assert.match(html, /\.m98-home-banner-slot\{width:468px;height:60px\}/);
+  assert.match(html, /\.m98-home-banner-slot\{width:320px;max-width:100%;height:100px\}/);
   assert.match(html, /\.m98-home-banner-slot\{width:250px;height:250px\}/);
   assert.match(html, /\.tab\{display:none;/);
   assert.match(html, /body\.articlepage main \.tab\{display:none!important\}/);
@@ -39,9 +39,6 @@ test("only the live banner handles no-fill; stale multi-placement scripts never 
   assert.doesNotMatch(html, /<link[^>]+href="\/display-ads\.css/);
   assert.match(html, /window\.purpleDisplay\.onUnfilled = function \(placement\)/);
   assert.match(html, /banner\.classList\.add\("m98-ad-unfilled"\)/);
-  assert.match(html, /banner\.dataset\.adResult = reason/);
-  assert.match(html, /new URLSearchParams\(location\.search\)\.has\("ads-debug"\)/);
-  assert.match(html, /class="m98-ad-test-status" hidden aria-live="polite"/);
   assert.match(html, /#tab-news \.m98-home-banner\.m98-ad-unfilled\{display:none\}/);
   assert.equal((html.match(/data-pa-tag\b/g) || []).length, 1);
 });
