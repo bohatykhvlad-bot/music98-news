@@ -20,6 +20,11 @@ for(let n=1;n<=8;n++){
       throw Error("LATEST_HTML_NOT_DEPLOYED");
     if(j.methodology!==expectedMethod||j.tracks?.length!==50)
       throw Error("LATEST_API_NOT_READY: "+j.methodology+"/"+j.tracks?.length);
+    if(!/^20\d{2}-\d{2}-\d{2}$/.test(j.sourceDates?.S||"")||
+      j.sourceDates?.U!==j.sourceDates?.S||j.sourceDates?.A!==j.sourceDates?.S)
+      throw Error("LIVE_CHART_MIXED_SOURCE_DATES: "+JSON.stringify(j.sourceDates));
+    if(j.tracks.some(t=>t.spotify?.date!==j.sourceDates.S||!Number.isSafeInteger(t.spotify?.daily)))
+      throw Error("LIVE_CHART_HAS_UNVERIFIED_OR_DIFFERENT_DAY_SPOTIFY");
     // A REAL browser must accept the JSON and construct 50 DOM rows.
     // Test both desktop and mobile, using a fresh profile every time.
     for(const [name,size] of [["desktop","1440,1000"],["mobile","390,880"]]){
@@ -37,7 +42,7 @@ for(let n=1;n<=8;n++){
       if(count!==50)throw Error("LIVE_CHROME_"+name+"_HAS_"+count+"_ROWS_INSTEAD_OF_50");
       if(!dump.includes("Daily Top 50"))throw Error("LIVE_CHROME_"+name+"_TITLE_NOT_UPDATED");
     }
-    console.log("CHART_LIVE_BROWSER_PASS",JSON.stringify({date:j.updated,method:j.methodology,rows:j.tracks.length}));
+    console.log("CHART_LIVE_BROWSER_PASS",JSON.stringify({published:j.updated,editionDate:j.sourceDates.S,sourceDates:j.sourceDates,method:j.methodology,rows:j.tracks.length}));
     process.exit(0);
   }catch(e){
     last=String(e.message||e).slice(0,300);
