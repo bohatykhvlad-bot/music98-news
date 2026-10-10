@@ -7,6 +7,8 @@ on:
       - "scripts/refresh-apple-spotify-streams.mjs"
       - "functions/lib/apple-spotify-chart.js"
       - "functions/lib/apple-us-hybrid.js"
+      - "functions/lib/tri-source-chart.js"
+      - "tests/tri-source-chart.test.mjs"
       - "functions/lib/daily-chart-sources.js"
       - ".github/workflows/apple-chart-source.yml"
   schedule:
@@ -28,8 +30,10 @@ jobs:
           node-version: "20"
       - name: Fetch paired verified Apple Music USA and Global Top 100
         run: node scripts/refresh-apple-ranking.mjs
-      - name: Collect multi-path Spotify daily streams for USA Top 50 candidates
+      - name: Build union of three daily Top 100 charts and recover verified Spotify counters
         run: node scripts/refresh-apple-spotify-streams.mjs
+      - name: Validate three-source identity, weights, rank continuity and Spotify numbers
+        run: node --test tests/tri-source-chart.test.mjs
       - name: Commit verified chart snapshots (regenerate after competing pushes)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,12 +48,13 @@ jobs:
             git reset --hard origin/main
             node scripts/refresh-apple-ranking.mjs
             node scripts/refresh-apple-spotify-streams.mjs
+            node --test tests/tri-source-chart.test.mjs
             git add public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json
             if git diff --cached --quiet; then
               echo "Current main already has matching verified sources"
               exit 0
             fi
-            git commit -m "chart: Apple USA 70 Spotify 20 Global 10 verified daily sources"
+            git commit -m "chart: three-source 40 USA 30 Spotify 30 Global verified edition"
             if git push origin HEAD:main; then
               gh workflow run apple-data.yml --ref main
               exit 0
