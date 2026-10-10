@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-10T20:16:17.414Z",
+  "updatedAt": "2026-10-10T20:24:24.046Z",
   "chartUpdated": "2026-10-10",
   "chartRev": "tri-source-v41",
   "rows": 50,
@@ -8,8 +8,7 @@
   "unresolved": [],
   "sourceCounts": {
     "apple-feed": 19,
-    "apple": 5,
-    "apple-chart": 25,
+    "apple-chart": 30,
     "deezer": 1
   },
   "entries": {
@@ -18,7 +17,7 @@
       "title": "Ain't In LA",
       "artist": "ADÉLA",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/54/19/e8/5419e883-3cc4-5d8b-a10d-c1fee1f5c969/26UMGIM82372.rgb.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "Ain't In LA - Single",
       "releaseArtist": "ADÉLA",
       "releaseDate": "2026-07-22T12:00:00Z",
@@ -27,11 +26,26 @@
       "collectionId": "6796149321",
       "trackId": "6796149323",
       "confidence": 98,
-      "score": 965,
+      "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:20.429Z",
+      "checkedAt": "2026-10-10T20:23:08.327Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6796149323",
+          "collectionId": "6796149321",
+          "releaseTitle": "Ain't In LA - Single",
+          "releaseArtist": "ADÉLA",
+          "releaseDate": "2026-07-22T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/54/19/e8/5419e883-3cc4-5d8b-a10d-c1fee1f5c969/26UMGIM82372.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6796149321?i=6796149323",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
         {
           "provider": "apple",
           "id": "6796149323",
@@ -60,21 +74,6 @@
           "score": 910,
           "confidence": 98,
           "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple-chart",
-          "id": "6792884101",
-          "collectionId": "6792883860",
-          "releaseTitle": "PRIMA",
-          "releaseArtist": "ADÉLA",
-          "releaseDate": "2026-07-23T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/77/7b/5d777b87-e796-0b3e-cef6-d37d993dd8fe/26UMGIM82371.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6792883860?i=6792884101",
-          "score": 770,
-          "confidence": 96,
-          "consensus": 1,
           "earliestReleaseYear": 2026
         },
         {
@@ -111,7 +110,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:48.950Z",
+      "checkedAt": "2026-10-10T20:23:55.387Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -207,7 +206,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.056Z",
+      "checkedAt": "2026-10-10T20:23:02.392Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -243,7 +242,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:40.927Z",
+      "checkedAt": "2026-10-10T20:23:46.286Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -324,7 +323,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.049Z",
+      "checkedAt": "2026-10-10T20:23:02.385Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -360,7 +359,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:22.800Z",
+      "checkedAt": "2026-10-10T20:23:10.028Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -426,7 +425,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:28.218Z",
+      "checkedAt": "2026-10-10T20:23:13.393Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -522,7 +521,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:16:09.320Z",
+      "checkedAt": "2026-10-10T20:24:16.331Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -576,7 +575,7 @@
       "title": "Blinding Lights",
       "artist": "The Weeknd",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/6f/bc/e6/6fbce6c4-c38c-72d8-4fd0-66cfff32f679/20UMGIM12176.rgb.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "After Hours",
       "releaseArtist": "The Weeknd",
       "releaseDate": "2019-11-29T08:00:00Z",
@@ -585,11 +584,26 @@
       "collectionId": "1499378108",
       "trackId": "1499378607",
       "confidence": 98,
-      "score": 995,
+      "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:32.237Z",
+      "checkedAt": "2026-10-10T20:23:17.494Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1499378607",
+          "collectionId": "1499378108",
+          "releaseTitle": "After Hours",
+          "releaseArtist": "The Weeknd",
+          "releaseDate": "2019-11-29T08:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/6f/bc/e6/6fbce6c4-c38c-72d8-4fd0-66cfff32f679/20UMGIM12176.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1499378108?i=1499378607",
+          "score": 1120,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2019
+        },
         {
           "provider": "apple",
           "id": "1499378607",
@@ -649,21 +663,6 @@
           "confidence": 98,
           "consensus": 2,
           "earliestReleaseYear": 2019
-        },
-        {
-          "provider": "apple",
-          "id": "1615102595",
-          "collectionId": "1615102584",
-          "releaseTitle": "After Hours (Deluxe)",
-          "releaseArtist": "The Weeknd",
-          "releaseDate": "2019-11-29T08:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7d/e7/44/7de744cb-490f-9f29-3fc7-4afdd5253f49/20UMGIM21167.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1615102584?i=1615102595",
-          "score": 995,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2019
         }
       ]
     },
@@ -672,7 +671,7 @@
       "title": "bloodstream",
       "artist": "Alyssa Grace",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a0/68/6e/a0686eec-94ac-0eae-40c0-a5bc38c6ba60/054391213129.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "bloodstream - Single",
       "releaseArtist": "Alyssa Grace",
       "releaseDate": "2026-07-10T12:00:00Z",
@@ -681,11 +680,26 @@
       "collectionId": "6781522684",
       "trackId": "6781522686",
       "confidence": 98,
-      "score": 965,
+      "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:42.261Z",
+      "checkedAt": "2026-10-10T20:23:47.772Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6781522686",
+          "collectionId": "6781522684",
+          "releaseTitle": "bloodstream - Single",
+          "releaseArtist": "Alyssa Grace",
+          "releaseDate": "2026-07-10T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a0/68/6e/a0686eec-94ac-0eae-40c0-a5bc38c6ba60/054391213129.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6781522684?i=6781522686",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
         {
           "provider": "apple",
           "id": "6781522686",
@@ -745,21 +759,6 @@
           "confidence": 98,
           "consensus": 2,
           "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple-chart",
-          "id": "6783576167",
-          "collectionId": "6783576156",
-          "releaseTitle": "spilling my guts",
-          "releaseArtist": "Alyssa Grace",
-          "releaseDate": "2026-07-10T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7f/a7/ef/7fa7ef61-6e22-f30f-441c-e89e7ff4a79a/093624817147.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/6783576156?i=6783576167",
-          "score": 770,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
         }
       ]
     },
@@ -780,7 +779,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.059Z",
+      "checkedAt": "2026-10-10T20:23:02.394Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -816,7 +815,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:37.133Z",
+      "checkedAt": "2026-10-10T20:23:41.277Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -897,7 +896,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.051Z",
+      "checkedAt": "2026-10-10T20:23:02.387Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -933,7 +932,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.058Z",
+      "checkedAt": "2026-10-10T20:23:02.393Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -969,7 +968,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.054Z",
+      "checkedAt": "2026-10-10T20:23:02.390Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1005,7 +1004,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:16:17.412Z",
+      "checkedAt": "2026-10-10T20:24:24.043Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1101,7 +1100,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:25.141Z",
+      "checkedAt": "2026-10-10T20:23:11.629Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1197,7 +1196,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:32.237Z",
+      "checkedAt": "2026-10-10T20:23:17.495Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1233,7 +1232,7 @@
       "score": 670,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:34.909Z",
+      "checkedAt": "2026-10-10T20:23:39.277Z",
       "alternatives": [
         {
           "provider": "deezer",
@@ -1269,7 +1268,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:28.915Z",
+      "checkedAt": "2026-10-10T20:23:14.484Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1365,7 +1364,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:36.388Z",
+      "checkedAt": "2026-10-10T20:23:40.671Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1431,7 +1430,7 @@
       "score": 940,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:56.290Z",
+      "checkedAt": "2026-10-10T20:24:07.903Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1527,7 +1526,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.056Z",
+      "checkedAt": "2026-10-10T20:23:02.392Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1551,7 +1550,7 @@
       "title": "hate that i made you love me",
       "artist": "Ariana Grande",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c7/8d/7d/c78d7db8-cf34-8a65-99d6-850a3d60d03b/26UMGIM66898.rgb.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "hate that i made you love me - Single",
       "releaseArtist": "Ariana Grande",
       "releaseDate": "2026-05-28T12:00:00Z",
@@ -1560,11 +1559,26 @@
       "collectionId": "6773388583",
       "trackId": "6773388585",
       "confidence": 98,
-      "score": 965,
+      "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:19.463Z",
+      "checkedAt": "2026-10-10T20:23:06.042Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "6773388585",
+          "collectionId": "6773388583",
+          "releaseTitle": "hate that i made you love me - Single",
+          "releaseArtist": "Ariana Grande",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c7/8d/7d/c78d7db8-cf34-8a65-99d6-850a3d60d03b/26UMGIM66898.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6773388583?i=6773388585",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
         {
           "provider": "apple",
           "id": "6773388585",
@@ -1624,21 +1638,6 @@
           "confidence": 98,
           "consensus": 2,
           "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "deezer",
-          "id": "4045817471",
-          "collectionId": "991609961",
-          "releaseTitle": "hate that i made you love me",
-          "releaseArtist": "Ariana Grande",
-          "releaseDate": "2026-05-29",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/020b1804e8c8a2aba6770f5b2763847b/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/4045817471",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
         }
       ]
     },
@@ -1659,7 +1658,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:45.954Z",
+      "checkedAt": "2026-10-10T20:23:51.824Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1740,7 +1739,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.055Z",
+      "checkedAt": "2026-10-10T20:23:02.391Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1776,7 +1775,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:16:05.070Z",
+      "checkedAt": "2026-10-10T20:24:15.684Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1872,7 +1871,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:50.808Z",
+      "checkedAt": "2026-10-10T20:23:59.515Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1938,7 +1937,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:47.961Z",
+      "checkedAt": "2026-10-10T20:23:53.450Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2004,7 +2003,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.057Z",
+      "checkedAt": "2026-10-10T20:23:02.393Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2040,7 +2039,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:20.430Z",
+      "checkedAt": "2026-10-10T20:23:08.328Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2076,7 +2075,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.050Z",
+      "checkedAt": "2026-10-10T20:23:02.386Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2098,9 +2097,9 @@
     "oneofthegirls|deppjennielilyrosetheweeknd": {
       "identity": "oneofthegirls|deppjennielilyrosetheweeknd",
       "title": "One Of The Girls",
-      "artist": "The Weeknd, JENNIE, Lily-Rose Depp",
+      "artist": "The Weeknd, JENNIE & Lily Rose Depp",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/db/28/e7/db28e7c3-f53a-76c8-eaa4-d92a22e4f160/23UMGIM72115.rgb.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "The Idol Episode 4 (Music from the HBO Original Series) - Single",
       "releaseArtist": "The Weeknd, JENNIE & Lily Rose Depp",
       "releaseDate": "2023-06-23T12:00:00Z",
@@ -2109,11 +2108,26 @@
       "collectionId": "1693891133",
       "trackId": "1693891139",
       "confidence": 98,
-      "score": 885,
+      "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:16:12.973Z",
+      "checkedAt": "2026-10-10T20:24:22.878Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1693891139",
+          "collectionId": "1693891133",
+          "releaseTitle": "The Idol Episode 4 (Music from the HBO Original Series) - Single",
+          "releaseArtist": "The Weeknd, JENNIE & Lily Rose Depp",
+          "releaseDate": "2023-06-23T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/db/28/e7/db28e7c3-f53a-76c8-eaa4-d92a22e4f160/23UMGIM72115.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1693891133?i=1693891139",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2023
+        },
         {
           "provider": "apple",
           "id": "1693891139",
@@ -2127,21 +2141,6 @@
           "score": 885,
           "confidence": 98,
           "consensus": 2,
-          "earliestReleaseYear": 2023
-        },
-        {
-          "provider": "apple-chart",
-          "id": "1720045966",
-          "collectionId": "1720045950",
-          "releaseTitle": "One of the Girls - EP",
-          "releaseArtist": "The Weeknd, JENNIE & Lily Rose Depp",
-          "releaseDate": "2023-06-23T07:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/2a/75/7c/2a757c4d-659e-dd5d-bcce-16800fa6b031/23UM1IM62083.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1720045950?i=1720045966",
-          "score": 850,
-          "confidence": 96,
-          "consensus": 1,
           "earliestReleaseYear": 2023
         },
         {
@@ -2208,7 +2207,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:30.248Z",
+      "checkedAt": "2026-10-10T20:23:15.477Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2244,7 +2243,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:58.487Z",
+      "checkedAt": "2026-10-10T20:24:10.473Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2340,7 +2339,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.051Z",
+      "checkedAt": "2026-10-10T20:23:02.386Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2376,7 +2375,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:57.308Z",
+      "checkedAt": "2026-10-10T20:24:09.681Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2472,7 +2471,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:49.828Z",
+      "checkedAt": "2026-10-10T20:23:56.971Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2538,7 +2537,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:30.248Z",
+      "checkedAt": "2026-10-10T20:23:15.476Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2619,7 +2618,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.054Z",
+      "checkedAt": "2026-10-10T20:23:02.389Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2655,7 +2654,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:40.346Z",
+      "checkedAt": "2026-10-10T20:23:44.321Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2736,7 +2735,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.053Z",
+      "checkedAt": "2026-10-10T20:23:02.389Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2772,7 +2771,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:32.237Z",
+      "checkedAt": "2026-10-10T20:23:17.495Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2808,7 +2807,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:52.593Z",
+      "checkedAt": "2026-10-10T20:24:03.176Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2904,7 +2903,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.052Z",
+      "checkedAt": "2026-10-10T20:23:02.387Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2940,7 +2939,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:17.058Z",
+      "checkedAt": "2026-10-10T20:23:02.394Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2976,7 +2975,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:39.753Z",
+      "checkedAt": "2026-10-10T20:23:43.123Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -3072,7 +3071,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:16:02.780Z",
+      "checkedAt": "2026-10-10T20:24:14.950Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -3168,7 +3167,7 @@
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T20:15:54.780Z",
+      "checkedAt": "2026-10-10T20:24:05.464Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -3249,7 +3248,7 @@
     },
     "wonderwall~v:remaster|oasis": {
       "identity": "wonderwall~v:remaster|oasis",
-      "title": "Wonderwall - Remastered",
+      "title": "Wonderwall (Remastered)",
       "artist": "Oasis",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ce/e3/0d/cee30d80-d3e7-66ae-de84-4b62d8bc3b4d/5051961151107.jpg/600x600bb.jpg",
       "provider": "apple-chart",
@@ -3260,11 +3259,11 @@
       "url": "https://music.apple.com/us/album/1821192759?i=1821192766",
       "collectionId": "1821192759",
       "trackId": "1821192766",
-      "confidence": 98,
-      "score": 1120,
-      "consensus": 2,
+      "confidence": 96,
+      "score": 880,
+      "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T20:16:10.401Z",
+      "checkedAt": "2026-10-10T20:24:19.187Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -3276,9 +3275,9 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ce/e3/0d/cee30d80-d3e7-66ae-de84-4b62d8bc3b4d/5051961151107.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1821192759?i=1821192766",
-          "score": 1120,
-          "confidence": 98,
-          "consensus": 2,
+          "score": 880,
+          "confidence": 96,
+          "consensus": 1,
           "earliestReleaseYear": 1995
         },
         {
@@ -3291,9 +3290,9 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/34/2e/cb/342ecb17-ef19-816a-4ce5-e60b9ceec161/5051961073164.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1525933483?i=1525933490",
-          "score": 995,
-          "confidence": 98,
-          "consensus": 2,
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
           "earliestReleaseYear": 1995
         },
         {
@@ -3306,24 +3305,9 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ce/e3/0d/cee30d80-d3e7-66ae-de84-4b62d8bc3b4d/5051961151107.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/1821192759?i=1821192766",
-          "score": 995,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 1995
-        },
-        {
-          "provider": "deezer",
-          "id": "987053242",
-          "collectionId": "153708702",
-          "releaseTitle": "(What's The Story) Morning Glory? (Deluxe Remastered Edition)",
-          "releaseArtist": "Oasis",
-          "releaseDate": "2014-09-26",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/ddb062c517401ee74d8a4df6f895d75e/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/987053242",
-          "score": 418,
-          "confidence": 98,
-          "consensus": 2,
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
           "earliestReleaseYear": 1995
         },
         {
