@@ -22,7 +22,7 @@ function fixtures(){
 }
 const seed=rows=>({schema:3,methodology:TRI_METHOD,
  appleUsDate:day,appleGlobalDate:day,spotifyDate:day,fingerprint:"a".repeat(64),
- sourceSizes:{U:100,A:100,S:100},coverage:{candidates:rows.length,
+ sourceSizes:{U:100,A:100,S:200},coverage:{candidates:rows.length,
   matched:rows.filter(t=>t.spotify.status==="matched").length,
   unmatched:rows.filter(t=>t.spotify.status!=="matched").length},tracks:rows});
 test("the three platform pool has no duplicates and preserves version distinctions",()=>{
@@ -75,7 +75,7 @@ test("partial, stale, duplicate and invented source data are blocked",()=>{
 test("live publisher can independently recompute scoring and rejects tampering",()=>{
  const rows=fixtures(),rank=rankTriCandidates(rows,day);
  const chart={methodology:TRI_METHOD,consensus:TRI_RULE,complete:true,
-  sources:{U:100,A:100,S:100},sourceDates:{S:day},
+  sources:{U:100,A:100,S:200},sourceDates:{U:day,A:day,S:day},
   spotifyFingerprint:"a".repeat(64),scoring:{maxDaily:rank.maxDaily},tracks:rank.tracks};
  assert.ok(isTriChart(chart));
  const forged=structuredClone(chart);forged.tracks[0].score+=4;
