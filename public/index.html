@@ -801,6 +801,8 @@ textarea{resize:vertical;min-height:64px}
   .nav{order:3;width:100%;height:48px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:4px;justify-content:stretch;align-items:center;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14)}
   /* All five mobile pills share exactly the same grid track width. */
   .nav-btn{width:100%;min-width:0;height:38px;padding:0 3px;font-size:12px;justify-content:center;top:0;text-indent:0!important}
+  /* The segments remain equal; only the label's optical X is adjusted. */
+  .nav-btn .nav-label{position:relative;left:var(--nav-label-offset,0px);display:inline-block}
   .search{width:auto;flex:1;height:36px;overflow:visible}
   .search input{height:36px;font-size:16px;background:rgba(255,255,255,.7);-webkit-appearance:none;appearance:none}
   .search input:focus,
@@ -978,11 +980,11 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
       <span class="brand-name">music98.news</span>
     </a>
     <nav class="nav" id="nav">
-      <a class="nav-btn active" data-tab="news" href="/">News</a>
-      <a class="nav-btn" data-tab="releases" href="/releases">Releases</a>
-      <a class="nav-btn" data-tab="discover" href="/discover">Discover</a>
-      <a class="nav-btn" data-tab="charts" href="/chart">Chart</a>
-      <a class="nav-btn" data-tab="concerts" href="/concerts">Concerts</a>
+      <a class="nav-btn active" data-tab="news" href="/"><span class="nav-label">News</span></a>
+      <a class="nav-btn" data-tab="releases" href="/releases"><span class="nav-label">Releases</span></a>
+      <a class="nav-btn" data-tab="discover" href="/discover"><span class="nav-label">Discover</span></a>
+      <a class="nav-btn" data-tab="charts" href="/chart"><span class="nav-label">Chart</span></a>
+      <a class="nav-btn" data-tab="concerts" href="/concerts"><span class="nav-label">Concerts</span></a>
     </nav>
     <div class="top-actions">
       <div class="search">
@@ -1440,6 +1442,39 @@ function centerSitePillInk(){
 }
 requestAnimationFrame(centerSitePillInk);
 if(document.fonts?.ready) document.fonts.ready.then(centerSitePillInk).catch(()=>{});
+
+/* Five equal-size navigation segments plus equal measured text-to-text gaps.
+   The first/last labels keep their native centers, while interior labels get
+   small horizontal adjustments. No nav/button widths or heights change. */
+function balanceMobileNavLabelGaps(){
+  const links=[...document.querySelectorAll("#nav .nav-btn")];
+  if(links.length!==5) return;
+  const labels=links.map(link=>link.querySelector(".nav-label"));
+  if(labels.some(label=>!label)) return;
+  labels.forEach(label=>label.style.removeProperty("--nav-label-offset"));
+  if(!window.matchMedia("(max-width:640px)").matches) return;
+  const boxes=links.map(link=>link.getBoundingClientRect());
+  const sizes=labels.map(label=>label.getBoundingClientRect().width);
+  if(boxes.some(box=>box.width<=0) || sizes.some(size=>size<=0)) return;
+  const centers=boxes.map(box=>box.left+box.width/2);
+  const gap=((centers[4]-centers[0])+(sizes[0]+sizes[4])/2-
+    sizes.reduce((sum,size)=>sum+size,0))/4;
+  if(gap<0) return;
+  let left=centers[0]-sizes[0]/2;
+  const shifts=[];
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  for(let i=0;i<5;i++){
+    const offset=Math.round((left+sizes[i]/2-centers[i])*dpr)/dpr;
+    const finalLeft=centers[i]-sizes[i]/2+offset;
+    if(finalLeft<boxes[i].left+1 || finalLeft+sizes[i]>boxes[i].right-1) return;
+    shifts.push(offset);
+    left+=sizes[i]+gap;
+  }
+  labels.forEach((label,i)=>label.style.setProperty("--nav-label-offset",shifts[i]+"px"));
+}
+requestAnimationFrame(balanceMobileNavLabelGaps);
+if(document.fonts?.ready) document.fonts.ready.then(balanceMobileNavLabelGaps).catch(()=>{});
+window.addEventListener("resize",()=>requestAnimationFrame(balanceMobileNavLabelGaps));
 
 window.music98PillPress = window.music98PillPress || function music98PillPress(el){
   if(!el || el.dataset.pressBound==="1") return el;
