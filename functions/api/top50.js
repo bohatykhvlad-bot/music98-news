@@ -962,6 +962,23 @@ async function decorateCachedTop50(env, payload, origin) {
   if (payload && Array.isArray(payload.tracks) && payload.tracks.length) {
     try {
       await applyNames(env, payload.tracks, origin);
+      if(payload.methodology===TRI_METHOD){
+        // Cached v3 editions created before the Apple-priority fix may hold a
+        // trusted but WRONG Deezer cover. Recover the exact Apple asset from
+        // the independently published three-source candidate snapshot.
+        const current=await readSeed(env,origin,"apple-spotify-streams.json");
+        if(current?.schema===3&&Array.isArray(current.tracks)){
+          const appleCovers=new Map(current.tracks
+            .filter(row=>isAppleArt(row.art))
+            .map(row=>[songIdentity(row.title,row.artist),row.art]));
+          for(const row of payload.tracks){
+            if(!isAppleArt(row.art)){
+              const art=appleCovers.get(songIdentity(row.title,row.artist));
+              if(art)row.art=art;
+            }
+          }
+        }
+      }
       await applyCovers(env, payload.tracks, origin, {retainTrusted:true,preferApple:payload.methodology===TRI_METHOD});
       const healed = await healMissingArtwork(env, payload.tracks, origin,{preferApple:payload.methodology===TRI_METHOD});
       await applyLoudness(env, payload.tracks, origin);
@@ -1059,8 +1076,15 @@ export async function onRequestGet({env,request}) {
        cached.spotifyFingerprint===verified.fingerprint &&
        !cachedTenureRegressed(cached,backup))
     {
+      const needsAppleRepair=cached.methodology===TRI_METHOD&&cached.tracks.some(t=>!isAppleArt(t.art));
       const decorated=await decorateCachedTop50(env, cached, origin);
-      if(hasCompleteChartArtwork(decorated.tracks))return top50Response(decorated);
+      if(hasCompleteChartArtwork(decorated.tracks)){
+        // Persist a repaired complete chart once; never perpetually serve old
+        // Deezer art from a stale KV entry after the source artwork is fixed.
+        if(needsAppleRepair&&decorated.tracks.every(t=>isAppleArt(t.art)))
+          await env.DESK.put(TOP50_KV,JSON.stringify(decorated));
+        return top50Response(decorated);
+      }
     }
     const retry=await env.DESK.get(TOP50_RETRY_KV,{type:"json"});
     if(retry?.fingerprint===verified.fingerprint && retry.seedEdition===seedEdition)
