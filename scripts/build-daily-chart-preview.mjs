@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {mergeKey} from "../functions/lib/chart-identity.js";
 import {onRequestGet} from "../functions/api/top50.js";
-import {DEEZER_GLOBAL_URL,DAILY_CHART_METHOD,completeDailySources,isConsensusChart} from "../functions/lib/daily-chart-sources.js";
+import {HYBRID_METHOD,isAppleSpotifyChart} from "../functions/lib/apple-spotify-chart.js";
 
 const output=process.argv[2];
 if(!output)throw new Error("Usage: node scripts/build-daily-chart-preview.mjs OUTPUT.json");
@@ -18,17 +18,13 @@ const env={
   }}
 };
 const networkFetch=globalThis.fetch;
-// Verify the production recovery path using the same-day official Deezer
-// snapshot. This also supports execution environments that cannot reach Deezer.
-globalThis.fetch=(input,init)=>String(input)===DEEZER_GLOBAL_URL
-  ? Promise.resolve(new Response("use verified daily snapshot",{status:503}))
-  : networkFetch(input,init);
+// The production route reads the paired Apple/Kworb snapshot from assets.
 try{
   const request=new Request("https://music98.news/api/top50");
   const response=await onRequestGet({env,request});
   const chart=await response.json();
-  if(response.status!==200 || chart.fallback || chart.methodology!==DAILY_CHART_METHOD ||
-     !isConsensusChart(chart) || chart.arrows?.ok!==true)
+  if(response.status!==200 || chart.fallback || chart.methodology!==HYBRID_METHOD ||
+     !isAppleSpotifyChart(chart) || chart.arrows?.ok!==true)
     throw new Error("Daily preview could not be verified: "+JSON.stringify(chart));
   const cached=await (await onRequestGet({env,request})).json();
   const ranking=rows=>rows.map(t=>[t.rank,mergeKey(t.title,t.artist),t.weeks,t.delta]);

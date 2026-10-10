@@ -1,3 +1,4 @@
+import {isAppleSpotifyChart} from "./apple-spotify-chart.js";
 import {mergeKey} from "./chart-identity.js";
 
 export const DAILY_CHART_METHOD = "daily-global-v1";
@@ -135,7 +136,7 @@ export function verifiedDailySeed(snapshot, source, now=Date.now()) {
 /* Old editions are retained for history recovery, never for serving a ranking
    under the new methodology. This keeps existing day counts through migration. */
 export function verifiedTenureEdition(snapshot) {
-  if (isConsensusChart(snapshot)) return true;
+  if (isAppleSpotifyChart(snapshot) || isConsensusChart(snapshot)) return true;
   if (!snapshot || snapshot.complete!==true || snapshot.tracks?.length!==CHART_SIZE) return false;
   if (snapshot.methodology===DAILY_CHART_METHOD) return completeDailySources(snapshot.sources);
   return !snapshot.methodology && Object.keys(snapshot.sources || {}).length===5 &&

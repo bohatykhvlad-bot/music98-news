@@ -1,7 +1,7 @@
 /* CI deployment contract: the live API must serve the EXACT cover URLs
  * committed by this run, not merely 50 nonempty strings from a stale build. */
 import fs from "node:fs";
-import {isConsensusChart} from "../functions/lib/daily-chart-sources.js";
+import {isAppleSpotifyChart} from "../functions/lib/apple-spotify-chart.js";
 import {artworkKey,mergeKey} from "../functions/lib/chart-identity.js";
 import {hasCompleteChartArtwork,artworkRegistryMismatches} from "../functions/lib/chart-artwork-gate.js";
 
@@ -23,7 +23,7 @@ for(let attempt=1;attempt<=20;attempt++){
       missingArtwork:!hasCompleteChartArtwork(j.tracks,j.tracks?.length),mismatches:mismatches.slice(0,6),
       mismatchCount:mismatches.length,cacheControl:r.headers.get("cache-control")};
     console.log("ARTWORK_PRODUCTION_CHECK",JSON.stringify(last));
-    if(r.ok && isConsensusChart(j) && j.tracks.length===audit.rows && j.updated===audit.chartUpdated && j.complete===true && !j.fallback &&
+    if(r.ok && isAppleSpotifyChart(j) && j.tracks.length===audit.rows && j.updated===audit.chartUpdated && j.complete===true && !j.fallback &&
        hasCompleteChartArtwork(j.tracks,j.tracks?.length) && mismatches.length===0 &&
        String(last.cacheControl||"").includes("no-store")){
       console.log("ARTWORK_PRODUCTION_PASS",JSON.stringify({rows:j.tracks.length,exactCovers:j.tracks.length,date:j.updated}));

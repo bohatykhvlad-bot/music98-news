@@ -1,0 +1,1101 @@
+{
+  "schema": 1,
+  "methodology": "apple-top50-spotify-daily-v1",
+  "appleDate": "2026-10-10",
+  "spotifyDate": "2026-10-09",
+  "capturedAt": "2026-10-10T08:28:07.939Z",
+  "fingerprint": "a62bbfa3bfcb2c4e64a8c8e5d2f51328e7b717360efca957999d08d3572ca1f0",
+  "coverage": {
+    "candidates": 50,
+    "matched": 37,
+    "unmatched": 13,
+    "artistPages": 27
+  },
+  "tracks": [
+    {
+      "pos": 1,
+      "title": "Solar Eclipse",
+      "artist": "Drake & Don Toliver",
+      "url": "https://music.apple.com/us/album/solar-eclipse/6818209777?i=6818209989",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 1
+      },
+      "spotify": {
+        "status": "track-not-found",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/3TVXtAsR1Inumwj472S9r4_songs.html",
+        "date": "2026-10-09"
+      }
+    },
+    {
+      "pos": 2,
+      "title": "BbY WOW",
+      "artist": "KAROL G, Judeline & rusowsky",
+      "url": "https://music.apple.com/us/album/bby-wow/6796864741?i=6796864754",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/2b/66/b2/2b66b26c-ab23-faa1-c4ee-06fa2cce8f76/26UM1IM00558.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 2
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 5470719,
+        "total": 290893381,
+        "spotifyId": "3h5T5JypYU7huFiVYhv1dr",
+        "matchedTitle": "BbY WOW",
+        "matchedArtist": "KAROL G",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/790FomKkXshlbRYZFtlgla_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 3,
+      "title": "Patient Zero",
+      "artist": "Taylor Swift",
+      "url": "https://music.apple.com/us/album/patient-zero/6814997249?i=6814997425",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 3
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 3408223,
+        "total": 80765920,
+        "spotifyId": "11hcBLPtbMp4aQI6zGQLub",
+        "matchedTitle": "Patient Zero",
+        "matchedArtist": "Taylor Swift",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/06HL4z0CvFAxyc27GXpf02_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 4,
+      "title": "Nicole Kidman",
+      "artist": "ADÉLA",
+      "url": "https://music.apple.com/us/album/nicole-kidman/6792883860?i=6792884088",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/77/7b/5d777b87-e796-0b3e-cef6-d37d993dd8fe/26UMGIM82371.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 4
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 5124148,
+        "total": 117008763,
+        "spotifyId": "70cHKK8bHAfJrOGVnfRG9J",
+        "matchedTitle": "Nicole Kidman",
+        "matchedArtist": "ADÉLA",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/2qanRMyA5bNuTvz1dK45OP_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 5,
+      "title": "Choosin' Texas",
+      "artist": "Ella Langley",
+      "url": "https://music.apple.com/us/album/choosin-texas/1844932149?i=1844932150",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/91/4d/e2914d0a-7f1d-f04c-fbf4-c50b38548838/196873638690.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 5
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 2318303,
+        "total": 757214995,
+        "spotifyId": "1REy2Bm9XrSoRMBKNXW69l",
+        "matchedTitle": "Choosin' Texas",
+        "matchedArtist": "Ella Langley",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/6BRxQ8cD3eqnrVj6WKDok8_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 6,
+      "title": "Quebec",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/quebec/6818209777?i=6818209990",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 6
+      },
+      "spotify": {
+        "status": "track-not-found",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/3TVXtAsR1Inumwj472S9r4_songs.html",
+        "date": "2026-10-09"
+      }
+    },
+    {
+      "pos": 7,
+      "title": "Cold Shoulder",
+      "artist": "Drake, Don Toliver & Yebba",
+      "url": "https://music.apple.com/us/album/cold-shoulder/6818059268?i=6818059600",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/62/58/98/62589807-decc-d418-eb07-5060de9a2d3e/26UMGIM63617.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 7
+      },
+      "spotify": {
+        "status": "track-not-found",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/3TVXtAsR1Inumwj472S9r4_songs.html",
+        "date": "2026-10-09"
+      }
+    },
+    {
+      "pos": 8,
+      "title": "Janice STFU",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/janice-stfu/6769568449?i=6769568596",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/35/b9/06/35b90629-a873-14f8-4789-ffc324960038/26UMGIM63614.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 8
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 1473264,
+        "total": 364079609,
+        "spotifyId": "514joG57v4yKTsfQmz7stz",
+        "matchedTitle": "Janice STFU",
+        "matchedArtist": "Drake",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/3TVXtAsR1Inumwj472S9r4_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 9,
+      "title": "stupid song",
+      "artist": "Olivia Rodrigo",
+      "url": "https://music.apple.com/us/album/stupid-song/1889992111?i=1889992115",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 9
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 3197423,
+        "total": 395965450,
+        "spotifyId": "4LfCY65LvojKjWEnU7fNN4",
+        "matchedTitle": "stupid song",
+        "matchedArtist": "Olivia Rodrigo",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/1McMsnEElThX1knmY4oliG_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 10,
+      "title": "the cure",
+      "artist": "Olivia Rodrigo",
+      "url": "https://music.apple.com/us/album/the-cure/1889992111?i=1889992123",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/1d/1b/f9/1d1bf9b1-44c6-9a6c-6ffb-c158488c06ce/26UMGIM39303.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 10
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 3752011,
+        "total": 491955151,
+        "spotifyId": "55pBIZO1cqoldeqpp5WR7H",
+        "matchedTitle": "the cure",
+        "matchedArtist": "Olivia Rodrigo",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/1McMsnEElThX1knmY4oliG_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 11,
+      "title": "Last Thing You Need",
+      "artist": "Morgan Wallen",
+      "url": "https://music.apple.com/us/album/last-thing-you-need/6812476961?i=6812477290",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/d3/1c/5dd31c9c-1e1c-0bbc-104f-4a42e2bb4c59/075679556424.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 11
+      },
+      "spotify": {
+        "status": "track-not-found",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/4oUHIQIBe0LHzYfvXNW4QM_songs.html",
+        "date": "2026-10-09"
+      }
+    },
+    {
+      "pos": 12,
+      "title": "Been By Now",
+      "artist": "Morgan Wallen",
+      "url": "https://music.apple.com/us/album/been-by-now/6792676858?i=6792676860",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/9f/8d/52/9f8d52a0-b6d9-d038-327b-4fe58bedce67/26UMGIM94572.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 12
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 830986,
+        "total": 78044320,
+        "spotifyId": "3xwMjQriBVW0OGEvNKo9c0",
+        "matchedTitle": "Been By Now",
+        "matchedArtist": "Morgan Wallen",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/4oUHIQIBe0LHzYfvXNW4QM_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 13,
+      "title": "hate that i made you love me",
+      "artist": "Ariana Grande",
+      "url": "https://music.apple.com/us/album/hate-that-i-made-you-love-me/1895420989?i=6763656876",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7e/e6/82/7ee682bd-1b17-6adc-be63-b5af1bdff369/26UMGIM51126.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 13
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 2432984,
+        "total": 543787189,
+        "spotifyId": "20jbSiX29FDX4oQxBXyUEi",
+        "matchedTitle": "hate that i made you love me",
+        "matchedArtist": "Ariana Grande",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/66CXWjxzNUsdJxJ2JdwvnR_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 14,
+      "title": "Ain't In LA",
+      "artist": "ADÉLA",
+      "url": "https://music.apple.com/us/album/aint-in-la/6792883860?i=6792884101",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/77/7b/5d777b87-e796-0b3e-cef6-d37d993dd8fe/26UMGIM82371.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 14
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 3715315,
+        "total": 197235888,
+        "spotifyId": "02HyFYmpzt02VJ8k0CqxKj",
+        "matchedTitle": "Ain't In LA",
+        "matchedArtist": "ADÉLA",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/2qanRMyA5bNuTvz1dK45OP_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 15,
+      "title": "Man I Need",
+      "artist": "Olivia Dean",
+      "url": "https://music.apple.com/us/album/man-i-need/1817609404?i=1817609509",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 15
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 2826309,
+        "total": 1472955609,
+        "spotifyId": "1qbmS6ep2hbBRaEZFpn7BX",
+        "matchedTitle": "Man I Need",
+        "matchedArtist": "Olivia Dean",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/00x1fYSGhdqScXBRpSj3DW_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 16,
+      "title": "musubi",
+      "artist": "Ayumu Imazu",
+      "url": "https://music.apple.com/us/album/musubi/6817260750?i=6817260751",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/aa/54/c5/aa54c5c6-e8e0-a701-6329-2c3a6fa228c2/26UM1IM20018.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 16
+      },
+      "spotify": {
+        "status": "artist-not-tracked",
+        "daily": null,
+        "sourceUrl": null,
+        "date": null
+      }
+    },
+    {
+      "pos": 17,
+      "title": "Great Expectation",
+      "artist": "SIENNA SPIRO",
+      "url": "https://music.apple.com/us/album/great-expectation/6769552402?i=6769552411",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f4/e5/61/f4e561f5-3e73-68c7-7ca4-295ac5a063ed/26UMGIM51351.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 17
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 2685054,
+        "total": 172421464,
+        "spotifyId": "7ujApz6iFP3PmKIDGcaGbe",
+        "matchedTitle": "Great Expectation",
+        "matchedArtist": "SIENNA SPIRO",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/02gSuSAWEdWa5UOvqzjX6v_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 18,
+      "title": "Beauty and a Beat (feat. Nicki Minaj)",
+      "artist": "Justin Bieber",
+      "url": "https://music.apple.com/us/album/beauty-and-a-beat-feat-nicki-minaj/1440650852?i=1440650961",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/73/08/1a/73081a96-0f7c-b5f8-2757-5c17fb714323/12UMGIM31899.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 18
+      },
+      "spotify": {
+        "status": "ambiguous",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/1uNFoZAHBGtllmzznpCI3s_songs.html",
+        "date": "2026-10-09"
+      }
+    },
+    {
+      "pos": 19,
+      "title": "The Fate of Ophelia",
+      "artist": "Taylor Swift",
+      "url": "https://music.apple.com/us/album/the-fate-of-ophelia/1833328839?i=1833328840",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2d/46/e0/2d46e0bc-8ab9-85dd-4b56-ee6951351034/25UM1IM19577.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 19
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 2204340,
+        "total": 1720827215,
+        "spotifyId": "0Gms8M0f1kJxAA2pXuLdtI",
+        "matchedTitle": "The Fate of Ophelia",
+        "matchedArtist": "Taylor Swift",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/06HL4z0CvFAxyc27GXpf02_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 20,
+      "title": "Babylon",
+      "artist": "Taylor Swift",
+      "url": "https://music.apple.com/us/album/babylon/6814997249?i=6814997429",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 20
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 1366492,
+        "total": 37872050,
+        "spotifyId": "2j7wI9QWrP8cjKDdOLVQTU",
+        "matchedTitle": "Babylon",
+        "matchedArtist": "Taylor Swift",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/06HL4z0CvFAxyc27GXpf02_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 21,
+      "title": "I Can't Love You Anymore",
+      "artist": "Ella Langley & Morgan Wallen",
+      "url": "https://music.apple.com/us/album/i-cant-love-you-anymore/1895158676?i=6763091996",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d9/7a/6e/d97a6e25-ef5c-0c26-64e9-266c18641a57/196874324103.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 21
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 622693,
+        "total": 145186404,
+        "spotifyId": "61rwYQu9An4QWrcCUyFUyq",
+        "matchedTitle": "I Can't Love You Anymore",
+        "matchedArtist": "Ella Langley",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/6BRxQ8cD3eqnrVj6WKDok8_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 22,
+      "title": "Yes! Tokyo (feat. SUPER★DRAGON, Sakurashimeji, ONE N' ONLY, BUDDiiS, ICEx & Lienel)",
+      "artist": "EBiDAN Ebisu Gakuen Boys Club, chotokkyu, M!LK & GNJB",
+      "url": "https://music.apple.com/us/album/yes-tokyo-feat-super-dragon-sakurashimeji-one-n-only/6793862982?i=6793862983",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/93/0b/de/930bde30-dac5-d610-024a-623237871a8c/4580789779237.png/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 22
+      },
+      "spotify": {
+        "status": "artist-not-tracked",
+        "daily": null,
+        "sourceUrl": null,
+        "date": null
+      }
+    },
+    {
+      "pos": 23,
+      "title": "WAIT FOR U (feat. Drake & Tems)",
+      "artist": "Future",
+      "url": "https://music.apple.com/us/album/wait-for-u-feat-drake-tems/1621119097?i=1621119447",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/65/f2/06/65f2067b-a8ea-239c-c219-8e0f0282dcea/196589073693.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 23
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 596136,
+        "total": 1423503522,
+        "spotifyId": "59nOXPmaKlBfGMDeOVGrIK",
+        "matchedTitle": "WAIT FOR U (feat. Drake & Tems)",
+        "matchedArtist": "Future",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/1RyvyyTE3xzB2ZywiAwp0i_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 24,
+      "title": "Be Her",
+      "artist": "Ella Langley",
+      "url": "https://music.apple.com/us/album/be-her/1869436835?i=1869436845",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a1/ba/64/a1ba6484-f462-1b88-ddff-d4c014d5f265/196874018361.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 24
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 1064774,
+        "total": 288298981,
+        "spotifyId": "1I5uP6N2FoPtnGk24jB4ha",
+        "matchedTitle": "Be Her",
+        "matchedArtist": "Ella Langley",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/6BRxQ8cD3eqnrVj6WKDok8_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 25,
+      "title": "Freestyle",
+      "artist": "Lil Baby",
+      "url": "https://music.apple.com/us/album/freestyle/1440928174?i=1440929293",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/93/e7/aa/93e7aa59-da8b-15bc-2992-5803f70fe8fa/17UM1IM55478.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 25
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 286545,
+        "total": 997006673,
+        "spotifyId": "5BbdKBZO0TH0GhfxUfyhL9",
+        "matchedTitle": "Freestyle",
+        "matchedArtist": "Lil Baby",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/5f7VJjfbwm532GiveGC0ZK_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 26,
+      "title": "For Okinawa (feat. Awich, CHICO CARLITO, ONE OK ROCK & Paledusk)",
+      "artist": "YAO",
+      "url": "https://music.apple.com/us/album/for-okinawa-feat-awich-chico-carlito-one-ok-rock-paledusk/6803148720?i=6803148739",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fa/d5/a6/fad5a6d5-60b1-4ba3-3da9-be47bb3b7d68/4550759798070_cover.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 26
+      },
+      "spotify": {
+        "status": "artist-not-tracked",
+        "daily": null,
+        "sourceUrl": null,
+        "date": null
+      }
+    },
+    {
+      "pos": 27,
+      "title": "pop it",
+      "artist": "Gunna",
+      "url": "https://music.apple.com/us/album/pop-it/6819441629?i=6819441636",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7f/c3/77/7fc37797-be3f-ad4e-e374-6dcf3d6f7913/075679559616.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 27
+      },
+      "spotify": {
+        "status": "track-not-found",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/2hlmm7s2ICUX0LVIhVFlZQ_songs.html",
+        "date": "2026-10-09"
+      }
+    },
+    {
+      "pos": 28,
+      "title": "Dead Fresh",
+      "artist": "Lil Baby",
+      "url": "https://music.apple.com/us/album/dead-fresh/6790569132?i=6790569133",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/74/80/37/748037d7-71c1-feff-4d38-3ef0a25578b6/26UMGIM85451.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 28
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 697936,
+        "total": 74875086,
+        "spotifyId": "5ZAMlvo6ZUjVRZOGu2bJib",
+        "matchedTitle": "Dead Fresh",
+        "matchedArtist": "Lil Baby",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/5f7VJjfbwm532GiveGC0ZK_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 29,
+      "title": "Wicked Games",
+      "artist": "The Weeknd",
+      "url": "https://music.apple.com/us/album/wicked-games/1714908584?i=1714908987",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/66/d5/13/66d513dd-3cb0-b86b-4d11-1fbab2e6a639/12UMGIM54989.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 29
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 492681,
+        "total": 831862170,
+        "spotifyId": "00aqkszH1FdUiJJWvX6iEl",
+        "matchedTitle": "Wicked Games",
+        "matchedArtist": "The Weeknd",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/1Xyo4u8uXC1ZmMpatF05PJ_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 30,
+      "title": "I’m Spent",
+      "artist": "Drake & Loe Shimmy",
+      "url": "https://music.apple.com/us/album/im-spent/6769551464?i=6769551476",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c4/3b/89/c43b8964-a24e-b396-bd65-e5b45cabe039/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 30
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 383911,
+        "total": 49101752,
+        "spotifyId": "3HkQz0gJg8AleZI6naFSr4",
+        "matchedTitle": "I'm Spent (feat. Loe Shimmy)",
+        "matchedArtist": "Drake",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/3TVXtAsR1Inumwj472S9r4_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 31,
+      "title": "In A Minute",
+      "artist": "Lil Baby",
+      "url": "https://music.apple.com/us/album/in-a-minute/1648587138?i=1648587330",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/9f/c0/99/9fc09958-180d-e66a-bbf7-9462289435f6/22UM1IM13098.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 31
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 71891,
+        "total": 236289059,
+        "spotifyId": "31lopd32BkJBTSgYE16c5e",
+        "matchedTitle": "In A Minute",
+        "matchedArtist": "Lil Baby",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/5f7VJjfbwm532GiveGC0ZK_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 32,
+      "title": "Pink Clouding",
+      "artist": "Taylor Swift",
+      "url": "https://music.apple.com/us/album/pink-clouding/6814997249?i=6814997428",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 32
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 1156398,
+        "total": 36695811,
+        "spotifyId": "3gyJbNBTRVRdZDA1yO3clm",
+        "matchedTitle": "Pink Clouding",
+        "matchedArtist": "Taylor Swift",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/06HL4z0CvFAxyc27GXpf02_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 33,
+      "title": "So Good (feat. Kendrick Lamar)",
+      "artist": "Jhené Aiko",
+      "url": "https://music.apple.com/us/album/so-good-feat-kendrick-lamar/6810715695?i=6810716062",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5f/51/9f/5f519f49-44c1-6aeb-f289-5b14c677abb1/26UM1IM17017.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 33
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 591980,
+        "total": 19379080,
+        "spotifyId": "3Yd3J42s3GZaYty4Iy4ewT",
+        "matchedTitle": "So Good (feat. Kendrick Lamar)",
+        "matchedArtist": "Jhené Aiko",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/5ZS223C6JyBfXasXxrRqOk_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 34,
+      "title": "Shiwaawase",
+      "artist": "VAUNDY",
+      "url": "https://music.apple.com/us/album/shiwaawase/1714599649?i=1714599822",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/8a/eb/75/8aeb7526-6fe4-a81a-5dce-c5d026e7f036/4547366655728.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 34
+      },
+      "spotify": {
+        "status": "stale",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/2IUl3m1H1EQ7QfNbNWvgru_songs.html",
+        "date": "2026-10-06"
+      }
+    },
+    {
+      "pos": 35,
+      "title": "Boston",
+      "artist": "STELLA LEFTY",
+      "url": "https://music.apple.com/us/album/boston/1884403092?i=1884403093",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7c/de/5e/7cde5e7a-612d-9714-d34c-1eb234c85ebb/810129961546.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 35
+      },
+      "spotify": {
+        "status": "different-edition",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/6hp2uD84OrQ3u3ukmTjLz2_songs.html",
+        "date": "2026-10-08"
+      }
+    },
+    {
+      "pos": 36,
+      "title": "God's Plan",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/gods-plan/1418213110?i=1418213269",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/1f/37/43/1f374304-2e04-2be3-53ea-41dd6f0b6fb8/00602567892410.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 36
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 941851,
+        "total": 3197014668,
+        "spotifyId": "6DCZcSspjsKoFjzjrWoCdn",
+        "matchedTitle": "God's Plan",
+        "matchedArtist": "Drake",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/3TVXtAsR1Inumwj472S9r4_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 37,
+      "title": "Mr. Brightside",
+      "artist": "The Killers",
+      "url": "https://music.apple.com/us/album/mr-brightside/1526194184?i=1526194192",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/1a/5a/071a5aee-6e42-060c-35b9-6a6e45b9ea59/06UMGIM10441.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 37
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 2243724,
+        "total": 3523521394,
+        "spotifyId": "2RvbnvBX3XKkHy8daq3PUT",
+        "matchedTitle": "Mr. Brightside",
+        "matchedArtist": "The Killers",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/0C0XlULifJtAgn6ZNCW2eu_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 38,
+      "title": "Yonaguni",
+      "artist": "Bad Bunny",
+      "url": "https://music.apple.com/us/album/yonaguni/1570323047?i=1570323056",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/b6/12/da/b612daba-6c68-c2ab-7492-fb2e079074d5/196006829308.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 38
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 411727,
+        "total": 1723579535,
+        "spotifyId": "2JPLbjOn0wPCngEot2STUS",
+        "matchedTitle": "Yonaguni",
+        "matchedArtist": "Bad Bunny",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/4q3ewBCX7sLwd24euuV69X_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 39,
+      "title": "Cinderella (feat. Ty Dolla $ign)",
+      "artist": "Mac Miller",
+      "url": "https://music.apple.com/us/album/cinderella-feat-ty-dolla-%24ign/1137965822?i=1137966332",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/33/cc/4d/33cc4d85-e92a-b171-1b72-4dc882ce2359/093624918844.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 39
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 2434501,
+        "total": 589829278,
+        "spotifyId": "5JID9gIKJ3tUKbd1tmGPLO",
+        "matchedTitle": "Cinderella (feat. Ty Dolla $ign)",
+        "matchedArtist": "Mac Miller",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/4LLpKhyESsyAXpc4laK94U_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 40,
+      "title": "Kyohan",
+      "artist": "Mrs. GREEN APPLE",
+      "url": "https://music.apple.com/us/album/kyohan/6808172946?i=6808172970",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/d9/cc/da/d9ccdae5-6251-b671-dbf3-5b0508dc52ad/26UM1IM13923.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 40
+      },
+      "spotify": {
+        "status": "different-edition",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/4QvgGvpgzgyUOo8Yp8LDm9_songs.html",
+        "date": "2026-10-08"
+      }
+    },
+    {
+      "pos": 41,
+      "title": "Billie Jean",
+      "artist": "Michael Jackson",
+      "url": "https://music.apple.com/us/album/billie-jean/269572838?i=269573364",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 41
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 2316692,
+        "total": 3295962556,
+        "spotifyId": "6vR5u5b8JeRESx5nZaIWx6",
+        "matchedTitle": "Billie Jean",
+        "matchedArtist": "Michael Jackson",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/3fMbdgg4jU18AjLCKBhRSm_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 42,
+      "title": "I'm The Problem",
+      "artist": "Morgan Wallen",
+      "url": "https://music.apple.com/us/album/im-the-problem/1802103958?i=1802103970",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 42
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 525758,
+        "total": 496976754,
+        "spotifyId": "3HlWVKwU0JqJXqJK9DWHnZ",
+        "matchedTitle": "I'm The Problem",
+        "matchedArtist": "Morgan Wallen",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/4oUHIQIBe0LHzYfvXNW4QM_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 43,
+      "title": "Best I Ever Had",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/best-i-ever-had/1452017773?i=1452017954",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7e/b0/35/7eb0353b-8f25-32dd-5f5e-71d9ed700247/00602577524004.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 43
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 351722,
+        "total": 918109275,
+        "spotifyId": "1GxHeBvQ9935Dd3cSfsfBa",
+        "matchedTitle": "Best I Ever Had",
+        "matchedArtist": "Drake",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/3TVXtAsR1Inumwj472S9r4_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 44,
+      "title": "LIKE ME (feat. 42 Dugg & Lil Baby)",
+      "artist": "Future",
+      "url": "https://music.apple.com/us/album/like-me-feat-42-dugg-lil-baby/1621803882?i=1621803969",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c1/27/d1/c127d12a-d259-dbd9-7d02-75056e376fb6/196589131805.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 44
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 25139,
+        "total": 74343264,
+        "spotifyId": "3gOL6mYIq19Oq8raxIntrV",
+        "matchedTitle": "LIKE ME (feat. 42 Dugg & Lil Baby)",
+        "matchedArtist": "Future",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/1RyvyyTE3xzB2ZywiAwp0i_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 45,
+      "title": "Brand New",
+      "artist": "Mrs. GREEN APPLE",
+      "url": "https://music.apple.com/us/album/brand-new/6788211807?i=6788211810",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/41/a0/b6/41a0b6b9-a720-25e5-fc69-7e9c3ca1296e/26UMGIM73217.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 45
+      },
+      "spotify": {
+        "status": "different-edition",
+        "daily": null,
+        "sourceUrl": "https://kworb.net/spotify/artist/4QvgGvpgzgyUOo8Yp8LDm9_songs.html",
+        "date": "2026-10-08"
+      }
+    },
+    {
+      "pos": 46,
+      "title": "Snooze",
+      "artist": "SZA",
+      "url": "https://music.apple.com/us/album/snooze/1657869377?i=1657869492",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/bd/3b/a9/bd3ba9fb-9609-144f-bcfe-ead67b5f6ab3/196589564931.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 46
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 949199,
+        "total": 2087051549,
+        "spotifyId": "4DEIW3K4lQj5F9lgWrNn8M",
+        "matchedTitle": "Snooze",
+        "matchedArtist": "SZA",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/7tYKF4w9nC0nq9CsPZTHyP_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 47,
+      "title": "Die With A Smile",
+      "artist": "Lady Gaga & Bruno Mars",
+      "url": "https://music.apple.com/us/album/die-with-a-smile/1762656724?i=1762656732",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/ae/f2/11aef294-f57c-bab9-c9fc-529162984e62/24UMGIM85348.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 47
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 3029480,
+        "total": 4049710813,
+        "spotifyId": "7so0lgd0zP2Sbgs2d7a1SZ",
+        "matchedTitle": "Die With A Smile",
+        "matchedArtist": "Lady Gaga",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/1HY2Jd0NmPuamShAr6KMms_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 48,
+      "title": "Golden",
+      "artist": "HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast",
+      "url": "https://music.apple.com/us/album/golden/1820264137?i=1820264150",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/e1/15/42/e1154273-8ecd-5702-e6e6-597f28001681/25UMGIM82363.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 48
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 1434163,
+        "total": 1977915338,
+        "spotifyId": "0pn9rqDnnJGsXCdvNYlqyo",
+        "matchedTitle": "Golden",
+        "matchedArtist": "HUNTR/X",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/2yNNYQBChuox9A5Ka93BIn_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 49,
+      "title": "Not Like Us",
+      "artist": "Kendrick Lamar",
+      "url": "https://music.apple.com/us/album/not-like-us/1744776162?i=1744776167",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/ef/b6/d0efb685-73be-fdee-58c9-be655f4cd4fd/24UMGIM51924.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 49
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 792142,
+        "total": 2055008667,
+        "spotifyId": "6AI3ezQ4o3HUoP6Dhudph3",
+        "matchedTitle": "Not Like Us",
+        "matchedArtist": "Kendrick Lamar",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/2YZyLoL8N0Wb9xBt1NhZWg_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    },
+    {
+      "pos": 50,
+      "title": "Baby (feat. Ludacris)",
+      "artist": "Justin Bieber",
+      "url": "https://music.apple.com/us/album/baby-feat-ludacris/1440661543?i=1440661545",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": "",
+      "sourceRanks": {
+        "A": 50
+      },
+      "spotify": {
+        "status": "matched",
+        "daily": 1098617,
+        "total": 1805322459,
+        "spotifyId": "6epn3r7S14KUqlReYr77hA",
+        "matchedTitle": "Baby",
+        "matchedArtist": "Justin Bieber",
+        "date": "2026-10-09",
+        "sourceUrl": "https://kworb.net/spotify/artist/1uNFoZAHBGtllmzznpCI3s_songs.html",
+        "metric": "kworb-spotify-artist-daily"
+      }
+    }
+  ]
+}

@@ -18,9 +18,9 @@ on:
     paths:
       - "functions/api/top50.js"
       - "functions/lib/daily-chart-sources.js"
-      - "public/data/spotify-chart.json"
+      - "public/data/apple-spotify-streams.json"
+      - "functions/lib/apple-spotify-chart.js"
       - "public/data/apple-chart.json"
-      - "public/data/deezer-chart.json"
       - "scripts/snapshot-live-chart.mjs"
       - "scripts/audit-live-chart.mjs"
       - ".github/workflows/apple-data.yml"

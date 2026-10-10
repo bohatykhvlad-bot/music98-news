@@ -75,17 +75,10 @@ test("verified chart recovery rejects mass day-one resets and old launch snapsho
     /bakedTop50\(/);
 });
 
-test("every source must supply all 50 positions",()=>{
-  const gate=completeDailySources;
-  const complete=Object.fromEntries(DAILY_SOURCE_IDS.map(k=>[k,50]));
-  assert.equal(gate(complete),true);
-  for(const key of Object.keys(complete)){
-    assert.equal(gate({...complete,[key]:49}),false,key);
-    assert.equal(gate({...complete,[key]:0}),false,key);
-  }
-  assert.match(top50,/invalid_rank_or_duplicate_source_/);
-  assert.match(top50,/spotify_mirror_disagreement/);
-  assert.match(top50,/spotify_newer_chart_waiting_for_mirror/);
+test("the active ranking requires paired Apple candidates and dated Kworb streams",()=>{
+  assert.match(top50,/verifiedStreamSeed\(streamSeed/);
+  assert.match(top50,/apple_candidates_changed_waiting_for_streams/);
+  assert.match(top50,/rankAppleSpotify\(independent.tracks\)/);
   assert.match(top50,/const memory=\{deferPersist:true\}/);
 });
 test("fresh Apple fallback also requires an intact Top 50",()=>{
@@ -93,17 +86,16 @@ test("fresh Apple fallback also requires an intact Top 50",()=>{
  assert.match(top50,/verifiedDailySeed\(await readSeed/);
  assert.doesNotMatch(top50,/rss.applemarketingtools.com/);
 });
-test("the Worker uses tested shared parsing and rejects unverified KV cache",()=>{
- assert.match(top50,/function parseSpotify\(html,size=SIZE\) \{ return parseKworbSpotify\(html,size\); \}/);
- assert.match(top50,/const verified=verifiedSpotifySnapshot\(spotifySeed\)/);
- assert.match(top50,/cached.sourceDates\?\.S===verified.date/);
+test("the Worker rejects obsolete three-source cache and refreshes when streams change",()=>{
+ assert.match(top50,/const verified=verifiedStreamSeed\(streamSeed\)/);
+ assert.match(top50,/cached.sourceDates\?\.S===verified.spotifyDate/);
  assert.match(top50,/cached.spotifyFingerprint===verified.fingerprint/);
- assert.match(top50,/const TOP50_KV = "top50v38"/);
- assert.match(top50,/TOP50_RETRY_KV="top50v38:retry"/);
+ assert.match(top50,/const TOP50_KV = "top50v39"/);
+ assert.match(top50,/TOP50_RETRY_KV="top50v39:retry"/);
 });
 
 test("verified source publisher dispatches downstream chart audit after bot commits",()=>{
- const spotifyWorkflow=readFileSync(new URL("../.github/workflows/spotify-chart-source.yml",import.meta.url),"utf8");
+ const spotifyWorkflow=readFileSync(new URL("../.github/workflows/apple-chart-source.yml",import.meta.url),"utf8");
  const auditWorkflow=readFileSync(new URL("../.github/workflows/apple-data.yml",import.meta.url),"utf8");
  assert.match(spotifyWorkflow,/actions: write/);
  assert.match(spotifyWorkflow,/GH_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}/);

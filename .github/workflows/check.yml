@@ -51,21 +51,6 @@ jobs:
       - run: npm ci
       - run: npm run check
 
-  verify-spotify-live:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Independently fetch, parse and compare live Spotify Top 50
-        run: node scripts/refresh-spotify-ranking.mjs
-      - name: Validate generated source fingerprint and all ranked rows
-        run: |
-          node --input-type=module -e 'import fs from "node:fs"; import {verifiedSpotifySnapshot} from "./functions/lib/spotify-chart.js"; const j=JSON.parse(fs.readFileSync("public/data/spotify-chart.json","utf8")); const v=verifiedSpotifySnapshot(j); if(!v || v.tracks.length!==100)process.exit(1); console.log("VERIFIED_LIVE_SOURCE",j.chartDate,j.provider,j.mirrorMatched,j.fingerprint);'
-
   verify-daily-global-live:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -77,19 +62,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Read official global daily song rankings
+      - name: Read Apple candidates and Kworb daily counters
         run: |
           node scripts/refresh-apple-ranking.mjs
-          node scripts/refresh-deezer-ranking.mjs
+          node scripts/refresh-apple-spotify-streams.mjs
       - name: Build a daily edition using isolated in-memory history
         run: |
-          node scripts/refresh-spotify-ranking.mjs
           node scripts/build-daily-chart-preview.mjs /tmp/daily-top50.json
       - uses: actions/upload-artifact@v4
         with:
-          name: daily-global-source-snapshots
+          name: apple-spotify-source-snapshots
           path: |
             public/data/apple-chart.json
-            public/data/deezer-chart.json
-            public/data/spotify-chart.json
+            public/data/apple-spotify-streams.json
             /tmp/daily-top50.json

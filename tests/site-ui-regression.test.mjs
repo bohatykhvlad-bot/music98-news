@@ -85,11 +85,11 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 
 test("daily chart checks server freshness before painting browser cache",()=>{
- assert.match(page,/const DAILYKEY = "music98news_daily_v47"/);
+ assert.match(page,/const DAILYKEY = "music98news_daily_v48"/);
  assert.match(page,/const hasVerifiedCache=!!\(cached && chartHasCompleteArtwork\(cached\.tracks\)/);
  assert.match(page,/sourceDates\?\.S && cached.spotifyFingerprint/);
  assert.doesNotMatch(page,/if\(hasVerifiedCache\) applyDaily\(cached.tracks, "cache"\)/);
- assert.match(page,/fetch\("\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=47"/);
+ assert.match(page,/fetch\("\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=48"/);
  assert.match(page,/cache:"no-store"/);
 });
 
@@ -236,11 +236,11 @@ test("mobile chart reclaims arrow space without shrinking artwork or playback",(
 });
 
 
-test("the UI requires daily-only source provenance and verified Spotify metadata",()=>{
+test("the UI requires Apple candidate provenance and verified Spotify daily metadata",()=>{
  assert.match(page,/j.complete === true/);
  assert.match(page,/isDailySourceEdition\(j\)/);
  assert.match(page,/j\?\.methodology===DAILY_CHART_METHOD/);
- assert.match(page,/Object.keys\(j.sources\|\|\{\}\).length===3/);
+ assert.match(page,/Object.keys\(j.sources\|\|\{\}\).length===2/);
  assert.match(page,/!!j.sourceDates\?\.S && !!j.spotifyFingerprint/);
  assert.doesNotMatch(page,/Last complete chart:/);
  assert.match(page,/else if\(tag === "backup"\) txt = ""/);

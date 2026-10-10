@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import {mergeKey} from "../functions/lib/chart-identity.js";
-import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
-import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,completeDailySources,isConsensusChart} from "../functions/lib/daily-chart-sources.js";
+import {verifiedStreamSeed,HYBRID_METHOD,isAppleSpotifyChart} from "../functions/lib/apple-spotify-chart.js";
+
 
 const OUT = new URL("../public/data/chart-tenure-backup.json", import.meta.url);
 const DAILY_OUT = new URL("../public/data/daily-top50-backup.json", import.meta.url);
@@ -15,14 +15,14 @@ const r = await fetch(liveUrl, {
 });
 if (!r.ok) throw new Error("live top50 HTTP " + r.status);
 const j = await r.json();
-const spotifyRef=verifiedSpotifySnapshot(JSON.parse(fs.readFileSync(
-  new URL("../public/data/spotify-chart.json",import.meta.url),"utf8")));
+const spotifyRef=verifiedStreamSeed(JSON.parse(fs.readFileSync(
+  new URL("../public/data/apple-spotify-streams.json",import.meta.url),"utf8")));
 if(!spotifyRef || j.fallback || j.complete!==true ||
-   j.methodology!==DAILY_CHART_METHOD || !completeDailySources(j.sources) ||
-   j.sourceDates?.S!==spotifyRef.date || j.spotifyFingerprint!==spotifyRef.fingerprint)
-  throw new Error("refusing snapshot unless all daily sources are complete and Spotify edition matches");
+   j.methodology!==HYBRID_METHOD ||
+   j.sourceDates?.S!==spotifyRef.spotifyDate || j.spotifyFingerprint!==spotifyRef.fingerprint)
+  throw new Error("refusing snapshot unless Apple candidates and Kworb daily edition match");
 const tracks = Array.isArray(j.tracks) ? j.tracks : [];
-if (!isConsensusChart(j)) throw new Error("refusing tenure snapshot: missing three-source consensus");
+if (!isAppleSpotifyChart(j)) throw new Error("refusing tenure snapshot: invalid Apple + Spotify ranking");
 if (j.arrows && j.arrows.ok === false) throw new Error("refusing tenure snapshot: live arrow/tenure self-check failed");
 
 let backup = {schema:1,current:null,previous:null};
@@ -78,14 +78,14 @@ const snapshot = {
   complete:true,
   methodology:j.methodology,
   consensus:j.consensus,
-  sources:Object.fromEntries(DAILY_SOURCE_IDS.map(k=>[k,Number(j.sources[k])])),
+  sources:j.sources,
   sourceDateKinds:j.sourceDateKinds,
   sourceDates:j.sourceDates,
   sourceOrigin:j.sourceOrigin,
   spotifyFingerprint:j.spotifyFingerprint,
   tracks: tracks.map((t,i) => ({
     rank: Number(t.rank) || i + 1,
-    sourceRanks:t.sourceRanks,
+    sourceRanks:t.sourceRanks,spotify:t.spotify,score:t.score,applePoints:t.applePoints,spotifyBonus:t.spotifyBonus,
     title: String(t.title || ""),
     artist: String(t.artist || ""),
     weeks: Math.max(1, Number(t.weeks) || 1),

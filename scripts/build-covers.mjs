@@ -5,7 +5,7 @@
  * with Deezer. Compilations and derivative packages are rejected.
  */
 import fs from "node:fs";
-import {isConsensusChart} from "../functions/lib/daily-chart-sources.js";
+import {isAppleSpotifyChart} from "../functions/lib/apple-spotify-chart.js";
 import path from "node:path";
 import dns from "node:dns";
 import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen, versionSignature } from "../functions/lib/chart-identity.js";
@@ -241,7 +241,7 @@ async function prospectiveChart(){
       const candidate=await json(CHART+(CHART.includes("?")?"&":"?")+"artworkAudit="+Date.now());
       if(candidate?.artworkAuditOnly===true && candidate.complete===true &&
          candidate.updated===new Date().toISOString().slice(0,10) &&
-         isConsensusChart(candidate)) return candidate;
+         isAppleSpotifyChart(candidate)) return candidate;
       last=JSON.stringify({updated:candidate?.updated,rev:candidate?.rev,
         fallback:candidate?.fallback,auditOnly:candidate?.artworkAuditOnly,
         rows:candidate?.tracks?.length});

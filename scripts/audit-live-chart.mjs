@@ -1,10 +1,10 @@
 import fs from "node:fs";
-import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
-import {DAILY_CHART_METHOD,completeDailySources,isConsensusChart} from "../functions/lib/daily-chart-sources.js";
+import {verifiedStreamSeed,HYBRID_METHOD,isAppleSpotifyChart} from "../functions/lib/apple-spotify-chart.js";
+
 /* Production and GitHub's independent Spotify reference must match exactly.
    Wait briefly for Workers Builds to deploy when a new snapshot is committed. */
-const mirror=JSON.parse(fs.readFileSync(new URL("../public/data/spotify-chart.json",import.meta.url),"utf8"));
-const verified=verifiedSpotifySnapshot(mirror);
+const mirror=JSON.parse(fs.readFileSync(new URL("../public/data/apple-spotify-streams.json",import.meta.url),"utf8"));
+const verified=verifiedStreamSeed(mirror);
 if(!verified)throw new Error("Spotify reference is missing, unverified or too old");
 let j=null,reason="";
 const attempts=20;
@@ -14,8 +14,8 @@ for(let attempt=0;attempt<attempts;attempt++){
    {headers:{"user-agent":"music98-chart-audit/2.0","cache-control":"no-cache"},signal:AbortSignal.timeout(15000)});
  if(res.ok){
    j=await res.json();
-   if(!j.fallback && isConsensusChart(j) &&
-     j.sourceDates?.S===verified.date && j.spotifyFingerprint===verified.fingerprint)break;
+   if(!j.fallback && isAppleSpotifyChart(j) &&
+     j.sourceDates?.S===verified.spotifyDate && j.spotifyFingerprint===verified.fingerprint)break;
  }
  reason=JSON.stringify({status:res.status,updated:j?.updated,rev:j?.rev,
   fallback:j?.fallback,sources:j?.sources,spotifyDate:j?.sourceDates?.S});
@@ -23,10 +23,10 @@ for(let attempt=0;attempt<attempts;attempt++){
  if(attempt<attempts-1)await new Promise(done=>setTimeout(done,15000));
 }
 if(!j || j.fallback || j.complete!==true ||
-  j.methodology!==DAILY_CHART_METHOD || !isConsensusChart(j) ||
-  j.sourceDates?.S!==verified.date || j.spotifyFingerprint!==verified.fingerprint)
+  j.methodology!==HYBRID_METHOD || !isAppleSpotifyChart(j) ||
+  j.sourceDates?.S!==verified.spotifyDate || j.spotifyFingerprint!==verified.fingerprint)
   throw new Error("Published chart differs from the verified source: "+reason);
-console.log("SPOTIFY_SOURCE_AUDIT",JSON.stringify({date:verified.date,provider:verified.source,
+console.log("SPOTIFY_SOURCE_AUDIT",JSON.stringify({date:verified.spotifyDate,provider:verified.source,
   rows:j.tracks.length,fingerprint:verified.fingerprint,liveOrigin:j.sourceOrigin?.S,updated:j.updated}));
 const news = (j.tracks || []).filter(x => String(x.delta).toLowerCase() === "new");
 const olivia = (j.tracks || []).find(x => /drop dead/i.test(x.title || "") && /olivia rodrigo/i.test(x.artist || ""));
@@ -107,7 +107,7 @@ if (prior && Array.isArray(prior.tracks) && prior.tracks.length >= 10) {
     regressed: regressed.length, oneDay: ones.length
   }));
 
-  if (!isConsensusChart(j)) throw new Error("live chart must contain only three-source consensus tracks");
+  if (!isAppleSpotifyChart(j)) throw new Error("live chart must contain only three-source consensus tracks");
   if (badArrows.length) throw new Error("day-over-day arrow mismatch: " + JSON.stringify(badArrows));
   if (badDays.length) throw new Error("day-over-day tenure mismatch: " + JSON.stringify(badDays));
   if (gap === 1 && established.length >= 10) {

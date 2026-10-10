@@ -6,10 +6,6 @@ on:
       - "scripts/refresh-spotify-ranking.mjs"
       - "functions/lib/spotify-chart.js"
       - ".github/workflows/spotify-chart-source.yml"
-  schedule:
-    # More checks improve recovery when Spotify and its independent mirror publish at different times.
-    # Every publish requires 100 verified ranks; these runs use GitHub Actions, not Worker requests.
-    - cron: "55 1,5,9,13,17,21 * * *"
   workflow_dispatch:
 permissions:
   contents: write
@@ -45,7 +41,7 @@ jobs:
             if git push origin HEAD:main; then
               # GITHUB_TOKEN pushes cannot trigger downstream push workflows.
               # workflow_dispatch is explicitly supported for this token.
-              gh workflow run apple-data.yml --ref main
+              gh workflow run apple-chart-source.yml --ref main
               exit 0
             fi
             sleep 4
