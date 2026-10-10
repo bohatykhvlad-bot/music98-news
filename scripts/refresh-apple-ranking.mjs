@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import {datedChartPath,verifiedDatedApple} from "../functions/lib/chart-history.js";
 import {SOURCE_SIZE,APPLE_GLOBAL_URL,APPLE_US_URL,parseAppleGlobal,parseAppleUs,verifiedDailySeed}
  from "../functions/lib/daily-chart-sources.js";
 async function fetchChart(url,parse,region,source) {
@@ -24,6 +25,15 @@ const [global,us]=await Promise.all([
 ]);
 // Require one Apple edition: mixing US and Global days skews the weighting.
 if(global.sourceDate!==us.sourceDate)throw new Error("Apple regions have different edition dates; retain previous snapshots");
+for(const [kind,snapshot,region] of [["apple-global",global,"A"],["apple-us",us,"U"]]){
+ if(!verifiedDatedApple(snapshot,region,snapshot.sourceDate))
+  throw new Error("Refusing invalid Apple dated archive: "+kind);
+ const archived=new URL("../public/data/"+datedChartPath(kind,snapshot.sourceDate),import.meta.url);
+ fs.mkdirSync(new URL("../public/data/chart-history/",import.meta.url),{recursive:true});
+ // Keep the latest verified capture of each date. Never relabel today's
+ // rankings as yesterday's. Historical archives are selected by sourceDate.
+ fs.writeFileSync(archived,JSON.stringify(snapshot,null,2)+"\n");
+}
 fs.writeFileSync(new URL("../public/data/apple-chart.json",import.meta.url),JSON.stringify(global,null,2)+"\n");
 fs.writeFileSync(new URL("../public/data/apple-us-chart.json",import.meta.url),JSON.stringify(us,null,2)+"\n");
-console.log("APPLE_GLOBAL_US_SOURCES",global.sourceDate,global.tracks.length,us.tracks.length);
+console.log("APPLE_GLOBAL_US_SOURCES_ARCHIVED",global.sourceDate,global.tracks.length,us.tracks.length);
