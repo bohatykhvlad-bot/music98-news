@@ -19,6 +19,23 @@ async function fetchChart(url,parse,region,source) {
  if(!verifiedDailySeed(snapshot,region==="us"?"U":"A"))throw new Error("Invalid Apple "+region+" snapshot");
  return snapshot;
 }
+/* Byte-stable collection: identical content keeps the existing timestamps, so
+   quiet four-hour runs change nothing downstream (no commits, no audits).
+   capturedAt/updated refresh only when ranks or provenance actually change. */
+function writeVerified(fileUrl, snapshot, label){
+ const body=JSON.stringify(snapshot,null,2)+"\n";
+ let previous=null;
+ try{ previous=JSON.parse(fs.readFileSync(fileUrl,"utf8")); }catch{}
+ if(previous){
+  const {updated:_oldUpdated,capturedAt:_oldCaptured,...before}=previous;
+  const {updated:_newUpdated,capturedAt:_newCaptured,...after}=snapshot;
+  if(JSON.stringify(before)===JSON.stringify(after)){
+   console.log("CHART_SOURCE_UNCHANGED",label,snapshot.sourceDate);
+   return;
+  }
+ }
+ fs.writeFileSync(fileUrl,body);
+}
 const [global,us]=await Promise.all([
  fetchChart(APPLE_GLOBAL_URL,parseAppleGlobal,"global","official-apple-global-playlist"),
  fetchChart(APPLE_US_URL,parseAppleUs,"us","official-apple-us-playlist")
@@ -32,8 +49,8 @@ for(const [kind,snapshot,region] of [["apple-global",global,"A"],["apple-us",us,
  fs.mkdirSync(new URL("../public/data/chart-history/",import.meta.url),{recursive:true});
  // Keep the latest verified capture of each date. Never relabel today's
  // rankings as yesterday's. Historical archives are selected by sourceDate.
- fs.writeFileSync(archived,JSON.stringify(snapshot,null,2)+"\n");
+ writeVerified(archived,snapshot,"archive:"+kind);
 }
-fs.writeFileSync(new URL("../public/data/apple-chart.json",import.meta.url),JSON.stringify(global,null,2)+"\n");
-fs.writeFileSync(new URL("../public/data/apple-us-chart.json",import.meta.url),JSON.stringify(us,null,2)+"\n");
+writeVerified(new URL("../public/data/apple-chart.json",import.meta.url),global,"rolling:apple-chart");
+writeVerified(new URL("../public/data/apple-us-chart.json",import.meta.url),us,"rolling:apple-us-chart");
 console.log("APPLE_GLOBAL_US_SOURCES_ARCHIVED",global.sourceDate,global.tracks.length,us.tracks.length);
