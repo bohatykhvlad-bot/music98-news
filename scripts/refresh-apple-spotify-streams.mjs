@@ -3,7 +3,7 @@ import {createHash} from "node:crypto";
 import {datedChartPath,verifiedDatedApple,verifiedDatedSpotify} from "../functions/lib/chart-history.js";
 import {KWORB_ARTISTS_URL,artistKey,htmlText,parseKworbArtists,
  parseKworbArtistDaily,matchKworbTrack,freshDay,parseKworbGlobalStreams} from "../functions/lib/apple-spotify-chart.js";
-import {TRI_METHOD,verifiedTriSeed,songIdentity} from "../functions/lib/tri-source-chart.js";
+import {TRI_METHOD,verifiedTriSeed,verifiedSpotifyRow,songIdentity} from "../functions/lib/tri-source-chart.js";
 import {shouldPublishSeed} from "../functions/lib/publish-window.js";
 import {pickSearchHit,pickDailyForDate,totalDelta,medianValue,FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
 
@@ -135,7 +135,7 @@ async function resolveSpotifyId(t){
  return null;
 }
 async function applySiteStreams(){
- const stats={processed:0,sitePrimary:0,soundcampsDelta:0,officialKept:0,unresolved:0,monitor:null};
+ const stats={processed:0,sitePrimary:0,soundcampsDelta:0,officialKept:0,unresolved:0,rejected:0,myscBlocked:false,monitor:null};
  const official=new Map();
  for(const [key,t] of candidates){
   if(t.spotify.status==="matched"&&t.spotify.date===chosen&&OFFICIAL_METRICS.has(t.spotify.metric))
@@ -147,6 +147,7 @@ async function applySiteStreams(){
   if(OFFICIAL_METRICS.has(t.spotify.metric)&&t.spotify.date===chosen)stats.officialKept++;
   else stats.unresolved++;
  };
+ let msFailStreak=0,msBlocked=false;
  for(const [key,t] of candidates){
   if(SERVICE_LIMIT&&stats.processed>=SERVICE_LIMIT){console.log("SITE_STREAM_LIMIT_REACHED",SERVICE_LIMIT);break;}
   stats.processed++;
@@ -156,13 +157,23 @@ async function applySiteStreams(){
    if(!entry?.id||duplicate){countFallback(t);}
    else{
     let found=null;
-    try{
-     const series=await mystreamcountSeries(entry.id);
-     const pick=series?pickDailyForDate(series.data,chosen,{windowDays:FALLBACK_WINDOW_DAYS}):null;
-     if(pick)found={id:entry.id,daily:pick.daily,date:pick.date,method:pick.method,
-      sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-daily-delta",
-      matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
-    }catch(e){console.warn("SERVICE_MYSC_FAILED",entry.id,String(e?.message||e));}
+    if(!msBlocked){
+     try{
+      const series=await mystreamcountSeries(entry.id);
+      const pick=series?pickDailyForDate(series.data,chosen,{windowDays:FALLBACK_WINDOW_DAYS}):null;
+      if(pick)found={id:entry.id,daily:pick.daily,date:pick.date,method:pick.method,
+       sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-daily-delta",
+       matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
+      msFailStreak=0;
+     }catch(e){
+      msFailStreak++;
+      console.warn("SERVICE_MYSC_FAILED",entry.id,String(e?.message||e));
+      if(msFailStreak>=5&&!msBlocked){
+       msBlocked=true;stats.myscBlocked=true;
+       console.warn("SERVICE_MYSC_BLOCKED","лимит сайта: сохраняю официальные значения, суммы soundcamps продолжаю собирать");
+      }
+     }
+    }
     /* Суммы soundcamps собираем всегда (если сайт доступен): история для дельт и контроль. */
     try{
      const total=await soundcampsTotal(entry.id);
@@ -208,11 +219,19 @@ async function applySiteStreams(){
  for(const t of candidates.values()){
   if(!t._site)continue;
   const daily=Math.max(1,Math.round(t._site.daily*calibration));
-  t.spotify={status:"matched",daily,spotifyId:t._site.id,total:null,date:t._site.date,
+  const row={status:"matched",daily,spotifyId:t._site.id,total:null,date:t._site.date,
    sourceUrl:t._site.sourceUrl,metric:t._site.metric,estimated:true,estimateMethod:t._site.method,
    trackUrl:t._site.trackUrl||("https://open.spotify.com/track/"+t._site.id),
    matchedTitle:t._site.matchedTitle,matchedArtist:t._site.matchedArtist};
   delete t._site;
+  /* Замена официального ряда сайтовым — только если он проходит валидатор.
+     Иначе сохраняем прежний (официальный) ряд: одна кривая запись не вправе
+     уронить весь выпуск. */
+  if(verifiedSpotifyRow(row,chosen))t.spotify=row;
+  else{
+   stats.rejected++;
+   console.log("TRI_ROW_REJECTED",JSON.stringify({title:t.title,artist:t.artist,row}));
+  }
  }
  idsCache.updated=new Date().toISOString();
  totalsCache.updated=new Date().toISOString();
@@ -376,7 +395,12 @@ const payload={schema:3,methodology:TRI_METHOD,
   officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
   calibration:totalsCache.calibration,monitor:siteStats.monitor},
  tracks};
-if(!verifiedTriSeed(payload))throw new Error("No complete verified SAME-DAY chart: "+chosen+" "+matched+"/"+tracks.length);
+if(!verifiedTriSeed(payload)){
+ const bad=payload.tracks.filter(t=>t.spotify?.status==="matched"&&!verifiedSpotifyRow(t.spotify,chosen)).slice(0,10);
+ for(const t of bad)console.log("TRI_ROW_REJECTED_FINAL",JSON.stringify({title:t.title,artist:t.artist,...t.spotify}));
+ try{fs.writeFileSync(new URL(".apple-spotify-streams.rejected.json",ROOT),JSON.stringify(payload,null,2)+"\n");}catch{}
+ throw new Error("No complete verified SAME-DAY chart: "+chosen+" "+matched+"/"+tracks.length);
+}
 if(old?.schema===3 && old.spotifyDate>chosen)
  throw new Error("Refusing to roll back a later published edition");
 if(old?.schema===3&&old.spotifyDate===chosen&&old.coverage?.matched>matched+8)
@@ -399,6 +423,7 @@ console.log("TRI_SOURCE_DATE_ALIGNED",JSON.stringify({
  artistRecovered:recovered,appleSource:us.source,
  siteRecovered:siteStats.sitePrimary,soundcampsDeltas:siteStats.soundcampsDelta,
  officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
+ rejected:siteStats.rejected,myscBlocked:siteStats.myscBlocked,
  calibration:totalsCache.calibration,monitor:siteStats.monitor,
  published:Boolean(changed&&decision.publish),
  allDatesEqual:payload.appleUsDate===payload.appleGlobalDate&&payload.spotifyDate===payload.appleUsDate
