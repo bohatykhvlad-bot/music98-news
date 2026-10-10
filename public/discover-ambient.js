@@ -16,6 +16,10 @@
   let clock=0, energy=0, pointerLastMove=0, renderer=null, lost=false;
   let sourceBounds=null, layoutFrame=0, inView=true;
   let scrolling=false, scrollTimer=0;
+  /* The ambient stays invisible until its measured geometry holds still for a
+     moment: painting at a transient layout size re-anchors the shader (the
+     aspect changes) and read as the background jerking sideways on open. */
+  let settled=false, settleFrame=0, settleRef=null, stableAt=0, lastSettledGeo=null;
   const defaultPalette=[[.18,.66,.90],[0,.83,.81],[.02,.59,.64]];
   let palette=defaultPalette.map(c=>c.slice()), targetPalette=palette.map(c=>c.slice()), artworkRequest=0;
   let paletteStrength=1,targetPaletteStrength=1;
@@ -249,20 +253,25 @@
     return sourceBounds || [width/2,height/2,Math.min(width*.3,330),225];
   }
 
+  function measureGeometry() {
+    const panelRect=panel?.getBoundingClientRect();
+    const subscribeTop=document.querySelector(".subscribe")?.getBoundingClientRect().top;
+    const w=Math.max(1,document.documentElement.clientWidth);
+    /* The canvas ends at the Subscribe card's top edge - the section's own
+       bottom plus its shared top margin - so the next block sits at the same
+       height as on Releases while no white strip shows on Discover. */
+    const panelBottom=panelRect?.height ? panelRect.bottom+scrollY : innerHeight;
+    const h=Math.max(1,Number.isFinite(subscribeTop)&&subscribeTop>0
+      ? Math.max(panelBottom,subscribeTop+scrollY) : panelBottom);
+    return {w, h};
+  }
   function resize() {
     // The texture and its source share document coordinates. Native scrolling
     // moves the existing canvas with the card instead of rebuilding a fixed
     // background around a source that jumps through viewport coordinates.
     const rect=stage?.getBoundingClientRect();
-    const panelRect=panel?.getBoundingClientRect();
-    const subscribeTop=document.querySelector(".subscribe")?.getBoundingClientRect().top;
-    width=Math.max(1,document.documentElement.clientWidth);
-    /* The canvas ends at the Subscribe card's top edge - the section's own
-       bottom plus its shared top margin - so the next block sits at the same
-       height as on Releases while no white strip shows on Discover. */
-    const panelBottom=panelRect?.height ? panelRect.bottom+scrollY : innerHeight;
-    height=Math.max(1,Number.isFinite(subscribeTop)&&subscribeTop>0
-      ? Math.max(panelBottom,subscribeTop+scrollY) : panelBottom);
+    const geo=measureGeometry();
+    width=geo.w;height=geo.h;
     if(rect?.width&&rect.height){
       sourceBounds=[rect.left+scrollX+rect.width/2,rect.top+scrollY+rect.height/2,rect.width/2,rect.height/2];
     }
@@ -279,6 +288,9 @@
     layoutFrame=requestAnimationFrame(()=>{
       layoutFrame=0;
       if(!active||lost)return;
+      if(!settled){start();return;}
+      const geo=measureGeometry();
+      if(geo.w!==width||geo.h!==height){unsettle();start();return;}
       resize();render();
     });
   }
@@ -318,12 +330,35 @@
   }
   function start() {
     if(frame)cancelAnimationFrame(frame);frame=0;last=0;
-    if(active&&!document.hidden&&!lost&&inView&&!scrolling){resize();render();if(!motion.matches)frame=requestAnimationFrame(loop);}
+    if(settleFrame)cancelAnimationFrame(settleFrame);settleFrame=0;
+    if(!(active&&!document.hidden&&!lost&&inView&&!scrolling))return;
+    if(!settled){settleFrame=requestAnimationFrame(watchSettle);return;}
+    resize();render();if(!motion.matches)frame=requestAnimationFrame(loop);
+  }
+  function watchSettle() {
+    settleFrame=0;
+    if(!active)return;
+    const geo=measureGeometry(), now=performance.now();
+    if(!settleRef||geo.w!==settleRef.w||geo.h!==settleRef.h){settleRef=geo;stableAt=now;}
+    const known=lastSettledGeo&&geo.w===lastSettledGeo.w&&geo.h===lastSettledGeo.h;
+    if(known||now-stableAt>=300){
+      settled=true;lastSettledGeo=geo;
+      document.body.classList.add("discover-ambient-settled");
+      start();
+      return;
+    }
+    settleFrame=requestAnimationFrame(watchSettle);
+  }
+  function unsettle() {
+    settled=false;settleRef=null;stableAt=0;
+    document.body.classList.remove("discover-ambient-settled");
+    if(settleFrame)cancelAnimationFrame(settleFrame);settleFrame=0;
   }
   function setVisible(value) {
     if(value&&!active)settlePalette();
     active=!!value;document.body.classList.toggle("discover-ambient-visible",active);
     if(!active){playing=false;energy=0;pointer.strength=0;pointer.targetStrength=0;}
+    unsettle();
     start();
   }
   function setPlaying(value) { playing=!!value;if(active&&motion.matches)render(); }

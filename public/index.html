@@ -889,9 +889,9 @@ textarea{resize:vertical;min-height:64px}
    and adjusts only this section's top inset, leaving the 450px embed intact. */
 #tab-discover{padding-top:var(--discover-heading-top,var(--section-heading-top));padding-bottom:12px}
 /* The Discover canvas is extended down across the shared Subscribe top
-   margin (see discover-ambient.js resize): the next section keeps the exact
-   same offset as on Releases, and no white strip shows between the ambient
-   and the subscribe card. */
+   margin (see discover-ambient.js measureGeometry): the next section keeps the
+   exact same offset as on Releases, and no white strip shows between the
+   ambient and the subscribe card. */
 
 #tab-discover .discover-layout{--discover-row-inset:0px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(4 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
 #tab-discover .discover-heading{grid-area:1/1/2/4;text-align:center;width:100%;margin-bottom:0}
@@ -907,8 +907,13 @@ textarea{resize:vertical;min-height:64px}
 #tab-discover .discover-card{z-index:1}
 /* Discover-only document ambience. The canvas is always click-through and
    sits behind the site UI; it never shifts the player or affects other tabs. */
-#discoverAmbient{position:absolute;top:0;left:0;z-index:0;width:100%;height:100vh;display:block;pointer-events:none;user-select:none;opacity:0;visibility:hidden}
-body.discover-ambient-visible #discoverAmbient{opacity:1;visibility:visible}
+#discoverAmbient{position:absolute;top:0;left:0;z-index:0;width:100%;height:100vh;display:block;pointer-events:none;user-select:none;opacity:0;visibility:hidden;transition:opacity .28s ease}
+body.discover-ambient-visible #discoverAmbient{visibility:visible}
+/* The ambient fades in only once its canvas geometry has settled
+   (discover-ambient.js): a late layout change must never re-anchor an
+   already visible background. */
+body.discover-ambient-visible.discover-ambient-settled #discoverAmbient{opacity:1}
+@media(prefers-reduced-motion:reduce){#discoverAmbient{transition:none}}
 
 #tab-discover .discover-card{position:relative;width:100%;max-width:660px;height:450px;flex:none;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);background:var(--card2);box-shadow:var(--shadow)}
 #tab-discover .discover-question{display:grid;place-items:center;position:absolute;inset:0;font-size:clamp(95px,10vw,130px);font-weight:300;color:#b8c5c9;line-height:1;user-select:none}
