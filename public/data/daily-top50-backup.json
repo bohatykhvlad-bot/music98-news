@@ -54,7 +54,7 @@
     "covers": 130,
     "names": 99,
     "namesWithUrl": 99,
-    "loudness": 12
+    "loudness": 50
   },
   "covers": {
     "asked": 0,
@@ -213,11 +213,11 @@
       "applePoints": 50,
       "spotifyBonus": 0,
       "rank": 5,
-      "delta": "14",
-      "weeks": 7,
       "gainDb": -7.1,
       "lufs": -8.9,
-      "truePeakDbtp": 0.9
+      "truePeakDbtp": 0.9,
+      "delta": "14",
+      "weeks": 7
     },
     {
       "pos": 10,
@@ -245,11 +245,11 @@
       "applePoints": 41,
       "spotifyBonus": 6.858350794475095,
       "rank": 6,
-      "delta": "2",
-      "weeks": 21,
       "gainDb": -11.5,
       "lufs": -4.5,
-      "truePeakDbtp": 0.8
+      "truePeakDbtp": 0.8,
+      "delta": "2",
+      "weeks": 21
     },
     {
       "pos": 9,
@@ -309,11 +309,11 @@
       "applePoints": 43,
       "spotifyBonus": 2.692998854446737,
       "rank": 8,
-      "delta": "19",
-      "weeks": 21,
       "gainDb": -6.1,
       "lufs": -9.9,
-      "truePeakDbtp": 0.3
+      "truePeakDbtp": 0.3,
+      "delta": "19",
+      "weeks": 21
     },
     {
       "pos": 6,
@@ -336,11 +336,11 @@
       "applePoints": 45,
       "spotifyBonus": 0,
       "rank": 9,
-      "delta": "15",
-      "weeks": 7,
       "gainDb": -8.7,
       "lufs": -7.3,
-      "truePeakDbtp": 0.6
+      "truePeakDbtp": 0.6,
+      "delta": "15",
+      "weeks": 7
     },
     {
       "pos": 7,
@@ -363,11 +363,11 @@
       "applePoints": 44,
       "spotifyBonus": 0,
       "rank": 10,
-      "delta": "16",
-      "weeks": 7,
       "gainDb": -7.3,
       "lufs": -8.7,
-      "truePeakDbtp": 0.6
+      "truePeakDbtp": 0.6,
+      "delta": "16",
+      "weeks": 7
     },
     {
       "pos": 14,
@@ -395,11 +395,11 @@
       "applePoints": 37,
       "spotifyBonus": 6.7912736881568945,
       "rank": 11,
-      "delta": "-2",
-      "weeks": 19,
       "gainDb": -9.8,
       "lufs": -6.2,
-      "truePeakDbtp": 0.4
+      "truePeakDbtp": 0.4,
+      "delta": "-2",
+      "weeks": 19
     },
     {
       "pos": 13,
@@ -491,11 +491,11 @@
       "applePoints": 39,
       "spotifyBonus": 1.5189703583751972,
       "rank": 14,
-      "delta": "-4",
-      "weeks": 21,
       "gainDb": -8.3,
       "lufs": -7.7,
-      "truePeakDbtp": 0.6
+      "truePeakDbtp": 0.6,
+      "delta": "-4",
+      "weeks": 21
     },
     {
       "pos": 11,
@@ -518,11 +518,11 @@
       "applePoints": 40,
       "spotifyBonus": 0,
       "rank": 15,
-      "delta": "17",
-      "weeks": 14,
       "gainDb": -9.3,
       "lufs": -6.7,
-      "truePeakDbtp": 0.6
+      "truePeakDbtp": 0.6,
+      "delta": "17",
+      "weeks": 14
     },
     {
       "pos": 17,
@@ -550,11 +550,11 @@
       "applePoints": 34,
       "spotifyBonus": 4.908045907676852,
       "rank": 16,
-      "delta": "-3",
-      "weeks": 8,
       "gainDb": -9.1,
       "lufs": -6.9,
-      "truePeakDbtp": 0.2
+      "truePeakDbtp": 0.2,
+      "delta": "-3",
+      "weeks": 8
     },
     {
       "pos": 19,
@@ -609,11 +609,11 @@
       "applePoints": 35,
       "spotifyBonus": 0,
       "rank": 18,
-      "delta": "24",
-      "weeks": 5,
       "gainDb": -9.5,
       "lufs": -6.5,
-      "truePeakDbtp": 0.5
+      "truePeakDbtp": 0.5,
+      "delta": "24",
+      "weeks": 5
     },
     {
       "pos": 20,
@@ -641,11 +641,11 @@
       "applePoints": 31,
       "spotifyBonus": 2.497828895982411,
       "rank": 19,
-      "delta": "20",
-      "weeks": 14,
       "gainDb": -6.9,
       "lufs": -9.1,
-      "truePeakDbtp": 0.3
+      "truePeakDbtp": 0.3,
+      "delta": "20",
+      "weeks": 14
     },
     {
       "pos": 18,
@@ -668,11 +668,11 @@
       "applePoints": 33,
       "spotifyBonus": 0,
       "rank": 20,
-      "delta": "-8",
-      "weeks": 12,
       "gainDb": -8.2,
       "lufs": -7.8,
-      "truePeakDbtp": 1.5
+      "truePeakDbtp": 1.5,
+      "delta": "-8",
+      "weeks": 12
     },
     {
       "pos": 21,
@@ -700,11 +700,11 @@
       "applePoints": 30,
       "spotifyBonus": 1.1382288141650119,
       "rank": 21,
-      "delta": "-4",
-      "weeks": 21,
       "gainDb": -8.6,
       "lufs": -7.4,
-      "truePeakDbtp": 0.3
+      "truePeakDbtp": 0.3,
+      "delta": "-4",
+      "weeks": 21
     },
     {
       "pos": 23,
@@ -732,11 +732,11 @@
       "applePoints": 28,
       "spotifyBonus": 1.0896849207572168,
       "rank": 22,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -8.5,
       "lufs": -7.5,
-      "truePeakDbtp": 0.6
+      "truePeakDbtp": 0.6,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 22,
@@ -759,11 +759,11 @@
       "applePoints": 29,
       "spotifyBonus": 0,
       "rank": 23,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -10.4,
       "lufs": -5.6,
-      "truePeakDbtp": 0.5
+      "truePeakDbtp": 0.5,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 24,
@@ -791,11 +791,11 @@
       "applePoints": 27,
       "spotifyBonus": 1.9463145520725886,
       "rank": 24,
-      "delta": "-13",
-      "weeks": 21,
       "gainDb": -7.4,
       "lufs": -8.6,
-      "truePeakDbtp": 0.5
+      "truePeakDbtp": 0.5,
+      "delta": "-13",
+      "weeks": 21
     },
     {
       "pos": 25,
@@ -823,11 +823,11 @@
       "applePoints": 26,
       "spotifyBonus": 0.5237794154662303,
       "rank": 25,
-      "delta": "re-entry",
-      "weeks": 1,
       "gainDb": -6.2,
       "lufs": -9.8,
-      "truePeakDbtp": -0.5
+      "truePeakDbtp": -0.5,
+      "delta": "re-entry",
+      "weeks": 1
     },
     {
       "pos": 26,
@@ -850,11 +850,11 @@
       "applePoints": 25,
       "spotifyBonus": 0,
       "rank": 26,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -10.5,
       "lufs": -5.5,
-      "truePeakDbtp": 0.3
+      "truePeakDbtp": 0.3,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 28,
@@ -882,11 +882,11 @@
       "applePoints": 23,
       "spotifyBonus": 1.275766494312722,
       "rank": 27,
-      "delta": "re-entry",
-      "weeks": 1,
       "gainDb": -8.4,
       "lufs": -7.6,
-      "truePeakDbtp": 0.9
+      "truePeakDbtp": 0.9,
+      "delta": "re-entry",
+      "weeks": 1
     },
     {
       "pos": 27,
@@ -909,11 +909,11 @@
       "applePoints": 24,
       "spotifyBonus": 0,
       "rank": 28,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -7.9,
       "lufs": -8.1,
-      "truePeakDbtp": 0.7
+      "truePeakDbtp": 0.7,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 29,
@@ -941,11 +941,11 @@
       "applePoints": 22,
       "spotifyBonus": 0.9005781506964624,
       "rank": 29,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -8.1,
       "lufs": -7.9,
-      "truePeakDbtp": 0.3
+      "truePeakDbtp": 0.3,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 30,
@@ -973,11 +973,11 @@
       "applePoints": 21,
       "spotifyBonus": 0.7017560214662826,
       "rank": 30,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -6.7,
       "lufs": -9.3,
-      "truePeakDbtp": 0.6
+      "truePeakDbtp": 0.6,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 32,
@@ -1005,11 +1005,11 @@
       "applePoints": 19,
       "spotifyBonus": 2.113795279925728,
       "rank": 31,
-      "delta": "re-entry",
-      "weeks": 1,
       "gainDb": -8.7,
       "lufs": -7.3,
-      "truePeakDbtp": 0.4
+      "truePeakDbtp": 0.4,
+      "delta": "re-entry",
+      "weeks": 1
     },
     {
       "pos": 31,
@@ -1037,11 +1037,11 @@
       "applePoints": 20,
       "spotifyBonus": 0.1314105147787704,
       "rank": 32,
-      "delta": "re-entry",
-      "weeks": 1,
       "gainDb": -7.8,
       "lufs": -8.2,
-      "truePeakDbtp": 1.1
+      "truePeakDbtp": 1.1,
+      "delta": "re-entry",
+      "weeks": 1
     },
     {
       "pos": 33,
@@ -1069,11 +1069,11 @@
       "applePoints": 18,
       "spotifyBonus": 1.0820881130981137,
       "rank": 33,
-      "delta": "re-entry",
-      "weeks": 1,
       "gainDb": -5,
       "lufs": -11,
-      "truePeakDbtp": 0.1
+      "truePeakDbtp": 0.1,
+      "delta": "re-entry",
+      "weeks": 1
     },
     {
       "pos": 37,
@@ -1101,11 +1101,11 @@
       "applePoints": 14,
       "spotifyBonus": 4.1013329326547385,
       "rank": 34,
-      "delta": "16",
-      "weeks": 2,
       "gainDb": -8.5,
       "lufs": -7.5,
-      "truePeakDbtp": -1.3
+      "truePeakDbtp": -1.3,
+      "delta": "16",
+      "weeks": 2
     },
     {
       "pos": 34,
@@ -1128,11 +1128,11 @@
       "applePoints": 17,
       "spotifyBonus": 0,
       "rank": 35,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -10.7,
       "lufs": -5.3,
-      "truePeakDbtp": 0.2
+      "truePeakDbtp": 0.2,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 36,
@@ -1160,11 +1160,11 @@
       "applePoints": 15,
       "spotifyBonus": 1.7216219659609642,
       "rank": 36,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -3.5,
       "lufs": -12.5,
-      "truePeakDbtp": 0.8
+      "truePeakDbtp": 0.8,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 39,
@@ -1192,11 +1192,11 @@
       "applePoints": 12,
       "spotifyBonus": 4.450056747568281,
       "rank": 37,
-      "delta": "-16",
-      "weeks": 12,
       "gainDb": -7.2,
       "lufs": -8.8,
-      "truePeakDbtp": 0.8
+      "truePeakDbtp": 0.8,
+      "delta": "-16",
+      "weeks": 12
     },
     {
       "pos": 35,
@@ -1219,11 +1219,11 @@
       "applePoints": 16,
       "spotifyBonus": 0,
       "rank": 38,
-      "delta": "-24",
-      "weeks": 21,
       "gainDb": -7,
       "lufs": -9,
-      "truePeakDbtp": 0.2
+      "truePeakDbtp": 0.2,
+      "delta": "-24",
+      "weeks": 21
     },
     {
       "pos": 41,
@@ -1251,11 +1251,11 @@
       "applePoints": 10,
       "spotifyBonus": 4.234712110053541,
       "rank": 39,
-      "delta": "re-entry",
-      "weeks": 1,
       "gainDb": -6.4,
       "lufs": -9.6,
-      "truePeakDbtp": 0.8
+      "truePeakDbtp": 0.8,
+      "delta": "re-entry",
+      "weeks": 1
     },
     {
       "pos": 38,
@@ -1283,11 +1283,11 @@
       "applePoints": 13,
       "spotifyBonus": 0.7526012577140226,
       "rank": 40,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -8.6,
       "lufs": -7.4,
-      "truePeakDbtp": 1
+      "truePeakDbtp": 1,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 40,
@@ -1310,11 +1310,11 @@
       "applePoints": 11,
       "spotifyBonus": 0,
       "rank": 41,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -10.9,
       "lufs": -5.1,
-      "truePeakDbtp": 0.7
+      "truePeakDbtp": 0.7,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 42,
@@ -1342,11 +1342,11 @@
       "applePoints": 9,
       "spotifyBonus": 0.9610400387956318,
       "rank": 42,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -6.2,
       "lufs": -9.8,
-      "truePeakDbtp": 0.9
+      "truePeakDbtp": 0.9,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 47,
@@ -1374,11 +1374,11 @@
       "applePoints": 4,
       "spotifyBonus": 5.537626772641768,
       "rank": 43,
-      "delta": "-27",
-      "weeks": 5,
       "gainDb": -6.4,
       "lufs": -9.6,
-      "truePeakDbtp": 0.4
+      "truePeakDbtp": 0.4,
+      "delta": "-27",
+      "weeks": 5
     },
     {
       "pos": 43,
@@ -1406,11 +1406,11 @@
       "applePoints": 8,
       "spotifyBonus": 0.6429173203741593,
       "rank": 44,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -10.1,
       "lufs": -5.9,
-      "truePeakDbtp": 0.7
+      "truePeakDbtp": 0.7,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 44,
@@ -1438,11 +1438,11 @@
       "applePoints": 7,
       "spotifyBonus": 0.04595191235375094,
       "rank": 45,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -8.2,
       "lufs": -7.8,
-      "truePeakDbtp": 0.3
+      "truePeakDbtp": 0.3,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 46,
@@ -1470,11 +1470,11 @@
       "applePoints": 5,
       "spotifyBonus": 1.7350534728616112,
       "rank": 46,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -6.2,
       "lufs": -9.8,
-      "truePeakDbtp": 0
+      "truePeakDbtp": 0,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 45,
@@ -1497,11 +1497,11 @@
       "applePoints": 6,
       "spotifyBonus": 0,
       "rank": 47,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -12.1,
       "lufs": -3.9,
-      "truePeakDbtp": 0.8
+      "truePeakDbtp": 0.8,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 48,
@@ -1529,11 +1529,11 @@
       "applePoints": 3,
       "spotifyBonus": 2.62152561665112,
       "rank": 48,
-      "delta": "re-entry",
-      "weeks": 1,
       "gainDb": -8.8,
       "lufs": -7.2,
-      "truePeakDbtp": 0.7
+      "truePeakDbtp": 0.7,
+      "delta": "re-entry",
+      "weeks": 1
     },
     {
       "pos": 49,
@@ -1561,11 +1561,11 @@
       "applePoints": 2,
       "spotifyBonus": 1.4479668942967094,
       "rank": 49,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -7.2,
       "lufs": -8.8,
-      "truePeakDbtp": 0.5
+      "truePeakDbtp": 0.5,
+      "delta": "new",
+      "weeks": 1
     },
     {
       "pos": 50,
@@ -1593,14 +1593,14 @@
       "applePoints": 1,
       "spotifyBonus": 2.008176621756665,
       "rank": 50,
-      "delta": "new",
-      "weeks": 1,
       "gainDb": -6.5,
       "lufs": -9.5,
-      "truePeakDbtp": 0.9
+      "truePeakDbtp": 0.9,
+      "delta": "new",
+      "weeks": 1
     }
   ],
-  "seedEdition": "[[\"A\",\"2026-10-10T08:35:11.385Z\",\"2026-10-10\"],[\"C\",\"130:de856d9c\"]]",
+  "seedEdition": "[[\"A\",\"2026-10-10T09:35:27.291Z\",\"2026-10-10\"],[\"C\",\"130:de856d9c\"]]",
   "arrows": {
     "ok": true,
     "bad": 0,
