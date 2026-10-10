@@ -697,9 +697,9 @@
       "rank": 17,
       "applePoints": 5.2,
       "spotifyBonus": 24.64653818070461,
-      "gainDb": -9.8,
-      "lufs": -6.2,
-      "truePeakDbtp": 0.4,
+      "gainDb": -9.4,
+      "lufs": -6.6,
+      "truePeakDbtp": 0.2,
       "delta": "-8",
       "weeks": 19
     },
@@ -878,7 +878,10 @@
       "applePoints": 0,
       "spotifyBonus": 18.345905201428014,
       "delta": "-7",
-      "weeks": 12
+      "weeks": 12,
+      "gainDb": -8,
+      "lufs": -8,
+      "truePeakDbtp": 0.7
     },
     {
       "title": "So Easy (To Fall In Love)",
@@ -911,7 +914,10 @@
       "applePoints": 0,
       "spotifyBonus": 18.170817761017144,
       "delta": "-5",
-      "weeks": 21
+      "weeks": 21,
+      "gainDb": -9.3,
+      "lufs": -6.7,
+      "truePeakDbtp": 0.5
     },
     {
       "title": "Orbiter",
@@ -944,7 +950,10 @@
       "applePoints": 16.8,
       "spotifyBonus": 15.484621204314434,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6.4,
+      "lufs": -9.6,
+      "truePeakDbtp": 0.2
     },
     {
       "title": "Blinding Lights",
@@ -977,7 +986,10 @@
       "applePoints": 0,
       "spotifyBonus": 16.129236722879185,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -7.3,
+      "lufs": -8.7,
+      "truePeakDbtp": -0.2
     },
     {
       "title": "Sweater Weather",
@@ -1010,7 +1022,10 @@
       "applePoints": 9.2,
       "spotifyBonus": 21.26516854801612,
       "delta": "10",
-      "weeks": 5
+      "weeks": 5,
+      "gainDb": -10.1,
+      "lufs": -5.9,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "Dope Girl",
@@ -1043,7 +1058,10 @@
       "applePoints": 22.4,
       "spotifyBonus": 5.011063740779766,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -9.3,
+      "lufs": -6.7,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "Draw You Out",
@@ -1076,7 +1094,10 @@
       "applePoints": 11.2,
       "spotifyBonus": 15.246026573573282,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -9.4,
+      "lufs": -6.6,
+      "truePeakDbtp": 0.3
     },
     {
       "title": "Earrings",
@@ -1109,7 +1130,10 @@
       "applePoints": 0,
       "spotifyBonus": 23.982901780106122,
       "delta": "-6",
-      "weeks": 21
+      "weeks": 21,
+      "gainDb": -7.7,
+      "lufs": -8.3,
+      "truePeakDbtp": 0.5
     },
     {
       "title": "Brand New",
@@ -1178,7 +1202,10 @@
       "applePoints": 0,
       "spotifyBonus": 22.14592965153179,
       "delta": "-2",
-      "weeks": 11
+      "weeks": 11,
+      "gainDb": -6.5,
+      "lufs": -9.5,
+      "truePeakDbtp": 0.2
     },
     {
       "title": "Stop The Wedding!",
@@ -1211,7 +1238,10 @@
       "applePoints": 0,
       "spotifyBonus": 22.097652549753406,
       "delta": "-2",
-      "weeks": 5
+      "weeks": 5,
+      "gainDb": -8.3,
+      "lufs": -7.7,
+      "truePeakDbtp": 0.2
     },
     {
       "title": "back to friends",
@@ -1244,7 +1274,10 @@
       "applePoints": 0,
       "spotifyBonus": 21.952207955474726,
       "delta": "-2",
-      "weeks": 6
+      "weeks": 6,
+      "gainDb": -10.8,
+      "lufs": -5.2,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "bloodstream",
@@ -1277,7 +1310,10 @@
       "applePoints": 5.6,
       "spotifyBonus": 16.178213115555245,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6,
+      "lufs": -10,
+      "truePeakDbtp": 0
     },
     {
       "title": "Iris",
@@ -1310,7 +1346,10 @@
       "applePoints": 0,
       "spotifyBonus": 21.478028743163545,
       "delta": "-2",
-      "weeks": 5
+      "weeks": 5,
+      "gainDb": -5.2,
+      "lufs": -10.8,
+      "truePeakDbtp": 0.3
     },
     {
       "title": "Love Me Not",
@@ -1343,7 +1382,10 @@
       "applePoints": 0,
       "spotifyBonus": 21.226684604042376,
       "delta": "1",
-      "weeks": 3
+      "weeks": 3,
+      "gainDb": -7.4,
+      "lufs": -8.6,
+      "truePeakDbtp": 0.7
     },
     {
       "title": "Babydoll",
@@ -1376,7 +1418,10 @@
       "applePoints": 0,
       "spotifyBonus": 21.194758546814427,
       "delta": "1",
-      "weeks": 21
+      "weeks": 21,
+      "gainDb": -7.2,
+      "lufs": -8.8,
+      "truePeakDbtp": 0.1
     },
     {
       "title": "Self Aware",
@@ -1409,7 +1454,10 @@
       "applePoints": 0,
       "spotifyBonus": 21.082128112805357,
       "delta": "6",
-      "weeks": 21
+      "weeks": 21,
+      "gainDb": -11.7,
+      "lufs": -4.3,
+      "truePeakDbtp": 0.9
     },
     {
       "title": "Loser",
@@ -1442,7 +1490,10 @@
       "applePoints": 0,
       "spotifyBonus": 20.63835243038636,
       "delta": "6",
-      "weeks": 21
+      "weeks": 21,
+      "gainDb": -9.6,
+      "lufs": -6.4,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "SWIM",
@@ -1475,7 +1526,10 @@
       "applePoints": 0,
       "spotifyBonus": 20.500733998656305,
       "delta": "8",
-      "weeks": 4
+      "weeks": 4,
+      "gainDb": -8.9,
+      "lufs": -7.1,
+      "truePeakDbtp": 0.7
     },
     {
       "title": "Treat You Better",
@@ -1508,7 +1562,10 @@
       "applePoints": 0,
       "spotifyBonus": 19.955342878635342,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -9.7,
+      "lufs": -6.3,
+      "truePeakDbtp": 0.2
     },
     {
       "title": "End of Beginning",
@@ -1541,7 +1598,10 @@
       "applePoints": 0,
       "spotifyBonus": 19.885005243644546,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6.3,
+      "lufs": -9.7,
+      "truePeakDbtp": 0.1
     },
     {
       "title": "Sailor Song",
@@ -1574,7 +1634,10 @@
       "applePoints": 0,
       "spotifyBonus": 19.881556272988146,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": 0,
+      "lufs": -16.4,
+      "truePeakDbtp": -2.4
     },
     {
       "title": "Ordinary",
@@ -1607,7 +1670,10 @@
       "applePoints": 0,
       "spotifyBonus": 19.76889127329556,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -11.2,
+      "lufs": -4.8,
+      "truePeakDbtp": 1.1
     },
     {
       "title": "Training Season",
@@ -1640,7 +1706,10 @@
       "applePoints": 0,
       "spotifyBonus": 19.75975139048852,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -9,
+      "lufs": -7,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "Just Give Me a Reason",
@@ -1673,7 +1742,10 @@
       "applePoints": 0,
       "spotifyBonus": 19.721542989448114,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -3.9,
+      "lufs": -12.1,
+      "truePeakDbtp": -0.4
     },
     {
       "title": "BIRDS OF A FEATHER",
@@ -1706,7 +1778,10 @@
       "applePoints": 0,
       "spotifyBonus": 19.683353032787263,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6.1,
+      "lufs": -9.9,
+      "truePeakDbtp": -0.2
     },
     {
       "title": "Wonderwall (Remastered)",
@@ -1739,7 +1814,10 @@
       "applePoints": 0,
       "spotifyBonus": 19.41709433553975,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -5.7,
+      "lufs": -10.3,
+      "truePeakDbtp": 0.3
     },
     {
       "title": "One Of The Girls",
@@ -1772,7 +1850,10 @@
       "applePoints": 0,
       "spotifyBonus": 18.956268085024575,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -7.6,
+      "lufs": -8.4,
+      "truePeakDbtp": 0.5
     },
     {
       "title": "Dai Dai",
@@ -1805,7 +1886,10 @@
       "applePoints": 0,
       "spotifyBonus": 18.845809897337613,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6.1,
+      "lufs": -9.9,
+      "truePeakDbtp": 0.3
     }
   ],
   "seedEdition": "[[\"A\",\"2026-10-08T22:28:31.743Z\",\"2026-10-08\"],[\"U\",\"2026-10-10T13:12:41.718Z\",\"2026-10-08\"],[\"C\",\"140:d294c52f\"]]",
