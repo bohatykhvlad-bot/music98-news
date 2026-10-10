@@ -1,0 +1,33 @@
+name: Inspect dated Apple chart HTML
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [".github/workflows/chart-history-inspect.yml"]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Inspect US Apple historical chart markup
+        run: |
+          node <<'JS'
+          const url="https://chartstats.com/US/songs/2026-10-08";
+          const r=await fetch(url,{headers:{"User-Agent":"Mozilla/5.0 (compatible; Music98 historical chart validator)"},
+           signal:AbortSignal.timeout(15000)});
+          const s=await r.text();
+          console.log("HTTP",r.status,"size",s.length,"type",r.headers.get("content-type"),"ROWS",(s.match(/<tr\b/gi)||[]).length);
+          console.log("PREVIEW_START",s.slice(0,1300));
+          const pos=s.indexOf("Solar Eclipse");
+          console.log("FIRST_SONG_CONTEXT",s.slice(Math.max(0,pos-950),pos+2300));
+          const firstTable=s.indexOf("<table");
+          console.log("TABLE_CONTEXT",s.slice(firstTable,firstTable+2600));
+          const next=s.indexOf("Choosin'");
+          console.log("THIRD_CONTEXT",s.slice(Math.max(0,next-650),next+850));
+          if(!r.ok||s.length<4000||pos<0)process.exit(1);
+          JS
