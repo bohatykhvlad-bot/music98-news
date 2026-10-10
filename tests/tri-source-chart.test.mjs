@@ -33,15 +33,30 @@ test("the three platform pool has no duplicates and preserves version distinctio
  const duplicate=structuredClone(rows);duplicate[1].spotify.spotifyId=duplicate[0].spotify.spotifyId;
  assert.equal(verifiedTriCandidates(duplicate,day),false);
 });
-test("USA, Global, Spotify may each supply entrants; all 50 ranked entries have real numeric streams",()=>{
+test("all 50 ranked entries have verified Spotify numbers and bounded source points",()=>{
  const rows=fixtures(),found=rankTriCandidates(rows,day);
  assert.equal(found.tracks.length,50);
  assert.ok(found.tracks.every(t=>t.spotify.status==="matched"&&Number.isInteger(t.spotify.daily)));
- assert.ok(found.tracks.some(t=>t.sourceRanks.U===null&&t.sourceRanks.A===null));
+ assert.ok(rows.some(t=>t.sourceRanks.U===null&&t.sourceRanks.A===null&&t.spotify.status==="matched"));
  assert.ok(found.tracks.every(t=>t.appleUsPoints>=0&&t.appleUsPoints<=40));
  assert.ok(found.tracks.every(t=>t.appleGlobalPoints>=0&&t.appleGlobalPoints<=30));
  assert.ok(found.tracks.every(t=>t.spotifyPoints>=0&&t.spotifyPoints<=30));
  assert.deepEqual(new Set(found.tracks.map(t=>songIdentity(t.title,t.artist))).size,50);
+});
+test("Spotify-only songs can enter even when absent from Apple USA and Global",()=>{
+ const isolated=Array.from({length:300},(_,i)=>({
+  title:"Unique "+i,artist:"Performer "+i,
+  sourceRanks:{U:i<100?i+1:null,A:i>=100&&i<200?i-99:null,S:i>=200?i-199:null},
+  spotify:i>=200?{status:"matched",daily:2800000-(i-200)*1000,
+   spotifyId:id(i),date:day,metric:"kworb-spotify-chart-global-daily",
+   sourceUrl:"https://kworb.net/spotify/country/global_daily.html"}:
+   {status:"unavailable",daily:null}
+ }));
+ assert.ok(verifiedTriCandidates(isolated,day));
+ const ranked=rankTriCandidates(isolated,day);
+ assert.equal(ranked.tracks.length,50);
+ assert.ok(ranked.tracks.every(t=>t.sourceRanks.U===null&&t.sourceRanks.A===null&&
+   Number.isInteger(t.spotify.daily)));
 });
 test("incomplete Spotify stream collection cannot produce an edition",()=>{
  const rows=fixtures();
