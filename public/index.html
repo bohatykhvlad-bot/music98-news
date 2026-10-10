@@ -887,6 +887,9 @@ textarea{resize:vertical;min-height:64px}
    The desktop Releases / Discover white-area height is synchronized in JS. */
 #tab-discover{padding-bottom:12px}
 #tab-discover.rise{animation:none}
+/* The Discover canvas ends at the tab boundary. The shared Subscribe top
+   margin otherwise exposes a white strip between the ambient and the next section. */
+body.discover-ambient-visible .subscribe{margin-top:0}
 #tab-discover .discover-layout{--discover-row-inset:12px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(4 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
 #tab-discover .discover-heading{grid-area:1/1/2/4;text-align:center;width:100%;margin-bottom:0}
 #tab-discover .discover-copy{grid-area:2/1;align-self:center;min-width:0;width:100%;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
