@@ -25,7 +25,7 @@
     "sourceOrigin": {
       "A": "official-global-live",
       "S": "kworb-crosschecked-kworb+musicrank",
-      "D": "github-current-day-worldwide"
+      "D": "official-worldwide-live"
     },
     "spotifyFingerprint": "4d81cc95e113afbef44e5a89e12c7123651b1a8c66ba568185c7c9699468a728",
     "tracks": [
@@ -123,7 +123,7 @@
         "title": "Ordinary",
         "artist": "Alex Warren",
         "weeks": 1,
-        "delta": "new"
+        "delta": "re-entry"
       },
       {
         "rank": 9,

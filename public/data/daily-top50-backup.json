@@ -43,7 +43,7 @@
   "sourceOrigin": {
     "A": "official-global-live",
     "S": "kworb-crosschecked-kworb+musicrank",
-    "D": "github-current-day-worldwide"
+    "D": "official-worldwide-live"
   },
   "sourceDates": {
     "A": "2026-10-09",
@@ -64,9 +64,9 @@
     "loudness": 50
   },
   "covers": {
-    "asked": 1,
+    "asked": 2,
     "filled": 0,
-    "failed": 0,
+    "failed": 2,
     "missing": 0
   },
   "tracks": [
@@ -216,7 +216,7 @@
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/78/fb/4678fb84-d19e-f11b-93ff-4dc17660bff8/075679619075.jpg/600x600bb.jpg",
       "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f4/2f/82/f42f82e5-e164-dd14-4f9a-2767d0215bae/mzaf_2512873933120069750.plus.aac.p.m4a",
       "year": "2024",
-      "delta": "new",
+      "delta": "re-entry",
       "weeks": 1
     },
     {
@@ -287,39 +287,39 @@
       },
       "url": "https://music.apple.com/us/album/beautiful-things/1724488123?i=1724488124&app=music&at=1001l3aZW&ct=music98",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/54/f4/92/54f49210-e260-b519-ebbd-f4f40ee710cd/054391342751.jpg/600x600bb.jpg",
-      "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/4d/d5/00/4dd5006f-ee02-c3f1-94db-0ed4b8dd68f1/mzaf_14250561294796027079.plus.aac.p.m4a",
-      "year": "2024",
+      "prev": "",
+      "year": "",
       "delta": "new",
       "weeks": 1
     }
   ],
-  "seedEdition": "[[\"A\",\"2026-10-10T07:16:15.000Z\",\"2026-10-09\"],[\"D\",\"2026-10-10T07:16:15.000Z\",\"2026-10-10\"],[\"C\",\"108:eb943f9b\"]]",
+  "seedEdition": "[[\"A\",\"2026-10-10T07:36:17.519Z\",\"2026-10-09\"],[\"D\",\"2026-10-10T07:36:18.184Z\",\"2026-10-10\"],[\"C\",\"108:eb943f9b\"]]",
   "arrows": {
     "ok": true,
     "bad": 0,
     "mixed": 0,
-    "new": 2,
-    "reentry": 0
+    "new": 1,
+    "reentry": 1
   },
   "memory": {
     "recoveryApplied": true,
     "recoverySource": "last-complete-chart",
     "recoveryWeek": 22,
     "recoveryEvidence": {
-      "repair": true,
+      "repair": false,
       "overlap": 10,
       "established": 10,
-      "broken": 10,
-      "massReset": true,
-      "missingReference": true
+      "broken": 0,
+      "massReset": false,
+      "missingReference": false
     },
     "week": 23,
     "sameDay": false,
     "refSource": "today",
     "refLen": 50,
     "nearMiss": [],
-    "ever": 50,
-    "new": 2,
-    "reentry": 0
+    "ever": 103,
+    "new": 1,
+    "reentry": 1
   }
 }
