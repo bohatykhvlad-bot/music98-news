@@ -9,6 +9,7 @@
   const motion = matchMedia("(prefers-reduced-motion: reduce)");
   const precisePointer = matchMedia("(hover:hover) and (pointer:fine)");
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+  const motionStrength=.95;
   const pointer = { x:0, y:0, targetX:0, targetY:0, strength:0, targetStrength:0 };
   let width=0, height=0, active=false, playing=false, frame=0, last=0;
   let clock=0, energy=0, pointerLastMove=0, renderer=null, lost=false;
@@ -16,6 +17,8 @@
   let scrolling=false, scrollTimer=0;
   const defaultPalette=[[.18,.66,.90],[0,.83,.81],[.02,.59,.64]];
   let palette=defaultPalette.map(c=>c.slice()), targetPalette=palette.map(c=>c.slice()), artworkRequest=0;
+  let paletteStrength=1,targetPaletteStrength=1;
+  let paletteMix=[.5,.125],targetPaletteMix=paletteMix.slice();
   const artworkPalettes=new Map();
 
   const vertex = `
@@ -31,6 +34,9 @@
     uniform vec3 pointer;
     uniform float time;
     uniform float energy;
+    uniform float paletteStrength;
+    uniform vec2 paletteMix;
+    const float motionStrength=${motionStrength.toFixed(2)};
     uniform vec3 tintBlue;
     uniform vec3 tintCyan;
     uniform vec3 tintMineral;
@@ -78,7 +84,7 @@
       // Bend the existing current with a softened version of the original
       // vortex. Its bounded displacement never creates a separate cloud.
       vec2 nudge=(vec2(-delta.y,delta.x)*.48-delta*.12)*influence;
-      p+=clamp(nudge,vec2(-27.2916/viewport.y),vec2(27.2916/viewport.y));
+      p+=clamp(nudge,vec2(-27.2916*motionStrength/viewport.y),vec2(27.2916*motionStrength/viewport.y));
       float t=time*.25;
       vec2 centre=source.xy/viewport.y, size=source.zw/viewport.y;
       vec2 nearest=clamp(p,centre-size,centre+size);
@@ -88,15 +94,15 @@
       // the texture displacement bounded so long playback cannot stretch it
       // into straight rays converging on a fixed point.
       vec2 tangent=vec2(-outward.y,outward.x);
-      float swell=.045*sin(distance*9.-time*.85+p.y*2.)
-                 +.020*sin(distance*16.+time*.55-p.x*1.8);
-      vec2 transport=p+tangent*swell+outward*.035*sin(distance*16.-time*.95)
+      float swell=motionStrength*(.045*sin(distance*9.-time*.85+p.y*2.)
+                 +.020*sin(distance*16.+time*.55-p.x*1.8));
+      vec2 transport=p+tangent*swell+outward*.035*motionStrength*sin(distance*16.-time*.95)
                      +vec2(time*.012,-time*.008);
       vec2 warp=vec2(fbm(transport*2.1+vec2(t*.15,0.)),fbm(transport*2.1+19.));
       float bend=(fbm(p*2.6+vec2(time*.04,-time*.02))-.5)*.10;
       // Fronts begin on the card boundary, then bend gradually as they spread.
       float edgeBend=smoothstep(0.,.12,max(distance,0.));
-      float waveDistance=distance+edgeBend*(bend+.025*sin(p.x*4.+p.y*3.-time*.3));
+      float waveDistance=distance+edgeBend*motionStrength*(bend+.025*sin(p.x*4.+p.y*3.-time*.3));
       float lanes=fbm(vec2(waveDistance*8.-time*.46,(p.x+p.y)*2.)+warp*.6);
       float volume=fbm(transport*4.8+warp*.9);
       float detail=noise(transport*26.+warp*2.);
@@ -104,12 +110,12 @@
       // Equal distances from the player share the same base coverage. This
       // removes the old asymmetric edge clouds and their white clearings.
       float envelope=.60+.40*exp(-max(distance,0.)*1.5);
-      float density=.08+volume*.62+lanes*.18+ripple*.10+detail*.05;
+      float density=.08+volume*.62+lanes*.18+ripple*.10*motionStrength+detail*.05;
       float body=envelope*(.10+smoothstep(.25,.80,density)*.8);
       // Keep the outward fronts within the diffuse texture so repeating
       // rings don't dominate the player or become a high-contrast pulse.
       float crests=smoothstep(.55,.98,ripple)*(.45+.55*smoothstep(.25,.75,volume));
-      body+=envelope*crests*.055;
+      body+=envelope*crests*.055*motionStrength;
       float haze=.04+envelope*.035;
       // Interpolated grain moves continuously instead of jumping between
       // random pixel cells as the current advances.
@@ -119,14 +125,14 @@
       vec2 motes=sparkle(lights,viewport.y/28.,89.);
       float depth=smoothstep(.30,.8,volume);
       vec3 blue=tintBlue, cyan=tintCyan, mineral=tintMineral;
-      vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23));
-      colour=mix(colour,mineral,clamp(smoothstep(.48,.86,lanes)*.25+crests*.04,0.,.65));
+      vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23)*paletteMix.x*2.);
+      colour=mix(colour,mineral,clamp((smoothstep(.48,.86,lanes)*2.+crests*.32)*paletteMix.y,0.,.65));
       // Lit grains sit within the volume, with a wider glow beneath it.
-      colour=mix(colour,vec3(.86,1.,.99),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.14,0.,.8));
-      float breathing=1.+.025*sin(time*.55);
+      colour=mix(colour,vec3(1.),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.14,0.,.8));
+      float breathing=1.+.025*motionStrength*sin(time*.55);
       float alpha=(body*(.405+grain*.03)+haze+dots.y*body*.12)*(1.+energy*.18)*breathing;
       alpha+=(dots.x*.025+dots.y*.04+motes.x*.035+motes.y*.04)*body;
-      gl_FragColor=vec4(colour,clamp(alpha,0.,.65));
+      gl_FragColor=vec4(colour,clamp(alpha*paletteStrength,0.,.65));
     }
   `;
 
@@ -150,7 +156,7 @@
           gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
           const position=gl.getAttribLocation(program,"position");
           gl.enableVertexAttribArray(position); gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
-          const locations=Object.fromEntries(["viewport","source","pointer","time","energy","tintBlue","tintCyan","tintMineral"]
+          const locations=Object.fromEntries(["viewport","source","pointer","time","energy","paletteStrength","paletteMix","tintBlue","tintCyan","tintMineral"]
             .map(key=>[key,gl.getUniformLocation(program,key)]));
           return { draw() {
             gl.viewport(0,0,canvas.width,canvas.height);
@@ -158,6 +164,8 @@
             gl.uniform4fv(locations.source,playerSource());
             gl.uniform3f(locations.pointer,pointer.x,pointer.y,pointer.strength);
             gl.uniform1f(locations.time,clock); gl.uniform1f(locations.energy,energy);
+            gl.uniform1f(locations.paletteStrength,paletteStrength);
+            gl.uniform2fv(locations.paletteMix,paletteMix);
             ["tintBlue","tintCyan","tintMineral"].forEach((key,i)=>gl.uniform3fv(locations[key],palette[i]));
             gl.drawArrays(gl.TRIANGLES,0,6);
           }};
@@ -179,17 +187,18 @@
     const light=document.createElement("canvas");light.width=light.height=24;
     const lightContext=light.getContext("2d");
     const lightGlow=lightContext.createRadialGradient(12,12,0,12,12,12);
-    lightGlow.addColorStop(0,"rgba(225,255,253,.65)");
-    lightGlow.addColorStop(.3,"rgba(175,249,246,.28)");
-    lightGlow.addColorStop(1,"rgba(175,249,246,0)");
+    lightGlow.addColorStop(0,"rgba(255,255,255,.65)");
+    lightGlow.addColorStop(.3,"rgba(255,255,255,.28)");
+    lightGlow.addColorStop(1,"rgba(255,255,255,0)");
     lightContext.fillStyle=lightGlow;lightContext.fillRect(0,0,24,24);
     const grains=Array.from({length:320},()=>({x:Math.random(),y:Math.random(),phase:Math.random()*6.28,size:3+Math.random()*3}));
     return { surface, draw() {
       if(surface.width!==canvas.width||surface.height!==canvas.height){surface.width=canvas.width;surface.height=canvas.height;}
       ctx.setTransform(surface.width/width,0,0,surface.height/height,0,0);
       ctx.clearRect(0,0,width,height);
-      const rgba=(c,a)=>`rgba(${c.map(v=>Math.round(v*255)).join(',')},${a})`;
-      ctx.fillStyle=rgba(palette[1],.06+.005*Math.sin(clock*.25));
+      const rgba=(c,a)=>`rgba(${c.map(v=>Math.round(v*255)).join(',')},${a*paletteStrength})`;
+      const base=palette[0].map((v,k)=>v+(palette[1][k]-v)*paletteMix[0]);
+      ctx.fillStyle=rgba(base,.06+.005*Math.sin(clock*.25));
       ctx.fillRect(0,0,width,height);
       const [sourceX,sourceY,halfWidth,halfHeight]=playerSource();
       const centres=[[sourceX,sourceY,width*.65,height*.8]];
@@ -197,13 +206,13 @@
         ctx.save();ctx.translate(x,y);ctx.scale(rx,ry);
         const glow=ctx.createRadialGradient(0,0,0,0,0,1);
         glow.addColorStop(0,rgba(palette[0],.12+energy*.04));
-        glow.addColorStop(.45,rgba(palette[1],.08));glow.addColorStop(1,rgba(palette[1],0));
+        glow.addColorStop(.45,rgba(base,.08));glow.addColorStop(1,rgba(base,0));
         ctx.fillStyle=glow;ctx.fillRect(-1,-1,2,2);ctx.restore();
       }
-      ctx.save();ctx.shadowBlur=32;ctx.shadowColor="rgba(0,220,215,.12)";
+      ctx.save();ctx.shadowBlur=32;ctx.shadowColor=rgba(palette[0],.12);
       for(let i=0;i<3;i++){
         const travel=(clock*.045+i/3)%1,spread=travel*Math.max(width,height)*.5;
-        ctx.strokeStyle=`rgba(0,178,194,${(1-travel)*(.02+energy*.015)})`;
+        ctx.strokeStyle=rgba(palette[1],(1-travel)*(.02+energy*.015)*motionStrength);
         ctx.lineWidth=32+spread*.06;ctx.beginPath();
         if(ctx.roundRect)ctx.roundRect(sourceX-halfWidth-spread,sourceY-halfHeight-spread,
           (halfWidth+spread)*2,(halfHeight+spread)*2,24+spread);
@@ -216,14 +225,14 @@
         const p=grains[i];
         // Curved outward paths start at the actual player boundary.
         const travel=(p.x+clock*.04)%1;
-        const angle=p.phase+Math.sin(travel*6.28-clock*.28+p.phase)*.13
-          +Math.sin(travel*11.-clock*.17)*.06;
+        const angle=p.phase+motionStrength*(Math.sin(travel*6.28-clock*.28+p.phase)*.13
+          +Math.sin(travel*11.-clock*.17)*.06);
         const cos=Math.cos(angle),sin=Math.sin(angle);
         const edge=Math.min(halfWidth/Math.max(Math.abs(cos),.001),halfHeight/Math.max(Math.abs(sin),.001));
         const radius=edge+travel*Math.max(width,height)*.7;
         let x=sourceX+cos*radius;
         let y=sourceY+sin*radius;
-        x+=Math.sin(clock*.25+p.phase)*22;y+=Math.cos(clock*.2+p.phase)*18;
+        x+=Math.sin(clock*.25+p.phase)*22*motionStrength;y+=Math.cos(clock*.2+p.phase)*18*motionStrength;
         const dx=x-pointer.x,dy=y-pointer.y,near=Math.exp(-(dx*dx+dy*dy)/32000)*pointer.strength;
         x-=dy*near*.17;y+=dx*near*.17;
         ctx.globalAlpha=(.25+.15*Math.sin(clock*.65+p.phase))*(1+energy*.15);
@@ -268,7 +277,7 @@
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
     pointer.targetX=clamp(x,0,innerWidth)+scrollX;pointer.targetY=clamp(y,0,innerHeight)+scrollY;
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
-    pointer.targetStrength=.497097;pointerLastMove=performance.now();
+    pointer.targetStrength=.497097*motionStrength;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;
@@ -285,6 +294,8 @@
       energy+=(Number(playing)-energy)*(1-Math.exp(-elapsed*(playing?2.4:1.5)));
       clock+=dt*(.28+energy*.76);
       palette=palette.map((c,i)=>c.map((v,k)=>v+(targetPalette[i][k]-v)*(1-Math.exp(-dt*1.4))));
+      paletteStrength+=(targetPaletteStrength-paletteStrength)*(1-Math.exp(-dt*1.4));
+      paletteMix=paletteMix.map((v,i)=>v+(targetPaletteMix[i]-v)*(1-Math.exp(-dt*1.4)));
       const smooth=1-Math.exp(-dt*2.6);
       if(ts-pointerLastMove>2500)pointer.targetStrength=0;
       pointer.x+=(pointer.targetX-pointer.x)*(1-Math.exp(-dt*4));
@@ -299,47 +310,51 @@
     if(active&&!document.hidden&&!lost&&inView&&!scrolling){resize();render();if(!motion.matches)frame=requestAnimationFrame(loop);}
   }
   function setVisible(value) {
+    if(value&&!active)settlePalette();
     active=!!value;document.body.classList.toggle("discover-ambient-visible",active);
     if(!active){playing=false;energy=0;pointer.strength=0;pointer.targetStrength=0;}
     start();
   }
   function setPlaying(value) { playing=!!value;if(active&&motion.matches)render(); }
+  function settlePalette() {
+    palette=targetPalette.map(c=>c.slice());paletteStrength=targetPaletteStrength;paletteMix=targetPaletteMix.slice();
+  }
+  function applyArtworkPalette(value,request) {
+    if(request!==artworkRequest)return;
+    targetPalette=value.colours.map(c=>c.slice());targetPaletteStrength=value.strength;
+    targetPaletteMix=value.mix.slice();
+    if(motion.matches||!active){settlePalette();if(active)render();}
+  }
   async function setArtwork(url) {
     const request=++artworkRequest;
-    targetPalette=defaultPalette.map(c=>c.slice());
-    if(!/^https:\/\/[^/]*mzstatic\.com\//i.test(url||''))return;
+    const analyser=window.music98DiscoverPalette;
+    if(!analyser)return;
+    let artwork;
+    try{artwork=new URL(url);if(artwork.protocol!=="https:"||!artwork.hostname.endsWith(".mzstatic.com"))throw Error("Unsupported artwork");}
+    catch{applyArtworkPalette(analyser.neutral(),request);return;}
     try {
-      let colours=artworkPalettes.get(url);
-      if(!colours){
+      let result=artworkPalettes.get(artwork.href);
+      if(!result){
         const image=new Image();image.crossOrigin="anonymous";
-        // One small read per cover, never in the animation loop.
-        image.src=url.replace(/\d+x\d+bb(?:-\d+)?\./,'64x64bb.');
-        await image.decode();
-        const sample=document.createElement('canvas');sample.width=sample.height=24;
+        // Sample the complete cover once, including dark, pale and neutral
+        // areas. Preserve its current colour while the next image loads.
+        image.src=artwork.href.replace(/\d+x\d+bb(?:-\d+)?\./,'128x128bb.');
+        let timeout;
+        try{
+          await Promise.race([image.decode(),new Promise((_,reject)=>{
+            timeout=setTimeout(()=>reject(Error("Artwork timed out")),8000);
+          })]);
+        }finally{clearTimeout(timeout);}
+        if(request!==artworkRequest)return;
+        const sample=document.createElement('canvas');sample.width=sample.height=48;
         const context=sample.getContext('2d',{willReadFrequently:true});
-        context.drawImage(image,0,0,24,24);
-        const pixels=context.getImageData(0,0,24,24).data,bins=new Map();
-        for(let i=0;i<pixels.length;i+=4){
-          const c=[pixels[i],pixels[i+1],pixels[i+2]].map(v=>v/255);
-          const high=Math.max(...c),low=Math.min(...c);
-          if(high<.18||low>.88||high-low<.12)continue;
-          const key=c.map(v=>Math.floor(v*5)).join(',');
-          const bin=bins.get(key)||{count:0,total:[0,0,0]};
-          bin.count++;c.forEach((v,k)=>bin.total[k]+=v);bins.set(key,bin);
-        }
-        const dominant=[...bins.values()].sort((a,b)=>b.count-a.count).slice(0,3);
-        if(!dominant.length)return;
-        colours=defaultPalette.map((base,i)=>{
-          const bin=dominant[i%dominant.length];
-          return base.map((v,k)=>v*.25+(bin.total[k]/bin.count)*.75);
-        });
-        artworkPalettes.set(url,colours);
+        context.drawImage(image,0,0,48,48);
+        result=analyser.extract(context.getImageData(0,0,48,48).data);
+        artworkPalettes.set(artwork.href,result);
         if(artworkPalettes.size>24)artworkPalettes.delete(artworkPalettes.keys().next().value);
       }
-      if(request!==artworkRequest)return;
-      targetPalette=colours.map(c=>c.slice());
-      if(motion.matches){palette=targetPalette.map(c=>c.slice());if(active)render();}
-    } catch { /* Keep the site palette if artwork is unavailable or CORS blocks sampling. */ }
+      applyArtworkPalette(result,request);
+    } catch { applyArtworkPalette(analyser.neutral(),request); }
   }
   canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();lost=true;if(frame)cancelAnimationFrame(frame);frame=0;});
   canvas.addEventListener("webglcontextrestored",()=>{lost=false;renderer=createRenderer();start();});
@@ -377,6 +392,6 @@
   }
   document.fonts?.ready.then(queueLayout);
   document.addEventListener("visibilitychange",()=>{if(active)start();});
-  motion.addEventListener?.("change",()=>{pointer.strength=0;pointer.targetStrength=0;if(active)start();});
+  motion.addEventListener?.("change",()=>{pointer.strength=0;pointer.targetStrength=0;if(motion.matches)settlePalette();if(active)start();});
   syncVisibility();
 })();
