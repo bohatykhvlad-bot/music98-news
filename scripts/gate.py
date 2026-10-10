@@ -141,7 +141,6 @@ REFERENT = re.compile(
 # The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
-    "october 23": "RAYE one-night This Symphony May Contain Hope concert at Royal Albert Hall, 23.10.2026 (Simon Jones PR 09.10.2026; Live Nation UK).",
     "october 15": "RAYE Royal Albert Hall concert general on-sale, 15.10.2026 at 10:00 UK time (Simon Jones PR 09.10.2026; Live Nation UK).",
     "april 6": "Lola Young Everything Begins Tour opens at The Pinnacle in Nashville on 06.04.2027 (Pollstar 05.10.2026).",
     "may 4": "Lola Young Everything Begins Tour closes at the Greek Theatre in Los Angeles on 04.05.2027 (Pollstar 05.10.2026).",
@@ -230,7 +229,7 @@ VERIFIED_DATES = {
     "september 16": "Yeat announced COCOON as a surprise EP 16.09.2026 (InMusic)",
     "september 27": "2026 MTV VMAs air 27.09.2026, CBS, Madonna opening; Song of the Summer fan voting "
                      "closes that day",
-    "october 23": "LISA EP 'PRESS PLAY' out 23.10.2026; John Legend *Muse* out 23.10.2026 via Republic Records, produced in full and co-written by Pharrell Williams (Universal Music Canada 08.09.2026 and 25.09.2026)",
+    "october 23": "LISA EP 'PRESS PLAY' out 23.10.2026; John Legend *Muse* out 23.10.2026 via Republic Records, produced in full and co-written by Pharrell Williams (Universal Music Canada 08.09.2026 and 25.09.2026); RAYE This Symphony May Contain Hope concert at Royal Albert Hall 23.10.2026 (Simon Jones PR 09.10.2026; Live Nation UK)",
     "2019": "Feid EP *19*, 2019 - the record EL CLUB DE LAS 19 FLORES reaches back to",
     "july 10": "Feid 'A XON DE QUE' advance track, 10.07.2026",
     "june 5": "Taylor Swift 'I Knew It, I Knew You' (Toy Story 5) out 05.06.2026 "
