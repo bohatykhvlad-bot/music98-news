@@ -75,11 +75,14 @@ export function pickDailyForDate(series, date, {windowDays = FALLBACK_WINDOW_DAY
     }
     if (best) return {date: latest.date, daily: Math.round(best.diff / best.span), method: "totals-window-" + best.span + "d"};
   }
-  /* Способ 2 (резерв): дневные значения с нормализацией на пропуски захвата. */
+  /* Способ 2 (резерв): дневные значения с нормализацией на пропуски захвата.
+     Только записи внутри окна — дата ряда не должна из него выпадать. */
   const before = rows.slice(0, latestIdx + 1);
   const norms = [];
   before.forEach((r, i) => {
     if (!(Number.isSafeInteger(r.daily) && r.daily > 0)) return;
+    const ms = day(r.date);
+    if (!(ms <= at && at - ms <= windowDays * 86400000)) return;
     const prev = before[i - 1];
     const gap = prev ? Math.max(1, Math.round((day(r.date) - day(prev.date)) / 86400000)) : 1;
     norms.push({date: r.date, raw: r.daily, norm: Math.round(r.daily / gap)});

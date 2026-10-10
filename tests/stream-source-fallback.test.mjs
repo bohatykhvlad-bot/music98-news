@@ -59,6 +59,19 @@ test("totals window cancels capture gaps and merged buckets", () => {
   assert.equal(pick.daily, 4000000);
 });
 
+test("fallback path never returns a value dated outside the window", () => {
+  const series = {
+    [back(30)]: {total: 0, daily: 500000},
+    [back(20)]: {total: 0, daily: 600000},
+    [back(11)]: {total: 0, daily: 700000},
+    [back(1)]: {total: 0, daily: 900000}
+  };
+  const pick = pickDailyForDate(series, day, {windowDays: FALLBACK_WINDOW_DAYS});
+  assert.equal(pick.method, "lone");
+  assert.equal(pick.date, back(1));
+  assert.equal(pick.daily, 900000);
+});
+
 test("totals delta works across capture gaps and respects the window", () => {
   const entries = [
     {date: back(3), total: 1000000},
