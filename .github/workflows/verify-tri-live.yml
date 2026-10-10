@@ -1,0 +1,24 @@
+name: Verify live tri-source chart
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/verify-live-tri-source.mjs"
+      - ".github/workflows/verify-tri-live.yml"
+permissions:
+  contents: read
+concurrency:
+  group: verify-tri-live
+  cancel-in-progress: false
+jobs:
+  check-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Verify source snapshot, runtime Top 50, complete media and tenure
+        run: node scripts/verify-live-tri-source.mjs
