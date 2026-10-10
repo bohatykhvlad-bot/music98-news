@@ -1,0 +1,31 @@
+name: RAYE ticket-link research (read-only)
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-2026-draft]
+    paths: [.github/workflows/raye-ticket-audit.yml]
+permissions:
+  contents: read
+jobs:
+  ticket-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Inspect live LISA ticket button carrier and RAYE draft fields only
+        run: |
+          python - <<'PY'
+          import sys,re
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          a=desk_read().get('posts',[])
+          for p in a:
+            if 'lisa' in str(p.get('artist','')).lower() or 'lalisa' in str(p.get('title','')).lower() or p.get('id')=='raye26royalalbertsymphony':
+              links=re.findall(r'\[tickets:([^\]]+)\]',p.get('body',''),re.I)
+              print('POST',p.get('id'),p.get('status'),str(p.get('title',''))[:110])
+              print('TICKET_BUTTONS',links)
+              print('OTHER_AFFILIATE_URLS',[u for u in re.findall(r'https?://[^\s\]\)"<>]+',p.get('body','')) if any(t in u for t in ['impact','ticketmaster','tkts','rakh','irclickid','irgwc'])][:5])
+          PY
