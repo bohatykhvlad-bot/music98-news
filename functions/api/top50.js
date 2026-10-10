@@ -134,7 +134,7 @@ async function applyLoudness(env, tracks, origin) {
   }
   return tracks;
 }
-async function applyCovers(env, tracks, origin, {retainTrusted = false} = {}) {
+async function applyCovers(env, tracks, origin, {retainTrusted = false, preferApple = false} = {}) {
   const seed = await coverSeed(env, origin);
   for (const t of tracks) {
     const strict = artworkKey(t.title, t.artist);
@@ -143,8 +143,12 @@ async function applyCovers(env, tracks, origin, {retainTrusted = false} = {}) {
     /* During a NEW build only Apple-provided art can bridge a lagging audited
        registry. An already published, complete snapshot may also preserve its
        previously verified Deezer artwork instead of losing it on redecorate. */
+    const sourceApple=isAppleArt(t.art)?t.art:"";
     const temporary = !chosen && (retainTrusted ? isTrustedChartArtwork(t.art) : isAppleArt(t.art)) ? t.art : "";
-    t.art = chosen && isTrustedChartArtwork(chosen) ? chosen : temporary;
+    // v3 already has exact Apple art for all 50 finalists. Never replace
+    // that official cover with an old Deezer registry entry during transition.
+    t.art=preferApple && sourceApple && !isAppleArt(chosen) ? sourceApple :
+      chosen && isTrustedChartArtwork(chosen) ? chosen : temporary;
   }
   return tracks;
 }
@@ -673,12 +677,12 @@ export async function buildTop50(origin, env, streamSeed) {
   await applyNames(env, tracks, origin);
   tracks.forEach((t) => { delete t.nameSrc; });
   await seedBaked(origin || "", tracks);
-  await applyCovers(env, tracks, origin);  /* засев -> память -> сборка -> Deezer -> пусто */
+  await applyCovers(env, tracks, origin,{preferApple:!!triple});  /* trust exact Apple art for v3 */
   await enrichArtByIds(tracks, coverStats); /* точный релиз по Apple-ID из ссылки */
   await enrichApple(tracks);               /* добор Apple URL/preview + safe exact artwork */
   await enrichArtByIds(tracks, coverStats);/* URL мог появиться только на предыдущем шаге */
   await enrichAppleFromAlbums(tracks); /* original album catalog, never a stripped stand-in */
-  await applyCovers(env, tracks, origin);  /* registry wins; exact Apple art is a safe bridge */
+  await applyCovers(env, tracks, origin,{preferApple:!!triple});  /* exact Apple cover outranks legacy Deezer */
   await applyLoudness(env, tracks, origin);
   tracks.forEach((t) => {
     t.url = appleAff(t.url);
