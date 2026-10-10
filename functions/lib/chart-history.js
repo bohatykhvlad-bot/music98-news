@@ -56,24 +56,42 @@ export function parseChartStatsUsHistorical(html,date){
  let schema;
  try { schema=JSON.parse(match[1]); }catch{throw new Error("chartstats_jsonld_invalid");}
  if(schema["@type"]!=="ItemList"||schema.numberOfItems!==100||
-   !Array.isArray(schema.itemListElement)||schema.itemListElement.length!==100||
-   !schema.name?.includes(date.slice(0,4)))throw new Error("chartstats_incomplete_top100:"+JSON.stringify({type:schema["@type"],numberOfItems:schema.numberOfItems,rows:schema.itemListElement?.length,name:schema.name,date}));
+   !Array.isArray(schema.itemListElement)||schema.itemListElement.length<10||
+   !schema.name?.includes(date.slice(0,4)))throw new Error("chartstats_incomplete_or_wrong_date_jsonld");
+ // Structured data contains only the first ten songs. The page's dated HTML
+ // table contains the full 100, with rank, title, artist and artwork.
  const table=text.match(/<tbody\b[^>]*>([\s\S]*?)<\/tbody>/i);
  if(!table)throw new Error("chartstats_html_rows_missing");
  const rows=[...table[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)];
- if(rows.length!==100)throw new Error("chartstats_not_100_rows");
- const tracks=schema.itemListElement.map((rec,i)=>{
-  if(rec.position!==i+1||rec.item?.["@type"]!=="MusicRecording")
-   throw new Error("chartstats_rank_"+(i+1));
-  const title=String(rec.item.name||"").trim(),artist=String(rec.item.byArtist?.name||"").trim();
-  const htmlRow=rows[i][1];
-  // Image metadata supplements the independently dated structured song list.
-  const img=htmlRow.match(/<img\b[^>]*\bsrc=["'](https:\/\/[^"']*mzstatic\.com\/[^"']+)["']/i);
-  const art=img?.[1]?.replaceAll("&amp;","&").replace(/300x300bb/,"600x600bb")||"";
-  const first=htmlRow.match(/<td\b[^>]*>([\s\S]*?)<\/td>/i);
-  const htmlPos=Number(first?.[1]?.replace(/<[^>]+>/g,"").trim());
-  if(htmlPos!==i+1||!title||!artist||!art)throw new Error("chartstats_missing_rank_or_art_"+(i+1));
-  return {pos:i+1,title,artist,url:"",art,year:"",prev:""};
+ if(rows.length!==100)throw new Error("chartstats_not_100_rows:"+rows.length);
+ const unescapeHtml=s=>String(s||"").replace(/&#(x[0-9a-f]+|\d+);|&(?:amp|quot|apos|lt|gt|nbsp|#39);/gi,m=>{
+  const entities={"&amp;":"&","&quot;":'"',"&apos;":"'","&lt;":"<","&gt;":">","&nbsp;":" ","&#39;":"'"};
+  const key=m.toLowerCase();
+  if(entities[key])return entities[key];
+  const n=key.match(/^&#(x[0-9a-f]+|\d+);$/);
+  if(n){const v=n[1].startsWith("x")?parseInt(n[1].slice(1),16):parseInt(n[1],10);
+   return v>0&&v<=0x10FFFF?String.fromCodePoint(v):"";}
+  return m;
+ });
+ const content=s=>unescapeHtml(String(s||"").replace(/<[^>]+>/g,"")).trim();
+ const tracks=rows.map((record,i)=>{
+  const row=record[1];
+  const cells=[...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)];
+  const pos=Number(content(cells[0]?.[1]));
+  const titleMatch=row.match(/<a\b[^>]*href=["']\/song\/[^"']+["'][^>]*>([\s\S]*?)<\/a>/i);
+  const artistMatch=row.match(/<a\b[^>]*href=["']\/artist\/[^"']+["'][^>]*>([\s\S]*?)<\/a>/i);
+  const title=content(titleMatch?.[1]),artist=content(artistMatch?.[1]);
+  const image=row.match(/<img\b[^>]*\bsrc=["'](https:\/\/[^"']*mzstatic\.com\/[^"']+)["']/i);
+  const art=image?.[1]?.replaceAll("&amp;","&").replace(/300x300bb/,"600x600bb")||"";
+  if(pos!==i+1||!title||!artist||!art)throw new Error("chartstats_missing_song_or_art_"+(i+1));
+  // Check the top ten against independently rendered JSON-LD positions.
+  if(i<schema.itemListElement.length){
+   const check=schema.itemListElement[i];
+   if(check.position!==i+1||check.item?.["@type"]!=="MusicRecording"||
+     mergeKey(check.item?.name,check.item?.byArtist?.name)!==mergeKey(title,artist))
+    throw new Error("chartstats_table_jsonld_mismatch_"+(i+1));
+  }
+  return {pos,title,artist,url:"",art,year:"",prev:""};
  });
  const snapshot={schema:2,updated:new Date().toISOString().slice(0,10),
   capturedAt:new Date().toISOString(),source:"historical-apple-us-chartstats",
