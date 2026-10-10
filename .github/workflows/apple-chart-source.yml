@@ -6,6 +6,7 @@ on:
       - "scripts/refresh-apple-ranking.mjs"
       - "scripts/refresh-apple-spotify-streams.mjs"
       - "functions/lib/apple-spotify-chart.js"
+      - "functions/lib/apple-us-hybrid.js"
       - "functions/lib/daily-chart-sources.js"
       - ".github/workflows/apple-chart-source.yml"
   schedule:
@@ -25,9 +26,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Fetch verified Apple Music Global Top 100
+      - name: Fetch paired verified Apple Music USA and Global Top 100
         run: node scripts/refresh-apple-ranking.mjs
-      - name: Collect Spotify daily streams for every Apple Top 50 candidate
+      - name: Collect multi-path Spotify daily streams for USA Top 50 candidates
         run: node scripts/refresh-apple-spotify-streams.mjs
       - name: Commit only complete current-day snapshot
         env:
@@ -35,9 +36,9 @@ jobs:
         run: |
           git config user.name "music98 apple chart bot"
           git config user.email "actions@users.noreply.github.com"
-          git add public/data/apple-chart.json public/data/apple-spotify-streams.json
+          git add public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m "chart: Apple Top 50 with verified Spotify daily streams"
+          git commit -m "chart: Apple USA 70 Spotify 20 Global 10 verified daily sources"
           for n in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then
