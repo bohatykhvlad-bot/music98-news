@@ -268,7 +268,7 @@
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
     pointer.targetX=clamp(x,0,innerWidth)+scrollX;pointer.targetY=clamp(y,0,innerHeight)+scrollY;
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
-    pointer.targetStrength=.497097;pointerLastMove=performance.now();
+    pointer.targetStrength=.42253245;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;
