@@ -1,5 +1,6 @@
 import {HYBRID_METHOD,HYBRID_RULE,SPOTIFY_BONUS_MAX,verifiedStreamSeed,rankAppleSpotify,isAppleSpotifyChart,validHybridRows} from "../lib/apple-spotify-chart.js";
 import {US_HYBRID_METHOD,US_HYBRID_RULE,validUsHybridRows,verifiedUsStreamSeed,rankAppleUsHybrid,isAppleUsHybridChart} from "../lib/apple-us-hybrid.js";
+import {TRI_METHOD,TRI_RULE,verifiedTriSeed,rankTriCandidates,isTriChart,songIdentity} from "../lib/tri-source-chart.js";
 import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
 import {hasCompleteChartArtwork as completeArtwork,isTrustedChartArtwork,missingChartArtwork} from "../lib/chart-artwork-gate.js";
 import {discoverAppleAlbumTracks} from "../lib/apple-album-discovery.js";
@@ -15,10 +16,10 @@ const APPLE_CT = "music98";
 const TOP50_KV = "top50v39";
 const TOP50_RETRY_KV="top50v39:retry";
 function verifiedSourceSnapshot(s) {
-  return isAppleUsHybridChart(s)||isAppleSpotifyChart(s);
+  return isTriChart(s)||isAppleUsHybridChart(s)||isAppleSpotifyChart(s);
 }
 function hasCompleteChartArtwork(tracks) {
-  return (validUsHybridRows(tracks)||validHybridRows(tracks)) && completeArtwork(tracks, 50);
+  return (tracks?.length===50&&tracks.every(t=>t.spotify?.status==="matched"&&Number.isSafeInteger(t.spotify.daily)&&t.spotify.daily>=0)||validUsHybridRows(tracks)||validHybridRows(tracks)) && completeArtwork(tracks, 50);
 }
 
 function isApplePreview(url) {
@@ -617,11 +618,34 @@ async function freshDailyRanking(env,origin,source) {
 }
 export async function buildTop50(origin, env, streamSeed) {
   const seed=streamSeed || await readSeed(env,origin,"apple-spotify-streams.json");
-  const regional=verifiedUsStreamSeed(seed);
-  const independent=regional || verifiedStreamSeed(seed);
+  const triple=verifiedTriSeed(seed);
+  const regional=triple?null:verifiedUsStreamSeed(seed);
+  const independent=triple || regional || verifiedStreamSeed(seed);
   if(!independent)throw new Error("apple_spotify_stream_snapshot_missing_or_stale");
   let tracks,sources;
-  if(regional){
+  let triScoring=null;
+  if(triple){
+    const [us,global]=await Promise.all([freshDailyRanking(env,origin,"U"),freshDailyRanking(env,origin,"A")]);
+    if(!us||!global||us.sourceDate!==independent.appleUsDate||
+      global.sourceDate!==independent.appleGlobalDate)
+      throw new Error("tri_source_apple_dates_changed");
+    const pool=independent.tracks;
+    for(const [source,original] of [["U",us.tracks],["A",global.tracks]]){
+      const sourceMap=new Map(pool.filter(t=>t.sourceRanks[source]!==null)
+        .map(t=>[t.sourceRanks[source],songIdentity(t.title,t.artist)]));
+      for(const song of original){
+        if(sourceMap.get(song.pos)!==songIdentity(song.title,song.artist))
+          throw new Error("tri_source_apple_candidates_mismatch_"+source+"_"+song.pos);
+      }
+    }
+    const ranked=rankTriCandidates(pool,independent.spotifyDate);
+    tracks=ranked.tracks.map(t=>({...t,spotify:{...t.spotify},sourceRanks:{...t.sourceRanks}}));
+    sources={U:100,A:100,S:independent.sourceSizes.S};
+    triScoring={appleUSA:"40*(101-US rank)/100",spotify:"30*sqrt(verified global daily/maxDaily)",
+      appleGlobal:"30*(101-Global rank)/100",maxDaily:ranked.maxDaily,
+      missingSpotify:"not eligible; no fabricated stream counts",
+      candidatePool:pool.length,eligibleWithVerifiedSpotify:ranked.eligible};
+  }else if(regional){
     const [us,global]=await Promise.all([
       freshDailyRanking(env,origin,"U"),freshDailyRanking(env,origin,"A")
     ]);
@@ -664,15 +688,20 @@ export async function buildTop50(origin, env, streamSeed) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: regional ? "apple-us-weighted-v40" : "apple-spotify-v39",
-    methodology: regional ? US_HYBRID_METHOD : HYBRID_METHOD,
-    consensus: regional ? US_HYBRID_RULE : HYBRID_RULE,
-    scoring:regional?{appleUSA:"70*(51-rank)/50",spotify:"20*sqrt(daily/max); median-neutral when absent",
+    rev: triple ? "tri-source-v41" : regional ? "apple-us-weighted-v40" : "apple-spotify-v39",
+    methodology: triple ? TRI_METHOD : regional ? US_HYBRID_METHOD : HYBRID_METHOD,
+    consensus: triple ? TRI_RULE : regional ? US_HYBRID_RULE : HYBRID_RULE,
+    scoring:triple?triScoring:regional?{appleUSA:"70*(51-rank)/50",spotify:"20*sqrt(daily/max); median-neutral when absent",
       appleGlobal:"10*(101-rank)/100",maximumMovementFromAppleUS:10,
       missingSpotify:"null measured streams; median used only to avoid ranking penalty"}:
       {apple:"51 - Apple rank",spotify:"10 * daily / maximum matched daily",
         spotifyBonusMax:SPOTIFY_BONUS_MAX,missingSpotify:"no bonus; retain Apple base points"},
-    sourceDetails:regional?{
+    sourceDetails:triple?{
+      U:{name:"Apple Music Top 100: USA",region:"us",url:"https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12"},
+      A:DAILY_SOURCE_DETAILS.A,
+      S:{name:"Spotify Global Daily Top 200 and verified artist Daily via Kworb",region:"global",
+        metric:"per-row verified global daily streams",url:"https://kworb.net/spotify/country/global_daily.html"}
+    }:regional?{
       U:{name:"Apple Music Top 100: USA",region:"us",url:"https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12"},
       A:DAILY_SOURCE_DETAILS.A,
       S:{name:"Spotify daily streams via Kworb",region:"global",
@@ -681,12 +710,12 @@ export async function buildTop50(origin, env, streamSeed) {
       metric:"artist-daily-counter",region:"global",url:"https://kworb.net/spotify/artists.html"}},
     sources,
     coverage:independent.coverage,
-    sourceOrigin:regional?{U:"verified-apple-usa-top50-snapshot",
+    sourceOrigin:triple?{U:"verified-apple-usa-top100",A:"verified-apple-global-top100",S:"kworb-global-daily-and-artist-pages"}:regional?{U:"verified-apple-usa-top50-snapshot",
       A:"verified-apple-global-top100-snapshot",S:"kworb-daily-snapshot"}:
       {A:"verified-apple-top50-snapshot",S:"kworb-artist-daily-snapshot"},
-    sourceDates:regional?{U:independent.appleUsDate,A:independent.appleGlobalDate,S:independent.spotifyDate}:
+    sourceDates:triple?{U:independent.appleUsDate,A:independent.appleGlobalDate,S:independent.spotifyDate}:regional?{U:independent.appleUsDate,A:independent.appleGlobalDate,S:independent.spotifyDate}:
       {A:independent.appleDate,S:independent.spotifyDate},
-    sourceDateKinds:regional?{U:"playlist-published",A:"playlist-published",S:"kworb-last-updated"}:
+    sourceDateKinds:triple?{U:"playlist-published",A:"playlist-published",S:"kworb-daily-edition"}:regional?{U:"playlist-published",A:"playlist-published",S:"kworb-last-updated"}:
       {A:"playlist-published",S:"kworb-last-updated"},
     spotifyFingerprint:independent.fingerprint,
     complete:true,
@@ -856,6 +885,7 @@ async function verifiedBackupTop50(env, origin, backup) {
     return {
       rank: i+1, title: t.title, artist: t.artist,
       sourceRanks: {...t.sourceRanks}, spotify:t.spotify, score:t.score, applePoints:t.applePoints, spotifyBonus:t.spotifyBonus,
+      appleUsPoints:t.appleUsPoints,appleGlobalPoints:t.appleGlobalPoints,spotifyPoints:t.spotifyPoints,
       weeks: Math.max(1, Number(t.weeks) || 1), delta: String(t.delta ?? "0"),
       url: prev.url || "", prev: prev.prev || "", year: prev.year || "", art: ""
     };
@@ -867,8 +897,8 @@ async function verifiedBackupTop50(env, origin, backup) {
   return {
     updated: snap.updated, launch:"2026-09-17", week:Number(snap.week)+1,
     rev:"apple-spotify-backup-v39", methodology:snap.methodology, consensus:snap.consensus,
-    sourceDetails:DAILY_SOURCE_DETAILS, fallback:"verified-snapshot", complete:true,
-    sources:snap.sources, sourceDates:snap.sourceDates||{},
+    sourceDetails:snap.sourceDetails||DAILY_SOURCE_DETAILS, fallback:"verified-snapshot", complete:true,
+    sources:snap.sources,scoring:snap.scoring,sourceDates:snap.sourceDates||{},
     sourceDateKinds:snap.sourceDateKinds||{}, spotifyFingerprint:snap.spotifyFingerprint,
     sourceOrigin:snap.sourceOrigin||{}, tracks,
     covers:{ missing:tracks.filter(t=>!t.art).length }
@@ -1005,7 +1035,7 @@ export async function onRequestGet({env,request}) {
     }),
     ["C",coverSeedEdition(await coverSeed(env,origin))]
   ]);
-  const verified=verifiedUsStreamSeed(streamSeed)||verifiedStreamSeed(streamSeed);
+  const verified=verifiedTriSeed(streamSeed)||verifiedUsStreamSeed(streamSeed)||verifiedStreamSeed(streamSeed);
   if(!verified)return fallbackOrUnavailable(env,origin,backup);
   /* Read-only edition preview for the scheduled independent artwork audit.
      It exposes the prospective source-verified chart without publishing it or
