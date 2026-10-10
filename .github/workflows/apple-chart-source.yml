@@ -35,8 +35,6 @@ jobs:
           node-version: "20"
       - name: Fetch paired verified Apple Music USA and Global Top 100
         run: node scripts/refresh-apple-ranking.mjs
-      - name: Restore Oct 8 and Oct 9 dated Apple archives and preserve verified Spotify date
-        run: node scripts/backfill-chart-history.mjs
       - name: Build union of THREE sources from the latest common source date
         run: node scripts/refresh-apple-spotify-streams.mjs
       - name: Prepare verified Apple media for Spotify-only Top 50 entrants
@@ -56,7 +54,6 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             node scripts/refresh-apple-ranking.mjs
-            node scripts/backfill-chart-history.mjs
             node scripts/refresh-apple-spotify-streams.mjs
             node scripts/resolve-tri-apple-media.mjs
             node --test tests/tri-source-*.test.mjs
@@ -69,6 +66,7 @@ jobs:
             if git push origin HEAD:main; then
               gh workflow run apple-data.yml --ref main
               gh workflow run verify-tri-live.yml --ref main
+              gh workflow run chart-browser-smoke.yml --ref main
               exit 0
             fi
             sleep 3
