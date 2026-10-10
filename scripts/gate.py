@@ -141,6 +141,8 @@ REFERENT = re.compile(
 # The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
+    "october 23": "RAYE one-night This Symphony May Contain Hope concert at Royal Albert Hall, 23.10.2026 (Simon Jones PR 09.10.2026; Live Nation UK).",
+    "october 15": "RAYE Royal Albert Hall concert general on-sale, 15.10.2026 at 10:00 UK time (Simon Jones PR 09.10.2026; Live Nation UK).",
     "april 6": "Lola Young Everything Begins Tour opens at The Pinnacle in Nashville on 06.04.2027 (Pollstar 05.10.2026).",
     "may 4": "Lola Young Everything Begins Tour closes at the Greek Theatre in Los Angeles on 04.05.2027 (Pollstar 05.10.2026).",
     "may 2026": "Victoria Monét graduated from the Institute of Culinary Education in May 2026 (Sony Music Canada 02.10.2026; Los Angeles Times 02.10.2026).",
@@ -179,7 +181,7 @@ VERIFIED_DATES = {
     "november 29": "Newly added VIVA LA LISA show at The Colosseum at Caesars Palace, 29.11.2026 (Caesars Entertainment 29.09.2026)",
     "september 25": "Taylor Swift 'Patient Zero' single out 25.09.2026 (Republic; AP/Variety/JustJared); "
                      "pre-order open 24h, three collector's edition CDs with double-sided covers (People)",
-    "october 13": "Patient Zero collector CD singles ship 13.10.2026 (themusicuniverse)",
+    "october 13": "Patient Zero collector CD singles ship 13.10.2026 (themusicuniverse); RAYE 23.10.2026 Royal Albert Hall artist presale starts 13.10.2026 (Simon Jones PR).",
     "september 22": "Patient Zero announcement 22.09.2026 (Taylor's Instagram; AP; website countdown two hours prior, Billboard); "
                      "Teddy Swims' Ugly Tour arena run opened 22.09.2026 in Kansas City; Yeat LOVE/LYFE Tour at the "
                      "Coca-Cola Roxy, Atlanta (yeatofficial.com/pages/tour)",
