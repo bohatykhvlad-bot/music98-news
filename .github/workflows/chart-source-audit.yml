@@ -1,0 +1,38 @@
+name: Daily chart source diagnostic
+
+on:
+  push:
+    branches: [fix/top50-cross-platform-consensus]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Capture official Apple global Top 100
+        run: node scripts/refresh-apple-ranking.mjs
+      - name: Capture independently checked Spotify global Top 100
+        run: node scripts/refresh-spotify-ranking.mjs
+      - name: Capture Deezer Top Worldwide playlist Top 100
+        run: node scripts/refresh-deezer-ranking.mjs
+      - name: Compare original Deezer chart API and playlist against same inputs
+        run: node scripts/audit-chart-source-options.mjs
+      - name: Preserve actual ranking source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: music98-deezer-api-source-audit
+          if-no-files-found: warn
+          path: |
+            public/data/apple-chart.json
+            public/data/spotify-chart.json
+            public/data/deezer-chart.json
+            /tmp/music98-chart-source-audit.json
