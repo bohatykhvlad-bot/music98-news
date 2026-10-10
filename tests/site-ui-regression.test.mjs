@@ -16,7 +16,11 @@ test("desktop navigation uses five equal-width pill segments",()=>{
   assert.match(page,/\.nav\{[^}]*height:40px;[^}]*padding:3px/);
   assert.match(page,/\.nav-btn\{position:relative;top:0\}/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
-  assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav-btn\{flex:1;height:38px;padding:0 3px;font-size:12px;justify-content:center;top:0\}/);
+  assert.match(page,/@media \\(max-width:640px\\)[\\s\\S]*?\\.nav\\{[^}]*grid-template-columns:repeat\\(5,minmax\\(0,1fr\\)\\)/);
+  assert.match(page,/@media \\(max-width:640px\\)[\\s\\S]*?\\.nav-btn\\{width:100%;min-width:0;height:38px;padding:0 4px;font-size:clamp\\(10px,3\\.15vw,12px\\);justify-content:center;top:0;text-indent:0!important\\}/);
+  assert.match(page,/\\.nav-btn \\.nav-label\\{position:static;display:inline-block;white-space:nowrap\\}/);
+  assert.equal((page.match(/<span class="nav-label">/g)||[]).length,5);
+  assert.doesNotMatch(page,/balanceMobileNavLabelGaps|nav-label-offset/);
 });
 
 test("Subscribe only fills cyan on hover and has no press animation",()=>{
