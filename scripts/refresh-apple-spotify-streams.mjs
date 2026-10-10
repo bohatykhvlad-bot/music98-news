@@ -2,119 +2,145 @@ import fs from "node:fs";
 import {createHash} from "node:crypto";
 import {mergeKey} from "../functions/lib/chart-identity.js";
 import {verifiedDailySeed} from "../functions/lib/daily-chart-sources.js";
-import {KWORB_ARTISTS_URL,htmlText,artistKey,leadingArtist,parseKworbArtists,
- parseKworbArtistDaily,matchKworbTrack,freshDay,parseKworbGlobalStreams,matchKworbGlobal}
+import {KWORB_ARTISTS_URL,artistKey,htmlText,leadingArtist,parseKworbArtists,
+ parseKworbArtistDaily,matchKworbTrack,freshDay,parseKworbGlobalStreams}
  from "../functions/lib/apple-spotify-chart.js";
-import {verifiedUsStreamSeed,US_HYBRID_METHOD} from "../functions/lib/apple-us-hybrid.js";
+import {TRI_METHOD,verifiedTriSeed,songIdentity} from "../functions/lib/tri-source-chart.js";
 
-const output=new URL("../public/data/apple-spotify-streams.json",import.meta.url);
-const read=path=>JSON.parse(fs.readFileSync(new URL("../public/data/"+path,import.meta.url),"utf8"));
+const OUT=new URL("../public/data/apple-spotify-streams.json",import.meta.url);
+const read=name=>JSON.parse(fs.readFileSync(new URL("../public/data/"+name,import.meta.url),"utf8"));
 const us=verifiedDailySeed(read("apple-us-chart.json"),"U");
 const global=verifiedDailySeed(read("apple-chart.json"),"A");
-if(!us||!global||us.sourceDate!==global.sourceDate)throw new Error("Two current same-date Apple US and Global snapshots required");
-async function text(url){
- let last;
+if(!us||!global||us.sourceDate!==global.sourceDate)
+ throw new Error("Two current same-date Apple US and Global Top 100 snapshots required");
+async function requestText(url){
+ let error;
  for(let attempt=0;attempt<3;attempt++){
   try{
-   const r=await fetch(url,{headers:{"user-agent":"Mozilla/5.0 (compatible; music98-chart-source/4.0)","cache-control":"no-cache"},
-    signal:AbortSignal.timeout(20000)});
+   const r=await fetch(url,{headers:{"user-agent":"Mozilla/5.0 (compatible; music98-chart-collector/5.0)","cache-control":"no-cache"},
+    signal:AbortSignal.timeout(18000)});
    if(!r.ok)throw new Error("HTTP "+r.status+" "+url);
    return await r.text();
-  }catch(e){last=e;if(attempt<2)await new Promise(done=>setTimeout(done,1000*(attempt+1)));}
+  }catch(e){error=e;if(attempt<2)await new Promise(resolve=>setTimeout(resolve,1000*(attempt+1)));}
  }
- throw last;
+ throw error;
 }
-const artists=parseKworbArtists(await text(KWORB_ARTISTS_URL));
-const globalPage=await text("https://kworb.net/spotify/country/global_daily.html");
-if(!/Spotify Daily Chart\s*-\s*Global/i.test(globalPage.slice(0,5000)))throw new Error("Wrong Kworb artist discovery chart");
+const [globalPage,artistIndex]=await Promise.all([
+ requestText("https://kworb.net/spotify/country/global_daily.html"),
+ requestText(KWORB_ARTISTS_URL)
+]);
+const chart=parseKworbGlobalStreams(globalPage);
+if(!freshDay(chart.date)||chart.tracks.length<100)
+ throw new Error("Spotify Global daily chart is incomplete or stale");
+const artists=parseKworbArtists(artistIndex);
+// Use chart artist URLs to discover recently charting performers who are
+// missing from the all-time artist index.
 for(const m of globalPage.matchAll(/<a\b[^>]*href=["']\.\.\/artist\/([A-Za-z0-9]{22})\.html["'][^>]*>([\s\S]*?)<\/a>/gi)){
  const name=htmlText(m[2]),key=artistKey(name);
- if(!artists.has(key))artists.set(key,{name,id:m[1],url:`https://kworb.net/spotify/artist/${m[1]}_songs.html`});
+ if(!artists.has(key))artists.set(key,{name,id:m[1],
+  url:`https://kworb.net/spotify/artist/${m[1]}_songs.html`});
 }
-// A Global Top-200 chart row can recover a new release absent from an
-// artist's all-time listing. Never confuse the chart's Streams metric with
-// an artist-page Daily total: preserve the origin on every recovered entry.
-let globalStreams=null;
-try{globalStreams=parseKworbGlobalStreams(globalPage);}
-catch(e){console.warn("Spotify Global chart secondary parser unavailable:",e.message);}
-const candidates=us.tracks.slice(0,50);
-const globalRanks=new Map(global.tracks.map(t=>[mergeKey(t.title,t.artist),t.pos]));
+
+const candidates=new Map(),rankSets={U:new Set(),A:new Set(),S:new Set()};
+function admit(t,source,rank){
+ if(!t?.title||!t?.artist||!Number.isInteger(rank))throw new Error("invalid_"+source+"_candidate");
+ const key=songIdentity(t.title,t.artist);
+ if(!key)throw new Error("unidentifiable_candidate_"+source+"_"+rank);
+ let item=candidates.get(key);
+ if(!item){
+  item={title:t.title,artist:t.artist,url:t.url||"",art:t.art||"",year:t.year||"",prev:"",
+   sourceRanks:{U:null,A:null,S:null},spotify:{status:"unavailable",daily:null,reason:"not-in-spotify-daily-chart"}};
+  candidates.set(key,item);
+ }
+ if(item.sourceRanks[source]!==null)throw new Error("duplicate_"+source+"_song:"+key);
+ if(rankSets[source].has(rank))throw new Error("duplicate_"+source+"_rank:"+rank);
+ rankSets[source].add(rank);item.sourceRanks[source]=rank;
+ // Apple song metadata is authoritative; Spotify names can include "w/".
+ if(source==="U"||(source==="A"&&!item.url)){
+  item.title=t.title;item.artist=t.artist;item.url=t.url||item.url;
+  item.art=t.art||item.art;item.year=t.year||item.year;
+ }
+ if(source==="S"){
+  if(!/^[A-Za-z0-9]{22}$/.test(t.spotifyId||"")||
+    !Number.isSafeInteger(t.daily)||t.daily<0)
+   throw new Error("Spotify global source has no track ID or daily streams at rank "+rank);
+  item.spotify={status:"matched",daily:t.daily,spotifyId:t.spotifyId,
+   total:null,date:chart.date,sourceUrl:"https://kworb.net/spotify/country/global_daily.html",
+   metric:"kworb-spotify-chart-global-daily",matchedTitle:t.title,matchedArtist:t.artist};
+ }
+ return item;
+}
+us.tracks.forEach(t=>admit(t,"U",t.pos));
+global.tracks.forEach(t=>admit(t,"A",t.pos));
+// Spotify Top 200 is a FULL candidate provider, not merely a correction.
+chart.tracks.slice(0,200).forEach(t=>admit(t,"S",t.pos));
+if(rankSets.U.size!==100||rankSets.A.size!==100||rankSets.S.size<100)
+ throw new Error("Incomplete chart source ranks");
+
 const credited=t=>String(t.artist||"").split(/\s*(?:,|\s+&\s+|\s+feat\.?\s+|\s+ft\.?\s+|\s+with\s+)\s*/i)
  .map(x=>x.trim()).filter(Boolean).slice(0,4);
-const wished=new Map(),candidateArtists=new Map();
-for(const t of candidates){
- const matches=credited(t).map(name=>artists.get(artistKey(name))).filter(Boolean);
- candidateArtists.set(t.pos,matches);
- for(const artist of matches)wished.set(artist.id,artist);
+const requested=new Map(), candidateArtists=new Map();
+// Recover independently measurable Apple-only tracks without converting
+// lifetime totals or regional Spotify USA chart values into Global daily.
+for(const [key,t] of candidates){
+ if(t.spotify.status==="matched")continue;
+ const ids=credited(t).map(name=>artists.get(artistKey(name))).filter(Boolean);
+ candidateArtists.set(key,ids);
+ for(const artist of ids)requested.set(artist.id,artist);
 }
-const jobs=[...wished.values()],pages=new Map();let cursor=0;
-await Promise.all(Array.from({length:Math.min(5,jobs.length)},async()=>{
+let cursor=0,artistErrors=0;const pages=new Map(),jobs=[...requested.values()];
+await Promise.all(Array.from({length:Math.min(6,jobs.length)},async()=>{
  while(cursor<jobs.length){
   const artist=jobs[cursor++];
-  try{pages.set(artist.id,parseKworbArtistDaily(await text(artist.url),artist));}
-  catch(e){console.warn("Artist stream page unavailable:",artist.name,String(e?.message||e));}
+  try{pages.set(artist.id,parseKworbArtistDaily(await requestText(artist.url),artist));}
+  catch(e){artistErrors++;console.warn("SPOTIFY_ARTIST_RECOVERY_FAILED",artist.name,String(e?.message||e));}
  }
 }));
-function evidence(t,date){
- const matches=[];
- for(const artist of candidateArtists.get(t.pos)||[]){
+let artistRecovered=0;
+for(const [key,t] of candidates){
+ if(t.spotify.status==="matched")continue;
+ const hits=[];
+ for(const artist of candidateArtists.get(key)||[]){
   const page=pages.get(artist.id);
-  if(!page||page.date!==date)continue;
-  const hit=matchKworbTrack(t,page);
-  if(hit.status==="matched")matches.push({daily:hit.daily,total:hit.total,spotifyId:hit.spotifyId,
-   matchedTitle:hit.title,matchedArtist:artist.name,sourceUrl:artist.url,metric:"kworb-spotify-artist-daily"});
+  if(page?.date!==chart.date)continue;
+  const match=matchKworbTrack(t,page);
+  if(match.status==="matched")hits.push({...match,artist});
  }
- const unique=new Set(matches.map(x=>x.spotifyId));
- if(unique.size===1&&matches.length){
-  // The first credited performer is preferred on a shared-track artist page.
-  return {status:"matched",...matches[0]};
- }
- if(unique.size>1)return {status:"ambiguous"};
- if(globalStreams?.date===date){
-  const track=matchKworbGlobal(t,globalStreams);
-  if(track)return {status:"matched",daily:track.daily,total:null,spotifyId:track.spotifyId,
-   matchedTitle:track.title,matchedArtist:track.artist,sourceUrl:"https://kworb.net/spotify/country/global_daily.html",
-   metric:"kworb-spotify-chart-global-daily"};
- }
- return null;
+ const distinct=new Set(hits.map(h=>h.spotifyId));
+ if(distinct.size!==1)continue;
+ const hit=hits[0];
+ // Never use the same Spotify recording twice under different Apple titles.
+ if([...candidates.values()].some(other=>other!==t&&
+   other.spotify.status==="matched"&&other.spotify.spotifyId===hit.spotifyId))continue;
+ t.spotify={status:"matched",daily:hit.daily,spotifyId:hit.spotifyId,total:hit.total,
+  date:chart.date,sourceUrl:hit.artist.url,metric:"kworb-spotify-artist-daily",
+  matchedTitle:hit.title,matchedArtist:hit.artist.name};
+ artistRecovered++;
 }
-// Pick the single current Spotify edition with the most matched US candidates;
-// mixed dates are never silently merged into a single day's rankings.
-const dateCounts=new Map();
-const days=new Set([...pages.values()].map(p=>p.date));
-if(globalStreams)days.add(globalStreams.date);
-for(const day of days){
- if(!freshDay(day))continue;
- const count=candidates.filter(t=>evidence(t,day)?.status==="matched").length;
- dateCounts.set(day,count);
-}
-const spotifyDate=[...dateCounts].sort((a,b)=>b[1]-a[1]||b[0].localeCompare(a[0]))[0]?.[0];
-if(!spotifyDate)throw new Error("No current Spotify edition");
-const tracks=candidates.map(t=>{
- const hit=evidence(t,spotifyDate);
- const available=(candidateArtists.get(t.pos)||[]).map(a=>pages.get(a.id)).filter(Boolean);
- const status=hit?.status||(available.some(p=>p.date!==spotifyDate)?"different-edition":
-  available.length?"track-not-found":"artist-not-tracked");
- const spotify=hit?.status==="matched"?
-  {...hit,date:spotifyDate,status:"matched"}:
-  {status,daily:null,date:null,sourceUrl:null};
- return {...t,sourceRanks:{U:t.pos,A:globalRanks.get(mergeKey(t.title,t.artist))??null},spotify};
-});
+const tracks=[...candidates.values()];
 const matched=tracks.filter(t=>t.spotify.status==="matched").length;
-const fingerprint=createHash("sha256").update(JSON.stringify([us.sourceDate,global.sourceDate,spotifyDate,tracks])).digest("hex");
-const payload={schema:2,methodology:US_HYBRID_METHOD,
- appleUsDate:us.sourceDate,appleGlobalDate:global.sourceDate,spotifyDate,
+const missing=tracks.length-matched;
+const fingerprint=createHash("sha256").update(JSON.stringify([
+ us.sourceDate,global.sourceDate,chart.date,tracks])).digest("hex");
+const payload={schema:3,methodology:TRI_METHOD,
+ appleUsDate:us.sourceDate,appleGlobalDate:global.sourceDate,spotifyDate:chart.date,
  capturedAt:new Date().toISOString(),fingerprint,
- coverage:{candidates:50,matched,unmatched:50-matched,artistPages:pages.size,
-  chartFallback:tracks.filter(t=>t.spotify.status==="matched"&&t.spotify.metric==="kworb-spotify-chart-global-daily").length},
+ sourceSizes:{U:100,A:100,S:rankSets.S.size},
+ coverage:{candidates:tracks.length,matched,unmatched:missing,
+  spotifyChart:rankSets.S.size,artistRecovered,artistPages:pages.size,artistErrors},
  tracks};
-if(!verifiedUsStreamSeed(payload))throw new Error("Insufficient or invalid Spotify coverage: "+matched+"/50");
-let old;try{old=read("apple-spotify-streams.json");}catch{}
-if(old?.appleUsDate===payload.appleUsDate&&old?.spotifyDate>payload.spotifyDate)
- throw new Error("Refusing older Spotify edition");
-if(old?.appleUsDate===payload.appleUsDate&&old.coverage?.matched>matched+5)
- throw new Error("Unexpected US coverage loss; retaining last verified snapshot");
-if(old?.fingerprint!==fingerprint)fs.writeFileSync(output,JSON.stringify(payload,null,2)+"\n");
-console.log("APPLE_US_GLOBAL_SPOTIFY",JSON.stringify({appleUsDate:us.sourceDate,spotifyDate,
- coverage:payload.coverage,missing:tracks.filter(t=>t.spotify.status!=="matched")
- .map(t=>({title:t.title,artist:t.artist,status:t.spotify.status}))}));
+if(!verifiedTriSeed(payload))throw new Error("Invalid union or fewer than 50 verified streams: "+matched+"/"+tracks.length);
+let old=null;try{old=read("apple-spotify-streams.json");}catch{}
+if(old?.schema===3&&old?.spotifyDate>chart.date)throw new Error("Refusing earlier Spotify edition");
+if(old?.schema===3&&old?.appleUsDate===us.sourceDate&&old.coverage.matched>matched+8)
+ throw new Error("Unexpected coverage regression, retaining previous verified snapshot");
+if(old?.fingerprint!==fingerprint){
+ const tmp=new URL("../public/data/.apple-spotify-streams.tmp",import.meta.url);
+ fs.writeFileSync(tmp,JSON.stringify(payload,null,2)+"\n");
+ fs.renameSync(tmp,OUT);
+}
+console.log("TRI_SOURCE_COLLECTOR",JSON.stringify({
+ appleDate:us.sourceDate,spotifyDate:chart.date,candidates:tracks.length,matched,
+ missing,spotifyChart:rankSets.S.size,artistRecovered,artistErrors,
+ candidateIntersection:tracks.filter(t=>t.sourceRanks.U!==null&&t.sourceRanks.A!==null&&t.sourceRanks.S!==null).length
+}));
