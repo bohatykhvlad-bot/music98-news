@@ -122,7 +122,7 @@
       vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23));
       colour=mix(colour,mineral,clamp(smoothstep(.48,.86,lanes)*.25+crests*.04,0.,.65));
       // Lit grains sit within the volume, with a wider glow beneath it.
-      colour=mix(colour,vec3(.86,1.,.99),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.14,0.,.8));
+      colour=mix(colour,vec3(.98,.98,.98),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.14,0.,.8));
       float breathing=1.+.025*sin(time*.55);
       float alpha=(body*(.405+grain*.03)+haze+dots.y*body*.12)*(1.+energy*.18)*breathing;
       alpha+=(dots.x*.025+dots.y*.04+motes.x*.035+motes.y*.04)*body;
@@ -179,9 +179,9 @@
     const light=document.createElement("canvas");light.width=light.height=24;
     const lightContext=light.getContext("2d");
     const lightGlow=lightContext.createRadialGradient(12,12,0,12,12,12);
-    lightGlow.addColorStop(0,"rgba(225,255,253,.65)");
-    lightGlow.addColorStop(.3,"rgba(175,249,246,.28)");
-    lightGlow.addColorStop(1,"rgba(175,249,246,0)");
+    lightGlow.addColorStop(0,"rgba(255,255,255,.65)");
+    lightGlow.addColorStop(.3,"rgba(245,245,245,.28)");
+    lightGlow.addColorStop(1,"rgba(245,245,245,0)");
     lightContext.fillStyle=lightGlow;lightContext.fillRect(0,0,24,24);
     const grains=Array.from({length:320},()=>({x:Math.random(),y:Math.random(),phase:Math.random()*6.28,size:3+Math.random()*3}));
     return { surface, draw() {
@@ -200,10 +200,10 @@
         glow.addColorStop(.45,rgba(palette[1],.08));glow.addColorStop(1,rgba(palette[1],0));
         ctx.fillStyle=glow;ctx.fillRect(-1,-1,2,2);ctx.restore();
       }
-      ctx.save();ctx.shadowBlur=32;ctx.shadowColor="rgba(0,220,215,.12)";
+      ctx.save();ctx.shadowBlur=32;ctx.shadowColor=rgba(palette[1],.12);
       for(let i=0;i<3;i++){
         const travel=(clock*.045+i/3)%1,spread=travel*Math.max(width,height)*.5;
-        ctx.strokeStyle=`rgba(0,178,194,${(1-travel)*(.02+energy*.015)})`;
+        ctx.strokeStyle=rgba(palette[1],(1-travel)*(.02+energy*.015));
         ctx.lineWidth=32+spread*.06;ctx.beginPath();
         if(ctx.roundRect)ctx.roundRect(sourceX-halfWidth-spread,sourceY-halfHeight-spread,
           (halfWidth+spread)*2,(halfHeight+spread)*2,24+spread);
@@ -304,42 +304,62 @@
     start();
   }
   function setPlaying(value) { playing=!!value;if(active&&motion.matches)render(); }
+  // Derive the actual dominant colour, including dark/grey/low-saturation
+  // artwork. Previous code discarded those pixels and left the cyan fallback.
+  function artworkPalette(pixels) {
+    const bins=new Map();
+    for(let i=0;i<pixels.length;i+=4) {
+      if(pixels[i+3]<160)continue;
+      const rgb=[pixels[i],pixels[i+1],pixels[i+2]].map(v=>v/255);
+      const key=rgb.map(v=>Math.min(7,Math.floor(v*8))).join(',');
+      const bin=bins.get(key)||{count:0,sum:[0,0,0]};
+      bin.count++;
+      rgb.forEach((v,k)=>bin.sum[k]+=v);
+      bins.set(key,bin);
+    }
+    const ranked=[...bins.values()].sort((a,b)=>b.count-a.count);
+    if(!ranked.length)return null;
+    // Keep the cover's most prevalent colour instead of treating tiny
+    // bright details as its primary hue. Other swatches only add texture.
+    const first=ranked[0],base=first.sum.map(v=>v/first.count);
+    const companion=ranked.find(b=>b.count>first.count*.10&&
+      b.sum.some((v,k)=>Math.abs(v/b.count-base[k])>.10));
+    const secondary=companion?companion.sum.map(v=>v/companion.count):base;
+    const shade=(rgb,gain,lift)=>rgb.map(v=>clamp(v*gain+lift,.06,.94));
+    return [shade(base,.76,.055),shade(base,.98,.10),
+      shade(base.map((v,k)=>v*.83+secondary[k]*.17),.90,.08)];
+  }
   async function setArtwork(url) {
     const request=++artworkRequest;
-    targetPalette=defaultPalette.map(c=>c.slice());
-    if(!/^https:\/\/[^/]*mzstatic\.com\//i.test(url||''))return;
+    if(!/^https:\/\/[^/]*mzstatic\.com\//i.test(url||'')){
+      targetPalette=defaultPalette.map(c=>c.slice());
+      return;
+    }
     try {
       let colours=artworkPalettes.get(url);
-      if(!colours){
+      if(!colours) {
         const image=new Image();image.crossOrigin="anonymous";
-        // One small read per cover, never in the animation loop.
         image.src=url.replace(/\d+x\d+bb(?:-\d+)?\./,'64x64bb.');
         await image.decode();
-        const sample=document.createElement('canvas');sample.width=sample.height=24;
+        const sample=document.createElement('canvas');sample.width=sample.height=32;
         const context=sample.getContext('2d',{willReadFrequently:true});
-        context.drawImage(image,0,0,24,24);
-        const pixels=context.getImageData(0,0,24,24).data,bins=new Map();
-        for(let i=0;i<pixels.length;i+=4){
-          const c=[pixels[i],pixels[i+1],pixels[i+2]].map(v=>v/255);
-          const high=Math.max(...c),low=Math.min(...c);
-          if(high<.18||low>.88||high-low<.12)continue;
-          const key=c.map(v=>Math.floor(v*5)).join(',');
-          const bin=bins.get(key)||{count:0,total:[0,0,0]};
-          bin.count++;c.forEach((v,k)=>bin.total[k]+=v);bins.set(key,bin);
-        }
-        const dominant=[...bins.values()].sort((a,b)=>b.count-a.count).slice(0,3);
-        if(!dominant.length)return;
-        colours=defaultPalette.map((base,i)=>{
-          const bin=dominant[i%dominant.length];
-          return base.map((v,k)=>v*.25+(bin.total[k]/bin.count)*.75);
-        });
+        if(!context)throw new Error("Artwork canvas unavailable");
+        context.drawImage(image,0,0,32,32);
+        colours=artworkPalette(context.getImageData(0,0,32,32).data);
+        if(!colours)throw new Error("Empty artwork image");
         artworkPalettes.set(url,colours);
         if(artworkPalettes.size>24)artworkPalettes.delete(artworkPalettes.keys().next().value);
       }
       if(request!==artworkRequest)return;
       targetPalette=colours.map(c=>c.slice());
       if(motion.matches){palette=targetPalette.map(c=>c.slice());if(active)render();}
-    } catch { /* Keep the site palette if artwork is unavailable or CORS blocks sampling. */ }
+    } catch {
+      if(request!==artworkRequest)return;
+      // For an unavailable cover, use neutral shades rather than falsely
+      // presenting the previous album's colour or an unrelated turquoise.
+      targetPalette=[[.31,.33,.35],[.48,.50,.52],[.39,.41,.43]];
+      if(motion.matches){palette=targetPalette.map(c=>c.slice());if(active)render();}
+    }
   }
   canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();lost=true;if(frame)cancelAnimationFrame(frame);frame=0;});
   canvas.addEventListener("webglcontextrestored",()=>{lost=false;renderer=createRenderer();start();});
