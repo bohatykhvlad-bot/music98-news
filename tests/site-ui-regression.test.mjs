@@ -240,7 +240,9 @@ test("the UI requires Apple candidate provenance and verified Spotify daily meta
  assert.match(page,/j.complete === true/);
  assert.match(page,/isDailySourceEdition\(j\)/);
  assert.match(page,/j.methodology===TRI_CHART_METHOD/);
- assert.match(page,/j.sources\?\.U===100 && j.sources\?\.A===100/);
+ assert.match(page,/j.sources\?\.U===100/);
+ assert.match(page,/j.sources\?\.A===100 \|\| \(j.sources\?\.A===50/);
+ assert.match(page,/j.sourceDates\?\.U===j.sourceDates\?\.S && j.sourceDates\?\.A===j.sourceDates\?\.S/);
  assert.match(page,/!!j.sourceDates\?\.S && !!j.spotifyFingerprint/);
  assert.doesNotMatch(page,/Last complete chart:/);
  assert.match(page,/else if\(tag === "backup"\) txt = ""/);
