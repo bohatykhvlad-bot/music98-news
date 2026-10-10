@@ -98,11 +98,17 @@ jobs:
             triple:triple.length,double:pairs.length,
             triplePreview:triple.slice(0,12)
           }));
+          // Provide all 300 source rows for a reviewed identity/edition mismatch audit.
+          console.log("FULL_TOP100_ROWS",JSON.stringify(sources.map((v,i)=>({
+            source:["A","S","D"][i],date:v.chartDate||v.sourceDate,
+            tracks:v.tracks.map(t=>[t.pos,t.title,t.artist])
+          }))));
           NODE
       - name: Build a daily edition using isolated in-memory history
         run: |
           node scripts/build-daily-chart-preview.mjs /tmp/daily-top50.json
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: daily-global-source-snapshots
           path: |
