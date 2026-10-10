@@ -2880,7 +2880,14 @@ function queueEqualizeBrowsePanels(){
   browsePanelSyncPending = true;
   requestAnimationFrame(()=>{
     browsePanelSyncPending = false;
-    const panes = [document.getElementById("tab-releases"), document.getElementById("tab-discover")];
+    equalizeBrowsePanelsNow();
+  });
+}
+/* Runs synchronously right before a newly shown tab paints. The deferred pass
+   (resize/load/observer) must never be the first one to move a panel that is
+   already visible: that produced the open-tab jump on Discover. */
+function equalizeBrowsePanelsNow(){
+  const panes = [document.getElementById("tab-releases"), document.getElementById("tab-discover")];
     if (panes.some(p=>!p)) return;
     const discoverLayout = panes[1].querySelector(".discover-layout");
     discoverLayout?.style.removeProperty("--discover-layout-height");
@@ -2940,7 +2947,7 @@ function queueEqualizeBrowsePanels(){
           const sharedTop = parseFloat(getComputedStyle(document.documentElement)
             .getPropertyValue("--section-heading-top")) || 8;
           return {
-            headingTop: Math.max(sharedTop, navBottom + gap - sectionTop),
+            headingTop: Math.round(Math.max(sharedTop, navBottom + gap - sectionTop)),
             bottomInset
           };
         });
@@ -2949,7 +2956,6 @@ function queueEqualizeBrowsePanels(){
           Math.max(0, height - geometry.headingTop - geometry.bottomInset) + "px");
       }
     }
-  });
 }
 window.addEventListener("resize", queueEqualizeBrowsePanels);
 window.addEventListener("load", queueEqualizeBrowsePanels);
@@ -3578,6 +3584,9 @@ function setTab(t){
     s.classList.toggle("active", on);
     s.classList.toggle("rise", on);
   });
+  /* Equalize Releases/Discover before the first paint of the switch: the
+     incoming tab must never be moved by a later deferred re-measure. */
+  equalizeBrowsePanelsNow();
   window.scrollTo(0, 0);
   /* the newly shown rail had zero size while hidden - its .ok state is stale;
      a frame later it has real geometry, so re-evaluate the arrows */
