@@ -931,7 +931,7 @@ async function lastGood(env, backup, origin) {
 /* The baked fallback file was written when covers still came from any source; run it
    through the same Apple-only cover pass before serving, so a failed rebuild cannot
    put Deezer sleeves (or a different picture) on the page. */
-async function healMissingArtwork(env, tracks, origin) {
+async function healMissingArtwork(env, tracks, origin, {preferApple=false}={}) {
   const before = (tracks || []).filter((t) => !t.art).length;
   if (!before) return { before: 0, after: 0, filled: 0 };
   await enrichArtByIds(tracks);
@@ -941,7 +941,7 @@ async function healMissingArtwork(env, tracks, origin) {
     await enrichArtByIds(stillMissing);
     await enrichAppleFromAlbums(stillMissing);
   }
-  await applyCovers(env, tracks, origin, {retainTrusted:true});
+  await applyCovers(env, tracks, origin, {retainTrusted:true,preferApple});
   const after = tracks.filter((t) => !t.art).length;
   return { before, after, filled: Math.max(0, before - after) };
 }
@@ -962,8 +962,8 @@ async function decorateCachedTop50(env, payload, origin) {
   if (payload && Array.isArray(payload.tracks) && payload.tracks.length) {
     try {
       await applyNames(env, payload.tracks, origin);
-      await applyCovers(env, payload.tracks, origin, {retainTrusted:true});
-      const healed = await healMissingArtwork(env, payload.tracks, origin);
+      await applyCovers(env, payload.tracks, origin, {retainTrusted:true,preferApple:payload.methodology===TRI_METHOD});
+      const healed = await healMissingArtwork(env, payload.tracks, origin,{preferApple:payload.methodology===TRI_METHOD});
       await applyLoudness(env, payload.tracks, origin);
       payload.tracks.forEach(t => {
         t.url=appleAff(t.url);
