@@ -20,6 +20,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/41/b9/4c/41b94cc9-bda4-bfb3-ab2c-40cea74bfc1b/mzaf_14893580160728665561.plus.aac.p.m4a",
     "year": "2026"
   },
+  "baby|justinbieber": {
+    "title": "Baby (feat. Ludacris)",
+    "artist": "Justin Bieber",
+    "url": "https://music.apple.com/us/album/1440661543?i=1440661545",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/89/66/d3/8966d3cb-68eb-5f2c-fef8-4ac420721387/mzaf_3044382270474258872.plus.aac.p.m4a",
+    "year": "2010"
+  },
   "babydoll|dominicfike": {
     "title": "Babydoll",
     "artist": "Dominic Fike",
@@ -90,6 +97,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c8/7c/d4/c87cd4df-1197-1d1d-a07c-c5139d59a58f/mzaf_8671653320488087674.plus.aac.p.m4a",
     "year": "2026"
   },
+  "bestieverhad|drake": {
+    "title": "Best I Ever Had",
+    "artist": "Drake",
+    "url": "https://music.apple.com/us/album/1452017773?i=1452017954",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/00/dd/f3/00ddf3d1-073d-dfbe-b7d5-b41280fc9d07/mzaf_10364873687170057621.plus.aac.p.m4a",
+    "year": "2009"
+  },
   "billiejean|michaeljackson": {
     "title": "Billie Jean",
     "artist": "Michael Jackson",
@@ -102,6 +116,13 @@
     "artist": "STELLA LEFTY",
     "url": "https://music.apple.com/us/album/1884403092?i=1884403093",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/44/0f/c5/440fc55c-cd76-7620-e6f8-b261df255ac0/mzaf_16427196732428704455.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "brandnew|mrsgreenapple": {
+    "title": "Brand New",
+    "artist": "Mrs. GREEN APPLE",
+    "url": "https://music.apple.com/us/album/6788211807?i=6788211810",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/b9/e2/86b9e295-d9f1-d53d-c4f5-5335ac7127b2/mzaf_13409156314119121134.plus.aac.p.m4a",
     "year": "2026"
   },
   "choosintexas|ellalangley": {
@@ -209,6 +230,27 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6e/df/af/6edfaf58-f901-e9b5-840b-9ac9e37f34b7/mzaf_8465065510938624101.plus.aac.p.m4a",
     "year": "2024"
   },
+  "forokinawa|yao": {
+    "title": "For Okinawa (feat. Awich, CHICO CARLITO, ONE OK ROCK & Paledusk)",
+    "artist": "YAO",
+    "url": "https://music.apple.com/us/album/6803148720?i=6803148739",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/f1/da/3e/f1da3e12-d280-1787-3c1b-c1b1823972e7/mzaf_12140783115020634748.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "freestyle|lilbaby": {
+    "title": "Freestyle",
+    "artist": "Lil Baby",
+    "url": "https://music.apple.com/us/album/1440928174?i=1440929293",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e5/2e/9b/e52e9bd5-761a-8665-542b-c7391e5c0f6c/mzaf_17420079795001025422.plus.aac.p.m4a",
+    "year": "2017"
+  },
+  "godsplan|drake": {
+    "title": "God's Plan",
+    "artist": "Drake",
+    "url": "https://music.apple.com/us/album/1418213110?i=1418213269",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ec/de/77/ecde7774-eb39-2e47-06e4-dbd911be7b75/mzaf_5914483064715703001.plus.aac.p.m4a",
+    "year": "2018"
+  },
   "golden|huntr": {
     "title": "Golden",
     "artist": "HUNTR/X, EJAE, AUDREY NUNA, REI AMI & KPop Demon Hunters Cast",
@@ -265,6 +307,27 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/73/76/42/737642e6-c478-bed7-f11f-efee96072450/mzaf_5163950318414409594.plus.aac.p.m4a",
     "year": "2026"
   },
+  "imspent|drake": {
+    "title": "I’m Spent",
+    "artist": "Drake & Loe Shimmy",
+    "url": "https://music.apple.com/us/album/6769551464?i=6769551476",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3a/5d/c1/3a5dc1b0-e482-ddaa-a93b-e5da5b418a3f/mzaf_11052678923105228585.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "imtheproblem|morganwallen": {
+    "title": "I'm The Problem",
+    "artist": "Morgan Wallen",
+    "url": "https://music.apple.com/us/album/1802103958?i=1802103970",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/4d/ca/26/4dca2667-33de-a871-7b3f-4a6b28558109/mzaf_8581491301158910393.plus.aac.p.m4a",
+    "year": "2025"
+  },
+  "inaminute|lilbaby": {
+    "title": "In A Minute",
+    "artist": "Lil Baby",
+    "url": "https://music.apple.com/us/album/1648587138?i=1648587330",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bb/f6/56/bbf6566c-7137-0484-be0b-8bc05283e99f/mzaf_1914219810054297365.plus.aac.p.m4a",
+    "year": "2022"
+  },
   "iris|thegoogoodolls": {
     "title": "Iris",
     "artist": "The Goo Goo Dolls",
@@ -293,12 +356,26 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/35/01/69/350169e0-8eb5-2d39-8bc3-8824c44824f8/mzaf_15481487577804135748.plus.aac.p.m4a",
     "year": "2025"
   },
+  "kyohan|mrsgreenapple": {
+    "title": "Kyohan",
+    "artist": "Mrs. GREEN APPLE",
+    "url": "https://music.apple.com/us/album/6808172946?i=6808172970",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ce/9c/15/ce9c15ce-9a24-7e58-9eaf-78711e5a019f/mzaf_1707437200112881647.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "lastthingyouneed|morganwallen": {
     "title": "Last Thing You Need",
     "artist": "Morgan Wallen",
     "url": "https://music.apple.com/us/album/6812476961?i=6812477290",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7f/98/3c/7f983c2f-9eb3-7089-b929-8c64b23fb29f/mzaf_5346668167578705013.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "likeme|future": {
+    "title": "LIKE ME (feat. 42 Dugg & Lil Baby)",
+    "artist": "Future",
+    "url": "https://music.apple.com/us/album/1621803882?i=1621803969",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/1b/57/98/1b579826-1c65-4b2a-70ff-bd9cc3f38a0e/mzaf_9370811424277154394.plus.aac.p.m4a",
+    "year": "2022"
   },
   "loser|tameimpala": {
     "title": "Loser",
@@ -370,6 +447,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/76/bf/8b/76bf8bad-7dff-5adc-7a2f-05c4b03e1e86/mzaf_11974986281424556101.plus.aac.p.m4a",
     "year": "2026"
   },
+  "notlikeus|kendricklamar": {
+    "title": "Not Like Us",
+    "artist": "Kendrick Lamar",
+    "url": "https://music.apple.com/us/album/1744776162?i=1744776167",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/96/f8/f8/96f8f80b-dbb5-f2ca-714e-9c39d5dc6846/mzaf_4599292728755362943.plus.aac.p.m4a",
+    "year": "2024"
+  },
   "ordinary|alexwarren": {
     "title": "Ordinary",
     "artist": "Alex Warren",
@@ -397,6 +481,13 @@
     "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1e/88/d5/1e88d560-253f-3fa2-87a0-2f83b9681948/mzaf_11928544907491655022.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "popit|gunna": {
+    "title": "pop it",
+    "artist": "Gunna",
+    "url": "https://music.apple.com/us/album/6819441629?i=6819441636",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8d/b4/22/8db422a9-8f7a-6863-6a47-1249696f012b/mzaf_9062412188855492119.plus.aac.p.m4a",
+    "year": "2020"
   },
   "quebec|drake": {
     "title": "Quebec",
@@ -426,11 +517,32 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/48/89/4d/48894def-36b6-0085-9184-b28a200cf47a/mzaf_6109765307626823795.plus.aac.p.m4a",
     "year": "2026"
   },
+  "shiwaawase|vaundy": {
+    "title": "Shiwaawase",
+    "artist": "VAUNDY",
+    "url": "https://music.apple.com/us/album/1714599649?i=1714599822",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/49/ec/f7/49ecf731-ac1a-0fc5-7c8e-c796cd55e4a3/mzaf_15983902472780899262.plus.aac.p.m4a",
+    "year": "2021"
+  },
+  "snooze|sza": {
+    "title": "Snooze",
+    "artist": "SZA",
+    "url": "https://music.apple.com/us/album/1657869377?i=1657869492",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5c/a7/8e/5ca78e4e-245f-5021-858c-45a8057eb296/mzaf_4277583948632043282.plus.aac.p.m4a",
+    "year": "2022"
+  },
   "soeasy|oliviadean": {
     "title": "So Easy (To Fall In Love)",
     "artist": "Olivia Dean",
     "url": "https://music.apple.com/us/album/1817609404?i=1817609507",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/b3/0a/c0/b30ac06f-1b78-f579-8e72-e2fc9eb3a2c8/mzaf_7319723033619206839.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "sogood|jhenaiko": {
+    "title": "So Good (feat. Kendrick Lamar)",
+    "artist": "Jhené Aiko",
+    "url": "https://music.apple.com/us/album/6810715695?i=6810716062",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/20/78/dd/2078ddf0-de7d-f534-a4fd-476382ae012b/mzaf_13935165721871139669.plus.aac.p.m4a",
     "year": "2026"
   },
   "solareclipse|drake": {
@@ -531,12 +643,26 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a8/87/16/a88716e2-9474-ec4e-06d6-d3a9a3ba96c8/mzaf_6258558385119267725.plus.aac.p.m4a",
     "year": "2024"
   },
+  "waitforu|future": {
+    "title": "WAIT FOR U (feat. Drake & Tems)",
+    "artist": "Future",
+    "url": "https://music.apple.com/us/album/1621119097?i=1621119447",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/77/67/90/77679025-8a80-42a2-bbcd-335dd083295b/mzaf_11646896799515737302.plus.aac.p.m4a",
+    "year": "2022"
+  },
   "whatyouneed|tems": {
     "title": "What You Need",
     "artist": "Tems",
     "url": "https://music.apple.com/us/album/1853635930?i=1853635937",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/7e/3c/25/7e3c2565-b83d-e690-49c1-92298bd2a244/mzaf_2428036131779969369.plus.aac.p.m4a",
     "year": "2025"
+  },
+  "wickedgames|theweeknd": {
+    "title": "Wicked Games",
+    "artist": "The Weeknd",
+    "url": "https://music.apple.com/us/album/1714908584?i=1714908987",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/f7/31/85/f7318523-d760-b7b4-a663-1c2c142b6335/mzaf_14329686155362176368.plus.aac.p.m4a",
+    "year": "2011"
   },
   "woman|kanebrown": {
     "title": "Woman",
@@ -551,5 +677,19 @@
     "url": "https://music.apple.com/us/album/6779378647?i=6779378648",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/e8/ba/6b/e8ba6b93-410e-86ab-9e60-fec68da95702/mzaf_13004185619102517044.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "yestokyo|ebidanebisugakuenboysclub": {
+    "title": "Yes! Tokyo (feat. SUPER★DRAGON, Sakurashimeji, ONE N' ONLY, BUDDiiS, ICEx & Lienel)",
+    "artist": "EBiDAN Ebisu Gakuen Boys Club, chotokkyu, M!LK & GNJB",
+    "url": "https://music.apple.com/us/album/6793862982?i=6793862983",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a5/95/ab/a595ab43-5ce7-d2f1-d2a9-9fd89ca935df/mzaf_9260178706887871181.plus.aac.p.m4a",
+    "year": "2026"
+  },
+  "yonaguni|badbunny": {
+    "title": "Yonaguni",
+    "artist": "Bad Bunny",
+    "url": "https://music.apple.com/us/album/1570323047?i=1570323056",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/49/b9/6b/49b96b1c-aeee-7e22-ce0a-be17bab4a864/mzaf_5470366028981689473.plus.aac.p.m4a",
+    "year": "2021"
   }
 }
