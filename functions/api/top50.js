@@ -1,6 +1,7 @@
 import {HYBRID_METHOD,HYBRID_RULE,SPOTIFY_BONUS_MAX,verifiedStreamSeed,rankAppleSpotify,isAppleSpotifyChart,validHybridRows} from "../lib/apple-spotify-chart.js";
 import {US_HYBRID_METHOD,US_HYBRID_RULE,validUsHybridRows,verifiedUsStreamSeed,rankAppleUsHybrid,isAppleUsHybridChart} from "../lib/apple-us-hybrid.js";
 import {TRI_METHOD,TRI_RULE,verifiedTriSeed,rankTriCandidates,isTriChart,songIdentity} from "../lib/tri-source-chart.js";
+import {datedChartPath,verifiedDatedApple} from "../lib/chart-history.js";
 import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
 import {hasCompleteChartArtwork as completeArtwork,isTrustedChartArtwork,missingChartArtwork} from "../lib/chart-artwork-gate.js";
 import {discoverAppleAlbumTracks} from "../lib/apple-album-discovery.js";
@@ -629,10 +630,18 @@ export async function buildTop50(origin, env, streamSeed) {
   let tracks,sources;
   let triScoring=null;
   if(triple){
-    const [us,global]=await Promise.all([freshDailyRanking(env,origin,"U"),freshDailyRanking(env,origin,"A")]);
+    const edition=independent.spotifyDate;
+    const [rawUS,rawGlobal]=await Promise.all([
+      readSeed(env,origin,datedChartPath("apple-us",edition)),
+      readSeed(env,origin,datedChartPath("apple-global",edition))
+    ]);
+    const us=verifiedDatedApple(rawUS,"U",edition);
+    const global=verifiedDatedApple(rawGlobal,"A",edition);
     if(!us||!global||us.sourceDate!==independent.appleUsDate||
-      global.sourceDate!==independent.appleGlobalDate)
-      throw new Error("tri_source_apple_dates_changed");
+       global.sourceDate!==independent.appleGlobalDate||
+       us.tracks.length!==independent.sourceSizes.U||
+       global.tracks.length!==independent.sourceSizes.A)
+      throw new Error("tri_source_same_day_archives_missing");
     const pool=independent.tracks;
     for(const [source,original] of [["U",us.tracks],["A",global.tracks]]){
       const sourceMap=new Map(pool.filter(t=>t.sourceRanks[source]!==null)
@@ -644,7 +653,7 @@ export async function buildTop50(origin, env, streamSeed) {
     }
     const ranked=rankTriCandidates(pool,independent.spotifyDate);
     tracks=ranked.tracks.map(t=>({...t,spotify:{...t.spotify},sourceRanks:{...t.sourceRanks}}));
-    sources={U:100,A:100,S:independent.sourceSizes.S};
+    sources={U:us.tracks.length,A:global.tracks.length,S:independent.sourceSizes.S};
     triScoring={appleUSA:"40*(101-US rank)/100",spotify:"30*sqrt(verified global daily/maxDaily)",
       appleGlobal:"30*(101-Global rank)/100",maxDaily:ranked.maxDaily,
       missingSpotify:"not eligible; no fabricated stream counts",
@@ -701,8 +710,9 @@ export async function buildTop50(origin, env, streamSeed) {
       {apple:"51 - Apple rank",spotify:"10 * daily / maximum matched daily",
         spotifyBonusMax:SPOTIFY_BONUS_MAX,missingSpotify:"no bonus; retain Apple base points"},
     sourceDetails:triple?{
-      U:{name:"Apple Music Top 100: USA",region:"us",url:"https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12"},
-      A:DAILY_SOURCE_DETAILS.A,
+      U:{name:"Apple Music Top 100: USA",region:"us",url:"https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12",
+        provenance:independent.archiveProvenance?.U},
+      A:{...DAILY_SOURCE_DETAILS.A,provenance:independent.archiveProvenance?.A},
       S:{name:"Spotify Global Daily Top 200 and verified artist Daily via Kworb",region:"global",
         metric:"per-row verified global daily streams",url:"https://kworb.net/spotify/country/global_daily.html"}
     }:regional?{
@@ -1047,16 +1057,21 @@ export async function onRequestGet({env,request}) {
     readSeed(env,origin,"apple-chart.json"),
     readSeed(env,origin,"apple-us-chart.json")
   ]);
-  // A newly deployed source snapshot must unblock a failed refresh immediately,
-  // even when Spotify has not changed. Keep the existing retry delay otherwise.
+  // A matching-day historical edition must be cached against its real
+  // dated archive, NOT against today's unrelated live Apple playlists.
+  const verified=verifiedTriSeed(streamSeed)||verifiedUsStreamSeed(streamSeed)||verifiedStreamSeed(streamSeed);
+  const sourceSnapshot=verified?.methodology===TRI_METHOD ? await Promise.all([
+    readSeed(env,origin,datedChartPath("apple-global",verified.spotifyDate)),
+    readSeed(env,origin,datedChartPath("apple-us",verified.spotifyDate))
+  ]) : [appleSeed,usSeed];
   const seedEdition=JSON.stringify([
-    ...[["A",appleSeed],["U",usSeed]].map(([id,raw])=>{
-      const seed=verifiedDailySeed(raw,id);
-      return seed ? [id,seed.capturedAt||seed.updated,seed.sourceDate] : [id,""];
+    ...[["A",sourceSnapshot[0]],["U",sourceSnapshot[1]]].map(([id,raw])=>{
+      const seed=verified?.methodology===TRI_METHOD ?
+        verifiedDatedApple(raw,id,verified.spotifyDate) : verifiedDailySeed(raw,id);
+      return seed?[id,seed.capturedAt||seed.updated,seed.sourceDate]:[id,""];
     }),
     ["C",coverSeedEdition(await coverSeed(env,origin))]
   ]);
-  const verified=verifiedTriSeed(streamSeed)||verifiedUsStreamSeed(streamSeed)||verifiedStreamSeed(streamSeed);
   if(!verified)return fallbackOrUnavailable(env,origin,backup);
   /* Read-only edition preview for the scheduled independent artwork audit.
      It exposes the prospective source-verified chart without publishing it or
