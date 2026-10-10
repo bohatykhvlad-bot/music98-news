@@ -9,6 +9,7 @@ on:
       - "functions/lib/apple-us-hybrid.js"
       - "functions/lib/tri-source-chart.js"
       - "tests/tri-source-chart.test.mjs"
+      - "scripts/resolve-tri-apple-media.mjs"
       - "functions/lib/daily-chart-sources.js"
       - ".github/workflows/apple-chart-source.yml"
   schedule:
@@ -32,6 +33,8 @@ jobs:
         run: node scripts/refresh-apple-ranking.mjs
       - name: Build union of three daily Top 100 charts and recover verified Spotify counters
         run: node scripts/refresh-apple-spotify-streams.mjs
+      - name: Prepare verified Apple media for Spotify-only Top 50 entrants
+        run: node scripts/resolve-tri-apple-media.mjs
       - name: Validate three-source identity, weights, rank continuity and Spotify numbers
         run: node --test tests/tri-source-chart.test.mjs
       - name: Commit verified chart snapshots (regenerate after competing pushes)
@@ -48,6 +51,7 @@ jobs:
             git reset --hard origin/main
             node scripts/refresh-apple-ranking.mjs
             node scripts/refresh-apple-spotify-streams.mjs
+            node scripts/resolve-tri-apple-media.mjs
             node --test tests/tri-source-chart.test.mjs
             git add public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json
             if git diff --cached --quiet; then
