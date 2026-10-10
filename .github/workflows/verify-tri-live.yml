@@ -10,7 +10,7 @@ permissions:
   contents: read
 concurrency:
   group: verify-tri-live
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   check-production:
     runs-on: ubuntu-latest
