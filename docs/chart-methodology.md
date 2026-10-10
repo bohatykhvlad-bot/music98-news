@@ -1,55 +1,55 @@
-# Daily Top 50: Apple candidates with Spotify daily stream correction
+# Music98 Daily Top 50 — USA-led hybrid (v2)
 
-The candidate set is exactly positions 1–50 of Apple Music's **Top 100: Global**
-playlist `pl.d25f5d1181894928af76c85c967f8f31`. Spotify does not add candidates.
-Deezer and the previous three-chart intersection are not used for this edition.
+## Sources and candidates
 
-For each candidate, the collector resolves the leading artist in Kworb's artist
-directory (supplemented by artist links in its global chart for newer artists).
-It reads the artist's **Spotify Top Songs → Daily** column, not lifetime Streams
-or the separate Spotify chart Streams column. Those metrics must not be mixed.
-These are Kworb-reported Spotify counters; this site does not directly query
-Spotify's internal play-count API.
+The 50 candidates are positions 1–50 of Apple Music's **Top 100: USA**
+playlist `pl.606afcbb70264d2eb2b51d8dbcfa6a12`.
+Apple **Top 100: Global** (`pl.d25f5d1181894928af76c85c967f8f31`)
+provides additional positions among its Top 100. The official Apple
+playlists must share a publication date; storefront locale is not used
+as a proxy for ranking region.
 
-Matches require the correct artist page, normalized title, and the same track
-version. Featured rows on another lead artist's page and ambiguous multiple IDs
-are rejected. Spotify IDs and source URLs are preserved in the public snapshot.
+Spotify supplies daily stream counters from Kworb artist pages. The collector
+tries all credited performers with independently verified pages and can
+recover globally charting tracks from Kworb's Spotify Global Daily Chart
+using exact song/version and Spotify ID. **Chart Streams and artist-page
+Daily are not identical metrics**. Each song records which metric and URL
+was used. Regional US stream counters are not silently mixed with global
+numbers. No cumulative/lifetime counter is substituted for a daily one.
 
-## Formula v1
+## Ranking and limits
 
 ```
-applePoints = 51 - appleRank
-spotifyBonus = 10 × dailyStreams / maxDailyStreamsAmongMatchedCandidates
-score = applePoints + spotifyBonus
+US points      = 70 * (51 - appleUSRank) / 50
+Spotify points = 20 * sqrt(daily / maxMeasuredDaily)
+Global points  = globalRank ? 10 * (101 - globalRank) / 100 : 0
+Total          = US points + Spotify points + Global points
 ```
 
-Order is descending score; ties retain Apple order. Spotify's bonus is bounded
-between 0 and 10 points. All 50 Apple candidates remain, including songs outside
-Spotify's global Top 200. The 10-point correction is a music98 editorial choice,
-not a formula provided by Apple, Spotify, or Kworb.
+When Spotify data is missing, `daily` remains **null** with its reason.
+For **scoring only**, the median of confirmed candidate daily values is
+substituted, so unknown is not falsely treated as zero plays. It is never
+reported as a confirmed counter. A supplementary source cannot move a
+track more than ten chart positions relative to the original US order.
+This 70/20/10 split and movement cap are Music98 editorial choices,
+not a chart endorsed by Apple or Spotify.
 
-An unmatched, ambiguous, stale, or different-edition counter is **unknown**
-(`daily: null`). It gets no Spotify bonus and retains its Apple base points.
-That is not a claim that the song has zero Spotify streams. Thus coverage can
-affect relative ordering; coverage and missing-data reasons are recorded.
+The chart always has the 50 Apple USA candidates; 50 **verified Spotify
+counters** cannot be promised because independent services may not expose
+them. The collector records matched/unmatched counts and recovery paths.
+Publication needs at least 25 genuine dated matched values. All 50 tracks
+must have verified audio/artwork and stable song identities before the Worker
+writes rank/tenure KV data. Missing or stale source snapshots cause the
+last verified full edition to be retained instead of fabricating rankings.
 
-## Dates and publication
+## Update safeguards
 
-Apple's playlist publication date and Kworb's page **Last updated** date are
-stored separately. Kworb's update date is not relabelled as an official Spotify
-chart date. All counters used in one edition must have the same recent update
-date. The collector chooses the recent date covering the most candidate songs;
-other dates receive no bonus. Recent means no more than two UTC days old.
+Apple USA and Global snapshots are fetched together. A complete paired
+stream snapshot is gathered with one recent Spotify edition date
+(maximum age two UTC days). Missing or mixed-region measurements are
+not silently converted. GitHub Actions regenerates source JSON from
+current main following a concurrent push rather than rebasing generated
+JSON through merge conflicts.
 
-GitHub Actions collects paired Apple/Kworb assets every four hours. It publishes
-them atomically only after validation, with at least 25 matched counters out of
-50. Network failures, malformed source tables, insufficient coverage, and a
-same-Apple-date loss of more than five matches retain the last verified snapshot.
-These guards distinguish a source outage from a legitimately untracked song.
-
-The Worker reads these assets instead of scraping 50 pages per visitor. Source
-fingerprints invalidate cached rankings even during same-day counter updates.
-Old three-source browser and Worker caches cannot be served as this methodology.
-Artwork, audio previews, stable track identity, tenure, and movement checks
-remain publication requirements. Historical editions retain their original
-methodology; they are never relabelled as the new chart.
+Historic editions use the scoring method under which they were created.
+Stored lifetime days and NEW/RE-ENTRY signals are not zeroed on migration.
