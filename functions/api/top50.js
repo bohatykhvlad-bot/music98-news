@@ -1,4 +1,5 @@
 import {HYBRID_METHOD,HYBRID_RULE,SPOTIFY_BONUS_MAX,verifiedStreamSeed,rankAppleSpotify,isAppleSpotifyChart,validHybridRows} from "../lib/apple-spotify-chart.js";
+import {US_HYBRID_METHOD,US_HYBRID_RULE,validUsHybridRows,verifiedUsStreamSeed,rankAppleUsHybrid,isAppleUsHybridChart} from "../lib/apple-us-hybrid.js";
 import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
 import {hasCompleteChartArtwork as completeArtwork,isTrustedChartArtwork,missingChartArtwork} from "../lib/chart-artwork-gate.js";
 import {discoverAppleAlbumTracks} from "../lib/apple-album-discovery.js";
@@ -14,10 +15,10 @@ const APPLE_CT = "music98";
 const TOP50_KV = "top50v39";
 const TOP50_RETRY_KV="top50v39:retry";
 function verifiedSourceSnapshot(s) {
-  return isAppleSpotifyChart(s);
+  return isAppleUsHybridChart(s)||isAppleSpotifyChart(s);
 }
 function hasCompleteChartArtwork(tracks) {
-  return validHybridRows(tracks) && completeArtwork(tracks, 50);
+  return (validUsHybridRows(tracks)||validHybridRows(tracks)) && completeArtwork(tracks, 50);
 }
 
 function isApplePreview(url) {
@@ -611,18 +612,37 @@ async function seedBaked(origin, tracks) {
 
 /* Use only same-day validated global snapshots when a live platform fails. */
 async function freshDailyRanking(env,origin,source) {
-  const file=source==="A" ? "apple-chart.json" : "deezer-chart.json";
+  const file=source==="A" ? "apple-chart.json" : source==="U" ? "apple-us-chart.json" : "deezer-chart.json";
   return verifiedDailySeed(await readSeed(env,origin,file),source);
 }
 export async function buildTop50(origin, env, streamSeed) {
-  const independent=verifiedStreamSeed(streamSeed || await readSeed(env,origin,"apple-spotify-streams.json"));
+  const seed=streamSeed || await readSeed(env,origin,"apple-spotify-streams.json");
+  const regional=verifiedUsStreamSeed(seed);
+  const independent=regional || verifiedStreamSeed(seed);
   if(!independent)throw new Error("apple_spotify_stream_snapshot_missing_or_stale");
-  const apple=await freshDailyRanking(env,origin,"A");
-  if(!apple || apple.sourceDate!==independent.appleDate || apple.tracks.slice(0,50).some((t,i)=>
-    mergeKey(t.title,t.artist)!==mergeKey(independent.tracks[i].title,independent.tracks[i].artist) ||
-    t.url!==independent.tracks[i].url))throw new Error("apple_candidates_changed_waiting_for_streams");
-  const tracks=rankAppleSpotify(independent.tracks).map(t=>({...t,spotify:{...t.spotify},sourceRanks:{...t.sourceRanks}}));
-  const sources={A:50,S:independent.coverage.matched};
+  let tracks,sources;
+  if(regional){
+    const [us,global]=await Promise.all([
+      freshDailyRanking(env,origin,"U"),freshDailyRanking(env,origin,"A")
+    ]);
+    if(!us||!global||us.sourceDate!==independent.appleUsDate||
+      global.sourceDate!==independent.appleGlobalDate||
+      us.tracks.slice(0,50).some((t,i)=>
+        mergeKey(t.title,t.artist)!==mergeKey(independent.tracks[i].title,independent.tracks[i].artist)||
+        t.url!==independent.tracks[i].url))
+      throw new Error("apple_us_global_candidates_changed_waiting_for_streams");
+    tracks=rankAppleUsHybrid(independent.tracks).map(t=>({...t,spotify:{...t.spotify},
+      sourceRanks:{...t.sourceRanks},applePoints:t.appleUsPoints,spotifyBonus:t.spotifyPoints}));
+    sources={U:50,A:100,S:independent.coverage.matched};
+  }else{
+    const apple=await freshDailyRanking(env,origin,"A");
+    if(!apple || apple.sourceDate!==independent.appleDate || apple.tracks.slice(0,50).some((t,i)=>
+      mergeKey(t.title,t.artist)!==mergeKey(independent.tracks[i].title,independent.tracks[i].artist) ||
+      t.url!==independent.tracks[i].url))throw new Error("apple_candidates_changed_waiting_for_streams");
+    tracks=rankAppleSpotify(independent.tracks).map(t=>({...t,spotify:{...t.spotify},
+      sourceRanks:{...t.sourceRanks}}));
+    sources={A:50,S:independent.coverage.matched};
+  }
   const coverStats = { asked: 0, filled: 0, failed: 0 };
   /* порядок важен: сначала данные Apple из засева (имя, ссылка, превью, год),
      потом добор из запечённого файла, потом обложки и живые запросы к Apple */
@@ -644,17 +664,30 @@ export async function buildTop50(origin, env, streamSeed) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "apple-spotify-v39",
-    methodology: HYBRID_METHOD,
-    consensus: HYBRID_RULE,
-    scoring:{apple:"51 - Apple rank",spotify:"10 * daily / maximum matched daily",spotifyBonusMax:SPOTIFY_BONUS_MAX,
-      missingSpotify:"no bonus; retain Apple base points"},
-    sourceDetails:{A:DAILY_SOURCE_DETAILS.A,S:{name:"Spotify daily streams via Kworb artist pages",metric:"artist-daily-counter",region:"global",url:"https://kworb.net/spotify/artists.html"}},
+    rev: regional ? "apple-us-weighted-v40" : "apple-spotify-v39",
+    methodology: regional ? US_HYBRID_METHOD : HYBRID_METHOD,
+    consensus: regional ? US_HYBRID_RULE : HYBRID_RULE,
+    scoring:regional?{appleUSA:"70*(51-rank)/50",spotify:"20*sqrt(daily/max); median-neutral when absent",
+      appleGlobal:"10*(101-rank)/100",maximumMovementFromAppleUS:10,
+      missingSpotify:"null measured streams; median used only to avoid ranking penalty"}:
+      {apple:"51 - Apple rank",spotify:"10 * daily / maximum matched daily",
+        spotifyBonusMax:SPOTIFY_BONUS_MAX,missingSpotify:"no bonus; retain Apple base points"},
+    sourceDetails:regional?{
+      U:{name:"Apple Music Top 100: USA",region:"us",url:"https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12"},
+      A:DAILY_SOURCE_DETAILS.A,
+      S:{name:"Spotify daily streams via Kworb",region:"global",
+        metric:"artist-daily or chart-global-daily (provenance per row)",url:"https://kworb.net/spotify/country/global_daily.html"}
+    }:{A:DAILY_SOURCE_DETAILS.A,S:{name:"Spotify daily streams via Kworb artist pages",
+      metric:"artist-daily-counter",region:"global",url:"https://kworb.net/spotify/artists.html"}},
     sources,
     coverage:independent.coverage,
-    sourceOrigin:{A:"verified-apple-top50-snapshot",S:"kworb-artist-daily-snapshot"},
-    sourceDates:{A:independent.appleDate,S:independent.spotifyDate},
-    sourceDateKinds:{A:"playlist-published",S:"kworb-last-updated"},
+    sourceOrigin:regional?{U:"verified-apple-usa-top50-snapshot",
+      A:"verified-apple-global-top100-snapshot",S:"kworb-daily-snapshot"}:
+      {A:"verified-apple-top50-snapshot",S:"kworb-artist-daily-snapshot"},
+    sourceDates:regional?{U:independent.appleUsDate,A:independent.appleGlobalDate,S:independent.spotifyDate}:
+      {A:independent.appleDate,S:independent.spotifyDate},
+    sourceDateKinds:regional?{U:"playlist-published",A:"playlist-published",S:"kworb-last-updated"}:
+      {A:"playlist-published",S:"kworb-last-updated"},
     spotifyFingerprint:independent.fingerprint,
     complete:true,
     seed: {
@@ -957,21 +990,22 @@ async function fallbackOrUnavailable(env,origin,backup) {
 export async function onRequestGet({env,request}) {
   const today=new Date().toISOString().slice(0,10);
   const origin=new URL(request.url).origin;
-  const [backup,streamSeed,appleSeed]=await Promise.all([
+  const [backup,streamSeed,appleSeed,usSeed]=await Promise.all([
     readSeed(env,origin,"chart-tenure-backup.json"),
     readSeed(env,origin,"apple-spotify-streams.json"),
-    readSeed(env,origin,"apple-chart.json")
+    readSeed(env,origin,"apple-chart.json"),
+    readSeed(env,origin,"apple-us-chart.json")
   ]);
   // A newly deployed source snapshot must unblock a failed refresh immediately,
   // even when Spotify has not changed. Keep the existing retry delay otherwise.
   const seedEdition=JSON.stringify([
-    ...[["A",appleSeed]].map(([id,raw])=>{
+    ...[["A",appleSeed],["U",usSeed]].map(([id,raw])=>{
       const seed=verifiedDailySeed(raw,id);
       return seed ? [id,seed.capturedAt||seed.updated,seed.sourceDate] : [id,""];
     }),
     ["C",coverSeedEdition(await coverSeed(env,origin))]
   ]);
-  const verified=verifiedStreamSeed(streamSeed);
+  const verified=verifiedUsStreamSeed(streamSeed)||verifiedStreamSeed(streamSeed);
   if(!verified)return fallbackOrUnavailable(env,origin,backup);
   /* Read-only edition preview for the scheduled independent artwork audit.
      It exposes the prospective source-verified chart without publishing it or
