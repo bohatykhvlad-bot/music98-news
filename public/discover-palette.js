@@ -13,6 +13,30 @@
       1.9779984951*l-2.428592205*m+.4505937099*s,
       .0259040371*l+.7827717662*m-.808675766*s];
   }
+  function srgb([L,a,b]) {
+    const l=(L+.3963377774*a+.2158037573*b)**3;
+    const m=(L-.1055613458*a-.0638541728*b)**3;
+    const s=(L-.0894841775*a-1.291485548*b)**3;
+    return [4.0767416621*l-3.3077115913*m+.2309699292*s,
+      -1.2684380046*l+2.6097574011*m-.3413193965*s,
+      -.0041960863*l-.7034186147*m+1.707614701*s]
+      .map(v=>clamp(v<=.0031308?12.92*v:1.055*v**(1/2.4)-.055,0,1));
+  }
+  // The translucent texture is composited onto white. An almost-white cover
+  // colour would disappear there, so give light tones room below white while
+  // keeping their hue. Neutrals stay neutral; only existing pastel colour is
+  // strengthened. Extraction itself still returns the original cover colours.
+  function ambient(palette) {
+    return {...palette,strength:Math.max(1.05,palette.strength),
+      colours:palette.colours.map(rgb=>{
+        const [L,a,b]=oklab(rgb);
+        if(L<=.6)return rgb.slice();
+        const chroma=Math.hypot(a,b);
+        const pale=clamp((.16-chroma)/.10,0,1);
+        const gain=1+1.1*pale*clamp((L-.6)/.25,0,1)*clamp((chroma-.01)/.025,0,1);
+        return srgb([L-(L-.6)*.8*pale,a*gain,b*gain]);
+      })};
+  }
   const distance=(a,b)=>.65*(a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2;
   const neutral=()=>({colours:[[.55,.55,.55],[.65,.65,.65],[.45,.45,.45]],mix:[.5,.125],strength:.75});
 
@@ -83,5 +107,5 @@
     const strength=.78+.40*vibrancy+.08*(1-lightness/total);
     return {colours,mix,strength};
   }
-  globalThis.music98DiscoverPalette=Object.freeze({extract,neutral});
+  globalThis.music98DiscoverPalette=Object.freeze({extract,neutral,ambient});
 })();

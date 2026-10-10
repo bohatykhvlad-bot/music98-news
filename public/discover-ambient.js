@@ -10,6 +10,7 @@
   const precisePointer = matchMedia("(hover:hover) and (pointer:fine)");
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const motionStrength=.95;
+  const pointerStrength=.30*motionStrength;
   const pointer = { x:0, y:0, targetX:0, targetY:0, strength:0, targetStrength:0 };
   let width=0, height=0, active=false, playing=false, frame=0, last=0;
   let clock=0, energy=0, pointerLastMove=0, renderer=null, lost=false;
@@ -84,7 +85,7 @@
       // Bend the existing current with a softened version of the original
       // vortex. Its bounded displacement never creates a separate cloud.
       vec2 nudge=(vec2(-delta.y,delta.x)*.48-delta*.12)*influence;
-      p+=clamp(nudge,vec2(-27.2916*motionStrength/viewport.y),vec2(27.2916*motionStrength/viewport.y));
+      p+=clamp(nudge,vec2(-16.*motionStrength/viewport.y),vec2(16.*motionStrength/viewport.y));
       float t=time*.25;
       vec2 centre=source.xy/viewport.y, size=source.zw/viewport.y;
       vec2 nearest=clamp(p,centre-size,centre+size);
@@ -128,7 +129,9 @@
       vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23)*paletteMix.x*2.);
       colour=mix(colour,mineral,clamp((smoothstep(.48,.86,lanes)*2.+crests*.32)*paletteMix.y,0.,.65));
       // Lit grains sit within the volume, with a wider glow beneath it.
-      colour=mix(colour,vec3(1.),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.14,0.,.8));
+      // Give pale currents shaded depth before adding the small light grains.
+      colour*=1.-depth*.12*smoothstep(.4,.7,max(colour.r,max(colour.g,colour.b)));
+      colour=mix(colour,vec3(1.),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.05,0.,.8));
       float breathing=1.+.025*motionStrength*sin(time*.55);
       float alpha=(body*(.405+grain*.03)+haze+dots.y*body*.12)*(1.+energy*.18)*breathing;
       alpha+=(dots.x*.025+dots.y*.04+motes.x*.035+motes.y*.04)*body;
@@ -277,7 +280,7 @@
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
     pointer.targetX=clamp(x,0,innerWidth)+scrollX;pointer.targetY=clamp(y,0,innerHeight)+scrollY;
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
-    pointer.targetStrength=.497097*motionStrength;pointerLastMove=performance.now();
+    pointer.targetStrength=pointerStrength;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;
@@ -296,10 +299,12 @@
       palette=palette.map((c,i)=>c.map((v,k)=>v+(targetPalette[i][k]-v)*(1-Math.exp(-dt*1.4))));
       paletteStrength+=(targetPaletteStrength-paletteStrength)*(1-Math.exp(-dt*1.4));
       paletteMix=paletteMix.map((v,i)=>v+(targetPaletteMix[i]-v)*(1-Math.exp(-dt*1.4)));
-      const smooth=1-Math.exp(-dt*2.6);
       if(ts-pointerLastMove>2500)pointer.targetStrength=0;
-      pointer.x+=(pointer.targetX-pointer.x)*(1-Math.exp(-dt*4));
-      pointer.y+=(pointer.targetY-pointer.y)*(1-Math.exp(-dt*4));
+      // A lighter bend follows the cursor gradually and settles more slowly
+      // on release, without increasing the underlying wave motion.
+      const smooth=1-Math.exp(-dt*(pointer.targetStrength>pointer.strength?1.8:1.4));
+      pointer.x+=(pointer.targetX-pointer.x)*(1-Math.exp(-dt*2.8));
+      pointer.y+=(pointer.targetY-pointer.y)*(1-Math.exp(-dt*2.8));
       pointer.strength+=(pointer.targetStrength-pointer.strength)*smooth;
       render();
     }
@@ -321,6 +326,7 @@
   }
   function applyArtworkPalette(value,request) {
     if(request!==artworkRequest)return;
+    value=window.music98DiscoverPalette.ambient(value);
     targetPalette=value.colours.map(c=>c.slice());targetPaletteStrength=value.strength;
     targetPaletteMix=value.mix.slice();
     if(motion.matches||!active){settlePalette();if(active)render();}

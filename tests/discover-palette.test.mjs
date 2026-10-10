@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import '../public/discover-palette.js';
 
-const {extract}=globalThis.music98DiscoverPalette;
+const {extract,ambient}=globalThis.music98DiscoverPalette;
 const pixels=(...blocks)=>new Uint8ClampedArray(blocks.flatMap(([rgb,count])=>Array.from({length:count},()=>[...rgb,255]).flat()));
 const close=(a,b)=>Math.abs(a-b)<1e-6;
 
@@ -55,4 +55,36 @@ test('transparent pixels do not supply colours and empty images use a neutral fa
   const result=extract(image);
   assert.ok(close(result.colours[0][0],240/255)&&close(result.colours[0][2],0));
   extract(new Uint8ClampedArray(16)).colours.forEach(([r,g,b])=>assert.ok(close(r,g)&&close(g,b)));
+});
+
+test('pale and white covers have visible depth when composited onto white',()=>{
+  for(const rgb of [[255,255,255],[246,248,253],[212,232,234],[195,195,195]]){
+    const cover=extract(pixels([rgb,100]));
+    const original=structuredClone(cover);
+    const result=ambient(cover);
+    // Even at 30% texture opacity, the tone must remain visibly below white.
+    const composite=result.colours[0].map(v=>1-.3*(1-v));
+    assert.ok(composite.reduce((a,b)=>a+b)/3<.92);
+    assert.ok(result.strength>=1);
+    assert.deepEqual(cover,original,'Original palette is not mutated');
+  }
+});
+
+test('deeper tones preserve neutral greys, pastel hue and vivid cover colours',()=>{
+  let previous=-1;
+  for(const value of [0,80,160,195,220,255]){
+    const [r,g,b]=ambient(extract(pixels([[value,value,value],100]))).colours[0];
+    assert.ok(close(r,g)&&close(g,b),'Grey cannot gain a colour cast');
+    assert.ok(r>previous,'Lightness ordering must remain intact');previous=r;
+  }
+  for(const rgb of [[212,232,234],[238,198,218],[246,240,218]]){
+    const tone=ambient(extract(pixels([rgb,100]))).colours[0];
+    for(let i=0;i<3;i++)for(let j=i+1;j<3;j++){
+      assert.equal(Math.sign(tone[i]-tone[j]),Math.sign(rgb[i]-rgb[j]));
+    }
+  }
+  for(const rgb of [[255,100,0],[138,206,0],[32,133,210]]){
+    const cover=extract(pixels([rgb,100])),tone=ambient(cover);
+    tone.colours[0].forEach((v,i)=>assert.ok(close(v,cover.colours[0][i])));
+  }
 });
