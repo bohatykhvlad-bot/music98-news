@@ -22,9 +22,14 @@ for(let attempt=1;attempt<=24;attempt++){
     dates:live.sourceDates,expectedDate:seed.spotifyDate}));
   }
   if(!isTriChart(live))throw new Error("Live formula, source ranks or all-50 stream gate failed");
-  if(live.tracks.some(t=>!t.art||!/^https:\/\/[^/]*mzstatic\.com\//.test(t.art)||
-    !t.url||!t.url.includes("music.apple.com")||t.spotify.daily===null))
-   throw new Error("Published chart has incomplete media/stream counts");
+  const mediaProblems=live.tracks.filter(t=>!t.art||!/^https:\/\/[^/]*mzstatic\.com\//.test(t.art)||
+    !t.url||!t.url.includes("music.apple.com")||t.spotify.daily===null)
+    .map(t=>({rank:t.rank,title:t.title,artist:t.artist,art:t.art||"",
+      url:t.url||"",daily:t.spotify?.daily}));
+  if(mediaProblems.length){
+   console.error("LIVE_TRI_MEDIA_PROBLEMS",JSON.stringify(mediaProblems));
+   process.exit(2);
+  }
   if(live.arrows?.ok!==true)throw new Error("Published chart has broken arrows or tenure");
   const rows=live.tracks;
   const breakdown={
