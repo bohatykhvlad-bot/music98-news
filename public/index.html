@@ -883,9 +883,10 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 
-/* Discover uses the exact same heading origin as News, Releases and Chart.
-   Only the player row is vertically balanced inside the shared panel height. */
-#tab-discover{padding-top:var(--section-heading-top);padding-bottom:12px}
+/* Balance the actual visible nav-to-title, title-to-player and player-to-
+   section-bottom gaps at desktop widths. JS measures the shared panel height
+   and adjusts only this section's top inset, leaving the 450px embed intact. */
+#tab-discover{padding-top:var(--discover-heading-top,var(--section-heading-top));padding-bottom:12px}
 #tab-discover.rise{animation:rise .28s ease both}
 @media(prefers-reduced-motion:reduce){#tab-discover.rise{animation:none}}
 /* The Discover canvas ends at the tab boundary. The shared Subscribe top
@@ -2884,6 +2885,7 @@ function queueEqualizeBrowsePanels(){
     if (panes.some(p=>!p)) return;
     const discoverLayout = panes[1].querySelector(".discover-layout");
     discoverLayout?.style.removeProperty("--discover-layout-height");
+    panes[1].style.removeProperty("--discover-heading-top");
     panes.forEach(p=>p.style.removeProperty("min-height"));
     if (window.matchMedia("(max-width:1100px)").matches) return;
     // Read the actual DOM geometry even when Discover is the inactive tab.
@@ -2911,15 +2913,31 @@ function queueEqualizeBrowsePanels(){
     if (height > 0) {
       panes.forEach(p=>p.style.minHeight = height + "px");
       if (discoverLayout && window.matchMedia("(min-width:1161px)").matches) {
-        // The heading inherits the shared 8px section inset. Center the fixed
-        // 450px Apple player in the rest of the panel without moving the title.
-        const style = getComputedStyle(panes[1]);
-        const top = parseFloat(style.paddingTop);
-        const bottom = parseFloat(style.paddingBottom);
-        discoverLayout.style.setProperty(
-          "--discover-layout-height",
-          Math.max(0, height - top - bottom) + "px"
-        );
+        // Measure even when Discover is the inactive tab. Centering the player
+        // in row 2 already equalizes its two adjacent gaps; moving the heading
+        // down balances those gaps with the one above the visible heading.
+        const geometry = withVisiblePanel(panes[1], () => {
+          const panel = panes[1];
+          const style = getComputedStyle(panel);
+          const sectionTop = panel.getBoundingClientRect().top + window.scrollY;
+          const bottomInset = parseFloat(style.paddingBottom) || 0;
+          const heading = discoverLayout.querySelector(".hd-t");
+          const card = discoverLayout.querySelector(".discover-card");
+          const headingHeight = heading.getBoundingClientRect().height;
+          const cardHeight = card.getBoundingClientRect().height;
+          const navBottom = document.getElementById("nav").getBoundingClientRect().bottom;
+          const sectionBottom = sectionTop + height - bottomInset;
+          const gap = Math.max(0, (sectionBottom - navBottom - headingHeight - cardHeight) / 3);
+          const sharedTop = parseFloat(getComputedStyle(document.documentElement)
+            .getPropertyValue("--section-heading-top")) || 8;
+          return {
+            headingTop: Math.max(sharedTop, navBottom + gap - sectionTop),
+            bottomInset
+          };
+        });
+        panes[1].style.setProperty("--discover-heading-top", geometry.headingTop + "px");
+        discoverLayout.style.setProperty("--discover-layout-height",
+          Math.max(0, height - geometry.headingTop - geometry.bottomInset) + "px");
       }
     }
   });
