@@ -1,0 +1,120 @@
+/* Сайты-источники Spotify-стримов (решение владельца: сайт — главный канал).
+   Чистые функции для тестов и коллектора:
+   - pickSearchHit: полбор трека в поиске сайта с учётом написаний (версии, фичеры, языки);
+   - pickDailyForDate: выбор дневного значения из серии (окно дней, сглаживание склеек);
+   - totalDelta: дневное из дельты снимков суммарных счётчиков;
+   - medianValue: медиана для калибровки. */
+import {artistKey,titleKey} from "./apple-spotify-chart.js";
+import {versionSignature} from "./chart-identity.js";
+
+export const FALLBACK_WINDOW_DAYS = 3;
+
+const NOISE = /karaoke|instrumental|lullaby|originally performed|cover version|tribute band/i;
+const norm = s => String(s || "").trim();
+
+export function pickSearchHit(title, artist, results) {
+  const tracks = (results || []).filter(x => x && x.kind === "track" && /^[A-Za-z0-9]{22}$/.test(x.id || ""));
+  if (!tracks.length) return null;
+  const titleN = titleKey(title), verN = versionSignature(title);
+  const names = [...new Set([norm(artist), ...norm(artist).split(/\s*(?:,|\s+&\s+|\s+feat\.?\s+|\s+ft\.?\s+|\s+with\s+)\s*/i)])]
+    .map(artistKey).filter(n => n.length >= 3);
+  const fullArtist = artistKey(norm(artist));
+  const artistHit = x => names.some(n => artistKey(x.subtitle || "").includes(n));
+  const scored = tracks
+    .filter(x => !(NOISE.test(x.name || "") && !NOISE.test(title)))
+    .map(x => {
+      let score = 0;
+      const hitN = titleKey(x.name || "");
+      if (hitN && hitN === titleN) score += 40;
+      else if (hitN && titleN && (hitN.startsWith(titleN) || titleN.startsWith(hitN))) score += 22;
+      if (versionSignature(x.name || "") === verN) score += 10;
+      if (artistHit(x)) score += 40;
+      if (fullArtist.length >= 5 && artistKey(x.subtitle || "").includes(fullArtist)) score += 15;
+      return {hit: x, score};
+    })
+    .filter(x => x.score >= 50)
+    .sort((a, b) => b.score - a.score);
+  return scored.length ? scored[0].hit : null;
+}
+
+export function seriesRows(series) {
+  return Object.entries(series || {})
+    .map(([date, v]) => ({date, daily: Number(v?.daily), total: Number(v?.total)}))
+    .filter(r => /^20\d{2}-\d{2}-\d{2}$/.test(r.date) && Number.isSafeInteger(r.daily) && r.daily > 0)
+    .sort((a, b) => (a.date < b.date ? -1 : 1));
+}
+
+export function pickDailyForDate(series, date, {windowDays = FALLBACK_WINDOW_DAYS} = {}) {
+  const at = Date.parse(date + "T00:00:00Z");
+  const day = d => Date.parse(d + "T00:00:00Z");
+  const rows = Object.entries(series || {})
+    .map(([d, v]) => ({date: d, daily: Number(v?.daily), total: Number(v?.total)}))
+    .filter(r => /^20\d{2}-\d{2}-\d{2}$/.test(r.date))
+    .sort((a, b) => (a.date < b.date ? -1 : 1));
+  if (!rows.length) return null;
+  let latestIdx = -1;
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const ms = day(rows[i].date);
+    if (ms <= at && at - ms <= windowDays * 86400000) { latestIdx = i; break; }
+  }
+  if (latestIdx < 0) return null;
+  const latest = rows[latestIdx];
+  /* Способ 1: среднее по разнице суммарных счётчиков за окно 2–4 дня —
+     шум захватов и «склейки» взаимно сокращаются. */
+  if (Number.isSafeInteger(latest.total) && latest.total > 0) {
+    let best = null;
+    for (let i = Math.max(0, latestIdx - 6); i < latestIdx; i++) {
+      const anchor = rows[i];
+      if (!Number.isSafeInteger(anchor.total) || anchor.total <= 0) continue;
+      const span = Math.round((day(latest.date) - day(anchor.date)) / 86400000);
+      if (span < 1 || span > 4) continue;
+      const diff = latest.total - anchor.total;
+      if (diff <= 0) continue;
+      const score = Math.abs(span - 3);
+      if (!best || score < best.score || (score === best.score && span > best.span)) best = {span, diff, score};
+    }
+    if (best) return {date: latest.date, daily: Math.round(best.diff / best.span), method: "totals-window-" + best.span + "d"};
+  }
+  /* Способ 2 (резерв): дневные значения с нормализацией на пропуски захвата. */
+  const before = rows.slice(0, latestIdx + 1);
+  const norms = [];
+  before.forEach((r, i) => {
+    if (!(Number.isSafeInteger(r.daily) && r.daily > 0)) return;
+    const prev = before[i - 1];
+    const gap = prev ? Math.max(1, Math.round((day(r.date) - day(prev.date)) / 86400000)) : 1;
+    norms.push({date: r.date, raw: r.daily, norm: Math.round(r.daily / gap)});
+  });
+  if (!norms.length) return null;
+  if (norms.length === 1) {
+    const only = norms[0];
+    return {date: only.date, daily: only.raw, method: only.date === date ? "exact-lone" : "lone"};
+  }
+  const sorted = norms.slice(-3).sort((a, b) => a.norm - b.norm);
+  const picked = sorted.length === 2 ? sorted[0] : sorted[Math.floor(sorted.length / 2)];
+  return {date: picked.date, daily: picked.norm, method: picked.date === date ? "exact-daily" : "nearest"};
+}
+
+export function totalDelta(entries, date, {windowDays = FALLBACK_WINDOW_DAYS, maxStepDays = 7} = {}) {
+  const at = Date.parse(date + "T00:00:00Z");
+  const rows = (entries || [])
+    .map(e => ({date: e?.date, total: Number(e?.total)}))
+    .filter(e => /^20\d{2}-\d{2}-\d{2}$/.test(e.date || "") && Number.isSafeInteger(e.total) && e.total >= 0)
+    .sort((a, b) => (a.date < b.date ? -1 : 1));
+  for (let i = rows.length - 1; i > 0; i--) {
+    const cur = rows[i], prev = rows[i - 1];
+    const step = (Date.parse(cur.date + "T00:00:00Z") - Date.parse(prev.date + "T00:00:00Z")) / 86400000;
+    if (!(step >= 1 && step <= maxStepDays)) continue;
+    const daily = Math.round((cur.total - prev.total) / step);
+    if (!(daily > 0)) continue;
+    const ms = Date.parse(cur.date + "T00:00:00Z");
+    if (ms <= at && at - ms <= windowDays * 86400000)
+      return {date: cur.date, daily, method: step === 1 ? "totals-delta" : "totals-delta-" + step + "d"};
+  }
+  return null;
+}
+
+export function medianValue(values, minimum = 1) {
+  const a = [...(values || [])].filter(v => Number.isFinite(v) && v > 0).sort((x, y) => x - y);
+  if (a.length < minimum) return null;
+  return a[Math.floor(a.length / 2)];
+}

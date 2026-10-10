@@ -15,12 +15,18 @@ must have independently confirmed Spotify daily streams before reaching the
 published Top 50. Thus the published chart never reports a fabricated 0,
 a misleading `null`, or a lifetime total as a daily counter.
 
-Spotify counts come from the Global Daily chart on Kworb and, for songs not
-listed there, a matching `Daily` field on a credited artist's page. Region,
-source URL, source date and metric type are retained per recording.
-The chart daily-stream series and artist-page Daily series may differ in
-tracking conventions; this is explicitly recorded rather than described as
-a single Spotify API feed. Artist names alone are not enough for matching.
+Spotify daily counts are collected from MyStreamCount — the measured
+day-over-day change of the public Spotify play counter — for the whole
+candidate pool: the latest clean measurement within a three-day window of
+the edition date, on one uniformly calibrated scale (the calibration is
+read from the median ratio against official values on overlapping songs).
+When that measurement is unavailable, the fallback ladder is: soundcamps
+total-count snapshots (difference between our own daily captures), then the
+official Kworb chart value as a last resort, so a song is only dropped when
+no source has a number. Region, source URL, source date and metric type are
+retained per recording; merged captures are smoothed, single fresh values
+are explicitly marked, and every estimate carries `estimated: true` in the
+seed for audit. Artist names alone are not enough for matching.
 
 ## Rank formula
 

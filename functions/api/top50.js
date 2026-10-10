@@ -700,7 +700,7 @@ export async function buildTop50(origin, env, streamSeed) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: triple ? "tri-source-v41" : regional ? "apple-us-weighted-v40" : "apple-spotify-v39",
+    rev: triple ? "tri-source-v42" : regional ? "apple-us-weighted-v40" : "apple-spotify-v39",
     methodology: triple ? TRI_METHOD : regional ? US_HYBRID_METHOD : HYBRID_METHOD,
     consensus: triple ? TRI_RULE : regional ? US_HYBRID_RULE : HYBRID_RULE,
     scoring:triple?triScoring:regional?{appleUSA:"70*(51-rank)/50",spotify:"20*sqrt(daily/max); median-neutral when absent",

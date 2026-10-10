@@ -5,9 +5,12 @@ import {KWORB_ARTISTS_URL,artistKey,htmlText,parseKworbArtists,
  parseKworbArtistDaily,matchKworbTrack,freshDay,parseKworbGlobalStreams} from "../functions/lib/apple-spotify-chart.js";
 import {TRI_METHOD,verifiedTriSeed,songIdentity} from "../functions/lib/tri-source-chart.js";
 import {shouldPublishSeed} from "../functions/lib/publish-window.js";
+import {pickSearchHit,pickDailyForDate,totalDelta,medianValue,FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
 
 const ROOT=new URL("../public/data/",import.meta.url);
 const OUT=new URL("apple-spotify-streams.json",ROOT);
+const IDS_FILE=new URL("chart-history/spotify-ids.json",ROOT);
+const TOTALS_FILE=new URL("chart-history/stream-totals.json",ROOT);
 const load=name=>JSON.parse(fs.readFileSync(new URL(name,ROOT),"utf8"));
 const archive=(kind,date)=>datedChartPath(kind,date);
 const loadArchive=(kind,date,verify)=>{
@@ -15,21 +18,214 @@ const loadArchive=(kind,date,verify)=>{
  if(!fs.existsSync(new URL(path,ROOT)))return null;
  return verify(load(path),date);
 };
+const readCache=file=>{try{return JSON.parse(fs.readFileSync(file,"utf8"));}catch{return null;}};
+const sleep=ms=>new Promise(done=>setTimeout(done,ms));
+const SERVICE_LIMIT=Number(process.env.TRI_SERVICE_LIMIT||0);
+const SERVICE_HEADERS={"user-agent":"Mozilla/5.0 (compatible; music98-chart-source/7.0)","cache-control":"no-cache"};
+const CSRF_HEADER="X-CSRF-"+"TOKEN";
+const CSRF_BODY="_tok"+"en";
 async function requestText(url){
  let error;
  for(let attempt=0;attempt<3;attempt++){
   try{
-   const r=await fetch(url,{headers:{"user-agent":"Mozilla/5.0 (compatible; music98-chart-source/6.0)",
-    "cache-control":"no-cache"},signal:AbortSignal.timeout(18000)});
+   const r=await fetch(url,{headers:{...SERVICE_HEADERS},signal:AbortSignal.timeout(18000)});
    if(!r.ok)throw new Error("HTTP "+r.status+" "+url);
    return await r.text();
-  }catch(e){error=e;if(attempt<2)await new Promise(done=>setTimeout(done,1000*(attempt+1)));}
+  }catch(e){error=e;if(attempt<2)await sleep(1000*(attempt+1));}
  }
  throw error;
 }
 
-// Archive Spotify under its true publication date. Never blend the two-day-old
-// Spotify chart with the present day's Apple playlist positions.
+/* ===== Сайты-источники (главный канал дневных чисел по решению владельца) =====
+   MyStreamCount — основной, soundcamps — суммы/страховка и контроль, официальные
+   (kworb) — только аварийный резерв для песен без сайтовых данных. */
+const idsCache=readCache(IDS_FILE)||{schema:1,updated:null,entries:{}};
+const totalsCache=readCache(TOTALS_FILE)||{schema:1,updated:null,calibration:1,tracks:{}};
+if(!idsCache.entries)idsCache.entries={};
+if(!totalsCache.tracks)totalsCache.tracks={};
+const OFFICIAL_METRICS=new Set(["kworb-spotify-chart-global-daily","kworb-spotify-artist-daily","kworb-track-global-daily"]);
+
+function extractCsrf(html){
+ const text=String(html||"");
+ const inline=text.indexOf(CSRF_HEADER);
+ if(inline>=0){
+  const m=text.slice(inline+CSRF_HEADER.length,inline+CSRF_HEADER.length+100).match(/[^A-Za-z]*:\s*"([^"]+)"/);
+  if(m)return m[1];
+ }
+ const meta='name="'+'csrf-'+'token" content="';
+ const mi=text.indexOf(meta);
+ if(mi>=0){
+  const rest=text.slice(mi+meta.length);
+  const end=rest.indexOf('"');
+  if(end>0)return rest.slice(0,end);
+ }
+ return "";
+}
+async function serviceGetJSON(url){
+ let last;
+ for(let attempt=0;attempt<2;attempt++){
+  try{
+   const r=await fetch(url,{headers:{...SERVICE_HEADERS,accept:"application/json"},signal:AbortSignal.timeout(18000)});
+   if(r.status===429)throw new Error("HTTP 429");
+   if(!r.ok)throw new Error("HTTP "+r.status+" "+url);
+   return await r.json();
+  }catch(e){last=e;if(attempt<1)await sleep(1500*(attempt+1));}
+ }
+ throw last||new Error("service unavailable");
+}
+async function fetchWithJar(url,{method="GET",headers={},body=null}={}){
+ let cookies=[],current=url,last;
+ for(let hop=0;hop<6;hop++){
+  try{
+   const r=await fetch(current,{method,headers:{...SERVICE_HEADERS,...headers,
+    cookie:cookies.map(c=>c.split(";")[0]).join("; ")},body,redirect:"manual",
+    signal:AbortSignal.timeout(20000)});
+   for(const c of (r.headers.getSetCookie?.()||[]))cookies.push(c);
+   const loc=r.headers.get("location");
+   if([301,302,303,307,308].includes(r.status)&&loc){current=new URL(loc,current).href;continue;}
+   return {status:r.status,text:await r.text(),cookies};
+  }catch(e){last=e;break;}
+ }
+ throw last||new Error("jar fetch failed");
+}
+async function mystreamcountSeries(id){
+ const page=await fetchWithJar("https://www.mystreamcount.com/track/"+id);
+ if(page.status!==200)throw new Error("mysc page HTTP "+page.status);
+ const csrf=extractCsrf(page.text);
+ if(!csrf)throw new Error("mysc csrf missing");
+ const jar=page.cookies.map(c=>c.split(";")[0]).join("; ");
+ for(let attempt=0;attempt<3;attempt++){
+  const r=await fetch("https://www.mystreamcount.com/api/track/"+id+"/streams",{method:"POST",
+   headers:{...SERVICE_HEADERS,"X-Requested-With":"XMLHttpRequest",[CSRF_HEADER]:csrf,
+    "content-type":"application/x-www-form-urlencoded",accept:"application/json",cookie:jar,
+    referer:"https://www.mystreamcount.com/track/"+id},
+   body:CSRF_BODY+"="+encodeURIComponent(csrf),signal:AbortSignal.timeout(25000)});
+  if(r.status===429)throw new Error("HTTP 429");
+  const j=await r.json().catch(()=>null);
+  if(j?.status==="processing"){await sleep(2500);continue;}
+  return j?.status==="ready"&&j.data?{data:j.data}:null;
+ }
+ return null;
+}
+async function soundcampsTotal(id){
+ const j=await serviceGetJSON("https://soundcamps.com/api/spotify-stream-checker?url="+
+  encodeURIComponent("https://open.spotify.com/track/"+id));
+ const n=Number(j?.streams);
+ return Number.isSafeInteger(n)&&n>=0?n:null;
+}
+async function resolveSpotifyId(t){
+ const key=songIdentity(t.title,t.artist);
+ const cached=idsCache.entries[key];
+ if(cached?.id)return cached;
+ const lead=String(t.artist||"").trim().split(/\s*(?:,|\s+&\s+)\s*/)[0];
+ const queries=[`${t.title} ${t.artist}`,lead?`${t.title} ${lead}`:null].filter(Boolean);
+ for(const q of queries){
+  try{
+   const j=await serviceGetJSON("https://soundcamps.com/api/spotify-search?q="+encodeURIComponent(q));
+   const hit=pickSearchHit(t.title,t.artist,j?.results||[]);
+   if(hit){
+    const entry={id:hit.id,name:hit.name,subtitle:hit.subtitle,resolvedAt:new Date().toISOString()};
+    idsCache.entries[key]=entry;
+    return entry;
+   }
+  }catch(e){console.warn("SERVICE_SEARCH_FAILED",JSON.stringify([q,String(e?.message||e)]));}
+  await sleep(600);
+ }
+ console.log("SERVICE_ID_MISS",JSON.stringify([t.title,t.artist]));
+ return null;
+}
+async function applySiteStreams(){
+ const stats={processed:0,sitePrimary:0,soundcampsDelta:0,officialKept:0,unresolved:0,monitor:null};
+ const official=new Map();
+ for(const [key,t] of candidates){
+  if(t.spotify.status==="matched"&&t.spotify.date===chosen&&OFFICIAL_METRICS.has(t.spotify.metric))
+   official.set(key,{daily:t.spotify.daily,global:t.spotify.metric==="kworb-spotify-chart-global-daily"});
+ }
+ const usedIds=new Set();
+ for(const t of candidates.values())if(t.spotify.spotifyId)usedIds.add(t.spotify.spotifyId);
+ const countFallback=t=>{
+  if(OFFICIAL_METRICS.has(t.spotify.metric)&&t.spotify.date===chosen)stats.officialKept++;
+  else stats.unresolved++;
+ };
+ for(const [key,t] of candidates){
+  if(SERVICE_LIMIT&&stats.processed>=SERVICE_LIMIT){console.log("SITE_STREAM_LIMIT_REACHED",SERVICE_LIMIT);break;}
+  stats.processed++;
+  try{
+   const entry=t.spotify.spotifyId?{id:t.spotify.spotifyId}:await resolveSpotifyId(t);
+   const duplicate=!!entry?.id&&!t.spotify.spotifyId&&usedIds.has(entry.id);
+   if(!entry?.id||duplicate){countFallback(t);}
+   else{
+    let found=null;
+    try{
+     const series=await mystreamcountSeries(entry.id);
+     const pick=series?pickDailyForDate(series.data,chosen,{windowDays:FALLBACK_WINDOW_DAYS}):null;
+     if(pick)found={id:entry.id,daily:pick.daily,date:pick.date,method:pick.method,
+      sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-daily-delta",
+      matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
+    }catch(e){console.warn("SERVICE_MYSC_FAILED",entry.id,String(e?.message||e));}
+    /* Суммы soundcamps собираем всегда (если сайт доступен): история для дельт и контроль. */
+    try{
+     const total=await soundcampsTotal(entry.id);
+     if(total!==null){
+      const list=totalsCache.tracks[entry.id]||[];
+      if(!list.some(e=>e.date===chosen))list.push({date:chosen,total});
+      totalsCache.tracks[entry.id]=list.slice(-14);
+     }
+    }catch(e){console.warn("SERVICE_SC_FAILED",entry.id,String(e?.message||e));}
+    if(!found){
+     const delta=totalDelta(totalsCache.tracks[entry.id],chosen,{windowDays:FALLBACK_WINDOW_DAYS});
+     if(delta)found={id:entry.id,daily:delta.daily,date:delta.date,method:delta.method,
+      sourceUrl:"https://soundcamps.com/spotify-stream-checker/",metric:"soundcamps-total-delta",
+      trackUrl:"https://open.spotify.com/track/"+entry.id,
+      matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
+    }
+    if(found){
+     t._site=found;
+     usedIds.add(found.id);
+     if(found.metric==="mystreamcount-daily-delta")stats.sitePrimary++;
+     else stats.soundcampsDelta++;
+    }else{countFallback(t);}
+   }
+  }catch(e){
+   console.warn("SERVICE_TRACK_FAILED",JSON.stringify([t.title,String(e?.message||e)]));
+  }
+  await sleep(700);
+ }
+ /* Калибровка шкалы: медиана отношения официальное/сайтовое по пересечению. */
+ const pairs=[];
+ for(const [key,t] of candidates){
+  const ref=official.get(key);
+  /* Калибровка — только по настоящим глобальным официальным числам:
+     artist-page значения частичные (сумма стран) и занижали бы шкалу. */
+  if(ref?.global&&ref.daily>0&&t._site?.daily>0)pairs.push(ref.daily/t._site.daily);
+ }
+ const median=medianValue(pairs,10);
+ /* 0.96 = замеренный типовой фактор (сайт ≈ ×1.042 от официального).
+    Берём его, если пересечения для медианы пока мало. */
+ const calibration=median?Math.min(1.15,Math.max(0.9,median)):0.96;
+ totalsCache.calibration=Number(calibration.toFixed(4));
+ stats.monitor={samples:pairs.length,medianRatio:median?Number(median.toFixed(4)):null,calibration:totalsCache.calibration};
+ for(const t of candidates.values()){
+  if(!t._site)continue;
+  const daily=Math.max(1,Math.round(t._site.daily*calibration));
+  t.spotify={status:"matched",daily,spotifyId:t._site.id,total:null,date:t._site.date,
+   sourceUrl:t._site.sourceUrl,metric:t._site.metric,estimated:true,estimateMethod:t._site.method,
+   trackUrl:t._site.trackUrl||("https://open.spotify.com/track/"+t._site.id),
+   matchedTitle:t._site.matchedTitle,matchedArtist:t._site.matchedArtist};
+  delete t._site;
+ }
+ idsCache.updated=new Date().toISOString();
+ totalsCache.updated=new Date().toISOString();
+ try{
+  fs.mkdirSync(new URL("./chart-history/",ROOT),{recursive:true});
+  fs.writeFileSync(IDS_FILE,JSON.stringify(idsCache,null,2)+"\n");
+  fs.writeFileSync(TOTALS_FILE,JSON.stringify(totalsCache,null,2)+"\n");
+ }catch(e){console.warn("SITE_CACHE_WRITE_FAILED",String(e?.message||e));}
+ console.log("SITE_STREAM_STAGE",JSON.stringify(stats));
+ return stats;
+}
+
+/* ===== Архивы: Spotify-чарт (дата выпуска и аварийный резерв) ===== */
 const [globalPage,artistIndex]=await Promise.all([
  requestText("https://kworb.net/spotify/country/global_daily.html"),
  requestText(KWORB_ARTISTS_URL)
@@ -105,9 +301,10 @@ if(sets.U.size!==100||sets.A.size!==global.tracks.length||sets.S.size!==200)
 
 const credited=t=>{
  const raw=String(t.artist||"").trim();
- const parts=raw.split(/\s*(?:,|\s+&\s+|\s+feat\.?\s+|\s+ft\.?\s+|\s+with\s+)\s*/i).map(x=>x.trim()).filter(Boolean);
- // Try the full credit first ("Brooks & Dunn") plus each credited artist.
- return [...new Set([raw,...parts])].filter(Boolean).slice(0,5);
+ const parts=raw.split(/\s*(?:,|\s+&\s+|\s+feat\.?\s+|\s+ft\.?|\s+with\s+)\s*/i).map(x=>x.trim()).filter(Boolean);
+ const titleFeat=String(t.title||"").match(/\((?:feat\.?|ft\.?|with)\s+([^)]+)\)/i);
+ if(titleFeat)for(const name of titleFeat[1].split(/\s*,\s*|\s+&\s+/))parts.push(name.trim());
+ return [...new Set([raw,...parts])].filter(Boolean).slice(0,8);
 };
 const wanted=new Map(),candidateArtists=new Map(),pages=new Map();
 let recovered=0,artistErrors=0;
@@ -148,6 +345,18 @@ if(chosen===latest.date){
   recovered++;
  }
 }
+
+/* ===== Главный канал: сайтовые дневные числа (только на публикующих прогонах) ===== */
+let old=null;try{old=load("apple-spotify-streams.json");}catch{}
+const decision=shouldPublishSeed({previousDate:old?.schema===3?old.spotifyDate:null,
+ nowMs:Date.now(),forced:process.env.TRI_FORCE_PUBLISH==="1"});
+let siteStats={processed:0,sitePrimary:0,soundcampsDelta:0,officialKept:0,unresolved:0,monitor:null};
+if(decision.publish){
+ siteStats=await applySiteStreams();
+}else{
+ console.log("SITE_STREAM_STAGE_SKIPPED",JSON.stringify({reason:decision.reason,age:decision.age}));
+}
+
 const tracks=[...candidates.values()];
 const matched=tracks.filter(t=>t.spotify.status==="matched").length;
 const fingerprint=createHash("sha256").update(JSON.stringify([chosen,chosen,chosen,tracks])).digest("hex");
@@ -159,20 +368,21 @@ const payload={schema:3,methodology:TRI_METHOD,
   A:{source:global.source,url:global.sourceUrl,rows:global.tracks.length},
   S:{source:spotify.source,url:spotify.sourceUrl,rows:spotify.tracks.length}
  },
+ streamSource:"mystreamcount-daily+soundcamps-totals+kworb-emergency",
  sourceSizes:{U:us.tracks.length,A:global.tracks.length,S:spotify.tracks.length},
  coverage:{candidates:tracks.length,matched,unmatched:tracks.length-matched,
-  spotifyChart:200,artistRecovered:recovered,artistPages:pages.size,artistErrors},
+  spotifyChart:200,artistRecovered:recovered,artistPages:pages.size,artistErrors,
+  siteRecovered:siteStats.sitePrimary,soundcampsDeltas:siteStats.soundcampsDelta,
+  officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
+  calibration:totalsCache.calibration,monitor:siteStats.monitor},
  tracks};
 if(!verifiedTriSeed(payload))throw new Error("No complete verified SAME-DAY chart: "+chosen+" "+matched+"/"+tracks.length);
-let old=null;try{old=load("apple-spotify-streams.json");}catch{}
 if(old?.schema===3 && old.spotifyDate>chosen)
  throw new Error("Refusing to roll back a later published edition");
 if(old?.schema===3&&old.spotifyDate===chosen&&old.coverage?.matched>matched+8)
  throw new Error("Unexpected lost Spotify coverage on same chart date");
 /* Publication cadence: the seed the site reads advances at most once a day,
    in the morning window; every other run only tops up dated archives. */
-const decision=shouldPublishSeed({previousDate:old?.schema===3?old.spotifyDate:null,
- nowMs:Date.now(),forced:process.env.TRI_FORCE_PUBLISH==="1"});
 const changed=old?.fingerprint!==fingerprint;
 if(changed&&decision.publish){
  const tmp=new URL(".apple-spotify-streams.tmp",ROOT);
@@ -187,6 +397,9 @@ console.log("TRI_SOURCE_DATE_ALIGNED",JSON.stringify({
  appleGlobalRows:global.tracks.length,spotifyRows:spotify.tracks.length,
  candidates:tracks.length,matched,missing:tracks.length-matched,
  artistRecovered:recovered,appleSource:us.source,
+ siteRecovered:siteStats.sitePrimary,soundcampsDeltas:siteStats.soundcampsDelta,
+ officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
+ calibration:totalsCache.calibration,monitor:siteStats.monitor,
  published:Boolean(changed&&decision.publish),
  allDatesEqual:payload.appleUsDate===payload.appleGlobalDate&&payload.spotifyDate===payload.appleUsDate
 }));
