@@ -7,6 +7,8 @@ export const DAILY_SOURCE_IDS = ["A", "S", "D"];
 export const CHART_SIZE = 50;
 export const SOURCE_SIZE = 100;
 export const APPLE_GLOBAL_ID = "pl.d25f5d1181894928af76c85c967f8f31";
+export const APPLE_US_ID = "pl.606afcbb70264d2eb2b51d8dbcfa6a12";
+export const APPLE_US_URL = "https://music.apple.com/us/playlist/top-100-usa/" + APPLE_US_ID;
 export const APPLE_GLOBAL_URL = "https://music.apple.com/us/playlist/top-100-global/" + APPLE_GLOBAL_ID;
 export const DEEZER_GLOBAL_ID = "3155776842";
 export const DEEZER_CHARTS_CREATOR_ID = "637006841";
@@ -83,32 +85,38 @@ function scriptJSON(html, id) {
   throw new Error("apple_global_missing_"+id);
 }
 
-/* /us/ selects catalog metadata. The exact playlist ID selects the global
-   daily ranking; the US most-played RSS is never a ranking fallback. */
-export function parseAppleGlobal(html, size=CHART_SIZE) {
+/* The playlist ID, not the storefront URL, determines its ranking region.
+   Never mistake the US storefront of the Global playlist for the US chart. */
+function parseApplePlaylist(html, id, title, size, source) {
   const state=scriptJSON(html,"serialized-server-data");
   const page=state?.data?.find(p => p?.intent?.contentDescriptor?.kind==="playlist" &&
-    p.intent.contentDescriptor.identifiers?.storeAdamID===APPLE_GLOBAL_ID);
+    p.intent.contentDescriptor.identifiers?.storeAdamID===id);
   const sections=page?.data?.sections;
-  const header=sections?.find(s => s.id==="playlist-detail-header-section - "+APPLE_GLOBAL_ID)?.items?.[0];
-  const items=sections?.find(s => s.id==="track-list - "+APPLE_GLOBAL_ID)?.items;
+  const header=sections?.find(s => s.id==="playlist-detail-header-section - "+id)?.items?.[0];
+  const items=sections?.find(s => s.id==="track-list - "+id)?.items;
   const schema=scriptJSON(html,"schema:music-playlist");
-  if (header?.title!=="Top 100: Global" || schema?.name!=="Top 100: Global" ||
-      !String(schema?.url || "").endsWith("/"+APPLE_GLOBAL_ID) ||
+  if(header?.title!==title || schema?.name!==title ||
+      !String(schema?.url || "").endsWith("/"+id) ||
       !Array.isArray(items) || items.length!==100)
-    throw new Error("apple_wrong_or_partial_global_playlist");
+    throw new Error("apple_wrong_or_partial_"+source+"_playlist");
   const publishedAt=String(schema.datePublished || ""), date=publishedAt.slice(0,10);
-  if (!currentSourceDate(date)) throw new Error("apple_global_date_stale_or_missing");
+  if(!currentSourceDate(date))throw new Error("apple_"+source+"_date_stale_or_missing");
   const tracks=validatedDailyRows(items.slice(0,size).map((item,i) => {
     const descriptor=item?.contentDescriptor;
-    if (descriptor?.kind!=="song" || Number(item.rankingText)!==i+1)
-      throw new Error("apple_global_rank_missing_"+(i+1));
+    if(descriptor?.kind!=="song" || Number(item.rankingText)!==i+1)
+      throw new Error("apple_"+source+"_rank_missing_"+(i+1));
     return {pos:i+1, title:item.title, artist:item.artistName,
       url:String(descriptor.url || ""),
       art:String(item.artwork?.dictionary?.url || "").replaceAll("{w}","600").replaceAll("{h}","600").replaceAll("{f}","jpg"),
       year:"", prev:""};
-  }),"A",size);
+  }),source,size);
   return {date,publishedAt,tracks};
+}
+export function parseAppleGlobal(html,size=CHART_SIZE) {
+  return parseApplePlaylist(html,APPLE_GLOBAL_ID,"Top 100: Global",size,"A");
+}
+export function parseAppleUs(html,size=SOURCE_SIZE) {
+  return parseApplePlaylist(html,APPLE_US_ID,"Top 100: USA",size,"U");
 }
 
 export function parseDeezerWorldwide(data, size=CHART_SIZE) {
@@ -124,9 +132,10 @@ export function parseDeezerWorldwide(data, size=CHART_SIZE) {
 }
 
 export function verifiedDailySeed(snapshot, source, now=Date.now()) {
-  const expected=source==="A" ? "official-apple-global-playlist" : "official-deezer-worldwide-playlist";
-  if (!["A","D"].includes(source) || snapshot?.schema!==2 || snapshot?.source!==expected ||
-      snapshot.region!=="global" || snapshot.cadence!=="daily" ||
+  const expected=source==="A" ? "official-apple-global-playlist" :
+    source==="U" ? "official-apple-us-playlist" : "official-deezer-worldwide-playlist";
+  if (!["A","U","D"].includes(source) || snapshot?.schema!==2 || snapshot?.source!==expected ||
+      snapshot.region!==(source==="U"?"us":"global") || snapshot.cadence!=="daily" ||
       !currentSourceDate(snapshot.updated,now,0) || !currentSourceDate(snapshot.sourceDate,now)) return null;
   const size=snapshot.tracks?.length;
   if(![CHART_SIZE,SOURCE_SIZE].includes(size))return null;
