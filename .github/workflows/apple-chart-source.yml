@@ -30,22 +30,31 @@ jobs:
         run: node scripts/refresh-apple-ranking.mjs
       - name: Collect multi-path Spotify daily streams for USA Top 50 candidates
         run: node scripts/refresh-apple-spotify-streams.mjs
-      - name: Commit only complete current-day snapshot
+      - name: Commit verified chart snapshots (regenerate after competing pushes)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "music98 apple chart bot"
           git config user.email "actions@users.noreply.github.com"
-          git add public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json
-          if git diff --cached --quiet; then exit 0; fi
-          git commit -m "chart: Apple USA 70 Spotify 20 Global 10 verified daily sources"
-          for n in 1 2 3; do
-            git pull --rebase origin main
+          for n in 1 2 3 4 5; do
+            # An artwork job may have pushed fresh chart.json while we collected.
+            # Rebasing generated JSON files causes conflicts, so restart from
+            # the newest main and regenerate the paired edition together.
+            git fetch origin main
+            git reset --hard origin/main
+            node scripts/refresh-apple-ranking.mjs
+            node scripts/refresh-apple-spotify-streams.mjs
+            git add public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json
+            if git diff --cached --quiet; then
+              echo "Current main already has matching verified sources"
+              exit 0
+            fi
+            git commit -m "chart: Apple USA 70 Spotify 20 Global 10 verified daily sources"
             if git push origin HEAD:main; then
-              # Bot pushes do not trigger downstream push workflows.
               gh workflow run apple-data.yml --ref main
               exit 0
             fi
             sleep 3
           done
+          echo "Concurrent chart source publish conflicts exhausted"
           exit 1
