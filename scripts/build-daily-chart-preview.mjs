@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import {mergeKey} from "../functions/lib/chart-identity.js";
 import {onRequestGet} from "../functions/api/top50.js";
-import {DEEZER_GLOBAL_URL,DAILY_CHART_METHOD,completeDailySources} from "../functions/lib/daily-chart-sources.js";
+import {DEEZER_GLOBAL_URL,DAILY_CHART_METHOD,completeDailySources,isConsensusChart} from "../functions/lib/daily-chart-sources.js";
 
 const output=process.argv[2];
 if(!output)throw new Error("Usage: node scripts/build-daily-chart-preview.mjs OUTPUT.json");
@@ -28,7 +28,7 @@ try{
   const response=await onRequestGet({env,request});
   const chart=await response.json();
   if(response.status!==200 || chart.fallback || chart.methodology!==DAILY_CHART_METHOD ||
-     !completeDailySources(chart.sources) || chart.tracks?.length!==50 || chart.arrows?.ok!==true)
+     !isConsensusChart(chart) || chart.arrows?.ok!==true)
     throw new Error("Daily preview could not be verified: "+JSON.stringify(chart));
   const cached=await (await onRequestGet({env,request})).json();
   const ranking=rows=>rows.map(t=>[t.rank,mergeKey(t.title,t.artist),t.weeks,t.delta]);

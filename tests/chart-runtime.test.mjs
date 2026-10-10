@@ -98,8 +98,8 @@ test("the Worker uses tested shared parsing and rejects unverified KV cache",()=
  assert.match(top50,/const verified=verifiedSpotifySnapshot\(spotifySeed\)/);
  assert.match(top50,/cached.sourceDates\?\.S===verified.date/);
  assert.match(top50,/cached.spotifyFingerprint===verified.fingerprint/);
- assert.match(top50,/const TOP50_KV = "top50v37"/);
- assert.match(top50,/TOP50_RETRY_KV="top50v37:retry"/);
+ assert.match(top50,/const TOP50_KV = "top50v38"/);
+ assert.match(top50,/TOP50_RETRY_KV="top50v38:retry"/);
 });
 
 test("verified source publisher dispatches downstream chart audit after bot commits",()=>{
@@ -132,7 +132,7 @@ test("artwork audit can inspect future chart without publishing it to KV",()=>{
 test("browser accepts only fully imaged chart editions and can retain a prior verified edition",()=>{
   const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
   assert.match(html,/function chartHasCompleteArtwork\(tracks\)/);
-  assert.match(html,/if\(!chartHasCompleteArtwork\(tracks\)\) throw new Error\("incomplete_chart_artwork"\)/);
+  assert.match(html,/if\(!isDailySourceEdition\(j\) \|\| !chartHasCompleteArtwork\(tracks\)\) throw new Error\("incomplete_chart_artwork"\)/);
   assert.match(html,/if\(hasVerifiedCache\) applyDaily\(cached\.tracks,"backup",cached\.date\)/);
   assert.match(html,/if\(fresh && chartHasCompleteArtwork\(tracks\)\)/);
 });

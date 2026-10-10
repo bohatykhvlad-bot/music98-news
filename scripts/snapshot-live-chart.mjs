@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import {mergeKey} from "../functions/lib/chart-identity.js";
 import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
-import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,completeDailySources} from "../functions/lib/daily-chart-sources.js";
+import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,completeDailySources,isConsensusChart} from "../functions/lib/daily-chart-sources.js";
 
 const OUT = new URL("../public/data/chart-tenure-backup.json", import.meta.url);
 const DAILY_OUT = new URL("../public/data/daily-top50-backup.json", import.meta.url);
@@ -22,7 +22,7 @@ if(!spotifyRef || j.fallback || j.complete!==true ||
    j.sourceDates?.S!==spotifyRef.date || j.spotifyFingerprint!==spotifyRef.fingerprint)
   throw new Error("refusing snapshot unless all daily sources are complete and Spotify edition matches");
 const tracks = Array.isArray(j.tracks) ? j.tracks : [];
-if (tracks.length !== 50) throw new Error("refusing tenure snapshot: expected 50 rows, got " + tracks.length);
+if (!isConsensusChart(j)) throw new Error("refusing tenure snapshot: missing three-source consensus");
 if (j.arrows && j.arrows.ok === false) throw new Error("refusing tenure snapshot: live arrow/tenure self-check failed");
 
 let backup = {schema:1,current:null,previous:null};
@@ -77,6 +77,7 @@ const snapshot = {
   rev: String(j.rev || ""),
   complete:true,
   methodology:j.methodology,
+  consensus:j.consensus,
   sources:Object.fromEntries(DAILY_SOURCE_IDS.map(k=>[k,Number(j.sources[k])])),
   sourceDateKinds:j.sourceDateKinds,
   sourceDates:j.sourceDates,
@@ -84,6 +85,7 @@ const snapshot = {
   spotifyFingerprint:j.spotifyFingerprint,
   tracks: tracks.map((t,i) => ({
     rank: Number(t.rank) || i + 1,
+    sourceRanks:t.sourceRanks,
     title: String(t.title || ""),
     artist: String(t.artist || ""),
     weeks: Math.max(1, Number(t.weeks) || 1),

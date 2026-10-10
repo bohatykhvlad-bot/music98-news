@@ -80,7 +80,7 @@ jobs:
           const audit = JSON.parse(fs.readFileSync("public/data/artwork-audit.json","utf8"));
           const unresolved = Array.isArray(audit.unresolved) ? audit.unresolved : [];
           const verified = Object.keys(audit.entries||{}).length;
-          if (audit.schema !== 2 || audit.rows !== 50 || verified + unresolved.length !== audit.rows) {
+          if (audit.schema !== 2 || audit.rows < 1 || audit.rows > 50 || verified + unresolved.length !== audit.rows) {
             throw new Error("artwork audit accounting is incomplete");
           }
           if (unresolved.length) {

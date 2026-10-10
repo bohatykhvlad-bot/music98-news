@@ -1,9 +1,9 @@
 import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, normTitle, pickAppleCandidate, primaryArtist, stripParen } from "../lib/chart-identity.js";
-import {hasCompleteChartArtwork,isTrustedChartArtwork,missingChartArtwork} from "../lib/chart-artwork-gate.js";
+import {hasCompleteChartArtwork as completeArtwork,isTrustedChartArtwork,missingChartArtwork} from "../lib/chart-artwork-gate.js";
 import {discoverAppleAlbumTracks} from "../lib/apple-album-discovery.js";
 import {candidateCompatible,isDerivativeRelease,isGenericRelease,rankArtworkCandidates} from "../lib/artwork-resolver.js";
 import {compareSpotifyRankings,parseKworbSpotify,spotifyDateCurrent,verifiedSpotifySnapshot} from "../lib/spotify-chart.js";
-import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,DAILY_SOURCE_DETAILS,APPLE_GLOBAL_URL,DEEZER_GLOBAL_URL,
+import {DAILY_CHART_METHOD,DAILY_CHART_CONSENSUS,isConsensusChart,hasConsensusTracks,DAILY_SOURCE_IDS,DAILY_SOURCE_DETAILS,APPLE_GLOBAL_URL,DEEZER_GLOBAL_URL,
   completeDailySources,parseAppleGlobal,parseDeezerWorldwide,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
 
 const SIZE = 50;
@@ -12,16 +12,18 @@ const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
 /* Separate ranking cache for daily-only global inputs. Tenure/media registries
    retain their keys, so changing the formula does not reset established songs. */
-const TOP50_KV = "top50v37";
-const TOP50_RETRY_KV="top50v37:retry";
+const TOP50_KV = "top50v38";
+const TOP50_RETRY_KV="top50v38:retry";
 const SOURCES = DAILY_SOURCE_IDS;
 /* A source missing even once changes the scoring scale and fabricates movement. */
 function completeChartSources(s) {
   return completeDailySources(s);
 }
 function verifiedSourceSnapshot(s) {
-  return !!s && s.methodology===DAILY_CHART_METHOD && s.complete===true && completeChartSources(s.sources) &&
-    Array.isArray(s.tracks) && s.tracks.length===SIZE;
+  return isConsensusChart(s);
+}
+function hasCompleteChartArtwork(tracks) {
+  return hasConsensusTracks(tracks) && completeArtwork(tracks, tracks.length);
 }
 
 function isApplePreview(url) {
@@ -716,6 +718,7 @@ export async function buildTop50(origin, env, spotifySeed) {
   ingest(bucket, "S", spotify);
   ingest(bucket, "D", deezer);
   const ranked = [...bucket.values()]
+    .filter(rec => SOURCES.every(source => Number.isInteger(rec.ranks[source])))
     .sort((a, b) => {
       const sa = SOURCES.reduce((n, k) => n + points(a.ranks[k]), 0);
       const sb = SOURCES.reduce((n, k) => n + points(b.ranks[k]), 0);
@@ -733,6 +736,7 @@ export async function buildTop50(origin, env, spotifySeed) {
     rank: i + 1,
     title: rec.title,
     artist: rec.artist,
+    sourceRanks: {...rec.ranks},
     url: rec.url || "",
     art: rec.art || "",
     prev: isApplePreview(rec.prev) ? rec.prev : "",
@@ -760,8 +764,9 @@ export async function buildTop50(origin, env, spotifySeed) {
     updated: new Date().toISOString().slice(0, 10),
     launch: "2026-09-17",
     week: chartWeek() + 1,
-    rev: "daily-global-v37",
+    rev: "daily-global-v38",
     methodology: DAILY_CHART_METHOD,
+    consensus: DAILY_CHART_CONSENSUS,
     sourceDetails: DAILY_SOURCE_DETAILS,
     sources,
     sourceOrigin:{A:appleOrigin,S:spotifyOrigin,D:deezerOrigin},
@@ -934,6 +939,7 @@ async function verifiedBackupTop50(env, origin, backup) {
     const prev = known.get(tenureKey(t.title,t.artist)) || {};
     return {
       rank: i+1, title: t.title, artist: t.artist,
+      sourceRanks: {...t.sourceRanks},
       weeks: Math.max(1, Number(t.weeks) || 1), delta: String(t.delta ?? "0"),
       url: prev.url || "", prev: prev.prev || "", year: prev.year || "", art: ""
     };
@@ -944,7 +950,7 @@ async function verifiedBackupTop50(env, origin, backup) {
   tracks.forEach(t => { t.url = appleAff(t.url); if (!isApplePreview(t.prev)) t.prev = ""; });
   return {
     updated: snap.updated, launch:"2026-09-17", week:Number(snap.week)+1,
-    rev:"daily-global-backup-v37", methodology:snap.methodology,
+    rev:"daily-global-backup-v38", methodology:snap.methodology, consensus:snap.consensus,
     sourceDetails:DAILY_SOURCE_DETAILS, fallback:"verified-snapshot", complete:true,
     sources:snap.sources, sourceDates:snap.sourceDates||{},
     sourceDateKinds:snap.sourceDateKinds||{}, spotifyFingerprint:snap.spotifyFingerprint,
@@ -1112,12 +1118,11 @@ export async function onRequestGet({env,request}) {
   }catch{}
   try{
     const payload=await withTimeout(buildTop50(origin,env,spotifySeed),14000);
-    if(payload.complete!==true || !completeChartSources(payload.sources) ||
-       payload.tracks?.length!==SIZE)throw new Error("incomplete_chart_sources");
+    if(!verifiedSourceSnapshot(payload))throw new Error("incomplete_chart_sources");
     /* Block ranking publication and KV writes until every one of the 50
        current rows has a trustworthy image URL. Never publish SVG initials. */
     if(!hasCompleteChartArtwork(payload.tracks))
-      throw new Error("incomplete_chart_artwork:"+JSON.stringify(missingChartArtwork(payload.tracks).slice(0,8)));
+      throw new Error("incomplete_chart_artwork:"+JSON.stringify(missingChartArtwork(payload.tracks,payload.tracks.length).slice(0,8)));
     payload.seedEdition=seedEdition;
     const memory={deferPersist:true};
     payload.tracks=await applyTenure(env,payload.tracks,memory,origin);

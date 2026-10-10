@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
-import {DAILY_CHART_METHOD,completeDailySources} from "../functions/lib/daily-chart-sources.js";
+import {DAILY_CHART_METHOD,completeDailySources,isConsensusChart} from "../functions/lib/daily-chart-sources.js";
 /* Production and GitHub's independent Spotify reference must match exactly.
    Wait briefly for Workers Builds to deploy when a new snapshot is committed. */
 const mirror=JSON.parse(fs.readFileSync(new URL("../public/data/spotify-chart.json",import.meta.url),"utf8"));
@@ -24,11 +24,11 @@ for(let attempt=0;attempt<attempts;attempt++){
  if(attempt<attempts-1)await new Promise(done=>setTimeout(done,15000));
 }
 if(!j || j.fallback || j.complete!==true ||
-  j.methodology!==DAILY_CHART_METHOD || !completeDailySources(j.sources) ||
+  j.methodology!==DAILY_CHART_METHOD || !isConsensusChart(j) ||
   j.sourceDates?.S!==verified.date || j.spotifyFingerprint!==verified.fingerprint)
   throw new Error("Published chart differs from the verified source: "+reason);
 console.log("SPOTIFY_SOURCE_AUDIT",JSON.stringify({date:verified.date,provider:verified.source,
-  rows:50,fingerprint:verified.fingerprint,liveOrigin:j.sourceOrigin?.S,updated:j.updated}));
+  rows:j.tracks.length,fingerprint:verified.fingerprint,liveOrigin:j.sourceOrigin?.S,updated:j.updated}));
 const news = (j.tracks || []).filter(x => String(x.delta).toLowerCase() === "new");
 const olivia = (j.tracks || []).find(x => /drop dead/i.test(x.title || "") && /olivia rodrigo/i.test(x.artist || ""));
 const rankSnapshot = (j.tracks || []).map((t, i) => ({
@@ -108,7 +108,7 @@ if (prior && Array.isArray(prior.tracks) && prior.tracks.length >= 10) {
     regressed: regressed.length, oneDay: ones.length
   }));
 
-  if (live.length !== 50) throw new Error("live chart must contain exactly 50 rows");
+  if (!isConsensusChart(j)) throw new Error("live chart must contain only three-source consensus tracks");
   if (badArrows.length) throw new Error("day-over-day arrow mismatch: " + JSON.stringify(badArrows));
   if (badDays.length) throw new Error("day-over-day tenure mismatch: " + JSON.stringify(badDays));
   if (gap === 1 && established.length >= 10) {

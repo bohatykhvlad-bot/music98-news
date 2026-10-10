@@ -1,6 +1,7 @@
 import {mergeKey} from "./chart-identity.js";
 
 export const DAILY_CHART_METHOD = "daily-global-v1";
+export const DAILY_CHART_CONSENSUS = "all-three-v1";
 export const DAILY_SOURCE_IDS = ["A", "S", "D"];
 export const CHART_SIZE = 50;
 export const APPLE_GLOBAL_ID = "pl.d25f5d1181894928af76c85c967f8f31";
@@ -18,6 +19,31 @@ export const DAILY_SOURCE_DETAILS = {
 export function completeDailySources(counts) {
   return !!counts && Object.keys(counts).length === DAILY_SOURCE_IDS.length &&
     DAILY_SOURCE_IDS.every(id => counts[id] === CHART_SIZE);
+}
+
+// Input charts remain complete Top 50s. The output is their intersection,
+// capped at 50; never fill missing consensus places with one-platform songs.
+export function hasConsensusTracks(tracks) {
+  if (!Array.isArray(tracks) || !tracks.length || tracks.length > CHART_SIZE) return false;
+  const identities = new Set();
+  const positions = Object.fromEntries(DAILY_SOURCE_IDS.map(id => [id, new Set()]));
+  return tracks.every(track => {
+    if (!track?.title || !track?.artist) return false;
+    const key = mergeKey(track.title, track.artist);
+    if (identities.has(key)) return false;
+    identities.add(key);
+    return DAILY_SOURCE_IDS.every(id => {
+      const rank = track.sourceRanks?.[id];
+      if (!Number.isInteger(rank) || rank < 1 || rank > CHART_SIZE || positions[id].has(rank)) return false;
+      positions[id].add(rank);
+      return true;
+    });
+  });
+}
+
+export function isConsensusChart(snapshot) {
+  return snapshot?.methodology === DAILY_CHART_METHOD && snapshot?.consensus === DAILY_CHART_CONSENSUS &&
+    snapshot.complete === true && completeDailySources(snapshot.sources) && hasConsensusTracks(snapshot.tracks);
 }
 
 export function currentSourceDate(day, now=Date.now(), maxLagDays=1) {
@@ -102,6 +128,7 @@ export function verifiedDailySeed(snapshot, source, now=Date.now()) {
 /* Old editions are retained for history recovery, never for serving a ranking
    under the new methodology. This keeps existing day counts through migration. */
 export function verifiedTenureEdition(snapshot) {
+  if (isConsensusChart(snapshot)) return true;
   if (!snapshot || snapshot.complete!==true || snapshot.tracks?.length!==CHART_SIZE) return false;
   if (snapshot.methodology===DAILY_CHART_METHOD) return completeDailySources(snapshot.sources);
   return !snapshot.methodology && Object.keys(snapshot.sources || {}).length===5 &&

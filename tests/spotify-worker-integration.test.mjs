@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {buildTop50,onRequestGet} from "../functions/api/top50.js";
 import {mergeKey,artworkKey} from "../functions/lib/chart-identity.js";
-import {DAILY_CHART_METHOD,parseAppleGlobal} from "../functions/lib/daily-chart-sources.js";
+import {DAILY_CHART_METHOD,DAILY_CHART_CONSENSUS,hasConsensusTracks,parseAppleGlobal} from "../functions/lib/daily-chart-sources.js";
 import {fakeDailySource} from "./fixtures/daily-chart.mjs";
 
 async function expectRejected(options,pattern){
@@ -33,7 +33,7 @@ function mediaEnvironment(source) {
    prev:"https://audio-ssl.itunes.apple.com/preview/"+(i+1)+".m4a"
  }]));
  const covers=Object.fromEntries(appleRows.map(row=>[artworkKey(row.title,row.artist),row.art]));
- const oldTracks=source.rows.map(t=>({...t,rank:t.pos,weeks:7,delta:"0"}));
+ const oldTracks=source.rows.map(t=>({...t,rank:t.pos,sourceRanks:{A:t.pos,S:t.pos,D:t.pos},weeks:7,delta:"0"}));
  const old={updated:yesterday,week:week-1,complete:true,
    sources:{A:50,S:50,D:50,B:50,Y:50},tracks:oldTracks};
  const assets={"apple-names.json":names,"covers.json":covers,"loudness.json":{},
@@ -61,7 +61,7 @@ test("daily migration preserves Apple audio/artwork, day counts and repeat-reque
    assert.ok(payload.tracks.every(t=>t.weeks===8 && t.delta==="0"));
    assert.ok(payload.tracks.every(t=>t.prev.startsWith("https://audio-ssl.itunes.apple.com/")));
    assert.ok(payload.tracks.every(t=>t.art.endsWith("600x600bb.jpg") && t.url.includes("music.apple.com/us/album/")));
-   assert.equal(writes.at(-1),"top50v37");
+   assert.equal(writes.at(-1),"top50v38");
    assert.ok(values.has("top50v36"));
    assert.ok(source.requests.every(url=>!url.includes("youtube") && !url.includes("billboard") && !url.includes("/chart/0")));
    const cached=await (await onRequestGet({env,request})).json();
@@ -75,7 +75,7 @@ test("incomplete daily source does not mutate tenure or publish an old weekly ed
  try{
    const response=await onRequestGet({env,request:new Request("https://music98.news/api/top50")});
    assert.equal(response.status,503);
-   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v37:retry"]);
+   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v38:retry"]);
  }finally{globalThis.fetch=previous;}
 });
 
@@ -121,10 +121,10 @@ test("a slow third source is awaited before ranking or history writes",async()=>
 test("a provider timeout serves the complete verified chart without rescoring on two inputs",async()=>{
  const source=fakeDailySource({deezerOffline:true}),{env,values,writes,assets}=mediaEnvironment(source);
  const previous=globalThis.fetch,old=assets["chart-tenure-backup.json"].current;
- const saved={...old,methodology:DAILY_CHART_METHOD,sources:{A:50,S:50,D:50},
+ const saved={...old,methodology:DAILY_CHART_METHOD,consensus:DAILY_CHART_CONSENSUS,sources:{A:50,S:50,D:50},
    spotifyFingerprint:source.snapshot.fingerprint,sourceDates:{S:old.updated},
    tracks:old.tracks.map(t=>({...t,url:"",art:"",prev:""}))};
- values.set("top50v37",saved);
+ values.set("top50v38",saved);
  globalThis.fetch=async input=>{
    if(String(input).includes("api.deezer.com"))throw new DOMException("Source timed out","TimeoutError");
    return source.fakeFetch(input);
@@ -137,7 +137,7 @@ test("a provider timeout serves the complete verified chart without rescoring on
    assert.equal(result.updated,old.updated);
    assert.deepEqual(result.tracks.map(t=>[t.rank,t.title,t.weeks,t.delta]),old.tracks.map(t=>[t.rank,t.title,t.weeks,t.delta]));
    assert.ok(result.tracks.every(t=>t.art && t.prev.startsWith("https://audio-ssl.itunes.apple.com/")));
-   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v37:retry"]);
+   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v38:retry"]);
  }finally{globalThis.fetch=previous;}
 });
 
@@ -181,7 +181,7 @@ test("a recovered third-source snapshot bypasses retry backoff without a Spotify
  try{
    const request=new Request("https://music98.news/api/top50");
    assert.equal((await onRequestGet({env,request})).status,503);
-   assert.ok(values.has("top50v37:retry"));
+   assert.ok(values.has("top50v38:retry"));
    const today=new Date().toISOString().slice(0,10);
    assets["deezer-chart.json"]={schema:2,updated:today,sourceDate:today,capturedAt:today+"T12:00:00Z",
      source:"official-deezer-worldwide-playlist",region:"global",cadence:"daily",tracks:source.rows};
@@ -197,7 +197,7 @@ test("a verified daily backup survives empty KV without rebuilding from two sour
  const source=fakeDailySource({deezerCount:49}),{env,assets,writes}=mediaEnvironment(source),previous=globalThis.fetch;
  const old=assets["chart-tenure-backup.json"].current;
  assets["daily-top50-backup.json"]={...old,updated:new Date().toISOString().slice(0,10),
-   complete:true,methodology:DAILY_CHART_METHOD,sources:{A:50,S:50,D:50},arrows:{ok:true},
+   complete:true,methodology:DAILY_CHART_METHOD,consensus:DAILY_CHART_CONSENSUS,sources:{A:50,S:50,D:50},arrows:{ok:true},
    tracks:old.tracks.map(t=>({...t,weeks:8}))};
  globalThis.fetch=source.fakeFetch;
  try{
@@ -207,7 +207,7 @@ test("a verified daily backup survives empty KV without rebuilding from two sour
    assert.equal(chart.fallback,"verified-daily-snapshot");
    assert.ok(chart.tracks.every(t=>t.weeks===8 && t.art && t.prev));
    assert.deepEqual(chart.sources,{A:50,S:50,D:50});
-   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v37:retry"]);
+   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v38:retry"]);
  }finally{globalThis.fetch=previous;}
 });
 
@@ -215,7 +215,7 @@ test("daily backup recovery refuses partial sources and regressed day counters",
  for(const broken of ["partial","regressed","weekly"]){
    const source=fakeDailySource({deezerCount:49}),{env,assets}=mediaEnvironment(source),previous=globalThis.fetch;
    const old=assets["chart-tenure-backup.json"].current;
-   const saved={...old,updated:new Date().toISOString().slice(0,10),methodology:DAILY_CHART_METHOD,
+   const saved={...old,updated:new Date().toISOString().slice(0,10),methodology:DAILY_CHART_METHOD,consensus:DAILY_CHART_CONSENSUS,
      sources:{A:50,S:50,D:50},arrows:{ok:true},tracks:old.tracks.map(t=>({...t,weeks:8}))};
    if(broken==="partial")saved.sources.D=49;
    if(broken==="regressed")saved.tracks.forEach(t=>{t.weeks=1;});
@@ -226,4 +226,40 @@ test("daily backup recovery refuses partial sources and regressed day counters",
      assert.equal((await onRequestGet({env,request:new Request("https://music98.news/api/top50")})).status,503,broken);
    }finally{globalThis.fetch=previous;}
  }
+});
+
+test("even first-place songs in one or two charts cannot fill a consensus edition",async()=>{
+ const source=fakeDailySource(),{env}=mediaEnvironment(source),previous=globalThis.fetch;
+ const deezer=structuredClone(source.deezer);
+ // The two strongest Apple songs lack one or two platforms. Only ranks 3–9
+ // match all three; all other rows remain valid, uniquely ranked inputs.
+ source.snapshot.tracks=source.snapshot.tracks.map(t=>t.pos===1||t.pos>9?{...t,title:'Spotify exclusive '+t.pos}:t);
+ deezer.tracks.data=deezer.tracks.data.map((t,i)=>i<2||i>=9?{...t,title:'Deezer exclusive '+(i+1)}:t);
+ const kw='<h2>'+source.snapshot.chartDate.replaceAll('-','/')+'</h2><table>'+source.snapshot.tracks.map(t=>
+  '<tr class="d2"><td class="np">'+t.pos+'</td><td class="text mp"><div>'+t.artist+' - '+t.title+'</div></td></tr>').join('')+'</table>';
+ globalThis.fetch=async input=>{
+   const url=String(input);
+   if(url.includes('kworb.net'))return new Response(kw);
+   if(url.includes('api.deezer.com'))return new Response(JSON.stringify(deezer));
+   return source.fakeFetch(input);
+ };
+ try{
+   const chart=await buildTop50('https://music98.news',env,source.snapshot);
+   assert.equal(chart.consensus,DAILY_CHART_CONSENSUS);
+   assert.equal(chart.tracks.length,7);
+   assert.deepEqual(chart.tracks.map(t=>t.title),source.rows.slice(2,9).map(t=>t.title));
+   assert.ok(hasConsensusTracks(chart.tracks));
+   assert.deepEqual(chart.tracks[0].sourceRanks,{A:3,S:3,D:3});
+ }finally{globalThis.fetch=previous;}
+});
+
+test("old aggregate caches and snapshots cannot reintroduce one-platform tracks",async()=>{
+ const source=fakeDailySource({deezerCount:49}),{env,assets,values}=mediaEnvironment(source),previous=globalThis.fetch;
+ const old=assets['chart-tenure-backup.json'].current;
+ const aggregate={...old,updated:new Date().toISOString().slice(0,10),methodology:DAILY_CHART_METHOD,
+  sources:{A:50,S:50,D:50},arrows:{ok:true},tracks:old.tracks.map(t=>({...t,weeks:8}))};
+ values.set('top50v37',aggregate);values.set('top50v38',aggregate);assets['daily-top50-backup.json']=aggregate;
+ globalThis.fetch=source.fakeFetch;
+ try{assert.equal((await onRequestGet({env,request:new Request('https://music98.news/api/top50')})).status,503);}
+ finally{globalThis.fetch=previous;}
 });
