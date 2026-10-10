@@ -1,0 +1,38 @@
+name: RAYE media verification
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-2026-draft]
+    paths: [.github/workflows/raye-verify-embed.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Probe real video identities
+        run: |
+          python - <<'PY'
+          import urllib.request,urllib.parse,json,re
+          urls=[
+            'https://www.youtube.com/oembed?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DIy2FoVeIUXs&format=json',
+            'https://www.youtube.com/watch?v=Iy2FoVeIUXs',
+            'https://www.simonjonespr.com/news/2026/10/9/raye-announces-very-special-london-show',
+            'https://www.youtube.com/results?search_query=RAYE+I+WILL+OVERCOME+LIVE+AT+ABBEY+ROAD+STUDIOS+October+2026'
+          ]
+          for url in urls:
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126.0 Safari/537.36','Accept-Language':'en-US'})
+              with urllib.request.urlopen(req,timeout=20) as f:
+                txt=f.read(2_000_000).decode('utf8','ignore')
+                code=f.status
+              print('FETCH',code,url,'LEN',len(txt))
+              if 'oembed' in url:print('OEMBED',txt[:800])
+              else:
+                ids=list(dict.fromkeys(re.findall(r'(?:(?:watch\\?v=)|(?:youtu\\.be/)|(?:videoId["\\\\:\\s]+["\\\\]))([A-Za-z0-9_-]{11})',txt)))
+                print('VIDEO_IDS',ids[:40])
+                for x in ['I Will Overcome','Iy2FoVeIUXs','youtube.com/watch']:
+                  k=txt.find(x)
+                  if k>=0:print('CONTEXT',x,txt[max(k-350,0):k+450].replace(chr(10),' ')[:800])
+            except Exception as e:print('FETCH_ERROR',url,type(e).__name__,str(e)[:180])
+          PY
