@@ -29,11 +29,12 @@ test("genuine dated historical Apple US Top 100 and original Apple Global Top 50
 test("ChartStats parser accepts dated structured top 100 and rejects partial or wrong-date HTML",()=>{
  const elements=apples.map((t,i)=>({position:i+1,item:{"@type":"MusicRecording",name:t.title,byArtist:{name:t.artist}}}));
  const rows=apples.map((t,i)=>'<tr><td>'+ (i+1) +
-   '</td><td><img src="'+t.art+'"></td></tr>').join("");
+   '</td><td><img src="'+t.art+'"><a href="/song/test-'+i+'">'+t.title+
+   '</a><a href="/artist/test-'+i+'">'+t.artist+'</a></td></tr>').join("");
  const html='<html><head><link rel="canonical" href="https://chartstats.com/US/songs/'+day+
   '"><meta name="description" content="The Apple Music Top 100 in United States"></head>'+
   '<script id="page-jsonld" type="application/ld+json">'+
-  JSON.stringify({"@type":"ItemList",name:"United States "+day.slice(0,4),numberOfItems:100,itemListElement:elements})+
+  JSON.stringify({"@type":"ItemList",name:"United States "+day.slice(0,4),numberOfItems:100,itemListElement:elements.slice(0,10)})+
   '</script><tbody>'+rows+'</tbody></html>';
  const parsed=parseChartStatsUsHistorical(html,day);
  assert.equal(parsed.tracks.length,100);
