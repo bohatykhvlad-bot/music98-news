@@ -81,7 +81,7 @@ export function isTriChart(j){
  if(j?.methodology!==TRI_METHOD||j.consensus!==TRI_RULE||j.complete!==true||
   j.sources?.U!==100||j.sources?.A!==100||j.sources?.S<100||
   j.tracks?.length!==50||!/^[a-f0-9]{64}$/.test(j.spotifyFingerprint||"")||
-  !/^20\\d{2}-\\d{2}-\\d{2}$/.test(j.sourceDates?.S||"")||new Set(j.tracks.map(t=>songIdentity(t.title,t.artist))).size!==50||
+  !/^20\d{2}-\d{2}-\d{2}$/.test(j.sourceDates?.S||"")||new Set(j.tracks.map(t=>songIdentity(t.title,t.artist))).size!==50||
   j.tracks.some(t=>!verifiedSpotifyRow(t.spotify,j.sourceDates.S)||
    !sourceRankValid(t.sourceRanks?.U,100)||!sourceRankValid(t.sourceRanks?.A,100)||
    !sourceRankValid(t.sourceRanks?.S,200)))return false;
