@@ -2,6 +2,14 @@
    Match catalog genres, never an artist's name, nationality or appearance. */
 (() => {
   const version=2;
+  const identityVersion=1;
+  // Case and composed Unicode may vary; accents remain part of a name.
+  // ROSALÍA and Rosalia are different artists, not spelling aliases.
+  const artistIdentityKey=value=>String(value||'').normalize('NFC').trim().replace(/\s+/g,' ').toLocaleLowerCase('en-US');
+  function verifiedIdentity(artist) {
+    return Number.isSafeInteger(artist?.artistId)&&artist.artistId>0
+      && /^[A-Za-z0-9]{22}$/.test(artist.spotifyArtistId||'');
+  }
   const normalize=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
   const excluded=/\b(?:indian|bollywood|tamil|telugu|punjabi|malayalam|kannada|bengali|gujarati|marathi|bhojpuri|haryanvi|rajasthani|assamese|odia|oriya|carnatic|hindustani)\b/i;
   const regionalMexican=/\b(?:musica mexicana|regional mexican|regional mexicano|mexican traditions|rancheras?|corridos?|mariachi|norteno|grupero|tejano|sierreno)\b|^banda$/i;
@@ -18,7 +26,9 @@
   }
   function eligibleAlbums(artist) {
     if(excludedArtist(artist))return [];
-    return (Array.isArray(artist?.albums)?artist.albums:[]).filter(album=>album&&typeof album==='object'&&!excludedGenre(album.genre));
+    return (Array.isArray(artist?.albums)?artist.albums:[]).filter(album=>album&&typeof album==='object'&&!excludedGenre(album.genre)
+      && (!artist?.artistId || (album.artistId===artist.artistId
+        && artistIdentityKey(album.artistName)===artistIdentityKey(artist.appleArtistName||artist.name))));
   }
-  globalThis.music98DiscoverCatalogPolicy=Object.freeze({version,excludedGenre,excludedArtist,eligibleAlbums});
+  globalThis.music98DiscoverCatalogPolicy=Object.freeze({version,identityVersion,artistIdentityKey,verifiedIdentity,excludedGenre,excludedArtist,eligibleAlbums});
 })();

@@ -14,6 +14,9 @@
   let clock=0, energy=0, pointerLastMove=0, renderer=null, lost=false;
   let sourceBounds=null, layoutFrame=0, inView=true;
   let scrolling=false, scrollTimer=0;
+  const defaultPalette=[[.18,.66,.90],[0,.83,.81],[.02,.59,.64]];
+  let palette=defaultPalette.map(c=>c.slice()), targetPalette=palette.map(c=>c.slice()), artworkRequest=0;
+  const artworkPalettes=new Map();
 
   const vertex = `
     attribute vec2 position;
@@ -28,6 +31,9 @@
     uniform vec3 pointer;
     uniform float time;
     uniform float energy;
+    uniform vec3 tintBlue;
+    uniform vec3 tintCyan;
+    uniform vec3 tintMineral;
     float hash(vec2 p) {
       vec3 p3=fract(vec3(p.xyx)*.1031);
       p3+=dot(p3,p3.yzx+33.33);
@@ -72,7 +78,7 @@
       // Bend the existing current with a softened version of the original
       // vortex. Its bounded displacement never creates a separate cloud.
       vec2 nudge=(vec2(-delta.y,delta.x)*.48-delta*.12)*influence;
-      p+=clamp(nudge,vec2(-28.728/viewport.y),vec2(28.728/viewport.y));
+      p+=clamp(nudge,vec2(-27.2916/viewport.y),vec2(27.2916/viewport.y));
       float t=time*.25;
       vec2 centre=source.xy/viewport.y, size=source.zw/viewport.y;
       vec2 nearest=clamp(p,centre-size,centre+size);
@@ -112,7 +118,7 @@
       vec2 dots=sparkle(lights,viewport.y/15.,3.);
       vec2 motes=sparkle(lights,viewport.y/28.,89.);
       float depth=smoothstep(.30,.8,volume);
-      vec3 blue=vec3(.18,.66,.90), cyan=vec3(.0,.83,.81), mineral=vec3(.02,.59,.64);
+      vec3 blue=tintBlue, cyan=tintCyan, mineral=tintMineral;
       vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23));
       colour=mix(colour,mineral,clamp(smoothstep(.48,.86,lanes)*.25+crests*.04,0.,.65));
       // Lit grains sit within the volume, with a wider glow beneath it.
@@ -144,7 +150,7 @@
           gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
           const position=gl.getAttribLocation(program,"position");
           gl.enableVertexAttribArray(position); gl.vertexAttribPointer(position,2,gl.FLOAT,false,0,0);
-          const locations=Object.fromEntries(["viewport","source","pointer","time","energy"]
+          const locations=Object.fromEntries(["viewport","source","pointer","time","energy","tintBlue","tintCyan","tintMineral"]
             .map(key=>[key,gl.getUniformLocation(program,key)]));
           return { draw() {
             gl.viewport(0,0,canvas.width,canvas.height);
@@ -152,6 +158,7 @@
             gl.uniform4fv(locations.source,playerSource());
             gl.uniform3f(locations.pointer,pointer.x,pointer.y,pointer.strength);
             gl.uniform1f(locations.time,clock); gl.uniform1f(locations.energy,energy);
+            ["tintBlue","tintCyan","tintMineral"].forEach((key,i)=>gl.uniform3fv(locations[key],palette[i]));
             gl.drawArrays(gl.TRIANGLES,0,6);
           }};
         }
@@ -181,15 +188,16 @@
       if(surface.width!==canvas.width||surface.height!==canvas.height){surface.width=canvas.width;surface.height=canvas.height;}
       ctx.setTransform(surface.width/width,0,0,surface.height/height,0,0);
       ctx.clearRect(0,0,width,height);
-      ctx.fillStyle=`rgba(0,190,207,${.06+.005*Math.sin(clock*.25)})`;
+      const rgba=(c,a)=>`rgba(${c.map(v=>Math.round(v*255)).join(',')},${a})`;
+      ctx.fillStyle=rgba(palette[1],.06+.005*Math.sin(clock*.25));
       ctx.fillRect(0,0,width,height);
       const [sourceX,sourceY,halfWidth,halfHeight]=playerSource();
       const centres=[[sourceX,sourceY,width*.65,height*.8]];
       for(const [x,y,rx,ry] of centres){
         ctx.save();ctx.translate(x,y);ctx.scale(rx,ry);
         const glow=ctx.createRadialGradient(0,0,0,0,0,1);
-        glow.addColorStop(0,`rgba(0,204,219,${.12+energy*.04})`);
-        glow.addColorStop(.45,"rgba(40,232,209,.08)");glow.addColorStop(1,"rgba(0,220,225,0)");
+        glow.addColorStop(0,rgba(palette[0],.12+energy*.04));
+        glow.addColorStop(.45,rgba(palette[1],.08));glow.addColorStop(1,rgba(palette[1],0));
         ctx.fillStyle=glow;ctx.fillRect(-1,-1,2,2);ctx.restore();
       }
       ctx.save();ctx.shadowBlur=32;ctx.shadowColor="rgba(0,220,215,.12)";
@@ -236,7 +244,7 @@
     const rect=stage?.getBoundingClientRect();
     const panelRect=panel?.getBoundingClientRect();
     width=Math.max(1,document.documentElement.clientWidth);
-    height=Math.max(1,innerHeight,panelRect?.height ? panelRect.bottom+scrollY : 0);
+    height=Math.max(1,panelRect?.height ? panelRect.bottom+scrollY : innerHeight);
     if(rect?.width&&rect.height){
       sourceBounds=[rect.left+scrollX+rect.width/2,rect.top+scrollY+rect.height/2,rect.width/2,rect.height/2];
     }
@@ -260,7 +268,7 @@
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
     pointer.targetX=clamp(x,0,innerWidth)+scrollX;pointer.targetY=clamp(y,0,innerHeight)+scrollY;
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
-    pointer.targetStrength=.5814;pointerLastMove=performance.now();
+    pointer.targetStrength=.55233;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;
@@ -275,7 +283,8 @@
       // Around 7 times more transport during playback, with a soft coast
       // into pause; the remaining motion is only a quiet background drift.
       energy+=(Number(playing)-energy)*(1-Math.exp(-elapsed*(playing?2.4:1.5)));
-      clock+=dt*(.14+energy*.90);
+      clock+=dt*(.28+energy*.76);
+      palette=palette.map((c,i)=>c.map((v,k)=>v+(targetPalette[i][k]-v)*(1-Math.exp(-dt*1.4))));
       const smooth=1-Math.exp(-dt*2.6);
       if(ts-pointerLastMove>2500)pointer.targetStrength=0;
       pointer.x+=(pointer.targetX-pointer.x)*(1-Math.exp(-dt*4));
@@ -295,10 +304,51 @@
     start();
   }
   function setPlaying(value) { playing=!!value;if(active&&motion.matches)render(); }
+  async function setArtwork(url) {
+    const request=++artworkRequest;
+    targetPalette=defaultPalette.map(c=>c.slice());
+    if(!/^https:\/\/[^/]*mzstatic\.com\//i.test(url||''))return;
+    try {
+      let colours=artworkPalettes.get(url);
+      if(!colours){
+        const image=new Image();image.crossOrigin="anonymous";
+        // One small read per cover, never in the animation loop.
+        image.src=url.replace(/\d+x\d+bb(?:-\d+)?\./,'64x64bb.');
+        await image.decode();
+        const sample=document.createElement('canvas');sample.width=sample.height=24;
+        const context=sample.getContext('2d',{willReadFrequently:true});
+        context.drawImage(image,0,0,24,24);
+        const pixels=context.getImageData(0,0,24,24).data,bins=new Map();
+        for(let i=0;i<pixels.length;i+=4){
+          const c=[pixels[i],pixels[i+1],pixels[i+2]].map(v=>v/255);
+          const high=Math.max(...c),low=Math.min(...c);
+          if(high<.18||low>.88||high-low<.12)continue;
+          const key=c.map(v=>Math.floor(v*5)).join(',');
+          const bin=bins.get(key)||{count:0,total:[0,0,0]};
+          bin.count++;c.forEach((v,k)=>bin.total[k]+=v);bins.set(key,bin);
+        }
+        const dominant=[...bins.values()].sort((a,b)=>b.count-a.count).slice(0,3);
+        if(!dominant.length)return;
+        colours=defaultPalette.map((base,i)=>{
+          const bin=dominant[i%dominant.length];
+          return base.map((v,k)=>v*.25+(bin.total[k]/bin.count)*.75);
+        });
+        artworkPalettes.set(url,colours);
+        if(artworkPalettes.size>24)artworkPalettes.delete(artworkPalettes.keys().next().value);
+      }
+      if(request!==artworkRequest)return;
+      targetPalette=colours.map(c=>c.slice());
+      if(motion.matches){palette=targetPalette.map(c=>c.slice());if(active)render();}
+    } catch { /* Keep the site palette if artwork is unavailable or CORS blocks sampling. */ }
+  }
   canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();lost=true;if(frame)cancelAnimationFrame(frame);frame=0;});
   canvas.addEventListener("webglcontextrestored",()=>{lost=false;renderer=createRenderer();start();});
   renderer=createRenderer();
-  window.music98DiscoverAmbient={setVisible,setPlaying,setPointer};
+  window.music98DiscoverAmbient={setVisible,setPlaying,setPointer,setArtwork};
+  const syncVisibility=()=>setVisible(!!panel?.classList.contains('active')&&!document.body.classList.contains('articlepage'));
+  // Start on direct entry as well as navigation; do not depend on a later
+  // catalogue request or on which deferred script first observes pagechange.
+  addEventListener('music98:pagechange',syncVisibility);
   addEventListener("pointermove",e=>{if(e.pointerType==="mouse"||e.pointerType==="pen")setPointer(e.clientX,e.clientY);},{passive:true});
   addEventListener("blur",()=>{pointer.targetStrength=0;});
   addEventListener("pointerout",e=>{if(!e.relatedTarget)pointer.targetStrength=0;});
@@ -327,4 +377,5 @@
   document.fonts?.ready.then(queueLayout);
   document.addEventListener("visibilitychange",()=>{if(active)start();});
   motion.addEventListener?.("change",()=>{pointer.strength=0;pointer.targetStrength=0;if(active)start();});
+  syncVisibility();
 })();

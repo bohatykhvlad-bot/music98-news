@@ -9,6 +9,7 @@
 import fs from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 import '../public/discover-catalog-policy.js';
+import {resolveArtistProfile,artistIdentityKey,identityVersion} from './lib/discover-artist-identity.mjs';
 export const {excludedGenre,excludedArtist,eligibleAlbums}=globalThis.music98DiscoverCatalogPolicy;
 const POLICY_VERSION=globalThis.music98DiscoverCatalogPolicy.version;
 
@@ -29,25 +30,27 @@ const cleanHtml=s=>decodeHtml(String(s).replace(/<script\b[^>]*>[\s\S]*?<\/scrip
 export function parseRankedArtists(html,limit=SOURCE_LIMIT){
  const rows=[];
  for(const m of String(html).matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)){
-  const cols=[...m[1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map(x=>cleanHtml(x[1]));
+  const raw=[...m[1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)];
+  const cols=raw.map(x=>cleanHtml(x[1]));
   if(cols.length<2)continue;
   const rank=Number(cols[0].replace(/[^\d]/g,''));
   const name=cols[1];
-  if(rank===rows.length+1&&rank<=limit&&name&&name.length<150)rows.push({name,rank});
+  const spotifyArtistId=raw[1]?.[1].match(/artist\/([A-Za-z0-9]{22})_songs\.html/)?.[1];
+  if(rank===rows.length+1&&rank<=limit&&name&&name.length<150)rows.push({name,rank,...(spotifyArtistId?{spotifyArtistId}:{})});
   if(rows.length>=limit)break;
  }
  return rows;
 }
 export const parseTop500=html=>parseRankedArtists(html,LIMIT);
 const OMIT=/(\b(deluxe|remix(?:es|ed)?|karaoke|instrumental|commentary|greatest hits|singles collection|compilation|live at|live in|anniversary edition|expanded edition|tour edition|video album)\b|\[live\]|\(live\)|\b(ep|single)\s*$)/i;
-export function albumCandidates(items,artist){
- const exact=normalize(artist);
+export function albumCandidates(items,artist,artistId){
+ const exact=artistIdentityKey(artist);
  const seen=new Set();
  const out=[];
  for(const v of Array.isArray(items)?items:[]){
   if(!v||!Number.isSafeInteger(Number(v.collectionId))||!(Number(v.collectionId)>0))continue;
   const artistLabel=v.artistName||'';
-  if(normalize(artistLabel)!==exact)continue;
+  if(artistIdentityKey(artistLabel)!==exact||Number(v.artistId)!==artistId)continue;
   const title=String(v.collectionName||'').trim();
   if(!title||OMIT.test(title))continue;
   if(v.collectionType&&String(v.collectionType).toLowerCase()!=='album')continue;
@@ -58,18 +61,19 @@ export function albumCandidates(items,artist){
   if(year&&year>new Date().getUTCFullYear()+1)continue;
   seen.add(key);
   const artwork=String(v.artworkUrl100||'');
-  out.push({id:Number(v.collectionId),title,year:year||null,genre:String(v.primaryGenreName||'Music'),...(/^https:\/\/[^/]*mzstatic\.com\//i.test(artwork)?{artwork:artwork.replace(/\d+x\d+bb(?:-\d+)?\./,'600x600bb.')}:{} )});
+  out.push({id:Number(v.collectionId),artistId,artistName:artistLabel,title,year:year||null,genre:String(v.primaryGenreName||'Music'),...(/^https:\/\/[^/]*mzstatic\.com\//i.test(artwork)?{artwork:artwork.replace(/\d+x\d+bb(?:-\d+)?\./,'600x600bb.')}:{} )});
  }
  return out;
 }
 export function albumLookupStale(old, now=Date.now()){
+ if(old?.albums?.length&&!globalThis.music98DiscoverCatalogPolicy.verifiedIdentity(old))return true;
  const checkedAt=old?.checkedAt?Date.parse(old.checkedAt):NaN;
  return !Number.isFinite(checkedAt)||(now-checkedAt)>6*86400_000;
 }
 // Avoid repeating ~1,000 paced Apple calls after a successful full catalog
 // build merely because several code changes queued additional workflow runs.
 export function reusableCatalog(previous,ranking,now=Date.now()){
- if(previous?.schema!==2||previous?.genrePolicyVersion!==POLICY_VERSION)return false;
+ if(previous?.schema!==2||previous?.genrePolicyVersion!==POLICY_VERSION||previous?.identityPolicyVersion!==identityVersion)return false;
  const arr=previous.artists;
  if(!Array.isArray(arr)||arr.length!==LIMIT||!Array.isArray(ranking)||ranking.length<LIMIT)return false;
  const cache=new Map([...arr,...(previous.excludedArtists||[]),...(previous.missingArtists||[])]
@@ -98,7 +102,16 @@ async function getJSON(url){
  if(!r.ok)throw Error(`${r.status} ${r.statusText} ${url}`);
  return r.json();
 }
-async function albumsFor(name){
+async function albumsFor(name,entry={}){
+ if(globalThis.music98DiscoverCatalogPolicy.verifiedIdentity(entry)&&entry.appleArtistName){
+  const lookup=new URL('https://itunes.apple.com/lookup');
+  lookup.searchParams.set('id',String(entry.artistId));lookup.searchParams.set('country','us');
+  lookup.searchParams.set('entity','album');lookup.searchParams.set('limit','200');
+  const results=(await getJSON(lookup)).results||[];
+  const artist=results.find(v=>v.wrapperType==='artist'&&v.artistId===entry.artistId);
+  if(!artist||artistIdentityKey(artist.artistName)!==artistIdentityKey(entry.appleArtistName))throw Error('Apple artist identity changed: '+name);
+  return {...entry,genre:String(artist.primaryGenreName||''),albums:albumCandidates(results,entry.appleArtistName,entry.artistId)};
+ }
  const search=new URL('https://itunes.apple.com/search');
  search.searchParams.set('term',name);
  search.searchParams.set('country','us');
@@ -113,14 +126,12 @@ async function albumsFor(name){
  if(err)throw err;
  // Search returns a relevance-limited window. For each matched artist,
  // an ID-based lookup often adds older releases the search did not return.
- const exact=normalize(name);
- const idCounts=new Map();
- for(const item of entries){
-  if(normalize(item?.artistName)!==exact)continue;
-  const id=Number(item.artistId);
-  if(Number.isSafeInteger(id)&&id>0)idCounts.set(id,(idCounts.get(id)||0)+1);
- }
- const artistId=[...idCounts].sort((a,b)=>b[1]-a[1])[0]?.[0];
+ const identity=await resolveArtistProfile({...entry,name},entries,{json:getJSON,text:async url=>{
+  const r=await fetch(url,{signal:AbortSignal.timeout(25000)});
+  if(!r.ok)throw Error('Spotify artist identity HTTP '+r.status);
+  return r.text();
+ }});
+ const {artistId,appleArtistName}=identity;
  if(artistId){
   const lookup=new URL('https://itunes.apple.com/lookup');
   lookup.searchParams.set('id',String(artistId));
@@ -128,12 +139,12 @@ async function albumsFor(name){
   lookup.searchParams.set('entity','album');
   lookup.searchParams.set('limit','200');
   try{const result=await getJSON(lookup);
-    const matched=(result.results||[]).find(v=>v.wrapperType==='artist'&&normalize(v.artistName)===exact);
+    const matched=(result.results||[]).find(v=>v.wrapperType==='artist'&&v.artistId===artistId&&artistIdentityKey(v.artistName)===artistIdentityKey(appleArtistName));
     genre=String(matched?.primaryGenreName||'');
     entries.push(...(Array.isArray(result.results)?result.results:[]))}
   catch(e){console.warn('ARTIST_LOOKUP_FALLBACK',name,e.message)}
  }
- return {albums:albumCandidates(entries,name),genre};
+ return {...identity,albums:albumCandidates(entries,appleArtistName,artistId),genre};
 }
 export async function assembleCatalog(ranking,previous,{batch=750,lookup=albumsFor,now=Date.now()}={}){
  const oldRecords=[...(previous?.artists||[])];
@@ -151,18 +162,19 @@ export async function assembleCatalog(ranking,previous,{batch=750,lookup=albumsF
   const key=normalize(entry.name);
   if(!key||names.has(key))continue;
   names.add(key);
-  const old=previousByName.get(key);
+  const cached=previousByName.get(key);
+  const old=previous?.identityPolicyVersion===identityVersion&&cached?.spotifyArtistId===entry.spotifyArtistId?cached:null;
   let profile=old?{...old,...entry}:{...entry,albums:[],checkedAt:null};
   if(albumLookupStale(old,now)&&fetched<batch){
    fetched++;
    try{
-    const result=await lookup(entry.name);
+    const result=await lookup(entry.name,old?{...old,...entry}:entry);
     const albums=Array.isArray(result)?result:result.albums;
     if(!Array.isArray(albums))throw Error('Invalid Apple album response');
     // Preserve a prior positive match when an otherwise successful Apple
     // search unexpectedly returns nothing; do not erase a healthy catalog.
     if(albums.length||!old?.albums?.length)
-      profile={...entry,genre:Array.isArray(result)?'':String(result.genre||''),albums,checkedAt:new Date(now).toISOString()};
+      profile={...entry,...(Array.isArray(result)?{}:result),genre:Array.isArray(result)?'':String(result.genre||''),albums,checkedAt:new Date(now).toISOString()};
    }catch(e){failed++;console.warn('DEFER',entry.rank,entry.name,e.message);}
   }
   if(profile.reason==='excluded-genre'||excludedArtist(profile)){
@@ -170,7 +182,7 @@ export async function assembleCatalog(ranking,previous,{batch=750,lookup=albumsF
     genres:[...new Set([profile.genre,...(profile.albums||[]).map(a=>a.genre),...(profile.genres||[])].filter(Boolean))],checkedAt:profile.checkedAt});
   }else{
    const albums=eligibleAlbums(profile);
-   if(albums.length)artists.push({...entry,position:artists.length+1,...(profile.genre?{genre:profile.genre}:{}),albums,checkedAt:profile.checkedAt});
+   if(albums.length&&globalThis.music98DiscoverCatalogPolicy.verifiedIdentity(profile))artists.push({...profile,...entry,position:artists.length+1,albums,checkedAt:profile.checkedAt});
    else missingArtists.push({...entry,albums:[],checkedAt:profile.checkedAt});
   }
   if(scanned%25===0||artists.length===LIMIT)
@@ -190,7 +202,7 @@ export async function assembleCatalog(ranking,previous,{batch=750,lookup=albumsF
    albums.add(album.id);
   }
  }
- return {schema:2,genrePolicyVersion:POLICY_VERSION,source:'kworb-spotify-monthly-listeners-and-itunes-search',isSample:false,
+ return {schema:2,identityPolicyVersion:identityVersion,genrePolicyVersion:POLICY_VERSION,source:'kworb-spotify-monthly-listeners-and-itunes-search',isSample:false,
   updatedAt:new Date(now).toISOString(),rankingCount:LIMIT,playableArtistCount:LIMIT,missingArtistCount:0,
   sourceRankingCount:ranking.length,scannedRankingCount:scanned,excludedArtistCount:excludedArtists.length,
   unmatchedArtistCount:missingArtists.length,fetchedArtistCount:fetched,failedLookupCount:failed,

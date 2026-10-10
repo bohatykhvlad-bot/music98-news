@@ -887,7 +887,7 @@ textarea{resize:vertical;min-height:64px}
    The desktop Releases / Discover white-area height is synchronized in JS. */
 #tab-discover{padding-bottom:12px}
 #tab-discover.rise{animation:none}
-#tab-discover .discover-layout{--discover-row-inset:12px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(2 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
+#tab-discover .discover-layout{--discover-row-inset:12px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(4 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
 #tab-discover .discover-heading{grid-area:1/1/2/4;text-align:center;width:100%;margin-bottom:0}
 #tab-discover .discover-copy{grid-area:2/1;align-self:center;min-width:0;width:100%;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
 #tab-discover .discover-intro{grid-area:2/3;align-self:center;min-width:0;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;max-width:100%}
@@ -2870,7 +2870,18 @@ function queueEqualizeBrowsePanels(){
         const top = parseFloat(style.paddingTop), bottom = parseFloat(style.paddingBottom);
         // Balance the player between the heading and Discover's own lower
         // edge. Subscribe's external margin belongs to the following section.
-        discoverLayout.style.setProperty("--discover-row-inset", bottom + "px");
+        // The screenshot compares the visible letters, not the empty space
+        // below their baseline. Centre against the heading's actual ink edge.
+        const title=discoverLayout.querySelector('.hd-t'), titleStyle=getComputedStyle(title);
+        const context=document.createElement('canvas').getContext('2d');
+        context.font=`${titleStyle.fontWeight} ${titleStyle.fontSize} ${titleStyle.fontFamily}`;
+        const metrics=context.measureText(title.textContent);
+        const lineHeight=parseFloat(titleStyle.lineHeight);
+        const tail=Number.isFinite(metrics.fontBoundingBoxDescent)
+          ? Math.max(0,(lineHeight-metrics.fontBoundingBoxAscent-metrics.fontBoundingBoxDescent)/2
+            +metrics.fontBoundingBoxDescent-metrics.actualBoundingBoxDescent) : 0;
+        discoverLayout.style.setProperty("--discover-row-inset", Math.max(0,bottom-tail) + "px");
+        discoverLayout.dataset.headingTail=tail;
         discoverLayout.style.setProperty("--discover-layout-height", (height - top - bottom) + "px");
       }
     }
@@ -4403,9 +4414,9 @@ window.music98DiscoverPlayer={
   pause: () => pauseAllMedia()
 };
 </script>
-<script src="/discover-ambient.js?v=20261010-flow11" defer></script>
-<script src="/discover-catalog-policy.js?v=20261010-genres02" defer></script>
-<script src="/discover-app.js?v=20261010-catalog-retry01" defer></script>
+<script src="/discover-ambient.js?v=20261010-flow12" defer></script>
+<script src="/discover-catalog-policy.js?v=20261010-identity01" defer></script>
+<script src="/discover-app.js?v=20261010-identity02" defer></script>
 <script src="/concerts-app.js?v=20261008-03" defer></script>
 </body>
 </html>

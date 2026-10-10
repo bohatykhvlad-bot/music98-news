@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseTop500,albumCandidates,decodeHtml,albumLookupStale,reusableCatalog,parseRankedArtists,assembleCatalog,excludedGenre,excludedArtist,eligibleAlbums} from './build-discover-albums.mjs';
+const identityPolicyVersion=globalThis.music98DiscoverCatalogPolicy.identityVersion;
+const artistFixture=a=>({...a,artistId:a.rank,appleArtistName:a.name,spotifyArtistId:String(a.rank).padStart(22,'0')});
+const albumsFixture=(a,albums)=>albums.map(v=>({...v,artistId:a.rank,artistName:a.name}));
 const genrePolicyVersion=globalThis.music98DiscoverCatalogPolicy.version;
 
 test('parses ranked rows with HTML-encoded artist names',()=>{
@@ -16,7 +19,7 @@ test('rejects singles, remixes, compilation, foreign artist and duplicates',()=>
  {collectionId:5,collectionName:'Song - Single',artistName:'Dua Lipa',trackCount:1},
  {collectionId:6,collectionName:'Actual Album',artistName:'Another Artist',trackCount:11}
  ];
- assert.deepEqual(albumCandidates(items,'Dua Lipa'),[{id:1,title:'Future Nostalgia',year:2020,genre:'Pop'}]);
+ assert.deepEqual(albumCandidates(items.map(v=>({...v,artistId:123})),'Dua Lipa',123),[{id:1,artistId:123,artistName:'Dua Lipa',title:'Future Nostalgia',year:2020,genre:'Pop'}]);
 });
 test('Unicode safe decoding',()=>assert.equal(decodeHtml('Beyonc&#233; &amp; Jhen&#xe9;'),'Beyoncé & Jhené'));
 
@@ -24,7 +27,7 @@ test('weekly refresh caches empty Apple results instead of repeating all API loo
  const now=Date.parse('2026-10-09T19:00:00Z');
  const recent={albums:[],checkedAt:'2026-10-09T18:00:00Z'};
  assert.equal(albumLookupStale(recent,now),false);
- assert.equal(albumLookupStale({albums:[{id:1}],checkedAt:'2026-10-09T18:00:00Z'},now),false);
+ assert.equal(albumLookupStale({artistId:1,spotifyArtistId:'1'.repeat(22),albums:[{id:1}],checkedAt:'2026-10-09T18:00:00Z'},now),false);
  assert.equal(albumLookupStale({albums:[],checkedAt:'2026-10-01T19:00:00Z'},now),true);
  assert.equal(albumLookupStale({albums:[],checkedAt:null},now),true);
  assert.equal(albumLookupStale(undefined,now),true);
@@ -32,11 +35,11 @@ test('weekly refresh caches empty Apple results instead of repeating all API loo
 
 test('filtered recent catalog reuses lookups while preserving the source ranks',()=>{
  const now=Date.parse('2026-10-10T01:00:00Z');
- const ranking=Array.from({length:502},(_,i)=>({rank:i+1,name:'Artist '+(i+1)}));
+ const ranking=Array.from({length:502},(_,i)=>artistFixture({rank:i+1,name:'Artist '+(i+1)}));
  const excludedArtists=[{...ranking[0],reason:'excluded-genre',genres:['Bollywood'],checkedAt:'2026-10-10T00:00:00Z'}];
  const missingArtists=[{...ranking[1],albums:[],checkedAt:'2026-10-10T00:00:00Z'}];
- const artists=ranking.slice(2).map((a,i)=>({...a,position:i+1,albums:[{id:100000+i,genre:'Pop'}],checkedAt:'2026-10-10T00:00:00Z'}));
- const previous={schema:2,genrePolicyVersion,artists,excludedArtists,missingArtists};
+ const artists=ranking.slice(2).map((a,i)=>({...a,position:i+1,albums:albumsFixture(a,[{id:100000+i,genre:'Pop'}]),checkedAt:'2026-10-10T00:00:00Z'}));
+ const previous={schema:2,identityPolicyVersion,genrePolicyVersion,artists,excludedArtists,missingArtists};
  assert.equal(reusableCatalog(previous,ranking,now),true);
  assert.equal(reusableCatalog({...previous,artists:artists.slice(0,499)},ranking,now),false);
  assert.equal(reusableCatalog({...previous,genrePolicyVersion:0},ranking,now),false);
@@ -65,10 +68,10 @@ test('genre policy excludes Indian categories without matching Indie or Indonesi
 
 test('backfills to exactly 500 playable artists, reusing fresh matches and caching exclusions',async()=>{
  const now=Date.parse('2026-10-10T01:00:00Z');
- const ranking=Array.from({length:550},(_,i)=>({rank:i+1,name:'Artist '+(i+1)}));
- const previous={artists:ranking.slice(0,500).map((a,i)=>({...a,albums:[{id:i+1,genre:i<30?'Bollywood':'Pop'}],checkedAt:'2026-10-10T00:00:00Z'}))};
+ const ranking=Array.from({length:550},(_,i)=>artistFixture({rank:i+1,name:'Artist '+(i+1)}));
+ const previous={identityPolicyVersion,artists:ranking.slice(0,500).map((a,i)=>({...a,albums:albumsFixture(a,[{id:i+1,genre:i<30?'Bollywood':'Pop'}]),checkedAt:'2026-10-10T00:00:00Z'}))};
  const calls=[];
- const result=await assembleCatalog(ranking,previous,{now,lookup:async name=>{calls.push(name);return {albums:[{id:10000+calls.length,genre:'Rock'}]}}});
+ const result=await assembleCatalog(ranking,previous,{now,lookup:async name=>{calls.push(name);return {...artistFixture({rank:Number(name.split(' ')[1]),name}),albums:albumsFixture({rank:Number(name.split(' ')[1]),name},[{id:10000+calls.length,genre:'Rock'}])}}});
  assert.equal(result.artists.length,500);
  assert.equal(result.playableArtistCount,500);
  assert.equal(result.artists[0].rank,31);
@@ -82,8 +85,8 @@ test('backfills to exactly 500 playable artists, reusing fresh matches and cachi
 });
 
 test('insufficient healthy candidates fail rather than returning a smaller catalog',async()=>{
- const ranking=Array.from({length:510},(_,i)=>({rank:i+1,name:'Artist '+(i+1)}));
- const previous={artists:ranking.map(a=>({...a,albums:[],checkedAt:'2026-10-10T00:00:00Z'}))};
+ const ranking=Array.from({length:510},(_,i)=>artistFixture({rank:i+1,name:'Artist '+(i+1)}));
+ const previous={identityPolicyVersion,artists:ranking.map(a=>({...a,albums:[],checkedAt:'2026-10-10T00:00:00Z'}))};
  await assert.rejects(assembleCatalog(ranking,previous,{now:Date.parse('2026-10-10T01:00:00Z'),lookup:async()=>{throw Error('must not retry fresh empty lookups')}}),/Catalog incomplete/);
  assert.equal(previous.artists.length,510);
  assert.ok(previous.artists.every(a=>!a.albums.length));
@@ -91,13 +94,13 @@ test('insufficient healthy candidates fail rather than returning a smaller catal
 
 test('weekly lookup budget covers excluded ranks and refreshes the last selected artist',async()=>{
  const now=Date.parse('2026-10-17T01:00:00Z');
- const ranking=Array.from({length:550},(_,i)=>({rank:i+1,name:'Artist '+(i+1)}));
+ const ranking=Array.from({length:550},(_,i)=>artistFixture({rank:i+1,name:'Artist '+(i+1)}));
  const calls=[];
  const oldTime='2026-10-09T01:00:00Z';
- const previous={genrePolicyVersion,artists:ranking.slice(30,530).map(a=>({...a,albums:[{id:a.rank,genre:'Pop'}],checkedAt:oldTime})),excludedArtists:ranking.slice(0,30).map(a=>({...a,reason:'excluded-genre',genres:['Bollywood'],checkedAt:oldTime}))};
+ const previous={identityPolicyVersion,genrePolicyVersion,artists:ranking.slice(30,530).map(a=>({...a,albums:albumsFixture(a,[{id:a.rank,genre:'Pop'}]),checkedAt:oldTime})),excludedArtists:ranking.slice(0,30).map(a=>({...a,reason:'excluded-genre',genres:['Bollywood'],checkedAt:oldTime}))};
  const result=await assembleCatalog(ranking,previous,{now,batch:750,lookup:async name=>{
   const rank=Number(name.split(' ')[1]);calls.push(rank);
-  return {albums:[{id:rank,genre:rank<=30?'Bollywood':'Pop'}]};
+  return {...artistFixture({rank,name}),albums:albumsFixture({rank,name},[{id:rank,genre:rank<=30?'Bollywood':'Pop'}])};
  }});
  assert.equal(calls.length,530);
  assert.equal(result.artists.at(-1).rank,530);
@@ -113,13 +116,13 @@ test('regional Mexican labels are excluded without removing other Latin genres',
 
 test('expanded policy refilters cached albums and backfills without re-querying previous exclusions',async()=>{
  const now=Date.parse('2026-10-10T01:00:00Z'),checkedAt=new Date(now).toISOString();
- const ranking=Array.from({length:560},(_,i)=>({rank:i+1,name:'Artist '+(i+1)}));
- const previous={genrePolicyVersion:1,
-  artists:ranking.slice(2,502).map((a,i)=>({...a,position:i+1,checkedAt,albums:[{id:a.rank,genre:i<10?'Música Mexicana':'Pop'}]})),
+ const ranking=Array.from({length:560},(_,i)=>artistFixture({rank:i+1,name:'Artist '+(i+1)}));
+ const previous={identityPolicyVersion,genrePolicyVersion:1,
+  artists:ranking.slice(2,502).map((a,i)=>({...a,position:i+1,checkedAt,albums:albumsFixture(a,[{id:a.rank,genre:i<10?'Música Mexicana':'Pop'}])})),
   excludedArtists:[{...ranking[0],reason:'excluded-genre',genres:['Bollywood'],checkedAt}],
   missingArtists:[{...ranking[1],albums:[],checkedAt}]};
  const calls=[];
- const result=await assembleCatalog(ranking,previous,{now,lookup:async name=>{calls.push(name);return {albums:[{id:10000+calls.length,genre:'Rock'}]}}});
+ const result=await assembleCatalog(ranking,previous,{now,lookup:async name=>{calls.push(name);return {...artistFixture({rank:Number(name.split(' ')[1]),name}),albums:albumsFixture({rank:Number(name.split(' ')[1]),name},[{id:10000+calls.length,genre:'Rock'}])}}});
  assert.equal(result.genrePolicyVersion,genrePolicyVersion);
  assert.equal(result.artists.length,500);
  assert.equal(result.excludedArtistCount,11);
@@ -128,4 +131,19 @@ test('expanded policy refilters cached albums and backfills without re-querying 
  assert.equal(calls.length,10);
  assert.ok(result.artists.every(a=>a.albums.every(v=>!excludedGenre(v.genre))));
  assert.equal(reusableCatalog(result,ranking,now),true);
+});
+
+test('same-name albums must belong to the verified Apple artist ID and preserve accents',()=>{
+ const row={collectionId:1144745324,collectionName:'Soy de Ti',artistId:1414486216,artistName:'Rosalia',trackCount:12,primaryGenreName:'Pop'};
+ assert.deepEqual(albumCandidates([row],'ROSALÍA',313845115),[]);
+ assert.deepEqual(albumCandidates([{...row,artistName:'Offset'}],'Offset',3973268),[]);
+ const real={...row,collectionId:1436309944,artistId:313845115,artistName:'ROSALÍA',collectionName:'EL MAL QUERER'};
+ const albums=albumCandidates([row,real],'ROSALÍA',313845115);
+ assert.equal(albums.length,1);assert.equal(albums[0].artistId,313845115);
+ const profile={name:'ROSALÍA',artistId:313845115,spotifyArtistId:'7ltDVBr6mKbRvohxheJ9h1',albums:[...albums,{id:row.collectionId,artistId:row.artistId,artistName:row.artistName,genre:'Pop'}]};
+ assert.deepEqual(eligibleAlbums(profile),albums);
+});
+
+test('legacy positive matches cannot be reused during the identity migration',()=>{
+ assert.equal(albumLookupStale({albums:[{id:1}],checkedAt:new Date().toISOString()}),true);
 });

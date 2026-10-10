@@ -33,9 +33,9 @@
   const policy = window.music98DiscoverCatalogPolicy;
 
   const validId = n => Number.isSafeInteger(n) && n > 0 && n < 1e12;
-  const usable = d => (Array.isArray(d?.artists) ? d.artists : [])
+  const usable = d => (d?.identityPolicyVersion===policy.identityVersion && Array.isArray(d?.artists) ? d.artists : [])
     .map(a => ({ ...a, albums: policy.eligibleAlbums(a) }))
-    .filter(a => typeof a?.name === "string" && a.name.trim()
+    .filter(a => policy.verifiedIdentity(a) && typeof a?.name === "string" && a.name.trim()
       && Array.isArray(a.albums) && a.albums.some(v => validId(v.id) && typeof v.title === "string"));
 
   async function loadCatalog() {
@@ -45,7 +45,7 @@
       button.disabled = true;
       status.textContent = "Loading albums…";
       try {
-        const response = await fetch("/data/discover-albums.json", {
+        const response = await fetch("/data/discover-albums.json?identity=1", {
           cache: "default", signal: AbortSignal.timeout(15000)
         });
         if (!response.ok) throw new Error("Catalog HTTP " + response.status);
@@ -111,6 +111,7 @@
     const site = window.music98DiscoverPlayer;
     if (site?.pause) site.pause();
     current = album;
+    window.music98DiscoverAmbient?.setArtwork(album.artwork);
     byId("discoverArtist").textContent = album.artist;
     byId("discoverAlbum").textContent = album.title;
     byId("discoverYear").textContent = album.year || "";
