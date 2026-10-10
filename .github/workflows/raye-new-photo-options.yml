@@ -12,6 +12,7 @@ jobs:
     steps:
       - name: Verify actual original photo bytes and dimensions
         run: |
+          python -m pip -q install pillow
           python - <<'PY'
           import urllib.request
           from io import BytesIO
