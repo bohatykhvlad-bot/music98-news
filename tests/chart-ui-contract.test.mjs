@@ -26,8 +26,9 @@ function validates(method,chart) {
 const chosen=rankTriCandidates(seed.tracks,seed.spotifyDate);
 const chart={
  methodology:TRI_METHOD,consensus:TRI_RULE,complete:true,
- updated:seed.appleUsDate,sources:{U:100,A:100,S:seed.sourceSizes.S},
- sourceDates:{U:seed.appleUsDate,A:seed.appleGlobalDate,S:seed.spotifyDate},
+ updated:seed.appleUsDate,sources:{U:100,A:seed.sourceSizes.A,S:seed.sourceSizes.S},
+ sourceDetails:{A:{provenance:seed.archiveProvenance?.A}},
+ sourceDates:{U:seed.spotifyDate,A:seed.spotifyDate,S:seed.spotifyDate},
  spotifyFingerprint:seed.fingerprint,tracks:chosen.tracks
 };
 test("production candidate sample is accepted by the real browser's current chart validators",()=>{
@@ -52,7 +53,9 @@ test("browser blocks truly incomplete chart versions, fake streams and duplicate
   x=>{x.tracks[2].sourceRanks.U=x.tracks[0].sourceRanks.U;},
   x=>{x.tracks.pop();},
   x=>{x.spotifyFingerprint="not-valid";},
-  x=>{x.sourceDates.S="not-a-date";}
+  x=>{x.sourceDates.S="not-a-date";},
+  x=>{x.sourceDates.U="2020-10-07";},
+  x=>{x.sources.A=50;x.sourceDetails.A.provenance={source:"unknown",rows:50};}
  ]){
   const altered=structuredClone(chart);
   mutate(altered);
