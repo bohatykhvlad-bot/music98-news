@@ -9,8 +9,8 @@
   "aintinla|adla": {
     "title": "Ain't In LA",
     "artist": "ADÉLA",
-    "url": "https://music.apple.com/us/album/6792883860?i=6792884101",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a5/1c/db/a51cdb2c-4d28-3aea-feb2-44b7d0f1c05b/mzaf_11945853055580460496.plus.aac.p.m4a",
+    "url": "https://music.apple.com/us/album/6796149321?i=6796149323",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/af/19/98/af1998ee-ed0e-4655-ec27-610c78dcb4fc/mzaf_18150537039377466708.plus.aac.p.m4a",
     "year": "2026"
   },
   "animal|katseye": {
@@ -111,6 +111,27 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/1f/6f/e6/1f6fe6c2-15b6-ed27-5c5f-0e63273cf167/mzaf_12076627970141246810.plus.aac.p.m4a",
     "year": "1982"
   },
+  "birdsofafeather|billieeilish": {
+    "title": "BIRDS OF A FEATHER",
+    "artist": "Billie Eilish",
+    "url": "https://music.apple.com/us/album/1739659134?i=1739659142",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/31/d3/3431d34e-847f-5d66-df83-0bce688d997e/mzaf_18106743962423782018.plus.aac.p.m4a",
+    "year": "2024"
+  },
+  "blindinglights|theweeknd": {
+    "title": "Blinding Lights",
+    "artist": "The Weeknd",
+    "url": "https://music.apple.com/us/album/1499378108?i=1499378607",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/19/d6/60/19d660ff-e3a9-8377-15a3-ce4b28e89cac/mzaf_18422426156481158187.plus.aac.p.m4a",
+    "year": "2019"
+  },
+  "bloodstream|alyssagrace": {
+    "title": "bloodstream",
+    "artist": "Alyssa Grace",
+    "url": "https://music.apple.com/us/album/6781522684?i=6781522686",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/04/8f/2d/048f2d4e-18c8-94ef-a0bd-0aca99b3d852/mzaf_1307706599533846993.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "boston|stellalefty": {
     "title": "Boston",
     "artist": "STELLA LEFTY",
@@ -195,6 +216,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/84/f2/ad/84f2adc3-c2e2-5bd1-14a6-3ca9256326a3/mzaf_7493570463891681462.plus.aac.p.m4a",
     "year": "2025"
   },
+  "dopegirl|rodwave": {
+    "title": "Dope Girl",
+    "artist": "Rod Wave",
+    "url": "https://music.apple.com/us/album/6807069399?i=6807069451",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/da/73/da/da73daee-35f4-c598-cc70-a41ce3a75c9f/mzaf_14872459948267454135.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "dracula|tameimpala": {
     "title": "Dracula",
     "artist": "Tame Impala",
@@ -227,7 +255,7 @@
     "title": "End of Beginning",
     "artist": "Djo",
     "url": "https://music.apple.com/us/album/1632447652?i=1632448108",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6e/df/af/6edfaf58-f901-e9b5-840b-9ac9e37f34b7/mzaf_8465065510938624101.plus.aac.p.m4a",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/38/81/10/38811007-ad71-7ca0-bb8c-fd26a0290add/mzaf_5172426609768569448.plus.aac.p.m4a",
     "year": "2024"
   },
   "forokinawa|yao": {
@@ -275,8 +303,8 @@
   "hatethatimadeyouloveme|arianagrande": {
     "title": "hate that i made you love me",
     "artist": "Ariana Grande",
-    "url": "https://music.apple.com/us/album/1895420989?i=6763656876",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/02/41/f3/0241f307-2ec2-f817-3953-78df5f80f63d/mzaf_525670659940588152.plus.aac.p.m4a",
+    "url": "https://music.apple.com/us/album/6773388583?i=6773388585",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9e/85/8d/9e858d51-fb47-3aff-c037-4e9fd284cefe/mzaf_12282803114326162707.plus.aac.p.m4a",
     "year": "2026"
   },
   "hootiefrutti|katseye": {
@@ -348,6 +376,13 @@
     "url": "https://music.apple.com/us/album/6769568449?i=6769568596",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a2/a3/18/a2a31893-76db-627e-0985-6c720be140b4/mzaf_4732841734320991384.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "justgivemeareason|pnk": {
+    "title": "Just Give Me a Reason (feat. Nate Ruess)",
+    "artist": "P!nk",
+    "url": "https://music.apple.com/us/album/545389041?i=545389290",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/48/26/e6/4826e6b6-3788-f75c-5688-32db211c106a/mzaf_14746398704531487022.plus.aac.p.m4a",
+    "year": "2012"
   },
   "kidmyself|johnmorgan": {
     "title": "Kid Myself",
@@ -454,6 +489,20 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/96/f8/f8/96f8f80b-dbb5-f2ca-714e-9c39d5dc6846/mzaf_4599292728755362943.plus.aac.p.m4a",
     "year": "2024"
   },
+  "oneofthegirls|theweeknd": {
+    "title": "One Of The Girls",
+    "artist": "The Weeknd, JENNIE & Lily Rose Depp",
+    "url": "https://music.apple.com/us/album/1693891133?i=1693891139",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/9e/2f/1f/9e2f1f11-20a8-767a-0e33-9029028a7024/mzaf_1603981766065362477.plus.aac.p.m4a",
+    "year": "2023"
+  },
+  "orbiter|noahkahan": {
+    "title": "Orbiter",
+    "artist": "Noah Kahan",
+    "url": "https://music.apple.com/us/album/1894997820?i=6762757958",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/62/a9/34/62a93491-136b-4396-cacc-390f5e24f0a0/mzaf_16199650500860119333.plus.aac.p.m4a",
+    "year": "2026"
+  },
   "ordinary|alexwarren": {
     "title": "Ordinary",
     "artist": "Alex Warren",
@@ -509,6 +558,13 @@
     "url": "https://music.apple.com/us/album/1866732792?i=1866732797",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/61/fc/d7/61fcd7e8-ea20-2f90-3672-09516cd050e6/mzaf_12696195794831485731.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "sailorsong|gigiperez": {
+    "title": "Sailor Song",
+    "artist": "Gigi Perez",
+    "url": "https://music.apple.com/us/album/1807389775?i=1807389776",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/d7/86/20/d786200e-b962-180d-7958-edb48e1e8251/mzaf_6246112794325340279.plus.aac.p.m4a",
+    "year": "2025"
   },
   "selfaware|tempercity": {
     "title": "Self Aware",
@@ -643,6 +699,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a8/87/16/a88716e2-9474-ec4e-06d6-d3a9a3ba96c8/mzaf_6258558385119267725.plus.aac.p.m4a",
     "year": "2024"
   },
+  "treatyoubetter|shawnmendes": {
+    "title": "Treat You Better",
+    "artist": "Shawn Mendes",
+    "url": "https://music.apple.com/us/album/1440892227?i=1440892713",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/55/01/6a/55016ae7-ea0f-46b9-b1e9-bdcd2a2e43a6/mzaf_8546251326492891284.plus.aac.p.m4a",
+    "year": "2016"
+  },
   "waitforu|future": {
     "title": "WAIT FOR U (feat. Drake & Tems)",
     "artist": "Future",
@@ -670,6 +733,13 @@
     "url": "https://music.apple.com/us/album/1882549705?i=1882549709",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/25/24/85/252485ef-d834-08f9-1061-dc6fb44b3b86/mzaf_667886181363622809.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "wonderwall~v:remaster|oasis": {
+    "title": "Wonderwall (Remastered)",
+    "artist": "Oasis",
+    "url": "https://music.apple.com/us/album/1821192759?i=1821192766",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/c3/db/03/c3db0391-376b-16df-18bc-b1b538b8596f/mzaf_3050299424375489016.plus.aac.p.m4a",
+    "year": "1995"
   },
   "wtfgoin|bellygangkushington": {
     "title": "WTF GOIN",
