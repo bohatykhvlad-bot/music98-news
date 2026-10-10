@@ -8,6 +8,9 @@ on:
       - "functions/lib/apple-spotify-chart.js"
       - "functions/lib/apple-us-hybrid.js"
       - "functions/lib/tri-source-chart.js"
+      - "functions/lib/chart-history.js"
+      - "scripts/backfill-chart-history.mjs"
+      - "public/data/chart-history/**"
       - "tests/tri-source-chart.test.mjs"
       - "tests/tri-source-worker-integration.test.mjs"
       - "scripts/resolve-tri-apple-media.mjs"
@@ -32,7 +35,9 @@ jobs:
           node-version: "20"
       - name: Fetch paired verified Apple Music USA and Global Top 100
         run: node scripts/refresh-apple-ranking.mjs
-      - name: Build union of three daily Top 100 charts and recover verified Spotify counters
+      - name: Restore Oct 8 and Oct 9 dated Apple archives and preserve verified Spotify date
+        run: node scripts/backfill-chart-history.mjs
+      - name: Build union of THREE sources from the latest common source date
         run: node scripts/refresh-apple-spotify-streams.mjs
       - name: Prepare verified Apple media for Spotify-only Top 50 entrants
         run: node scripts/resolve-tri-apple-media.mjs
@@ -51,15 +56,16 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             node scripts/refresh-apple-ranking.mjs
+            node scripts/backfill-chart-history.mjs
             node scripts/refresh-apple-spotify-streams.mjs
             node scripts/resolve-tri-apple-media.mjs
             node --test tests/tri-source-*.test.mjs
-            git add public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json
+            git add public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json public/data/chart-history/
             if git diff --cached --quiet; then
               echo "Current main already has matching verified sources"
               exit 0
             fi
-            git commit -m "chart: three-source 40 USA 30 Spotify 30 Global verified edition"
+            git commit -m "chart: matching-date Apple USA Global Spotify 40-30-30 edition"
             if git push origin HEAD:main; then
               gh workflow run apple-data.yml --ref main
               gh workflow run verify-tri-live.yml --ref main
