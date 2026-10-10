@@ -1,0 +1,27 @@
+name: Chart desktop and mobile browser smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - "public/index.html"
+      - "scripts/audit-chart-browser.mjs"
+      - ".github/workflows/chart-browser-smoke.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: chart-browser-smoke
+  cancel-in-progress: true
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Require live 50 rendered rows in desktop and mobile Chrome
+        run: node scripts/audit-chart-browser.mjs
