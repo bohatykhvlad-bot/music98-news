@@ -793,13 +793,15 @@ textarea{resize:vertical;min-height:64px}
   .topbar{--hp:0;height:auto;background:transparent;padding:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
   .topbar-glass{display:block}
   .topbar-glass-full,.topbar-glass-isle{top:0;bottom:0;height:auto}
-  .topbar-in{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:9px 16px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;clip-path:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .topbar-in{gap:8px;display:flex;flex-wrap:wrap;width:100%;max-width:100%;min-width:0;height:auto;padding:9px 16px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible;clip-path:none;backdrop-filter:none;-webkit-backdrop-filter:none}
   .brand{height:36px}
   .brand-logo{width:32px;height:32px}
   .brand-name{font-size:17px}
   .top-actions{flex:1;min-width:0;overflow:visible}
-  .nav{order:3;width:100%;height:48px;gap:4px;padding:4px;justify-content:stretch;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14)}
-  .nav-btn{flex:1;height:38px;padding:0 3px;font-size:12px;justify-content:center;top:0}
+  .nav{order:3;flex:0 0 100%;width:100%;max-width:100%;min-width:0;height:48px;gap:4px;padding:4px;justify-content:stretch;background:rgba(255,255,255,.55);border:1px solid rgba(15,60,64,.14)}
+  /* Equal mobile pill insets; avoid glyph-measurement offsets that drift
+     with Android font fallback and don't let intrinsic text widen the nav. */
+  .nav-btn{min-width:0;flex:1;height:38px;padding:0;font-size:12px;justify-content:center;top:0;text-indent:0!important}
   .search{width:auto;flex:1;height:36px;overflow:visible}
   .search input{height:36px;font-size:16px;background:rgba(255,255,255,.7);-webkit-appearance:none;appearance:none}
   .search input:focus,
@@ -1428,6 +1430,10 @@ window.music98InkShift = window.music98InkShift || function music98InkShift(el){
   return Math.max(-2,Math.min(2,Math.round(advance/2-inkCenter)));
 };
 window.music98CenterPillInk = window.music98CenterPillInk || function music98CenterPillInk(el){
+  if(el?.classList.contains("nav-btn") && matchMedia("(max-width:640px)").matches){
+    el.style.setProperty("--ink-x","0px");
+    return;
+  }
   if(el) el.style.setProperty("--ink-x",window.music98InkShift(el)+"px");
 };
 function centerSitePillInk(){
@@ -1451,11 +1457,11 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v46";
-const DAILY_CHART_METHOD = "daily-global-v1";
+const DAILYKEY = "music98news_daily_v47";
+const DAILY_CHART_METHOD = "daily-global-consensus-v2";
 function isDailySourceEdition(j){
   return j?.methodology===DAILY_CHART_METHOD && Object.keys(j.sources||{}).length===3 &&
-    ["A","S","D"].every(k=>j.sources[k]===50);
+    ["A","S","D"].every(k=>j.sources[k]===100);
 }
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
@@ -2525,6 +2531,13 @@ function chartHasCompleteArtwork(tracks){
     } catch(e){ return false; }
   });
 }
+function hasThreePlatformConsensus(tracks){
+  return Array.isArray(tracks) && tracks.length===50 && tracks.every((t,i)=>{
+    const r=t?.sourceRanks;
+    return Number(t?.rank)===i+1 && r && Object.keys(r).length===3 &&
+      ["A","S","D"].every(k=>Number.isInteger(r[k])&&r[k]>=1&&r[k]<=100);
+  });
+}
 function refreshDailyTop50(){
   if(S.autoChart === false){
     autoRows = null;
@@ -2535,7 +2548,7 @@ function refreshDailyTop50(){
   }
   let cached = null;
   try{ cached = JSON.parse(lsGetRaw(DAILYKEY)||"null"); }catch(e){ cached = null; }
-  const hasVerifiedCache=!!(cached && chartHasCompleteArtwork(cached.tracks) &&
+  const hasVerifiedCache=!!(cached && chartHasCompleteArtwork(cached.tracks) && hasThreePlatformConsensus(cached.tracks) &&
     isDailySourceEdition(cached) && cached.sourceDates?.S && cached.spotifyFingerprint);
   /* Never paint a locally cached ranking as today's chart before checking
      the latest independently verified source fingerprint with the server. */
@@ -2545,12 +2558,12 @@ function refreshDailyTop50(){
   setChartStatus({}, "loading");
   // The server checks the latest mirror fingerprint before each chart response.
   // The server returns the latest verified recovery snapshot if live sources fail.
-  fetch("/api/top50?d=" + todayUTC() + "&rev=46",
+  fetch("/api/top50?d=" + todayUTC() + "&rev=47",
     {cache:"no-store",headers:{"Cache-Control":"no-cache"}})
     .then(r=>{ if(!r.ok) throw 0; return r.json(); })
     .then(j=>{
       const tracks = (j && j.tracks) || [];
-      if(!chartHasCompleteArtwork(tracks)) throw new Error("incomplete_chart_artwork");
+      if(!chartHasCompleteArtwork(tracks) || !hasThreePlatformConsensus(tracks) || !isDailySourceEdition(j)) throw new Error("incomplete_or_unverified_chart");
       const fresh = j.updated === todayUTC() && !j.fallback && j.complete === true &&
         isDailySourceEdition(j) &&
         !!j.sourceDates?.S && !!j.spotifyFingerprint;

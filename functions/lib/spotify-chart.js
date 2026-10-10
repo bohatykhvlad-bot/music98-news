@@ -1,5 +1,5 @@
 import {mergeKey} from "./chart-identity.js";
-export const SPOTIFY_TOP_SIZE=50;
+export const SPOTIFY_TOP_SIZE=100;
 export const SPOTIFY_MAX_LAG_DAYS=2;
 function textOf(html){
  return String(html||"").replace(/<[^>]*>/g,"")
@@ -91,14 +91,22 @@ export function parseMusicrankSpotify(html){
  }
  return {date,source:"musicrank",ldConfirmed:20,tracks:verified};
 }
+/* Two independent mirrors can name the very same Spotify recording using
+   different remaster-year labels (2001 vs 2004), or drop that label entirely.
+   Compare the underlying song and lead artist, but NEVER ignore remix/live etc. */
+function spotifyMirrorKey(row){
+ const title=String(row?.title||"")
+   .replace(/\s*[-–—]\s*(?:(?:19|20)\d{2}\s*)?remaster(?:ed)?(?:\s*(?:19|20)\d{2})?\b/gi,"")
+   .replace(/\s*\(\s*(?:(?:19|20)\d{2}\s*)?remaster(?:ed)?(?:\s*(?:19|20)\d{2})?\s*\)/gi,"");
+ return mergeKey(title,row?.artist);
+}
 export function compareSpotifyRankings(a,b){
  if(!a||!b||a.date!==b.date)return {ok:false,dateMatch:false,mismatchPositions:[]};
  try{validatedSpotifyRows(a.tracks);validatedSpotifyRows(b.tracks);}
  catch{return {ok:false,dateMatch:true,mismatchPositions:[]};}
  const mismatchPositions=[];
  for(let i=0;i<SPOTIFY_TOP_SIZE;i++)
-  if(mergeKey(a.tracks?.[i]?.title,a.tracks?.[i]?.artist)!==
-     mergeKey(b.tracks?.[i]?.title,b.tracks?.[i]?.artist))mismatchPositions.push(i+1);
+  if(spotifyMirrorKey(a.tracks?.[i])!==spotifyMirrorKey(b.tracks?.[i]))mismatchPositions.push(i+1);
  return {ok:mismatchPositions.length===0,dateMatch:true,mismatchPositions};
 }
 export function verifiedSpotifySnapshot(s,now=Date.now()){

@@ -12,7 +12,7 @@ async function expectRejected(options,pattern){
  finally{globalThis.fetch=previous;}
 }
 test("worker refuses 49 Deezer rows rather than making an incomplete combined chart",async()=>{
- await expectRejected({deezerCount:49},/incomplete_chart_sources/);
+ await expectRejected({deezerCount:99},/incomplete_chart_sources/);
 });
 test("worker rejects a changed Spotify rank even if both mirrors appear complete",async()=>{
  await expectRejected({kworbSwap:true},/spotify_mirror_disagreement:36/);
@@ -20,7 +20,7 @@ test("worker rejects a changed Spotify rank even if both mirrors appear complete
 test("worker falls back to verified independent Spotify if the live HTML lost a row",async()=>{
  /* The mirror fallback is allowed, but another incomplete source must still
     block any publication before ranking/tenure mutations. */
- await expectRejected({kworbMissing:[17],deezerCount:49},/incomplete_chart_sources/);
+ await expectRejected({kworbMissing:[17],deezerCount:99},/incomplete_chart_sources/);
 });
 
 function mediaEnvironment(source) {
@@ -33,7 +33,7 @@ function mediaEnvironment(source) {
    prev:"https://audio-ssl.itunes.apple.com/preview/"+(i+1)+".m4a"
  }]));
  const covers=Object.fromEntries(appleRows.map(row=>[artworkKey(row.title,row.artist),row.art]));
- const oldTracks=source.rows.map(t=>({...t,rank:t.pos,weeks:7,delta:"0"}));
+ const oldTracks=source.rows.slice(0,50).map(t=>({...t,rank:t.pos,weeks:7,delta:"0"}));
  const old={updated:yesterday,week:week-1,complete:true,
    sources:{A:50,S:50,D:50,B:50,Y:50},tracks:oldTracks};
  const assets={"apple-names.json":names,"covers.json":covers,"loudness.json":{},
@@ -56,12 +56,12 @@ test("daily migration preserves Apple audio/artwork, day counts and repeat-reque
    const response=await onRequestGet({env,request}),payload=await response.json();
    assert.equal(response.status,200);
    assert.equal(payload.methodology,DAILY_CHART_METHOD);
-   assert.deepEqual(payload.sources,{A:50,S:50,D:50});
+   assert.deepEqual(payload.sources,{A:100,S:100,D:100});
    assert.equal(payload.arrows.ok,true);
    assert.ok(payload.tracks.every(t=>t.weeks===8 && t.delta==="0"));
    assert.ok(payload.tracks.every(t=>t.prev.startsWith("https://audio-ssl.itunes.apple.com/")));
    assert.ok(payload.tracks.every(t=>t.art.endsWith("600x600bb.jpg") && t.url.includes("music.apple.com/us/album/")));
-   assert.equal(writes.at(-1),"top50v37");
+   assert.equal(writes.at(-1),"top50v38");
    assert.ok(values.has("top50v36"));
    assert.ok(source.requests.every(url=>!url.includes("youtube") && !url.includes("billboard") && !url.includes("/chart/0")));
    const cached=await (await onRequestGet({env,request})).json();
@@ -70,12 +70,12 @@ test("daily migration preserves Apple audio/artwork, day counts and repeat-reque
 });
 
 test("incomplete daily source does not mutate tenure or publish an old weekly edition",async()=>{
- const source=fakeDailySource({deezerCount:49}),{env,writes}=mediaEnvironment(source),previous=globalThis.fetch;
+ const source=fakeDailySource({deezerCount:99}),{env,writes}=mediaEnvironment(source),previous=globalThis.fetch;
  globalThis.fetch=source.fakeFetch;
  try{
    const response=await onRequestGet({env,request:new Request("https://music98.news/api/top50")});
    assert.equal(response.status,503);
-   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v37:retry"]);
+   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v38:retry"]);
  }finally{globalThis.fetch=previous;}
 });
 
@@ -90,7 +90,7 @@ test("validated daily global snapshots recover both Apple and Deezer outages",as
  globalThis.fetch=source.fakeFetch;
  try{
    const payload=await buildTop50("https://music98.news",env,source.snapshot);
-   assert.deepEqual(payload.sources,{A:50,S:50,D:50});
+   assert.deepEqual(payload.sources,{A:100,S:100,D:100});
    assert.equal(payload.sourceOrigin.A,"github-current-day-global");
    assert.equal(payload.sourceOrigin.D,"github-current-day-worldwide");
  }finally{globalThis.fetch=previous;}
@@ -113,7 +113,7 @@ test("a slow third source is awaited before ranking or history writes",async()=>
    assert.deepEqual(writes,[]);
    release();
    const result=await (await pending).json();
-   assert.deepEqual(result.sources,{A:50,S:50,D:50});
+   assert.deepEqual(result.sources,{A:100,S:100,D:100});
    assert.equal(result.tracks.length,50);
  }finally{release();globalThis.fetch=previous;}
 });
@@ -121,10 +121,10 @@ test("a slow third source is awaited before ranking or history writes",async()=>
 test("a provider timeout serves the complete verified chart without rescoring on two inputs",async()=>{
  const source=fakeDailySource({deezerOffline:true}),{env,values,writes,assets}=mediaEnvironment(source);
  const previous=globalThis.fetch,old=assets["chart-tenure-backup.json"].current;
- const saved={...old,methodology:DAILY_CHART_METHOD,sources:{A:50,S:50,D:50},
+ const saved={...old,methodology:DAILY_CHART_METHOD,sources:{A:100,S:100,D:100},
    spotifyFingerprint:source.snapshot.fingerprint,sourceDates:{S:old.updated},
-   tracks:old.tracks.map(t=>({...t,url:"",art:"",prev:""}))};
- values.set("top50v37",saved);
+   tracks:old.tracks.map(t=>({...t,sourceRanks:{A:t.rank,S:t.rank,D:t.rank},url:"",art:"",prev:""}))};
+ values.set("top50v38",saved);
  globalThis.fetch=async input=>{
    if(String(input).includes("api.deezer.com"))throw new DOMException("Source timed out","TimeoutError");
    return source.fakeFetch(input);
@@ -137,7 +137,7 @@ test("a provider timeout serves the complete verified chart without rescoring on
    assert.equal(result.updated,old.updated);
    assert.deepEqual(result.tracks.map(t=>[t.rank,t.title,t.weeks,t.delta]),old.tracks.map(t=>[t.rank,t.title,t.weeks,t.delta]));
    assert.ok(result.tracks.every(t=>t.art && t.prev.startsWith("https://audio-ssl.itunes.apple.com/")));
-   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v37:retry"]);
+   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v38:retry"]);
  }finally{globalThis.fetch=previous;}
 });
 
@@ -181,24 +181,24 @@ test("a recovered third-source snapshot bypasses retry backoff without a Spotify
  try{
    const request=new Request("https://music98.news/api/top50");
    assert.equal((await onRequestGet({env,request})).status,503);
-   assert.ok(values.has("top50v37:retry"));
+   assert.ok(values.has("top50v38:retry"));
    const today=new Date().toISOString().slice(0,10);
    assets["deezer-chart.json"]={schema:2,updated:today,sourceDate:today,capturedAt:today+"T12:00:00Z",
      source:"official-deezer-worldwide-playlist",region:"global",cadence:"daily",tracks:source.rows};
    const response=await onRequestGet({env,request}),payload=await response.json();
    assert.equal(response.status,200);
    assert.equal(payload.fallback,undefined);
-   assert.deepEqual(payload.sources,{A:50,S:50,D:50});
+   assert.deepEqual(payload.sources,{A:100,S:100,D:100});
    assert.equal(payload.spotifyFingerprint,source.snapshot.fingerprint);
  }finally{globalThis.fetch=previous;}
 });
 
 test("a verified daily backup survives empty KV without rebuilding from two sources",async()=>{
- const source=fakeDailySource({deezerCount:49}),{env,assets,writes}=mediaEnvironment(source),previous=globalThis.fetch;
+ const source=fakeDailySource({deezerCount:99}),{env,assets,writes}=mediaEnvironment(source),previous=globalThis.fetch;
  const old=assets["chart-tenure-backup.json"].current;
  assets["daily-top50-backup.json"]={...old,updated:new Date().toISOString().slice(0,10),
-   complete:true,methodology:DAILY_CHART_METHOD,sources:{A:50,S:50,D:50},arrows:{ok:true},
-   tracks:old.tracks.map(t=>({...t,weeks:8}))};
+   complete:true,methodology:DAILY_CHART_METHOD,sources:{A:100,S:100,D:100},arrows:{ok:true},
+   tracks:old.tracks.map(t=>({...t,weeks:8,sourceRanks:{A:t.rank,S:t.rank,D:t.rank}}))};
  globalThis.fetch=source.fakeFetch;
  try{
    const response=await onRequestGet({env,request:new Request("https://music98.news/api/top50")});
@@ -206,18 +206,18 @@ test("a verified daily backup survives empty KV without rebuilding from two sour
    assert.equal(response.status,200);
    assert.equal(chart.fallback,"verified-daily-snapshot");
    assert.ok(chart.tracks.every(t=>t.weeks===8 && t.art && t.prev));
-   assert.deepEqual(chart.sources,{A:50,S:50,D:50});
-   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v37:retry"]);
+   assert.deepEqual(chart.sources,{A:100,S:100,D:100});
+   assert.deepEqual(writes.filter(k=>k!=="names_v1"),["top50v38:retry"]);
  }finally{globalThis.fetch=previous;}
 });
 
 test("daily backup recovery refuses partial sources and regressed day counters",async()=>{
  for(const broken of ["partial","regressed","weekly"]){
-   const source=fakeDailySource({deezerCount:49}),{env,assets}=mediaEnvironment(source),previous=globalThis.fetch;
+   const source=fakeDailySource({deezerCount:99}),{env,assets}=mediaEnvironment(source),previous=globalThis.fetch;
    const old=assets["chart-tenure-backup.json"].current;
    const saved={...old,updated:new Date().toISOString().slice(0,10),methodology:DAILY_CHART_METHOD,
-     sources:{A:50,S:50,D:50},arrows:{ok:true},tracks:old.tracks.map(t=>({...t,weeks:8}))};
-   if(broken==="partial")saved.sources.D=49;
+     sources:{A:100,S:100,D:100},arrows:{ok:true},tracks:old.tracks.map(t=>({...t,weeks:8,sourceRanks:{A:t.rank,S:t.rank,D:t.rank}}))};
+   if(broken==="partial")saved.sources.D=99;
    if(broken==="regressed")saved.tracks.forEach(t=>{t.weeks=1;});
    if(broken==="weekly"){delete saved.methodology;saved.sources={A:50,S:50,D:50,B:50,Y:50};}
    assets["daily-top50-backup.json"]=saved;

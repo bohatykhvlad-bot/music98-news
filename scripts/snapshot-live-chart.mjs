@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import {mergeKey} from "../functions/lib/chart-identity.js";
 import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
-import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,completeDailySources} from "../functions/lib/daily-chart-sources.js";
+import {DAILY_CHART_METHOD,DAILY_SOURCE_IDS,completeDailySources,verifiedConsensusTracks} from "../functions/lib/daily-chart-sources.js";
 
 const OUT = new URL("../public/data/chart-tenure-backup.json", import.meta.url);
 const DAILY_OUT = new URL("../public/data/daily-top50-backup.json", import.meta.url);
@@ -18,7 +18,7 @@ const j = await r.json();
 const spotifyRef=verifiedSpotifySnapshot(JSON.parse(fs.readFileSync(
   new URL("../public/data/spotify-chart.json",import.meta.url),"utf8")));
 if(!spotifyRef || j.fallback || j.complete!==true ||
-   j.methodology!==DAILY_CHART_METHOD || !completeDailySources(j.sources) ||
+   j.methodology!==DAILY_CHART_METHOD || !completeDailySources(j.sources) || !verifiedConsensusTracks(j.tracks,j.sources) ||
    j.sourceDates?.S!==spotifyRef.date || j.spotifyFingerprint!==spotifyRef.fingerprint)
   throw new Error("refusing snapshot unless all daily sources are complete and Spotify edition matches");
 const tracks = Array.isArray(j.tracks) ? j.tracks : [];
@@ -84,6 +84,7 @@ const snapshot = {
   spotifyFingerprint:j.spotifyFingerprint,
   tracks: tracks.map((t,i) => ({
     rank: Number(t.rank) || i + 1,
+    sourceRanks: {...t.sourceRanks},
     title: String(t.title || ""),
     artist: String(t.artist || ""),
     weeks: Math.max(1, Number(t.weeks) || 1),

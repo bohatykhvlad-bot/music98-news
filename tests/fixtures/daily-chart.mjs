@@ -16,10 +16,10 @@ export function appleHTML(rows, {id=APPLE_GLOBAL_ID,count=100,date=new Date().to
     '</script><script id=schema:music-playlist type="application/ld+json">'+JSON.stringify(schema)+'</script>';
 }
 
-export function fakeDailySource({deezerCount=50,kworbMissing=[],kworbSwap=false,appleOffline=false,deezerOffline=false}={}) {
+export function fakeDailySource({deezerCount=100,kworbMissing=[],kworbSwap=false,appleOffline=false,deezerOffline=false}={}) {
   const today=new Date().toISOString().slice(0,10),requests=[];
-  const rows=Array.from({length:50},(_,i)=>({pos:i+1,title:"Source Song "+(i+1),artist:"Source Artist "+(i+1)}));
-  const snapshot={schema:1,verified:true,provider:"kworb+musicrank",mirrorMatched:50,
+  const rows=Array.from({length:100},(_,i)=>({pos:i+1,title:"Source Song "+(i+1),artist:"Source Artist "+(i+1)}));
+  const snapshot={schema:1,verified:true,provider:"kworb+musicrank",mirrorMatched:100,
     fingerprint:"a".repeat(64),chartDate:today,tracks:rows};
   const kw='<title>Spotify Daily Chart - Global</title><h2>'+today.replaceAll("-","/")+'</h2><table>'+
     rows.filter(x=>!kworbMissing.includes(x.pos)).map(x=>
