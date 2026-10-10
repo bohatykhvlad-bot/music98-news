@@ -85,11 +85,11 @@ test("clean Chart and Concerts routes are no-store",()=>{
 
 
 test("daily chart checks server freshness before painting browser cache",()=>{
- assert.match(page,/const DAILYKEY = "music98news_daily_v48"/);
- assert.match(page,/const hasVerifiedCache=!!\(cached && chartHasCompleteArtwork\(cached\.tracks\)/);
+ assert.match(page,/const DAILYKEY = "music98news_daily_v49"/);
+ assert.match(page,/const hasVerifiedCache=!!\(cached && chartHasCompleteArtwork\(cached\.tracks,cached\.methodology\)/);
  assert.match(page,/sourceDates\?\.S && cached.spotifyFingerprint/);
  assert.doesNotMatch(page,/if\(hasVerifiedCache\) applyDaily\(cached.tracks, "cache"\)/);
- assert.match(page,/fetch\("\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=48"/);
+ assert.match(page,/fetch\("\/api\/top50\?d=" \+ todayUTC\(\) \+ "&rev=49"/);
  assert.match(page,/cache:"no-store"/);
 });
 
@@ -176,9 +176,9 @@ test("site text stays off persistent compositor transforms and whole-button filt
 
 
 test("daily chart caches only complete, source-stamped rows with artwork",()=>{
- assert.match(page,/cached && chartHasCompleteArtwork\(cached\.tracks\)/);
- assert.match(page,/if\(!isDailySourceEdition\(j\) \|\| !chartHasCompleteArtwork\(tracks\)\) throw new Error\("incomplete_chart_artwork"\)/);
- assert.match(page,/if\(fresh && chartHasCompleteArtwork\(tracks\)\)/);
+ assert.match(page,/cached && chartHasCompleteArtwork\(cached\.tracks,cached\.methodology\)/);
+ assert.match(page,/if\(!isDailySourceEdition\(j\) \|\| !chartHasCompleteArtwork\(tracks,j\.methodology\)\) throw new Error\("incomplete_chart_artwork"\)/);
+ assert.match(page,/if\(fresh && chartHasCompleteArtwork\(tracks,j\.methodology\)\)/);
  assert.match(page,/spotifyFingerprint:j.spotifyFingerprint/);
  assert.match(page,/sourceDates:j.sourceDates/);
 });
@@ -239,8 +239,8 @@ test("mobile chart reclaims arrow space without shrinking artwork or playback",(
 test("the UI requires Apple candidate provenance and verified Spotify daily metadata",()=>{
  assert.match(page,/j.complete === true/);
  assert.match(page,/isDailySourceEdition\(j\)/);
- assert.match(page,/j\?\.methodology===DAILY_CHART_METHOD/);
- assert.match(page,/Object.keys\(j.sources\|\|\{\}\).length===2/);
+ assert.match(page,/j.methodology===TRI_CHART_METHOD/);
+ assert.match(page,/j.sources\?\.U===100 && j.sources\?\.A===100/);
  assert.match(page,/!!j.sourceDates\?\.S && !!j.spotifyFingerprint/);
  assert.doesNotMatch(page,/Last complete chart:/);
  assert.match(page,/else if\(tag === "backup"\) txt = ""/);
