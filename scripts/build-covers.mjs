@@ -5,7 +5,7 @@
  * with Deezer. Compilations and derivative packages are rejected.
  */
 import fs from "node:fs";
-import {isAppleSpotifyChart} from "../functions/lib/apple-spotify-chart.js";
+import {isVerifiedChartEdition} from "../functions/lib/daily-chart-sources.js";
 import path from "node:path";
 import dns from "node:dns";
 import { appleCandidateCompatible, artworkCreditSignature, artworkKey, mergeKey, normTitle, primaryArtist, stripParen, versionSignature } from "../functions/lib/chart-identity.js";
@@ -239,9 +239,12 @@ async function prospectiveChart(){
   for(let attempt=0;attempt<20;attempt++){
     try{
       const candidate=await json(CHART+(CHART.includes("?")?"&":"?")+"artworkAudit="+Date.now());
-      if(candidate?.artworkAuditOnly===true && candidate.complete===true &&
+      /* Accept whichever chart family the Worker currently publishes (today:
+         tri-source). A hard-coded legacy family check silently rejected every
+         fresh audit edition after the methodology migration. */
+      if(candidate?.artworkAuditOnly===true && candidate.complete===true && !candidate.fallback &&
          candidate.updated===new Date().toISOString().slice(0,10) &&
-         isAppleSpotifyChart(candidate)) return candidate;
+         isVerifiedChartEdition(candidate)) return candidate;
       last=JSON.stringify({updated:candidate?.updated,rev:candidate?.rev,
         fallback:candidate?.fallback,auditOnly:candidate?.artworkAuditOnly,
         rows:candidate?.tracks?.length});

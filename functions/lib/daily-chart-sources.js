@@ -3,6 +3,13 @@ import {isAppleUsHybridChart} from "./apple-us-hybrid.js";
 import {isTriChart} from "./tri-source-chart.js";
 import {mergeKey} from "./chart-identity.js";
 
+/* Any chart family the Worker can currently publish. Scripts that audit the
+   prospective or live edition (covers, artwork contract) accept exactly this
+   set — never a single hard-coded legacy family. */
+export function isVerifiedChartEdition(snapshot) {
+  return isTriChart(snapshot) || isAppleUsHybridChart(snapshot) || isAppleSpotifyChart(snapshot);
+}
+
 export const DAILY_CHART_METHOD = "daily-global-v1";
 export const DAILY_CHART_CONSENSUS = "all-three-v1";
 export const DAILY_SOURCE_IDS = ["A", "S", "D"];
@@ -147,7 +154,7 @@ export function verifiedDailySeed(snapshot, source, now=Date.now()) {
 /* Old editions are retained for history recovery, never for serving a ranking
    under the new methodology. This keeps existing day counts through migration. */
 export function verifiedTenureEdition(snapshot) {
-  if (isTriChart(snapshot) || isAppleUsHybridChart(snapshot) || isAppleSpotifyChart(snapshot) || isConsensusChart(snapshot)) return true;
+  if (isVerifiedChartEdition(snapshot) || isConsensusChart(snapshot)) return true;
   if (!snapshot || snapshot.complete!==true || snapshot.tracks?.length!==CHART_SIZE) return false;
   if (snapshot.methodology===DAILY_CHART_METHOD) return completeDailySources(snapshot.sources);
   return !snapshot.methodology && Object.keys(snapshot.sources || {}).length===5 &&

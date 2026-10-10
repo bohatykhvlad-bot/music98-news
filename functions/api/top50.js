@@ -6,7 +6,7 @@ import { appleCandidateCompatible, artworkKey, isVersionedMergeKey, mergeKey, no
 import {hasCompleteChartArtwork as completeArtwork,isTrustedChartArtwork,missingChartArtwork} from "../lib/chart-artwork-gate.js";
 import {discoverAppleAlbumTracks} from "../lib/apple-album-discovery.js";
 import {candidateCompatible,isDerivativeRelease,isGenericRelease,rankArtworkCandidates} from "../lib/artwork-resolver.js";
-import {DAILY_SOURCE_DETAILS,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
+import {DAILY_SOURCE_DETAILS,isVerifiedChartEdition,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
 
 const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
@@ -17,7 +17,7 @@ const APPLE_CT = "music98";
 const TOP50_KV = "top50v39";
 const TOP50_RETRY_KV="top50v39:retry";
 function verifiedSourceSnapshot(s) {
-  return isTriChart(s)||isAppleUsHybridChart(s)||isAppleSpotifyChart(s);
+  return isVerifiedChartEdition(s);
 }
 function hasCompleteChartArtwork(tracks) {
   return (tracks?.length===50&&tracks.every(t=>t.spotify?.status==="matched"&&Number.isSafeInteger(t.spotify.daily)&&t.spotify.daily>=0)||validUsHybridRows(tracks)||validHybridRows(tracks)) && completeArtwork(tracks, 50);

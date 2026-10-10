@@ -28,6 +28,7 @@ on:
       - "functions/lib/artwork-resolver.js"
       - "functions/lib/apple-album-discovery.js"
       - "scripts/build-covers.mjs"
+      - "scripts/verify-live-artwork.mjs"
       - "scripts/build-loudness.mjs"
       - "public/data/cover-corrections.json"
   # Artwork code changes may refresh artwork immediately, but must never rebuild
