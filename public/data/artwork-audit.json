@@ -1,6 +1,6 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-10T07:37:13.834Z",
+  "updatedAt": "2026-10-10T07:39:00.925Z",
   "chartUpdated": "2026-10-10",
   "chartRev": "daily-global-v38",
   "rows": 12,
@@ -8,8 +8,7 @@
   "unresolved": [],
   "sourceCounts": {
     "apple-feed": 8,
-    "apple-chart": 3,
-    "apple": 1
+    "apple-chart": 4
   },
   "entries": {
     "bbywow|gjudelinekarolrusowsky": {
@@ -29,7 +28,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:09.644Z",
+      "checkedAt": "2026-10-10T07:38:55.335Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -53,7 +52,7 @@
       "title": "Beautiful Things",
       "artist": "Benson Boone",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a5/c1/9c/a5c19c62-d641-93b4-2800-e74778569f5f/093624852483.jpg/600x600bb.jpg",
-      "provider": "apple",
+      "provider": "apple-chart",
       "releaseTitle": "Fireworks & Rollerblades",
       "releaseArtist": "Benson Boone",
       "releaseDate": "2024-01-18T12:00:00Z",
@@ -62,11 +61,26 @@
       "collectionId": "1736051351",
       "trackId": "1736051619",
       "confidence": 98,
-      "score": 885,
+      "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:13.832Z",
+      "checkedAt": "2026-10-10T07:39:00.923Z",
       "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1736051619",
+          "collectionId": "1736051351",
+          "releaseTitle": "Fireworks & Rollerblades",
+          "releaseArtist": "Benson Boone",
+          "releaseDate": "2024-01-18T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/a5/c1/9c/a5c19c62-d641-93b4-2800-e74778569f5f/093624852483.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1736051351?i=1736051619",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
         {
           "provider": "apple",
           "id": "1736051619",
@@ -95,21 +109,6 @@
           "score": 885,
           "confidence": 98,
           "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple-chart",
-          "id": "1724488124",
-          "collectionId": "1724488123",
-          "releaseTitle": "Beautiful Things - Single",
-          "releaseArtist": "Benson Boone",
-          "releaseDate": "2024-01-18T08:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/54/f4/92/54f49210-e260-b519-ebbd-f4f40ee710cd/054391342751.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1724488123?i=1724488124",
-          "score": 850,
-          "confidence": 96,
-          "consensus": 1,
           "earliestReleaseYear": 2024
         },
         {
@@ -161,7 +160,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:09.647Z",
+      "checkedAt": "2026-10-10T07:38:55.338Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -197,7 +196,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:11.497Z",
+      "checkedAt": "2026-10-10T07:38:57.627Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -293,7 +292,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:09.647Z",
+      "checkedAt": "2026-10-10T07:38:55.338Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -329,7 +328,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:09.647Z",
+      "checkedAt": "2026-10-10T07:38:55.339Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -365,7 +364,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:09.644Z",
+      "checkedAt": "2026-10-10T07:38:55.336Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -401,7 +400,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:10.837Z",
+      "checkedAt": "2026-10-10T07:38:56.731Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -497,7 +496,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:09.646Z",
+      "checkedAt": "2026-10-10T07:38:55.337Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -533,7 +532,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:12.172Z",
+      "checkedAt": "2026-10-10T07:38:58.449Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -614,7 +613,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:09.646Z",
+      "checkedAt": "2026-10-10T07:38:55.337Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -650,7 +649,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-10T07:37:10.838Z",
+      "checkedAt": "2026-10-10T07:38:56.732Z",
       "alternatives": [
         {
           "provider": "apple-feed",
