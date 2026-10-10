@@ -1,0 +1,36 @@
+name: RAYE alternative photo original verification
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-2026-draft]
+    paths: [.github/workflows/raye-new-photo-options.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify actual original photo bytes and dimensions
+        run: |
+          python - <<'PY'
+          import urllib.request
+          from io import BytesIO
+          from PIL import Image
+          candidates={
+           'NME_REDSOLO':'https://www.nme.com/wp-content/uploads/2026/01/RAYE3%402000x1270.jpg',
+           'NME_RED_DUET':'https://www.nme.com/wp-content/uploads/2026/01/RAYE2%402000x1270.jpg',
+           'INTERIA_SMILING':'https://i.iplsc.com/000M8HSPLM9HP25J-C323-F4.webp',
+           'INTERIA_SIDE':'https://i.iplsc.com/000M8HQMVB03DN6W-C429.webp',
+           'TREATMENT_STAGE':'https://images.prismic.io/treatmentstudio/aYscD90YXLCxVpZk_295_RAYE_016.jpg',
+           'TREATMENT_PORTRAIT':'https://images.prismic.io/treatmentstudio/aYscSt0YXLCxVpZx_295_RAYE_06_P.jpg'
+          }
+          for k,u in candidates.items():
+           try:
+            req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0','Accept':'image/avif,image/webp,image/png,image/jpeg,*/*'})
+            with urllib.request.urlopen(req,timeout=25) as r:
+             data=r.read(8_000_000)
+             ctype=r.headers.get('Content-Type','')
+            im=Image.open(BytesIO(data))
+            print('PHOTO_OK',k,im.size,im.mode,ctype,len(data),u)
+           except Exception as e:print('PHOTO_ERROR',k,type(e).__name__,str(e)[:180])
+          PY
