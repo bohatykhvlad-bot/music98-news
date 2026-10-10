@@ -1476,10 +1476,15 @@ function isDailySourceEdition(j){
   if(!j || j.complete!==true) return false;
   if(j.methodology===TRI_CHART_METHOD)
     return j.consensus===TRI_CHART_CONSENSUS &&
-      j.sources?.U===100 && j.sources?.A===100 &&
-      Number.isInteger(j.sources?.S) && j.sources.S>=100 && j.sources.S<=200 &&
+      j.sources?.U===100 &&
+      (j.sources?.A===100 || (j.sources?.A===50 &&
+        j.sourceDetails?.A?.provenance?.source==="official-apple-global-playlist" &&
+        j.sourceDetails?.A?.provenance?.rows===50)) &&
+      j.sources?.S===200 &&
       chartHasTriTracks(j.tracks) &&
+      j.tracks.every(t=>t.sourceRanks?.A==null||t.sourceRanks.A<=j.sources.A) &&
       /^20\d{2}-\d{2}-\d{2}$/.test(j.sourceDates?.S||"") &&
+      j.sourceDates?.U===j.sourceDates?.S && j.sourceDates?.A===j.sourceDates?.S &&
       /^[a-f0-9]{64}$/.test(j.spotifyFingerprint||"");
   return j.methodology===DAILY_CHART_METHOD && j.consensus==="apple-candidates-spotify-boost-v1" &&
     chartHasConsensusTracks(j.tracks) && j.sources?.A===50 && Object.keys(j.sources||{}).length===2 &&
@@ -2621,7 +2626,7 @@ function refreshDailyTop50(){
          Only fully decorated fresh results may be kept as today's browser cache. */
       if(fresh && chartHasCompleteArtwork(tracks,j.methodology))
         lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks,
-          complete:j.complete,methodology:j.methodology,consensus:j.consensus,sources:j.sources,sourceDates:j.sourceDates,spotifyFingerprint:j.spotifyFingerprint}));
+          complete:j.complete,methodology:j.methodology,consensus:j.consensus,sources:j.sources,sourceDetails:j.sourceDetails,sourceDates:j.sourceDates,spotifyFingerprint:j.spotifyFingerprint}));
       applyDaily(tracks, fresh ? "live" : "backup", j.updated);
     })
     .catch(()=>{ if(hasVerifiedCache) applyDaily(cached.tracks,"backup",cached.date);
