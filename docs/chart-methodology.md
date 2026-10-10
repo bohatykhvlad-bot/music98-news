@@ -43,12 +43,28 @@ not a Spotify or Apple-endorsed sales/stream-equivalent chart.
 
 ## Collection and fail-safe behavior
 
-GitHub Actions requests fresh USA and Global Apple Top 100 charts as an
-atomic date-matched pair, then reads Spotify's dated Global Daily ranking.
-Up to 200 Spotify chart entries can bring their own verified daily streams.
-Additional artist pages are checked concurrently to recover Apple-only
-songs. Collection records the number of candidates, verified counts,
-unmatched songs, and each source's edition date.
+GitHub Actions collects the official Apple USA and Global Top 100 **every day**
+and saves two immutable-by-date ranking snapshots. Spotify's Global Daily
+Top 200 (and its numerical daily streams) is also saved under its true
+source date. The collector selects only the **latest common calendar date**
+present in all three archives within the two-day lag window.
+
+On 10 October, the most recently confirmed common date is 8 October:
+Apple USA Top 100 via the dated ChartStats historical archive (100 positions),
+official Apple Global Top 50 recovered from music98's own verified 8 October
+commit (50 positions), and Spotify Global Daily Top 200 from 8 October.
+The initial Global archive is only 50 positions, so the collector does not
+invent positions 51–100: any unlisted song earns no Global ranking points
+for that edition. After 10 October, the daily archive captures all 100
+official Global ranks. Dated third-party Apple history is explicitly marked
+as a historical source, not represented as Apple's official archived API.
+
+Additional artist pages are checked only if their daily edition date
+actually equals the selected chart date. This prevents taking an older
+Spotify chart while accidentally supplementing it with today's artist
+counters. Verified song identities, positions, stream provenance and
+capture dates remain in the source files. Historical input is retained for
+14 days to accommodate source lag, retries and publishing audits.
 
 The publisher rejects stale, malformed, partial and cross-edition input,
 ambiguous IDs, duplicate song/Spotify IDs, missing artwork, broken previews
@@ -56,7 +72,9 @@ and damaged tenure or movement metadata. The worker writes the full
 validated chart LAST, so a failed build never overwrites a good edition.
 
 The source refresh runs every four hours (UTC: 01:45, 05:45, 09:45,
-13:45, 17:45, 21:45). Failure leaves the preceding healthy edition
+13:45, 17:45, 21:45). If no day has all three verified inputs, the
+collector **does not substitute another date**, even if that source is
+newer or older. Failure leaves the preceding healthy edition
 untouched. The next scheduled run retries; an earlier manual refresh is
 also possible. A missing independent Spotify measurement is not filled
 using Apple positions, regional US streams, or synthetic estimates.
