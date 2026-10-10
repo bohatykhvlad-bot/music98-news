@@ -46,7 +46,7 @@
     "D": "official-worldwide-live"
   },
   "sourceDates": {
-    "A": "2026-10-09",
+    "A": "2026-10-10",
     "S": "2026-10-08",
     "D": "2026-10-10"
   },
@@ -152,7 +152,7 @@
       "title": "Choosin' Texas",
       "artist": "Ella Langley",
       "sourceRanks": {
-        "A": 6,
+        "A": 5,
         "S": 31,
         "D": 3
       },
@@ -171,7 +171,7 @@
       "title": "hate that i made you love me",
       "artist": "Ariana Grande",
       "sourceRanks": {
-        "A": 11,
+        "A": 13,
         "S": 23,
         "D": 10
       },
@@ -190,7 +190,7 @@
       "title": "Man I Need",
       "artist": "Olivia Dean",
       "sourceRanks": {
-        "A": 16,
+        "A": 15,
         "S": 13,
         "D": 44
       },
@@ -228,7 +228,7 @@
       "title": "The Fate of Ophelia",
       "artist": "Taylor Swift",
       "sourceRanks": {
-        "A": 18,
+        "A": 19,
         "S": 35,
         "D": 81
       },
@@ -247,7 +247,7 @@
       "title": "drop dead",
       "artist": "Olivia Rodrigo",
       "sourceRanks": {
-        "A": 38,
+        "A": 53,
         "S": 42,
         "D": 60
       },
@@ -266,7 +266,7 @@
       "title": "So Easy (To Fall In Love)",
       "artist": "Olivia Dean",
       "sourceRanks": {
-        "A": 44,
+        "A": 52,
         "S": 45,
         "D": 75
       },
@@ -285,7 +285,7 @@
       "title": "Beautiful Things",
       "artist": "Benson Boone",
       "sourceRanks": {
-        "A": 73,
+        "A": 74,
         "S": 58,
         "D": 67
       },
@@ -300,7 +300,7 @@
       "weeks": 1
     }
   ],
-  "seedEdition": "[[\"A\",\"2026-10-10T07:44:43.599Z\",\"2026-10-09\"],[\"D\",\"2026-10-10T07:44:44.219Z\",\"2026-10-10\"],[\"C\",\"87:88b4def9\"]]",
+  "seedEdition": "[[\"A\",\"2026-10-10T08:12:16.789Z\",\"2026-10-10\"],[\"D\",\"2026-10-10T08:12:17.489Z\",\"2026-10-10\"],[\"C\",\"87:88b4def9\"]]",
   "arrows": {
     "ok": true,
     "bad": 0,
