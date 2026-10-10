@@ -6,6 +6,10 @@ export const TRI_RULE="three-source-union-verified-streams-v3";
 export const TOP_SIZE=50;
 export const SOURCE_SIZE=100;
 export const SPOTIFY_SIZE=200;
+/* The published edition advances once a day (morning window, see
+   publish-window.js); the seed captured that morning must stay valid until
+   the next advance, so tri-source captures are accepted up to three days old. */
+export const TRI_MAX_LAG_DAYS=3;
 
 // Preserve versions and Unicode identities. Apple's catalog and Spotify's
 // credit/title presentation legitimately differ; never join by title alone.
@@ -26,7 +30,7 @@ export function verifiedSpotifyRow(s,date){
   ["kworb-spotify-artist-daily","kworb-spotify-chart-global-daily"].includes(s.metric);
 }
 export function verifiedTriCandidates(rows,date) {
- if(!Array.isArray(rows)||rows.length<100||rows.length>400||!freshDay(date))return false;
+ if(!Array.isArray(rows)||rows.length<100||rows.length>400||!freshDay(date,Date.now(),TRI_MAX_LAG_DAYS))return false;
  const keys=new Set(),ids=new Set(),positions={U:new Set(),A:new Set(),S:new Set()};
  return rows.every(t=>{
   const key=songIdentity(t.title,t.artist),r=t.sourceRanks||{};
@@ -46,9 +50,9 @@ export function verifiedTriCandidates(rows,date) {
 }
 export function verifiedTriSeed(s,now=Date.now()){
  if(s?.schema!==3||s.methodology!==TRI_METHOD||
-  !freshDay(s.appleUsDate,now)||s.appleUsDate!==s.appleGlobalDate||
+  !freshDay(s.appleUsDate,now,TRI_MAX_LAG_DAYS)||s.appleUsDate!==s.appleGlobalDate||
   s.appleUsDate!==s.spotifyDate||
-  !freshDay(s.spotifyDate,now)||!/^[a-f0-9]{64}$/.test(s.fingerprint||"")||
+  !freshDay(s.spotifyDate,now,TRI_MAX_LAG_DAYS)||!/^[a-f0-9]{64}$/.test(s.fingerprint||"")||
   !verifiedTriCandidates(s.tracks,s.spotifyDate))return null;
  const hits=s.tracks.filter(t=>t.spotify.status==="matched").length;
  if(hits<50||hits!==s.coverage?.matched||s.coverage?.candidates!==s.tracks.length ||

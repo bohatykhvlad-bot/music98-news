@@ -4,6 +4,7 @@ import {datedChartPath,verifiedDatedApple,verifiedDatedSpotify} from "../functio
 import {KWORB_ARTISTS_URL,artistKey,htmlText,parseKworbArtists,
  parseKworbArtistDaily,matchKworbTrack,freshDay,parseKworbGlobalStreams} from "../functions/lib/apple-spotify-chart.js";
 import {TRI_METHOD,verifiedTriSeed,songIdentity} from "../functions/lib/tri-source-chart.js";
+import {shouldPublishSeed} from "../functions/lib/publish-window.js";
 
 const ROOT=new URL("../public/data/",import.meta.url);
 const OUT=new URL("apple-spotify-streams.json",ROOT);
@@ -164,15 +165,24 @@ if(old?.schema===3 && old.spotifyDate>chosen)
  throw new Error("Refusing to roll back a later published edition");
 if(old?.schema===3&&old.spotifyDate===chosen&&old.coverage?.matched>matched+8)
  throw new Error("Unexpected lost Spotify coverage on same chart date");
-if(old?.fingerprint!==fingerprint){
+/* Publication cadence: the seed the site reads advances at most once a day,
+   in the morning window; every other run only tops up dated archives. */
+const decision=shouldPublishSeed({previousDate:old?.schema===3?old.spotifyDate:null,
+ nowMs:Date.now(),forced:process.env.TRI_FORCE_PUBLISH==="1"});
+const changed=old?.fingerprint!==fingerprint;
+if(changed&&decision.publish){
  const tmp=new URL(".apple-spotify-streams.tmp",ROOT);
  fs.writeFileSync(tmp,JSON.stringify(payload,null,2)+"\n");
  fs.renameSync(tmp,OUT);
+}else if(changed){
+ console.log("TRI_PUBLICATION_DEFERRED",JSON.stringify({chosen,previous:old?.spotifyDate||null,
+  age:decision.age,reason:decision.reason}));
 }
 console.log("TRI_SOURCE_DATE_ALIGNED",JSON.stringify({
  editionDate:chosen,latestSpotifyDate:latest.date,appleUsRows:us.tracks.length,
  appleGlobalRows:global.tracks.length,spotifyRows:spotify.tracks.length,
  candidates:tracks.length,matched,missing:tracks.length-matched,
  artistRecovered:recovered,appleSource:us.source,
+ published:Boolean(changed&&decision.publish),
  allDatesEqual:payload.appleUsDate===payload.appleGlobalDate&&payload.spotifyDate===payload.appleUsDate
 }));

@@ -79,5 +79,14 @@ untouched. The next scheduled run retries; an earlier manual refresh is
 also possible. A missing independent Spotify measurement is not filled
 using Apple positions, regional US streams, or synthetic estimates.
 
+The published edition itself advances to a newer common date at most once
+per day, and that advance is taken in the morning window (UTC 05:00–09:59,
+≈08:00–13:00 Kyiv): the 05:45 and 09:45 runs may publish, while every other
+run only tops up the dated archives. The previously published snapshot stays
+acceptable to the publisher until the next morning advance, so a deferred
+top-up can never freeze the site; if both morning attempts are missed, the
+following run performs the advance as a catch-up. A manual override for an
+immediate advance is `TRI_FORCE_PUBLISH=1`.
+
 Historical NEW/RE-ENTRY, arrows, and days are carried forward under the
 existing continuity rules even when the scoring methodology changes.
