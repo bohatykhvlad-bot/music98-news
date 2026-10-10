@@ -888,9 +888,10 @@ textarea{resize:vertical;min-height:64px}
    section-bottom gaps at desktop widths. JS measures the shared panel height
    and adjusts only this section's top inset, leaving the 450px embed intact. */
 #tab-discover{padding-top:var(--discover-heading-top,var(--section-heading-top));padding-bottom:12px}
-/* The Discover canvas ends at the tab boundary. The shared Subscribe top
-   margin otherwise exposes a white strip between the ambient and the next section. */
-body.discover-ambient-visible .subscribe{margin-top:0}
+/* The Discover canvas is extended down across the shared Subscribe top
+   margin (see discover-ambient.js resize): the next section keeps the exact
+   same offset as on Releases, and no white strip shows between the ambient
+   and the subscribe card. */
 
 #tab-discover .discover-layout{--discover-row-inset:0px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(4 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
 #tab-discover .discover-heading{grid-area:1/1/2/4;text-align:center;width:100%;margin-bottom:0}

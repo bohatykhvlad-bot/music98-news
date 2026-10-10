@@ -255,8 +255,14 @@
     // background around a source that jumps through viewport coordinates.
     const rect=stage?.getBoundingClientRect();
     const panelRect=panel?.getBoundingClientRect();
+    const subscribeTop=document.querySelector(".subscribe")?.getBoundingClientRect().top;
     width=Math.max(1,document.documentElement.clientWidth);
-    height=Math.max(1,panelRect?.height ? panelRect.bottom+scrollY : innerHeight);
+    /* The canvas ends at the Subscribe card's top edge - the section's own
+       bottom plus its shared top margin - so the next block sits at the same
+       height as on Releases while no white strip shows on Discover. */
+    const panelBottom=panelRect?.height ? panelRect.bottom+scrollY : innerHeight;
+    height=Math.max(1,Number.isFinite(subscribeTop)&&subscribeTop>0
+      ? Math.max(panelBottom,subscribeTop+scrollY) : panelBottom);
     if(rect?.width&&rect.height){
       sourceBounds=[rect.left+scrollX+rect.width/2,rect.top+scrollY+rect.height/2,rect.width/2,rect.height/2];
     }
