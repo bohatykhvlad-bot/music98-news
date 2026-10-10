@@ -1479,7 +1479,7 @@ function isDailySourceEdition(j){
       j.sources?.U===100 && j.sources?.A===100 &&
       Number.isInteger(j.sources?.S) && j.sources.S>=100 && j.sources.S<=200 &&
       chartHasTriTracks(j.tracks) &&
-      /^20\\d{2}-\\d{2}-\\d{2}$/.test(j.sourceDates?.S||"") &&
+      /^20\d{2}-\d{2}-\d{2}$/.test(j.sourceDates?.S||"") &&
       /^[a-f0-9]{64}$/.test(j.spotifyFingerprint||"");
   return j.methodology===DAILY_CHART_METHOD && j.consensus==="apple-candidates-spotify-boost-v1" &&
     chartHasConsensusTracks(j.tracks) && j.sources?.A===50 && Object.keys(j.sources||{}).length===2 &&
