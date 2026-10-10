@@ -87,7 +87,7 @@ test("fresh Apple fallback also requires an intact Top 50",()=>{
  assert.doesNotMatch(top50,/rss.applemarketingtools.com/);
 });
 test("the Worker rejects obsolete three-source cache and refreshes when streams change",()=>{
- assert.match(top50,/const verified=verifiedStreamSeed\(streamSeed\)/);
+ assert.match(top50,/const verified=verifiedTriSeed\(streamSeed\)\|\|verifiedUsStreamSeed\(streamSeed\)\|\|verifiedStreamSeed\(streamSeed\)/);
  assert.match(top50,/cached.sourceDates\?\.S===verified.spotifyDate/);
  assert.match(top50,/cached.spotifyFingerprint===verified.fingerprint/);
  assert.match(top50,/const TOP50_KV = "top50v39"/);
