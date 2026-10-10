@@ -353,6 +353,7 @@
   addEventListener("blur",()=>{pointer.targetStrength=0;});
   addEventListener("pointerout",e=>{if(!e.relatedTarget)pointer.targetStrength=0;});
   addEventListener("resize",queueLayout,{passive:true});
+  panel?.addEventListener("animationend",queueLayout);
   // Let the compositor scroll the cached texture without competing with
   // full-canvas shader draws. Resume its clock without a catch-up jump.
   addEventListener("scroll",()=>{
