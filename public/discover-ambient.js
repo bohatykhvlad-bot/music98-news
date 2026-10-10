@@ -77,8 +77,8 @@
       float influence=exp(-dot(delta,delta)/.085)*pointer.z;
       // Bend the existing current with a softened version of the original
       // vortex. Its bounded displacement never creates a separate cloud.
-      vec2 nudge=(vec2(-delta.y,delta.x)*.48-delta*.12)*influence;
-      p+=clamp(nudge,vec2(-27.2916/viewport.y),vec2(27.2916/viewport.y));
+      vec2 nudge=(vec2(-delta.y,delta.x)*.408-delta*.102)*influence;
+      p+=clamp(nudge,vec2(-23.19786/viewport.y),vec2(23.19786/viewport.y));
       float t=time*.25;
       vec2 centre=source.xy/viewport.y, size=source.zw/viewport.y;
       vec2 nearest=clamp(p,centre-size,centre+size);
@@ -118,13 +118,20 @@
       vec2 dots=sparkle(lights,viewport.y/15.,3.);
       vec2 motes=sparkle(lights,viewport.y/28.,89.);
       float depth=smoothstep(.30,.8,volume);
-      vec3 blue=tintBlue, cyan=tintCyan, mineral=tintMineral;
-      vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23));
-      colour=mix(colour,mineral,clamp(smoothstep(.48,.86,lanes)*.25+crests*.04,0.,.65));
-      // Lit grains sit within the volume, with a wider glow beneath it.
-      colour=mix(colour,vec3(.98,.98,.98),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.14,0.,.8));
+      // Neutral grey moving structure is ALWAYS visible, including for
+      // monochrome or white album covers. Artwork colours tint the currents
+      // rather than replacing the base with dark/flat album pixels.
+      vec3 neutral=mix(vec3(.31,.36,.39),vec3(.71,.75,.77),
+                       smoothstep(.16,.88,volume*.62+lanes*.27+crests*.11));
+      vec3 album=mix(tintBlue,tintCyan,smoothstep(.12,.85,warp.x+p.y*.23));
+      album=mix(album,tintMineral,clamp(smoothstep(.48,.86,lanes)*.25,0.,.4));
+      float chroma=max(album.r,max(album.g,album.b))-min(album.r,min(album.g,album.b));
+      float tint=clamp(chroma*2.1,0.,.62) * (.45+.55*smoothstep(.28,.78,lanes));
+      vec3 colour=mix(neutral,album,tint);
+      // White/muted records still preserve visible grey ridges and glow.
+      colour=mix(colour,vec3(.95,.96,.97),clamp(dots.x*.31+dots.y*.34+motes.y*.25,0.,.52));
       float breathing=1.+.025*sin(time*.55);
-      float alpha=(body*(.405+grain*.03)+haze+dots.y*body*.12)*(1.+energy*.18)*breathing;
+      float alpha=(body*(.49+grain*.04)+haze+dots.y*body*.12)*(1.+energy*.18)*breathing;
       alpha+=(dots.x*.025+dots.y*.04+motes.x*.035+motes.y*.04)*body;
       gl_FragColor=vec4(colour,clamp(alpha,0.,.65));
     }
@@ -189,21 +196,21 @@
       ctx.setTransform(surface.width/width,0,0,surface.height/height,0,0);
       ctx.clearRect(0,0,width,height);
       const rgba=(c,a)=>`rgba(${c.map(v=>Math.round(v*255)).join(',')},${a})`;
-      ctx.fillStyle=rgba(palette[1],.06+.005*Math.sin(clock*.25));
+      ctx.fillStyle=rgba([.50,.55,.58],.065+.006*Math.sin(clock*.25));
       ctx.fillRect(0,0,width,height);
       const [sourceX,sourceY,halfWidth,halfHeight]=playerSource();
       const centres=[[sourceX,sourceY,width*.65,height*.8]];
       for(const [x,y,rx,ry] of centres){
         ctx.save();ctx.translate(x,y);ctx.scale(rx,ry);
         const glow=ctx.createRadialGradient(0,0,0,0,0,1);
-        glow.addColorStop(0,rgba(palette[0],.12+energy*.04));
-        glow.addColorStop(.45,rgba(palette[1],.08));glow.addColorStop(1,rgba(palette[1],0));
+        glow.addColorStop(0,rgba(palette[0].map((v,i)=>.5*v+.5*[.42,.46,.49][i]),.15+energy*.04));
+        glow.addColorStop(.45,rgba([.56,.6,.62],.10));glow.addColorStop(1,rgba(palette[1],0));
         ctx.fillStyle=glow;ctx.fillRect(-1,-1,2,2);ctx.restore();
       }
-      ctx.save();ctx.shadowBlur=32;ctx.shadowColor=rgba(palette[1],.12);
+      ctx.save();ctx.shadowBlur=32;ctx.shadowColor=rgba([.48,.53,.57],.18);
       for(let i=0;i<3;i++){
         const travel=(clock*.045+i/3)%1,spread=travel*Math.max(width,height)*.5;
-        ctx.strokeStyle=rgba(palette[1],(1-travel)*(.02+energy*.015));
+        ctx.strokeStyle=rgba([.43,.48,.51],(1-travel)*(.032+energy*.017));
         ctx.lineWidth=32+spread*.06;ctx.beginPath();
         if(ctx.roundRect)ctx.roundRect(sourceX-halfWidth-spread,sourceY-halfHeight-spread,
           (halfWidth+spread)*2,(halfHeight+spread)*2,24+spread);
@@ -268,7 +275,7 @@
     if(!active||motion.matches||!precisePointer.matches||!Number.isFinite(x)||!Number.isFinite(y))return;
     pointer.targetX=clamp(x,0,innerWidth)+scrollX;pointer.targetY=clamp(y,0,innerHeight)+scrollY;
     if(pointer.strength<.01){pointer.x=pointer.targetX;pointer.y=pointer.targetY;}
-    pointer.targetStrength=.42253245;pointerLastMove=performance.now();
+    pointer.targetStrength=.3591525825;pointerLastMove=performance.now();
   }
   function loop(ts) {
     frame=0;
