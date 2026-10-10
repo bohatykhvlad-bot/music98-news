@@ -10,6 +10,7 @@ on:
       - "functions/lib/tri-source-chart.js"
       - "functions/lib/chart-history.js"
       - "scripts/backfill-chart-history.mjs"
+      - "scripts/prune-chart-history.mjs"
       - "public/data/chart-history/**"
       - "tests/tri-source-chart.test.mjs"
       - "tests/tri-source-worker-integration.test.mjs"
@@ -40,7 +41,9 @@ jobs:
       - name: Prepare verified Apple media for Spotify-only Top 50 entrants
         run: node scripts/resolve-tri-apple-media.mjs
       - name: Validate three-source identity, weights, rank continuity and Spotify numbers
-        run: node --test tests/tri-source-*.test.mjs
+        run: node --test tests/tri-source-*.test.mjs tests/chart-history.test.mjs
+      - name: Retain only 14 days of dated source snapshots
+        run: node scripts/prune-chart-history.mjs
       - name: Commit verified chart snapshots (regenerate after competing pushes)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,8 +59,9 @@ jobs:
             node scripts/refresh-apple-ranking.mjs
             node scripts/refresh-apple-spotify-streams.mjs
             node scripts/resolve-tri-apple-media.mjs
-            node --test tests/tri-source-*.test.mjs
-            git add public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json public/data/chart-history/
+            node --test tests/tri-source-*.test.mjs tests/chart-history.test.mjs
+            node scripts/prune-chart-history.mjs
+            git add -A public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json public/data/chart-history/
             if git diff --cached --quiet; then
               echo "Current main already has matching verified sources"
               exit 0
