@@ -17,7 +17,7 @@ const setup=sliceBetween(site,"const DAILY_CHART_METHOD =","const APPLE_AT =");
 const validators=sliceBetween(site,"function chartHasConsensusTracks(tracks){","function refreshDailyTop50(){");
 const context=vm.createContext({
  URL,Number,Set,Map,
- normText:s=>String(s||"").normalize("NFKD").toLowerCase().replace(/[^\\p{L}\\p{N}]+/gu,""),
+ normText:s=>String(s||"").normalize("NFKD").toLowerCase().replace(/[^\p{L}\p{N}]+/gu,""),
 });
 vm.runInContext(setup+"\n"+validators,context,{timeout:500});
 function validates(method,chart) {
