@@ -887,17 +887,17 @@ textarea{resize:vertical;min-height:64px}
    The desktop Releases / Discover white-area height is synchronized in JS. */
 #tab-discover{padding-bottom:12px}
 #tab-discover.rise{animation:none}
-#tab-discover .discover-layout{--discover-row-inset:30px;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
-#tab-discover .discover-heading{grid-area:1/1;text-align:center;width:100%;margin-bottom:0}
-#tab-discover .discover-copy{grid-area:2/1;align-self:center;min-width:0;width:calc((100% - 660px)/2 - 16px);min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
-#tab-discover .discover-intro{grid-area:2/1;align-self:center;justify-self:end;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:center;width:calc((100% - 660px)/2 - 16px);max-width:100%}
+#tab-discover .discover-layout{--discover-row-inset:12px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(2 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
+#tab-discover .discover-heading{grid-area:1/1/2/4;text-align:center;width:100%;margin-bottom:0}
+#tab-discover .discover-copy{grid-area:2/1;align-self:center;min-width:0;width:100%;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
+#tab-discover .discover-intro{grid-area:2/3;align-self:center;min-width:0;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;max-width:100%}
 #tab-discover .discover-selected{display:flex;flex-direction:column;gap:4px;width:100%;max-width:100%}
 #tab-discover .discover-selected[hidden]{display:none!important}
 #tab-discover .discover-artist{font-size:clamp(23px,2.6vw,32px);font-weight:800;color:var(--text);line-height:1.16;letter-spacing:-.035em;margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-album{font-size:17px;font-weight:500;line-height:1.3;color:var(--muted);margin:0;overflow-wrap:anywhere}
 #tab-discover .discover-details{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);margin:0}
 #tab-discover .discover-details span+span:not(:empty):before{content:"·";margin-right:9px}
-#tab-discover .discover-stage{grid-area:2/1;align-self:center;justify-self:center;position:relative;isolation:isolate;min-width:0;width:100%;max-width:660px;padding-top:var(--discover-row-inset);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px}
+#tab-discover .discover-stage{grid-area:2/2;align-self:center;justify-self:center;position:relative;isolation:isolate;min-width:0;width:100%;max-width:660px;padding-top:var(--discover-row-inset);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px}
 #tab-discover .discover-card{z-index:1}
 /* Discover-only document ambience. The canvas is always click-through and
    sits behind the site UI; it never shifts the player or affects other tabs. */
@@ -912,7 +912,13 @@ body.discover-ambient-visible #discoverAmbient{opacity:1;visibility:visible}
 #tab-discover .discover-status{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 #tab-discover #discoverFind{color:var(--text);font-weight:600;align-self:center;margin-top:0}
 @media(hover:hover) and (pointer:fine){#tab-discover #discoverFind:hover{color:#03282b}#tab-discover #discoverFind:hover::before{background:var(--accent);border-color:var(--accent)}}
-@media(min-width:1161px){#tab-discover .discover-artist{font-size:26px}}
+@media(min-width:1161px){
+  #tab-discover .discover-artist{font-size:26px}
+  #tab-discover .discover-copy{align-items:flex-end}
+  #tab-discover .discover-selected{width:max-content}
+  #tab-discover .discover-intro{align-items:flex-start}
+  #tab-discover #discoverFind{align-self:flex-start}
+}
 @media(max-width:1160px){
   #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px;height:auto}
   #tab-discover .discover-heading{margin-bottom:0}
@@ -2865,10 +2871,9 @@ function queueEqualizeBrowsePanels(){
       if (discoverLayout && window.matchMedia("(min-width:1161px)").matches) {
         const style = getComputedStyle(panes[1]);
         const top = parseFloat(style.paddingTop), bottom = parseFloat(style.paddingBottom);
-        const subscribeGap = parseFloat(getComputedStyle(document.querySelector(".subscribe")).marginTop);
-        // Include the white clearance before Subscribe in the lower gap, while
-        // keeping the player and both side columns within the shared panel.
-        discoverLayout.style.setProperty("--discover-row-inset", (bottom + subscribeGap) + "px");
+        // Balance the player between the heading and Discover's own lower
+        // edge. Subscribe's external margin belongs to the following section.
+        discoverLayout.style.setProperty("--discover-row-inset", bottom + "px");
         discoverLayout.style.setProperty("--discover-layout-height", (height - top - bottom) + "px");
       }
     }

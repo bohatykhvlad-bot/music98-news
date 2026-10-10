@@ -592,7 +592,7 @@ function points(pos,size=SIZE) {
 
 async function getText(url) {
   const r = await fetch(url, {
-    headers: { "User-Agent": UA },
+    headers: { "User-Agent": UA, "Cache-Control": "no-cache" },
     signal: AbortSignal.timeout(8000),
   });
   if (!r.ok) throw new Error(String(r.status));

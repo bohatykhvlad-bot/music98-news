@@ -4,7 +4,7 @@ const output=new URL("../public/data/apple-chart.json",import.meta.url);
 let chart,lastError;
 for(let attempt=0;attempt<3;attempt++){
  try{
-   const r=await fetch(APPLE_GLOBAL_URL,{headers:{"user-agent":"Mozilla/5.0 (compatible; music98-chart-source/2.0)"},
+   const r=await fetch(APPLE_GLOBAL_URL,{headers:{"user-agent":"Mozilla/5.0 (compatible; music98-chart-source/2.0)","cache-control":"no-cache"},
      signal:AbortSignal.timeout(12000)});
    if(!r.ok)throw new Error("Apple Global HTTP "+r.status);
    chart=parseAppleGlobal(await r.text(),SOURCE_SIZE);break;
