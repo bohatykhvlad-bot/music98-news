@@ -50,6 +50,50 @@ export function parseKworbArtistDaily(html,artist){
  if(!tracks.length)throw new Error('kworb_empty_artist_page');
  return {date,tracks};
 }
+/* Supplementary source: Spotify Global DAILY CHART's Streams column.
+   This is a chart-filtered play count, unlike artist-page Daily totals.
+   Keep the provenance separate; never silently label it as artist Daily. */
+export function parseKworbGlobalStreams(html){
+ const h=String(html||"");
+ if(!/Spotify Daily Chart\s*-\s*Global/i.test(h.slice(0,5000)))throw new Error("kworb_wrong_global_chart");
+ const dateMatch=h.match(/\b(20\d{2})[\/-](\d{2})[\/-](\d{2})\b/);
+ const date=dateMatch?[dateMatch[1],dateMatch[2],dateMatch[3]].join("-"):"";
+ if(!freshDay(date))throw new Error("kworb_global_chart_stale");
+ const table=[...h.matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)]
+   .find(m=>/Artist and Title/i.test(m[1])&&/>\s*Streams\s*</i.test(m[1]));
+ if(!table)throw new Error("kworb_global_chart_table_missing");
+ const headers=[...table[1].matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map(m=>htmlText(m[1]));
+ const col=headers.findIndex(x=>x==="Streams");
+ if(col<0)throw new Error("kworb_global_stream_column_missing");
+ const tracks=[];
+ for(const row of table[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)){
+  const cells=[...row[1].matchAll(/<td\b([^>]*)>([\s\S]*?)<\/td>/gi)];
+  if(cells.length<=col)continue;
+  const pos=Number(htmlText(cells[0][2]));
+  if(!Number.isInteger(pos)||pos<1||pos>200)continue;
+  const label=htmlText(cells[2]?.[2]||"");
+  const cut=label.indexOf(" - ");
+  if(cut<1)continue;
+  const dailyText=htmlText(cells[col][2]);
+  const daily=/^\d[\d,]*$/.test(dailyText)?Number(dailyText.replaceAll(",","")):null;
+  const spotifyId=cells[2][2].match(/\/track\/([A-Za-z0-9]{22})(?:\.html|[?"'])/i)?.[1]||
+    cells[2][2].match(/spotify\.com\/track\/([A-Za-z0-9]{22})/i)?.[1]||null;
+  if(!Number.isSafeInteger(daily)||daily<0)continue;
+  tracks.push({pos,artist:label.slice(0,cut),title:label.slice(cut+3),daily,spotifyId});
+ }
+ if(!tracks.length)throw new Error("kworb_global_daily_empty");
+ return {date,tracks};
+}
+export function matchKworbGlobal(apple,chart){
+ if(!chart?.tracks)return null;
+ const artist=artistKey(leadingArtist(apple.artist));
+ const hits=chart.tracks.filter(t=>titleKey(t.title)===titleKey(apple.title)&&
+  versionSignature(t.title)===versionSignature(apple.title)&&
+  artistKey(leadingArtist(t.artist))===artist&&t.spotifyId);
+ const ids=new Set(hits.map(t=>t.spotifyId));
+ return ids.size===1?hits[0]:null;
+}
+
 export function matchKworbTrack(apple,page){
  // The page is resolved by the full leading artist, not an ambiguous title-only search.
  const same=t=>titleKey(t.title)===titleKey(apple.title)&&versionSignature(t.title)===versionSignature(apple.title);
