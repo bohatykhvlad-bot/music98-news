@@ -141,15 +141,14 @@ async function applyCovers(env, tracks, origin, {retainTrusted = false, preferAp
     const strict = artworkKey(t.title, t.artist);
     const legacy = mergeKey(t.title, t.artist); // rollout compatibility alias
     const chosen = seed[strict] || seed[legacy] || "";
-    /* During a NEW build only Apple-provided art can bridge a lagging audited
-       registry. An already published, complete snapshot may also preserve its
-       previously verified Deezer artwork instead of losing it on redecorate. */
-    const sourceApple=isAppleArt(t.art)?t.art:"";
+    /* The audited registry is the single source of truth once it carries an
+       entry for the song: the daily artwork audit prefers a clean Apple
+       release and falls back to a cross-checked Deezer pick only when Apple
+       has none. Runtime-only art may bridge a lagging registry (new rows),
+       never silently disagree with it — verify-live-artwork enforces exact
+       equality between the published registry and the live chart. */
     const temporary = !chosen && (retainTrusted ? isTrustedChartArtwork(t.art) : isAppleArt(t.art)) ? t.art : "";
-    // v3 already has exact Apple art for all 50 finalists. Never replace
-    // that official cover with an old Deezer registry entry during transition.
-    t.art=preferApple && sourceApple && !isAppleArt(chosen) ? sourceApple :
-      chosen && isTrustedChartArtwork(chosen) ? chosen : temporary;
+    t.art = chosen && isTrustedChartArtwork(chosen) ? chosen : temporary;
   }
   return tracks;
 }
