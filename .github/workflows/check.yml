@@ -104,6 +104,38 @@ jobs:
             tracks:v.tracks.map(t=>[t.pos,t.title,t.artist])
           }))));
           NODE
+      - name: Compare the original Deezer chart endpoint with the curated playlist
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          import {mergeKey} from "./functions/lib/chart-identity.js";
+          const a=JSON.parse(fs.readFileSync("public/data/apple-chart.json","utf8"));
+          const s=JSON.parse(fs.readFileSync("public/data/spotify-chart.json","utf8"));
+          const apple=new Set(a.tracks.map(x=>mergeKey(x.title,x.artist)));
+          const spotify=new Set(s.tracks.map(x=>mergeKey(x.title,x.artist)));
+          for(const limit of [100,200]){
+            try{
+              const url="https://api.deezer.com/chart/0/tracks?limit="+limit;
+              const res=await fetch(url,{headers:{"user-agent":"Mozilla/5.0"},
+                signal:AbortSignal.timeout(14000)});
+              if(!res.ok)throw Error("HTTP "+res.status);
+              const j=await res.json();
+              if(j.error)throw Error(JSON.stringify(j.error));
+              const tracks=(j.data||[]).map((x,i)=>({
+                pos:x.position||i+1,title:x.title_short||x.title,artist:x.artist?.name||""
+              }));
+              const triple=tracks.filter(x=>apple.has(mergeKey(x.title,x.artist)) &&
+                spotify.has(mergeKey(x.title,x.artist)));
+              const pairA=tracks.filter(x=>apple.has(mergeKey(x.title,x.artist))).length;
+              const pairS=tracks.filter(x=>spotify.has(mergeKey(x.title,x.artist))).length;
+              console.log("ORIGINAL_DEEZER_CHART_COMPARISON",JSON.stringify({
+                requested:limit,count:tracks.length,total:j.total,next:!!j.next,
+                appleOverlap:pairA,spotifyOverlap:pairS,triple:triple.length,
+                triplePreview:triple.slice(0,15),firstFive:tracks.slice(0,5)
+              }));
+            }catch(e){console.log("ORIGINAL_DEEZER_CHART_UNAVAILABLE",limit,String(e));}
+          }
+          NODE
       - name: Build a daily edition using isolated in-memory history
         run: |
           node scripts/build-daily-chart-preview.mjs /tmp/daily-top50.json
