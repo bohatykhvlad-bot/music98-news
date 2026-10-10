@@ -1,4 +1,4 @@
-name: RAYE approved editorial draft creation
+name: RAYE editorial draft final verification
 on:
   push:
     branches:
@@ -43,21 +43,19 @@ jobs:
       - name: Local mechanical preflight
         run: |
           python scripts/preflight.py --post raye26royalalbertsymphony --file .github/editorial-drafts/raye-royal-albert-hall-2026.json --min-words 400
-      - name: Import original verified press portrait from The Orchard Japan
+      - name: Verify saved Cloudflare draft using guarded reader
         run: |
-          python scripts/post.py photo --url 'https://prcdn.freetls.fastly.net/release_image/55377/1691/55377-1691-efa29c5aaf67fc596beb31d2beef6fb4-1500x1000.jpg' --name raye-royal-albert-hall-aliyah-otchere-2026.jpg
-      - name: Create Cloudflare editorial draft through mandatory guarded runner
-        run: |
-          python scripts/post.py create --file .github/editorial-drafts/raye-royal-albert-hall-2026.json
+          python scripts/post.py show raye26royalalbertsymphony > /tmp/raye-saved-post.txt
+          grep -q 'status draft' /tmp/raye-saved-post.txt
       - name: Post-save read-back and double mechanical gate
         run: |
           python scripts/post.py preflight raye26royalalbertsymphony
           python scripts/post.py gate raye26royalalbertsymphony
           python - <<'PY'
-          import os, json,urllib.request
-          key=os.environ['ADMIN_PASSWORD']
-          req=urllib.request.Request('https://music98.news/api/desk',headers={'X-Admin-Key':key,'Cache-Control':'no-cache'})
-          with urllib.request.urlopen(req,timeout=35) as r: desk=json.load(r)
+          import json,sys
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          desk=desk_read()
           expected=json.load(open('.github/editorial-drafts/raye-royal-albert-hall-2026.json',encoding='utf-8'))
           found=[p for p in desk['posts'] if p.get('id')==expected['id']]
           assert len(found)==1 and found[0]['status']=='draft'
