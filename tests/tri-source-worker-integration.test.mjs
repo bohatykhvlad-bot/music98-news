@@ -18,7 +18,7 @@ function setup(){
    metric:"kworb-spotify-chart-global-daily"}
  }));
  const seed={schema:3,methodology:TRI_METHOD,appleUsDate:today,appleGlobalDate:today,spotifyDate:today,
-  fingerprint:"a".repeat(64),sourceSizes:{U:100,A:100,S:100},
+  fingerprint:"a".repeat(64),sourceSizes:{U:100,A:100,S:200},
   coverage:{candidates:100,matched:100,unmatched:0},tracks:spotify};
  const backup={schema:1,current:{updated:yesterday,week:Math.floor((Date.now()-Date.UTC(2026,8,17))/86400000)-1,
   complete:true,sources:{A:50,S:50,D:50,B:50,Y:50},
@@ -62,7 +62,7 @@ test("Worker publishes complete 40/30/30 chart with 50 real daily Spotify stream
   assert.ok(isTriChart(json));
   assert.equal(json.methodology,TRI_METHOD);assert.equal(json.consensus,TRI_RULE);
   assert.equal(json.tracks.length,50);
-  assert.deepEqual(json.sources,{U:100,A:100,S:100});
+  assert.deepEqual(json.sources,{U:100,A:100,S:200});
   assert.ok(json.tracks.every(t=>t.spotify.status==="matched"&&Number.isSafeInteger(t.spotify.daily)
     &&t.art.includes("mzstatic.com")&&t.url.includes("music.apple.com")));
   assert.equal(f.writes.at(-1),"top50v39");
@@ -71,7 +71,7 @@ test("Worker publishes complete 40/30/30 chart with 50 real daily Spotify stream
  });
 });
 test("Apple source mismatch blocks publishing a mixed-date or mixed-candidate ranking",async()=>{
- const f=setup();f.assets["apple-us-chart.json"].tracks[0].title="Wrong US candidate";
+ const f=setup();f.assets["apple-us-"+new Date().toISOString().slice(0,10)+".json"].tracks[0].title="Wrong US candidate";
  await runWithNetworkDown(async()=>{
   const response=await onRequestGet({env:f.env,request:req()});
   assert.equal(response.status,503);
