@@ -8,9 +8,9 @@ const top50=readFileSync(new URL("../functions/api/top50.js",import.meta.url),"u
 test("cached Top 50 refreshes only display metadata/artwork before response",()=>{
   assert.match(top50,/async function decorateCachedTop50\(env, payload, origin\)/);
   assert.match(top50,/await applyNames\(env, payload\.tracks, origin\)/);
-  assert.match(top50,/await applyCovers\(env, payload\.tracks, origin, \{retainTrusted:true\}\)/);
+  assert.match(top50,/await applyCovers\(env, payload\.tracks, origin, \{retainTrusted:true,preferApple:payload\.methodology===TRI_METHOD\}\)/);
   assert.match(top50,/const decorated=await decorateCachedTop50\(env, cached, origin\)/);
-  assert.match(top50,/if\(hasCompleteChartArtwork\(decorated\.tracks\)\)return top50Response\(decorated\)/);
+  assert.match(top50,/if\(hasCompleteChartArtwork\(decorated\.tracks\)\)\{/);
   assert.doesNotMatch(top50,/decorateCachedTop50[\s\S]{0,600}sort\(/);
   assert.doesNotMatch(top50,/decorateCachedTop50[\s\S]{0,600}rank\s*=/);
 });
@@ -25,7 +25,7 @@ test("server Apple fallback keeps lead artist and never retries title-only",()=>
 
 
 test("current-day cached chart self-heals missing artwork without changing ranking",()=>{
-  assert.match(top50,/async function healMissingArtwork\(env, tracks, origin\)/);
+  assert.match(top50,/async function healMissingArtwork\(env, tracks, origin, \{preferApple=false\}=\{\}\)/);
   assert.match(top50,/await enrichArtByIds\(tracks\)/);
   assert.match(top50,/const stillMissing = tracks\.filter\(\(t\) => !t\.art\)/);
   assert.match(top50,/await enrichApple\(stillMissing\)/);
@@ -109,7 +109,7 @@ test("all 50 covers are a hard publication gate, including current-day KV and fa
   assert.match(top50,/if\(fallback && hasCompleteChartArtwork\(fallback\.tracks\)\)/);
   assert.match(top50,/if\s*\(hasCompleteChartArtwork\(v\.tracks\)\) return v/);
   assert.match(top50,/hasCompleteChartArtwork\(saved\.tracks\) \? saved/);
-  assert.match(top50,/if\(hasCompleteChartArtwork\(decorated\.tracks\)\)return top50Response\(decorated\)/);
+  assert.match(top50,/if\(hasCompleteChartArtwork\(decorated\.tracks\)\)\{/);
 });
 
 test("artwork audit can inspect future chart without publishing it to KV",()=>{
@@ -123,10 +123,10 @@ test("artwork audit can inspect future chart without publishing it to KV",()=>{
 
 test("browser accepts only fully imaged chart editions and can retain a prior verified edition",()=>{
   const html=readFileSync(new URL("../public/index.html",import.meta.url),"utf8");
-  assert.match(html,/function chartHasCompleteArtwork\(tracks\)/);
-  assert.match(html,/if\(!isDailySourceEdition\(j\) \|\| !chartHasCompleteArtwork\(tracks\)\) throw new Error\("incomplete_chart_artwork"\)/);
+  assert.match(html,/function chartHasCompleteArtwork\(tracks,methodology\)/);
+  assert.match(html,/if\(!isDailySourceEdition\(j\) \|\| !chartHasCompleteArtwork\(tracks,j\.methodology\)\) throw new Error\("incomplete_chart_artwork"\)/);
   assert.match(html,/if\(hasVerifiedCache\) applyDaily\(cached\.tracks,"backup",cached\.date\)/);
-  assert.match(html,/if\(fresh && chartHasCompleteArtwork\(tracks\)\)/);
+  assert.match(html,/if\(fresh && chartHasCompleteArtwork\(tracks,j\.methodology\)\)/);
 });
 
 test("artwork audit refuses stale prospective chart and live audit rejects any missing cover",()=>{
