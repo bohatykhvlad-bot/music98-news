@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import {mergeKey} from "../functions/lib/chart-identity.js";
 import {verifiedStreamSeed,HYBRID_METHOD,isAppleSpotifyChart} from "../functions/lib/apple-spotify-chart.js";
+import {verifiedTriSeed,TRI_METHOD,isTriChart} from "../functions/lib/tri-source-chart.js";
 
 
 const OUT = new URL("../public/data/chart-tenure-backup.json", import.meta.url);
@@ -15,14 +16,16 @@ const r = await fetch(liveUrl, {
 });
 if (!r.ok) throw new Error("live top50 HTTP " + r.status);
 const j = await r.json();
-const spotifyRef=verifiedStreamSeed(JSON.parse(fs.readFileSync(
-  new URL("../public/data/apple-spotify-streams.json",import.meta.url),"utf8")));
+const spotifyRefRaw=JSON.parse(fs.readFileSync(
+  new URL("../public/data/apple-spotify-streams.json",import.meta.url),"utf8"));
+const spotifyRef=verifiedTriSeed(spotifyRefRaw)||verifiedStreamSeed(spotifyRefRaw);
+const validChart=chart=>chart?.methodology===TRI_METHOD?isTriChart(chart):isAppleSpotifyChart(chart);
 if(!spotifyRef || j.fallback || j.complete!==true ||
-   j.methodology!==HYBRID_METHOD ||
+   j.methodology!==spotifyRef.methodology ||
    j.sourceDates?.S!==spotifyRef.spotifyDate || j.spotifyFingerprint!==spotifyRef.fingerprint)
   throw new Error("refusing snapshot unless Apple candidates and Kworb daily edition match");
 const tracks = Array.isArray(j.tracks) ? j.tracks : [];
-if (!isAppleSpotifyChart(j)) throw new Error("refusing tenure snapshot: invalid Apple + Spotify ranking");
+if (!validChart(j)) throw new Error("refusing tenure snapshot: invalid verified source ranking");
 if (j.arrows && j.arrows.ok === false) throw new Error("refusing tenure snapshot: live arrow/tenure self-check failed");
 
 let backup = {schema:1,current:null,previous:null};
@@ -79,6 +82,8 @@ const snapshot = {
   methodology:j.methodology,
   consensus:j.consensus,
   sources:j.sources,
+  scoring:j.scoring,
+  sourceDetails:j.sourceDetails,
   sourceDateKinds:j.sourceDateKinds,
   sourceDates:j.sourceDates,
   sourceOrigin:j.sourceOrigin,
@@ -86,6 +91,7 @@ const snapshot = {
   tracks: tracks.map((t,i) => ({
     rank: Number(t.rank) || i + 1,
     sourceRanks:t.sourceRanks,spotify:t.spotify,score:t.score,applePoints:t.applePoints,spotifyBonus:t.spotifyBonus,
+    appleUsPoints:t.appleUsPoints,appleGlobalPoints:t.appleGlobalPoints,spotifyPoints:t.spotifyPoints,
     title: String(t.title || ""),
     artist: String(t.artist || ""),
     weeks: Math.max(1, Number(t.weeks) || 1),
