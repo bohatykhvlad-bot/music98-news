@@ -889,7 +889,7 @@ textarea{resize:vertical;min-height:64px}
 #tab-discover.rise{animation:none}
 /* The Discover canvas ends at the tab boundary. The shared Subscribe top
    margin otherwise exposes a white strip between the ambient and the next section. */
-body.discover-ambient-visible .subscribe{margin-top:0}
+
 #tab-discover .discover-layout{--discover-row-inset:12px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(4 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
 #tab-discover .discover-heading{grid-area:1/1/2/4;text-align:center;width:100%;margin-bottom:0}
 #tab-discover .discover-copy{grid-area:2/1;align-self:center;min-width:0;width:100%;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
@@ -916,11 +916,6 @@ body.discover-ambient-visible #discoverAmbient{opacity:1;visibility:visible}
 #tab-discover #discoverFind{color:var(--text);font-weight:600;align-self:center;margin-top:0}
 @media(hover:hover) and (pointer:fine){#tab-discover #discoverFind:hover{color:#03282b}#tab-discover #discoverFind:hover::before{background:var(--accent);border-color:var(--accent)}}
 @media(min-width:1161px){
-  /* Move the entire content row by the measured ink-to-edge correction,
-     without changing grid track sizes or disturbing the mobile layout. */
-  #tab-discover .discover-copy,
-  #tab-discover .discover-stage,
-  #tab-discover .discover-intro{position:relative;top:var(--discover-row-offset,0px)}
   #tab-discover .discover-artist{font-size:26px}
   #tab-discover .discover-copy{align-items:flex-end}
   #tab-discover .discover-selected{width:max-content}
@@ -2850,7 +2845,6 @@ function queueEqualizeBrowsePanels(){
     if (panes.some(p=>!p)) return;
     const discoverLayout = panes[1].querySelector(".discover-layout");
     discoverLayout?.style.removeProperty("--discover-layout-height");
-    discoverLayout?.style.removeProperty("--discover-row-offset");
     panes.forEach(p=>p.style.removeProperty("min-height"));
     if (window.matchMedia("(max-width:1100px)").matches) return;
     // Read the actual DOM geometry even when Discover is the inactive tab.
@@ -2880,40 +2874,21 @@ function queueEqualizeBrowsePanels(){
       if (discoverLayout && window.matchMedia("(min-width:1161px)").matches) {
         const style = getComputedStyle(panes[1]);
         const top = parseFloat(style.paddingTop), bottom = parseFloat(style.paddingBottom);
+        // Balance the player between the heading and Discover's own lower
+        // edge. Subscribe's external margin belongs to the following section.
+        // The screenshot compares the visible letters, not the empty space
+        // below their baseline. Centre against the heading's actual ink edge.
+        const title=discoverLayout.querySelector('.hd-t'), titleStyle=getComputedStyle(title);
+        const context=document.createElement('canvas').getContext('2d');
+        context.font=`${titleStyle.fontWeight} ${titleStyle.fontSize} ${titleStyle.fontFamily}`;
+        const metrics=context.measureText(title.textContent);
+        const lineHeight=parseFloat(titleStyle.lineHeight);
+        const tail=Number.isFinite(metrics.fontBoundingBoxDescent)
+          ? Math.max(0,(lineHeight-metrics.fontBoundingBoxAscent-metrics.fontBoundingBoxDescent)/2
+            +metrics.fontBoundingBoxDescent-metrics.actualBoundingBoxDescent) : 0;
+        discoverLayout.style.setProperty("--discover-row-inset", Math.max(0,bottom-tail) + "px");
+        discoverLayout.dataset.headingTail=tail;
         discoverLayout.style.setProperty("--discover-layout-height", (height - top - bottom) + "px");
-        // Get the real title baseline from a zero-size inline DOM marker.
-        // Canvas only supplies the glyph's descent; guessing the baseline
-        // from line-height/font bounding boxes gave visibly uneven gaps.
-        withVisiblePanel(panes[1], () => {
-          const title = discoverLayout.querySelector(".hd-t");
-          const card = discoverLayout.querySelector(".discover-card");
-          if (!title || !card) return;
-          let baseline = title.querySelector(".discover-baseline-probe");
-          if (!baseline) {
-            baseline = document.createElement("span");
-            baseline.className = "discover-baseline-probe";
-            baseline.setAttribute("aria-hidden", "true");
-            baseline.style.cssText = "display:inline-block;width:0;height:0;padding:0;margin:0;border:0;vertical-align:baseline";
-            title.appendChild(baseline);
-          }
-          const font = getComputedStyle(title);
-          const context = document.createElement("canvas").getContext("2d");
-          let descent = 0;
-          if (context) {
-            context.font = `${font.fontStyle} ${font.fontWeight} ${font.fontSize} ${font.fontFamily}`;
-            const measured = context.measureText(title.firstChild.textContent);
-            if (Number.isFinite(measured.actualBoundingBoxDescent)) descent = measured.actualBoundingBoxDescent;
-          }
-          const inkBottom = baseline.getBoundingClientRect().top + descent;
-          const cardRect = card.getBoundingClientRect();
-          const panelRect = panes[1].getBoundingClientRect();
-          const upperGap = cardRect.top - inkBottom;
-          const lowerGap = panelRect.bottom - cardRect.bottom;
-          const offset = (lowerGap - upperGap) / 2;
-          // Relative positioning shifts the player, artist text and button as
-          // one row; neither panel height nor Apple Music iframe size changes.
-          discoverLayout.style.setProperty("--discover-row-offset", offset + "px");
-        });
       }
     }
   });
