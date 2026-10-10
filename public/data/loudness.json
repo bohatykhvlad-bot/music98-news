@@ -4,7 +4,7 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": "2026-10-10T07:45:37.846Z"
+    "measuredAt": "2026-10-10T08:12:58.845Z"
   },
   "bbywow|karolg": {
     "integratedLufs": -10.3,
