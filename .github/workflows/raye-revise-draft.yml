@@ -31,8 +31,8 @@ jobs:
           import json
           p=json.load(open('.github/editorial-drafts/raye-royal-albert-hall-2026.json'))
           assert p['id']=='raye26royalalbertsymphony' and p['status']=='draft'
-          assert p['cover']['src']=='photos/raye-frances-beach-o2-2026-confetti.jpg'
-          assert p['cover']['credit']=='Frances Beach'
+          assert p['cover']['src']=='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg'
+          assert p['cover']['credit']=='Radoslaw Zydowicz'
           assert p['excerpt']==p['body'][:len(p['excerpt'])]
           assert '[tickets:' not in p['body'] and 'ticketmaster' not in p['body'].lower()
           assert 'rooms' not in p['body'].lower()
@@ -46,7 +46,7 @@ jobs:
         run: |
           python - <<'PY'
           import urllib.request,struct
-          u='https://tgtumixhqhzrjubppeep.supabase.co/storage/v1/object/public/media/migrated/legacy/2026/329de3d442d8-raye_o2_arena_frances_beach-16.jpg'
+          u='https://www.nme.com/wp-content/uploads/2026/01/RAYE3%402000x1270.jpg'
           req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0','Accept':'image/jpeg'})
           with urllib.request.urlopen(req,timeout=40) as r:
             data=r.read()
@@ -72,7 +72,7 @@ jobs:
           PY
       - name: Upload verified original 2000px performance photo
         run: |
-          python scripts/post.py photo --url 'https://tgtumixhqhzrjubppeep.supabase.co/storage/v1/object/public/media/migrated/legacy/2026/329de3d442d8-raye_o2_arena_frances_beach-16.jpg' --name raye-frances-beach-o2-2026-confetti.jpg
+          python scripts/post.py photo --url 'https://www.nme.com/wp-content/uploads/2026/01/RAYE3%402000x1270.jpg' --name raye-radoslaw-zydowicz-lodz-live-2026.jpg
       - name: Verify independent final editorial readthrough with exact staged payload
         run: |
           python scripts/editorial_readthrough.py --post raye26royalalbertsymphony --file .github/editorial-drafts/raye-royal-albert-hall-2026.json --phase post-edit --confirm-full-read
@@ -96,5 +96,5 @@ jobs:
           for f in ('title','body','excerpt','cover','artist'):
             assert now.get(f)==p.get(f),f
           assert not any(t in now['body'].lower() for t in ('[tickets:', 'ticketmaster', 'rooms'))
-          print('RAYE_POST_SAVE_VERIFIED draft=true cover=Frances_Beach photo_2000px=uploaded no_ticket_link=true body_matches=true')
+          print('RAYE_POST_SAVE_VERIFIED draft=true cover=Radoslaw_Zydowicz photo_2000px=uploaded no_ticket_link=true body_matches=true')
           PY
