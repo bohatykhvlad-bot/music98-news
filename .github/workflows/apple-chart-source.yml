@@ -62,6 +62,7 @@ jobs:
             git commit -m "chart: three-source 40 USA 30 Spotify 30 Global verified edition"
             if git push origin HEAD:main; then
               gh workflow run apple-data.yml --ref main
+              gh workflow run verify-tri-live.yml --ref main
               exit 0
             fi
             sleep 3
