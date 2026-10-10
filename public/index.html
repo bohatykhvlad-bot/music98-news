@@ -191,6 +191,7 @@ main{position:relative;z-index:1}
 .tab.active{display:block}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
+@media(prefers-reduced-motion:reduce){.tab.rise{animation:none}}
 .hd{margin:0 0 24px}
 .hd-t{margin:0;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.15;color:var(--text);white-space:nowrap}
 
@@ -887,8 +888,6 @@ textarea{resize:vertical;min-height:64px}
    section-bottom gaps at desktop widths. JS measures the shared panel height
    and adjusts only this section's top inset, leaving the 450px embed intact. */
 #tab-discover{padding-top:var(--discover-heading-top,var(--section-heading-top));padding-bottom:12px}
-#tab-discover.rise{animation:rise .28s ease both}
-@media(prefers-reduced-motion:reduce){#tab-discover.rise{animation:none}}
 /* The Discover canvas ends at the tab boundary. The shared Subscribe top
    margin otherwise exposes a white strip between the ambient and the next section. */
 body.discover-ambient-visible .subscribe{margin-top:0}
@@ -2919,7 +2918,17 @@ function queueEqualizeBrowsePanels(){
         const geometry = withVisiblePanel(panes[1], () => {
           const panel = panes[1];
           const style = getComputedStyle(panel);
-          const sectionTop = panel.getBoundingClientRect().top + window.scrollY;
+          // The shared .tab.rise animation translates the whole Discover tab
+          // by 10px on entry. getBoundingClientRect() INCLUDES that temporary
+          // translation. Ignore it when computing the permanent heading inset;
+          // otherwise the inset counteracts the animation and the heading
+          // appears nearly stationary while the other sections rise normally.
+          const transform = getComputedStyle(panel).transform;
+          const animationOffsetY = transform !== "none" &&
+            typeof DOMMatrixReadOnly === "function"
+            ? new DOMMatrixReadOnly(transform).m42 : 0;
+          const sectionTop = panel.getBoundingClientRect().top +
+            window.scrollY - animationOffsetY;
           const bottomInset = parseFloat(style.paddingBottom) || 0;
           const heading = discoverLayout.querySelector(".hd-t");
           const card = discoverLayout.querySelector(".discover-card");
