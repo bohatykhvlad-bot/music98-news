@@ -1,55 +1,65 @@
-# Music98 Daily Top 50 — USA-led hybrid (v2)
+# Music98 Daily Top 50 — Apple USA 40 / Spotify 30 / Apple Global 30
 
-## Sources and candidates
+## Three independent entry paths
 
-The 50 candidates are positions 1–50 of Apple Music's **Top 100: USA**
-playlist `pl.606afcbb70264d2eb2b51d8dbcfa6a12`.
-Apple **Top 100: Global** (`pl.d25f5d1181894928af76c85c967f8f31`)
-provides additional positions among its Top 100. The official Apple
-playlists must share a publication date; storefront locale is not used
-as a proxy for ranking region.
+A candidate can originate from any of these daily charts:
 
-Spotify supplies daily stream counters from Kworb artist pages. The collector
-tries all credited performers with independently verified pages and can
-recover globally charting tracks from Kworb's Spotify Global Daily Chart
-using exact song/version and Spotify ID. **Chart Streams and artist-page
-Daily are not identical metrics**. Each song records which metric and URL
-was used. Regional US stream counters are not silently mixed with global
-numbers. No cumulative/lifetime counter is substituted for a daily one.
+- Apple Music **Top 100: USA** (40% weight).
+- Spotify **Daily Top 200: Global**, with published daily stream numbers (30%).
+- Apple Music **Top 100: Global** (30%).
 
-## Ranking and limits
+Songs are joined using validated title, lead artist, and version. The
+candidate pool is a UNION, never the strict three-way intersection or merely
+50 Apple USA songs. An Apple-exclusive candidate can be considered, but it
+must have independently confirmed Spotify daily streams before reaching the
+published Top 50. Thus the published chart never reports a fabricated 0,
+a misleading `null`, or a lifetime total as a daily counter.
+
+Spotify counts come from the Global Daily chart on Kworb and, for songs not
+listed there, a matching `Daily` field on a credited artist's page. Region,
+source URL, source date and metric type are retained per recording.
+The chart daily-stream series and artist-page Daily series may differ in
+tracking conventions; this is explicitly recorded rather than described as
+a single Spotify API feed. Artist names alone are not enough for matching.
+
+## Rank formula
 
 ```
-US points      = 70 * (51 - appleUSRank) / 50
-Spotify points = 20 * sqrt(daily / maxMeasuredDaily)
-Global points  = globalRank ? 10 * (101 - globalRank) / 100 : 0
-Total          = US points + Spotify points + Global points
+Apple USA score    = 40 * (101 - usRank) / 100, or 0 when absent
+Spotify score      = 30 * sqrt(verifiedDaily / maximumDailyAmongCandidates)
+Apple Global score = 30 * (101 - globalRank) / 100, or 0 when absent
+Total              = sum of the three scores
 ```
 
-When Spotify data is missing, `daily` remains **null** with its reason.
-For **scoring only**, the median of confirmed candidate daily values is
-substituted, so unknown is not falsely treated as zero plays. It is never
-reported as a confirmed counter. A supplementary source cannot move a
-track more than ten chart positions relative to the original US order.
-This 70/20/10 split and movement cap are Music98 editorial choices,
-not a chart endorsed by Apple or Spotify.
+Spotify's square-root transform keeps one enormous hit from overwhelming
+all other songs while still allowing daily differences to reorder nearby
+positions. All three signals have a maximum of their declared percentage
+points. The maximum Spotify stream count comes from the full matched
+candidate pool, not just the final Top 50. Only the highest-scoring 50
+songs with strictly verified Spotify daily numbers are selected.
 
-The chart always has the 50 Apple USA candidates; 50 **verified Spotify
-counters** cannot be promised because independent services may not expose
-them. The collector records matched/unmatched counts and recovery paths.
-Publication needs at least 25 genuine dated matched values. All 50 tracks
-must have verified audio/artwork and stable song identities before the Worker
-writes rank/tenure KV data. Missing or stale source snapshots cause the
-last verified full edition to be retained instead of fabricating rankings.
+The weighting and transformations are Music98 editorial methodology,
+not a Spotify or Apple-endorsed sales/stream-equivalent chart.
 
-## Update safeguards
+## Collection and fail-safe behavior
 
-Apple USA and Global snapshots are fetched together. A complete paired
-stream snapshot is gathered with one recent Spotify edition date
-(maximum age two UTC days). Missing or mixed-region measurements are
-not silently converted. GitHub Actions regenerates source JSON from
-current main following a concurrent push rather than rebasing generated
-JSON through merge conflicts.
+GitHub Actions requests fresh USA and Global Apple Top 100 charts as an
+atomic date-matched pair, then reads Spotify's dated Global Daily ranking.
+Up to 200 Spotify chart entries can bring their own verified daily streams.
+Additional artist pages are checked concurrently to recover Apple-only
+songs. Collection records the number of candidates, verified counts,
+unmatched songs, and each source's edition date.
 
-Historic editions use the scoring method under which they were created.
-Stored lifetime days and NEW/RE-ENTRY signals are not zeroed on migration.
+The publisher rejects stale, malformed, partial and cross-edition input,
+ambiguous IDs, duplicate song/Spotify IDs, missing artwork, broken previews
+and damaged tenure or movement metadata. The worker writes the full
+validated chart LAST, so a failed build never overwrites a good edition.
+
+The source refresh runs every four hours (UTC: 01:45, 05:45, 09:45,
+13:45, 17:45, 21:45). Failure leaves the preceding healthy edition
+untouched. The next scheduled run retries; an earlier manual refresh is
+also possible. A missing independent Spotify measurement is not filled
+using Apple positions, regional US streams, or synthetic estimates.
+
+Historical NEW/RE-ENTRY, arrows, and days are carried forward under the
+existing continuity rules even when the scoring methodology changes.
