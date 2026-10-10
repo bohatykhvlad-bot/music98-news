@@ -1,0 +1,66 @@
+name: RAYE approved editorial draft creation
+on:
+  push:
+    branches:
+      - editorial/raye-royal-albert-hall-2026-draft
+    paths:
+      - .github/workflows/raye-create-draft.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: raye-royal-albert-hall-draft
+  cancel-in-progress: false
+jobs:
+  create-draft:
+    if: github.ref_name == 'editorial/raye-royal-albert-hall-2026-draft'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify editorial credentials and payload
+        run: |
+          test -n "$ADMIN_PASSWORD"
+          python -m py_compile scripts/post.py scripts/gate.py scripts/preflight.py scripts/editorial_readthrough.py
+          python - <<'PY'
+          import json
+          p=json.load(open('.github/editorial-drafts/raye-royal-albert-hall-2026.json',encoding='utf-8'))
+          assert p['id']=='raye26royalalbertsymphony'
+          assert p['status']=='draft' and p['type']=='news'
+          assert p['body'].startswith(p['excerpt'])
+          assert '[youtube:Iy2FoVeIUXs]' in p['body']
+          print('PAYLOAD VALIDATED: RAYE ONLY, DRAFT ONLY')
+          PY
+      - name: Readthrough of exact final editorial payload
+        run: |
+          python scripts/editorial_readthrough.py --post raye26royalalbertsymphony --file .github/editorial-drafts/raye-royal-albert-hall-2026.json --phase post-edit --confirm-full-read
+      - name: Local mechanical preflight
+        run: |
+          python scripts/preflight.py --post raye26royalalbertsymphony --file .github/editorial-drafts/raye-royal-albert-hall-2026.json --min-words 400
+      - name: Import original verified press portrait from The Orchard Japan
+        run: |
+          python scripts/post.py photo --url 'https://prcdn.freetls.fastly.net/release_image/55377/1691/55377-1691-efa29c5aaf67fc596beb31d2beef6fb4-1500x1000.jpg' --name raye-royal-albert-hall-aliyah-otchere-2026.jpg
+      - name: Create Cloudflare editorial draft through mandatory guarded runner
+        run: |
+          python scripts/post.py create --file .github/editorial-drafts/raye-royal-albert-hall-2026.json
+      - name: Post-save read-back and double mechanical gate
+        run: |
+          python scripts/post.py preflight raye26royalalbertsymphony
+          python scripts/post.py gate raye26royalalbertsymphony
+          python - <<'PY'
+          import os, json,urllib.request
+          key=os.environ['ADMIN_PASSWORD']
+          req=urllib.request.Request('https://music98.news/api/desk',headers={'X-Admin-Key':key,'Cache-Control':'no-cache'})
+          with urllib.request.urlopen(req,timeout=35) as r: desk=json.load(r)
+          expected=json.load(open('.github/editorial-drafts/raye-royal-albert-hall-2026.json',encoding='utf-8'))
+          found=[p for p in desk['posts'] if p.get('id')==expected['id']]
+          assert len(found)==1 and found[0]['status']=='draft'
+          for f in ['title','body','excerpt','cover']:
+              assert found[0][f]==expected[f],f
+          print('POST_SAVE_VERIFIED id='+expected['id']+' status=draft body_matches=true cover_matches=true live=false')
+          PY
