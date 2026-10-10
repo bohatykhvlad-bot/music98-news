@@ -883,16 +883,16 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 
-/* Section headings share typography; Discover balances its visible heading
-   within the desktop panel height shared with Releases. */
-#tab-discover{padding-top:var(--discover-heading-top,var(--section-heading-top));padding-bottom:12px}
+/* Discover uses the exact same heading origin as News, Releases and Chart.
+   Only the player row is vertically balanced inside the shared panel height. */
+#tab-discover{padding-top:var(--section-heading-top);padding-bottom:12px}
 #tab-discover.rise{animation:rise .28s ease both}
 @media(prefers-reduced-motion:reduce){#tab-discover.rise{animation:none}}
 /* The Discover canvas ends at the tab boundary. The shared Subscribe top
    margin otherwise exposes a white strip between the ambient and the next section. */
 body.discover-ambient-visible .subscribe{margin-top:0}
 
-#tab-discover .discover-layout{--discover-row-inset:12px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(4 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
+#tab-discover .discover-layout{--discover-row-inset:0px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(4 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
 #tab-discover .discover-heading{grid-area:1/1/2/4;text-align:center;width:100%;margin-bottom:0}
 #tab-discover .discover-copy{grid-area:2/1;align-self:center;min-width:0;width:100%;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
 #tab-discover .discover-intro{grid-area:2/3;align-self:center;min-width:0;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;max-width:100%}
@@ -2884,8 +2884,6 @@ function queueEqualizeBrowsePanels(){
     if (panes.some(p=>!p)) return;
     const discoverLayout = panes[1].querySelector(".discover-layout");
     discoverLayout?.style.removeProperty("--discover-layout-height");
-    discoverLayout?.style.removeProperty("--discover-row-inset");
-    panes[1].style.removeProperty("--discover-heading-top");
     panes.forEach(p=>p.style.removeProperty("min-height"));
     if (window.matchMedia("(max-width:1100px)").matches) return;
     // Read the actual DOM geometry even when Discover is the inactive tab.
@@ -2913,30 +2911,15 @@ function queueEqualizeBrowsePanels(){
     if (height > 0) {
       panes.forEach(p=>p.style.minHeight = height + "px");
       if (discoverLayout && window.matchMedia("(min-width:1161px)").matches) {
+        // The heading inherits the shared 8px section inset. Center the fixed
+        // 450px Apple player in the rest of the panel without moving the title.
         const style = getComputedStyle(panes[1]);
+        const top = parseFloat(style.paddingTop);
         const bottom = parseFloat(style.paddingBottom);
-        // Give the navigation pill, heading ink, player and lower boundary
-        // three equal gaps. Font line boxes include space above and below the
-        // letters, so use the actual glyph bounds when placing the heading.
-        const title=discoverLayout.querySelector('.hd-t'), titleStyle=getComputedStyle(title);
-        const context=document.createElement('canvas').getContext('2d');
-        context.font=`${titleStyle.fontWeight} ${titleStyle.fontSize} ${titleStyle.fontFamily}`;
-        const metrics=context.measureText(title.textContent);
-        const lineHeight=parseFloat(titleStyle.lineHeight);
-        const fontBounds=Number.isFinite(metrics.fontBoundingBoxDescent);
-        const leading=fontBounds ? (lineHeight-metrics.fontBoundingBoxAscent-metrics.fontBoundingBoxDescent)/2 : 0;
-        const head=fontBounds ? leading+metrics.fontBoundingBoxAscent-metrics.actualBoundingBoxAscent : 0;
-        const tail=fontBounds ? leading+metrics.fontBoundingBoxDescent-metrics.actualBoundingBoxDescent : 0;
-        const inkHeight=lineHeight-head-tail;
-        const panelTop=panes[1].parentElement.getBoundingClientRect().top+scrollY;
-        const pillBottom=document.getElementById("nav").getBoundingClientRect().bottom;
-        const playerHeight=parseFloat(getComputedStyle(document.getElementById("discoverPlayerStage")).height);
-        const gap=Math.max(0,(panelTop+height-pillBottom-inkHeight-playerHeight)/3);
-        const top=Math.max(0,pillBottom-panelTop+gap-head);
-        panes[1].style.setProperty("--discover-heading-top",top+"px");
-        discoverLayout.style.setProperty("--discover-row-inset", Math.max(0,bottom-tail) + "px");
-        discoverLayout.dataset.headingTail=tail;
-        discoverLayout.style.setProperty("--discover-layout-height", (height - top - bottom) + "px");
+        discoverLayout.style.setProperty(
+          "--discover-layout-height",
+          Math.max(0, height - top - bottom) + "px"
+        );
       }
     }
   });
