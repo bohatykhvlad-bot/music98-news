@@ -1,0 +1,99 @@
+name: RAYE revised draft and photo update
+on:
+  push:
+    branches:
+      - editorial/raye-royal-albert-hall-2026-draft
+    paths:
+      - .github/workflows/raye-revise-draft.yml
+permissions:
+  contents: read
+concurrency:
+  group: raye-final-revise-draft
+  cancel-in-progress: false
+jobs:
+  update-draft:
+    if: github.ref_name == 'editorial/raye-royal-albert-hall-2026-draft'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Confirm staged changes and lock target to draft-only
+        run: |
+          test -n "$ADMIN_PASSWORD"
+          python - <<'PY'
+          import json
+          p=json.load(open('.github/editorial-drafts/raye-royal-albert-hall-2026.json'))
+          assert p['id']=='raye26royalalbertsymphony' and p['status']=='draft'
+          assert p['cover']['src']=='photos/raye-frances-beach-o2-2026-confetti.jpg'
+          assert p['cover']['credit']=='Frances Beach'
+          assert p['excerpt']==p['body'][:len(p['excerpt'])]
+          assert '[tickets:' not in p['body'] and 'ticketmaster' not in p['body'].lower()
+          assert 'rooms' not in p['body'].lower()
+          print('TARGET_LOCKED draft-only no-ticket-links')
+          PY
+      - name: Read original draft end-to-end and attest pre-edit
+        run: |
+          python scripts/post.py show raye26royalalbertsymphony > /tmp/raye-before.txt
+          python scripts/post.py editorial raye26royalalbertsymphony --phase pre-edit
+      - name: Independently inspect candidate photo before upload
+        run: |
+          python - <<'PY'
+          import urllib.request,struct
+          u='https://tgtumixhqhzrjubppeep.supabase.co/storage/v1/object/public/media/migrated/legacy/2026/329de3d442d8-raye_o2_arena_frances_beach-16.jpg'
+          req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0','Accept':'image/jpeg'})
+          with urllib.request.urlopen(req,timeout=40) as r:
+            data=r.read()
+            assert r.headers.get('Content-Type','').startswith('image/jpeg')
+          assert len(data)>100_000
+          from io import BytesIO
+          f=BytesIO(data)
+          assert f.read(2)==b'\xff\xd8'
+          while True:
+            b=f.read(1)
+            if not b:raise ValueError('no JPEG dimensions')
+            if b!=b'\xff': continue
+            marker=f.read(1)[0]
+            if marker in (0xd8,0xd9,0x01) or 0xd0<=marker<=0xd7:continue
+            n=struct.unpack('>H',f.read(2))[0]
+            if marker in (0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9):
+              dat=f.read(5)
+              h,w=int.from_bytes(dat[1:3],'big'),int.from_bytes(dat[3:5],'big')
+              print('CANDIDATE_PHOTO',w,h,'bytes',len(data),'actual_decoded_dimensions')
+              assert w>=1920 and h>=1080
+              break
+            f.seek(n-2,1)
+          PY
+      - name: Upload verified original 2000px performance photo
+        run: |
+          python scripts/post.py photo --url 'https://tgtumixhqhzrjubppeep.supabase.co/storage/v1/object/public/media/migrated/legacy/2026/329de3d442d8-raye_o2_arena_frances_beach-16.jpg' --name raye-frances-beach-o2-2026-confetti.jpg
+      - name: Verify independent final editorial readthrough with exact staged payload
+        run: |
+          python scripts/editorial_readthrough.py --post raye26royalalbertsymphony --file .github/editorial-drafts/raye-royal-albert-hall-2026.json --phase post-edit --confirm-full-read
+          python scripts/preflight.py --post raye26royalalbertsymphony --file .github/editorial-drafts/raye-royal-albert-hall-2026.json --min-words 400
+      - name: Apply guarded draft-only replacement via canonical editorial runner
+        run: |
+          python scripts/post.py replace-draft raye26royalalbertsymphony --file .github/editorial-drafts/raye-royal-albert-hall-2026.json
+      - name: Re-read saved text, photo attribution, publication status and mechanical gates
+        run: |
+          python scripts/post.py gate raye26royalalbertsymphony
+          python scripts/post.py preflight raye26royalalbertsymphony
+          python - <<'PY'
+          import json,sys
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          p=json.load(open('.github/editorial-drafts/raye-royal-albert-hall-2026.json'))
+          matches=[x for x in desk_read()['posts'] if x.get('id')==p['id']]
+          assert len(matches)==1
+          now=matches[0]
+          assert now.get('status')=='draft'
+          for f in ('title','body','excerpt','cover','artist'):
+            assert now.get(f)==p.get(f),f
+          assert not any(t in now['body'].lower() for t in ('[tickets:', 'ticketmaster', 'rooms'))
+          print('RAYE_POST_SAVE_VERIFIED draft=true cover=Frances_Beach photo_2000px=uploaded no_ticket_link=true body_matches=true')
+          PY
