@@ -31,6 +31,15 @@ test('matches feature spelling while retaining versions, Unicode titles and ambi
  assert.equal(matchKworbTrack({title:'Song'},parseKworbArtistDaily(page([{title:'Song'},{title:'Song'}]),artist)).status,'ambiguous');
  assert.notEqual(titleKey('曲一'),titleKey('曲二'));
 });
+test('featured rows and dominant duplicate versions are usable with explicit credit checks',()=>{
+ const feat='<tr><td><a href="https://open.spotify.com/track/'+('b'.repeat(22))+'" >* Song (feat. Guest)</a></td><td>1,000,000</td><td>123,456</td></tr>';
+ const featPage=parseKworbArtistDaily(`<title>Artist - Spotify Top Songs</title>Last updated: ${date.replaceAll('-','/')}<table><tr><th>Song Title</th><th>Streams</th><th>Daily</th></tr>${feat}</table>`,artist);
+ assert.equal(matchKworbTrack({title:'Song'},featPage).status,'track-not-found');
+ assert.equal(matchKworbTrack({title:'Song'},featPage,'Guest').daily,123456);
+ assert.equal(matchKworbTrack({title:'Song'},featPage,'Someone Else').status,'track-not-found');
+ const dupes=parseKworbArtistDaily(page([{title:'Song',total:'50000000'},{title:'Song',total:'200000000'}]),artist);
+ assert.equal(matchKworbTrack({title:'Song'},dupes).total,200000000);
+});
 test('missing Daily stays unknown rather than becoming zero or lifetime streams',()=>{
  const p=parseKworbArtistDaily(page([{title:'Song',daily:'-'}]),artist);
  assert.equal(p.tracks[0].daily,null);assert.equal(matchKworbTrack({title:'Song'},p).status,'track-not-found');

@@ -94,12 +94,26 @@ export function matchKworbGlobal(apple,chart){
  return ids.size===1?hits[0]:null;
 }
 
-export function matchKworbTrack(apple,page){
+export function matchKworbTrack(apple,page,artistName){
  // The page is resolved by the full leading artist, not an ambiguous title-only search.
  const same=t=>titleKey(t.title)===titleKey(apple.title)&&versionSignature(t.title)===versionSignature(apple.title);
- const hits=page.tracks.filter(t=>!t.featured&&same(t));
+ let hits=page.tracks.filter(t=>!t.featured&&same(t));
+ if(!hits.length&&artistName){
+  /* A featured row is usable only when it keeps the featured credit and that
+     credit names this page's artist; the caller must still have the artist in
+     the song's credited list before asking. */
+  const artist=artistKey(artistName);
+  if(artist)hits=page.tracks.filter(t=>t.featured&&same(t)&&artistKey(t.title).includes(artist));
+ }
  const ids=new Set(hits.map(t=>t.spotifyId));
- if(ids.size>1)return {status:'ambiguous'};
+ if(ids.size>1){
+  /* Duplicate same-title rows: only a firmly dominant lifetime total identifies
+     the main release (single vs remix). Anything closer stays ambiguous. */
+  const byTotal=[...hits].sort((a,b)=>(Number(b.total)||0)-(Number(a.total)||0));
+  const top=byTotal[0],second=byTotal.find(t=>t.spotifyId!==top.spotifyId);
+  if(top&&(Number(top.total)||0)>0&&(!second||(Number(top.total)||0)>=2*(Number(second.total)||0)))hits.splice(0,hits.length,top);
+  else return {status:'ambiguous'};
+ }
  const hit=hits[0];
  return hit&&hit.daily!==null?{status:'matched',...hit}:{status:'track-not-found'};
 }

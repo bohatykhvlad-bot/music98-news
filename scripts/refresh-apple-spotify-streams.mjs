@@ -103,8 +103,12 @@ spotify.tracks.forEach(t=>admit(t,"S",t.pos));
 if(sets.U.size!==100||sets.A.size!==global.tracks.length||sets.S.size!==200)
  throw new Error("Daily source set incomplete for "+chosen);
 
-const credited=t=>String(t.artist||"").split(/\s*(?:,|\s+&\s+|\s+feat\.?\s+|\s+ft\.?\s+|\s+with\s+)\s*/i)
- .map(x=>x.trim()).filter(Boolean).slice(0,4);
+const credited=t=>{
+ const raw=String(t.artist||"").trim();
+ const parts=raw.split(/\s*(?:,|\s+&\s+|\s+feat\.?\s+|\s+ft\.?\s+|\s+with\s+)\s*/i).map(x=>x.trim()).filter(Boolean);
+ // Try the full credit first ("Brooks & Dunn") plus each credited artist.
+ return [...new Set([raw,...parts])].filter(Boolean).slice(0,5);
+};
 const wanted=new Map(),candidateArtists=new Map(),pages=new Map();
 let recovered=0,artistErrors=0;
 // Artist pages expose their latest edition only; never use a later day's
@@ -130,7 +134,7 @@ if(chosen===latest.date){
   for(const artist of candidateArtists.get(key)||[]){
    const page=pages.get(artist.id);
    if(page?.date!==chosen)continue;
-   const match=matchKworbTrack(t,page);
+   const match=matchKworbTrack(t,page,artist.name);
    if(match.status==="matched")hits.push({...match,artist});
   }
   const ids=new Set(hits.map(h=>h.spotifyId));
