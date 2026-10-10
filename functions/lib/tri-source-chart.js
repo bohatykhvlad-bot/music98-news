@@ -47,12 +47,14 @@ export function verifiedTriCandidates(rows,date) {
 export function verifiedTriSeed(s,now=Date.now()){
  if(s?.schema!==3||s.methodology!==TRI_METHOD||
   !freshDay(s.appleUsDate,now)||s.appleUsDate!==s.appleGlobalDate||
+  s.appleUsDate!==s.spotifyDate||
   !freshDay(s.spotifyDate,now)||!/^[a-f0-9]{64}$/.test(s.fingerprint||"")||
   !verifiedTriCandidates(s.tracks,s.spotifyDate))return null;
  const hits=s.tracks.filter(t=>t.spotify.status==="matched").length;
  if(hits<50||hits!==s.coverage?.matched||s.coverage?.candidates!==s.tracks.length ||
   s.coverage?.unmatched!==s.tracks.length-hits||s.sourceSizes?.U!==100||
-  s.sourceSizes?.A!==100||s.sourceSizes?.S<100)return null;
+  ![50,100].includes(s.sourceSizes?.A)||s.sourceSizes?.S!==200||
+  s.tracks.some(t=>t.sourceRanks?.A!==null&&t.sourceRanks.A>s.sourceSizes.A))return null;
  return s;
 }
 export function rankTriCandidates(rows,date) {
@@ -79,9 +81,12 @@ export function rankTriCandidates(rows,date) {
 }
 export function isTriChart(j){
  if(j?.methodology!==TRI_METHOD||j.consensus!==TRI_RULE||j.complete!==true||
-  j.sources?.U!==100||j.sources?.A!==100||j.sources?.S<100||
+  j.sources?.U!==100||![50,100].includes(j.sources?.A)||j.sources?.S!==200||
   j.tracks?.length!==50||!/^[a-f0-9]{64}$/.test(j.spotifyFingerprint||"")||
-  !/^20\d{2}-\d{2}-\d{2}$/.test(j.sourceDates?.S||"")||new Set(j.tracks.map(t=>songIdentity(t.title,t.artist))).size!==50||
+  !/^20\d{2}-\d{2}-\d{2}$/.test(j.sourceDates?.S||"")||
+  j.sourceDates?.S!==j.sourceDates?.U||j.sourceDates?.S!==j.sourceDates?.A||
+  j.tracks.some(t=>t.sourceRanks?.A!==null&&t.sourceRanks.A>j.sources.A)||
+  new Set(j.tracks.map(t=>songIdentity(t.title,t.artist))).size!==50||
   j.tracks.some(t=>!verifiedSpotifyRow(t.spotify,j.sourceDates.S)||
    !sourceRankValid(t.sourceRanks?.U,100)||!sourceRankValid(t.sourceRanks?.A,100)||
    !sourceRankValid(t.sourceRanks?.S,200)))return false;
