@@ -57,7 +57,7 @@ export function parseChartStatsUsHistorical(html,date){
  try { schema=JSON.parse(match[1]); }catch{throw new Error("chartstats_jsonld_invalid");}
  if(schema["@type"]!=="ItemList"||schema.numberOfItems!==100||
    !Array.isArray(schema.itemListElement)||schema.itemListElement.length!==100||
-   !schema.name?.includes(date.slice(0,4)))throw new Error("chartstats_incomplete_top100");
+   !schema.name?.includes(date.slice(0,4)))throw new Error("chartstats_incomplete_top100:"+JSON.stringify({type:schema["@type"],numberOfItems:schema.numberOfItems,rows:schema.itemListElement?.length,name:schema.name,date}));
  const table=text.match(/<tbody\b[^>]*>([\s\S]*?)<\/tbody>/i);
  if(!table)throw new Error("chartstats_html_rows_missing");
  const rows=[...table[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)];
