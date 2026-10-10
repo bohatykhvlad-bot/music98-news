@@ -1468,11 +1468,21 @@ window.music98PillPress = window.music98PillPress || function music98PillPress(e
 document.querySelectorAll("[data-pill-press]").forEach(window.music98PillPress);
 
 const SKEY = "music98news_settings_v2";
-const DAILYKEY = "music98news_daily_v48";
+const DAILYKEY = "music98news_daily_v49";
 const DAILY_CHART_METHOD = "apple-top50-spotify-daily-v1";
+const TRI_CHART_METHOD = "apple-us40-spotify30-global30-v3";
+const TRI_CHART_CONSENSUS = "three-source-union-verified-streams-v3";
 function isDailySourceEdition(j){
-  return j?.methodology===DAILY_CHART_METHOD && j.consensus==="apple-candidates-spotify-boost-v1" &&
-    j.complete===true && chartHasConsensusTracks(j.tracks) && j.sources?.A===50 && Object.keys(j.sources||{}).length===2 &&
+  if(!j || j.complete!==true) return false;
+  if(j.methodology===TRI_CHART_METHOD)
+    return j.consensus===TRI_CHART_CONSENSUS &&
+      j.sources?.U===100 && j.sources?.A===100 &&
+      Number.isInteger(j.sources?.S) && j.sources.S>=100 && j.sources.S<=200 &&
+      chartHasTriTracks(j.tracks) &&
+      /^20\\d{2}-\\d{2}-\\d{2}$/.test(j.sourceDates?.S||"") &&
+      /^[a-f0-9]{64}$/.test(j.spotifyFingerprint||"");
+  return j.methodology===DAILY_CHART_METHOD && j.consensus==="apple-candidates-spotify-boost-v1" &&
+    chartHasConsensusTracks(j.tracks) && j.sources?.A===50 && Object.keys(j.sources||{}).length===2 &&
     j.sources.S>=25 && j.sources.S===j.tracks.filter(t=>t.spotify.status==="matched").length;
 }
 const APPLE_AT = "1001l3aZW";
@@ -2544,8 +2554,31 @@ function chartHasConsensusTracks(tracks){
       ["artist-not-tracked","track-not-found","ambiguous","stale","different-edition"].includes(t.spotify?.status)&&t.spotify.daily===null;
   });
 }
-function chartHasCompleteArtwork(tracks){
-  return chartHasConsensusTracks(tracks) && tracks.every(t=>{
+function chartHasTriTracks(tracks){
+  if(!Array.isArray(tracks)||tracks.length!==50)return false;
+  const identities=new Set(),ids=new Set(),ranked={U:new Set(),A:new Set(),S:new Set()};
+  return tracks.every((t,i)=>{
+    const key=normText(t.title)+"|"+normText(t.artist);
+    if(!t.title||!t.artist||identities.has(key)||t.rank!==i+1 ||
+      t.spotify?.status!=="matched"||!Number.isSafeInteger(t.spotify.daily)||
+      t.spotify.daily<0||!/^[A-Za-z0-9]{22}$/.test(t.spotify.spotifyId||"")||
+      ids.has(t.spotify.spotifyId)||!Number.isFinite(t.score))return false;
+    identities.add(key);ids.add(t.spotify.spotifyId);
+    const r=t.sourceRanks||{};
+    if(r.U==null && r.A==null && r.S==null)return false;
+    for(const [source,max] of [["U",100],["A",100],["S",200]]){
+      const pos=r[source];
+      if(pos==null)continue;
+      if(!Number.isInteger(pos)||pos<1||pos>max||ranked[source].has(pos))return false;
+      ranked[source].add(pos);
+    }
+    return true;
+  });
+}
+function chartHasCompleteArtwork(tracks,methodology){
+  const acceptable = methodology===TRI_CHART_METHOD ?
+    chartHasTriTracks(tracks) : chartHasConsensusTracks(tracks);
+  return acceptable && tracks.every(t=>{
     try {
       const u=new URL(String(t.art||""));
       const h=u.hostname.toLowerCase();
@@ -2565,7 +2598,7 @@ function refreshDailyTop50(){
   }
   let cached = null;
   try{ cached = JSON.parse(lsGetRaw(DAILYKEY)||"null"); }catch(e){ cached = null; }
-  const hasVerifiedCache=!!(cached && chartHasCompleteArtwork(cached.tracks) &&
+  const hasVerifiedCache=!!(cached && chartHasCompleteArtwork(cached.tracks,cached.methodology) &&
     isDailySourceEdition(cached) && cached.sourceDates?.S && cached.spotifyFingerprint);
   /* Never paint a locally cached ranking as today's chart before checking
      the latest independently verified source fingerprint with the server. */
@@ -2575,18 +2608,18 @@ function refreshDailyTop50(){
   setChartStatus({}, "loading");
   // The server checks the latest mirror fingerprint before each chart response.
   // The server returns the latest verified recovery snapshot if live sources fail.
-  fetch("/api/top50?d=" + todayUTC() + "&rev=48",
+  fetch("/api/top50?d=" + todayUTC() + "&rev=49",
     {cache:"no-store",headers:{"Cache-Control":"no-cache"}})
     .then(r=>{ if(!r.ok) throw 0; return r.json(); })
     .then(j=>{
       const tracks = (j && j.tracks) || [];
-      if(!isDailySourceEdition(j) || !chartHasCompleteArtwork(tracks)) throw new Error("incomplete_chart_artwork");
+      if(!isDailySourceEdition(j) || !chartHasCompleteArtwork(tracks,j.methodology)) throw new Error("incomplete_chart_artwork");
       const fresh = j.updated === todayUTC() && !j.fallback && j.complete === true &&
         isDailySourceEdition(j) &&
         !!j.sourceDates?.S && !!j.spotifyFingerprint;
       /* Preserve yesterday's verified rank/tenure without calling it today's.
          Only fully decorated fresh results may be kept as today's browser cache. */
-      if(fresh && chartHasCompleteArtwork(tracks))
+      if(fresh && chartHasCompleteArtwork(tracks,j.methodology))
         lsSetRaw(DAILYKEY, JSON.stringify({date: todayUTC(), tracks,
           complete:j.complete,methodology:j.methodology,consensus:j.consensus,sources:j.sources,sourceDates:j.sourceDates,spotifyFingerprint:j.spotifyFingerprint}));
       applyDaily(tracks, fresh ? "live" : "backup", j.updated);
