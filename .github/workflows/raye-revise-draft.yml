@@ -5,6 +5,7 @@ on:
       - editorial/raye-royal-albert-hall-2026-draft
     paths:
       - .github/workflows/raye-revise-draft.yml
+      - .github/editorial-drafts/raye-royal-albert-hall-2026.json
 permissions:
   contents: read
 concurrency:
