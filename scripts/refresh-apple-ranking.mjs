@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import {APPLE_GLOBAL_URL,parseAppleGlobal,verifiedDailySeed} from "../functions/lib/daily-chart-sources.js";
+import {SOURCE_SIZE,APPLE_GLOBAL_URL,parseAppleGlobal,verifiedDailySeed} from "../functions/lib/daily-chart-sources.js";
 const output=new URL("../public/data/apple-chart.json",import.meta.url);
 let chart,lastError;
 for(let attempt=0;attempt<3;attempt++){
@@ -7,7 +7,7 @@ for(let attempt=0;attempt<3;attempt++){
    const r=await fetch(APPLE_GLOBAL_URL,{headers:{"user-agent":"Mozilla/5.0 (compatible; music98-chart-source/2.0)"},
      signal:AbortSignal.timeout(12000)});
    if(!r.ok)throw new Error("Apple Global HTTP "+r.status);
-   chart=parseAppleGlobal(await r.text());break;
+   chart=parseAppleGlobal(await r.text(),SOURCE_SIZE);break;
  }catch(e){lastError=e;if(attempt<2)await new Promise(done=>setTimeout(done,2500));}
 }
 if(!chart)throw lastError||new Error("Apple Global unavailable");

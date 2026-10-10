@@ -8,7 +8,7 @@ on:
       - ".github/workflows/spotify-chart-source.yml"
   schedule:
     # More checks improve recovery when Spotify and its independent mirror publish at different times.
-    # Every publish still requires 50 verified ranks; these runs use GitHub Actions, not Worker requests.
+    # Every publish requires 100 verified ranks; these runs use GitHub Actions, not Worker requests.
     - cron: "55 1,5,9,13,17,21 * * *"
   workflow_dispatch:
 permissions:
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Require matching dated Top 50 from both Spotify mirrors
+      - name: Require matching dated Top 100 from both Spotify mirrors
         run: node scripts/refresh-spotify-ranking.mjs
       - name: Publish only completely validated source edition
         env:
@@ -39,7 +39,7 @@ jobs:
             echo "Spotify source unchanged"
             exit 0
           fi
-          git commit -m "chart: independently verified Spotify Top 50"
+          git commit -m "chart: independently verified Spotify Top 100"
           for n in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then

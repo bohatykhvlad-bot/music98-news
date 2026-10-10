@@ -95,8 +95,9 @@ async function runCollector({kwDate,mrDate,kwOffline=false,mrOffline=false,initi
   const original=JSON.stringify(initial)+"\n";
   await fs.writeFile(output,original);
   const mrHuman=new Date(mrDate+"T00:00:00Z").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"});
-  const responses={kworb:{status:kwOffline?503:200,body:kworb(tracks,kwDate)},
-   musicrank:{status:mrOffline?503:200,body:musicrank(tracks,mrHuman)}};
+  const expanded=Array.from({length:100},(_,i)=>({pos:i+1,title:"Song "+(i+1),artist:"Artist "+(i+1)}));
+  const responses={kworb:{status:kwOffline?503:200,body:kworb(expanded,kwDate)},
+   musicrank:{status:mrOffline?503:200,body:musicrank(expanded,mrHuman)}};
   const preload=path.join(dir,"fetch.mjs");
   await fs.writeFile(preload,'const responses='+JSON.stringify(responses)+';\n'+
    'globalThis.fetch=async input=>{const host=new URL(String(input)).hostname;'+
@@ -126,12 +127,30 @@ test("collector preserves the last verified snapshot while either mirror is miss
   assert.equal(outcome.unchanged,true);
  }
 });
-test("collector publishes only after both mirrors agree on the new date and all 50 ranks",async()=>{
+test("collector publishes only after both mirrors agree on the new date and all 100 ranks",async()=>{
  const today=new Date().toISOString().slice(0,10),yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
  const result=await runCollector({kwDate:today,mrDate:today,initial:{chartDate:yesterday}});
  assert.equal(result.status,0,result.stderr);
  assert.equal(result.snapshot.chartDate,today);
  assert.equal(result.snapshot.provider,"kworb+musicrank");
- assert.equal(result.snapshot.mirrorMatched,50);
- assert.equal(verifiedSpotifySnapshot(result.snapshot)?.tracks.length,50);
+ assert.equal(result.snapshot.mirrorMatched,100);
+ assert.equal(verifiedSpotifySnapshot(result.snapshot)?.tracks.length,100);
+});
+
+test("a stable Spotify ID confirms naming differences, while a different song still blocks verification",()=>{
+ const left={date:'2026-10-08',tracks:tracks.map((t,i)=>({...t,spotifyId:String(i+1).padStart(22,'0')}))};
+ const right=structuredClone(left);
+ left.tracks[0].title='Dreams - 2001 Remaster';right.tracks[0].title='Dreams - 2004 Remaster';
+ assert.equal(compareSpotifyRankings(left,right).ok,true);
+ right.tracks[0].spotifyId='X'.repeat(22);
+ assert.deepEqual(compareSpotifyRankings(left,right).mismatchPositions,[1]);
+});
+
+test("serialized Musicrank IDs must cover the entire visible Top 100",()=>{
+ const rows=Array.from({length:100},(_,i)=>({pos:i+1,title:'Song '+(i+1),artist:'Artist '+(i+1)}));
+ const flight=records=>'<script>self.__next_f.push('+JSON.stringify([1,JSON.stringify({rows:records.map(t=>({rank:t.pos,title:t.title,artist:t.artist,credits:[],sourceEntityId:String(t.pos).padStart(22,'0')}))})])+')</script>';
+ const html=musicrank(rows,'Oct 8, 2026');
+ const parsed=parseMusicrankSpotify(html+flight(rows),100);
+ assert.equal(parsed.tracks.length,100);assert.equal(parsed.tracks[99].spotifyId,'100'.padStart(22,'0'));
+ assert.throws(()=>parseMusicrankSpotify(html+flight(rows.slice(0,99)),100),/partial_spotify_ids/);
 });

@@ -4,9 +4,11 @@ export const DAILY_CHART_METHOD = "daily-global-v1";
 export const DAILY_CHART_CONSENSUS = "all-three-v1";
 export const DAILY_SOURCE_IDS = ["A", "S", "D"];
 export const CHART_SIZE = 50;
+export const SOURCE_SIZE = 100;
 export const APPLE_GLOBAL_ID = "pl.d25f5d1181894928af76c85c967f8f31";
 export const APPLE_GLOBAL_URL = "https://music.apple.com/us/playlist/top-100-global/" + APPLE_GLOBAL_ID;
 export const DEEZER_GLOBAL_ID = "3155776842";
+export const DEEZER_CHARTS_CREATOR_ID = "637006841";
 export const DEEZER_GLOBAL_URL = "https://api.deezer.com/playlist/" + DEEZER_GLOBAL_ID;
 export const DAILY_SOURCE_DETAILS = {
   A: {name:"Apple Music Top 100: Global", region:"global", cadence:"daily", entity:"song", url:APPLE_GLOBAL_URL},
@@ -18,10 +20,12 @@ export const DAILY_SOURCE_DETAILS = {
 
 export function completeDailySources(counts) {
   return !!counts && Object.keys(counts).length === DAILY_SOURCE_IDS.length &&
-    DAILY_SOURCE_IDS.every(id => counts[id] === CHART_SIZE);
+    (DAILY_SOURCE_IDS.every(id => counts[id] === CHART_SIZE) ||
+     DAILY_SOURCE_IDS.every(id => counts[id] === SOURCE_SIZE));
 }
 
-// Input charts remain complete Top 50s. The output is their intersection,
+// Input charts are complete Top 100s (legacy Top 50 snapshots remain readable).
+// The output is their intersection,
 // capped at 50; never fill missing consensus places with one-platform songs.
 export function hasConsensusTracks(tracks) {
   if (!Array.isArray(tracks) || !tracks.length || tracks.length > CHART_SIZE) return false;
@@ -34,7 +38,7 @@ export function hasConsensusTracks(tracks) {
     identities.add(key);
     return DAILY_SOURCE_IDS.every(id => {
       const rank = track.sourceRanks?.[id];
-      if (!Number.isInteger(rank) || rank < 1 || rank > CHART_SIZE || positions[id].has(rank)) return false;
+      if (!Number.isInteger(rank) || rank < 1 || rank > SOURCE_SIZE || positions[id].has(rank)) return false;
       positions[id].add(rank);
       return true;
     });
@@ -43,7 +47,8 @@ export function hasConsensusTracks(tracks) {
 
 export function isConsensusChart(snapshot) {
   return snapshot?.methodology === DAILY_CHART_METHOD && snapshot?.consensus === DAILY_CHART_CONSENSUS &&
-    snapshot.complete === true && completeDailySources(snapshot.sources) && hasConsensusTracks(snapshot.tracks);
+    snapshot.complete === true && completeDailySources(snapshot.sources) && hasConsensusTracks(snapshot.tracks) &&
+    snapshot.tracks.every(t => DAILY_SOURCE_IDS.every(id => t.sourceRanks[id] <= snapshot.sources[id]));
 }
 
 export function currentSourceDate(day, now=Date.now(), maxLagDays=1) {
@@ -53,8 +58,8 @@ export function currentSourceDate(day, now=Date.now(), maxLagDays=1) {
     ms<=today && today-ms<=maxLagDays*86400000;
 }
 
-export function validatedDailyRows(rows, source) {
-  if (!Array.isArray(rows) || rows.length !== CHART_SIZE)
+export function validatedDailyRows(rows, source, size=CHART_SIZE) {
+  if (!Array.isArray(rows) || rows.length !== size)
     throw new Error("incomplete_chart_sources:"+source);
   const identities=new Set();
   return rows.map((row,i) => {
@@ -79,7 +84,7 @@ function scriptJSON(html, id) {
 
 /* /us/ selects catalog metadata. The exact playlist ID selects the global
    daily ranking; the US most-played RSS is never a ranking fallback. */
-export function parseAppleGlobal(html) {
+export function parseAppleGlobal(html, size=CHART_SIZE) {
   const state=scriptJSON(html,"serialized-server-data");
   const page=state?.data?.find(p => p?.intent?.contentDescriptor?.kind==="playlist" &&
     p.intent.contentDescriptor.identifiers?.storeAdamID===APPLE_GLOBAL_ID);
@@ -93,7 +98,7 @@ export function parseAppleGlobal(html) {
     throw new Error("apple_wrong_or_partial_global_playlist");
   const publishedAt=String(schema.datePublished || ""), date=publishedAt.slice(0,10);
   if (!currentSourceDate(date)) throw new Error("apple_global_date_stale_or_missing");
-  const tracks=validatedDailyRows(items.slice(0,CHART_SIZE).map((item,i) => {
+  const tracks=validatedDailyRows(items.slice(0,size).map((item,i) => {
     const descriptor=item?.contentDescriptor;
     if (descriptor?.kind!=="song" || Number(item.rankingText)!==i+1)
       throw new Error("apple_global_rank_missing_"+(i+1));
@@ -101,20 +106,20 @@ export function parseAppleGlobal(html) {
       url:String(descriptor.url || ""),
       art:String(item.artwork?.dictionary?.url || "").replaceAll("{w}","600").replaceAll("{h}","600").replaceAll("{f}","jpg"),
       year:"", prev:""};
-  }),"A");
+  }),"A",size);
   return {date,publishedAt,tracks};
 }
 
-export function parseDeezerWorldwide(data) {
+export function parseDeezerWorldwide(data, size=CHART_SIZE) {
   if (String(data?.id)!==DEEZER_GLOBAL_ID || data?.title!=="Top Worldwide" ||
-      data?.creator?.name!=="Deezer Charts" || data?.nb_tracks<CHART_SIZE)
+      data?.creator?.name!=="Deezer Charts" || String(data?.creator?.id)!==DEEZER_CHARTS_CREATOR_ID || data?.nb_tracks<size)
     throw new Error("deezer_wrong_or_partial_worldwide_playlist");
-  return validatedDailyRows((data.tracks?.data || []).slice(0,CHART_SIZE).map((item,i) => ({
+  return validatedDailyRows((data.tracks?.data || []).slice(0,size).map((item,i) => ({
     pos:i+1, title:item.title,
     artist:(item.contributors || []).map(a => a?.name).filter(Boolean).join(", ") || item.artist?.name,
     // Playback, artwork and listen links continue to use the existing Apple resolver.
     url:"", art:"", year:"", prev:"",
-  })),"D");
+  })),"D",size);
 }
 
 export function verifiedDailySeed(snapshot, source, now=Date.now()) {
@@ -122,7 +127,9 @@ export function verifiedDailySeed(snapshot, source, now=Date.now()) {
   if (!["A","D"].includes(source) || snapshot?.schema!==2 || snapshot?.source!==expected ||
       snapshot.region!=="global" || snapshot.cadence!=="daily" ||
       !currentSourceDate(snapshot.updated,now,0) || !currentSourceDate(snapshot.sourceDate,now)) return null;
-  try { return {...snapshot,tracks:validatedDailyRows(snapshot.tracks,source)}; } catch { return null; }
+  const size=snapshot.tracks?.length;
+  if(![CHART_SIZE,SOURCE_SIZE].includes(size))return null;
+  try { return {...snapshot,tracks:validatedDailyRows(snapshot.tracks,source,size)}; } catch { return null; }
 }
 
 /* Old editions are retained for history recovery, never for serving a ranking

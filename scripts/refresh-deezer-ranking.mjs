@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import {createHash} from "node:crypto";
-import {DEEZER_GLOBAL_URL,parseDeezerWorldwide,verifiedDailySeed} from "../functions/lib/daily-chart-sources.js";
+import {SOURCE_SIZE,DEEZER_GLOBAL_URL,parseDeezerWorldwide,verifiedDailySeed} from "../functions/lib/daily-chart-sources.js";
 
 const output=new URL("../public/data/deezer-chart.json",import.meta.url);
 const r=await fetch(DEEZER_GLOBAL_URL,{headers:{"user-agent":"music98-chart-source/2.0"},
   signal:AbortSignal.timeout(15000)});
 if(!r.ok)throw new Error("Deezer Worldwide HTTP "+r.status);
-const data=await r.json(),tracks=parseDeezerWorldwide(data);
+const data=await r.json(),tracks=parseDeezerWorldwide(data,SOURCE_SIZE);
 const capturedAt=new Date().toISOString(),today=capturedAt.slice(0,10);
 // The public playlist has no closed chart-day date. Record when it was read;
 // do not label this as a measured 24-hour streaming total.

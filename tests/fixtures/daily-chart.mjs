@@ -16,10 +16,10 @@ export function appleHTML(rows, {id=APPLE_GLOBAL_ID,count=100,date=new Date().to
     '</script><script id=schema:music-playlist type="application/ld+json">'+JSON.stringify(schema)+'</script>';
 }
 
-export function fakeDailySource({deezerCount=50,kworbMissing=[],kworbSwap=false,appleOffline=false,deezerOffline=false}={}) {
+export function fakeDailySource({size=50,deezerCount=size,kworbMissing=[],kworbSwap=false,appleOffline=false,deezerOffline=false}={}) {
   const today=new Date().toISOString().slice(0,10),requests=[];
-  const rows=Array.from({length:50},(_,i)=>({pos:i+1,title:"Source Song "+(i+1),artist:"Source Artist "+(i+1)}));
-  const snapshot={schema:1,verified:true,provider:"kworb+musicrank",mirrorMatched:50,
+  const rows=Array.from({length:size},(_,i)=>({pos:i+1,title:"Source Song "+(i+1),artist:"Source Artist "+(i+1)}));
+  const snapshot={schema:1,verified:true,provider:"kworb+musicrank",mirrorMatched:size,
     fingerprint:"a".repeat(64),chartDate:today,tracks:rows};
   const kw='<title>Spotify Daily Chart - Global</title><h2>'+today.replaceAll("-","/")+'</h2><table>'+
     rows.filter(x=>!kworbMissing.includes(x.pos)).map(x=>
@@ -27,7 +27,7 @@ export function fakeDailySource({deezerCount=50,kworbMissing=[],kworbSwap=false,
       '<td class="text mp"><div><b>'+x.artist+'</b> - '+(kworbSwap&&x.pos===36?"Wrong Song":x.title)+'</div></td></tr>'
     ).join("")+'</table>';
   const apple=appleHTML(rows);
-  const deezer={id:Number(DEEZER_GLOBAL_ID),title:"Top Worldwide",nb_tracks:100,creator:{name:"Deezer Charts"},
+  const deezer={id:Number(DEEZER_GLOBAL_ID),title:"Top Worldwide",nb_tracks:100,creator:{id:637006841,name:"Deezer Charts"},
     tracks:{data:rows.slice(0,deezerCount).map(x=>({title:x.title,artist:{name:x.artist}}))}};
   const fakeFetch=async input=>{
     const url=String(input);requests.push(url);

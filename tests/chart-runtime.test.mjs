@@ -94,7 +94,7 @@ test("fresh Apple fallback also requires an intact Top 50",()=>{
  assert.doesNotMatch(top50,/rss.applemarketingtools.com/);
 });
 test("the Worker uses tested shared parsing and rejects unverified KV cache",()=>{
- assert.match(top50,/function parseSpotify\(html\) \{ return parseKworbSpotify\(html\); \}/);
+ assert.match(top50,/function parseSpotify\(html,size=SIZE\) \{ return parseKworbSpotify\(html,size\); \}/);
  assert.match(top50,/const verified=verifiedSpotifySnapshot\(spotifySeed\)/);
  assert.match(top50,/cached.sourceDates\?\.S===verified.date/);
  assert.match(top50,/cached.spotifyFingerprint===verified.fingerprint/);

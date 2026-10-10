@@ -1,5 +1,6 @@
 import {mergeKey} from "./chart-identity.js";
 export const SPOTIFY_TOP_SIZE=50;
+export const SPOTIFY_INPUT_SIZE=100;
 export const SPOTIFY_MAX_LAG_DAYS=2;
 function textOf(html){
  return String(html||"").replace(/<[^>]*>/g,"")
@@ -35,9 +36,10 @@ export function validatedSpotifyRows(rows,limit=SPOTIFY_TOP_SIZE){
   identities.add(key);
  }
  return sorted.map(t=>({pos:Number(t.pos),title:String(t.title).trim(),artist:String(t.artist).trim(),
-  url:String(t.url||""),art:String(t.art||""),year:String(t.year||""),prev:""}));
+  url:String(t.url||""),art:String(t.art||""),year:String(t.year||""),prev:"",
+  ...(t.spotifyId?{spotifyId:String(t.spotifyId)}:{})}));
 }
-export function parseKworbSpotify(html){
+export function parseKworbSpotify(html,limit=SPOTIFY_TOP_SIZE){
  const h=String(html||"");
  if(!/Spotify Daily Chart\s*-\s*Global/i.test(h.slice(0,5000)))throw new Error("kworb_wrong_chart");
  const m=h.match(/\b(20\d{2})[/-](\d{2})[/-](\d{2})\b/),date=dateISO(m?m[1]+"-"+m[2]+"-"+m[3]:"");
@@ -47,17 +49,18 @@ export function parseKworbSpotify(html){
   const cells=[...row[1].matchAll(/<td\b([^>]*)>([\s\S]*?)<\/td>/gi)];
   if(cells.length<3||!classes(cells[0][1]).has("np"))continue;
   const rank=textOf(cells[0][2]);if(!/^\d+$/.test(rank))continue;
-  const pos=Number(rank);if(pos<1||pos>SPOTIFY_TOP_SIZE)continue;
+  const pos=Number(rank);if(pos<1||pos>limit)continue;
   const cell=cells.find(c=>classes(c[1]).has("text")&&classes(c[1]).has("mp"));
   if(!cell)continue;
   const div=cell[2].match(/<div\b[^>]*>([\s\S]*?)<\/div>/i);
   const name=textOf(div?div[1]:cell[2]),cut=name.indexOf(" - ");
   if(cut<1)throw new Error("kworb_identity_missing_"+pos);
-  tracks.push({pos,artist:name.slice(0,cut),title:name.slice(cut+3)});
+  const spotifyId=cell[2].match(/href=["'][^"']*\/track\/([A-Za-z0-9]{22})\.html["']/)?.[1];
+  tracks.push({pos,artist:name.slice(0,cut),title:name.slice(cut+3),spotifyId});
  }
- return {date,source:"kworb",tracks:validatedSpotifyRows(tracks)};
+ return {date,source:"kworb",tracks:validatedSpotifyRows(tracks,limit)};
 }
-export function parseMusicrankSpotify(html){
+export function parseMusicrankSpotify(html,limit=SPOTIFY_TOP_SIZE){
  const h=String(html||""),description=h.match(/<meta\b[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i)?.[1]||"";
  const human=description.match(/\bfor\s+([A-Za-z]+\s+\d{1,2},\s+20\d{2})\./i)?.[1];
  const parsed=human?new Date(human+" 00:00:00 UTC"):new Date(NaN);
@@ -72,7 +75,7 @@ export function parseMusicrankSpotify(html){
  if(from<0||to<from)throw new Error("musicrank_chart_body_missing");
  const main=h.slice(from,to),tracks=[],seen=new Set();
  const re=/<a\b[^>]*href=["'](\/track\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;let m;
- while((m=re.exec(main))&&tracks.length<SPOTIFY_TOP_SIZE){
+ while((m=re.exec(main))&&tracks.length<limit){
   const url=m[1],title=textOf(m[2]);if(!title||seen.has(url))continue;
   const next=main.slice(re.lastIndex,re.lastIndex+2500);
   const boundary=next.search(/<a\b[^>]*href=["']\/track\//i);
@@ -81,7 +84,25 @@ export function parseMusicrankSpotify(html){
   if(!artist)throw new Error("musicrank_artist_missing_"+(tracks.length+1));
   seen.add(url);tracks.push({pos:tracks.length+1,title,artist:textOf(artist[1])});
  }
- const verified=validatedSpotifyRows(tracks);
+ const verified=validatedSpotifyRows(tracks,limit);
+ // Read the page's serialized data as JSON, never execute page scripts. The
+ // stable Spotify ID resolves harmless canonical/remaster name differences.
+ const ids=new Map();
+ for(const script of h.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)){
+  const call=script[1].match(/^self\.__next_f\.push\(([\s\S]*)\)\s*;?$/);
+  if(!call)continue;
+  let chunk;try{chunk=JSON.parse(call[1])?.[1];}catch{continue;}
+  if(typeof chunk!=="string")continue;
+  for(const row of chunk.matchAll(/\{"rank":(\d+),"title":("(?:\\.|[^"\\])*"),"artist":("(?:\\.|[^"\\])*"),"credits":\[[\s\S]*?\],"sourceEntityId":"([A-Za-z0-9]{22})"/g)){
+   const pos=Number(row[1]);if(pos<1||pos>limit)continue;
+   const title=JSON.parse(row[2]),artist=JSON.parse(row[3]);
+   if(mergeKey(title,artist)!==mergeKey(verified[pos-1]?.title,verified[pos-1]?.artist))
+    throw new Error("musicrank_serialized_identity_mismatch_"+pos);
+   ids.set(pos,row[4]);
+  }
+ }
+ if(ids.size&&ids.size!==limit)throw new Error("musicrank_partial_spotify_ids");
+ verified.forEach(t=>{if(ids.has(t.pos))t.spotifyId=ids.get(t.pos);});
  for(let i=0;i<20;i++){
   const record=expected[i];
   if(Number(record?.position)!==i+1||
@@ -93,18 +114,25 @@ export function parseMusicrankSpotify(html){
 }
 export function compareSpotifyRankings(a,b){
  if(!a||!b||a.date!==b.date)return {ok:false,dateMatch:false,mismatchPositions:[]};
- try{validatedSpotifyRows(a.tracks);validatedSpotifyRows(b.tracks);}
+ const limit=a.tracks?.length;
+ if(![SPOTIFY_TOP_SIZE,SPOTIFY_INPUT_SIZE].includes(limit)||b.tracks?.length!==limit)
+  return {ok:false,dateMatch:true,mismatchPositions:[]};
+ try{validatedSpotifyRows(a.tracks,limit);validatedSpotifyRows(b.tracks,limit);}
  catch{return {ok:false,dateMatch:true,mismatchPositions:[]};}
  const mismatchPositions=[];
- for(let i=0;i<SPOTIFY_TOP_SIZE;i++)
-  if(mergeKey(a.tracks?.[i]?.title,a.tracks?.[i]?.artist)!==
-     mergeKey(b.tracks?.[i]?.title,b.tracks?.[i]?.artist))mismatchPositions.push(i+1);
+ for(let i=0;i<limit;i++){
+  const left=a.tracks[i],right=b.tracks[i];
+  const same=(left.spotifyId&&right.spotifyId&&left.spotifyId===right.spotifyId) ||
+    mergeKey(left.title,left.artist)===mergeKey(right.title,right.artist);
+  if(!same)mismatchPositions.push(i+1);
+ }
  return {ok:mismatchPositions.length===0,dateMatch:true,mismatchPositions};
 }
 export function verifiedSpotifySnapshot(s,now=Date.now()){
  if(s?.schema!==1||s.verified!==true||!spotifyDateCurrent(s.chartDate,now))return null;
- if(s.provider!=="kworb+musicrank"||s.mirrorMatched!==SPOTIFY_TOP_SIZE)return null;
+ const size=s.tracks?.length;
+ if(s.provider!=="kworb+musicrank"||![SPOTIFY_TOP_SIZE,SPOTIFY_INPUT_SIZE].includes(size)||s.mirrorMatched!==size)return null;
  if(!/^[a-f0-9]{64}$/.test(String(s.fingerprint||"")))return null;
- try{return {date:s.chartDate,source:s.provider,fingerprint:s.fingerprint,tracks:validatedSpotifyRows(s.tracks)};}
+ try{return {date:s.chartDate,source:s.provider,fingerprint:s.fingerprint,tracks:validatedSpotifyRows(s.tracks,size)};}
  catch{return null;}
 }

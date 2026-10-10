@@ -250,6 +250,12 @@ test("even first-place songs in one or two charts cannot fill a consensus editio
    assert.deepEqual(chart.tracks.map(t=>t.title),source.rows.slice(2,9).map(t=>t.title));
    assert.ok(hasConsensusTracks(chart.tracks));
    assert.deepEqual(chart.tracks[0].sourceRanks,{A:3,S:3,D:3});
+   const response=await onRequestGet({env,request:new Request('https://music98.news/api/top50')});
+   const published=await response.json();
+   assert.equal(response.status,200);
+   assert.equal(published.arrows.ok,true);
+   assert.equal(published.tracks.length,7);
+   assert.ok(published.tracks.every(t=>t.weeks===8));
  }finally{globalThis.fetch=previous;}
 });
 
@@ -262,4 +268,27 @@ test("old aggregate caches and snapshots cannot reintroduce one-platform tracks"
  globalThis.fetch=source.fakeFetch;
  try{assert.equal((await onRequestGet({env,request:new Request('https://music98.news/api/top50')})).status,503);}
  finally{globalThis.fetch=previous;}
+});
+
+test("Top 100 inputs discover consensus songs below 50 without admitting exclusive leaders",async()=>{
+ const source=fakeDailySource({size:100}),{env}=mediaEnvironment(source),previous=globalThis.fetch;
+ const deezer=structuredClone(source.deezer);
+ source.snapshot.tracks=source.snapshot.tracks.map(t=>t.pos<=50?{...t,title:'Spotify exclusive '+t.pos}:t);
+ deezer.tracks.data=deezer.tracks.data.map((t,i)=>i<50?{...t,title:'Deezer exclusive '+(i+1)}:t);
+ const kw='<title>Spotify Daily Chart - Global</title><h2>'+source.snapshot.chartDate.replaceAll('-','/')+'</h2><table>'+source.snapshot.tracks.map(t=>
+  '<tr class="d2"><td class="np">'+t.pos+'</td><td class="text mp"><div>'+t.artist+' - '+t.title+'</div></td></tr>').join('')+'</table>';
+ globalThis.fetch=async input=>{
+   const url=String(input);
+   if(url.includes('kworb.net'))return new Response(kw);
+   if(url.includes('api.deezer.com'))return new Response(JSON.stringify(deezer));
+   return source.fakeFetch(input);
+ };
+ try{
+   const chart=await buildTop50('https://music98.news',env,source.snapshot);
+   assert.deepEqual(chart.sources,{A:100,S:100,D:100});
+   assert.equal(chart.tracks.length,50);
+   assert.deepEqual(chart.tracks.map(t=>t.title),source.rows.slice(50).map(t=>t.title));
+   assert.deepEqual(chart.tracks[0].sourceRanks,{A:51,S:51,D:51});
+   assert.ok(hasConsensusTracks(chart.tracks));
+ }finally{globalThis.fetch=previous;}
 });

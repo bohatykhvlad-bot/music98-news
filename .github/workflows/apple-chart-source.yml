@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Fetch verified Apple Music Global Top 50
+      - name: Fetch verified Apple Music Global Top 100
         run: node scripts/refresh-apple-ranking.mjs
       - name: Fetch verified Deezer Top Worldwide
         run: node scripts/refresh-deezer-ranking.mjs

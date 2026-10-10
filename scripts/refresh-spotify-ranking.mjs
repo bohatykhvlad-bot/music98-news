@@ -1,11 +1,11 @@
 import fs from "node:fs";
 import {createHash} from "node:crypto";
 import {parseKworbSpotify,parseMusicrankSpotify,spotifyDateCurrent,
- compareSpotifyRankings,validatedSpotifyRows,verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
+ compareSpotifyRankings,validatedSpotifyRows,verifiedSpotifySnapshot,SPOTIFY_INPUT_SIZE} from "../functions/lib/spotify-chart.js";
 const OUT=new URL("../public/data/spotify-chart.json",import.meta.url);
 const sources=[
- {name:"Kworb",url:"https://kworb.net/spotify/country/global_daily.html",parse:parseKworbSpotify},
- {name:"Musicrank",url:"https://musicrank.org/spotify",parse:parseMusicrankSpotify}
+ {name:"Kworb",url:"https://kworb.net/spotify/country/global_daily.html",parse:html=>parseKworbSpotify(html,SPOTIFY_INPUT_SIZE)},
+ {name:"Musicrank",url:"https://musicrank.org/spotify",parse:html=>parseMusicrankSpotify(html,SPOTIFY_INPUT_SIZE)}
 ];
 async function collect(src){
  let last;
@@ -36,14 +36,14 @@ if(kw.ok&&mr.ok&&kw.data.date===mr.data.date){
    match.mismatchPositions.slice(0,5).map(p=>({
     position:p,kworb:kw.data.tracks[p-1],musicrank:mr.data.tracks[p-1]
    }))));
- chosen=kw.data;provider="kworb+musicrank";mirrorMatched=50;ldConfirmed=mr.data.ldConfirmed;
+ chosen=kw.data;provider="kworb+musicrank";mirrorMatched=SPOTIFY_INPUT_SIZE;ldConfirmed=mr.data.ldConfirmed;
 }else if(kw.ok&&mr.ok&&kw.data.date!==mr.data.date){
  throw new Error("Spotify mirrors have different dates: await same-date verification");
 }else{
  throw new Error("No independently verified Spotify source: "+
    JSON.stringify({kworb:kw.ok?kw.data.date:kw.error,musicrank:mr.ok?mr.data.date:mr.error}));
 }
-const tracks=validatedSpotifyRows(chosen.tracks);
+const tracks=validatedSpotifyRows(chosen.tracks,SPOTIFY_INPUT_SIZE);
 const fingerprint=createHash("sha256").update(JSON.stringify(tracks.map(t=>[t.pos,t.title,t.artist]))).digest("hex");
 let old=null;try{old=JSON.parse(fs.readFileSync(OUT,"utf8"));}catch{}
 if(old?.chartDate&&old.chartDate>chosen.date)

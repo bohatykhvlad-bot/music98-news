@@ -14,8 +14,7 @@ for(let attempt=0;attempt<attempts;attempt++){
    {headers:{"user-agent":"music98-chart-audit/2.0","cache-control":"no-cache"},signal:AbortSignal.timeout(15000)});
  if(res.ok){
    j=await res.json();
-   if(!j.fallback && j.complete===true &&
-     j.methodology===DAILY_CHART_METHOD && completeDailySources(j.sources) &&
+   if(!j.fallback && isConsensusChart(j) &&
      j.sourceDates?.S===verified.date && j.spotifyFingerprint===verified.fingerprint)break;
  }
  reason=JSON.stringify({status:res.status,updated:j?.updated,rev:j?.rev,

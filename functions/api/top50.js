@@ -3,7 +3,7 @@ import {hasCompleteChartArtwork as completeArtwork,isTrustedChartArtwork,missing
 import {discoverAppleAlbumTracks} from "../lib/apple-album-discovery.js";
 import {candidateCompatible,isDerivativeRelease,isGenericRelease,rankArtworkCandidates} from "../lib/artwork-resolver.js";
 import {compareSpotifyRankings,parseKworbSpotify,spotifyDateCurrent,verifiedSpotifySnapshot} from "../lib/spotify-chart.js";
-import {DAILY_CHART_METHOD,DAILY_CHART_CONSENSUS,isConsensusChart,hasConsensusTracks,DAILY_SOURCE_IDS,DAILY_SOURCE_DETAILS,APPLE_GLOBAL_URL,DEEZER_GLOBAL_URL,
+import {DAILY_CHART_METHOD,SOURCE_SIZE,DAILY_CHART_CONSENSUS,isConsensusChart,hasConsensusTracks,DAILY_SOURCE_IDS,DAILY_SOURCE_DETAILS,APPLE_GLOBAL_URL,DEEZER_GLOBAL_URL,
   completeDailySources,parseAppleGlobal,parseDeezerWorldwide,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
 
 const SIZE = 50;
@@ -555,7 +555,7 @@ async function applyTenure(env, tracks, diag, origin) {
 /* Movement self-check:
    NEW and RE-ENTRY both start a fresh current run at 1 day.
    Numeric movement requires presence in yesterday's Top 50. */
-function arrowCheck(tracks) {
+function arrowCheck(tracks, referenceLength=SIZE) {
   const taken = new Set();
   let bad = 0;
   let mixed = 0;
@@ -575,7 +575,8 @@ function arrowCheck(tracks) {
     if (!Number.isFinite(n)) { bad += 1; return; }
     if (w < 2) mixed += 1;
     const p = i + n;
-    if (p < 0 || p >= tracks.length || taken.has(p)) bad += 1;
+    // Yesterday's chart may be longer than today's strict intersection.
+    if (p < 0 || p >= referenceLength || taken.has(p)) bad += 1;
     else taken.add(p);
   });
 
@@ -583,10 +584,10 @@ function arrowCheck(tracks) {
 }
 const UA = "Mozilla/5.0 (compatible; music98/1.0)";
 
-function points(pos) {
+function points(pos,size=SIZE) {
   const n = Number(pos);
-  if (!n || n < 1 || n > SIZE) return 0;
-  return SIZE + 1 - n;
+  if (!n || n < 1 || n > size) return 0;
+  return size + 1 - n;
 }
 
 async function getText(url) {
@@ -601,7 +602,7 @@ async function getJson(url) {
   return JSON.parse(await getText(url));
 }
 /* All HTML structure, highlighted rows and the source date are parsed in one tested module. */
-function parseSpotify(html) { return parseKworbSpotify(html); }
+function parseSpotify(html,size=SIZE) { return parseKworbSpotify(html,size); }
 
 function ingest(bucket, src, rows) {
   for (const row of rows) {
@@ -665,21 +666,22 @@ async function freshDailyRanking(env,origin,source) {
   return verifiedDailySeed(await readSeed(env,origin,file),source);
 }
 export async function buildTop50(origin, env, spotifySeed) {
+  const inputSize=spotifySeed?.tracks?.length===SOURCE_SIZE ? SOURCE_SIZE : SIZE;
   let [appleChart, spotify, deezer] = await Promise.all([
-    safe("A", async () => parseAppleGlobal(await getText(APPLE_GLOBAL_URL))),
-    safe("S", async () => parseSpotify(await getText("https://kworb.net/spotify/country/global_daily.html"))),
-    safe("D", async () => parseDeezerWorldwide(await getJson(DEEZER_GLOBAL_URL))),
+    safe("A", async () => parseAppleGlobal(await getText(APPLE_GLOBAL_URL),inputSize)),
+    safe("S", async () => parseSpotify(await getText("https://kworb.net/spotify/country/global_daily.html"),inputSize)),
+    safe("D", async () => parseDeezerWorldwide(await getJson(DEEZER_GLOBAL_URL),inputSize)),
   ]);
   let apple=appleChart?.tracks || [];
   let appleOrigin="official-global-live",deezerOrigin="official-worldwide-live";
   let appleDate=appleChart?.date || "",deezerDate=new Date().toISOString().slice(0,10);
-  if(apple.length!==SIZE){
+  if(![SIZE,SOURCE_SIZE].includes(apple.length)){
     const snapshot=await freshDailyRanking(env,origin,"A");
     apple=snapshot?.tracks || [];
     appleDate=snapshot?.sourceDate || "";
     appleOrigin=snapshot ? "github-current-day-global" : "unavailable";
   }
-  if(deezer.length!==SIZE){
+  if(![SIZE,SOURCE_SIZE].includes(deezer.length)){
     const snapshot=await freshDailyRanking(env,origin,"D");
     deezer=snapshot?.tracks || [];
     deezerDate=snapshot?.sourceDate || "";
@@ -702,11 +704,10 @@ export async function buildTop50(origin, env, spotifySeed) {
   const sources={A:apple.length,S:spotify.length,D:deezer.length};
   if(!completeChartSources(sources))
     throw new Error("incomplete_chart_sources:"+JSON.stringify(sources));
-  /* Each platform must contribute ranks 1 through 50, without duplicate
-     song identities. A source that looks like 50 rows may still skip a rank. */
+  /* Each platform must supply every input rank, without duplicate identities. */
   for(const [label,rows] of [["A",apple],["S",spotify],["D",deezer]]){
     const identities=new Set();
-    for(let i=0;i<SIZE;i++){
+    for(let i=0;i<rows.length;i++){
       const row=rows[i],identity=mergeKey(row?.title,row?.artist);
       if(Number(row?.pos)!==i+1||!identity||identities.has(identity))
         throw new Error("invalid_rank_or_duplicate_source_"+label+"_at_"+(i+1));
@@ -720,14 +721,11 @@ export async function buildTop50(origin, env, spotifySeed) {
   const ranked = [...bucket.values()]
     .filter(rec => SOURCES.every(source => Number.isInteger(rec.ranks[source])))
     .sort((a, b) => {
-      const sa = SOURCES.reduce((n, k) => n + points(a.ranks[k]), 0);
-      const sb = SOURCES.reduce((n, k) => n + points(b.ranks[k]), 0);
+      const sa = SOURCES.reduce((n, k) => n + points(a.ranks[k],sources[k]), 0);
+      const sb = SOURCES.reduce((n, k) => n + points(b.ranks[k],sources[k]), 0);
       if (sb !== sa) return sb - sa;
-      const ca = SOURCES.filter((k) => a.ranks[k]).length;
-      const cb = SOURCES.filter((k) => b.ranks[k]).length;
-      if (cb !== ca) return cb - ca;
-      const ba = Math.min(...SOURCES.map((k) => a.ranks[k]).filter(Boolean), 99);
-      const bb = Math.min(...SOURCES.map((k) => b.ranks[k]).filter(Boolean), 99);
+      const ba = Math.min(...SOURCES.map((k) => a.ranks[k]));
+      const bb = Math.min(...SOURCES.map((k) => b.ranks[k]));
       if (ba !== bb) return ba - bb;
       return a.title.localeCompare(b.title);
     })
@@ -1119,14 +1117,13 @@ export async function onRequestGet({env,request}) {
   try{
     const payload=await withTimeout(buildTop50(origin,env,spotifySeed),14000);
     if(!verifiedSourceSnapshot(payload))throw new Error("incomplete_chart_sources");
-    /* Block ranking publication and KV writes until every one of the 50
-       current rows has a trustworthy image URL. Never publish SVG initials. */
+    /* Every admitted row needs trustworthy artwork before ranking/KV writes. */
     if(!hasCompleteChartArtwork(payload.tracks))
       throw new Error("incomplete_chart_artwork:"+JSON.stringify(missingChartArtwork(payload.tracks,payload.tracks.length).slice(0,8)));
     payload.seedEdition=seedEdition;
     const memory={deferPersist:true};
     payload.tracks=await applyTenure(env,payload.tracks,memory,origin);
-    payload.arrows=arrowCheck(payload.tracks);
+    payload.arrows=arrowCheck(payload.tracks,memory.refLen || SIZE);
     if(payload.arrows?.ok===false || cachedTenureRegressed(payload,backup))
       throw new Error("failed_chart_tenure_checks");
     const pending=memory.pendingTenure;

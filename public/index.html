@@ -1027,7 +1027,7 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
   </section>
 
   <section class="tab" id="tab-charts">
-    <div class="hd"><h1 class="hd-t">Daily Top 50</h1>
+    <div class="hd"><h1 class="hd-t">Daily chart</h1>
     </div>
     <div class="chart-switch" id="chartSwitch" hidden></div>
     <div class="chart" id="chartList" role="list"></div>
@@ -1464,7 +1464,8 @@ const DAILY_CHART_METHOD = "daily-global-v1";
 function isDailySourceEdition(j){
   return j?.methodology===DAILY_CHART_METHOD && j.consensus==="all-three-v1" &&
     chartHasConsensusTracks(j.tracks) && Object.keys(j.sources||{}).length===3 &&
-    ["A","S","D"].every(k=>j.sources[k]===50);
+    ([50,100].some(size=>["A","S","D"].every(k=>j.sources[k]===size))) &&
+    j.tracks.every(t=>["A","S","D"].every(id=>t.sourceRanks[id]<=j.sources[id]));
 }
 const APPLE_AT = "1001l3aZW";
 const APPLE_CT = "music98";
@@ -2532,7 +2533,7 @@ function chartHasConsensusTracks(tracks){
     identities.add(key);
     return ["A","S","D"].every(id=>{
       const rank=t.sourceRanks?.[id];
-      if(!Number.isInteger(rank)||rank<1||rank>50||positions[id].has(rank))return false;
+      if(!Number.isInteger(rank)||rank<1||rank>100||positions[id].has(rank))return false;
       positions[id].add(rank);return true;
     });
   });
@@ -3376,6 +3377,7 @@ function hydrateArts(){
 }
 function renderCharts(){
   const source = (autoRows && autoRows.length) ? autoRows : data.chart;
+  $("#tab-charts .hd-t").textContent = source.length ? "Daily Top " + source.length : "Daily chart";
   const rows = source.map((r,i)=>({r,i})).filter(x=>chartMatches(x.r));
   lastChartCount = rows.length;
   $("#chartList").innerHTML = rows.map((o)=>{

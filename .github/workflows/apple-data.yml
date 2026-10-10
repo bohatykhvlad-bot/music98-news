@@ -137,7 +137,7 @@ jobs:
             fi
           fi
 
-      - name: Дождаться точного совпадения всех 50 live обложек с проверенным реестром
+      - name: Дождаться совпадения всех live обложек с проверенным реестром
         run: node scripts/verify-live-artwork.mjs
       # Repair media before the source-version audit: a slow Worker deployment
       # must not skip cover recovery for the chart already visible to visitors.
