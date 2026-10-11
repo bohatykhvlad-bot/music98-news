@@ -1,4 +1,4 @@
-name: RAYE published final copy comparison
+name: RAYE final public equality audit
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
