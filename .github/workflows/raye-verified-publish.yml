@@ -1,4 +1,4 @@
-name: RAYE authorized guarded editorial publication
+name: RAYE authorized guarded editorial publication (approved)
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
