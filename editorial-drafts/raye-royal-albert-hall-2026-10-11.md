@@ -8,7 +8,7 @@
 
 RAYE will return to London's Royal Albert Hall on October 23 with an orchestral show built around her second album, *This Music May Contain Hope.* The concert is titled *This Symphony May Contain Hope.* She will perform the album in full alongside her band, the Heritage Orchestra and the Flames Collective choir. Presales open October 13, with general ticket sales beginning October 15.
 
-She has performed with the same orchestra and choir at Royal Albert Hall before. That concert, built around her debut *My 21st Century Blues*, became the film *Live at the Royal Albert Hall* and the live album *My 21st Century Symphony.* The film later earned a Grammy nomination. In an interview with the Recording Academy, RAYE described how she likes to change songs onstage, extending an introduction or taking an arrangement somewhere new instead of simply reproducing the recording. She also brought the orchestral show to The O2.
+She has played Royal Albert Hall with the Heritage Orchestra and Flames Collective before. That earlier concert was built around her debut, *My 21st Century Blues*, and was released as both a film and a live album. The film later received a Grammy nomination. In an interview with the Recording Academy, RAYE explained that she enjoys changing songs onstage, whether by extending an introduction or taking an arrangement somewhere different from the studio recording.
 
 Getting to make an album of her own had been a struggle. RAYE signed a publishing deal as a teenager and wrote for artists including Beyoncé and Charli XCX, while releasing EPs and dance-pop singles herself. She has said she wanted to make R&B but had little creative control during her time with Polydor. She was finding success as a songwriter without being able to release the full-length record she wanted. In 2021, she publicly criticized the label over the delay and left to pursue her music independently.
 
@@ -16,7 +16,7 @@ Her debut, *My 21st Century Blues*, eventually arrived. "Escapism." with 070 Sha
 
 Her second album is structured around four seasons, moving from heartbreak toward hope. RAYE told Apple Music she wanted to make music that could help people through difficult times. "Click Clack Symphony.", featuring Hans Zimmer, has a cinematic sweep, while "Nightingale Lane." leans into jazz and soul. The record became her first UK No. 1 album. "I Will Overcome." appears near the beginning, after the short opening track, and has become part of her live performances too.
 
-Alongside the concert announcement, she released a new Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. She had introduced the song on tour before the album came out, and the Abbey Road video gives it another setting. The Royal Albert Hall concert will feature different musicians. There, she will reunite with the Heritage Orchestra and Flames Collective, who accompanied her previous orchestral performance at the venue.
+Alongside the concert announcement, she released a new Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. She had introduced the song on tour before the album came out. At Royal Albert Hall, she will perform with the Heritage Orchestra and Flames Collective instead, reuniting with the musicians who accompanied her earlier concert there.
 
 ## Existing media and credit — preserve on desk sync
 
