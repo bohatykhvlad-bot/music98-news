@@ -1,4 +1,4 @@
-name: RAYE read-only live article editorial recheck
+name: RAYE post-edit final public and desk exact audit
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
