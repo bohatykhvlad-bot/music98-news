@@ -8,7 +8,7 @@
 
 RAYE will return to London's Royal Albert Hall on October 23 to perform her second album in full. The one-night concert, *This Symphony May Contain Hope.*, will reunite her with the Heritage Orchestra and Flames Collective, the orchestra and choir from her previous symphonic performance at the venue. Her own band will join them, bringing all three groups together for the newly released material. Tickets go on sale October 15.
 
-Released in March, *This Music May Contain Hope.* is divided into four seasons. Its songs begin with heartbreak and loneliness before gradually turning towards hope. RAYE told Apple Music she wanted to make something listeners could turn to during difficult times. The songs move between jazz, soul and pop, and Hans Zimmer appears on "Click Clack Symphony." It was her first album to reach No. 1 in the UK.
+Released in March, *This Music May Contain Hope.* is divided into four seasons. Its songs begin with heartbreak and loneliness before gradually turning towards hope. RAYE told Apple Music she wanted to make something listeners could turn to during difficult times. The songs move between jazz, soul and pop, and Hans Zimmer also appears on "Click Clack Symphony." It was her first album to reach No. 1 in the UK.
 
 The announcement came with a new Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. Earlier this year, RAYE told ELLE that the song was "big and dramatic" and spoke about lyrics in which she acknowledges that she is struggling but believes she will get through it. On the album, the track follows a short introduction. It establishes the story's starting point before the music moves through its darker chapters and, eventually, towards hope.
 
