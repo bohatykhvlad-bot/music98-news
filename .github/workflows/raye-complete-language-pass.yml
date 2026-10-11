@@ -1,4 +1,4 @@
-name: RAYE final comprehensive editorial cleanup
+name: RAYE full-article human-voice correction and verification
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
