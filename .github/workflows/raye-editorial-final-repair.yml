@@ -1,4 +1,4 @@
-name: RAYE human voice postedit audit
+name: RAYE chronology and continuity review
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -34,7 +34,7 @@ jobs:
           original=matches[0]
           old=original.get('body') or ''
           h=hashlib.sha256(old.encode()).hexdigest()
-          if h!='7fa2ad209be71c403a5edddccc93e5b480f742659dd07f9b504dc58786768a7a':raise SystemExit('SOURCE_CHANGED_ABORT '+h)
+          if h!='1174b53dd53c2c20061fd61a983a09f8abd6e35beb88116c4bdc945087505be5':raise SystemExit('SOURCE_CHANGED_ABORT '+h)
           if original.get('status')!='live' or original.get('type')!='news':raise SystemExit('NOT_LIVE_NEWS')
           if original.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall':raise SystemExit('TITLE_CHANGED')
           cover=original.get('cover') or {}
