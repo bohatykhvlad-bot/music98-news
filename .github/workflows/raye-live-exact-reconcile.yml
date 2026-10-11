@@ -1,4 +1,4 @@
-name: RAYE independently verified seven-paragraph live audit
+name: RAYE published final copy comparison
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
