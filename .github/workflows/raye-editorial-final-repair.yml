@@ -1,4 +1,4 @@
-name: RAYE editorial final repair after ending gate
+name: RAYE approved final lyric revision
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -34,7 +34,7 @@ jobs:
           original=matches[0]
           old=original.get('body') or ''
           h=hashlib.sha256(old.encode()).hexdigest()
-          if h!='ecb27a9a20d09870ca34beb102945b9380858e2f817eee431461a9d52a89044c':raise SystemExit('SOURCE_CHANGED_ABORT '+h)
+          if h!='22fe2b9c802489099b43e574e69477be1f94e9c64c5d4cb1cf942a3105c7b252':raise SystemExit('SOURCE_CHANGED_ABORT '+h)
           if original.get('status')!='live' or original.get('type')!='news':raise SystemExit('NOT_LIVE_NEWS')
           if original.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall':raise SystemExit('TITLE_CHANGED')
           cover=original.get('cover') or {}
