@@ -1,0 +1,52 @@
+name: RAYE prepublication desk inspection
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths: [.github/workflows/raye-prepublication-inspect.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Read RAYE draft metadata without printing private article prose
+        shell: python
+        run: |
+          import json, os, re, urllib.request, hashlib
+          secret=os.environ.get('ADMIN_PASSWORD','')
+          if not secret: raise SystemExit('EDITOR_KEY_NOT_CONFIGURED')
+          h={'X-Admin-Key':secret,'Accept':'application/json','User-Agent':'music98-raye-inspect','Cache-Control':'no-cache'}
+          req=urllib.request.Request('https://music98.news/api/desk',headers=h)
+          with urllib.request.urlopen(req,timeout=35) as r:posts=json.load(r)['posts']
+          found=[p for p in posts if 'raye' in (str(p.get('title',''))+' '+str(p.get('artist',''))).lower() and 'royal albert hall' in (str(p.get('title',''))+' '+str(p.get('body',''))).lower()]
+          print('RAYE_CANDIDATES='+str(len(found)))
+          if len(found)!=1:raise SystemExit('AMBIGUOUS_RAYE_TARGET')
+          p=found[0]
+          cover=p.get('cover') or {}
+          body=str(p.get('body') or '')
+          media=re.findall(r'\[(photo|youtube|apple|instagram|tiktok|tickets):([^\]]+)\]',body,re.I)
+          print('TARGET_ID='+str(p.get('id','')))
+          print('STATUS='+str(p.get('status','')))
+          print('TYPE='+str(p.get('type','')))
+          print('TITLE='+str(p.get('title','')))
+          print('EXCERPT_LITERAL='+str(body.startswith(p.get('excerpt') or '')))
+          print('BODY_SHA256='+hashlib.sha256(body.encode()).hexdigest())
+          print('WORDS='+str(len(body.split())))
+          print('MEDIA_KINDS='+','.join(m[0] for m in media))
+          print('MEDIA_TOKENS='+str(len(media)))
+          print('COVER_SRC='+str(cover.get('src','')))
+          print('COVER_CREDIT='+str(cover.get('credit','')))
+          print('COVER_CREDIT_URL='+str(cover.get('creditUrl','')))
+          for typ,payload in media:
+            if typ.lower()=='photo':
+              items=payload.split('|')
+              print('PHOTO_SRC='+items[0][:250])
+              print('PHOTO_CREDIT='+(items[1][:90] if len(items)>1 else ''))
+              print('PHOTO_CREDIT_URL='+(items[2][:240] if len(items)>2 else ''))
+          if p.get('status')!='draft':raise SystemExit('NOT_A_DRAFT')
+          if len(media)<1:raise SystemExit('MISSING_MEDIA')
+          if not cover.get('src'):raise SystemExit('MISSING_COVER')
+          print('RAYE_DRAFT_INSPECTED_READ_ONLY')
