@@ -12,9 +12,9 @@ She first performed at the Royal Albert Hall with an orchestra in September 2023
 
 In 2021, after years of releasing singles and writing for other artists, RAYE publicly criticised Polydor for holding back her debut album. She left the label and eventually released *My 21st Century Blues* independently in 2023. "Escapism." with 070 Shake gave her a first UK No. 1 single, and in 2024 she won six BRIT Awards in one night, including Album of the Year and Songwriter of the Year. 
 
-RAYE released her follow-up in March and organized it into four seasons. Its songs move from isolation and heartbreak towards recovery, with jazz and soul influences appearing alongside more theatrical arrangements. "Click Clack Symphony." features Hans Zimmer, while "Nightingale Lane." leans into the kind of soulful singing she fought to make room for earlier in her career. The record reached No. 1 in the UK, giving her a second chart-topping album after *My 21st Century Blues*.
+RAYE released her follow-up in March and organized it into four seasons. Its songs move from isolation and heartbreak towards recovery, with jazz and soul influences appearing alongside more theatrical arrangements. "Click Clack Symphony." features Hans Zimmer, while "Nightingale Lane." leans into the kind of soulful singing she fought to make room for earlier in her career. The album became her first UK No. 1, surpassing the No. 2 peak of *My 21st Century Blues*, and was shortlisted for the 2026 Mercury Prize.
 
-Alongside the announcement, RAYE released a new performance of "I Will Overcome." recorded at Abbey Road Studios with the London Symphony Orchestra. The concert itself will feature the Heritage Orchestra, so the studio performance is a separate recording, not a rehearsal from the upcoming show. She first performed the song at the opening night of her 2026 tour in Łódź, Poland, in January, when she introduced nine new tracks before the album was released. "I Will Overcome." was still unreleased when that tour began.
+Alongside the announcement, RAYE released a new performance of "I Will Overcome." recorded at Abbey Road Studios with the London Symphony Orchestra. The concert itself will feature the Heritage Orchestra, so the studio performance is a separate recording, not a rehearsal from the upcoming show. She first performed the song at the opening night of her 2026 tour in Łódź, Poland, in January, when she introduced nine new tracks before the album was released.
 
 ## Existing media and credit — preserve on desk sync
 
@@ -34,6 +34,8 @@ Alongside the announcement, RAYE released a new performance of "I Will Overcome.
 5. Album interview and tracks: https://music.apple.com/us/album/this-music-may-contain-hope/1871085677
 6. January tour performance and Radoslaw Zydowicz photo attribution: https://www.nme.com/news/music/watch-raye-debut-new-this-music-may-contain-hope-songs-as-she-kicks-off-2026-tour-in-poland-3925061
 7. Additional photo attribution: https://www.redcarpet-fashionawards.com/2026/01/27/raye-wore-emilia-wickstead-for-her-this-tour-may-contain-new-music-tour/
+8. Official UK album chart result (first No. 1; debut peaked at No. 2): https://www.officialcharts.com/chart-news/raye-this-music-may-contain-hope-number-1-album/
+9. Mercury Prize 2026 official shortlist: https://upload.mercuryprize.com/news/2026/2026-mercury-prize-albums-of-the-year-revealed/
 
 ## Publication gate
 
