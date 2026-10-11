@@ -1,4 +1,4 @@
-name: RAYE reviewed live performance narrative
+name: RAYE human voice postedit audit
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
