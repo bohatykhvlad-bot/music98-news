@@ -22,9 +22,9 @@ test("desktop nav uses five equal centered cells with matching pill insets",()=>
 
 test("mobile nav, logo row and safe header space are symmetrical",()=>{
   assert.match(home,/\.topbar-in\{gap:8px;display:flex;flex-wrap:wrap;height:auto;padding:9px 16px;/);
-  assert.match(home,/\.nav\{order:3;width:100%;height:48px;display:flex;justify-content:center;gap:4px;padding:4px;/);
-  assert.match(home,/\.nav-btn\{flex:1 1 auto;width:auto;min-width:0;height:38px;padding:0 clamp\(4px,2vw,9px\);font-size:clamp\(10px,3\.15vw,12px\);justify-content:center;top:0;text-indent:0!important\}/);
-  assert.doesNotMatch(home,/\.nav\{order:3;[^}]*grid-template-columns:/);
+  assert.match(home,/\.nav\{order:3;width:100%;height:48px;display:grid;grid-template-columns:repeat\(5,minmax\(0,1fr\)\);gap:4px;padding:4px;/);
+  assert.match(home,/\.nav-btn\{width:100%;min-width:0;height:38px;padding:0 2px;font-size:clamp\(9px,2\.8vw,12px\);justify-content:center;top:0;text-indent:0!important\}/);
+  assert.match(home,/\.nav\{order:3;[^}]*grid-template-columns:repeat\(5,minmax\(0,1fr\)\)/);
   assert.match(home,/@media \(max-width:299px\)\{\.nav \.nav-btn\{font-size:9px;padding:0 4px\}\}/);
   assert.match(home,/body\{padding-top:var\(--header-h, 110px\)\}/);
   assert.doesNotMatch(home,/padding-top:calc\(var\(--header-h,[^;]*\+\s*8px/);

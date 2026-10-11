@@ -82,6 +82,8 @@ jobs:
                   viewport:innerWidth,dpr:devicePixelRatio,htmlZoom:getComputedStyle(document.documentElement).zoom,
                   navTop:abs(top.top-nav.top),navBottom:abs(nav.bottom-top.bottom),
                   navLeft:abs(first.left-nav.left),navRight:abs(nav.right-last.right),
+                  navPillWidths:[...document.querySelectorAll('.nav-btn')].map(x=>abs(x.getBoundingClientRect().width)),
+                  navTextFits:[...document.querySelectorAll('.nav-btn')].map(x=>x.scrollWidth<=x.clientWidth+1),
                   sideTop:abs(pill.top-side.top),sideBottom:abs(side.bottom-pill.bottom),
                   sideLeft:abs(pill.left-side.left),sideRight:abs(side.right-end.right),
                   mapTop:abs(mapBtn.top-sw.top),mapBottom:abs(sw.bottom-mapBtn.bottom),
@@ -110,6 +112,12 @@ jobs:
                   data.sideFilter!=='none'||data.sideTransform!=='none'||data.navTransform!=='none')
                   throw Error('PILL_GEOMETRY_FAIL '+JSON.stringify(data));
                 if(data.mainWidth>width+.1)throw Error('HORIZONTAL_LAYOUT_OVERFLOW '+JSON.stringify(data));
+                if(width<=640){
+                  const widths=data.navPillWidths;
+                  if(widths.length!==5||Math.max(...widths)-Math.min(...widths)>.1||
+                    data.navTextFits.some(x=>!x))
+                    throw Error('MOBILE_NAV_PILLS_NOT_EQUAL_OR_LABEL_CLIPPED '+JSON.stringify(data));
+                }
                 console.log('NATIVE_PILL_GEOMETRY_PASS '+JSON.stringify(data));
                 if(width===1280&&dpr===1.5 || width===390&&dpr===1.5){
                   const png=await send('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});

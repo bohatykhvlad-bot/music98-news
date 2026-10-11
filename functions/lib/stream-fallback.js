@@ -12,29 +12,45 @@ export const FALLBACK_WINDOW_DAYS = 3;
 const NOISE = /karaoke|instrumental|lullaby|originally performed|cover version|tribute band/i;
 const norm = s => String(s || "").trim();
 
-export function pickSearchHit(title, artist, results) {
-  const tracks = (results || []).filter(x => x && x.kind === "track" && /^[A-Za-z0-9]{22}$/.test(x.id || ""));
-  if (!tracks.length) return null;
-  const titleN = titleKey(title), verN = versionSignature(title);
-  const names = [...new Set([norm(artist), ...norm(artist).split(/\s*(?:,|\s+&\s+|\s+feat\.?\s+|\s+ft\.?\s+|\s+with\s+)\s*/i)])]
-    .map(artistKey).filter(n => n.length >= 3);
-  const fullArtist = artistKey(norm(artist));
-  const artistHit = x => names.some(n => artistKey(x.subtitle || "").includes(n));
-  const scored = tracks
-    .filter(x => !(NOISE.test(x.name || "") && !NOISE.test(title)))
-    .map(x => {
-      let score = 0;
-      const hitN = titleKey(x.name || "");
-      if (hitN && hitN === titleN) score += 40;
-      else if (hitN && titleN && (hitN.startsWith(titleN) || titleN.startsWith(hitN))) score += 22;
-      if (versionSignature(x.name || "") === verN) score += 10;
-      if (artistHit(x)) score += 40;
-      if (fullArtist.length >= 5 && artistKey(x.subtitle || "").includes(fullArtist)) score += 15;
-      return {hit: x, score};
-    })
-    .filter(x => x.score >= 50)
-    .sort((a, b) => b.score - a.score);
-  return scored.length ? scored[0].hit : null;
+export function spotifySearchQueries(title,artist,aliases=[]) {
+ const base=String(title||"").trim();
+ const bare=base.replace(/\s*[\(\[]\s*(?:feat\.?|ft\.?|featuring|with|w\/)\b[^\)\]]*[\)\]]/gi,"").trim();
+ const lead=String(artist||"").split(/\s*(?:,|\s+&\s+| feat\.? | ft\.? )\s*/i)[0].trim();
+ const names=[base,bare,...aliases].map(x=>String(x||"").trim()).filter(Boolean);
+ const queries=[base+" "+artist,bare+" "+lead,
+    ...names.flatMap(n=>[n+" "+lead,n])];
+ return [...new Set(queries.map(x=>x.replace(/\s+/g," ").trim()).filter(Boolean))].slice(0,10);
+}
+
+/* A translation is not evidence that two RECORDINGS match. Reject wrong
+   titles and version variants even if their artist names look correct.
+   Japanese names are searched as verified catalog aliases, not guessed
+   translations. Multiple equally credible different IDs remain ambiguous. */
+export function pickSearchHit(title,artist,results,aliases=[]) {
+ const tracks=(results||[]).filter(x=>x&&x.kind==="track"&&/^[A-Za-z0-9]{22}$/.test(x.id||""));
+ const titles=[title,...aliases].map(titleKey).filter(Boolean);
+ const wantedVersion=versionSignature(title);
+ const lead=String(artist||"").trim().split(/\s*(?:,|\s+&\s+| feat\.? | ft\.? )\s*/i)[0];
+ const names=[artist,lead,...String(artist||"").split(/\s*(?:,|\s+&\s+| feat\.? | ft\.? )\s*/i)]
+   .map(artistKey).filter(x=>x.length>=3);
+ const fullArtist=artistKey(artist);
+ const ranked=tracks
+  .filter(x=>!(NOISE.test(x.name||"")&&!NOISE.test(title)))
+  .filter(x=>versionSignature(x.name||"")===wantedVersion)
+  .map(x=>{
+    const got=titleKey(x.name||"");
+    const exact=titles.includes(got);
+    const prefix=!exact&&got.length>=6&&titles.some(t=>t.length>=6&&
+      (got.startsWith(t)||t.startsWith(got))&&Math.min(got.length,t.length)/Math.max(got.length,t.length)>.78);
+    if(!exact&&!prefix)return null;
+    const credit=artistKey(x.subtitle||"");
+    if(!names.some(n=>credit.includes(n)))return null;
+    const score=(exact?90:55)+(fullArtist.length>=5&&credit.includes(fullArtist)?20:0);
+    return {hit:x,score};
+  }).filter(Boolean)
+  .sort((a,b)=>b.score-a.score||a.hit.id.localeCompare(b.hit.id));
+ if(ranked.length>1&&ranked[0].score===ranked[1].score&&ranked[0].hit.id!==ranked[1].hit.id)return null;
+ return ranked[0]?.hit||null;
 }
 
 export function seriesRows(series) {

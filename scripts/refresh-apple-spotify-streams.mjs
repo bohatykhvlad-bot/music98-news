@@ -5,7 +5,7 @@ import {KWORB_ARTISTS_URL,artistKey,htmlText,parseKworbArtists,
  parseKworbArtistDaily,matchKworbTrack,freshDay,parseKworbGlobalStreams} from "../functions/lib/apple-spotify-chart.js";
 import {TRI_METHOD,verifiedTriSeed,verifiedSpotifyRow,songIdentity} from "../functions/lib/tri-source-chart.js";
 import {shouldPublishSeed} from "../functions/lib/publish-window.js";
-import {pickSearchHit,pickDailyForDate,measuredProviderDelta,saveCounterObservation,extractCounterTotal,medianValue,FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
+import {pickSearchHit,spotifySearchQueries,pickDailyForDate,measuredProviderDelta,saveCounterObservation,extractCounterTotal,medianValue,FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
 
 const ROOT=new URL("../public/data/",import.meta.url);
 const OUT=new URL("apple-spotify-streams.json",ROOT);
@@ -116,25 +116,54 @@ async function soundcampsTotal(id){
  const n=Number(j?.streams);
  return Number.isSafeInteger(n)&&n>=0?n:null;
 }
+/* Ask Apple for the Japanese storefront name of the SAME track ID.
+   Never trust a Japanese translation without an exact Apple catalog ID match. */
+async function verifiedJapaneseAppleAliases(t){
+ let id="";
+ try{
+  const u=new URL(t.url||"");
+  if(!/(^|\.)music\.apple\.com$/.test(u.hostname))return [];
+  id=u.searchParams.get("i")||u.pathname.match(/\/song\/[^/]*\/(\d+)/)?.[1]||"";
+ }catch{return [];}
+ if(!/^\d{6,}$/.test(id))return [];
+ try{
+  const j=await serviceGetJSON("https://itunes.apple.com/lookup?id="+id+
+   "&country=jp&lang=ja_jp&entity=song");
+  const item=(j?.results||[]).find(x=>String(x.trackId||"")===id);
+  if(!item||!item.trackName)return [];
+  /* The same catalog ID is decisive; a different live/remix version isn't. */
+  return [String(item.trackName).trim()];
+ }catch(e){console.warn("JP_APPLE_ALIAS_UNAVAILABLE",id,String(e?.message||e));return [];}
+}
 async function resolveSpotifyId(t){
  const key=songIdentity(t.title,t.artist);
  const cached=idsCache.entries[key];
- if(cached?.id)return cached;
- const lead=String(t.artist||"").trim().split(/\s*(?:,|\s+&\s+)\s*/)[0];
- const queries=[`${t.title} ${t.artist}`,lead?`${t.title} ${lead}`:null].filter(Boolean);
- for(const q of queries){
-  try{
-   const j=await serviceGetJSON("https://soundcamps.com/api/spotify-search?q="+encodeURIComponent(q));
-   const hit=pickSearchHit(t.title,t.artist,j?.results||[]);
-   if(hit){
-    const entry={id:hit.id,name:hit.name,subtitle:hit.subtitle,resolvedAt:new Date().toISOString()};
-    idsCache.entries[key]=entry;
-    return entry;
-   }
-  }catch(e){console.warn("SERVICE_SEARCH_FAILED",JSON.stringify([q,String(e?.message||e)]));}
-  await sleep(600);
+ if(cached?.id&&/^[A-Za-z0-9]{22}$/.test(cached.id))return cached;
+ let localized=[];
+ const querySets=[spotifySearchQueries(t.title,t.artist)];
+ for(let stage=0;stage<2;stage++){
+  if(stage===1){
+   localized=await verifiedJapaneseAppleAliases(t);
+   if(!localized.length)break;
+   querySets.push(spotifySearchQueries(t.title,t.artist,localized));
+  }
+  const tried=new Set(querySets.slice(0,stage).flat());
+  for(const q of querySets[stage]){
+   if(tried.has(q))continue;
+   try{
+    const j=await serviceGetJSON("https://soundcamps.com/api/spotify-search?q="+encodeURIComponent(q));
+    const hit=pickSearchHit(t.title,t.artist,j?.results||[],localized);
+    if(hit){
+     const entry={id:hit.id,name:hit.name,subtitle:hit.subtitle,resolvedAt:new Date().toISOString(),
+      matchedFrom:stage===1?"verified-apple-japanese-alias":"original-title-search"};
+     idsCache.entries[key]=entry;
+     return entry;
+    }
+   }catch(e){console.warn("SERVICE_SEARCH_FAILED",JSON.stringify([q,String(e?.message||e)]));}
+   await sleep(600);
+  }
  }
- console.log("SERVICE_ID_MISS",JSON.stringify([t.title,t.artist]));
+ console.log("SERVICE_ID_MISS",JSON.stringify({title:t.title,artist:t.artist,aliases:localized}));
  return null;
 }
 async function applySiteStreams(){

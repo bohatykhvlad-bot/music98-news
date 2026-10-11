@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {pickSearchHit, pickDailyForDate, totalDelta, saveCounterObservation, measuredProviderDelta, extractCounterTotal, medianValue, FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
+import {pickSearchHit, spotifySearchQueries, pickDailyForDate, totalDelta, saveCounterObservation, measuredProviderDelta, extractCounterTotal, medianValue, FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
 import {verifiedSpotifyRow} from "../functions/lib/tri-source-chart.js";
 
 const id = "b".repeat(22);
@@ -11,7 +11,8 @@ test("search hit selection handles spellings, feat credits and noise", () => {
   const hit = (name, subtitle, trackId = id) => ({kind: "track", id: trackId, name, subtitle});
   assert.equal(pickSearchHit("Quebec", "Drake", [hit("Quebec", "Drake")]).id, id);
   assert.equal(pickSearchHit("I'M DAT N***A", "Future", [hit("I'M DAT N****", "Future")]).id, id);
-  assert.equal(pickSearchHit("musubi", "Ayumu Imazu", [hit("結び", "Ayumu Imazu")]).id, id);
+  assert.equal(pickSearchHit("musubi", "Ayumu Imazu", [hit("結び", "Ayumu Imazu")]), null);
+  assert.equal(pickSearchHit("musubi", "Ayumu Imazu", [hit("結び", "Ayumu Imazu")],["結び"]).id, id);
   assert.equal(pickSearchHit("Song", "Artist", [hit("Song (Karaoke Version)", "Karaoke SESH")]), null);
   assert.equal(pickSearchHit("Song", "Artist", [hit("Other Song", "Different Band")]), null);
   assert.equal(pickSearchHit("Song", "Artist", [{kind: "artist", id, name: "Artist"}]), null);
@@ -123,4 +124,20 @@ test("cumulative measurements require two actual dates and identical providers",
  assert.equal(measuredProviderDelta(rows,day,"mystreamcount").daily,200000);
  assert.equal(extractCounterTotal("<div>Total Streams</div><b>20,830,455</b>"),20830455);
  assert.equal(extractCounterTotal("<script>Total Streams 90000</script>"),null);
+});
+
+test("Japanese Apple aliases resolve the precise Spotify track and not another song from the artist",()=>{
+ const yes="7L1UsUbSqowTKwrgT0v8AS";
+ const tracks=[
+  {kind:"track",id:yes,name:"Yes! 東京",subtitle:"EBiDAN (恵比寿学園男子部), chotokkyu, M!LK, GNJB"},
+  {kind:"track",id:"A".repeat(22),name:"Yes! 東京 - SUPER★DRAGON ver. 体験入学",subtitle:"EBiDAN (恵比寿学園男子部), SUPER★DRAGON"},
+  {kind:"track",id:"B".repeat(22),name:"Other Song",subtitle:"EBiDAN (恵比寿学園男子部)"}
+ ];
+ assert.equal(pickSearchHit("Yes! Tokyo","EBiDAN Ebisu Gakuen Boys Club, chotokkyu, M!LK & GNJB",tracks),null);
+ assert.equal(pickSearchHit("Yes! Tokyo","EBiDAN Ebisu Gakuen Boys Club, chotokkyu, M!LK & GNJB",tracks,["Yes! 東京"]).id,yes);
+ const queries=spotifySearchQueries("Yes! Tokyo (feat. Band)","EBiDAN, chotokkyu",["Yes! 東京"]);
+ assert.ok(queries.some(x=>x.includes("Yes! 東京")));
+ assert.ok(queries.some(x=>x==="Yes! Tokyo EBiDAN"));
+ assert.equal(pickSearchHit("FOR OKINAWA","YAO",[
+  {kind:"track",id:"C".repeat(22),name:"Different Song",subtitle:"YAO"}]),null);
 });
