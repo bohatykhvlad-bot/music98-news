@@ -3065,19 +3065,42 @@ function wireRail(gridSel, prevSel, nextSel){
   // relative scrollLeft increment. Relative scrollBy drifts whenever a prior
   // drag, fractional CSS pixel or still-running smooth scroll left the rail
   // between cards. Retain the queued destination for rapid successive taps.
-  let tapTarget=null, tapAt=-Infinity;
+  // 30% gentler rail motion for both News and Releases.
+  const RAIL_SPEED = 0.7;
+  const ARROW_STEP_MS = 500;
+  let tapTarget=null, tapAt=-Infinity, tapRaf=0;
+  const stopTap=()=>{
+    if(tapRaf) cancelAnimationFrame(tapRaf);
+    tapRaf=0;
+    rail.style.scrollBehavior="";
+    rail.classList.remove("gliding");
+  };
   const moveOneCard=dir=>{
     const unit=step();
     if(!(unit>0)) return;
     const now=performance.now();
     const actual=rail.scrollLeft;
-    const from=tapTarget!=null && now-tapAt<700 && Math.abs(actual-tapTarget)>0.5
+    const from=tapTarget!=null && now-tapAt<1100 && Math.abs(actual-tapTarget)>0.5
       ? tapTarget : actual;
     const max=Math.max(0,rail.scrollWidth-rail.clientWidth);
     const target=Math.max(0,Math.min(max,(Math.round(from/unit)+dir)*unit));
     tapTarget=target;
     tapAt=now;
-    rail.scrollTo({left:target,behavior:"smooth"});
+    stopTap();
+    const distance=Math.abs(target-actual);
+    if(distance<0.5) return;
+    // Time-based, frame-rate independent ease-in/out; queued taps remain card-aligned.
+    const duration=ARROW_STEP_MS * (distance/unit);
+    rail.style.scrollBehavior="auto";
+    rail.classList.add("gliding");
+    const tick=t=>{
+      const u=Math.min(1,Math.max(0,(t-now)/duration));
+      const eased=u*u*(3-2*u);
+      rail.scrollLeft=actual+(target-actual)*eased;
+      if(u<1) tapRaf=requestAnimationFrame(tick);
+      else{ tapRaf=0; rail.style.scrollBehavior=""; rail.classList.remove("gliding"); syncRail(gridSel); }
+    };
+    tapRaf=requestAnimationFrame(tick);
   };
   const hold = {raf:0, v:0, dir:0, pressedAt:0, frameAt:0, button:null};
   const stopHold = ()=>{
@@ -3093,10 +3116,10 @@ function wireRail(gridSel, prevSel, nextSel){
     if(!hold.dir){ stopHold(); return; }
     const dt = Math.min(50, Math.max(0, now - hold.frameAt));
     hold.frameAt = now;
-    /* Keep the original held-arrow acceleration and 26px/60Hz-frame cap. */
+    /* Scale held-arrow acceleration and top speed down together by 30%. */
     rail.style.scrollBehavior = "auto";
     rail.classList.add("gliding");
-    hold.v = Math.min(26, hold.v + dt * 0.045);
+    hold.v = Math.min(26 * RAIL_SPEED, hold.v + dt * 0.045 * RAIL_SPEED);
     rail.scrollLeft += hold.dir * hold.v * (dt/16.7);
     if(rail._max == null) rail._max = Math.max(0, rail.scrollWidth - rail.clientWidth - 1);
     if((hold.dir<0 && rail.scrollLeft<=0) || (hold.dir>0 && rail.scrollLeft>=rail._max)){ stopHold(); return; }
@@ -3129,6 +3152,7 @@ function wireRail(gridSel, prevSel, nextSel){
       if(e.button != null && e.button !== 0) return;
       e.preventDefault();
       if(hold.button) stopHold(); /* restart after an interrupted glide */
+      stopTap();
       try{ btn.setPointerCapture(e.pointerId); }catch(_){}
       btn.classList.add("hold");
       rail._holding = true;
@@ -3155,6 +3179,20 @@ function wireRail(gridSel, prevSel, nextSel){
     btn.addEventListener("pointerup", ()=>release());
     btn.addEventListener("pointercancel", ()=>release(true));
   });
+  /* Slow horizontal trackpad/Shift+wheel motion without trapping vertical scrolling.
+     Touch stays browser-native with its existing momentum and snap rules. */
+  rail.addEventListener("wheel",e=>{
+    if(e.ctrlKey || !e.cancelable) return;
+    if(!(Math.abs(e.deltaX)>Math.abs(e.deltaY) || e.shiftKey)) return;
+    if(rail.scrollWidth<=rail.clientWidth) return;
+    const raw=e.deltaX || (e.shiftKey ? e.deltaY : 0);
+    if(!raw) return;
+    e.preventDefault();
+    stopTap();
+    tapTarget=null;
+    const pixels=e.deltaMode===1 ? raw*16 : e.deltaMode===2 ? raw*rail.clientWidth : raw;
+    rail.scrollLeft+=pixels*RAIL_SPEED;
+  },{passive:false});
   /* syncRail owns the sole scroll/DOM observers for this rail. */
   syncRail(gridSel);
   /* drag the cards themselves: press + move = the rail follows the pointer,
@@ -3231,7 +3269,7 @@ function wireRail(gridSel, prevSel, nextSel){
   const dragStop = ()=>{ cancelAnimationFrame(drag.raf); drag.raf = 0; };
   const momentum = ()=>{
     drag.raf = 0;
-    const v0raw = drag.vx;               /* px per ms, signed with the movement */
+    const v0raw = drag.vx * RAIL_SPEED; /* match the slower live pointer drag */
     if(Math.abs(v0raw) < 0.3){ return; }
     rail.style.scrollBehavior = "auto";
     rail.classList.add("gliding");       /* hover-freeze while gliding */
@@ -3243,7 +3281,7 @@ function wireRail(gridSel, prevSel, nextSel){
        so 120Hz screens play the same curve instead of a 2x-speed one.
        Owner tune-down: launch speed capped and flight shortened ~13% so a
        hard flick no longer whips - seam preserved via dur = dist*k/v0. */
-    const v0 = Math.max(-2.1, Math.min(2.1, v0raw));   /* cap the launch punch */
+    const v0 = Math.max(-2.1 * RAIL_SPEED, Math.min(2.1 * RAIL_SPEED, v0raw));
     const dist = v0 * 260;
     const dur = 624;                     /* = 260 * 2.4, keeps the start slope seamless */
     const from = rail.scrollLeft;
@@ -3289,6 +3327,7 @@ function wireRail(gridSel, prevSel, nextSel){
        our CSS snap), links stay plain anchors, and the custom grab/lift/
        velocity/momentum code remains a mouse/pen-only feature. */
     if((e.pointerType || "mouse") === "touch"){ dragStop(); if(drag.over){ drag.over = 0; drag.springing = false; setOver(0); } return; }
+    stopTap();
     tapTarget=null; // mouse drag takes over from any queued arrow snap
     drag.on = true; drag.id = e.pointerId; drag.moved = false; drag.pt = e.pointerType || "mouse";
     drag.x = e.clientX; drag.sl = rail.scrollLeft;
@@ -3370,7 +3409,7 @@ function wireRail(gridSel, prevSel, nextSel){
     const dt = Math.max(8, now - drag.lt);
     drag.vx = (e.clientX - drag.lx) / dt;   /* px per ms, signed with movement */
     drag.lx = e.clientX; drag.lt = now;
-    drag.pendX = drag.sl - dx;
+    drag.pendX = drag.sl - dx * RAIL_SPEED;
     if(!drag.raf2) drag.raf2 = requestAnimationFrame(applyDrag);
   });
   const endDrag = e=>{

@@ -126,12 +126,14 @@ test("brief arrow tap steps one card; cancelled press never triggers a step",()=
   next.handlers.pointerdown[0]({button:0,pointerId:2,preventDefault(){}});
   env.frame(1000/60);
   next.handlers.pointerup[0]({pointerId:2});
-  assert.equal(rail.steps.length,1);
-  assert.equal(rail.steps[0].behavior,"smooth");
-  assert.equal(rail.steps[0].left,261);
+  assert.equal(rail.steps.length,0,"short arrows now use a controlled rAF tween");
+  env.frame(250);
+  assert.ok(rail.scrollLeft>0 && rail.scrollLeft<261,"still animating at 250ms");
+  env.frame(250);
+  assert.equal(rail.scrollLeft,261,"500ms tween lands exactly on the card");
   next.handlers.pointerdown[0]({button:0,pointerId:3,preventDefault(){}});
   next.handlers.pointercancel[0]({pointerId:3});
-  assert.equal(rail.steps.length,1);
+  assert.equal(rail.steps.length,0);
 });
 
 test("short arrows align the first AND second card exactly, including from a fractional scroll offset",()=>{
@@ -140,6 +142,7 @@ test("short arrows align the first AND second card exactly, including from a fra
     const tap=button=>{
       button.handlers.pointerdown[0]({button:0,pointerId:27,preventDefault(){}});
       button.handlers.pointerup[0]({pointerId:27});
+      env.frame(520);
     };
     tap(next);
     assert.equal(rail.scrollLeft,261,"first click must align the second card to the fixed left boundary");
@@ -159,15 +162,18 @@ test("short arrows align the first AND second card exactly, including from a fra
 
 test("rapid short arrow taps queue distinct aligned destinations while smooth scrolling is still in progress",()=>{
   const env=rig(),{rail,next}=env.a;
-  rail.deferScrollTo=true;
   const tap=()=>{
     next.handlers.pointerdown[0]({button:0,pointerId:6,preventDefault(){}});
     next.handlers.pointerup[0]({pointerId:6});
   };
   tap();
+  env.frame(100);
+  const moving=rail.scrollLeft;
   tap();
-  assert.deepEqual(rail.steps.map(x=>x.left),[261,522],"second tap must not repeat the pending first target");
-  assert.deepEqual(rail.steps.map(x=>x.behavior),["smooth","smooth"]);
+  assert.ok(moving>0 && moving<261,"first tween must be in progress");
+  assert.equal(rail.steps.length,0,"no native smooth scrolling");
+  env.frame(1100);
+  assert.equal(rail.scrollLeft,522,"second tap queues the next exact card");
 });
 
 test("scroll events avoid layout width reads and coalesce to a single frame",()=>{
@@ -213,7 +219,7 @@ test("mouse drag retains lifted card and seamless momentum in both sections",()=
     assert.equal(card.style.transform,"translateY(-4px)");
     rail.emit("pointermove",{pointerId:4,clientX:160});
     env.frame(1000/60);
-    assert.ok(rail.scrollLeft>=39 && rail.scrollLeft<=41);
+    assert.ok(rail.scrollLeft>=27 && rail.scrollLeft<=29,"30% shorter mouse drag");
     rail.emit("pointerup",{pointerId:4});
     assert.equal(rail.classList.has("dragging"),false);
     assert.equal(card.classList.has("grab"),true,"lift survives the release");
@@ -228,6 +234,9 @@ test("desktop lift, band, glass arrows, and distinct mobile stacking are unchang
   assert.match(source,/const rubberMag = over =>/);
   assert.match(source,/return 22 \* Math\.tanh\(Math\.abs\(over\) \/ 220\)/);
   assert.match(source,/const dur = 624/);
+  assert.match(source,/const RAIL_SPEED = 0\.7/);
+  assert.match(source,/const ARROW_STEP_MS = 500/);
+  assert.match(source,/drag\.pendX = drag\.sl - dx \* RAIL_SPEED/);
   assert.match(source,/drag\.grabCard\.style\.transform = "translateY\(-4px\)"/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.rail\{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr/);
   assert.doesNotMatch(source,/new MutationObserver\(\(\)=> syncRail/);
