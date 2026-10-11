@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Register confirmed general ticket sale date for the editorial gate
+        run: python scripts/post.py register "October 15" "RAYE Royal Albert Hall general sale October 15, 2026, confirmed in Simon Jones PR official concert announcement"
       - name: Validate exact live RAYE source and stage only approved sentence replacement
         shell: python
         run: |
