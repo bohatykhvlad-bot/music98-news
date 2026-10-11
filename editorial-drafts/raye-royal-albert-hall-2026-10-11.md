@@ -20,10 +20,10 @@ By the time *My 21st Century Blues* arrived, RAYE had spent years writing for ot
 
 ## Existing media and credit — preserve on desk sync
 
-- **Cover URL:** https://music98.news/photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg (reported existing site asset, not reuploaded or reverified).
+- **Cover URL:** https://music98.news/photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg (verified accessible as a JPEG image by the live production preflight; not reuploaded).
 - **Cover photographer:** Radosław Żydowicz (also commonly credited without Polish diacritics as Radoslaw Zydowicz). Photo taken at RAYE's Łódź show on January 22, 2026; authorship cross-checked against independent published credits.
 - **Photographer credit link:** VERIFIED official photography portfolio: https://rozentuzjazmowany.pl/ (currently saved in the protected desk's cover.creditUrl). The photographer's own photography business is credited as Rozentuzjazmowany, and the site includes a first-person photographer introduction. Do not substitute an unrelated outlet link.
-- **Embedded video:** retain original in-desk RAYE "I Will Overcome. (Live at Abbey Road Studios)" YouTube embed and move it only one paragraph higher, immediately after paragraph three, leaving three substantial paragraphs after the video. The exact current shortcode/video ID could not be read from the protected desk. Do not create a second video or substitute an unverified video ID.
+- **Embedded video:** retain original in-desk RAYE "I Will Overcome. (Live at Abbey Road Studios)" YouTube embed and move it only one paragraph higher, immediately after paragraph three, leaving three substantial paragraphs after the video. The original shortcode was verified as `[youtube:Iy2FoVeIUXs]` through the protected editor and the live page; retain this ID.
 - **Tickets button:** none, by editorial decision.
 - **Current in-desk article:** live article ID `raye26royalalbertsymphony`, verified from the protected editor. This file mirrors the published paragraphs, excluding the in-desk YouTube shortcode inserted after paragraph three.
 
@@ -41,10 +41,10 @@ By the time *My 21st Century Blues* arrived, RAYE had spent years writing for ot
 10. RAYE interview with Recording Academy (songwriting at 16, Beyoncé/Charli XCX, label creative control): https://www.grammy.com/news/raye-my-21st-century-blues-interview-songwriter-2025-grammys/
 11. Songwriters Hall of Fame 2026 gala report (Nile Rodgers, Hal David Starlight Award): https://www.songhall.org/news/shof-celebrates-best-of-songwriting-legends-at-2026-gala
 12. BMI June 2026 confirmation (first British woman to receive award): https://www.bmi.com/news/bmi-congratulates-its-2026-songwriters-hall-of-fame-inductees-honorees
+13. RAYE explains the origin of "I Will Overcome." to ELLE: https://www.elle.com/culture/music/a69947108/raye-new-album-music-tour-interview-2026/
 14. Official Charts background on the song, its lyrics and UK chart history: https://www.officialcharts.com/songs/raye-ft-070-shake-escapism/
 
 ## Publication gate
 
 The article is live. The protected GitHub Actions publishing workflow verified the exact body hash, preserved the original cover and video, and passed the readthrough, gate and preflight checks. This markdown file is the editorial reference; further changes require a fresh authorized desk write and post-save verification.
 
-13. RAYE explains the origin of "I Will Overcome." to ELLE: https://www.elle.com/culture/music/a69947108/raye-new-album-music-tour-interview-2026/
