@@ -1,4 +1,4 @@
-name: RAYE post-edit final public and desk exact audit
+name: RAYE independently verified seven-paragraph live audit
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -40,12 +40,17 @@ jobs:
             print(desc+'_WORDS='+str(len(b.split())))
             print(desc+'_PARAGRAPHS='+str(len(b.split('\n\n'))))
             print(desc+'_MATCH_EXPECTED='+str(b==expected))
-            print(desc+'_HAS_POLYDOR='+str('her record label, Polydor' in b))
+            print(desc+'_HAS_POLYDOR='+str('Polydor, her record label at the time' in b))
             print(desc+'_VIDEO_AFTER_P3='+str(len(b.split('\n\n'))>3 and b.split('\n\n')[3]=='[youtube:Iy2FoVeIUXs]'))
+            cover=p.get('cover') or {}
+            photo_ok=cover.get('src')=='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' and cover.get('creditUrl')=='https://rozentuzjazmowany.pl/'
+            print(desc+'_COVER_AND_PHOTOGRAPHER='+str(photo_ok))
+            if not photo_ok or p.get('status')!='live' or 'Polydor, her record label at the time' not in b:raise SystemExit(desc+'_PUBLISHED_METADATA_FAILED')
             if b!=expected:
               diffs=list(difflib.unified_diff(expected.splitlines(),b.splitlines(),fromfile='GitHub',tofile=desc,lineterm=''))
               for line in diffs[:90]:print('DIFF '+line[:350])
               print(desc+'_FIRST_MISMATCH_BYTE='+str(next((i for i,(x,y) in enumerate(zip(b,expected)) if x!=y),min(len(b),len(expected)))))
+            if b!=expected:raise SystemExit(desc+'_SOURCE_MISMATCH')
             return p
           desk=desk_read()['posts']
           audit(desk,'PROTECTED_DESK')
