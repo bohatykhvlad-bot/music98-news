@@ -17,15 +17,7 @@ jobs:
         run: |
           node <<'NODE'
           const {randomBytes,createCipheriv,publicEncrypt,constants}=require('node:crypto');
-          const pub=`-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA00Von4mFWWi4FFidc+ZF
-7+nBcxD/XL47OLm9peH1Lq3D9BPPxfIaQpt6AZ7PCs2BX8qahroiEZk8I1kubGkt
-G0YryxVkrff/RaDmA8YVd60Zo3zw+o81vNq3WBaMIlqSi9pM9jAyzzX2eS0By/z/
-w8XhED8JWnndEBTwhSQMy8LMfIkV3HjcWBdKUAm/r9gjktMO6MlfYFmiFqAaY4td
-un7/opW61euxRoW6bjsiUUaItkcy/wj4LYVZ+O85J5lev6fXr9OmEkaVqKHZ7Tfi
-zCnMzk97eBQqiTnlVkaTZ3qDJtVcHcPVuYr9O5OPe7Yjqf2b9j7PWBpe2GLMlm2L
-WwIDAQAB
------END PUBLIC KEY-----`;
+          const pub="-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA00Von4mFWWi4FFidc+ZF\n7+nBcxD/XL47OLm9peH1Lq3D9BPPxfIaQpt6AZ7PCs2BX8qahroiEZk8I1kubGkt\nG0YryxVkrff/RaDmA8YVd60Zo3zw+o81vNq3WBaMIlqSi9pM9jAyzzX2eS0By/z/\nw8XhED8JWnndEBTwhSQMy8LMfIkV3HjcWBdKUAm/r9gjktMO6MlfYFmiFqAaY4td\nun7/opW61euxRoW6bjsiUUaItkcy/wj4LYVZ+O85J5lev6fXr9OmEkaVqKHZ7Tfi\nzCnMzk97eBQqiTnlVkaTZ3qDJtVcHcPVuYr9O5OPe7Yjqf2b9j7PWBpe2GLMlm2L\nWwIDAQAB\n-----END PUBLIC KEY-----";
           (async()=>{
             const key=process.env.ADMIN_PASSWORD;
             if(!key)throw Error('EDITOR_KEY_MISSING');
