@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-10T21:59:31.309Z",
+  "updated": "2026-10-11T10:06:06.421Z",
   "entries": {
     "quebec|drake": {
       "id": "67DgVQlvQ0qilSBN1hdkKN",
@@ -91,6 +91,402 @@
       "name": "共犯",
       "subtitle": "Mrs. GREEN APPLE",
       "resolvedAt": "2026-10-10T21:54:52.883Z"
+    },
+    "coldshoulder|drake": {
+      "id": "50GVx8sCc1TDKHXumgYqEO",
+      "name": "Cold Shoulder (feat. Don Toliver & Yebba)",
+      "subtitle": "Drake, Don Toliver, Yebba",
+      "resolvedAt": "2026-10-11T09:56:18.683Z"
+    },
+    "beenbynow|morganwallen": {
+      "id": "3xwMjQriBVW0OGEvNKo9c0",
+      "name": "Been By Now",
+      "subtitle": "Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:56:24.883Z"
+    },
+    "icantloveyouanymore|ellalangley": {
+      "id": "5aVBxVa0kz9uzv0F4gwdEn",
+      "name": "I Can't Love You Anymore",
+      "subtitle": "Ella Langley, Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:56:28.103Z"
+    },
+    "beher|ellalangley": {
+      "id": "05CjWFAcAlY6O9po6Qwakk",
+      "name": "Be Her",
+      "subtitle": "Ella Langley",
+      "resolvedAt": "2026-10-11T09:56:29.949Z"
+    },
+    "waitforu|future": {
+      "id": "59nOXPmaKlBfGMDeOVGrIK",
+      "name": "WAIT FOR U (feat. Drake & Tems)",
+      "subtitle": "Future, Drake, Tems",
+      "resolvedAt": "2026-10-11T09:56:34.944Z"
+    },
+    "inaminute|lilbaby": {
+      "id": "3ihIZrJreMJPjQdNLrEXnP",
+      "name": "In A Minute",
+      "subtitle": "Lil Baby",
+      "resolvedAt": "2026-10-11T09:56:37.483Z"
+    },
+    "freestyle|lilbaby": {
+      "id": "5BbdKBZO0TH0GhfxUfyhL9",
+      "name": "Freestyle",
+      "subtitle": "Lil Baby",
+      "resolvedAt": "2026-10-11T09:56:40.150Z"
+    },
+    "imspent|drake": {
+      "id": "0SeTP12t4EwBJ6zsjHn9Wa",
+      "name": "I'm Spent (feat. Loe Shimmy)",
+      "subtitle": "Drake, Loe Shimmy",
+      "resolvedAt": "2026-10-11T09:56:42.770Z"
+    },
+    "deadfresh|lilbaby": {
+      "id": "5ZAMlvo6ZUjVRZOGu2bJib",
+      "name": "Dead Fresh",
+      "subtitle": "Lil Baby",
+      "resolvedAt": "2026-10-11T09:56:45.058Z"
+    },
+    "imtheproblem|morganwallen": {
+      "id": "7AeM1BGYM7emrqmQn1PuWv",
+      "name": "I'm The Problem",
+      "subtitle": "Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:56:46.928Z"
+    },
+    "dontwe|morganwallen": {
+      "id": "45UDzIWgqj5hgQKXLlfdp7",
+      "name": "Don't We",
+      "subtitle": "Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:56:49.513Z"
+    },
+    "bestieverhad|drake": {
+      "id": "3QLjDkgLh9AOEHlhQtDuhs",
+      "name": "Best I Ever Had",
+      "subtitle": "Drake",
+      "resolvedAt": "2026-10-11T09:56:51.751Z"
+    },
+    "likeme|future": {
+      "id": "3gOL6mYIq19Oq8raxIntrV",
+      "name": "LIKE ME (feat. 42 Dugg & Lil Baby)",
+      "subtitle": "Future, 42 Dugg, Lil Baby",
+      "resolvedAt": "2026-10-11T09:56:54.523Z"
+    },
+    "marchmadness|future": {
+      "id": "3WcC6NH9J77xPEvj1SOL7z",
+      "name": "March Madness",
+      "subtitle": "Future",
+      "resolvedAt": "2026-10-11T09:56:59.729Z"
+    },
+    "lastnight|morganwallen": {
+      "id": "583dMdiUquLMenarTp7PQm",
+      "name": "Last Night",
+      "subtitle": "Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:57:03.682Z"
+    },
+    "justincase|morganwallen": {
+      "id": "02Ya2Q08bBKFqUJvjmyRXK",
+      "name": "Just In Case",
+      "subtitle": "Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:57:06.116Z"
+    },
+    "frozen|lilbaby": {
+      "id": "19n0UZuW8AArMVWNztoXu9",
+      "name": "Frozen",
+      "subtitle": "Lil Baby",
+      "resolvedAt": "2026-10-11T09:57:08.204Z"
+    },
+    "wickedgames|theweeknd": {
+      "id": "249E7AgSyA4vhtXNEjQYb5",
+      "name": "Wicked Games",
+      "subtitle": "The Weeknd",
+      "resolvedAt": "2026-10-11T09:57:14.182Z"
+    },
+    "wantsandneeds|drake": {
+      "id": "65OVbaJR5O1RmwOQx0875b",
+      "name": "Wants and Needs (feat. Lil Baby)",
+      "subtitle": "Drake, Lil Baby",
+      "resolvedAt": "2026-10-11T09:57:16.394Z"
+    },
+    "marvinsroom|drake": {
+      "id": "047fCsbO4NdmwCBn8pcUXl",
+      "name": "Marvins Room",
+      "subtitle": "Drake",
+      "resolvedAt": "2026-10-11T09:57:21.554Z"
+    },
+    "sticktalk|future": {
+      "id": "20fAoPjfYltmd3K3bO7gbt",
+      "name": "Stick Talk",
+      "subtitle": "Future",
+      "resolvedAt": "2026-10-11T09:57:23.805Z"
+    },
+    "sum2prove|lilbaby": {
+      "id": "5f4Hy5mw5SRaUgXX9c6P5S",
+      "name": "Sum 2 Prove",
+      "subtitle": "Lil Baby",
+      "resolvedAt": "2026-10-11T09:57:25.971Z"
+    },
+    "thinkinboutme|morganwallen": {
+      "id": "4Sb8neYCkT7lyMIo2kOOEC",
+      "name": "Thinkin’ Bout Me",
+      "subtitle": "Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:57:29.850Z"
+    },
+    "powertrip|jcole": {
+      "id": "2uwnP6tZVVmTovzX5ELooy",
+      "name": "Power Trip (feat. Miguel)",
+      "subtitle": "J. Cole, Miguel",
+      "resolvedAt": "2026-10-11T09:57:32.305Z"
+    },
+    "wastedonyou|morganwallen": {
+      "id": "5YanmSgudc0CaxZrn40YnM",
+      "name": "Wasted On You",
+      "subtitle": "Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:57:36.739Z"
+    },
+    "pinkclouding|taylorswift": {
+      "id": "3gyJbNBTRVRdZDA1yO3clm",
+      "name": "Pink Clouding",
+      "subtitle": "Taylor Swift",
+      "resolvedAt": "2026-10-11T09:57:38.811Z"
+    },
+    "kaceytalk|youngboyneverbrokeagain": {
+      "id": "1SF8piqsZWn86DajVKih8F",
+      "name": "Kacey Talk",
+      "subtitle": "YoungBoy Never Broke Again",
+      "resolvedAt": "2026-10-11T09:57:40.735Z"
+    },
+    "whatiwant|morganwallen": {
+      "id": "48NthgcgfoRrWT8LtgW28A",
+      "name": "What I Want (feat. Tate McRae)",
+      "subtitle": "Morgan Wallen, Tate McRae",
+      "resolvedAt": "2026-10-11T09:57:43.072Z"
+    },
+    "righton|lilbaby": {
+      "id": "6ws54n2IzyrIxxyzlG2bVJ",
+      "name": "Right On",
+      "subtitle": "Lil Baby",
+      "resolvedAt": "2026-10-11T09:57:45.231Z"
+    },
+    "cowgirls|morganwallen": {
+      "id": "4mtmmBBEgdJLYWnLy5zvWE",
+      "name": "Cowgirls",
+      "subtitle": "Morgan Wallen, ERNEST",
+      "resolvedAt": "2026-10-11T09:57:47.484Z"
+    },
+    "snooze|sza": {
+      "id": "4iZ4pt7kvcaH6Yo8UoZ4s2",
+      "name": "Snooze",
+      "subtitle": "SZA",
+      "resolvedAt": "2026-10-11T09:57:53.697Z"
+    },
+    "ihadsomehelp|postmalone": {
+      "id": "7221xIgOnuakPdLqT0F3nP",
+      "name": "I Had Some Help (Feat. Morgan Wallen)",
+      "subtitle": "Post Malone, Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:57:55.994Z"
+    },
+    "werentforthewind|ellalangley": {
+      "id": "4v9alNvEjLjvqo4LNWwswl",
+      "name": "weren't for the wind",
+      "subtitle": "Ella Langley",
+      "resolvedAt": "2026-10-11T09:58:00.116Z"
+    },
+    "brokenclocks|sza": {
+      "id": "2fXwCWkh6YG5zU1IyvQrbs",
+      "name": "Broken Clocks",
+      "subtitle": "SZA",
+      "resolvedAt": "2026-10-11T09:58:02.360Z"
+    },
+    "cleveland|taylorswift": {
+      "id": "7uxkx8HPBYkJKcimOyggUM",
+      "name": "Cleveland!",
+      "subtitle": "Taylor Swift",
+      "resolvedAt": "2026-10-11T09:58:04.709Z"
+    },
+    "dont|brysontiller": {
+      "id": "3pXF1nA74528Edde4of9CC",
+      "name": "Don't",
+      "subtitle": "Bryson Tiller",
+      "resolvedAt": "2026-10-11T09:58:06.647Z"
+    },
+    "nowwho|youngboyneverbrokeagain": {
+      "id": "477ztj2o2hYKeUjUrKk8K5",
+      "name": "Now Who",
+      "subtitle": "YoungBoy Never Broke Again",
+      "resolvedAt": "2026-10-11T09:58:14.907Z"
+    },
+    "godsplan|drake": {
+      "id": "6DCZcSspjsKoFjzjrWoCdn",
+      "name": "God's Plan",
+      "subtitle": "Drake",
+      "resolvedAt": "2026-10-11T09:58:17.233Z"
+    },
+    "30for30|sza": {
+      "id": "3aSWXU6owkZeVhh94XxEWO",
+      "name": "30 For 30 (with Kendrick Lamar)",
+      "subtitle": "SZA, Kendrick Lamar",
+      "resolvedAt": "2026-10-11T09:58:19.799Z"
+    },
+    "notlikeus|kendricklamar": {
+      "id": "6AI3ezQ4o3HUoP6Dhudph3",
+      "name": "Not Like Us",
+      "subtitle": "Kendrick Lamar",
+      "resolvedAt": "2026-10-11T09:58:22.028Z"
+    },
+    "lowdown|lilbaby": {
+      "id": "5m0yZ33oOy0yYBtdTXuxQe",
+      "name": "Low Down",
+      "subtitle": "Lil Baby",
+      "resolvedAt": "2026-10-11T09:58:25.888Z"
+    },
+    "shabang|drake": {
+      "id": "6vjpQIdABqntoe3zPazPec",
+      "name": "Shabang",
+      "subtitle": "Drake",
+      "resolvedAt": "2026-10-11T09:58:28.185Z"
+    },
+    "yonaguni|badbunny": {
+      "id": "2JPLbjOn0wPCngEot2STUS",
+      "name": "Yonaguni",
+      "subtitle": "Bad Bunny",
+      "resolvedAt": "2026-10-11T09:58:30.129Z"
+    },
+    "likethat|future": {
+      "id": "2tudvzsrR56uom6smgOcSf",
+      "name": "Like That",
+      "subtitle": "Future, Metro Boomin, Kendrick Lamar",
+      "resolvedAt": "2026-10-11T09:58:32.430Z"
+    },
+    "jaded|koewetzel": {
+      "id": "0VV38e61NaGvYAko5HoHm0",
+      "name": "Jaded (feat. Ella Langley)",
+      "subtitle": "Koe Wetzel, Ella Langley",
+      "resolvedAt": "2026-10-11T09:58:34.826Z"
+    },
+    "somethingintheorange|zachbryan": {
+      "id": "3WMj8moIAXJhHsyLaqIIHI",
+      "name": "Something in the Orange",
+      "subtitle": "Zach Bryan",
+      "resolvedAt": "2026-10-11T09:58:36.739Z"
+    },
+    "tennesseewhiskey|chrisstapleton": {
+      "id": "3fqwjXwUGN6vbzIwvyFMhx",
+      "name": "Tennessee Whiskey",
+      "subtitle": "Chris Stapleton",
+      "resolvedAt": "2026-10-11T09:58:39.079Z"
+    },
+    "wtfgoin|bellygangkushington": {
+      "id": "0a5qYlqZgVqynD4lsGwvPT",
+      "name": "WTF GOIN (feat. 21 Savage)",
+      "subtitle": "Belly Gang Kushington, 21 Savage",
+      "resolvedAt": "2026-10-11T09:58:41.691Z"
+    },
+    "youproof|morganwallen": {
+      "id": "57a4iloBWqan5rtqPJBoVY",
+      "name": "You Proof",
+      "subtitle": "Morgan Wallen",
+      "resolvedAt": "2026-10-11T09:58:43.535Z"
+    },
+    "howitfeels|lilbaby": {
+      "id": "62nb5YUYUqtYJhVPwRhCke",
+      "name": "How It Feels",
+      "subtitle": "Lil Baby, Lil Durk",
+      "resolvedAt": "2026-10-11T09:58:45.711Z"
+    },
+    "wnba|drake": {
+      "id": "6zZvy88xp6FIjJKhqwnJeQ",
+      "name": "WNBA",
+      "subtitle": "Drake",
+      "resolvedAt": "2026-10-11T09:58:48.045Z"
+    },
+    "passionfruit|drake": {
+      "id": "5mCPDVBb16L4XQwDdbRUpz",
+      "name": "Passionfruit",
+      "subtitle": "Drake",
+      "resolvedAt": "2026-10-11T09:58:51.488Z"
+    },
+    "wherethewildthingsare|lukecombs": {
+      "id": "0eBFgRxyVSeuT4iyrbukdn",
+      "name": "Where the Wild Things Are",
+      "subtitle": "Luke Combs",
+      "resolvedAt": "2026-10-11T09:58:53.955Z"
+    },
+    "e85|dontoliver": {
+      "id": "3B4cjvGlPvyBLNG3AzEgkZ",
+      "name": "E85",
+      "subtitle": "Don Toliver",
+      "resolvedAt": "2026-10-11T09:58:57.911Z"
+    },
+    "vettemotors|youngboyneverbrokeagain": {
+      "id": "0HrWshW3SuFJ6nKS9ba9Mh",
+      "name": "Vette Motors",
+      "subtitle": "YoungBoy Never Broke Again",
+      "resolvedAt": "2026-10-11T09:59:00.213Z"
+    },
+    "acoupleminutes|oliviadean": {
+      "id": "312z6PZ8wwREck8613PkJk",
+      "name": "A Couple Minutes",
+      "subtitle": "Olivia Dean",
+      "resolvedAt": "2026-10-11T09:59:03.104Z"
+    },
+    "fastcar|lukecombs": {
+      "id": "1Lo0QY9cvc8sUB2vnIOxDT",
+      "name": "Fast Car",
+      "subtitle": "Luke Combs",
+      "resolvedAt": "2026-10-11T09:59:05.285Z"
+    },
+    "beautifulcrazy|lukecombs": {
+      "id": "2rxQMGVafnNaRaXlRMWPde",
+      "name": "Beautiful Crazy",
+      "subtitle": "Luke Combs",
+      "resolvedAt": "2026-10-11T09:59:11.522Z"
+    },
+    "noflockin|kodakblack": {
+      "id": "34oWbFBfGEElvgO0a5c9V4",
+      "name": "No Flockin'",
+      "subtitle": "Kodak Black",
+      "resolvedAt": "2026-10-11T09:59:13.668Z"
+    },
+    "poeticjustice|kendricklamar": {
+      "id": "2P3SLxeQHPqh8qKB6gtJY2",
+      "name": "Poetic Justice",
+      "subtitle": "Kendrick Lamar, Drake",
+      "resolvedAt": "2026-10-11T09:59:15.903Z"
+    },
+    "bitchdontkillmyvibe|kendricklamar": {
+      "id": "712uvW1Vezq8WpQi38v2L9",
+      "name": "Bitch, Don’t Kill My Vibe",
+      "subtitle": "Kendrick Lamar",
+      "resolvedAt": "2026-10-11T09:59:20.176Z"
+    },
+    "goosebumps|travisscott": {
+      "id": "6gBFPUFcJLzWGx4lenP6h2",
+      "name": "goosebumps",
+      "subtitle": "Travis Scott",
+      "resolvedAt": "2026-10-11T09:59:26.836Z"
+    },
+    "bebyyou|lukecombs": {
+      "id": "7aLndReanHBzpTGE5Am9H8",
+      "name": "Be By You",
+      "subtitle": "Luke Combs",
+      "resolvedAt": "2026-10-11T09:59:29.312Z"
+    },
+    "shegotthebestofme|lukecombs": {
+      "id": "698eQRku24PIYPQPHItKlA",
+      "name": "She Got the Best of Me",
+      "subtitle": "Luke Combs",
+      "resolvedAt": "2026-10-11T09:59:31.123Z"
+    },
+    "712pm|future": {
+      "id": "3FSwpQ9dBZBeBV6UdYHI2R",
+      "name": "712PM",
+      "subtitle": "Future",
+      "resolvedAt": "2026-10-11T09:59:33.437Z"
+    },
+    "controlla|drake": {
+      "id": "3O8NlPh2LByMU9lSRSHedm",
+      "name": "Controlla",
+      "subtitle": "Drake",
+      "resolvedAt": "2026-10-11T09:59:35.675Z"
     }
   }
 }

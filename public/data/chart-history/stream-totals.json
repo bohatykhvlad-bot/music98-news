@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "updated": "2026-10-10T21:59:31.309Z",
-  "calibration": 0.9906,
+  "updated": "2026-10-11T10:06:06.421Z",
+  "calibration": 0.9,
   "tracks": {
     "4IAWZw00ZI9DLKDjesx86u": [
       {
@@ -1699,6 +1699,114 @@
       {
         "date": "2026-10-09",
         "total": 1271481563
+      }
+    ],
+    "5aVBxVa0kz9uzv0F4gwdEn": [
+      {
+        "date": "2026-10-09",
+        "total": 145882843
+      }
+    ],
+    "05CjWFAcAlY6O9po6Qwakk": [
+      {
+        "date": "2026-10-09",
+        "total": 289380344
+      }
+    ],
+    "3ihIZrJreMJPjQdNLrEXnP": [
+      {
+        "date": "2026-10-09",
+        "total": 236359847
+      }
+    ],
+    "0SeTP12t4EwBJ6zsjHn9Wa": [
+      {
+        "date": "2026-10-09",
+        "total": 49451939
+      }
+    ],
+    "7AeM1BGYM7emrqmQn1PuWv": [
+      {
+        "date": "2026-10-09",
+        "total": 497516764
+      }
+    ],
+    "45UDzIWgqj5hgQKXLlfdp7": [
+      {
+        "date": "2026-10-09",
+        "total": 125398001
+      }
+    ],
+    "3QLjDkgLh9AOEHlhQtDuhs": [
+      {
+        "date": "2026-10-09",
+        "total": 918476613
+      }
+    ],
+    "249E7AgSyA4vhtXNEjQYb5": [
+      {
+        "date": "2026-10-09",
+        "total": 832368793
+      }
+    ],
+    "4Sb8neYCkT7lyMIo2kOOEC": [
+      {
+        "date": "2026-10-09",
+        "total": 845548120
+      }
+    ],
+    "48NthgcgfoRrWT8LtgW28A": [
+      {
+        "date": "2026-10-09",
+        "total": 479096644
+      }
+    ],
+    "4iZ4pt7kvcaH6Yo8UoZ4s2": [
+      {
+        "date": "2026-10-09",
+        "total": 2087982675
+      }
+    ],
+    "7221xIgOnuakPdLqT0F3nP": [
+      {
+        "date": "2026-10-09",
+        "total": 1614761313
+      }
+    ],
+    "4v9alNvEjLjvqo4LNWwswl": [
+      {
+        "date": "2026-10-09",
+        "total": 503925034
+      }
+    ],
+    "0VV38e61NaGvYAko5HoHm0": [
+      {
+        "date": "2026-10-09",
+        "total": 31325024
+      }
+    ],
+    "57a4iloBWqan5rtqPJBoVY": [
+      {
+        "date": "2026-10-09",
+        "total": 989428034
+      }
+    ],
+    "6zZvy88xp6FIjJKhqwnJeQ": [
+      {
+        "date": "2026-10-09",
+        "total": 59888846
+      }
+    ],
+    "2P3SLxeQHPqh8qKB6gtJY2": [
+      {
+        "date": "2026-10-09",
+        "total": 762841651
+      }
+    ],
+    "712uvW1Vezq8WpQi38v2L9": [
+      {
+        "date": "2026-10-09",
+        "total": 960550377
       }
     ]
   }
