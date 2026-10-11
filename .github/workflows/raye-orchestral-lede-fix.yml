@@ -39,22 +39,22 @@ jobs:
           if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('RAYE_COVER_CHANGED')
           old_first="RAYE will perform her second album in full at London's Royal Albert Hall on October 23."
           old_second="The one-night concert, *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir."
-          new_first="RAYE will return to London's Royal Albert Hall on October 23 for an orchestral performance of her latest album, *This Music May Contain Hope.*"
-          new_second="The one-night show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir."
+          new_first="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert."
+          new_second="Titled *This Symphony May Contain Hope.*, the show will rework her latest album, *This Music May Contain Hope.*, with her band, the Heritage Orchestra and Flames Collective choir."
           before=(p.get('body') or '').strip()
           if not before.startswith(old_first+' '+old_second):raise SystemExit('RAYE_LIVE_LEDE_CHANGED_ABORT')
           if (p.get('excerpt') or '').strip()!=old_first:raise SystemExit('RAYE_LIVE_EXCERPT_CHANGED_ABORT')
-          before_media=re.findall(r'\\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\\]]+\\]',before,re.I)
-          if before_media!=['[youtube:Iy2FoVeIUXs]'] or before.split('\\n\\n').index(before_media[0])!=3:raise SystemExit('RAYE_MEDIA_CHANGED')
+          before_media=re.findall(r'\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\]]+\]',before,re.I)
+          if before_media!=['[youtube:Iy2FoVeIUXs]'] or before.split('\n\n').index(before_media[0])!=3:raise SystemExit('RAYE_MEDIA_CHANGED')
           text=Path('editorial-drafts/raye-royal-albert-hall-2026-10-11.md').read_text('utf-8')
-          section=text.split('## Article body\\n\\n',1)[1].split('\\n\\n## Existing media and credit',1)[0].strip()
-          paragraphs=[x.strip() for x in section.split('\\n\\n') if x.strip()]
+          section=text.split('## Article body\n\n',1)[1].split('\n\n## Existing media and credit',1)[0].strip()
+          paragraphs=[x.strip() for x in section.split('\n\n') if x.strip()]
           if len(paragraphs)!=7 or any(len(x.split())<65 for x in paragraphs[1:]):raise SystemExit('RAYE_PARAGRAPHS_CHANGED')
-          expected='\\n\\n'.join(paragraphs[:3]+before_media+paragraphs[3:])
+          expected='\n\n'.join(paragraphs[:3]+before_media+paragraphs[3:])
           if not expected.startswith(new_first+' '+new_second):raise SystemExit('RAYE_SOURCE_LEDE_MISMATCH')
           if expected.replace(new_first+' '+new_second,old_first+' '+old_second,1)!=before:raise SystemExit('RAYE_UNRELATED_LIVE_CONTENT_CHANGED_ABORT')
           if any(v in expected for v in ('in full','every song','second album')):raise SystemExit('RAYE_UNWANTED_LEDE_CLAIM')
-          excerpt=new_first.replace('*','')
+          excerpt=new_first
           if not expected.startswith(new_first):raise SystemExit('RAYE_EXCERPT_NOT_PREFIX')
           if not _local_gate(dict(p,body=expected,excerpt=excerpt)):raise SystemExit('RAYE_GATE_FAILED')
           candidate=dict(p,body=expected,excerpt=excerpt,status='draft')
@@ -88,8 +88,8 @@ jobs:
           digest=hashlib.sha256(body.encode()).hexdigest()
           if digest!=open('/tmp/raye-lede-sha.txt').read().strip():raise SystemExit('RAYE_BODY_HASH_MISMATCH')
           if (p.get('excerpt') or '')!=open('/tmp/raye-lede-excerpt.txt').read():raise SystemExit('RAYE_EXCERPT_MISMATCH')
-          media=re.findall(r'\\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\\]]+\\]',body,re.I)
-          if media!=['[youtube:Iy2FoVeIUXs]'] or body.split('\\n\\n').index(media[0])!=3:raise SystemExit('RAYE_VIDEO_CHANGED')
+          media=re.findall(r'\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\]]+\]',body,re.I)
+          if media!=['[youtube:Iy2FoVeIUXs]'] or body.split('\n\n').index(media[0])!=3:raise SystemExit('RAYE_VIDEO_CHANGED')
           cover=p.get('cover') or {}
           if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('RAYE_COVER_CHANGED_AFTER')
           print('RAYE_PUBLISHED_LEDE_VERIFIED status=live body_sha='+digest)
