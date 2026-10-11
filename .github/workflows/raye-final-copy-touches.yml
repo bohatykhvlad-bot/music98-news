@@ -1,0 +1,82 @@
+name: RAYE live editorial sentence cleanup
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths:
+      - .github/workflows/raye-final-copy-touches.yml
+permissions:
+  contents: read
+jobs:
+  correct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Register verified October ticket on-sale date
+        run: python scripts/post.py register "October 15" "RAYE Royal Albert Hall general ticket sales October 15, 2026, as in official concert announcement"
+      - name: Validate exact current published text and prepare minimal editorial corrections
+        shell: python
+        run: |
+          import sys,hashlib,re
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from post import desk_read,_local_gate,_local_preflight
+          pid='raye26royalalbertsymphony'
+          a=[x for x in desk_read()['posts'] if x.get('id')==pid]
+          if len(a)!=1 or a[0].get('status')!='live':raise SystemExit('RAYE_NOT_UNIQUELY_LIVE')
+          p=a[0]
+          body=p.get('body') or ''
+          src=Path('editorial-drafts/raye-royal-albert-hall-2026-10-11.md').read_text('utf-8')
+          arts=[s.strip() for s in src.split('## Article body\n\n',1)[1].split('\n\n## Existing media',1)[0].strip().split('\n\n')]
+          yt='[youtube:Iy2FoVeIUXs]'
+          expected='\n\n'.join(arts[:3]+[yt]+arts[3:])
+          if body!=expected:raise SystemExit('LIVE_ARTICLE_CHANGED_SINCE_READ_ABORT '+hashlib.sha256(body.encode()).hexdigest())
+          changes=[
+            ('The venue has hosted an orchestral concert from RAYE before. In 2023, she performed songs from her debut with a 50-piece Heritage Orchestra and the Flames Collective choir.',
+             'At her 2023 Royal Albert Hall concert, RAYE performed songs from her debut with the Heritage Orchestra and Flames Collective choir.'),
+            ('Her path to that stage was not straightforward. RAYE spent years writing songs for other artists, including Beyoncé and Charli XCX, while releasing EPs and dance-pop singles under her own name.',
+             'Before releasing her debut, RAYE spent years writing songs for other artists, including Beyoncé and Charli XCX, while releasing EPs and dance-pop singles under her own name.'),
+            ('This time, they have an entirely different set of songs to work with.',
+             'Unlike the earlier show, this concert will follow the new album\'s story rather than return to the debut\'s biggest songs.')
+          ]
+          new=body
+          for old,replacement in changes:
+            if new.count(old)!=1:raise SystemExit('SOURCE_PHRASE_MISSING')
+            new=new.replace(old,replacement,1)
+          if not new.startswith(p.get('excerpt') or ''):raise SystemExit('EXCERPT_CHANGED')
+          medias=re.findall(r'\[(?:youtube|photo|apple|instagram|ig|tiktok):[^\]]+\]',new,re.I)
+          if medias!=[yt] or new.split('\n\n').index(yt)!=3:raise SystemExit('VIDEO_CHANGED')
+          proposal=dict(p,body=new)
+          if not _local_gate(proposal):raise SystemExit('LOCAL_GATE_FAIL')
+          if not _local_preflight(dict(proposal,status='draft'),baseline=p,expected_media=1,min_words=400):raise SystemExit('LOCAL_PREFLIGHT_FAIL')
+          Path('/tmp/raye-final-touches.txt').write_text(new,'utf-8')
+          Path('/tmp/raye-excerpt.txt').write_text(p['excerpt'],'utf-8')
+          Path('/tmp/raye-target-hash.txt').write_text(hashlib.sha256(new.encode()).hexdigest())
+          print('RAYE_THREE_EDITORIAL_SENTENCES_VALIDATED sha='+hashlib.sha256(new.encode()).hexdigest())
+      - name: Run mandatory pre- and post-edit editorial readthroughs
+        run: |
+          python scripts/post.py editorial raye26royalalbertsymphony --phase pre-edit
+          python scripts/post.py editorial raye26royalalbertsymphony --phase post-edit --body-file /tmp/raye-final-touches.txt --title "RAYE Announces One-Night Orchestral Show at Royal Albert Hall"
+      - name: Write corrected copy with canonical protected edit tool
+        run: |
+          EXCERPT="$(cat /tmp/raye-excerpt.txt)"
+          python scripts/post.py set raye26royalalbertsymphony --body-file /tmp/raye-final-touches.txt --excerpt "$EXCERPT"
+      - name: Confirm live status and precise published body
+        shell: python
+        run: |
+          import sys,re,hashlib
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          p=next((p for p in desk_read()['posts'] if p.get('id')=='raye26royalalbertsymphony'),None)
+          if not p or p.get('status')!='live':raise SystemExit('NOT_LIVE')
+          b=p['body'];expected=open('/tmp/raye-target-hash.txt').read().strip()
+          if hashlib.sha256(b.encode()).hexdigest()!=expected:raise SystemExit('HASH_MISMATCH')
+          if 'her record label, Polydor' not in b:raise SystemExit('POLYDOR_CONTEXT_LOST')
+          if b.split('\n\n')[3]!='[youtube:Iy2FoVeIUXs]':raise SystemExit('VIDEO_POSITION_CHANGED')
+          print('RAYE_EDITORIAL_CLEANUP_LIVE_VERIFIED sha='+expected+' video_after_p3=true')
