@@ -436,7 +436,7 @@ if(!verifiedTriSeed(payload)){
 }
 if(old?.schema===3 && old.spotifyDate>chosen)
  throw new Error("Refusing to roll back a later published edition");
-if(old?.schema===3&&old.spotifyDate===chosen&&old.coverage?.matched>matched+8)
+if(decision.publish&&old?.schema===3&&old.spotifyDate===chosen&&old.coverage?.matched>matched+8)
  throw new Error("Unexpected lost Spotify coverage on same chart date");
 /* Publication cadence: the seed the site reads advances at most once a day,
    in the morning window; every other run only tops up dated archives. */
