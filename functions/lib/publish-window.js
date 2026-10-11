@@ -39,6 +39,10 @@ export function shouldPublishSeed({previousDate, candidateDate = null, lastPubli
      source edition. Keep today's ranks and movement stable until tomorrow. */
   if (String(lastPublishedAt||"").slice(0,10)===today)
     return {publish: false, reason: "already-published-today", age};
+  /* No new common day means no new edition. Recomputing yesterday's ranks
+     on another calendar day creates phantom movements and resets streaks. */
+  if (candidateDate && candidateDate<=previousDate)
+    return {publish: false, reason: "no-new-source-edition", age};
   if (age > MAX_DEFERRAL_DAYS) return {publish: true, reason: "catch-up", age};
   if (inPublishWindow(nowMs)) return {publish: true, reason: "morning-window", age};
   /* The morning may have failed on a rate limit, missing cover or temporary

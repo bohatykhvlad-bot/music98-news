@@ -72,3 +72,15 @@ test("an already-published edition stays frozen for the rest of the UTC day",()=
   assert.equal(shouldPublishSeed({...opts,nowMs:at("2026-10-13T05:45:00Z")}).publish,true);
   assert.equal(shouldPublishSeed({...opts,nowMs:at("2026-10-12T09:45:00Z"),forced:true}).reason,"forced");
 });
+
+test("an unchanged common source date never becomes a second publication day",()=>{
+ const now=at("2026-10-12T05:45:00Z");
+ const result=shouldPublishSeed({previousDate:"2026-10-09",
+  candidateDate:"2026-10-09",lastPublishedAt:"2026-10-11T05:48:00Z",
+  nowMs:now});
+ assert.equal(result.publish,false);
+ assert.equal(result.reason,"no-new-source-edition");
+ assert.equal(shouldPublishSeed({previousDate:"2026-10-09",
+  candidateDate:"2026-10-10",lastPublishedAt:"2026-10-11T05:48:00Z",
+  nowMs:now}).publish,true);
+});
