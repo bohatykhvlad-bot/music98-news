@@ -6,13 +6,13 @@
 
 ## Article body
 
-RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert. The show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir. She has spent much of 2026 performing the new material on tour, after introducing several of those songs live when the tour began in Poland in January. Tickets go on sale October 15 at 10am.
+RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert. The show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir. She has spent much of 2026 performing the new material on the road, after introducing several of those songs live when the tour began in Poland in January. Tickets go on sale October 15 at 10am.
 
 Released in March, *This Music May Contain Hope.* is arranged around four seasons, starting in a darker place and moving toward hope. She told Apple Music she wanted to make songs listeners could turn to when life felt difficult. She sent Hans Zimmer a rough demo of "Click Clack Symphony." and asked if he wanted to work on it. They went back and forth until the finished recording included an orchestra. She called the track "unapologetically cinematic." The album became her first UK No. 1.
 
 The concert announcement arrived with a new Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. In January, RAYE played the then-unreleased album version for ELLE and called it "big and dramatic." She discussed a verse that moves from hiding pain to admitting she is not okay and still believing she will get through it. On the album, the song follows a spoken introduction about a woman alone in Paris.
 
-The October concert is her second symphonic project. In 2023, RAYE rearranged songs from *My 21st Century Blues* for the Royal Albert Hall with orchestra and choir. The performance later became a live album and concert film. She took the production to The O2 the following year, while the film went on to receive a Grammy nomination for Best Music Film. The Heritage Orchestra and Flames Collective, both part of the 2023 show, are returning this time.
+The October concert is her second symphonic project. In 2023, RAYE rearranged songs from *My 21st Century Blues* for the same venue with orchestra and choir. That performance later became a live album and concert film, and she took the production to The O2 the following year. The film was later nominated for Best Music Film at the Grammys. The Heritage Orchestra and Flames Collective, both part of the 2023 show, are returning this time.
 
 Before RAYE released an album of her own, she spent years writing songs for artists including Beyoncé and Charli XCX. Polydor signed her as a teenager, but seven years passed without a full-length release. She has said she wanted to make R&B, while the label steered her toward dance-pop and left her with little creative control over her own music. After challenging the delays publicly in 2021, she left the label and became independent.
 
