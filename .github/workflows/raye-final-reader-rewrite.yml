@@ -1,4 +1,4 @@
-name: RAYE final independent reader rewrite
+name: RAYE final reader cleanup
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
