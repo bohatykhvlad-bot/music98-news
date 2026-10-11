@@ -40,9 +40,9 @@ test("production candidate sample is accepted by the real browser's current char
  const v=vm.runInContext("chartHasCompleteArtwork(chart.tracks,chart.methodology)",vm.createContext({...context,chart}),{timeout:500});
  assert.equal(v,true);
 });
-test("Spotify-only songs are accepted rather than rejected for having no Global Apple position",()=>{
+test("Spotify-only songs are eligible but not required in every top 50 edition",()=>{
  assert.ok(chart.tracks.some(t=>t.sourceRanks.A===null));
- assert.ok(chart.tracks.some(t=>t.sourceRanks.U===null&&t.sourceRanks.A===null));
+ assert.ok(chart.tracks.every(t=>t.sourceRanks.U!==null||t.sourceRanks.A!==null||t.sourceRanks.S!==null));
  assert.equal(validates("isDailySourceEdition",chart),true);
 });
 test("browser blocks truly incomplete chart versions, fake streams and duplicate ranks",()=>{

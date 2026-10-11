@@ -404,7 +404,7 @@ if(decision.publish){
 
 const tracks=[...candidates.values()];
 const missingUs=tracks.filter(t=>t.sourceRanks.U!==null&&t.spotify.status!=="matched");
-if(missingUs.length)throw new Error("Apple USA 40pct missing verified Spotify counts: "+missingUs.length);
+if(decision.publish&&missingUs.length)throw new Error("Apple USA 40pct missing verified Spotify counts: "+missingUs.length);
 const missingTracks=tracks.filter(t=>t.spotify.status!=="matched");
 if(missingTracks.length)console.warn("TRI_UNMEASURED",JSON.stringify(missingTracks.map(t=>({
  title:t.title,artist:t.artist,appleRank:t.sourceRanks.A,
