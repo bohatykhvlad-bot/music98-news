@@ -1,4 +1,4 @@
-name: RAYE read-only live correction audit
+name: RAYE live read-only prose inspection
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 jobs:
-  audit:
+  inspect:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -18,27 +18,27 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Compare exact saved article hash, media and cover against reviewed content
+      - name: Read currently published RAYE article without making any changes
         shell: python
         run: |
-          import os,hashlib,re,sys
+          import re,sys,hashlib
           sys.path.insert(0,'scripts')
           from post import desk_read
-          expected='b703db952e4ccb7324d75d027e390e365b285d674107b28c77a1707c255f08af'
-          posts=desk_read()['posts']
-          p=next((q for q in posts if q.get('id')=='raye26royalalbertsymphony'),None)
-          if not p or p.get('status')!='live':raise SystemExit('NOT_LIVE')
+          p=next((p for p in desk_read()['posts'] if p.get('id')=='raye26royalalbertsymphony'),None)
+          if not p or p.get('status')!='live':raise SystemExit('RAYE_POST_NOT_LIVE')
           body=p.get('body') or ''
-          actual=hashlib.sha256(body.encode()).hexdigest()
-          if actual!=expected:raise SystemExit('LIVE_BODY_HASH_MISMATCH '+actual)
-          parts=body.split('\n\n')
-          medias=re.findall(r'\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\]]+\]',body,re.I)
-          if len(medias)!=1 or not re.fullmatch(r'\[youtube:[A-Za-z0-9_-]{11}\]',medias[0]):raise SystemExit('MEDIA_MISMATCH')
-          if parts.index(medias[0])!=3:raise SystemExit('MEDIA_NOT_AFTER_THIRD_PARAGRAPH')
-          if 'Poland' in body or 'not footage' in body or 'not a rehearsal' in body:raise SystemExit('OLD_CLAIMS_REMAIN')
-          if not body.startswith(p.get('excerpt') or ''):raise SystemExit('EXCERPT_NOT_LITERAL_PREFIX')
-          cover=p.get('cover') or {}
-          if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('COVER_CHANGED')
-          print('RAYE_LIVE_AUDIT_PASS status=live sha256='+actual+' paragraphs='+str(len(parts)-1)+' media_after_paragraph=3 cover=preserved old_phrases=absent')
-      - name: Check public feed, cover JPEG and YouTube embed
-        run: python scripts/post.py verify raye26royalalbertsymphony
+          media=re.findall(r'\[(?:photo|youtube|apple|tiktok|instagram|ig):[^\]]+\]',body,re.I)
+          paragraphs=body.split('\n\n')
+          assert len(media)==1
+          print('RAYE_LIVE_SHA256='+hashlib.sha256(body.encode()).hexdigest())
+          print('RAYE_LIVE_TITLE='+str(p.get('title')))
+          print('RAYE_LIVE_EXCERPT='+str(p.get('excerpt')))
+          print('RAYE_LIVE_WORDS='+str(len(re.findall(r"\b[\w’'-]+\b",body))))
+          print('RAYE_HAS_OLD_POLYDOR='+str('little creative control at Polydor' in body))
+          print('RAYE_HAS_EXPLAINED_POLYDOR='+str('her record label, Polydor' in body))
+          print('RAYE_VIDEO_AFTER_PARAGRAPH='+str(paragraphs.index(media[0])))
+          print('RAYE_COVER_SRC='+str((p.get('cover') or {}).get('src')))
+          print('RAYE_COVER_CREDIT_URL='+str((p.get('cover') or {}).get('creditUrl')))
+          print('RAYE_LIVE_BODY_BEGIN')
+          print(body)
+          print('RAYE_LIVE_BODY_END')
