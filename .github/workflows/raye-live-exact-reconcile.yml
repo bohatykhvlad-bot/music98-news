@@ -1,0 +1,54 @@
+name: RAYE live article exact body reconciliation
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths: [.github/workflows/raye-live-exact-reconcile.yml]
+permissions:
+  contents: read
+jobs:
+  audit-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compare exact public and protected current article with reviewed GitHub source
+        shell: python
+        run: |
+          import sys,hashlib,re,difflib,json,urllib.request,datetime
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          pid='raye26royalalbertsymphony'
+          f=Path('editorial-drafts/raye-royal-albert-hall-2026-10-11.md').read_text('utf-8')
+          source=f.split('## Article body\n\n',1)[1].split('\n\n## Existing media and credit',1)[0].strip()
+          ps=source.split('\n\n')
+          expected='\n\n'.join(ps[:3]+['[youtube:Iy2FoVeIUXs]']+ps[3:])
+          h=lambda t:hashlib.sha256(t.encode('utf-8')).hexdigest()
+          print('EXPECTED_HASH='+h(expected))
+          def audit(posts,desc):
+            p=next((p for p in posts if p.get('id')==pid),None)
+            if not p:raise SystemExit(desc+'_NOT_FOUND')
+            b=p.get('body') or ''
+            print(desc+'_STATUS='+str(p.get('status')))
+            print(desc+'_HASH='+h(b))
+            print(desc+'_WORDS='+str(len(b.split())))
+            print(desc+'_PARAGRAPHS='+str(len(b.split('\n\n'))))
+            print(desc+'_MATCH_EXPECTED='+str(b==expected))
+            print(desc+'_HAS_POLYDOR='+str('her record label, Polydor' in b))
+            print(desc+'_VIDEO_AFTER_P3='+str(len(b.split('\n\n'))>3 and b.split('\n\n')[3]=='[youtube:Iy2FoVeIUXs]'))
+            if b!=expected:
+              diffs=list(difflib.unified_diff(expected.splitlines(),b.splitlines(),fromfile='GitHub',tofile=desc,lineterm=''))
+              for line in diffs[:90]:print('DIFF '+line[:350])
+              print(desc+'_FIRST_MISMATCH_BYTE='+str(next((i for i,(x,y) in enumerate(zip(b,expected)) if x!=y),min(len(b),len(expected)))))
+            return p
+          desk=desk_read()['posts']
+          audit(desk,'PROTECTED_DESK')
+          req=urllib.request.Request('https://music98.news/api/desk?audit='+str(datetime.datetime.now().timestamp()),headers={'User-Agent':'music98-read-only-editorial-audit','Accept':'application/json','Cache-Control':'no-cache'})
+          with urllib.request.urlopen(req,timeout=30) as response: public=json.load(response)['posts']
+          audit(public,'PUBLIC_FEED')
