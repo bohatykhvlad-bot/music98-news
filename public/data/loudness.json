@@ -4,7 +4,7 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": "2026-10-11T10:08:25.010Z"
+    "measuredAt": "2026-10-11T10:20:29.715Z"
   },
   "aintinla|adla": {
     "integratedLufs": -6.2,
