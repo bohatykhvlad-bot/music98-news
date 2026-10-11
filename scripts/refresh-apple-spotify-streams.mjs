@@ -388,15 +388,22 @@ if(decision.publish){
  siteStats=await applySiteStreams();
  /* Preserve verified site measurements across rate-limited retries for the
     same exact edition and Spotify recording. */
- if(old?.schema===3&&old.spotifyDate===chosen&&Array.isArray(old.tracks)){
+ if(old?.schema===3&&old.spotifyDate<=chosen&&Array.isArray(old.tracks)){
   const prior=new Map(old.tracks.map(t=>[songIdentity(t.title,t.artist),t.spotify]));
+  let recovered=0;
   for(const [key,t] of candidates){
    const p=prior.get(key);
+   /* Exact ID, known source, genuinely measured and within the existing
+      three-day freshness window. Missing measurements are NOT invented. */
    if(!p||!String(p.metric||"").startsWith("mystreamcount-")||
       !verifiedSpotifyRow(p,chosen))continue;
-   if(t.spotify?.status==="matched"&&t.spotify.spotifyId!==p.spotifyId)continue;
-   if(!String(t.spotify?.metric||"").startsWith("mystreamcount-"))t.spotify={...p};
+   if(t.spotify?.status==="matched" &&
+      (t.spotify.spotifyId!==p.spotifyId||old.spotifyDate<chosen))continue;
+   if(!String(t.spotify?.metric||"").startsWith("mystreamcount-")){
+    t.spotify={...p};recovered++;
+   }
   }
+  siteStats.verifiedCarryForward=recovered;
  }
 }else{
  console.log("SITE_STREAM_STAGE_SKIPPED",JSON.stringify({reason:decision.reason,age:decision.age}));
