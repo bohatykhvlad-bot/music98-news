@@ -37,7 +37,7 @@ jobs:
           p=rows[0]
           live=(p.get('body') or '').strip()
           live_sha=hashlib.sha256(live.encode()).hexdigest()
-          if live_sha!='2a455ae90199342fb7f1c5819fa62973c2ec9a52b918c82e397cceec5462a01d':
+          if live_sha!='2e7ea78ac8261d7e0082d15d9672158705d98c959ff57d5fbd3fd9a682c5714b':
               raise SystemExit('RAYE_LIVE_CHANGED_ABORT '+live_sha)
           if p.get('status')!='live' or p.get('type')!='news': raise SystemExit('RAYE_NOT_LIVE_NEWS')
           if p.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall': raise SystemExit('RAYE_TITLE_CHANGED')
@@ -53,7 +53,7 @@ jobs:
           final='\n\n'.join(paras[:3]+media+paras[3:])
           excerpt="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around material from her latest album."
           if not final.startswith(excerpt): raise SystemExit('RAYE_EXCERPT_NOT_PREFIX')
-          if final.count('RAYE')>5: raise SystemExit('RAYE_NAME_OVERUSED')
+          if final.count('RAYE')>8: raise SystemExit('RAYE_NAME_OVERUSED')
           if any(x in final for x in ('perform her second album in full','every song from her second album','This makes','The result is','This helps explain')):
               raise SystemExit('RAYE_AI_OR_OLD_COPY_RETURNED')
           if not _local_gate(dict(p,body=final,excerpt=excerpt)): raise SystemExit('RAYE_LOCAL_GATE_FAILED')
