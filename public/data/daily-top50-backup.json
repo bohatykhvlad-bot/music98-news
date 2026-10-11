@@ -408,7 +408,10 @@
       "applePoints": 39.6,
       "spotifyBonus": 16.790616646289834,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.7,
+      "lufs": -7.3,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "Cold Shoulder",
@@ -561,7 +564,10 @@
       "applePoints": 36.8,
       "spotifyBonus": 11.507135735401071,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.3,
+      "lufs": -7.7,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "Last Thing You Need",
@@ -597,7 +603,10 @@
       "applePoints": 37.2,
       "spotifyBonus": 11.386810149280135,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -9.3,
+      "lufs": -6.7,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "Babylon",
@@ -711,7 +720,10 @@
       "applePoints": 35.6,
       "spotifyBonus": 13.126096070554782,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -7.4,
+      "lufs": -8.6,
+      "truePeakDbtp": 0.5
     },
     {
       "title": "I Can't Love You Anymore",
@@ -747,7 +759,10 @@
       "applePoints": 36,
       "spotifyBonus": 10.233198952874412,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.6,
+      "lufs": -7.4,
+      "truePeakDbtp": 0.3
     },
     {
       "title": "WAIT FOR U",
@@ -783,7 +798,10 @@
       "applePoints": 34.4,
       "spotifyBonus": 9.855809470430662,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.5,
+      "lufs": -7.5,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "Cinderella",
@@ -858,7 +876,10 @@
       "applePoints": 32.8,
       "spotifyBonus": 10.555537501486972,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.4,
+      "lufs": -7.6,
+      "truePeakDbtp": 0.9
     },
     {
       "title": "I’m Spent",
@@ -894,7 +915,10 @@
       "applePoints": 33.2,
       "spotifyBonus": 9.195698434536812,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6.7,
+      "lufs": -9.3,
+      "truePeakDbtp": 0.6
     },
     {
       "title": "Freestyle",
@@ -930,7 +954,10 @@
       "applePoints": 33.6,
       "spotifyBonus": 6.888555562463061,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6.2,
+      "lufs": -9.8,
+      "truePeakDbtp": -0.5
     },
     {
       "title": "Pink Clouding",
@@ -966,7 +993,10 @@
       "applePoints": 22.4,
       "spotifyBonus": 16.53338122501002,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.7,
+      "lufs": -7.3,
+      "truePeakDbtp": 0.4
     },
     {
       "title": "The Fate of Ophelia",
@@ -1038,7 +1068,10 @@
       "applePoints": 32.4,
       "spotifyBonus": 10.585498663563659,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6.2,
+      "lufs": -9.8,
+      "truePeakDbtp": 0.9
     },
     {
       "title": "Boston",
@@ -1152,7 +1185,10 @@
       "applePoints": 27.2,
       "spotifyBonus": 10.353432418981631,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.1,
+      "lufs": -7.9,
+      "truePeakDbtp": 0.3
     },
     {
       "title": "In A Minute",
@@ -1188,7 +1224,10 @@
       "applePoints": 34,
       "spotifyBonus": 3.903938859988939,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -7.8,
+      "lufs": -8.2,
+      "truePeakDbtp": 1.1
     },
     {
       "title": "Classic PT2",
@@ -1224,7 +1263,10 @@
       "applePoints": 30.4,
       "spotifyBonus": 10.065949944353509,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -4.6,
+      "lufs": -11.4,
+      "truePeakDbtp": 0.4
     },
     {
       "title": "Mr. Brightside",
@@ -1299,7 +1341,10 @@
       "applePoints": 31.6,
       "spotifyBonus": 8.575713642790632,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -10.1,
+      "lufs": -5.9,
+      "truePeakDbtp": 0.7
     },
     {
       "title": "So Good",
@@ -1335,7 +1380,10 @@
       "applePoints": 26,
       "spotifyBonus": 9.892464385924553,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -5,
+      "lufs": -11,
+      "truePeakDbtp": 0.1
     },
     {
       "title": "Ain't In LA",
@@ -1370,9 +1418,9 @@
       "rank": 34,
       "applePoints": 3.2,
       "spotifyBonus": 24.606615224855595,
-      "gainDb": -9.4,
-      "lufs": -6.6,
-      "truePeakDbtp": 0.2,
+      "gainDb": -9.8,
+      "lufs": -6.2,
+      "truePeakDbtp": 0.4,
       "delta": "-17",
       "weeks": 20
     },
@@ -1410,7 +1458,10 @@
       "applePoints": 17.6,
       "spotifyBonus": 15.564537069875513,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6.4,
+      "lufs": -9.6,
+      "truePeakDbtp": 0.5
     },
     {
       "title": "Snooze",
@@ -1446,7 +1497,10 @@
       "applePoints": 19.6,
       "spotifyBonus": 14.270729194320621,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -6.2,
+      "lufs": -9.8,
+      "truePeakDbtp": 0
     },
     {
       "title": "Beauty and a Beat",
@@ -1521,7 +1575,10 @@
       "applePoints": 31.2,
       "spotifyBonus": 2.0235217340760374,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.2,
+      "lufs": -7.8,
+      "truePeakDbtp": 0.3
     },
     {
       "title": "Die With A Smile",
@@ -1596,7 +1653,10 @@
       "applePoints": 29.6,
       "spotifyBonus": 13.128721550964983,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -5.8,
+      "lufs": -10.2,
+      "truePeakDbtp": 0.2
     },
     {
       "title": "Not Like Us",
@@ -1632,7 +1692,10 @@
       "applePoints": 14.4,
       "spotifyBonus": 11.395664705099827,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -7.2,
+      "lufs": -8.8,
+      "truePeakDbtp": 0.5
     },
     {
       "title": "drop dead",
@@ -1707,7 +1770,10 @@
       "applePoints": 12.8,
       "spotifyBonus": 8.140513919296385,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.6,
+      "lufs": -7.4,
+      "truePeakDbtp": 1
     },
     {
       "title": "Last Night",
@@ -1743,7 +1809,10 @@
       "applePoints": 29.2,
       "spotifyBonus": 9.738127223579609,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -5.2,
+      "lufs": -10.8,
+      "truePeakDbtp": -0.4
     },
     {
       "title": "Don't We",
@@ -1779,7 +1848,10 @@
       "applePoints": 32,
       "spotifyBonus": 6.6360729838679475,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8.5,
+      "lufs": -7.5,
+      "truePeakDbtp": 0.7
     },
     {
       "title": "So Easy (To Fall In Love)",
@@ -1854,7 +1926,10 @@
       "applePoints": 28.8,
       "spotifyBonus": 8.420232124822787,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -7.9,
+      "lufs": -8.1,
+      "truePeakDbtp": 0.4
     },
     {
       "title": "Billie Jean",
@@ -1926,7 +2001,10 @@
       "applePoints": 15.2,
       "spotifyBonus": 0.49767764151909205,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -3.5,
+      "lufs": -12.5,
+      "truePeakDbtp": 0.8
     },
     {
       "title": "Power Trip",
@@ -1962,7 +2040,10 @@
       "applePoints": 23.6,
       "spotifyBonus": 11.713314927318544,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -7.6,
+      "lufs": -8.4,
+      "truePeakDbtp": 0.5
     }
   ],
   "seedEdition": "[[\"A\",\"2026-10-09T08:00:27.476Z\",\"2026-10-09\"],[\"U\",\"2026-10-10T13:12:41.753Z\",\"2026-10-09\"],[\"C\",\"144:fd76be3c\"]]",
