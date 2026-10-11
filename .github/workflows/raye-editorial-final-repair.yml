@@ -1,4 +1,4 @@
-name: RAYE fact-registered chronology repair
+name: RAYE safeguarded date-order correction
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -50,8 +50,8 @@ jobs:
           excerpt=s.split('**Excerpt (plain-text rendering of the first sentence):** ',1)[1].splitlines()[0]
           new='\n\n'.join(paragraphs[:3]+media+paragraphs[3:])
           if not new.startswith(excerpt):raise SystemExit('EXCERPT_NOT_PREFIX')
-          original_paragraphs=old.split('\\n\\n')
-          proposed_paragraphs=new.split('\\n\\n')
+          original_paragraphs=old.split('\n\n')
+          proposed_paragraphs=new.split('\n\n')
           if len(original_paragraphs)!=8 or len(proposed_paragraphs)!=8:raise SystemExit('POST_STRUCTURE_CHANGED')
           if original_paragraphs[:5]!=proposed_paragraphs[:5] or original_paragraphs[7]!=proposed_paragraphs[7]:raise SystemExit('UNRELATED_COPY_CHANGED')
           if any(t in new for t in ('newly released material',"story's starting point",'such a private confession','Poland','not footage')):raise SystemExit('OLD_FILLER_RETURNED')
