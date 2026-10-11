@@ -1,4 +1,4 @@
-name: RAYE restrained human-voice editorial polish
+name: RAYE remove repeated name in neighboring paragraphs
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -47,28 +47,17 @@ jobs:
           media=re.findall(r'\[(?:youtube|photo|apple|instagram|ig|tiktok|tickets):[^\]]+\]',p.get('body') or '',re.I)
           if media!=['[youtube:Iy2FoVeIUXs]']:raise SystemExit('RAYE_MEDIA_CHANGED')
           updated='\n\n'.join(paras[:3]+media+paras[3:])
-          old=updated
-          edits=[
-            ("She began playing new songs on tour before the album came out, using the live shows to work out how they should sound on the finished record.", "She played some of the songs on tour before the album was released, listening to audience reactions as she worked out how the studio versions should sound."),
-            ("They exchanged ideas until the recording included an orchestra.", "They developed the song together, and the recording features an orchestra."),
-            ("She called the finished song \"unapologetically cinematic.\"", "She called it \"unapologetically cinematic.\""),
-            ("The full album went to No. 1 in the UK.", "The album later reached No. 1 in the UK."),
-            ("The announcement included a new Abbey Road Studios performance of \"I Will Overcome.\" with the London Symphony Orchestra.", "RAYE also released an Abbey Road Studios performance of \"I Will Overcome.\" with the London Symphony Orchestra."),
-            ("Earlier this year, RAYE played the song for an ELLE journalist and called it \"big and dramatic.\"", "In an ELLE interview earlier this year, she played the song and called it \"big and dramatic.\""),
-            ("She explained lyrics about how people hide their pain, followed by an admission that she is struggling but believes she will get through it.", "She explained a verse in which the narrator admits she is struggling but still believes she will somehow get through it."),
-            ("The song follows a short opening scene about a woman alone in Paris.", "On the album, the song follows a spoken introduction about a woman alone in Paris."),
-            ("Unlike that earlier show, which reworked existing recordings, the new concert is built around material that already incorporates orchestral arrangements in the studio.", "This time, she is bringing songs that already feature orchestral arrangements in the versions released on her latest album."),
-            ("Before she could release an album of her own, RAYE spent years writing songs for other artists, including Beyoncé and Charli XCX.", "RAYE spent years writing songs for other artists, including Beyoncé and Charli XCX, before releasing her debut album."),
-            ("After publicly criticizing years of delays in 2021, she left the label to work independently.", "After criticizing the delays publicly in 2021, she left the label to work independently."),
-            ("On *This Music May Contain Hope.*, RAYE wrote from a different place. She told ELLE she had composed most of it sober and no longer used alcohol to bury difficult feelings.", "RAYE told ELLE she wrote most of *This Music May Contain Hope.* sober, having stopped using alcohol to bury difficult feelings."),
-            ("Its opening autumn chapter explores the urge to fix loneliness with a drink or a relationship.", "The album's autumn section explores the temptation to drink or start a relationship rather than face loneliness."),
-            ("She spoke about learning to spend an evening by herself, something she once found difficult.", "She said being alone had once made her sad, but she was now learning to enjoy her own company instead."),
-          ]
-          for before,after in edits:
-              if old.count(after)!=1:raise SystemExit('RAYE_REWRITE_MISSING_OR_DUPLICATE '+before[:40])
-              old=old.replace(after,before,1)
           original=(p.get('body') or '').strip()
-          if old!=original:raise SystemExit('RAYE_LIVE_BODY_CHANGED_OR_UNRELATED_EDIT_ABORT')
+          source_sha=hashlib.sha256(original.encode()).hexdigest()
+          if source_sha!='8a23636c89503f538f55185c27c3f55f4c1e78bd2a7166e548e09f8f939a0a24':raise SystemExit('RAYE_CURRENT_LIVE_SOURCE_CHANGED_ABORT sha='+source_sha)
+          before_a="RAYE told Apple Music she hoped the songs would help listeners through difficult times."
+          after_a="She told Apple Music she hoped the songs would help listeners through difficult times."
+          before_b="RAYE also released an Abbey Road Studios performance of \"I Will Overcome.\" with the London Symphony Orchestra."
+          after_b="She also released an Abbey Road Studios performance of \"I Will Overcome.\" with the London Symphony Orchestra."
+          if original.count(before_a)!=1 or original.count(before_b)!=1:raise SystemExit('RAYE_REPETITIONS_NOT_IN_EXPECTED_LOCATIONS')
+          expected=original.replace(before_a,after_a,1).replace(before_b,after_b,1)
+          if updated!=expected:raise SystemExit('RAYE_UNRELATED_CHANGES_BLOCKED')
+          if original.count('RAYE')-updated.count('RAYE')!=2:raise SystemExit('RAYE_REPETITIONS_NOT_REDUCED')
           if original.split('\n\n')[3]!=media[0] or updated.split('\n\n')[3]!=media[0]:raise SystemExit('RAYE_VIDEO_POSITION_CHANGED')
           excerpt="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert."
           if (p.get('excerpt') or '').strip()!=excerpt or not updated.startswith(excerpt):raise SystemExit('RAYE_EXCERPT_CHANGED')
@@ -80,7 +69,7 @@ jobs:
           if not _local_preflight(candidate,baseline=p,expected_media=1,min_words=400):raise SystemExit('RAYE_LOCAL_PREFLIGHT_FAILED')
           Path('/tmp/raye-polished.txt').write_text(updated,encoding='utf-8')
           Path('/tmp/raye-polished-sha.txt').write_text(hashlib.sha256(updated.encode()).hexdigest(),encoding='utf-8')
-          print('RAYE_TARGETED_REWRITE_VALIDATED paragraphs=7 edits='+str(len(edits))+' words='+str(len(updated.split())))
+          print('RAYE_REPETITION_FIX_VALIDATED paragraphs=7 replaced=2 words='+str(len(updated.split())))
       - name: Full pre-edit and post-edit editorial readthrough
         shell: bash
         run: |
