@@ -12,7 +12,7 @@ RAYE performed at the Royal Albert Hall in September 2023, months after releasin
 
 RAYE was writing for other artists long before her own albums came out. She signed her first publishing deal at 16 and went on to co-write Beyoncé's "Bigger" and Charli XCX's "After the Afterparty." Meanwhile, much of the music she released under her own name leaned towards dance-pop, even as she wanted to explore R&B. Speaking to the Recording Academy in 2025, she said she had little creative control at Polydor. She put out several EPs and built an audience through singles and collaborations, but an album remained out of reach despite the success of her writing work.
 
-In 2021, RAYE publicly criticised Polydor for holding back her debut album. She left the label and eventually released *My 21st Century Blues* independently in 2023. "Escapism." with 070 Shake gave her a first UK No. 1 single, and in 2024 she won six BRIT Awards in one night, including Album of the Year and Songwriter of the Year. In June, Nile Rodgers presented her with the Hal David Starlight Award from the Songwriters Hall of Fame, recognizing her songwriting career. 
+In 2021, RAYE publicly criticised Polydor for holding back her debut album. She left the label and eventually released *My 21st Century Blues* independently in 2023. "Escapism." with 070 Shake gave her a first UK No. 1 single, and in 2024 she won six BRIT Awards in one night, including Album of the Year and Songwriter of the Year. In June, Nile Rodgers presented her with the Hal David Starlight Award from the Songwriters Hall of Fame, recognizing her songwriting career. She became the first British woman to receive the award. 
 
 RAYE released her follow-up in March and organized it into four seasons. Its songs move from isolation and heartbreak towards recovery, with jazz and soul influences appearing alongside more theatrical arrangements. "Click Clack Symphony." features Hans Zimmer, while "Nightingale Lane." leans into the kind of soulful singing she fought to make room for earlier in her career. The album became her first UK No. 1, surpassing the No. 2 peak of *My 21st Century Blues*, and was shortlisted for the 2026 Mercury Prize.
 
@@ -41,6 +41,7 @@ Alongside the announcement, RAYE released a new performance of "I Will Overcome.
 
 10. RAYE interview with Recording Academy (songwriting at 16, Beyoncé/Charli XCX, label creative control): https://www.grammy.com/news/raye-my-21st-century-blues-interview-songwriter-2025-grammys/
 11. Songwriters Hall of Fame 2026 gala report (Nile Rodgers, Hal David Starlight Award): https://www.songhall.org/shof-gala
+12. BMI June 2026 confirmation (first British woman to receive award): https://www.bmi.com/news/bmi-congratulates-its-2026-songwriters-hall-of-fame-inductees-honorees
 
 ## Publication gate
 
