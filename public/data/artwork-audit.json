@@ -1,15 +1,15 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-11T10:19:48.276Z",
+  "updatedAt": "2026-10-11T13:06:03.922Z",
   "chartUpdated": "2026-10-11",
   "chartRev": "tri-source-v42",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 41,
+    "apple-feed": 40,
     "previous-audit": 1,
-    "apple-chart": 8
+    "apple-chart": 9
   },
   "entries": {
     "aintinla|adela": {
@@ -29,7 +29,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:38.675Z",
+      "checkedAt": "2026-10-11T13:05:45.488Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -65,7 +65,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.558Z",
+      "checkedAt": "2026-10-11T13:05:36.910Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -101,7 +101,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.339Z",
+      "checkedAt": "2026-10-11T13:05:10.600Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -137,7 +137,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:42.493Z",
+      "checkedAt": "2026-10-11T13:05:53.785Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -203,7 +203,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.346Z",
+      "checkedAt": "2026-10-11T13:05:10.608Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -239,7 +239,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.559Z",
+      "checkedAt": "2026-10-11T13:05:36.911Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -275,7 +275,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:38.674Z",
+      "checkedAt": "2026-10-11T13:05:45.487Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -311,7 +311,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:48.273Z",
+      "checkedAt": "2026-10-11T13:06:03.920Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -407,7 +407,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:36.841Z",
+      "checkedAt": "2026-10-11T13:05:44.162Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -443,7 +443,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:44.733Z",
+      "checkedAt": "2026-10-11T13:05:58.325Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -479,7 +479,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.343Z",
+      "checkedAt": "2026-10-11T13:05:10.605Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -515,7 +515,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.562Z",
+      "checkedAt": "2026-10-11T13:05:36.913Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -551,7 +551,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:38.673Z",
+      "checkedAt": "2026-10-11T13:05:45.486Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -587,7 +587,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:40.541Z",
+      "checkedAt": "2026-10-11T13:05:47.277Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -668,7 +668,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.344Z",
+      "checkedAt": "2026-10-11T13:05:10.606Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -704,7 +704,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.562Z",
+      "checkedAt": "2026-10-11T13:05:36.913Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -740,7 +740,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:44.733Z",
+      "checkedAt": "2026-10-11T13:05:58.325Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -836,7 +836,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:45.335Z",
+      "checkedAt": "2026-10-11T13:05:58.873Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -872,7 +872,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:45.334Z",
+      "checkedAt": "2026-10-11T13:05:58.872Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -968,7 +968,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.563Z",
+      "checkedAt": "2026-10-11T13:05:36.918Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1004,7 +1004,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:48.274Z",
+      "checkedAt": "2026-10-11T13:06:03.920Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1040,7 +1040,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.559Z",
+      "checkedAt": "2026-10-11T13:05:36.910Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1076,7 +1076,7 @@
       "score": 1090,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:38.671Z",
+      "checkedAt": "2026-10-11T13:05:45.485Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1172,7 +1172,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.560Z",
+      "checkedAt": "2026-10-11T13:05:36.911Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1208,7 +1208,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.563Z",
+      "checkedAt": "2026-10-11T13:05:36.917Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1244,7 +1244,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:36.841Z",
+      "checkedAt": "2026-10-11T13:05:44.161Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1280,7 +1280,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:38.672Z",
+      "checkedAt": "2026-10-11T13:05:45.486Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1316,7 +1316,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.345Z",
+      "checkedAt": "2026-10-11T13:05:10.607Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1352,7 +1352,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:45.960Z",
+      "checkedAt": "2026-10-11T13:05:59.477Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1388,7 +1388,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:45.335Z",
+      "checkedAt": "2026-10-11T13:05:58.873Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1424,7 +1424,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.558Z",
+      "checkedAt": "2026-10-11T13:05:36.909Z",
       "alternatives": []
     },
     "likeme|42babyduggfuturelil": {
@@ -1444,7 +1444,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:42.494Z",
+      "checkedAt": "2026-10-11T13:05:53.785Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1480,7 +1480,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.346Z",
+      "checkedAt": "2026-10-11T13:05:10.607Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1516,7 +1516,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:38.673Z",
+      "checkedAt": "2026-10-11T13:05:45.486Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1552,7 +1552,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.340Z",
+      "checkedAt": "2026-10-11T13:05:10.601Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1588,7 +1588,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:44.734Z",
+      "checkedAt": "2026-10-11T13:05:58.326Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1624,7 +1624,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.340Z",
+      "checkedAt": "2026-10-11T13:05:10.602Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1648,7 +1648,7 @@
       "title": "Pink Clouding",
       "artist": "Taylor Swift",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
+      "provider": "apple-chart",
       "releaseTitle": "The Life of a Showgirl: The Encore",
       "releaseArtist": "Taylor Swift",
       "releaseDate": "2026-09-24T07:00:00Z",
@@ -1656,14 +1656,14 @@
       "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
       "collectionId": "6814997249",
       "trackId": "6814997428",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.563Z",
+      "checkedAt": "2026-10-11T13:05:38.063Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
+          "provider": "apple-chart",
           "id": "6814997428",
           "collectionId": "6814997249",
           "releaseTitle": "The Life of a Showgirl: The Encore",
@@ -1672,9 +1672,54 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
-          "score": 1270,
-          "confidence": 99,
-          "consensus": 1,
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6814996162",
+          "collectionId": "6814995859",
+          "releaseTitle": "The Life of a Showgirl: The Encore",
+          "releaseArtist": "Taylor Swift",
+          "releaseDate": "2026-09-24T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f1/a3/c7/f1a3c711-ff60-caee-2314-37c0dd3f7616/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6814995859?i=6814996162",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6814997428",
+          "collectionId": "6814997249",
+          "releaseTitle": "The Life of a Showgirl: The Encore",
+          "releaseArtist": "Taylor Swift",
+          "releaseDate": "2026-09-24T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6814997249?i=6814997428",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4304169632",
+          "collectionId": "1103662682",
+          "releaseTitle": "The Life of a Showgirl: The Encore",
+          "releaseArtist": "Taylor Swift",
+          "releaseDate": "2026-09-25",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/3b43f946f6478daf5233a41414c34067/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4304169632",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
           "earliestReleaseYear": 2026
         }
       ]
@@ -1696,7 +1741,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:48.274Z",
+      "checkedAt": "2026-10-11T13:06:03.921Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1732,7 +1777,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.344Z",
+      "checkedAt": "2026-10-11T13:05:10.605Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1768,7 +1813,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:40.542Z",
+      "checkedAt": "2026-10-11T13:05:47.277Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1804,7 +1849,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:45.959Z",
+      "checkedAt": "2026-10-11T13:05:59.476Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1885,7 +1930,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:38.674Z",
+      "checkedAt": "2026-10-11T13:05:45.487Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1921,7 +1966,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.342Z",
+      "checkedAt": "2026-10-11T13:05:10.604Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1957,7 +2002,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.343Z",
+      "checkedAt": "2026-10-11T13:05:10.604Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1993,7 +2038,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:13.342Z",
+      "checkedAt": "2026-10-11T13:05:10.603Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2029,7 +2074,7 @@
       "score": 1010,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:36.839Z",
+      "checkedAt": "2026-10-11T13:05:44.160Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -2125,7 +2170,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:34.560Z",
+      "checkedAt": "2026-10-11T13:05:36.912Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2161,7 +2206,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:38.672Z",
+      "checkedAt": "2026-10-11T13:05:45.485Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2197,7 +2242,7 @@
       "score": 1210,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-11T10:19:45.334Z",
+      "checkedAt": "2026-10-11T13:05:58.872Z",
       "alternatives": [
         {
           "provider": "apple-feed",
