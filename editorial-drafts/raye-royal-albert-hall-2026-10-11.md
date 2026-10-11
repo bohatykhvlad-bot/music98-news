@@ -2,11 +2,11 @@
 
 **Status:** EDITORIAL DRAFT ONLY — not published; not synced to music98.news editor.
 
-**Excerpt (plain-text rendering of the first sentence):** RAYE will return to London's Royal Albert Hall on October 23 with an orchestral show built around her second album, This Music May Contain Hope.
+**Excerpt (plain-text rendering of the first sentence):** RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her second album.
 
 ## Article body
 
-RAYE will return to London's Royal Albert Hall on October 23 with an orchestral show built around her second album, *This Music May Contain Hope.* The concert is titled *This Symphony May Contain Hope.* She will perform the album in full alongside her band, the Heritage Orchestra and the Flames Collective choir. Presales open October 13, with general ticket sales beginning October 15.
+RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her second album. The performance, titled *This Symphony May Contain Hope.*, will feature music from *This Music May Contain Hope.* She will perform the album in full alongside her band, the Heritage Orchestra and the Flames Collective choir. Presales open October 13, with general ticket sales beginning October 15.
 
 She has played Royal Albert Hall with the Heritage Orchestra and Flames Collective before. That earlier concert was built around her debut, *My 21st Century Blues*, and was released as both a film and a live album. The film later received a Grammy nomination. In an interview with the Recording Academy, RAYE explained that she enjoys changing songs onstage, whether by extending an introduction or taking an arrangement somewhere different from the studio recording.
 
@@ -22,7 +22,7 @@ Alongside the concert announcement, she released a new Abbey Road Studios perfor
 
 - **Cover URL:** https://music98.news/photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg (reported existing site asset, not reuploaded or reverified).
 - **Cover photographer:** Radosław Żydowicz (also commonly credited without Polish diacritics as Radoslaw Zydowicz). Photo taken at RAYE's Łódź show on January 22, 2026; authorship cross-checked against independent published credits.
-- **Photographer credit link:** **UNVERIFIED.** Do not point to NME, another outlet, or an invented portfolio URL. Original editor field could not be inspected. Photography brand identified as Rozentuzjazmowany Photography, but official portfolio/social address not reliably established.
+- **Photographer credit link:** VERIFIED official photography portfolio: https://rozentuzjazmowany.pl/ (currently saved in the protected desk's cover.creditUrl). The photographer's own photography business is credited as Rozentuzjazmowany, and the site includes a first-person photographer introduction. Do not substitute an unrelated outlet link.
 - **Embedded video:** retain original in-desk RAYE "I Will Overcome. (Live at Abbey Road Studios)" YouTube embed and place it between paragraphs five and six, so the article ends with prose rather than a media block. The exact current shortcode/video ID could not be read from the protected desk. Do not create a second video or substitute an unverified video ID.
 - **Tickets button:** none, by editorial decision.
 - **Current in-desk article:** draft only. Existing ID, cover metadata, excerpt formatting and embed cannot be verified from the public GitHub repository; do not auto-overwrite without fetching the current desk record via the authenticated editorial workflow.
