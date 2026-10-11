@@ -6,9 +6,9 @@
 
 ## Article body
 
-RAYE will return to London's Royal Albert Hall on October 23 to perform her second album with an orchestra. The one-night concert, titled *This Symphony May Contain Hope.*, will present *This Music May Contain Hope.* in full with her band, the Heritage Orchestra and the Flames Collective choir. Presales begin October 13, with general ticket sales opening October 15.
+RAYE will return to London's Royal Albert Hall on October 23 to perform her second album with an orchestra. The concert is called *This Symphony May Contain Hope.* Her band, the Heritage Orchestra and the Flames Collective choir will accompany a full performance of *This Music May Contain Hope.* Presales begin October 13, with general ticket sales opening October 15.
 
-The announcement also came with a performance of "I Will Overcome." recorded at Abbey Road Studios with the London Symphony Orchestra. She introduced the song at her tour opener in Łódź, Poland, in January, when she played several tracks from the then-unreleased album. The Abbey Road recording features a different orchestra from the Heritage Orchestra booked for the October concert. The video was released alongside the concert announcement.
+The announcement also came with a performance of "I Will Overcome." recorded at Abbey Road Studios with the London Symphony Orchestra. She introduced the song at her tour opener in Łódź, Poland, in January, when she played several tracks from the then-unreleased album. The Abbey Road recording features a different orchestra from the Heritage Orchestra booked for the October concert. She also performed "I Will Overcome." at the MTV Video Music Awards in September.
 
 In September 2023, RAYE performed *My 21st Century Blues* at Royal Albert Hall with a 50-piece Heritage Orchestra and the Flames Collective choir. The concert was filmed as *Live at the Royal Albert Hall*, which later received a Grammy nomination for Best Music Film. She took *My 21st Century Symphony* to London's The O2 the following year, again accompanied by the orchestra and choir. The 2023 concert also produced a live album, *My 21st Century Symphony.*, released that October.
 
@@ -16,7 +16,7 @@ Before those concerts, she spent years writing songs for other artists while wai
 
 In 2021, she publicly criticized Polydor for holding back her debut album and subsequently left the label. *My 21st Century Blues* arrived independently in 2023, and "Escapism." with 070 Shake gave her a UK No. 1 single. The following year, she collected a record six BRIT Awards in one night, including Album of the Year and Songwriter of the Year. In June 2026, Nile Rodgers presented her with the Hal David Starlight Award, making her the first British woman to receive that songwriting honor.
 
-Released in March, *This Music May Contain Hope.* is divided into four seasons, with songs moving from heartbreak and isolation toward a more hopeful ending. RAYE told Apple Music she wanted to make a record that might help listeners through difficult periods in their own lives. Its arrangements draw on jazz, soul, R&B and pop. "Click Clack Symphony." features Hans Zimmer, while "Nightingale Lane." is a slow soul ballad that gives RAYE room to explore a different side of her voice. The album became her first UK No. 1, surpassing the No. 2 peak of *My 21st Century Blues*, and was shortlisted for the 2026 Mercury Prize.
+Released in March, *This Music May Contain Hope.* is divided into four seasons, with songs moving from heartbreak and isolation toward a more hopeful ending. RAYE told Apple Music she wanted to make a record that might help listeners through difficult periods in their own lives. Its arrangements draw on jazz, soul, R&B and pop. "Click Clack Symphony." features Hans Zimmer, while the slower "Nightingale Lane." tells a story of heartbreak. The album became her first UK No. 1, surpassing the No. 2 peak of *My 21st Century Blues*, and was shortlisted for the 2026 Mercury Prize.
 
 ## Existing media and credit — preserve on desk sync
 
