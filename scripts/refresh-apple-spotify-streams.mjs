@@ -411,6 +411,7 @@ if(chosen===latest.date){
 /* ===== Главный канал: сайтовые дневные числа (только на публикующих прогонах) ===== */
 let old=null;try{old=load("apple-spotify-streams.json");}catch{}
 const decision=shouldPublishSeed({previousDate:old?.schema===3?old.spotifyDate:null,
+ candidateDate:chosen,lastPublishedAt:old?.schema===3?old.capturedAt:null,
  nowMs:Date.now(),forced:process.env.TRI_FORCE_PUBLISH==="1"});
 let siteStats={processed:0,sitePrimary:0,soundcampsDelta:0,officialKept:0,unresolved:0,monitor:null};
 if(decision.publish){

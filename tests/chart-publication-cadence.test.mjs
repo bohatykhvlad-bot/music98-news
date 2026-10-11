@@ -53,3 +53,22 @@ test("the published seed stays valid until the next morning advance", () => {
   assert.equal(verifiedTriSeed(build(offset(5))), null, "five-day-old seed rejected");
   assert.ok(dayAge(offset(3)) <= 3);
 });
+
+test("a missed morning publisher recovers in an afternoon run only for a newer dated edition",()=>{
+  const now=at("2026-10-12T13:45:00Z");
+  assert.deepEqual(shouldPublishSeed({previousDate:"2026-10-09",candidateDate:"2026-10-10",
+    lastPublishedAt:"2026-10-11T06:12:00Z",nowMs:now}),
+    {publish:true,reason:"missed-morning-retry",age:3});
+  assert.equal(shouldPublishSeed({previousDate:"2026-10-09",candidateDate:"2026-10-09",
+    lastPublishedAt:"2026-10-11T06:12:00Z",nowMs:now}).publish,false);
+  assert.equal(shouldPublishSeed({previousDate:"2026-10-09",candidateDate:null,
+    lastPublishedAt:"2026-10-11T06:12:00Z",nowMs:now}).publish,false);
+});
+test("an already-published edition stays frozen for the rest of the UTC day",()=>{
+  const opts={previousDate:"2026-10-10",candidateDate:"2026-10-11",
+    lastPublishedAt:"2026-10-12T05:48:00Z"};
+  for(const clock of ["2026-10-12T09:45:00Z","2026-10-12T13:45:00Z","2026-10-12T21:45:00Z"])
+    assert.equal(shouldPublishSeed({...opts,nowMs:at(clock)}).reason,"already-published-today");
+  assert.equal(shouldPublishSeed({...opts,nowMs:at("2026-10-13T05:45:00Z")}).publish,true);
+  assert.equal(shouldPublishSeed({...opts,nowMs:at("2026-10-12T09:45:00Z"),forced:true}).reason,"forced");
+});

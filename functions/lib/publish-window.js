@@ -29,11 +29,22 @@ export function dayAge(day, nowMs = Date.now()) {
   return Math.round((today - at) / 86400000);
 }
 
-export function shouldPublishSeed({previousDate, nowMs = Date.now(), forced = false} = {}) {
+export function shouldPublishSeed({previousDate, candidateDate = null, lastPublishedAt = null,
+  nowMs = Date.now(), forced = false} = {}) {
   if (forced) return {publish: true, reason: "forced"};
   if (!previousDate) return {publish: true, reason: "initial"};
   const age = dayAge(previousDate, nowMs);
+  const today = new Date(nowMs).toISOString().slice(0,10);
+  /* A chart already published today must not rebuild under a late-arriving
+     source edition. Keep today's ranks and movement stable until tomorrow. */
+  if (String(lastPublishedAt||"").slice(0,10)===today)
+    return {publish: false, reason: "already-published-today", age};
   if (age > MAX_DEFERRAL_DAYS) return {publish: true, reason: "catch-up", age};
   if (inPublishWindow(nowMs)) return {publish: true, reason: "morning-window", age};
+  /* The morning may have failed on a rate limit, missing cover or temporary
+     outage. A later scheduled run can publish a genuinely newer COMMON source
+     date today, without waiting for the old seed to expire. */
+  if (candidateDate && candidateDate>previousDate)
+    return {publish: true, reason: "missed-morning-retry", age};
   return {publish: false, reason: "deferred-to-morning", age};
 }
