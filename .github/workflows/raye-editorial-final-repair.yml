@@ -1,4 +1,4 @@
-name: RAYE approved final lyric revision
+name: RAYE seven-paragraph narrative final QA
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -34,7 +34,7 @@ jobs:
           original=matches[0]
           old=original.get('body') or ''
           h=hashlib.sha256(old.encode()).hexdigest()
-          if h!='22fe2b9c802489099b43e574e69477be1f94e9c64c5d4cb1cf942a3105c7b252':raise SystemExit('SOURCE_CHANGED_ABORT '+h)
+          if h!='ee47fa3ec8902b6d91922ff8152f5f01c4bbcd64059fc5b2f2b4264a10e6fc1f':raise SystemExit('SOURCE_CHANGED_ABORT '+h)
           if original.get('status')!='live' or original.get('type')!='news':raise SystemExit('NOT_LIVE_NEWS')
           if original.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall':raise SystemExit('TITLE_CHANGED')
           cover=original.get('cover') or {}
@@ -44,12 +44,12 @@ jobs:
           s=Path('editorial-drafts/raye-royal-albert-hall-2026-10-11.md').read_text(encoding='utf-8')
           content=s.split('## Article body\n\n',1)[1].split('\n\n## Existing media and credit',1)[0].strip()
           paragraphs=[x.strip() for x in content.split('\n\n') if x.strip()]
-          if len(paragraphs)!=6 or any(len(x.split())<70 for x in paragraphs):raise SystemExit('PARAGRAPH_RHYTHM_FAILED')
+          if len(paragraphs)!=7 or len(paragraphs[0].split())<55 or any(len(x.split())<70 for x in paragraphs[1:]):raise SystemExit('PARAGRAPH_RHYTHM_FAILED')
           excerpt=s.split('**Excerpt (plain-text rendering of the first sentence):** ',1)[1].splitlines()[0]
           new='\n\n'.join(paragraphs[:3]+media+paragraphs[3:])
           if not new.startswith(excerpt):raise SystemExit('EXCERPT_NOT_PREFIX')
           if any(t in new for t in ('newly released material',"story's starting point",'such a private confession','Poland','not footage')):raise SystemExit('OLD_FILLER_RETURNED')
-          if 'her record label, Polydor' not in new or '"Escapism."' not in new:raise SystemExit('IMPORTANT_CONTEXT_MISSING')
+          if 'Polydor, her record label at the time' not in new or '"Escapism."' not in new:raise SystemExit('IMPORTANT_CONTEXT_MISSING')
           if new.count('[youtube:')!=1:raise SystemExit('MEDIA_COUNT_MISMATCH')
           proposal=dict(original,body=new,excerpt=excerpt)
           if not _local_gate(proposal):raise SystemExit('LOCAL_GATE_FAILED')
@@ -58,7 +58,7 @@ jobs:
           Path('/tmp/raye-final-excerpt.txt').write_text(excerpt,encoding='utf-8')
           newsha=hashlib.sha256(new.encode()).hexdigest()
           Path('/tmp/raye-final-sha.txt').write_text(newsha)
-          print('RAYE_COPY_REVIEWED_AND_STAGED paragraphs=6 words='+str(len(new.split()))+' sha256='+newsha)
+          print('RAYE_COPY_REVIEWED_AND_STAGED paragraphs=7 words='+str(len(new.split()))+' sha256='+newsha)
       - name: Mandatory complete editorial readthrough before and after
         shell: bash
         run: |
