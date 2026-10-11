@@ -1,4 +1,4 @@
-name: RAYE safeguarded date-order correction
+name: RAYE full-article editorial final pass
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -36,7 +36,7 @@ jobs:
           original=matches[0]
           old=original.get('body') or ''
           h=hashlib.sha256(old.encode()).hexdigest()
-          if h!='1174b53dd53c2c20061fd61a983a09f8abd6e35beb88116c4bdc945087505be5':raise SystemExit('SOURCE_CHANGED_ABORT '+h)
+          if h!='52ad8a258e9e7ae595031ded9a360b92a3899689a45c020d2349f0fba919fbc4':raise SystemExit('SOURCE_CHANGED_ABORT '+h)
           if original.get('status')!='live' or original.get('type')!='news':raise SystemExit('NOT_LIVE_NEWS')
           if original.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall':raise SystemExit('TITLE_CHANGED')
           cover=original.get('cover') or {}
@@ -54,6 +54,8 @@ jobs:
           proposed_paragraphs=new.split('\n\n')
           if len(original_paragraphs)!=8 or len(proposed_paragraphs)!=8:raise SystemExit('POST_STRUCTURE_CHANGED')
           if original_paragraphs[:5]!=proposed_paragraphs[:5] or original_paragraphs[7]!=proposed_paragraphs[7]:raise SystemExit('UNRELATED_COPY_CHANGED')
+          if proposed_paragraphs[5].startswith('Her first') or proposed_paragraphs[6].startswith('Her first'):raise SystemExit('ADJACENT_OPENING_REPETITION')
+          if 'In January 2023' not in proposed_paragraphs[6] or 'the following month' not in proposed_paragraphs[6]:raise SystemExit('RELEASE_CHRONOLOGY_LOST')
           if any(t in new for t in ('newly released material',"story's starting point",'such a private confession','Poland','not footage')):raise SystemExit('OLD_FILLER_RETURNED')
           if 'Polydor, her record label at the time' not in new or '"Escapism."' not in new:raise SystemExit('IMPORTANT_CONTEXT_MISSING')
           if new.count('[youtube:')!=1:raise SystemExit('MEDIA_COUNT_MISMATCH')
