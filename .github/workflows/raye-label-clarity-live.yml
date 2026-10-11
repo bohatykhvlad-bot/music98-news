@@ -1,0 +1,72 @@
+name: RAYE clarify record label in live article
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths:
+      - .github/workflows/raye-label-clarity-live.yml
+permissions:
+  contents: read
+jobs:
+  correct-raye:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate exact live RAYE source and stage only approved sentence replacement
+        shell: python
+        run: |
+          import sys,hashlib,re
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from post import desk_read,_local_gate,_local_preflight
+          pid='raye26royalalbertsymphony'
+          matches=[p for p in desk_read()['posts'] if p.get('id')==pid]
+          assert len(matches)==1
+          p=matches[0]
+          original=p.get('body','')
+          if p.get('status')!='live':raise SystemExit('RAYE_NOT_LIVE')
+          if hashlib.sha256(original.encode()).hexdigest()!='b703db952e4ccb7324d75d027e390e365b285d674107b28c77a1707c255f08af':raise SystemExit('SOURCE_CHANGED_ABORT')
+          old='She has said she wanted to make R&B but had little creative control at Polydor.'
+          new='She has said she wanted to make R&B, but her record label, Polydor, gave her little creative control.'
+          if original.count(old)!=1:raise SystemExit('PHRASE_NOT_UNIQUE')
+          revised=original.replace(old,new,1)
+          media=lambda x:re.findall(r'\[(?:photo|youtube|apple|instagram|ig|tiktok):[^\]]+\]',x,re.I)
+          if media(original)!=media(revised):raise SystemExit('MEDIA_CHANGED')
+          if not revised.startswith(p.get('excerpt') or ''):raise SystemExit('EXCERPT_CHANGED')
+          candidate=dict(p,body=revised)
+          if not _local_gate(candidate):raise SystemExit('GATE_FAIL')
+          if not _local_preflight(dict(candidate,status='draft'),baseline=p,expected_media=1,min_words=400):raise SystemExit('PREFLIGHT_FAIL')
+          Path('/tmp/raye-label-body.txt').write_text(revised,encoding='utf-8')
+          Path('/tmp/raye-label-excerpt.txt').write_text(p['excerpt'],encoding='utf-8')
+          Path('/tmp/raye-label-hash.txt').write_text(hashlib.sha256(revised.encode()).hexdigest())
+          print('SINGLE_APPROVED_POLYDOR_SENTENCE_STAGED')
+      - name: Required two full editorial read barriers
+        shell: bash
+        run: |
+          python scripts/post.py editorial raye26royalalbertsymphony --phase pre-edit
+          python scripts/post.py editorial raye26royalalbertsymphony --phase post-edit --body-file /tmp/raye-label-body.txt --title "RAYE Announces One-Night Orchestral Show at Royal Albert Hall"
+      - name: Write one-sentence clarification to existing live post
+        shell: bash
+        run: |
+          EXCERPT="$(cat /tmp/raye-label-excerpt.txt)"
+          python scripts/post.py set raye26royalalbertsymphony --body-file /tmp/raye-label-body.txt --excerpt "$EXCERPT"
+      - name: Verify exact live SHA and original video position
+        shell: python
+        run: |
+          import hashlib,sys,re
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          p=next((p for p in desk_read()['posts'] if p.get('id')=='raye26royalalbertsymphony'),None)
+          if not p or p.get('status')!='live':raise SystemExit('STATUS_NOT_LIVE')
+          b=p['body']
+          if hashlib.sha256(b.encode()).hexdigest()!=open('/tmp/raye-label-hash.txt').read().strip():raise SystemExit('BODY_HASH_MISMATCH')
+          if 'her record label, Polydor, gave her little creative control' not in b:raise SystemExit('CONTEXT_MISSING')
+          m=re.findall(r'\[(?:photo|youtube|apple|instagram|ig|tiktok):[^\]]+\]',b,re.I)
+          if len(m)!=1 or b.split('\n\n').index(m[0])!=3:raise SystemExit('MEDIA_MOVED')
+          print('RAYE_POLYDOR_LIVE_VERIFIED=TRUE')
