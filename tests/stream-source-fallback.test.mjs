@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {pickSearchHit, pickDailyForDate, totalDelta, medianValue, FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
+import {pickSearchHit, pickDailyForDate, totalDelta, saveCounterObservation, measuredProviderDelta, extractCounterTotal, medianValue, FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
 import {verifiedSpotifyRow} from "../functions/lib/tri-source-chart.js";
 
 const id = "b".repeat(22);
@@ -108,4 +108,19 @@ test("verified rows accept site metrics with guards and official only by exact d
     sourceUrl: `https://kworb.net/spotify/track/${id}.html`};
   assert.ok(verifiedSpotifyRow(official, day));
   assert.equal(verifiedSpotifyRow({...official, date: back(1)}, day), false);
+});
+
+test("cumulative measurements require two actual dates and identical providers",()=>{
+ let rows=saveCounterObservation([],back(1),2000000,"mystreamcount");
+ assert.equal(measuredProviderDelta(rows,day,"mystreamcount"),null);
+ rows=saveCounterObservation(rows,day,2100000,"mystreamcount");
+ rows=saveCounterObservation(rows,day,100,"soundcamps");
+ assert.equal(measuredProviderDelta(rows,day,"mystreamcount").daily,100000);
+ assert.equal(measuredProviderDelta(rows,day,"soundcamps"),null);
+ assert.equal(measuredProviderDelta([{date:back(1),total:1},{date:day,total:9999}],day,"soundcamps"),null);
+ rows=saveCounterObservation(rows,day,2200000,"mystreamcount");
+ assert.equal(rows.length,3);
+ assert.equal(measuredProviderDelta(rows,day,"mystreamcount").daily,200000);
+ assert.equal(extractCounterTotal("<div>Total Streams</div><b>20,830,455</b>"),20830455);
+ assert.equal(extractCounterTotal("<script>Total Streams 90000</script>"),null);
 });

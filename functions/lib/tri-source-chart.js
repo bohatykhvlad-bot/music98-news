@@ -26,7 +26,7 @@ const sourcePattern=/^https:\/\/kworb\.net\/spotify\/(?:artist\/[A-Za-z0-9]{22}_
 export function verifiedSpotifyRow(s,date){
  if(!s||s.status!=="matched"||!Number.isSafeInteger(s.daily)||s.daily<0||
   !/^[A-Za-z0-9]{22}$/.test(s.spotifyId||""))return false;
- if(s.metric==="mystreamcount-daily-delta")
+ if(["mystreamcount-daily-delta","mystreamcount-total-delta"].includes(s.metric))
   /* Главный канал: измеренная дневная дельта публичного счётчика (сайт).
      Принимаем только с флагом estimated и датой замера в пределах трёх дней. */
   return s.estimated===true&&/^https:\/\/www\.mystreamcount\.com\/track\/[A-Za-z0-9]{22}$/.test(s.sourceUrl||"")&&

@@ -121,3 +121,24 @@ export function medianValue(values, minimum = 1) {
   if (a.length < minimum) return null;
   return a[Math.floor(a.length / 2)];
 }
+
+/* Never treat a total count as a daily count. Use only TWO observations
+   from the SAME provider and their real UTC capture dates. */
+export function saveCounterObservation(records,day,total,provider) {
+ if(!/^20\d{2}-\d{2}-\d{2}$/.test(day||"")||!Number.isSafeInteger(total)||total<0||
+    !["mystreamcount","soundcamps"].includes(provider)) return records||[];
+ const valid=(records||[]).filter(x=>x?.provider&&x?.date&&Number.isSafeInteger(x.total)&&
+   !(x.date===day&&x.provider===provider));
+ return [...valid,{date:day,total,provider}].sort((a,b)=>a.date.localeCompare(b.date)).slice(-28);
+}
+export function measuredProviderDelta(records,day,provider){
+ return totalDelta((records||[]).filter(x=>x.provider===provider),day);
+}
+export function extractCounterTotal(html){
+ const flat=String(html||"").replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi," ")
+  .replace(/<[^>]*>/g," ").replace(/\s+/g," ");
+ const x=flat.match(/Total Streams\s*([\d,]+)/i);
+ if(!x)return null;
+ const value=Number(x[1].replace(/,/g,""));
+ return Number.isSafeInteger(value)&&value>=0?value:null;
+}
