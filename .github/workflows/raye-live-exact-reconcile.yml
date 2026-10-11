@@ -1,4 +1,4 @@
-name: RAYE final public equality audit
+name: RAYE last public article exact matching audit
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
