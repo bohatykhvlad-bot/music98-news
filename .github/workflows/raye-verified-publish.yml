@@ -18,6 +18,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Register verified RAYE public ticket-sale date
+        shell: bash
+        run: |
+          python scripts/post.py register "October 15" "RAYE Royal Albert Hall general ticket sale starts 15 October 2026 at 10am; confirmed in official Simon Jones PR release 9 October 2026"
       - name: Verify unchanged draft, original cover, photographer and video; stage exact reviewed copy
         shell: bash
         run: |
@@ -73,7 +77,7 @@ jobs:
           if len(paragraphs)!=6:raise SystemExit('NOT_SIX_APPROVED_PARAGRAPHS')
           intro='**Excerpt (plain-text rendering of the first sentence):** '
           excerpt=source.split(intro,1)[1].splitlines()[0].strip()
-          updated='\n\n'.join(paragraphs[:5]+['[youtube:'+yt[0]+']']+paragraphs[5:])
+          updated='\n\n'.join(paragraphs[:4]+['[youtube:'+yt[0]+']']+paragraphs[4:])
           if not updated.startswith(excerpt):raise SystemExit('EXCERPT_NOT_EXACT_PREFIX')
           if len(re.findall(r"\b[\w'’-]+\b",updated,re.UNICODE))<400:raise SystemExit('BELOW_400_WORDS')
           if updated.count('[youtube:')!=1:raise SystemExit('YOUTUBE_MEDIA_REGRESSION')
