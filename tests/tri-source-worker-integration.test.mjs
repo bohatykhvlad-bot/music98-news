@@ -92,6 +92,23 @@ test("complete last verified three-source chart survives a later source outage",
   assert.deepEqual(fallback.tracks,good.tracks);
  });
 });
+test("unchanged source edition keeps last published date and arrows instead of creating phantom day",async()=>{
+ const f=setup();
+ await runWithNetworkDown(async()=>{
+  const good=await (await onRequestGet({env:f.env,request:req()})).json();
+  const yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  f.assets["daily-top50-backup.json"]={...good,updated:yesterday,
+   tracks:good.tracks.map((t,i)=>({...t,delta:i===0?"0":t.delta}))};
+  f.values.clear();f.writes.length=0;
+  const response=await onRequestGet({env:f.env,request:req()});
+  const j=await response.json();
+  assert.equal(response.status,200);
+  assert.equal(j.fallback,"awaiting-new-source-edition");
+  assert.equal(j.updated,yesterday);
+  assert.deepEqual(j.tracks,f.assets["daily-top50-backup.json"].tracks);
+  assert.deepEqual(f.writes,[]);
+ });
+});
 test("read-only artwork preview recomputes verified weights without writing ranks",async()=>{
  const f=setup();
  await runWithNetworkDown(async()=>{

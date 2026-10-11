@@ -33,8 +33,8 @@ test("top and concert pills use identical border-box vertical geometry",()=>{
   assert.equal(40-2-2*3,32);
   // Mobile 48px / 38px nav and 44px / 36px concerts use 1px+4px
   // and 1px+3px per side, respectively.
-  assert.match(page,/\.nav\{order:3;width:100%;height:48px;display:flex;justify-content:space-between;gap:4px;padding:4px/);
-  assert.match(page,/\.nav-btn\{flex:0 1 auto;width:auto;min-width:0;height:38px/);
+  assert.match(page,/\.nav\{order:3;width:100%;height:48px;display:flex;justify-content:center;gap:4px;padding:4px/);
+  assert.match(page,/\.nav-btn\{flex:1 1 auto;width:auto;min-width:0;height:38px/);
   assert.match(css,/\.side-tabs\{height:44px\}/);
   assert.match(css,/\.side-tab\{height:36px\}/);
   assert.equal(48-2-2*4,38);

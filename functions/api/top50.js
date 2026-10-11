@@ -1072,6 +1072,19 @@ export async function onRequestGet({env,request}) {
     ["C",coverSeedEdition(await coverSeed(env,origin))]
   ]);
   if(!verified)return fallbackOrUnavailable(env,origin,backup);
+  /* Do not redate the same verified source edition at UTC midnight.
+     A fresh ranking needs a NEW common chart date. Otherwise repeat the
+     latest audited publication with its original movements/tenure intact. */
+  if(verified.methodology===TRI_METHOD){
+    const saved=await readSeed(env,origin,"daily-top50-backup.json");
+    if(saved && String(saved.updated||"")<today &&
+       saved.sourceDates?.S===verified.spotifyDate &&
+       saved.spotifyFingerprint===verified.fingerprint &&
+       verifiedSourceSnapshot(saved) && saved.arrows?.ok===true &&
+       hasCompleteChartArtwork(saved.tracks)){
+      return top50Response({...saved,fallback:"awaiting-new-source-edition"});
+    }
+  }
   /* Read-only edition preview for the scheduled independent artwork audit.
      It exposes the prospective source-verified chart without publishing it or
      altering tenure/rank KV. The ordinary endpoint never serves missing art. */

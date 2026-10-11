@@ -44,17 +44,36 @@ jobs:
         run: node --test tests/tri-source-*.test.mjs tests/chart-history.test.mjs
       - name: Retain only 14 days of dated source snapshots
         run: node scripts/prune-chart-history.mjs
-      - name: Commit verified chart snapshots (regenerate after competing pushes)
+      - name: Commit verified snapshots without discarding the successful collection
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "music98 apple chart bot"
           git config user.email "actions@users.noreply.github.com"
+          # The already verified in-memory collection may contain hundreds
+          # of Spotify measurements. Never throw it away before the first push:
+          # a second crawl can hit HTTP 429 and corrupt coverage.
+          git add -A public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json public/data/chart-history/
+          if git diff --cached --quiet; then
+            echo "Current main already has matching verified sources"
+            exit 0
+          fi
+          git commit -m "chart: matching-date Apple USA Global Spotify 40-30-30 edition"
           for n in 1 2 3 4 5; do
-            # An artwork job may have pushed fresh chart.json while we collected.
-            # Rebasing generated JSON files causes conflicts, so restart from
-            # the newest main and regenerate the paired edition together.
+            if git push origin HEAD:main; then
+              gh workflow run apple-data.yml --ref main
+              gh workflow run verify-tri-live.yml --ref main
+              gh workflow run chart-browser-smoke.yml --ref main
+              exit 0
+            fi
+            echo "Concurrent chart snapshot push; trying to rebase verified files ($n/5)"
             git fetch origin main
+            # A clean rebase preserves ALL collected and validated song data.
+            if git rebase origin/main; then
+              continue
+            fi
+            # Only conflicting writes force a re-collection, never a routine push.
+            git rebase --abort || true
             git reset --hard origin/main
             node scripts/refresh-apple-ranking.mjs
             node scripts/refresh-apple-spotify-streams.mjs
@@ -63,17 +82,10 @@ jobs:
             node scripts/prune-chart-history.mjs
             git add -A public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json public/data/chart-history/
             if git diff --cached --quiet; then
-              echo "Current main already has matching verified sources"
+              echo "Concurrent publisher already saved an identical edition"
               exit 0
             fi
-            git commit -m "chart: matching-date Apple USA Global Spotify 40-30-30 edition"
-            if git push origin HEAD:main; then
-              gh workflow run apple-data.yml --ref main
-              gh workflow run verify-tri-live.yml --ref main
-              gh workflow run chart-browser-smoke.yml --ref main
-              exit 0
-            fi
-            sleep 3
+            git commit -m "chart: matching-date three-source edition after conflict"
           done
           echo "Concurrent chart source publish conflicts exhausted"
           exit 1
