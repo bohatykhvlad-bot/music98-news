@@ -37,7 +37,7 @@ jobs:
           p=rows[0]
           live=(p.get('body') or '').strip()
           live_sha=hashlib.sha256(live.encode()).hexdigest()
-          if live_sha!='323b75f13e6e9bc873799ac96c7c7422a5e1d074315c7e875ccc523f60bc516c':
+          if live_sha!='484b83a42ee89d033d0a7b07900b57bba382a6bdebdf625eb8ad344328532047':
               raise SystemExit('RAYE_LIVE_CHANGED_ABORT '+live_sha)
           if p.get('status')!='live' or p.get('type')!='news': raise SystemExit('RAYE_NOT_LIVE_NEWS')
           if p.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall': raise SystemExit('RAYE_TITLE_CHANGED')
@@ -51,7 +51,7 @@ jobs:
           media=re.findall(r'\[(?:youtube|photo|apple|instagram|ig|tiktok|tickets):[^\]]+\]',live,re.I)
           if media!=['[youtube:Iy2FoVeIUXs]'] or live.split('\n\n')[3]!=media[0]: raise SystemExit('RAYE_MEDIA_CHANGED')
           final='\n\n'.join(paras[:3]+media+paras[3:])
-          excerpt="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert."
+          excerpt="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around material from her latest album."
           if not final.startswith(excerpt): raise SystemExit('RAYE_EXCERPT_NOT_PREFIX')
           if final.count('RAYE')>5: raise SystemExit('RAYE_NAME_OVERUSED')
           if any(x in final for x in ('perform her second album in full','every song from her second album','This makes','The result is','This helps explain')):
@@ -70,7 +70,7 @@ jobs:
       - name: Write final copy through guarded editor
         shell: bash
         run: |
-          python scripts/post.py set "$POST_ID" --body-file /tmp/raye-final.txt --excerpt "RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert."
+          python scripts/post.py set "$POST_ID" --body-file /tmp/raye-final.txt --excerpt "RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around material from her latest album."
       - name: Gate and exact post-save verification
         shell: bash
         run: |

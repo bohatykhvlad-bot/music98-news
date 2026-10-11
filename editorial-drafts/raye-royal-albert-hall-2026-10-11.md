@@ -2,23 +2,23 @@
 
 **Status:** LIVE on music98.news. Corrected copy published and verified in the authenticated editor.
 
-**Excerpt (plain-text rendering of the first sentence):** RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert.
+**Excerpt (plain-text rendering of the first sentence):** RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around material from her latest album.
 
 ## Article body
 
-RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert. The show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir. She has spent much of 2026 performing the new material on the road, after introducing several of those songs live when the tour began in Poland in January. Tickets go on sale October 15 at 10am.
+RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around material from her latest album. The show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir. She has spent much of 2026 performing the new material on the road, after introducing several of those songs live when the tour began in Poland in January. Tickets go on sale October 15 at 10am.
 
-Released in March, *This Music May Contain Hope.* is arranged around four seasons, starting in a darker place and moving toward hope. She told Apple Music she wanted to make songs listeners could turn to when life felt difficult. She sent Hans Zimmer a rough demo of "Click Clack Symphony." and asked if he wanted to work on it. They went back and forth until the finished recording included an orchestra. She called the track "unapologetically cinematic." The album became her first UK No. 1.
+Released in March, *This Music May Contain Hope.* is arranged around four seasons, starting in a darker place and moving toward hope. She told Apple Music she wanted the songs to help listeners through difficult times. She sent Hans Zimmer a rough demo of "Click Clack Symphony." and asked if he wanted to work on it. They went back and forth until the finished recording included an orchestra. She called the track "unapologetically cinematic." The album later reached No. 1 in the UK.
 
 The concert announcement arrived with a new Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. In January, RAYE played the then-unreleased album version for ELLE and called it "big and dramatic." She discussed a verse that moves from hiding pain to admitting she is not okay and still believing she will get through it. On the album, the song follows a spoken introduction about a woman alone in Paris.
 
 The October concert is her second symphonic project. In 2023, RAYE rearranged songs from *My 21st Century Blues* for the same venue with orchestra and choir. That performance later became a live album and concert film, and she took the production to The O2 the following year. The film was later nominated for a Grammy. The orchestra and choir from that 2023 concert are returning together for the new show.
 
-Before RAYE released an album of her own, she spent years writing songs for artists including Beyoncé and Charli XCX. Polydor signed her as a teenager, but seven years passed without a full-length release. She has said she wanted to make R&B, while the label steered her toward dance-pop and left her with little creative control over her own music. After challenging the delays publicly in 2021, she left the label and became independent.
+Before RAYE released an album of her own, she spent years writing songs for artists including Beyoncé and Charli XCX. Polydor signed her as a teenager, but seven years passed without a full-length release. She has said R&B was the music she wanted to make, while the label steered her toward dance-pop and left her with little creative control over her own work. After challenging the delays publicly in 2021, she left the label and became independent.
 
 In January 2023, "Escapism." with 070 Shake became her first UK No. 1 single. The song turned a breakup into a dark story of alcohol, drugs and nights out, a sharp departure from the dance-pop singles that had defined much of her earlier career. *My 21st Century Blues* followed the next month, finally putting the jazz, soul and R&B she had wanted to make at the center of her own record. When "Escapism." reached the top, she described the moment as proof that she had been right to back herself.
 
-Sobriety changed the writing process for *This Music May Contain Hope.* She told ELLE she made most of the album sober and no longer used alcohol to bury or numb difficult feelings. Its autumn section starts with loneliness and the temptation to look for a quick fix in alcohol or a relationship. She described learning to spend time by herself without treating solitude as something to escape. "I don't want someone else to come and fix me," she said.
+Sobriety also changed how she approached the record. She told ELLE she made most of it sober and no longer used alcohol to bury or numb difficult feelings. Its autumn section starts with loneliness and the temptation to look for a quick fix in alcohol or a relationship. She described learning to spend time by herself without treating solitude as something to escape. "I don't want someone else to come and fix me," she said.
 
 ## Existing media and credit — preserve on desk sync
 
