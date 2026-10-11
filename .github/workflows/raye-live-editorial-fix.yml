@@ -1,4 +1,4 @@
-name: RAYE live article language and media correction
+name: RAYE final live article editorial correction
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
