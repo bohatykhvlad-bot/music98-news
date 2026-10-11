@@ -1,0 +1,91 @@
+name: RAYE editorial final repair
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths:
+      - .github/workflows/raye-editorial-final-repair.yml
+permissions:
+  contents: read
+jobs:
+  edit-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+      POST_ID: raye26royalalbertsymphony
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Register verified concert ticket-sale date
+        run: python scripts/post.py register "October 15" "RAYE Royal Albert Hall October 23, 2026 concert on general sale October 15, per artist official PR announcement"
+      - name: Validate live article identity, full final text and media
+        shell: python
+        run: |
+          import hashlib,os,sys,re
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from post import desk_read,_local_gate,_local_preflight
+          pid=os.environ['POST_ID']
+          matches=[p for p in desk_read()['posts'] if p.get('id')==pid]
+          if len(matches)!=1:raise SystemExit('RAYE_NOT_UNIQUE')
+          original=matches[0]
+          old=original.get('body') or ''
+          h=hashlib.sha256(old.encode()).hexdigest()
+          if h!='ecb27a9a20d09870ca34beb102945b9380858e2f817eee431461a9d52a89044c':raise SystemExit('SOURCE_CHANGED_ABORT '+h)
+          if original.get('status')!='live' or original.get('type')!='news':raise SystemExit('NOT_LIVE_NEWS')
+          if original.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall':raise SystemExit('TITLE_CHANGED')
+          cover=original.get('cover') or {}
+          if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('PHOTO_CHANGED')
+          media=re.findall(r'\[(?:youtube|photo|apple|instagram|tiktok|ig|tickets):[^\]]+\]',old,re.I)
+          if media!=['[youtube:Iy2FoVeIUXs]'] or old.split('\n\n').index(media[0])!=3:raise SystemExit('ORIGINAL_VIDEO_CHANGED')
+          s=Path('editorial-drafts/raye-royal-albert-hall-2026-10-11.md').read_text(encoding='utf-8')
+          content=s.split('## Article body\n\n',1)[1].split('\n\n## Existing media and credit',1)[0].strip()
+          paragraphs=[x.strip() for x in content.split('\n\n') if x.strip()]
+          if len(paragraphs)!=6 or any(len(x.split())<70 for x in paragraphs):raise SystemExit('PARAGRAPH_RHYTHM_FAILED')
+          excerpt=s.split('**Excerpt (plain-text rendering of the first sentence):** ',1)[1].splitlines()[0]
+          new='\n\n'.join(paragraphs[:3]+media+paragraphs[3:])
+          if not new.startswith(excerpt):raise SystemExit('EXCERPT_NOT_PREFIX')
+          if any(t in new for t in ('newly released material',"story's starting point",'such a private confession','Poland','not footage')):raise SystemExit('OLD_FILLER_RETURNED')
+          if 'her record label, Polydor' not in new or '"Escapism."' not in new:raise SystemExit('IMPORTANT_CONTEXT_MISSING')
+          if new.count('[youtube:')!=1:raise SystemExit('MEDIA_COUNT_MISMATCH')
+          proposal=dict(original,body=new,excerpt=excerpt)
+          if not _local_gate(proposal):raise SystemExit('LOCAL_GATE_FAILED')
+          if not _local_preflight(dict(proposal,status='draft'),baseline=original,expected_media=1,min_words=400):raise SystemExit('LOCAL_PREFLIGHT_FAILED')
+          Path('/tmp/raye-final-body.txt').write_text(new,encoding='utf-8')
+          Path('/tmp/raye-final-excerpt.txt').write_text(excerpt,encoding='utf-8')
+          newsha=hashlib.sha256(new.encode()).hexdigest()
+          Path('/tmp/raye-final-sha.txt').write_text(newsha)
+          print('RAYE_COPY_REVIEWED_AND_STAGED paragraphs=6 words='+str(len(new.split()))+' sha256='+newsha)
+      - name: Mandatory complete editorial readthrough before and after
+        shell: bash
+        run: |
+          python scripts/post.py editorial "$POST_ID" --phase pre-edit
+          python scripts/post.py editorial "$POST_ID" --phase post-edit --body-file /tmp/raye-final-body.txt --title "RAYE Announces One-Night Orchestral Show at Royal Albert Hall"
+      - name: Guarded update to current live article
+        shell: bash
+        run: |
+          EXCERPT="$(cat /tmp/raye-final-excerpt.txt)"
+          python scripts/post.py set "$POST_ID" --body-file /tmp/raye-final-body.txt --excerpt "$EXCERPT"
+      - name: Verify remote gate, publication status, media and exact text hash
+        shell: bash
+        run: |
+          python scripts/post.py gate "$POST_ID"
+          python scripts/post.py verify "$POST_ID"
+          python - <<'PY'
+          import sys,hashlib,re
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          p=next((p for p in desk_read()['posts'] if p.get('id')=='raye26royalalbertsymphony'),None)
+          if not p or p.get('status')!='live':raise SystemExit('LIVE_STATUS_LOST')
+          b=p.get('body') or ''
+          expected=open('/tmp/raye-final-sha.txt').read().strip()
+          if hashlib.sha256(b.encode()).hexdigest()!=expected:raise SystemExit('LIVE_TEXT_HASH_MISMATCH')
+          if b.split('\n\n')[3]!='[youtube:Iy2FoVeIUXs]':raise SystemExit('VIDEO_MOVED')
+          c=p.get('cover') or {}
+          if c.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or c.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('PHOTO_CREDIT_CHANGED')
+          if not b.startswith(p.get('excerpt') or ''):raise SystemExit('EXCERPT_MISMATCH')
+          print('RAYE_FINAL_EDITORIAL_LIVE_VERIFIED sha256='+expected+' video_after_3=true cover_unchanged=true')
+          PY
