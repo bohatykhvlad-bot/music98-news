@@ -1,0 +1,96 @@
+name: RAYE one-sentence orchestral lede correction
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths:
+      - editorial-drafts/raye-royal-albert-hall-2026-10-11.md
+      - .github/workflows/raye-orchestral-lede-fix.yml
+permissions:
+  contents: read
+jobs:
+  correct-published-lede:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+      POST_ID: raye26royalalbertsymphony
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Confirm official ticket-sale date and protect editorial gate
+        run: python scripts/post.py register "October 15" "RAYE Royal Albert Hall show October 23 2026, general ticket on-sale October 15 at 10am per official Simon Jones PR announcement of October 9"
+      - name: Validate live original and stage one precise two-sentence correction
+        shell: python
+        run: |
+          import hashlib,os,re,sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from post import desk_read,_local_gate,_local_preflight
+          pid=os.environ['POST_ID']
+          matches=[p for p in desk_read()['posts'] if p.get('id')==pid]
+          if len(matches)!=1:raise SystemExit('RAYE_POST_NOT_UNIQUE')
+          p=matches[0]
+          if p.get('status')!='live' or p.get('type')!='news':raise SystemExit('RAYE_NOT_LIVE_NEWS')
+          if p.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall':raise SystemExit('RAYE_TITLE_CHANGED')
+          cover=p.get('cover') or {}
+          if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('RAYE_COVER_CHANGED')
+          old_first="RAYE will perform her second album in full at London's Royal Albert Hall on October 23."
+          old_second="The one-night concert, *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir."
+          new_first="RAYE will return to London's Royal Albert Hall on October 23 for an orchestral performance of her latest album, *This Music May Contain Hope.*"
+          new_second="The one-night show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir."
+          before=(p.get('body') or '').strip()
+          if not before.startswith(old_first+' '+old_second):raise SystemExit('RAYE_LIVE_LEDE_CHANGED_ABORT')
+          if (p.get('excerpt') or '').strip()!=old_first:raise SystemExit('RAYE_LIVE_EXCERPT_CHANGED_ABORT')
+          before_media=re.findall(r'\\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\\]]+\\]',before,re.I)
+          if before_media!=['[youtube:Iy2FoVeIUXs]'] or before.split('\\n\\n').index(before_media[0])!=3:raise SystemExit('RAYE_MEDIA_CHANGED')
+          text=Path('editorial-drafts/raye-royal-albert-hall-2026-10-11.md').read_text('utf-8')
+          section=text.split('## Article body\\n\\n',1)[1].split('\\n\\n## Existing media and credit',1)[0].strip()
+          paragraphs=[x.strip() for x in section.split('\\n\\n') if x.strip()]
+          if len(paragraphs)!=7 or any(len(x.split())<65 for x in paragraphs[1:]):raise SystemExit('RAYE_PARAGRAPHS_CHANGED')
+          expected='\\n\\n'.join(paragraphs[:3]+before_media+paragraphs[3:])
+          if not expected.startswith(new_first+' '+new_second):raise SystemExit('RAYE_SOURCE_LEDE_MISMATCH')
+          if expected.replace(new_first+' '+new_second,old_first+' '+old_second,1)!=before:raise SystemExit('RAYE_UNRELATED_LIVE_CONTENT_CHANGED_ABORT')
+          if any(v in expected for v in ('in full','every song','second album')):raise SystemExit('RAYE_UNWANTED_LEDE_CLAIM')
+          excerpt=new_first.replace('*','')
+          if not expected.startswith(new_first):raise SystemExit('RAYE_EXCERPT_NOT_PREFIX')
+          if not _local_gate(dict(p,body=expected,excerpt=excerpt)):raise SystemExit('RAYE_GATE_FAILED')
+          candidate=dict(p,body=expected,excerpt=excerpt,status='draft')
+          if not _local_preflight(candidate,baseline=p,expected_media=1,min_words=400):raise SystemExit('RAYE_PREFLIGHT_FAILED')
+          Path('/tmp/raye-lede-updated.txt').write_text(expected,encoding='utf-8')
+          Path('/tmp/raye-lede-excerpt.txt').write_text(excerpt,encoding='utf-8')
+          Path('/tmp/raye-lede-sha.txt').write_text(hashlib.sha256(expected.encode()).hexdigest(),encoding='utf-8')
+          print('RAYE_LEDE_READY exact_only_first_two_sentences=true words='+str(len(expected.split())))
+      - name: Mandatory full article pre-edit and post-edit readthrough
+        shell: bash
+        run: |
+          python scripts/post.py editorial "$POST_ID" --phase pre-edit
+          python scripts/post.py editorial "$POST_ID" --phase post-edit --body-file /tmp/raye-lede-updated.txt --title "RAYE Announces One-Night Orchestral Show at Royal Albert Hall"
+      - name: Apply guarded text and excerpt update to existing published post
+        shell: bash
+        run: |
+          EXCERPT="$(cat /tmp/raye-lede-excerpt.txt)"
+          python scripts/post.py set "$POST_ID" --body-file /tmp/raye-lede-updated.txt --excerpt "$EXCERPT"
+      - name: Verify final live article, cover and video unchanged
+        shell: bash
+        run: |
+          python scripts/post.py gate "$POST_ID"
+          python scripts/post.py verify "$POST_ID"
+          python - <<'PY'
+          import hashlib,os,re,sys
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          p=next((x for x in desk_read()['posts'] if x.get('id')==os.environ['POST_ID']),None)
+          if not p or p.get('status')!='live':raise SystemExit('RAYE_NOT_LIVE')
+          body=p.get('body') or ''
+          digest=hashlib.sha256(body.encode()).hexdigest()
+          if digest!=open('/tmp/raye-lede-sha.txt').read().strip():raise SystemExit('RAYE_BODY_HASH_MISMATCH')
+          if (p.get('excerpt') or '')!=open('/tmp/raye-lede-excerpt.txt').read():raise SystemExit('RAYE_EXCERPT_MISMATCH')
+          media=re.findall(r'\\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\\]]+\\]',body,re.I)
+          if media!=['[youtube:Iy2FoVeIUXs]'] or body.split('\\n\\n').index(media[0])!=3:raise SystemExit('RAYE_VIDEO_CHANGED')
+          cover=p.get('cover') or {}
+          if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('RAYE_COVER_CHANGED_AFTER')
+          print('RAYE_PUBLISHED_LEDE_VERIFIED status=live body_sha='+digest)
+          PY

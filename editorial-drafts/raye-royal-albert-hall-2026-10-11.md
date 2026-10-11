@@ -2,11 +2,11 @@
 
 **Status:** LIVE on music98.news. Corrected copy published and verified in the authenticated editor.
 
-**Excerpt (plain-text rendering of the first sentence):** RAYE will perform her second album in full at London's Royal Albert Hall on October 23.
+**Excerpt (plain-text rendering of the first sentence):** RAYE will return to London's Royal Albert Hall on October 23 for an orchestral performance of her latest album, *This Music May Contain Hope.*
 
 ## Article body
 
-RAYE will perform her second album in full at London's Royal Albert Hall on October 23. The one-night concert, *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir. She began playing new songs on tour before the album came out, using the live shows to work out how they should sound on the finished record. Tickets go on sale October 15 at 10am.
+RAYE will return to London's Royal Albert Hall on October 23 for an orchestral performance of her latest album, *This Music May Contain Hope.* The one-night show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir. She began playing new songs on tour before the album came out, using the live shows to work out how they should sound on the finished record. Tickets go on sale October 15 at 10am.
 
 Released in March, *This Music May Contain Hope.* follows four seasons, moving from loneliness towards hope. RAYE told Apple Music she hoped the songs would help listeners through difficult times. For "Click Clack Symphony.", she sent Hans Zimmer a rough demo and asked if he wanted to collaborate. They exchanged ideas until the recording included an orchestra. She called the finished song "unapologetically cinematic." The full album went to No. 1 in the UK.
 
