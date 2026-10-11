@@ -20,8 +20,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Confirm official ticket-sale date and protect editorial gate
-        run: python scripts/post.py register "October 15" "RAYE Royal Albert Hall show October 23 2026, general ticket on-sale October 15 at 10am per official Simon Jones PR announcement of October 9"
+      - name: Register both documented dates before editorial gate
+        run: |
+          python scripts/post.py register "October 15" "RAYE Royal Albert Hall show October 23 2026, general ticket on-sale October 15 at 10am per official Simon Jones PR announcement of October 9"
+          python scripts/post.py register "January 2023" "RAYE and 070 Shake's Escapism. reached No. 1 in the UK in January 2023, per Official Charts Company"
       - name: Validate live original and stage one precise two-sentence correction
         shell: python
         run: |
