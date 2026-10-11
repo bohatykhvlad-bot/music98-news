@@ -37,7 +37,7 @@ jobs:
           p=rows[0]
           live=(p.get('body') or '').strip()
           live_sha=hashlib.sha256(live.encode()).hexdigest()
-          if live_sha!='484b83a42ee89d033d0a7b07900b57bba382a6bdebdf625eb8ad344328532047':
+          if live_sha!='b486b50e1e7e4ec96c69d7428c2249ae37630630abfe6ae75a98cd467735cd75':
               raise SystemExit('RAYE_LIVE_CHANGED_ABORT '+live_sha)
           if p.get('status')!='live' or p.get('type')!='news': raise SystemExit('RAYE_NOT_LIVE_NEWS')
           if p.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall': raise SystemExit('RAYE_TITLE_CHANGED')
@@ -86,7 +86,7 @@ jobs:
           expected=open('/tmp/raye-final-sha.txt').read().strip()
           if hashlib.sha256(live.encode()).hexdigest()!=expected: raise SystemExit('RAYE_FINAL_HASH_MISMATCH')
           if live.split('\n\n')[3]!='[youtube:Iy2FoVeIUXs]': raise SystemExit('RAYE_VIDEO_MOVED')
-          if p.get('excerpt')!="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert.": raise SystemExit('RAYE_EXCERPT_CHANGED')
+          if p.get('excerpt')!="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around material from her latest album.": raise SystemExit('RAYE_EXCERPT_CHANGED')
           cover=p.get('cover') or {}
           if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':
               raise SystemExit('RAYE_COVER_CHANGED_AFTER')
