@@ -1,4 +1,4 @@
-name: RAYE live article exact body reconciliation
+name: RAYE read-only live article editorial recheck
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
