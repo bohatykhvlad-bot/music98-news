@@ -146,6 +146,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/86/b9/e2/86b9e295-d9f1-d53d-c4f5-5335ac7127b2/mzaf_13409156314119121134.plus.aac.p.m4a",
     "year": "2026"
   },
+  "brokenwindowserenade|whiskeymyers": {
+    "title": "Broken Window Serenade",
+    "artist": "Whiskey Myers",
+    "url": "https://music.apple.com/us/album/1813021356?i=1813021660",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/99/aa/06/99aa06cf-ee64-7022-bc3c-bacb5d696869/mzaf_12695967465468457006.plus.aac.p.m4a",
+    "year": "2011"
+  },
   "choosintexas|ellalangley": {
     "title": "Choosin' Texas",
     "artist": "Ella Langley",
@@ -163,8 +170,8 @@
   "classicpt2|drake": {
     "title": "Classic PT2",
     "artist": "Drake",
-    "url": "https://music.apple.com/us/album/6818059268?i=6818059601",
-    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/34/bf/18/34bf1898-cc51-c915-a00a-05bd8febaeaa/mzaf_12302555311102118914.plus.aac.p.m4a",
+    "url": "https://music.apple.com/us/album/6818209777?i=6818209993",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/31/1f/57/311f5776-9efe-697e-08b5-6450aeef8f48/mzaf_9933267362891157830.plus.aac.p.m4a",
     "year": "2026"
   },
   "cleveland|taylorswift": {
@@ -384,6 +391,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/48/26/e6/4826e6b6-3788-f75c-5688-32db211c106a/mzaf_14746398704531487022.plus.aac.p.m4a",
     "year": "2012"
   },
+  "justincase|morganwallen": {
+    "title": "Just In Case",
+    "artist": "Morgan Wallen",
+    "url": "https://music.apple.com/us/album/1802103958?i=1802103977",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a6/97/14/a69714b2-d08d-e3f6-4842-014455fc0374/mzaf_9818844047208886961.plus.aac.p.m4a",
+    "year": "2025"
+  },
   "kidmyself|johnmorgan": {
     "title": "Kid Myself",
     "artist": "John Morgan",
@@ -397,6 +411,13 @@
     "url": "https://music.apple.com/us/album/6808172946?i=6808172970",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ce/9c/15/ce9c15ce-9a24-7e58-9eaf-78711e5a019f/mzaf_1707437200112881647.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "lastnight|morganwallen": {
+    "title": "Last Night",
+    "artist": "Morgan Wallen",
+    "url": "https://music.apple.com/us/album/1818423949?i=1818424212",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/3b/bc/4e/3bbc4e49-5496-495c-5b46-e54061218930/mzaf_8040581572099729456.plus.aac.p.m4a",
+    "year": "2023"
   },
   "lastthingyouneed|morganwallen": {
     "title": "Last Thing You Need",
@@ -537,6 +558,13 @@
     "url": "https://music.apple.com/us/album/6819441629?i=6819441636",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8d/b4/22/8db422a9-8f7a-6863-6a47-1249696f012b/mzaf_9062412188855492119.plus.aac.p.m4a",
     "year": "2020"
+  },
+  "powertrip|jcole": {
+    "title": "Power Trip (feat. Miguel)",
+    "artist": "J. Cole",
+    "url": "https://music.apple.com/us/album/1529510479?i=1529510489",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/a9/39/bb/a939bb21-8ccd-4d6e-269a-a1f7a459dca0/mzaf_13743459880089508221.plus.aac.p.m4a",
+    "year": "2013"
   },
   "quebec|drake": {
     "title": "Quebec",
