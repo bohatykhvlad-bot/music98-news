@@ -14,9 +14,9 @@ The announcement came with a new Abbey Road Studios performance of "I Will Overc
 
 Her earlier Royal Albert Hall concert was built around *My 21st Century Blues*, which she had struggled for years to release. That concert was filmed, and the resulting movie later received a Grammy nomination for Best Music Film. A live album followed, and she also brought the symphonic production to The O2. RAYE has described how much she enjoys changing arrangements onstage, sometimes extending an introduction or taking a song in a different direction from its studio version.
 
-RAYE spent much of her early career writing for other artists. She contributed songs to Beyoncé and Charli XCX while releasing EPs and dance-pop singles under her own name. She has said she wanted to pursue R&B but had little creative control at her record label, Polydor. In 2021, she publicly criticized the company for delaying her first full-length release and subsequently left. Working independently allowed her to put jazz and soul at the center of her music, rather than keeping to the dance-pop sound of her earlier singles.
+Before she could release her first album, RAYE spent years writing for other artists, including Beyoncé and Charli XCX, while putting out EPs and dance-pop singles under her own name. She has said she wanted to make R&B but had little creative control at her record label, Polydor. After publicly criticizing the delays, she left in 2021. As an independent artist, she could finally explore the jazz and soul influences that had received less attention in her earlier releases.
 
-"Escapism." with 070 Shake became her first UK No. 1 single, and she went on to win six BRIT Awards in one night. Her earlier orchestral concert had reshaped songs people knew from the studio recordings. The new material already includes sweeping instrumental arrangements, but it also has quieter passages in which her voice takes the lead. Playing the whole album gives the returning musicians space for those smaller moments as well as the dramatic ones.
+One of her first independent successes was "Escapism.", a collaboration with 070 Shake about trying to numb the pain of a breakup through drinking and nights out. The song's jagged electronic sound marked a departure from her earlier singles, and it reached No. 1 in the UK before *My 21st Century Blues* was released. Her new album also deals with difficult experiences, but its four-season structure leads the songs toward a more hopeful ending. At Royal Albert Hall, she will perform that progression in full, with the musicians who joined her for her first symphonic concert.
 
 ## Existing media and credit — preserve on desk sync
 
@@ -41,6 +41,7 @@ RAYE spent much of her early career writing for other artists. She contributed s
 10. RAYE interview with Recording Academy (songwriting at 16, Beyoncé/Charli XCX, label creative control): https://www.grammy.com/news/raye-my-21st-century-blues-interview-songwriter-2025-grammys/
 11. Songwriters Hall of Fame 2026 gala report (Nile Rodgers, Hal David Starlight Award): https://www.songhall.org/news/shof-celebrates-best-of-songwriting-legends-at-2026-gala
 12. BMI June 2026 confirmation (first British woman to receive award): https://www.bmi.com/news/bmi-congratulates-its-2026-songwriters-hall-of-fame-inductees-honorees
+14. Official Charts background on the song, its lyrics and UK chart history: https://www.officialcharts.com/songs/raye-ft-070-shake-escapism/
 
 ## Publication gate
 
