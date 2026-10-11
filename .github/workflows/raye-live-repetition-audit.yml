@@ -1,0 +1,31 @@
+name: RAYE live text and repeated-name audit
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths: [.github/workflows/raye-live-repetition-audit.yml]
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Read current public article and its first paragraphs
+        shell: python
+        run: |
+          import urllib.request,json,hashlib,re
+          req=urllib.request.Request('https://music98.news/api/desk?audit=raye-20261011-repetitions',headers={'Accept':'application/json','Cache-Control':'no-cache','User-Agent':'Mozilla/5.0'})
+          with urllib.request.urlopen(req,timeout=30) as r: data=json.load(r)
+          rows=[p for p in data.get('posts',[]) if p.get('id')=='raye26royalalbertsymphony']
+          if len(rows)!=1:raise SystemExit('RAYE_NOT_UNIQUE_PUBLIC')
+          p=rows[0]; body=p.get('body') or ''
+          print('STATUS:',p.get('status'))
+          print('POST_TITLE:',p.get('title'))
+          print('EXCERPT:',p.get('excerpt'))
+          print('BODY_HASH:',hashlib.sha256(body.encode()).hexdigest())
+          print('WORDS:',len(body.split()))
+          print('START_RAYE_PARAGRAPHS:',sum(bool(re.match(r'^RAYE\\b',x)) for x in body.split('\\n\\n')))
+          for i,paragraph in enumerate(body.split('\\n\\n')):
+              print('PARAGRAPH_'+str(i+1)+': '+paragraph[:1000])
+          print('COVER_SRC:',(p.get('cover') or {}).get('src'))
+          print('LIVE_AUDIT_COMPLETE')
