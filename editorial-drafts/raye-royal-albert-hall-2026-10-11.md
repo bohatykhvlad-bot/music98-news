@@ -2,7 +2,7 @@
 
 **Status:** EDITORIAL DRAFT ONLY — not published; not synced to music98.news editor.
 
-**Excerpt (plain-text rendering of the first sentence):** RAYE will perform her second album in full at London's Royal Albert Hall on October 23.
+**Excerpt (plain-text rendering of the first sentence):** RAYE will perform her second album in full at London's Royal Albert Hall on October 23, backed by the orchestra and choir from her previous symphonic concert.
 
 ## Article body
 
