@@ -42,7 +42,7 @@ jobs:
           old_first="RAYE will perform her second album in full at London's Royal Albert Hall on October 23."
           old_second="The one-night concert, *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir."
           new_first="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert."
-          new_second="Titled *This Symphony May Contain Hope.*, the show will rework her latest album, *This Music May Contain Hope.*, with her band, the Heritage Orchestra and Flames Collective choir."
+          new_second="The show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir."
           before=(p.get('body') or '').strip()
           if not before.startswith(old_first+' '+old_second):raise SystemExit('RAYE_LIVE_LEDE_CHANGED_ABORT')
           if (p.get('excerpt') or '').strip()!=old_first:raise SystemExit('RAYE_LIVE_EXCERPT_CHANGED_ABORT')
