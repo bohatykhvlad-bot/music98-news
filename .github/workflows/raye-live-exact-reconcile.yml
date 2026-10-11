@@ -1,4 +1,4 @@
-name: RAYE last public article exact matching audit
+name: RAYE propagated copy exact check
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -52,8 +52,20 @@ jobs:
               print(desc+'_FIRST_MISMATCH_BYTE='+str(next((i for i,(x,y) in enumerate(zip(b,expected)) if x!=y),min(len(b),len(expected)))))
             if b!=expected:raise SystemExit(desc+'_SOURCE_MISMATCH')
             return p
-          desk=desk_read()['posts']
+          import time
+          for attempt in range(1,13):
+            desk=desk_read()['posts']
+            req=urllib.request.Request('https://music98.news/api/desk?audit='+str(datetime.datetime.now().timestamp()),headers={'User-Agent':'music98-read-only-editorial-audit','Accept':'application/json','Cache-Control':'no-cache'})
+            with urllib.request.urlopen(req,timeout=30) as response: public=json.load(response)['posts']
+            protected=next((p for p in desk if p.get('id')==pid),None)
+            published=next((p for p in public if p.get('id')==pid),None)
+            psha=h((protected or {}).get('body') or '')
+            rsha=h((published or {}).get('body') or '')
+            print('ATTEMPT_'+str(attempt)+' PROTECTED='+psha+' PUBLIC='+rsha+' EXPECTED='+h(expected))
+            if protected and published and psha==h(expected) and rsha==h(expected):
+              break
+            if attempt==12:raise SystemExit('CONTENT_PROPAGATION_NOT_CONFIRMED')
+            time.sleep(6)
           audit(desk,'PROTECTED_DESK')
-          req=urllib.request.Request('https://music98.news/api/desk?audit='+str(datetime.datetime.now().timestamp()),headers={'User-Agent':'music98-read-only-editorial-audit','Accept':'application/json','Cache-Control':'no-cache'})
-          with urllib.request.urlopen(req,timeout=30) as response: public=json.load(response)['posts']
           audit(public,'PUBLIC_FEED')
+          print('RAYE_PUBLIC_AND_DESK_EXACT_MATCH_CONFIRMED')
