@@ -1,4 +1,4 @@
-name: RAYE final duplication-free editorial quality gate
+name: RAYE reviewed live performance narrative
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
