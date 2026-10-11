@@ -2,21 +2,21 @@
 
 **Status:** EDITORIAL DRAFT ONLY — not published; not synced to music98.news editor.
 
-**Excerpt (plain-text rendering of the first sentence):** RAYE will return to London's Royal Albert Hall on October 23 to perform her second album with an orchestra.
+**Excerpt (plain-text rendering of the first sentence):** RAYE will return to London's Royal Albert Hall on October 23 for a one-night performance of her second album, This Music May Contain Hope., with an orchestra.
 
 ## Article body
 
-RAYE will return to London's Royal Albert Hall on October 23 to perform her second album with an orchestra. The one-night concert is called *This Symphony May Contain Hope.* Her band, the Heritage Orchestra and the Flames Collective choir will accompany a full performance of *This Music May Contain Hope.* Presales begin October 13, with general ticket sales opening October 15.
+RAYE will return to London's Royal Albert Hall on October 23 for a one-night performance of her second album, *This Music May Contain Hope.*, with an orchestra. The concert, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and the Flames Collective choir. The album will be performed in full, with presales opening October 13 and general ticket sales starting October 15.
 
-The announcement also came with a performance of "I Will Overcome." recorded at Abbey Road Studios with the London Symphony Orchestra. She introduced the song at her tour opener in Łódź, Poland, in January, when she played several tracks from the then-unreleased album. The Abbey Road recording features a different orchestra from the Heritage Orchestra booked for the October concert. She also sang it at the MTV Video Music Awards in September.
+This is not her first orchestral show at the venue. In September 2023, she brought *My 21st Century Blues* to the Royal Albert Hall with a 50-piece Heritage Orchestra and the Flames Collective. The performance became both a concert film, *Live at the Royal Albert Hall*, and a live album, *My 21st Century Symphony.* The film later earned a Grammy nomination for Best Music Film. She brought the same orchestral concert format to London's The O2 in 2024.
 
-In September 2023, RAYE performed *My 21st Century Blues* at Royal Albert Hall with a 50-piece Heritage Orchestra and the Flames Collective choir. The concert was filmed as *Live at the Royal Albert Hall*, later nominated for Best Music Film at the Grammys. She also released a live album from the performance, *My 21st Century Symphony.*, that October. In 2024, she brought the orchestral format to London's The O2 for a sold-out headline concert.
+Long before those shows, RAYE was writing songs for other artists while struggling to release an album of her own. She signed her first publishing deal at 16 and went on to co-write Beyoncé's "Bigger" and Charli XCX's "After the Afterparty." As a performer, she released several EPs and became known for dance-pop hits. But in an interview with the Recording Academy, she explained that R&B had been her original ambition, and that she had little creative control while signed to Polydor.
 
-Before those concerts, she spent years writing songs for other artists while waiting to release an album of her own. She signed her first publishing deal at 16 and later co-wrote Beyoncé's "Bigger" and Charli XCX's "After the Afterparty." She also released several EPs and found success with dance-pop singles, although that was not the music she had originally wanted to pursue. In a 2025 interview with the Recording Academy, she spoke about wanting to make R&B and having little creative control while signed to Polydor.
+In 2021, she publicly criticized Polydor for holding back her debut album and subsequently left the label. *My 21st Century Blues* finally arrived independently in 2023. "Escapism." with 070 Shake became her first UK No. 1 single, and in 2024 she won a record six BRIT Awards in one night, including Album of the Year and Songwriter of the Year. In June 2026, Nile Rodgers presented her with the Hal David Starlight Award, making her the first British woman to receive that songwriting honor.
 
-In 2021, she publicly criticized Polydor for holding back her debut album and subsequently left the label. *My 21st Century Blues* arrived independently in 2023, and "Escapism." with 070 Shake gave her a UK No. 1 single. The following year, she collected a record six BRIT Awards in one night, including Album of the Year and Songwriter of the Year. In June 2026, Nile Rodgers presented her with the Hal David Starlight Award, making her the first British woman to receive that songwriting honor.
+Her second album arrived in March. RAYE divided *This Music May Contain Hope.* into four seasons, with the songs moving from heartbreak and isolation toward a more hopeful ending. She told Apple Music that she wanted the record to help listeners through difficult moments, and the music moves between jazz, soul, R&B and pop. "Click Clack Symphony." features Hans Zimmer. On "Joy.", she is joined by her sisters Amma and Absolutely. The album gave her a first UK No. 1 and a place on the 2026 Mercury Prize shortlist.
 
-Released in March, *This Music May Contain Hope.* is divided into four seasons, with songs moving from heartbreak and isolation toward a more hopeful ending. RAYE told Apple Music she wanted to make a record that might help listeners through difficult periods in their own lives. Its arrangements draw on jazz, soul, R&B and pop. "Click Clack Symphony." features Hans Zimmer, while the slower "Nightingale Lane." tells a story of heartbreak. The album became her first UK No. 1, surpassing the No. 2 peak of *My 21st Century Blues*, and was shortlisted for the 2026 Mercury Prize.
+The Royal Albert Hall announcement was accompanied by a new Abbey Road Studios performance of "I Will Overcome." The recording pairs RAYE with the London Symphony Orchestra, rather than the Heritage Orchestra booked for the concert. She had introduced the song at the opening night of her 2026 tour in Łódź, Poland, in January, while the album was still unreleased. She later performed it at the MTV Video Music Awards in September. The Abbey Road version arrived on October 9, the same day the Royal Albert Hall show was announced.
 
 ## Existing media and credit — preserve on desk sync
 
@@ -37,10 +37,10 @@ Released in March, *This Music May Contain Hope.* is divided into four seasons, 
 6. January tour performance and Radoslaw Zydowicz photo attribution: https://www.nme.com/news/music/watch-raye-debut-new-this-music-may-contain-hope-songs-as-she-kicks-off-2026-tour-in-poland-3925061
 7. Additional photo attribution: https://www.redcarpet-fashionawards.com/2026/01/27/raye-wore-emilia-wickstead-for-her-this-tour-may-contain-new-music-tour/
 8. Official UK album chart result (first No. 1; debut peaked at No. 2): https://www.officialcharts.com/chart-news/raye-this-music-may-contain-hope-number-1-album/
-9. Mercury Prize 2026 official shortlist: https://upload.mercuryprize.com/news/2026/2026-mercury-prize-albums-of-the-year-revealed/
+9. Mercury Prize 2026 official shortlist: https://www.mercuryprize.com/shortlist/
 
 10. RAYE interview with Recording Academy (songwriting at 16, Beyoncé/Charli XCX, label creative control): https://www.grammy.com/news/raye-my-21st-century-blues-interview-songwriter-2025-grammys/
-11. Songwriters Hall of Fame 2026 gala report (Nile Rodgers, Hal David Starlight Award): https://www.songhall.org/shof-gala
+11. Songwriters Hall of Fame 2026 gala report (Nile Rodgers, Hal David Starlight Award): https://www.songhall.org/news/shof-celebrates-best-of-songwriting-legends-at-2026-gala
 12. BMI June 2026 confirmation (first British woman to receive award): https://www.bmi.com/news/bmi-congratulates-its-2026-songwriters-hall-of-fame-inductees-honorees
 
 ## Publication gate
