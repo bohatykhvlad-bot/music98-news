@@ -17,7 +17,7 @@ test("desktop navigation uses five equal-width pill segments",()=>{
   assert.match(page,/\.nav-btn\{position:relative;top:0\}/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.nav\{order:3;width:100%/);
   assert.ok(page.includes('.nav{order:3;width:100%;height:48px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:4px;'));
-  assert.ok(page.includes('.nav-btn{width:100%;min-width:0;height:38px;padding:0 2px;font-size:clamp(9px,2.8vw,12px);'));
+  assert.ok(page.includes('.nav-btn{width:100%;min-width:0;height:38px;padding:0 2px;font-size:clamp(10px,3vw,12px);'));
   assert.ok(page.includes('.nav-btn .nav-label{position:static;display:inline-block;white-space:nowrap}'));
   assert.equal((page.match(/<span class="nav-label">/g)||[]).length,5);
   assert.doesNotMatch(page,/balanceMobileNavLabelGaps|nav-label-offset/);

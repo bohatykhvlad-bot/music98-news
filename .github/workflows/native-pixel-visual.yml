@@ -126,6 +126,38 @@ jobs:
                   console.log('SCREENSHOT '+path+' '+fs.statSync(path).size);
                 }
               }
+
+              // Confirm live Cloudflare deployment instead of validating only source CSS.
+              const prod='https://music98.news/chart';
+              const prodExpr='(()=>{'+
+                'const nav=document.querySelector("#nav.nav");'+
+                'if(!nav)return null;'+
+                'const buttons=[...nav.querySelectorAll(".nav-btn")];'+
+                'if(buttons.length!==5)return null;'+
+                'return {screen:innerWidth,widths:buttons.map(b=>Math.round(b.getBoundingClientRect().width*100)/100),'+
+                'textFits:buttons.map(b=>b.scrollWidth<=b.clientWidth+1),'+
+                'left:Math.round((buttons[0].getBoundingClientRect().left-nav.getBoundingClientRect().left)*100)/100,'+
+                'right:Math.round((nav.getBoundingClientRect().right-buttons[4].getBoundingClientRect().right)*100)/100,'+
+                'layout:getComputedStyle(nav).display};})()';
+              for(const width of [320,390]){
+                await send('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:true,screenWidth:width,screenHeight:900});
+                let ok=null;
+                for(let retry=0;retry<12;retry++){
+                  await send('Page.navigate',{url:prod+'?navPillAudit='+Date.now()+'&try='+retry+'&w='+width});
+                  await pause(1400);
+                  const resp=await send('Runtime.evaluate',{expression:prodExpr,returnByValue:true});
+                  const v=resp.result?.value;
+                  if(v?.screen!==width||v.widths.length!==5)continue;
+                  const unequal=Math.max(...v.widths)-Math.min(...v.widths);
+                  if(v.layout==='grid'&&unequal<.1&&v.textFits.every(Boolean)&&Math.abs(v.left-v.right)<.1){
+                    ok=v;break;
+                  }
+                  console.log('LIVE_NAV_WAIT '+JSON.stringify(v));
+                  await pause(2500);
+                }
+                if(!ok)throw Error('LIVE_MOBILE_NAV_NOT_DEPLOYED_'+width);
+                console.log('LIVE_MOBILE_NAV_EQUAL_PILLS '+JSON.stringify(ok));
+              }
             }finally{
               if(socket)socket.close();
               chrome.kill('SIGTERM');
