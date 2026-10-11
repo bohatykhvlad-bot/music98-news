@@ -2,13 +2,13 @@
 
 **Status:** LIVE on music98.news. Corrected copy published and verified in the authenticated editor.
 
-**Excerpt (plain-text rendering of the first sentence):** RAYE will return to London's Royal Albert Hall on October 23 to perform her second album in full with an orchestra and choir.
+**Excerpt (plain-text rendering of the first sentence):** RAYE will return to London's Royal Albert Hall on October 23 to perform her second album in full.
 
 ## Article body
 
-RAYE will return to London's Royal Albert Hall on October 23 to perform her second album in full with an orchestra and choir. The concert is called *This Symphony May Contain Hope.* Her band will join the Heritage Orchestra and Flames Collective, who accompanied her at the same venue three years ago. The evening will be devoted to *This Music May Contain Hope.* rather than a selection of songs from across her career. Tickets go on sale October 15.
+RAYE will return to London's Royal Albert Hall on October 23 to perform her second album in full. The one-night concert, *This Symphony May Contain Hope.*, will reunite her with the Heritage Orchestra and Flames Collective, the orchestra and choir from her previous symphonic performance at the venue. Her own band will join them, bringing all three groups together for the new material. Tickets go on sale October 15.
 
-Released in March, the album is divided into four seasons. Its songs begin with heartbreak and loneliness before gradually turning towards hope. RAYE told Apple Music she wanted to make something listeners could turn to during difficult times. The music moves between jazz, soul and pop, with orchestral passages alongside more intimate moments. Hans Zimmer appears on "Click Clack Symphony.", while "Nightingale Lane." draws more heavily on jazz influences. It was her first album to reach No. 1 in the UK.
+Released in March, *This Music May Contain Hope.* is divided into four seasons. Its songs begin with heartbreak and loneliness before gradually turning towards hope. RAYE told Apple Music she wanted to make something listeners could turn to during difficult times. The music moves between jazz, soul and pop, with orchestral passages alongside more intimate moments. Hans Zimmer appears on "Click Clack Symphony.", one of the record's more expansive songs. It was her first album to reach No. 1 in the UK.
 
 The announcement came with a new Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. Earlier this year, RAYE told ELLE that the song was "big and dramatic" and spoke about lyrics in which she acknowledges that she is struggling but believes she will get through it. On the album, the track follows a short introduction. It establishes the story's starting point before the music moves through its darker chapters and, eventually, towards hope.
 
