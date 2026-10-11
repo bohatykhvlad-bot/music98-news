@@ -38,7 +38,23 @@ for(let n=1;n<=8;n++){
       const list=dump.match(/<div\s+id="chartList"[^>]*>([\s\S]*?)<\/div>\s*<\/section>/);
       const count=(list?list[1]:dump).match(/class="chart-row(?:\s|")/g)?.length||0;
       const artists=([...(list?list[1]:dump).matchAll(/data-title="([^"]+)"/g)]).slice(0,4).map(m=>m[1]);
-      console.log("CHART_BROWSER",JSON.stringify({name,count,htmlUpdated:j.updated,method:j.methodology,artists}));
+      /* Compare the server's actual movements with their rendered DOM classes.
+         A 50-row browser test cannot pass while its arrows disappear. */
+      const expected={up:0,down:0,same:0,new:0,reentry:0};
+      for(const row of j.tracks){
+        const d=String(row.delta??"0").toLowerCase();
+        if(d==="new")expected.new++;
+        else if(d==="re-entry")expected.reentry++;
+        else if(Number(d)>0)expected.up++;
+        else if(Number(d)<0)expected.down++;
+        else expected.same++;
+      }
+      const actual=Object.fromEntries(Object.keys(expected).map(kind=>
+        [kind,(dump.match(new RegExp('class="delta '+kind+'"','g'))||[]).length]));
+      for(const kind of Object.keys(expected))
+        if(actual[kind]!==expected[kind])
+          throw Error("LIVE_CHROME_"+name+"_ARROWS_MISMATCH "+JSON.stringify({kind,actual,expected}));
+      console.log("CHART_BROWSER",JSON.stringify({name,count,htmlUpdated:j.updated,method:j.methodology,artists,arrows:actual}));
       if(count!==50)throw Error("LIVE_CHROME_"+name+"_HAS_"+count+"_ROWS_INSTEAD_OF_50");
       if(!dump.includes("Daily Top 50"))throw Error("LIVE_CHROME_"+name+"_TITLE_NOT_UPDATED");
     }

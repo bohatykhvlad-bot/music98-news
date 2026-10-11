@@ -41,7 +41,7 @@ jobs:
       - name: Prepare verified Apple media for Spotify-only Top 50 entrants
         run: node scripts/resolve-tri-apple-media.mjs
       - name: Validate three-source identity, weights, rank continuity and Spotify numbers
-        run: node --test tests/tri-source-*.test.mjs tests/chart-history.test.mjs
+        run: node --test tests/tri-source-*.test.mjs tests/chart-history.test.mjs tests/stream-source-fallback.test.mjs
       - name: Retain only 14 days of dated source snapshots
         run: node scripts/prune-chart-history.mjs
       - name: Commit verified snapshots without discarding the successful collection
@@ -78,7 +78,7 @@ jobs:
             node scripts/refresh-apple-ranking.mjs
             node scripts/refresh-apple-spotify-streams.mjs
             node scripts/resolve-tri-apple-media.mjs
-            node --test tests/tri-source-*.test.mjs tests/chart-history.test.mjs
+            node --test tests/tri-source-*.test.mjs tests/chart-history.test.mjs tests/stream-source-fallback.test.mjs
             node scripts/prune-chart-history.mjs
             git add -A public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json public/data/chart-history/
             if git diff --cached --quiet; then
