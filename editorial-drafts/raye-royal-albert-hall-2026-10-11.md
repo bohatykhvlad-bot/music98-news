@@ -6,19 +6,19 @@
 
 ## Article body
 
-RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert. The show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir. She played some of the new songs on tour before the album was released, using those shows to shape the recordings. Tickets go on sale October 15 at 10am.
+RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert. The show, titled *This Symphony May Contain Hope.*, will feature her band, the Heritage Orchestra and Flames Collective choir. She played some of the songs on tour before the album was released, listening to audience reactions as she worked out how the studio versions should sound. Tickets go on sale October 15 at 10am.
 
 Released in March, *This Music May Contain Hope.* follows four seasons, moving from loneliness towards hope. RAYE told Apple Music she hoped the songs would help listeners through difficult times. For "Click Clack Symphony.", she sent Hans Zimmer a rough demo and asked if he wanted to collaborate. They developed the song together, and the recording features an orchestra. She called it "unapologetically cinematic." The album later reached No. 1 in the UK.
 
-RAYE also released an Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. In an ELLE interview earlier this year, she played the song and called it "big and dramatic." She described lyrics about hiding pain and telling yourself you will get through it. On the album, the song follows a spoken introduction about a woman alone in Paris.
+RAYE also released an Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. In an ELLE interview earlier this year, she played the song and called it "big and dramatic." She explained a verse in which the narrator admits she is struggling but still believes she will somehow get through it. On the album, the song follows a spoken introduction about a woman alone in Paris.
 
-Her previous Royal Albert Hall concert put songs from *My 21st Century Blues* into new arrangements for orchestra and choir. That 2023 performance was released as a live album and a concert film, which later earned a Grammy nomination for Best Music Film. She brought a similar production to The O2 the following year. This time, she is bringing songs that already feature orchestral arrangements on the album.
+Her previous Royal Albert Hall concert put songs from *My 21st Century Blues* into new arrangements for orchestra and choir. That 2023 performance was released as a live album and a concert film, which later earned a Grammy nomination for Best Music Film. She brought a similar production to The O2 the following year. This time, she is bringing songs that already feature orchestral arrangements in the versions released on her latest album.
 
 RAYE spent years writing songs for other artists, including Beyoncé and Charli XCX, before releasing her debut album. Polydor, her record label at the time, had signed her as a teenager but released mostly EPs and dance-pop singles under her name. She has said she wanted to make R&B but had little creative control over her music. After criticizing the delays publicly in 2021, she left the label to work independently.
 
 In January 2023, "Escapism." with 070 Shake gave RAYE her first UK No. 1 single. The song follows someone trying to numb the pain of a breakup through alcohol, drugs and nights out, far removed from the lighter dance-pop material she was known for. *My 21st Century Blues* arrived the following month, with the jazz, soul and R&B influences she had wanted to explore. She later described the chart success as proof that she had been right to back herself.
 
-RAYE told ELLE she wrote most of *This Music May Contain Hope.* sober, having stopped using alcohol to bury difficult feelings. The album's autumn section explores the temptation to drink or start a relationship rather than face loneliness. She spoke about learning to spend an evening by herself, something she once found difficult. "I don't want someone else to come and fix me," she said.
+RAYE told ELLE she wrote most of *This Music May Contain Hope.* sober, having stopped using alcohol to bury difficult feelings. The album's autumn section explores the temptation to drink or start a relationship rather than face loneliness. She said being alone had once made her sad, but she was now learning to enjoy her own company instead. "I don't want someone else to come and fix me," she said.
 
 ## Existing media and credit — preserve on desk sync
 
