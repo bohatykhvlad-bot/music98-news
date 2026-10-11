@@ -389,7 +389,7 @@ test("desktop scroll snapport excludes the 32px shadow bleed on both carousels",
     "Chromium must snap cards to the visible content boundary, not the -32px rail bleed");
   assert.match(page,/const moveOneCard=dir=>\{/,
     "short clicks must use absolute aligned card destinations");
-  assert.match(page,/const ARROW_STEP_MS = 500;/,
+  assert.match(page,/const ARROW_STEP_MS = 435;/,
     "short arrow animation has an explicit slower duration");
   assert.match(page,/rail\.scrollLeft=actual\+\(target-actual\)\*eased/,
     "arrows preserve aligned destinations without relative scrollBy");

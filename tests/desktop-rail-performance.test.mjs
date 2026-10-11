@@ -127,10 +127,10 @@ test("brief arrow tap steps one card; cancelled press never triggers a step",()=
   env.frame(1000/60);
   next.handlers.pointerup[0]({pointerId:2});
   assert.equal(rail.steps.length,0,"short arrows now use a controlled rAF tween");
+  env.frame(200);
+  assert.ok(rail.scrollLeft>0 && rail.scrollLeft<261,"still animating at 200ms");
   env.frame(250);
-  assert.ok(rail.scrollLeft>0 && rail.scrollLeft<261,"still animating at 250ms");
-  env.frame(250);
-  assert.equal(rail.scrollLeft,261,"500ms tween lands exactly on the card");
+  assert.equal(rail.scrollLeft,261,"435ms tween lands exactly on the card");
   next.handlers.pointerdown[0]({button:0,pointerId:3,preventDefault(){}});
   next.handlers.pointercancel[0]({pointerId:3});
   assert.equal(rail.steps.length,0);
@@ -219,7 +219,7 @@ test("mouse drag retains lifted card and seamless momentum in both sections",()=
     assert.equal(card.style.transform,"translateY(-4px)");
     rail.emit("pointermove",{pointerId:4,clientX:160});
     env.frame(1000/60);
-    assert.ok(rail.scrollLeft>=27 && rail.scrollLeft<=29,"30% shorter mouse drag");
+    assert.ok(rail.scrollLeft>=32 && rail.scrollLeft<=33,"15% faster mouse drag than previous tuning");
     rail.emit("pointerup",{pointerId:4});
     assert.equal(rail.classList.has("dragging"),false);
     assert.equal(card.classList.has("grab"),true,"lift survives the release");
@@ -234,8 +234,8 @@ test("desktop lift, band, glass arrows, and distinct mobile stacking are unchang
   assert.match(source,/const rubberMag = over =>/);
   assert.match(source,/return 22 \* Math\.tanh\(Math\.abs\(over\) \/ 220\)/);
   assert.match(source,/const dur = 624/);
-  assert.match(source,/const RAIL_SPEED = 0\.7/);
-  assert.match(source,/const ARROW_STEP_MS = 500/);
+  assert.match(source,/const RAIL_SPEED = 0\.805/);
+  assert.match(source,/const ARROW_STEP_MS = 435/);
   assert.match(source,/drag\.pendX = drag\.sl - dx \* RAIL_SPEED/);
   assert.match(source,/drag\.grabCard\.style\.transform = "translateY\(-4px\)"/);
   assert.match(page,/@media \(max-width:640px\)[\s\S]*?\.rail\{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:1fr/);
