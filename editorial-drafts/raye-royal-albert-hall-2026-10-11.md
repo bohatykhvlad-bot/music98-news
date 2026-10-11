@@ -10,7 +10,9 @@ RAYE will return to London's Royal Albert Hall on October 23 to perform her seco
 
 She first performed at the Royal Albert Hall with an orchestra in September 2023, months after releasing *My 21st Century Blues*. She performed songs from her debut with a 50-piece Heritage Orchestra and the Flames Collective choir. The concert was filmed for *Live at the Royal Albert Hall*, later nominated for a Grammy in the Best Music Film category. She brought her *My 21st Century Symphony* show to The O2 the following year, again performing with the orchestra and choir.
 
-In 2021, after years of releasing singles and writing for other artists, RAYE publicly criticised Polydor for holding back her debut album. She left the label and eventually released *My 21st Century Blues* independently in 2023. "Escapism." with 070 Shake gave her a first UK No. 1 single, and in 2024 she won six BRIT Awards in one night, including Album of the Year and Songwriter of the Year. 
+RAYE was writing for other artists long before her own albums came out. She signed her first publishing deal at 16 and went on to co-write Beyoncé's "Bigger" and Charli XCX's "After the Afterparty." Meanwhile, much of the music she released under her own name leaned towards dance-pop, even as she wanted to explore R&B. Speaking to the Recording Academy in 2025, she said she had little creative control at Polydor. She put out several EPs and built an audience through singles and collaborations, but an album remained out of reach despite the success of her writing work.
+
+In 2021, RAYE publicly criticised Polydor for holding back her debut album. She left the label and eventually released *My 21st Century Blues* independently in 2023. "Escapism." with 070 Shake gave her a first UK No. 1 single, and in 2024 she won six BRIT Awards in one night, including Album of the Year and Songwriter of the Year. In June, Nile Rodgers presented her with the Hal David Starlight Award from the Songwriters Hall of Fame, recognizing her songwriting career. 
 
 RAYE released her follow-up in March and organized it into four seasons. Its songs move from isolation and heartbreak towards recovery, with jazz and soul influences appearing alongside more theatrical arrangements. "Click Clack Symphony." features Hans Zimmer, while "Nightingale Lane." leans into the kind of soulful singing she fought to make room for earlier in her career. The album became her first UK No. 1, surpassing the No. 2 peak of *My 21st Century Blues*, and was shortlisted for the 2026 Mercury Prize.
 
@@ -36,6 +38,9 @@ Alongside the announcement, RAYE released a new performance of "I Will Overcome.
 7. Additional photo attribution: https://www.redcarpet-fashionawards.com/2026/01/27/raye-wore-emilia-wickstead-for-her-this-tour-may-contain-new-music-tour/
 8. Official UK album chart result (first No. 1; debut peaked at No. 2): https://www.officialcharts.com/chart-news/raye-this-music-may-contain-hope-number-1-album/
 9. Mercury Prize 2026 official shortlist: https://upload.mercuryprize.com/news/2026/2026-mercury-prize-albums-of-the-year-revealed/
+
+10. RAYE interview with Recording Academy (songwriting at 16, Beyoncé/Charli XCX, label creative control): https://www.grammy.com/news/raye-my-21st-century-blues-interview-songwriter-2025-grammys/
+11. Songwriters Hall of Fame 2026 gala report (Nile Rodgers, Hal David Starlight Award): https://www.songhall.org/shof-gala
 
 ## Publication gate
 
