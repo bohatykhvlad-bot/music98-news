@@ -19,6 +19,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Register verified general sale date for editorial gate
+        shell: bash
+        run: |
+          python scripts/post.py register "October 15" "RAYE Royal Albert Hall general ticket sale starts October 15, 2026 at 10am, per Simon Jones PR's October 9 concert announcement"
       - name: Lock current LIVE article and prepare reviewed replacement
         shell: bash
         run: |
