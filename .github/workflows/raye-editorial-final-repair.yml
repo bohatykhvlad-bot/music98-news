@@ -1,4 +1,4 @@
-name: RAYE editorial final repair
+name: RAYE editorial final repair after ending gate
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
