@@ -1,4 +1,4 @@
-name: RAYE chronology and continuity review
+name: RAYE fact-registered chronology repair
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
@@ -20,7 +20,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Register verified concert ticket-sale date
-        run: python scripts/post.py register "October 15" "RAYE Royal Albert Hall October 23, 2026 concert on general sale October 15, per artist official PR announcement"
+        run: |
+          python scripts/post.py register "October 15" "RAYE Royal Albert Hall October 23, 2026 concert on general sale October 15, per artist official PR announcement"
+          python scripts/post.py register "January 2023" "Official Charts confirms Escapism with 070 Shake became RAYE's first UK No. 1 single in January 2023"
       - name: Validate live article identity, full final text and media
         shell: python
         run: |
@@ -48,6 +50,10 @@ jobs:
           excerpt=s.split('**Excerpt (plain-text rendering of the first sentence):** ',1)[1].splitlines()[0]
           new='\n\n'.join(paragraphs[:3]+media+paragraphs[3:])
           if not new.startswith(excerpt):raise SystemExit('EXCERPT_NOT_PREFIX')
+          original_paragraphs=old.split('\\n\\n')
+          proposed_paragraphs=new.split('\\n\\n')
+          if len(original_paragraphs)!=8 or len(proposed_paragraphs)!=8:raise SystemExit('POST_STRUCTURE_CHANGED')
+          if original_paragraphs[:5]!=proposed_paragraphs[:5] or original_paragraphs[7]!=proposed_paragraphs[7]:raise SystemExit('UNRELATED_COPY_CHANGED')
           if any(t in new for t in ('newly released material',"story's starting point",'such a private confession','Poland','not footage')):raise SystemExit('OLD_FILLER_RETURNED')
           if 'Polydor, her record label at the time' not in new or '"Escapism."' not in new:raise SystemExit('IMPORTANT_CONTEXT_MISSING')
           if new.count('[youtube:')!=1:raise SystemExit('MEDIA_COUNT_MISMATCH')
