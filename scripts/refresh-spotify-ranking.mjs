@@ -3,12 +3,12 @@ import {createHash} from "node:crypto";
 import {parseMusicrankSpotify,spotifyDateCurrent,validatedSpotifyRows,
  verifiedSpotifySnapshot,SPOTIFY_INPUT_SIZE} from "../functions/lib/spotify-chart.js";
 const OUT=new URL("../public/data/spotify-chart.json",import.meta.url);
-const URL="https://musicrank.org/spotify";
+const SOURCE_URL="https://musicrank.org/spotify";
 async function collect(){
  let last;
  for(let n=0;n<3;n++){
   try{
-   const res=await fetch(URL,{headers:{"user-agent":"Mozilla/5.0 (compatible; music98-chart-source/8.0)",
+   const res=await fetch(SOURCE_URL,{headers:{"user-agent":"Mozilla/5.0 (compatible; music98-chart-source/8.0)",
     "cache-control":"no-cache"},signal:AbortSignal.timeout(18000)});
    if(!res.ok)throw new Error("HTTP "+res.status);
    const out=parseMusicrankSpotify(await res.text(),SPOTIFY_INPUT_SIZE);
@@ -27,7 +27,7 @@ let old=null;try{old=JSON.parse(fs.readFileSync(OUT,"utf8"));}catch{}
 if(old?.chartDate&&old.chartDate>chosen.date)
  throw new Error("Refusing older Spotify edition "+chosen.date+" after "+old.chartDate);
 const payload={schema:1,verified:true,chartDate:chosen.date,provider:"musicrank",
- sourceUrl:URL,ldConfirmed:chosen.ldConfirmed,fingerprint,tracks,capturedAt:new Date().toISOString()};
+ sourceUrl:SOURCE_URL,ldConfirmed:chosen.ldConfirmed,fingerprint,tracks,capturedAt:new Date().toISOString()};
 if(!verifiedSpotifySnapshot(payload))throw new Error("Refusing invalid Musicrank Spotify payload");
 if(old?.chartDate===chosen.date&&old?.fingerprint===fingerprint&&verifiedSpotifySnapshot(old)){
  console.log("SPOTIFY_SOURCE_UNCHANGED",JSON.stringify({date:chosen.date,provider:"musicrank",rows:tracks.length}));
