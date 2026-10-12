@@ -32,16 +32,20 @@ export function verifiedDatedApple(snapshot,region,date){
 }
 
 export function verifiedDatedSpotify(snapshot,date) {
- if(snapshot?.schema!==1||snapshot.source!=="kworb-spotify-global-daily"||
+ if(snapshot?.schema!==1||snapshot.source!=="musicrank-spotify-global-daily"||
+  snapshot.sourceUrl!=="https://musicrank.org/spotify"||
   snapshot.region!=="global"||snapshot.date!==date||
   !Array.isArray(snapshot.tracks)||snapshot.tracks.length!==200)return null;
  const ids=new Set(),identity=new Set();
  for(let i=0;i<200;i++){
   const t=snapshot.tracks[i],key=mergeKey(t?.title,t?.artist);
   if(t?.pos!==i+1||!key||identity.has(key)||
-    !/^[A-Za-z0-9]{22}$/.test(t.spotifyId||"")||
-    ids.has(t.spotifyId)||!Number.isSafeInteger(t.daily)||t.daily<0)return null;
-  ids.add(t.spotifyId);identity.add(key);
+    !Number.isSafeInteger(t.daily)||t.daily<=0)return null;
+  if(t.spotifyId){
+   if(!/^[A-Za-z0-9]{22}$/.test(t.spotifyId)||ids.has(t.spotifyId))return null;
+   ids.add(t.spotifyId);
+  }
+  identity.add(key);
  }
  return snapshot;
 }
