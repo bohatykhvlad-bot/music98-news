@@ -12,19 +12,21 @@ permissions:
   actions: write
 concurrency:
   group: spotify-chart-source
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Require matching dated Top 100 from both Spotify mirrors
+      - name: Fetch and validate Musicrank Spotify Global Top 200
         run: node scripts/refresh-spotify-ranking.mjs
-      - name: Publish only completely validated source edition
+      - name: Publish validated Musicrank source edition
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -33,14 +35,13 @@ jobs:
           git add public/data/spotify-chart.json
           if git diff --cached --quiet; then
             echo "Spotify source unchanged"
+            gh workflow run apple-chart-source.yml --ref main
             exit 0
           fi
-          git commit -m "chart: independently verified Spotify Top 100"
+          git commit -m "chart: refresh Musicrank Spotify Top 200"
           for n in 1 2 3; do
             git pull --rebase origin main
             if git push origin HEAD:main; then
-              # GITHUB_TOKEN pushes cannot trigger downstream push workflows.
-              # workflow_dispatch is explicitly supported for this token.
               gh workflow run apple-chart-source.yml --ref main
               exit 0
             fi

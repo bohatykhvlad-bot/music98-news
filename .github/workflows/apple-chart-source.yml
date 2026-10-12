@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - "scripts/refresh-apple-ranking.mjs"
+      - "scripts/refresh-spotify-ranking.mjs"
+      - "functions/lib/spotify-chart.js"
       - "scripts/refresh-apple-spotify-streams.mjs"
       - "functions/lib/apple-spotify-chart.js"
       - "functions/lib/apple-us-hybrid.js"
@@ -41,6 +43,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Refresh Musicrank Spotify Global Top 200
+        run: node scripts/refresh-spotify-ranking.mjs
       - name: Fetch paired verified Apple Music USA and Global Top 100
         run: node scripts/refresh-apple-ranking.mjs
       - name: Build union of THREE sources from the latest common source date
@@ -74,6 +78,7 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           BASE="$GITHUB_SHA"
           SOURCES=(
+            scripts/refresh-spotify-ranking.mjs
             scripts/refresh-apple-ranking.mjs
             scripts/refresh-apple-spotify-streams.mjs
             functions/lib/apple-spotify-chart.js
