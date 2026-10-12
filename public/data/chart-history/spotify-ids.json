@@ -515,6 +515,13 @@
       "subtitle": "ILLIT",
       "resolvedAt": "2026-10-12T18:50:39.812Z",
       "matchedFrom": "original-title-search"
+    },
+    "popit|gunna": {
+      "id": "3LVkyYg0PSo8XInTPKKhZM",
+      "name": "pop it",
+      "subtitle": "Gunna",
+      "resolvedAt": "2026-10-12T18:53:00Z",
+      "matchedFrom": "official-spotify-track-url-verified"
     }
   }
 }
