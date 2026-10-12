@@ -1,3 +1,4 @@
+import {verifiedSpotifyRow} from "../functions/lib/tri-source-chart.js";
 import fs from "node:fs";
 import {execFileSync} from "node:child_process";
 
@@ -23,8 +24,8 @@ for(let n=1;n<=8;n++){
     if(!/^20\d{2}-\d{2}-\d{2}$/.test(j.sourceDates?.S||"")||
       j.sourceDates?.U!==j.sourceDates?.S||j.sourceDates?.A!==j.sourceDates?.S)
       throw Error("LIVE_CHART_MIXED_SOURCE_DATES: "+JSON.stringify(j.sourceDates));
-    if(j.tracks.some(t=>t.spotify?.date!==j.sourceDates.S||!Number.isSafeInteger(t.spotify?.daily)))
-      throw Error("LIVE_CHART_HAS_UNVERIFIED_OR_DIFFERENT_DAY_SPOTIFY");
+    if(j.tracks.some(t=>!verifiedSpotifyRow(t.spotify,j.sourceDates.S)))
+      throw Error("LIVE_CHART_HAS_UNVERIFIED_SPOTIFY");
     // A REAL browser must accept the JSON and construct 50 DOM rows.
     // Test both desktop and mobile, using a fresh profile every time.
     for(const [name,size] of [["desktop","1440,1000"],["mobile","390,880"]]){
