@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {pickSearchHit, spotifySearchQueries, pickDailyForDate, totalDelta, saveCounterObservation, measuredProviderDelta, extractCounterTotal, medianValue, FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
+import {pickSearchHit, spotifySearchQueries, pickDailyForDate, totalDelta, saveCounterObservation, measuredProviderDelta, extractCounterTotal, medianValue, FALLBACK_WINDOW_DAYS, STREAM_PROVIDER_PRIORITY} from "../functions/lib/stream-fallback.js";
 import {verifiedSpotifyRow} from "../functions/lib/tri-source-chart.js";
 
 const id = "b".repeat(22);
@@ -16,6 +16,10 @@ test("search hit selection handles spellings, feat credits and noise", () => {
   assert.equal(pickSearchHit("Song", "Artist", [hit("Song (Karaoke Version)", "Karaoke SESH")]), null);
   assert.equal(pickSearchHit("Song", "Artist", [hit("Other Song", "Different Band")]), null);
   assert.equal(pickSearchHit("Song", "Artist", [{kind: "artist", id, name: "Artist"}]), null);
+});
+
+test("SoundCamps is the primary site counter and MyStreamCount is fallback",()=>{
+ assert.deepEqual(STREAM_PROVIDER_PRIORITY,["soundcamps","mystreamcount"]);
 });
 
 test("daily picker prefers the totals window and smooths capture merges", () => {

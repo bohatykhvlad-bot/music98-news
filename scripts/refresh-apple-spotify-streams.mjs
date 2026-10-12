@@ -38,8 +38,9 @@ async function requestText(url){
 }
 
 /* ===== Сайты-источники (главный канал дневных чисел по решению владельца) =====
-   MyStreamCount — основной, soundcamps — суммы/страховка и контроль, официальные
-   (kworb) — только аварийный резерв для песен без сайтовых данных. */
+   SoundCamps — основной счётчик: сохраняем totals и считаем измеренную дневную
+   дельту. MyStreamCount вызывается только когда SoundCamps ещё не имеет двух
+   дат для дельты. Kworb остаётся аварийным резервом, без выдуманных чисел. */
 const idsCache=readCache(IDS_FILE)||{schema:1,updated:null,entries:{}};
 const totalsCache=readCache(TOTALS_FILE)||{schema:1,updated:null,calibration:1,tracks:{}};
 if(!idsCache.entries)idsCache.entries={};
@@ -167,7 +168,7 @@ async function resolveSpotifyId(t){
  return null;
 }
 async function applySiteStreams(){
- const stats={processed:0,sitePrimary:0,siteCounterDelta:0,siteCapture:0,soundcampsDelta:0,officialKept:0,unresolved:0,rejected:0,myscBlocked:false,monitor:null};
+ const stats={processed:0,sitePrimary:0,myscFallback:0,siteCapture:0,soundcampsDelta:0,officialKept:0,unresolved:0,rejected:0,myscBlocked:false,monitor:null};
  const capture=(id,provider,total)=>{
   totalsCache.tracks[id]=saveCounterObservation(totalsCache.tracks[id],CAPTURE_DAY,total,provider);
   stats.siteCapture++;
@@ -193,57 +194,55 @@ async function applySiteStreams(){
    if(!entry?.id||duplicate){countFallback(t);}
    else{
     let found=null;
-    if(!msBlocked){
+    /* Primary path: one lightweight SoundCamps total request. Once two real
+       capture dates exist, their delta is the daily count. */
+    try{
+     const total=await soundcampsTotal(entry.id);
+     if(total!==null)capture(entry.id,"soundcamps",total);
+    }catch(e){console.warn("SERVICE_SC_FAILED",entry.id,String(e?.message||e));}
+    const soundDelta=measuredProviderDelta(totalsCache.tracks[entry.id],chosen,"soundcamps");
+    if(soundDelta){
+     found={id:entry.id,daily:soundDelta.daily,date:soundDelta.date,method:soundDelta.method,
+      sourceUrl:"https://soundcamps.com/spotify-stream-checker/",metric:"soundcamps-total-delta",
+      trackUrl:"https://open.spotify.com/track/"+entry.id,
+      matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
+     stats.sitePrimary++;stats.soundcampsDelta++;
+    }
+    /* MyStreamCount is now a targeted bootstrap/fallback only. This avoids
+       hundreds of page+POST requests and the 429 cascade that blocked builds. */
+    if(!found&&!msBlocked){
      try{
       const series=await mystreamcountSeries(entry.id,n=>capture(entry.id,"mystreamcount",n));
       const pick=series?pickDailyForDate(series.data,chosen,{windowDays:FALLBACK_WINDOW_DAYS}):null;
       if(pick)found={id:entry.id,daily:pick.daily,date:pick.date,method:pick.method,
        sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-daily-delta",
        matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
+      if(!found){
+       const delta=measuredProviderDelta(totalsCache.tracks[entry.id],chosen,"mystreamcount");
+       if(delta)found={id:entry.id,daily:delta.daily,date:delta.date,method:delta.method,
+        sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-total-delta",
+        matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
+      }
+      if(found)stats.myscFallback++;
       msFailStreak=0;
      }catch(e){
       msFailStreak++;
       console.warn("SERVICE_MYSC_FAILED",entry.id,String(e?.message||e));
       if(msFailStreak>=5&&!msBlocked){
        msBlocked=true;stats.myscBlocked=true;
-       console.warn("SERVICE_MYSC_BLOCKED","лимит сайта: сохраняю официальные значения, суммы soundcamps продолжаю собирать");
+       console.warn("SERVICE_MYSC_BLOCKED","fallback rate-limited; keeping SoundCamps/verified Kworb values");
       }
      }
-    }
-    /* Суммы soundcamps собираем всегда (если сайт доступен): история для дельт и контроль. */
-    try{
-     const total=await soundcampsTotal(entry.id);
-     if(total!==null){
-      capture(entry.id,"soundcamps",total);
-     }
-    }catch(e){console.warn("SERVICE_SC_FAILED",entry.id,String(e?.message||e));}
-    if(!found){
-     const delta=measuredProviderDelta(totalsCache.tracks[entry.id],chosen,"mystreamcount");
-     if(delta){
-      found={id:entry.id,daily:delta.daily,date:delta.date,method:delta.method,
-       sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-total-delta",
-       matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
-      stats.siteCounterDelta++;
-     }
-    }
-    if(!found){
-     const delta=measuredProviderDelta(totalsCache.tracks[entry.id],chosen,"soundcamps");
-     if(delta)found={id:entry.id,daily:delta.daily,date:delta.date,method:delta.method,
-      sourceUrl:"https://soundcamps.com/spotify-stream-checker/",metric:"soundcamps-total-delta",
-      trackUrl:"https://open.spotify.com/track/"+entry.id,
-      matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
     }
     if(found){
      t._site=found;
      usedIds.add(found.id);
-     if(found.metric.startsWith("mystreamcount-"))stats.sitePrimary++;
-     else stats.soundcampsDelta++;
     }else{countFallback(t);}
    }
   }catch(e){
    console.warn("SERVICE_TRACK_FAILED",JSON.stringify([t.title,String(e?.message||e)]));
   }
-  await sleep(700);
+  await sleep(250);
  }
  /* Калибровка шкалы: медиана отношения официальное/сайтовое по пересечению. */
  const pairs=[];
@@ -413,7 +412,7 @@ let old=null;try{old=load("apple-spotify-streams.json");}catch{}
 const decision=shouldPublishSeed({previousDate:old?.schema===3?old.spotifyDate:null,
  candidateDate:chosen,lastPublishedAt:old?.schema===3?old.capturedAt:null,
  nowMs:Date.now(),forced:process.env.TRI_FORCE_PUBLISH==="1"});
-let siteStats={processed:0,sitePrimary:0,soundcampsDelta:0,officialKept:0,unresolved:0,monitor:null};
+let siteStats={processed:0,sitePrimary:0,myscFallback:0,soundcampsDelta:0,officialKept:0,unresolved:0,monitor:null};
 if(decision.publish){
  siteStats=await applySiteStreams();
  /* Preserve verified site measurements across rate-limited retries for the
@@ -425,11 +424,11 @@ if(decision.publish){
    const p=prior.get(key);
    /* Exact ID, known source, genuinely measured and within the existing
       three-day freshness window. Missing measurements are NOT invented. */
-   if(!p||!String(p.metric||"").startsWith("mystreamcount-")||
-      !verifiedSpotifyRow(p,chosen))continue;
+   const priorSite=/^(?:soundcamps-|mystreamcount-)/.test(String(p?.metric||""));
+   if(!p||!priorSite||!verifiedSpotifyRow(p,chosen))continue;
    if(t.spotify?.status==="matched" &&
       (t.spotify.spotifyId!==p.spotifyId||old.spotifyDate<chosen))continue;
-   if(!String(t.spotify?.metric||"").startsWith("mystreamcount-")){
+   if(!/^(?:soundcamps-|mystreamcount-)/.test(String(t.spotify?.metric||""))){
     t.spotify={...p};recovered++;
    }
   }
@@ -457,12 +456,12 @@ const payload={schema:3,methodology:TRI_METHOD,
   A:{source:global.source,url:global.sourceUrl,rows:global.tracks.length},
   S:{source:spotify.source,url:spotify.sourceUrl,rows:spotify.tracks.length}
  },
- streamSource:"mystreamcount-daily+soundcamps-totals+kworb-emergency",
+ streamSource:"soundcamps-totals-primary+mystreamcount-fallback+kworb-emergency",
  sourceSizes:{U:us.tracks.length,A:global.tracks.length,S:spotify.tracks.length},
  coverage:{candidates:tracks.length,matched,unmatched:tracks.length-matched,
   spotifyChart:200,artistRecovered:recovered,artistPages:pages.size,artistErrors,
   siteRecovered:siteStats.sitePrimary,soundcampsDeltas:siteStats.soundcampsDelta,
-  officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
+  myscFallback:siteStats.myscFallback,officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
   calibration:totalsCache.calibration,monitor:siteStats.monitor},
  tracks};
 if(!verifiedTriSeed(payload)){
@@ -492,7 +491,7 @@ console.log("TRI_SOURCE_DATE_ALIGNED",JSON.stringify({
  candidates:tracks.length,matched,missing:tracks.length-matched,
  artistRecovered:recovered,appleSource:us.source,
  siteRecovered:siteStats.sitePrimary,soundcampsDeltas:siteStats.soundcampsDelta,
- officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
+ myscFallback:siteStats.myscFallback,officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
  rejected:siteStats.rejected,myscBlocked:siteStats.myscBlocked,
  calibration:totalsCache.calibration,monitor:siteStats.monitor,
  published:Boolean(changed&&decision.publish),

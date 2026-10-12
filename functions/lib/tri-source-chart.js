@@ -27,13 +27,13 @@ export function verifiedSpotifyRow(s,date){
  if(!s||s.status!=="matched"||!Number.isSafeInteger(s.daily)||s.daily<0||
   !/^[A-Za-z0-9]{22}$/.test(s.spotifyId||""))return false;
  if(["mystreamcount-daily-delta","mystreamcount-total-delta"].includes(s.metric))
-  /* Главный канал: измеренная дневная дельта публичного счётчика (сайт).
-     Принимаем только с флагом estimated и датой замера в пределах трёх дней. */
+  /* Резервный сайт: MyStreamCount используется только когда основной
+     SoundCamps ещё не имеет пары totals для измеренной дневной дельты. */
   return s.estimated===true&&/^https:\/\/www\.mystreamcount\.com\/track\/[A-Za-z0-9]{22}$/.test(s.sourceUrl||"")&&
    s.sourceUrl.endsWith("/"+s.spotifyId)&&freshDay(s.date,Date.parse(date+"T00:00:00Z"),3);
  if(s.metric==="soundcamps-total-delta")
-  /* Страховка №2: дельта снимков точных сумм.
-     Источник — checker-страница, трек проверяется по trackUrl. */
+  /* Главный сайтовый канал: SoundCamps total snapshots. Дневное число —
+     только измеренная дельта двух реальных дат; trackUrl фиксирует запись. */
   return s.estimated===true&&(s.sourceUrl||"")==="https://soundcamps.com/spotify-stream-checker/"&&
    String(s.trackUrl||"").endsWith("/"+s.spotifyId)&&freshDay(s.date,Date.parse(date+"T00:00:00Z"),3);
  if(s.metric==="kworb-track-global-daily")

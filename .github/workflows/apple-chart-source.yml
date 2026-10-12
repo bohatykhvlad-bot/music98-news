@@ -10,10 +10,11 @@ on:
       - "functions/lib/tri-source-chart.js"
       - "functions/lib/chart-history.js"
       - "functions/lib/publish-window.js"
+      - "functions/lib/stream-fallback.js"
       - "tests/chart-publication-cadence.test.mjs"
+      - "tests/stream-source-fallback.test.mjs"
       - "scripts/backfill-chart-history.mjs"
       - "scripts/prune-chart-history.mjs"
-      - "public/data/chart-history/**"
       - "tests/tri-source-chart.test.mjs"
       - "tests/tri-source-worker-integration.test.mjs"
       - "scripts/resolve-tri-apple-media.mjs"
@@ -27,15 +28,19 @@ permissions:
   actions: write
 concurrency:
   group: apple-chart-source
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   fetch-apple:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
       - name: Fetch paired verified Apple Music USA and Global Top 100
         run: node scripts/refresh-apple-ranking.mjs
       - name: Build union of THREE sources from the latest common source date
@@ -46,48 +51,66 @@ jobs:
         run: node --test tests/tri-source-*.test.mjs tests/chart-history.test.mjs tests/chart-publication-cadence.test.mjs tests/stream-source-fallback.test.mjs
       - name: Retain only 14 days of dated source snapshots
         run: node scripts/prune-chart-history.mjs
-      - name: Commit verified snapshots without discarding the successful collection
+      - name: Preserve the verified collection before any Git push
+        run: |
+          tar -czf /tmp/music98-chart-sources.tgz             public/data/apple-chart.json             public/data/apple-us-chart.json             public/data/apple-spotify-streams.json             public/data/chart-history
+      - name: Upload verified source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: chart-sources-${{ github.run_id }}
+          path: |
+            public/data/apple-chart.json
+            public/data/apple-us-chart.json
+            public/data/apple-spotify-streams.json
+            public/data/chart-history/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Commit verified snapshots without recollecting on push conflicts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           git config user.name "music98 apple chart bot"
           git config user.email "actions@users.noreply.github.com"
-          # The already verified in-memory collection may contain hundreds
-          # of Spotify measurements. Never throw it away before the first push:
-          # a second crawl can hit HTTP 429 and corrupt coverage.
-          git add -A public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json public/data/chart-history/
-          if git diff --cached --quiet; then
-            echo "Current main already has matching verified sources"
-            exit 0
-          fi
-          git commit -m "chart: matching-date Apple USA Global Spotify 40-30-30 edition"
+          BASE="$GITHUB_SHA"
+          SOURCES=(
+            scripts/refresh-apple-ranking.mjs
+            scripts/refresh-apple-spotify-streams.mjs
+            functions/lib/apple-spotify-chart.js
+            functions/lib/apple-us-hybrid.js
+            functions/lib/tri-source-chart.js
+            functions/lib/chart-history.js
+            functions/lib/publish-window.js
+            functions/lib/stream-fallback.js
+          )
+          publish() {
+            git add -A public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json public/data/chart-history/
+            if git diff --cached --quiet; then
+              echo "Current main already has matching verified sources"
+              return 2
+            fi
+            git commit -m "chart: matching-date Apple USA Global Spotify 40-30-30 edition"
+            git push origin HEAD:main
+          }
           for n in 1 2 3 4 5; do
-            if git push origin HEAD:main; then
+            if publish; then
               gh workflow run apple-data.yml --ref main
               gh workflow run verify-tri-live.yml --ref main
               gh workflow run chart-browser-smoke.yml --ref main
               exit 0
+            else
+              code=$?
+              if [ "$code" -eq 2 ]; then exit 0; fi
             fi
-            echo "Concurrent chart snapshot push; trying to rebase verified files ($n/5)"
+            echo "Concurrent main update; reapplying the already verified snapshot ($n/5)"
             git fetch origin main
-            # A clean rebase preserves ALL collected and validated song data.
-            if git rebase origin/main; then
-              continue
-            fi
-            # Only conflicting writes force a re-collection, never a routine push.
-            git rebase --abort || true
-            git reset --hard origin/main
-            node scripts/refresh-apple-ranking.mjs
-            node scripts/refresh-apple-spotify-streams.mjs
-            node scripts/resolve-tri-apple-media.mjs
-            node --test tests/tri-source-*.test.mjs tests/chart-history.test.mjs tests/chart-publication-cadence.test.mjs tests/stream-source-fallback.test.mjs
-            node scripts/prune-chart-history.mjs
-            git add -A public/data/apple-chart.json public/data/apple-us-chart.json public/data/apple-spotify-streams.json public/data/chart-history/
-            if git diff --cached --quiet; then
-              echo "Concurrent publisher already saved an identical edition"
+            if ! git diff --quiet "$BASE" origin/main -- "${SOURCES[@]}"; then
+              echo "Chart source code changed during this run; discard stale output. New code has its own run."
               exit 0
             fi
-            git commit -m "chart: matching-date three-source edition after conflict"
+            git reset --hard origin/main
+            tar -xzf /tmp/music98-chart-sources.tgz
+            sleep 4
           done
-          echo "Concurrent chart source publish conflicts exhausted"
+          echo "Could not publish the verified chart snapshot after five retries" >&2
           exit 1

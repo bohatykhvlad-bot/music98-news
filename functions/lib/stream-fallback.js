@@ -8,6 +8,7 @@ import {artistKey,titleKey} from "./apple-spotify-chart.js";
 import {versionSignature} from "./chart-identity.js";
 
 export const FALLBACK_WINDOW_DAYS = 3;
+export const STREAM_PROVIDER_PRIORITY = Object.freeze(["soundcamps","mystreamcount"]);
 
 const NOISE = /karaoke|instrumental|lullaby|originally performed|cover version|tribute band/i;
 const norm = s => String(s || "").trim();
