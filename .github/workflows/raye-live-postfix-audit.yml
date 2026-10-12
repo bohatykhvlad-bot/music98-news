@@ -1,0 +1,44 @@
+name: RAYE live read-only prose inspection
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths:
+      - .github/workflows/raye-live-postfix-audit.yml
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read currently published RAYE article without making any changes
+        shell: python
+        run: |
+          import re,sys,hashlib
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          p=next((p for p in desk_read()['posts'] if p.get('id')=='raye26royalalbertsymphony'),None)
+          if not p or p.get('status')!='live':raise SystemExit('RAYE_POST_NOT_LIVE')
+          body=p.get('body') or ''
+          media=re.findall(r'\[(?:photo|youtube|apple|tiktok|instagram|ig):[^\]]+\]',body,re.I)
+          paragraphs=body.split('\n\n')
+          assert len(media)==1
+          print('RAYE_LIVE_SHA256='+hashlib.sha256(body.encode()).hexdigest())
+          print('RAYE_LIVE_TITLE='+str(p.get('title')))
+          print('RAYE_LIVE_EXCERPT='+str(p.get('excerpt')))
+          print('RAYE_LIVE_WORDS='+str(len(re.findall(r"\b[\w’'-]+\b",body))))
+          print('RAYE_HAS_OLD_POLYDOR='+str('little creative control at Polydor' in body))
+          print('RAYE_HAS_EXPLAINED_POLYDOR='+str('her record label, Polydor' in body))
+          print('RAYE_VIDEO_AFTER_PARAGRAPH='+str(paragraphs.index(media[0])))
+          print('RAYE_COVER_SRC='+str((p.get('cover') or {}).get('src')))
+          print('RAYE_COVER_CREDIT_URL='+str((p.get('cover') or {}).get('creditUrl')))
+          print('RAYE_LIVE_BODY_BEGIN')
+          print(body)
+          print('RAYE_LIVE_BODY_END')

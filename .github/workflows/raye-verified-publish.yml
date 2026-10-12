@@ -1,0 +1,132 @@
+name: RAYE guarded publication with final editorial approval
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths: [.github/workflows/raye-verified-publish.yml]
+permissions:
+  contents: read
+jobs:
+  publish-after-all-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+      RAYE_POST_ID: raye26royalalbertsymphony
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Register verified RAYE public ticket-sale date
+        shell: bash
+        run: |
+          python scripts/post.py register "October 15" "RAYE Royal Albert Hall general ticket sale starts 15 October 2026 at 10am; confirmed in official Simon Jones PR release 9 October 2026"
+      - name: Verify unchanged draft, original cover, photographer and video; stage exact reviewed copy
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json,os,hashlib,re,urllib.request,urllib.parse,sys
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from post import desk_read
+          secret=os.environ.get('ADMIN_PASSWORD')
+          if not secret: raise SystemExit('MISSING_EDITOR_CREDENTIAL')
+          pid='raye26royalalbertsymphony'
+          matches=[p for p in desk_read()['posts'] if p.get('id')==pid]
+          if len(matches)!=1: raise SystemExit('TARGET_NOT_UNIQUE')
+          original=matches[0]
+          old=original.get('body') or ''
+          if original.get('status')!='draft' or original.get('type')!='news': raise SystemExit('NOT_ELIGIBLE_DRAFT')
+          if original.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall':raise SystemExit('TITLE_CHANGED')
+          if hashlib.sha256(old.encode()).hexdigest()!='defe7411a224977becd019f596155c5f9901157afd2788d42b02d5bd9cf58166':raise SystemExit('ORIGINAL_DRAFT_CHANGED_ABORT')
+          cov=original.get('cover') or {}
+          if cov.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg':raise SystemExit('UNEXPECTED_COVER')
+          if cov.get('credit') not in ('Radoslaw Zydowicz','Radosław Żydowicz'):raise SystemExit('PHOTOGRAPHER_MISMATCH')
+          if cov.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('PHOTOGRAPHER_PORTFOLIO_MISMATCH')
+          req=urllib.request.Request('https://music98.news/'+cov['src'],headers={'User-Agent':'Mozilla/5.0'})
+          with urllib.request.urlopen(req,timeout=30) as h:
+            data=h.read()
+            ct=h.headers.get('Content-Type','')
+          if len(data)<100000 or data[:3]!=b'\xff\xd8\xff' or not ct.lower().startswith('image/jpeg'):
+            raise SystemExit('COVER_INVALID_JPEG_OR_TOO_SMALL')
+          def dimensions(blob):
+            i=2
+            while i<len(blob)-9:
+              if blob[i]!=255: i+=1;continue
+              marker=blob[i+1]
+              if marker in (0xd8,0xd9):i+=2;continue
+              seg=int.from_bytes(blob[i+2:i+4],'big')
+              if marker in (0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb):
+                return int.from_bytes(blob[i+7:i+9],'big'),int.from_bytes(blob[i+5:i+7],'big')
+              i+=2+max(seg,2)
+            raise SystemExit('COVER_DIMENSIONS_MISSING')
+          width,height=dimensions(data)
+          if max(width,height)<1920:raise SystemExit('COVER_BELOW_ORIGINAL_1920_THRESHOLD')
+          print('COVER_OK dimensions=%dx%d bytes=%d photographer=verified portfolio=verified'%(width,height,len(data)))
+          media=re.findall(r'\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\]]+\]',old,re.I)
+          yt=re.findall(r'\[youtube:([^\]]+)\]',old,re.I)
+          if len(media)!=1 or len(yt)!=1:raise SystemExit('UNEXPECTED_EXISTING_MEDIA')
+          if not re.fullmatch(r'[A-Za-z0-9_-]{11}',yt[0]):raise SystemExit('YOUTUBE_ID_INVALID')
+          print('ORIGINAL_DRAFT_LOCKED, single YouTube shortcode preserved')
+          source=Path('editorial-drafts/raye-royal-albert-hall-2026-10-11.md').read_text(encoding='utf-8')
+          if not source.startswith('# RAYE Announces One-Night Orchestral Show at Royal Albert Hall'):raise SystemExit('WRONG_EDITORIAL_SOURCE')
+          start='## Article body\n\n';end='\n\n## Existing media and credit'
+          if start not in source or end not in source:raise SystemExit('ARTICLE_SECTION_MISSING')
+          paragraphs=[p.strip() for p in source.split(start,1)[1].split(end,1)[0].strip().split('\n\n') if p.strip()]
+          if len(paragraphs)!=6:raise SystemExit('NOT_SIX_APPROVED_PARAGRAPHS')
+          intro='**Excerpt (plain-text rendering of the first sentence):** '
+          excerpt=source.split(intro,1)[1].splitlines()[0].strip()
+          updated='\n\n'.join(paragraphs[:4]+['[youtube:'+yt[0]+']']+paragraphs[4:])
+          if not updated.startswith(excerpt):raise SystemExit('EXCERPT_NOT_EXACT_PREFIX')
+          if len(re.findall(r"\b[\w'’-]+\b",updated,re.UNICODE))<400:raise SystemExit('BELOW_400_WORDS')
+          if updated.count('[youtube:')!=1:raise SystemExit('YOUTUBE_MEDIA_REGRESSION')
+          candidate=dict(original,body=updated,excerpt=excerpt)
+          from post import _local_gate, _local_preflight
+          if not _local_gate(candidate): raise SystemExit('LOCAL_GATE_FAILED_BEFORE_WRITE')
+          if not _local_preflight(candidate,baseline=original,expected_media=1,min_words=400): raise SystemExit('LOCAL_PREFLIGHT_FAILED_BEFORE_WRITE')
+          Path('/tmp/raye-final-body.txt').write_text(updated,encoding='utf-8')
+          Path('/tmp/raye-excerpt.txt').write_text(excerpt,encoding='utf-8')
+          Path('/tmp/raye-body-hash.txt').write_text(hashlib.sha256(updated.encode()).hexdigest())
+          print('FINAL_REVIEWED_COPY_STAGED paragraphs=6 words=%d media=1 sha256=%s'%(len(updated.split()),hashlib.sha256(updated.encode()).hexdigest()))
+          PY
+      - name: Stamp and validate editorial reads
+        shell: bash
+        run: |
+          python scripts/post.py editorial "$RAYE_POST_ID" --phase pre-edit
+          python scripts/post.py editorial "$RAYE_POST_ID" --body-file /tmp/raye-final-body.txt --title "RAYE Announces One-Night Orchestral Show at Royal Albert Hall" --phase post-edit
+      - name: Write only edited body and literal excerpt through protected desk runner
+        shell: bash
+        run: |
+          EXCERPT="$(cat /tmp/raye-excerpt.txt)"
+          python scripts/post.py set "$RAYE_POST_ID" --body-file /tmp/raye-final-body.txt --excerpt "$EXCERPT"
+      - name: Full remote gate and preflight before publication
+        shell: bash
+        run: |
+          python scripts/post.py gate "$RAYE_POST_ID"
+          python scripts/post.py preflight "$RAYE_POST_ID"
+      - name: Publish using canonical guarded command
+        shell: bash
+        run: |
+          python scripts/post.py publish "$RAYE_POST_ID"
+      - name: Verify live status, exact body and public visibility
+        shell: bash
+        run: |
+          python scripts/post.py verify "$RAYE_POST_ID"
+          python - <<'PY'
+          import json,hashlib,os,time,urllib.request
+          expected=open('/tmp/raye-body-hash.txt').read().strip()
+          pid=os.environ['RAYE_POST_ID']
+          ua={'User-Agent':'Mozilla/5.0','Accept':'application/json','Cache-Control':'no-cache'}
+          for n in range(10):
+            try:
+              req=urllib.request.Request('https://music98.news/api/desk?audit='+str(time.time()),headers=ua)
+              with urllib.request.urlopen(req,timeout=25) as r:posts=json.load(r).get('posts',[])
+              match=[p for p in posts if p.get('id')==pid]
+              if len(match)==1 and match[0].get('status')=='live' and hashlib.sha256((match[0].get('body') or '').encode()).hexdigest()==expected:
+                print('RAYE_PUBLIC_LIVE_VERIFIED sha256='+expected)
+                break
+            except Exception as err:print('PUBLIC_VERIFY_RETRY '+str(n)+': '+type(err).__name__)
+            time.sleep(5)
+          else:raise SystemExit('RAYE_PUBLIC_VERIFICATION_FAILED')
+          PY

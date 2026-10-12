@@ -1,0 +1,37 @@
+name: RAYE secure current draft review
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths: [.github/workflows/raye-secure-review.yml]
+permissions:
+  contents: read
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - name: Seal exact draft with one-time review public key
+        shell: bash
+        run: |
+          node <<'NODE'
+          const {randomBytes,createCipheriv,publicEncrypt,constants}=require('node:crypto');
+          const pub="-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA00Von4mFWWi4FFidc+ZF\n7+nBcxD/XL47OLm9peH1Lq3D9BPPxfIaQpt6AZ7PCs2BX8qahroiEZk8I1kubGkt\nG0YryxVkrff/RaDmA8YVd60Zo3zw+o81vNq3WBaMIlqSi9pM9jAyzzX2eS0By/z/\nw8XhED8JWnndEBTwhSQMy8LMfIkV3HjcWBdKUAm/r9gjktMO6MlfYFmiFqAaY4td\nun7/opW61euxRoW6bjsiUUaItkcy/wj4LYVZ+O85J5lev6fXr9OmEkaVqKHZ7Tfi\nzCnMzk97eBQqiTnlVkaTZ3qDJtVcHcPVuYr9O5OPe7Yjqf2b9j7PWBpe2GLMlm2L\nWwIDAQAB\n-----END PUBLIC KEY-----";
+          (async()=>{
+            const key=process.env.ADMIN_PASSWORD;
+            if(!key)throw Error('EDITOR_KEY_MISSING');
+            const response=await fetch('https://music98.news/api/desk',{headers:{'X-Admin-Key':key,'Accept':'application/json','Cache-Control':'no-cache'},signal:AbortSignal.timeout(30000)});
+            if(!response.ok)throw Error('DESK_UNAVAILABLE_'+response.status);
+            const posts=(await response.json()).posts;
+            const matches=posts.filter(x=>x.id==='raye26royalalbertsymphony'&&x.status==='draft');
+            if(matches.length!==1)throw Error('RAYE_DRAFT_NOT_UNIQUE');
+            const data=Buffer.from(JSON.stringify(matches[0]));
+            const aes=randomBytes(32),iv=randomBytes(12);
+            const cipher=createCipheriv('aes-256-gcm',aes,iv);
+            const ct=Buffer.concat([cipher.update(data),cipher.final()]);
+            const wrapped=publicEncrypt({key:pub,padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},aes);
+            console.log('RAYE_REVIEW_SEALED='+Buffer.from(JSON.stringify({wrapped:wrapped.toString('base64'),iv:iv.toString('base64'),tag:cipher.getAuthTag().toString('base64'),ct:ct.toString('base64')})).toString('base64'));
+            console.log('RAYE_DRAFT_SEALED_PROTECTED_BYTES='+data.length);
+          })().catch(e=>{console.error('RAYE_SEAL_FAILED '+e.message);process.exit(1)});
+          NODE

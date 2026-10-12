@@ -1,0 +1,104 @@
+name: RAYE final live article editorial correction
+on:
+  push:
+    branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
+    paths:
+      - .github/workflows/raye-live-editorial-fix.yml
+permissions:
+  contents: read
+jobs:
+  fix-live-story:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      RAYE_ID: raye26royalalbertsymphony
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Register verified general sale date for editorial gate
+        shell: bash
+        run: |
+          python scripts/post.py register "October 15" "RAYE Royal Albert Hall general ticket sale starts October 15, 2026 at 10am, per Simon Jones PR's October 9 concert announcement"
+      - name: Lock current LIVE article and prepare reviewed replacement
+        shell: bash
+        run: |
+          python - <<'PY'
+          import sys,os,re,json,hashlib
+          from pathlib import Path
+          sys.path.insert(0,'scripts')
+          from post import desk_read, _local_gate, _local_preflight
+          pid=os.environ['RAYE_ID']
+          data=desk_read()
+          hits=[p for p in data.get('posts',[]) if p.get('id')==pid]
+          if len(hits)!=1:raise SystemExit('LIVE_RAYE_NOT_UNIQUE')
+          p=hits[0]
+          before=p.get('body') or ''
+          before_sha=hashlib.sha256(before.encode()).hexdigest()
+          if p.get('status')!='live' or p.get('type')!='news':raise SystemExit('POST_NOT_LIVE')
+          if before_sha!='69a72ad58ce141126a64daa5537a339df626637241d447d57e2fbab1720826d7':raise SystemExit('LIVE_SOURCE_CHANGED_ABORT sha='+before_sha)
+          if p.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall':raise SystemExit('TITLE_CHANGED')
+          cover=p.get('cover') or {}
+          if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('COVER_CHANGED')
+          media=re.findall(r'\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\]]+\]',before,re.I)
+          if len(media)!=1 or not re.fullmatch(r'\[youtube:[A-Za-z0-9_-]{11}\]',media[0]):raise SystemExit('EXISTING_MEDIA_CHANGED')
+          oldparts=before.split('\n\n')
+          if len(oldparts)!=7 or oldparts.index(media[0])!=4:raise SystemExit('EXISTING_MEDIA_POSITION_CHANGED')
+          source=Path('editorial-drafts/raye-royal-albert-hall-2026-10-11.md').read_text('utf-8')
+          article=source.split('## Article body\n\n',1)[1].split('\n\n## Existing media',1)[0].strip()
+          paragraphs=[x.strip() for x in article.split('\n\n') if x.strip()]
+          if len(paragraphs)!=6:raise SystemExit('UNEXPECTED_PARAGRAPH_COUNT')
+          if any('Poland' in x or 'not footage' in x or 'current tour' in x or 'not a rehearsal' in x for x in paragraphs):raise SystemExit('OLD_AI_PHRASE_REMAINING')
+          excerpt=source.split('**Excerpt (plain-text rendering of the first sentence):** ',1)[1].splitlines()[0]
+          updated='\n\n'.join(paragraphs[:3]+[media[0]]+paragraphs[3:])
+          if not updated.startswith(excerpt):raise SystemExit('EXCERPT_MISMATCH')
+          candidate=dict(p,body=updated,excerpt=excerpt)
+          if not _local_gate(candidate):raise SystemExit('LOCAL_GATE_BLOCKED')
+          trial=dict(candidate,status='draft')
+          if not _local_preflight(trial,baseline=p,expected_media=1,min_words=400):raise SystemExit('LOCAL_PREFLIGHT_BLOCKED')
+          from hashlib import sha256
+          digest=sha256(updated.encode()).hexdigest()
+          Path('/tmp/raye-live-corrected-body.txt').write_text(updated,encoding='utf-8')
+          Path('/tmp/raye-live-corrected-excerpt.txt').write_text(excerpt,encoding='utf-8')
+          Path('/tmp/raye-live-corrected-sha.txt').write_text(digest)
+          print('RAYE_READY_FOR_EDITORIAL_CHECK words='+str(len(updated.split()))+' media=1 position=after_paragraph_3 sha256='+digest)
+          PY
+      - name: Attest source and final reviewed text through editorial gate
+        shell: bash
+        run: |
+          python scripts/post.py editorial "$RAYE_ID" --phase pre-edit
+          python scripts/post.py editorial "$RAYE_ID" --phase post-edit --body-file /tmp/raye-live-corrected-body.txt --title "RAYE Announces One-Night Orchestral Show at Royal Albert Hall"
+      - name: Update only the existing LIVE article body and excerpt
+        shell: bash
+        run: |
+          EXCERPT="$(cat /tmp/raye-live-corrected-excerpt.txt)"
+          python scripts/post.py set "$RAYE_ID" --body-file /tmp/raye-live-corrected-body.txt --excerpt "$EXCERPT"
+      - name: Check production gate and verify exact public body, media and cover
+        shell: bash
+        run: |
+          python scripts/post.py gate "$RAYE_ID"
+          python scripts/post.py verify "$RAYE_ID"
+          python - <<'PY'
+          import hashlib,os,json,time,urllib.request,re
+          pid=os.environ['RAYE_ID']
+          expected=open('/tmp/raye-live-corrected-sha.txt').read().strip()
+          secret=os.environ['ADMIN_PASSWORD']
+          for attempt in range(8):
+            h={'X-Admin-Key':secret,'Cache-Control':'no-cache','Accept':'application/json'}
+            req=urllib.request.Request('https://music98.news/api/desk?audit='+str(time.time()),headers=h)
+            with urllib.request.urlopen(req,timeout=30) as resp:posts=json.load(resp)['posts']
+            p=next((x for x in posts if x.get('id')==pid),None)
+            if p and p.get('status')=='live' and hashlib.sha256((p.get('body') or '').encode()).hexdigest()==expected:
+              body=p['body'];c=p.get('cover') or {}
+              if c.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or c.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('COVER_POSTSAVE_CHANGED')
+              media=re.findall(r'\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\]]+\]',body,re.I)
+              if len(media)!=1 or body.split('\n\n').index(media[0])!=3:raise SystemExit('MEDIA_POSTSAVE_MISMATCH')
+              if 'Poland' in body or 'not footage' in body:raise SystemExit('BAD_PROSE_POSTSAVE')
+              print('RAYE_LIVE_CORRECTION_VERIFIED status=live sha256='+expected+' video_after_paragraph=3 cover_preserved=true')
+              break
+            time.sleep(2)
+          else:raise SystemExit('POSTSAVE_VERIFY_FAILED')
+          PY

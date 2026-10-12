@@ -48,6 +48,8 @@ A post fails if:
 - a sentence only explains what the previous sentence already showed;
 - research residue becomes prose: names, dates, venues, tracks, guests, credits;
 - the same artist name/surname is repeated mechanically;
+- a previous concert, record, career dispute or breakthrough is reintroduced in another paragraph without adding a distinct, verified fact;
+- the ending repeats the opening announcement or an earlier comparison instead of landing on new reporting;
 - the article follows a press-release template instead of an editorial idea;
 - the ending summarizes the article instead of ending it;
 - minor metadata appears after the story has already peaked;
