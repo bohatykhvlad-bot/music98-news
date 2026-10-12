@@ -71,7 +71,7 @@ export function parseMusicrankSpotify(html,limit=SPOTIFY_INPUT_SIZE){
   if(!artist)throw new Error("musicrank_artist_missing_"+(tracks.length+1));
   const flat=textOf(context),stream=flat.match(/([\d.]+)\s*([KMB]?)\s*streams\b/i);
   const daily=stream?compactStreams(stream[1],stream[2]):null;
-  if(!daily)throw new Error("musicrank_streams_missing_"+(tracks.length+1));
+  if(!daily)throw new Error("musicrank_streams_missing_"+(tracks.length+1)+":"+title+":"+flat.slice(0,700));
   seen.add(url);tracks.push({pos:tracks.length+1,title,artist:textOf(artist[1]),daily});
  }
  const verified=validatedSpotifyRows(tracks,limit);
