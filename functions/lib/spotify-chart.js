@@ -58,52 +58,32 @@ export function parseMusicrankSpotify(html,limit=SPOTIFY_INPUT_SIZE){
   .find(x=>x?.["@type"]==="ItemList"&&/Spotify/i.test(String(x.name||"")));
  const expected=ld?.itemListElement;
  if(!Array.isArray(expected)||expected.length<20)throw new Error("musicrank_top20_metadata_missing");
- const from=h.indexOf("<main"),to=h.indexOf("</main>",from);
- if(from<0||to<from)throw new Error("musicrank_chart_body_missing");
- const main=h.slice(from,to),tracks=[],seen=new Set();
- const re=/<a\b[^>]*href=["'](\/track\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;let m;
- while((m=re.exec(main))&&tracks.length<limit){
-  const url=m[1],title=textOf(m[2]);if(!title||seen.has(url))continue;
-  const next=main.slice(re.lastIndex,re.lastIndex+3200);
-  const boundary=next.search(/<a\b[^>]*href=["']\/track\//i);
-  const context=boundary<0?next:next.slice(0,boundary);
-  const artist=context.match(/<a\b[^>]*href=["']\/artist\/[^"']+["'][^>]*>([\s\S]*?)<\/a>/i);
-  if(!artist)throw new Error("musicrank_artist_missing_"+(tracks.length+1));
-  const flat=textOf(context),stream=flat.match(/([\d.]+)\s*([KMB]?)\s*streams\b/i);
-  const daily=stream?compactStreams(stream[1],stream[2]):null;
-  if(!daily)throw new Error("musicrank_streams_missing_"+(tracks.length+1));
-  seen.add(url);tracks.push({pos:tracks.length+1,title,artist:textOf(artist[1]),daily});
- }
- if(tracks.length!==limit){
-  const direct=h.indexOf('"rank":131'),escaped=h.indexOf('\\\"rank\\\":131');
-  const at=Math.max(direct,escaped);
-  throw new Error("musicrank_visible_rows_"+tracks.length+":"+h.slice(Math.max(0,at),at<0?1200:at+1800));
- }
- const verified=validatedSpotifyRows(tracks,limit);
- const ids=new Map();
+
+ const rows=new Map();
  for(const script of h.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)){
   const call=script[1].match(/^self\.__next_f\.push\(([\s\S]*)\)\s*;?$/);
   if(!call)continue;
   let chunk;try{chunk=JSON.parse(call[1])?.[1];}catch{continue;}
   if(typeof chunk!=="string")continue;
-  for(const row of chunk.matchAll(/\{"rank":(\d+),"title":("(?:\\.|[^"\\])*"),"artist":("(?:\\.|[^"\\])*"),"credits":\[[\s\S]*?\],"sourceEntityId":"([A-Za-z0-9]{22})"/g)){
-   const pos=Number(row[1]);if(pos<1||pos>limit)continue;
-   const title=JSON.parse(row[2]),artist=JSON.parse(row[3]);
-   if(mergeKey(title,artist)!==mergeKey(verified[pos-1]?.title,verified[pos-1]?.artist))
-    throw new Error("musicrank_serialized_identity_mismatch_"+pos);
-   ids.set(pos,row[4]);
+  const re=/\{"rank":(\d+),"title":("(?:\\.|[^"\\])*"),"artist":("(?:\\.|[^"\\])*"),"credits":\[[\s\S]*?\],"sourceEntityId":"([A-Za-z0-9]{22})","isrc":(?:null|"(?:\\.|[^"\\])*"),"value":"(\d+)"/g;
+  for(const m of chunk.matchAll(re)){
+   const pos=Number(m[1]);if(pos<1||pos>limit)continue;
+   const row={pos,title:JSON.parse(m[2]),artist:JSON.parse(m[3]),spotifyId:m[4],daily:Number(m[5])};
+   const prev=rows.get(pos);
+   if(prev&&JSON.stringify(prev)!==JSON.stringify(row))throw new Error("musicrank_duplicate_rank_"+pos);
+   rows.set(pos,row);
   }
  }
- if(ids.size&&ids.size!==limit)throw new Error("musicrank_partial_spotify_ids");
- verified.forEach(t=>{if(ids.has(t.pos))t.spotifyId=ids.get(t.pos);});
+ if(rows.size!==limit)throw new Error("musicrank_serialized_rows_"+rows.size+"_of_"+limit);
+ const tracks=validatedSpotifyRows(Array.from({length:limit},(_,i)=>rows.get(i+1)),limit);
  for(let i=0;i<20;i++){
   const record=expected[i];
   if(Number(record?.position)!==i+1||
    mergeKey(record?.item?.name,record?.item?.byArtist?.name)!==
-   mergeKey(verified[i].title,verified[i].artist))
+   mergeKey(tracks[i].title,tracks[i].artist))
    throw new Error("musicrank_metadata_mismatch_"+(i+1));
  }
- return {date,source:"musicrank",sourceUrl:"https://musicrank.org/spotify",ldConfirmed:20,tracks:verified};
+ return {date,source:"musicrank",sourceUrl:"https://musicrank.org/spotify",ldConfirmed:20,tracks};
 }
 export function verifiedSpotifySnapshot(s,now=Date.now()){
  if(s?.schema!==1||s.verified!==true||s.provider!=="musicrank"||
