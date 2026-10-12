@@ -1,0 +1,37 @@
+name: Temporary RAYE editorial inspection
+on:
+  push:
+    paths:
+      - .github/workflows/temporary-raye-inspection.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Read public RAYE article only
+        run: |
+          node <<'NODE'
+          (async () => {
+            const resp = await fetch("https://music98.news/api/desk?editorialcheck="+Date.now(), {
+              headers: {"User-Agent":"Mozilla/5.0","Cache-Control":"no-cache"},
+              signal: AbortSignal.timeout(25000)
+            });
+            if(!resp.ok) throw new Error("PUBLIC_DESK_HTTP_"+resp.status);
+            const json=await resp.json();
+            const matches=(json.posts||[]).filter(p=>/raye|this music may contain hope|hans zimmer|click clack symphony/i.test([p.artist,p.title,p.excerpt,p.body].join(" ")) && p.status==="live");
+            if(!matches.length) throw new Error("RAYE_LIVE_POST_NOT_FOUND");
+            for(const post of matches) {
+              console.log("=== RAYE LIVE POST START ===");
+              console.log("ID: "+post.id);
+              console.log("TITLE: "+post.title);
+              console.log("STATUS: "+post.status);
+              console.log("EXCERPT: "+post.excerpt);
+              console.log("BODY:");
+              console.log(post.body);
+              console.log("=== RAYE LIVE POST END ===");
+            }
+          })().catch(e=>{console.error(e.message);process.exit(1)});
+          NODE
