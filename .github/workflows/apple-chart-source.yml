@@ -49,6 +49,42 @@ jobs:
         run: node scripts/refresh-apple-ranking.mjs
       - name: Build union of THREE sources from the latest common source date
         run: node scripts/refresh-apple-spotify-streams.mjs
+      - name: Preserve real Spotify ID and stream observations even if publication is blocked
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/chart-measurement-recovery
+          for file in public/data/chart-history/spotify-ids.json public/data/chart-history/stream-totals.json; do
+            if [ -f "$file" ]; then
+              mkdir -p "/tmp/chart-measurement-recovery/$(dirname "$file")"
+              cp "$file" "/tmp/chart-measurement-recovery/$file"
+            fi
+          done
+          git config user.name "music98 chart measurement bot"
+          git config user.email "actions@users.noreply.github.com"
+          for n in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            for file in public/data/chart-history/spotify-ids.json public/data/chart-history/stream-totals.json; do
+              if [ -f "/tmp/chart-measurement-recovery/$file" ]; then
+                cp "/tmp/chart-measurement-recovery/$file" "$file"
+              fi
+            done
+            git add public/data/chart-history/spotify-ids.json public/data/chart-history/stream-totals.json
+            if git diff --cached --quiet; then
+              echo "Spotify observations already preserved"
+              break
+            fi
+            git commit -m "chart: retain verified site observations without publishing incomplete Top 50"
+            if git push origin HEAD:main; then
+              echo "Cached stream measurements safely retained"
+              break
+            fi
+            sleep 3
+          done
       - name: Prepare verified Apple media for Spotify-only Top 50 entrants
         run: node scripts/resolve-tri-apple-media.mjs
       - name: Validate three-source identity, weights, rank continuity and Spotify numbers
