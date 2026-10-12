@@ -6,28 +6,30 @@
 
 ## Article body
 
-RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album. Titled *This Symphony May Contain Hope.*, the show will bring together her band, the Heritage Orchestra and Flames Collective choir. Several songs from the album were already part of her live set when the tour opened in Poland in January, giving audiences an early look at the material before its March release. Tickets go on sale October 15 at 10am.
+RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album. Titled *This Symphony May Contain Hope.*, the show will feature her band, the Heritage Orchestra and Flames Collective choir. She previewed several new songs when her tour opened in Poland in January, ahead of the record's March release. Tickets go on general sale October 15 at 10am UK time.
 
-Released in March, *This Music May Contain Hope.* is arranged around four seasons, beginning in a darker place and moving toward hope. RAYE told Apple Music she hoped listeners could turn to the songs during difficult times. For "Click Clack Symphony.", she sent Hans Zimmer a rough demo and asked whether he wanted to collaborate. They traded ideas until the finished recording included an orchestra. She later called the track "unapologetically cinematic." The album reached No. 1 in the UK.
+Released in March, the album *This Music May Contain Hope.* is divided into four seasonal chapters, moving from its darkest songs toward a more hopeful finish. RAYE told Apple Music she wanted listeners to turn to its songs during difficult times. For "Click Clack Symphony.", she sent composer Hans Zimmer a rough demo and invited him to collaborate. Their exchanges led to an orchestral recording she called "unapologetically cinematic." The record reached No. 1 in the UK.
 
-The announcement also included a new Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. During a January ELLE interview, RAYE played the then-unreleased album version and called it "big and dramatic." She described a verse in which the narrator stops hiding her pain, admits she is not okay and still believes she will get through it. On the album, the song follows a spoken introduction about a woman alone in Paris.
+The announcement included a new Abbey Road Studios performance of "I Will Overcome." with the London Symphony Orchestra. In January, RAYE played the then-unreleased studio version for ELLE, calling it "big and dramatic." She described a verse in which the narrator admits she is not okay but still believes she will get through it. The song follows a spoken introduction about a woman alone in Paris.
 
-RAYE first brought this kind of orchestral production to the Royal Albert Hall in 2023, when she rearranged songs from *My 21st Century Blues* for orchestra and choir. The concert was recorded and later released as both a live album and concert film, and a similar production followed at The O2 the next year. The film later earned a Grammy nomination. The same orchestra and choir will return for the new show in October.
+[youtube:Iy2FoVeIUXs]
 
-Before releasing an album of her own, RAYE spent years writing songs for artists including Beyoncé and Charli XCX. Polydor signed her as a teenager, but seven years passed without a full-length release despite several EPs and singles. She has said R&B was the music she wanted to make, but the label steered her toward dance-pop and gave her little creative control over her own work. After publicly criticizing the delays in 2021, she left Polydor and began releasing music independently.
+RAYE first performed at the Royal Albert Hall with an orchestra and choir in 2023, presenting new arrangements of songs from *My 21st Century Blues*. The recording was released as the live album *My 21st Century Symphony.* and a concert film, which later earned a Grammy nomination. She brought a similar format to The O2 the following year. For October's concert, she will be joined by the same orchestra and choir.
 
-In January 2023, "Escapism." with 070 Shake became her first UK No. 1 single. The song follows someone trying to numb the pain of a breakup with alcohol, drugs and nights out, a darker turn from the dance-pop singles that had defined much of her earlier career. Her debut album arrived the following month, putting jazz, soul and R&B at the center of her own music. RAYE later described the chart success as proof that backing herself had been the right decision.
+Before her breakthrough as a solo artist, RAYE spent years writing songs for artists including Beyoncé and Charli XCX. Polydor signed her as a teenager, but seven years passed without a full-length record despite several EPs and singles. She has said she wanted to make R&B, while the label pushed her toward dance-pop and gave her little creative control. In 2021, she publicly criticized the delays, left Polydor and began releasing music independently.
 
-The album's autumn chapter starts with loneliness and the belief that finding love might be enough to make it disappear. RAYE has talked about learning to spend an evening alone rather than relying on someone else to make everything better. Becoming more comfortable in her own company was not easy, but it changed how she thought about future relationships. "I don't want someone else to come and fix me," she said.
+In January 2023, "Escapism." with 070 Shake became her first UK No. 1 single. Its narrator tries to numb the pain of a breakup through alcohol, drugs and nights out, a departure from the dance-pop singles of her earlier career. Her debut, *My 21st Century Blues*, arrived the following month, putting jazz, soul and R&B at its center. She later described the chart success as confirmation that backing herself had been the right decision.
+
+On *This Music May Contain Hope.*, the autumn chapter deals with loneliness and the temptation to believe a new relationship will make it disappear. RAYE has spoken about struggling to spend time alone, then learning not to expect a partner to solve everything. She has said she wants children and a family, but first needs to be more comfortable with herself. "I don't want someone else to come and fix me," she said.
 
 ## Existing media and credit — preserve on desk sync
 
 - **Cover URL:** https://music98.news/photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg (verified accessible as a JPEG image by the live production preflight; not reuploaded).
 - **Cover photographer:** Radosław Żydowicz (also commonly credited without Polish diacritics as Radoslaw Zydowicz). Photo taken at RAYE's Łódź show on January 22, 2026; authorship cross-checked against independent published credits.
 - **Photographer credit link:** VERIFIED official photography portfolio: https://rozentuzjazmowany.pl/ (currently saved in the protected desk's cover.creditUrl). The photographer's own photography business is credited as Rozentuzjazmowany, and the site includes a first-person photographer introduction. Do not substitute an unrelated outlet link.
-- **Embedded video:** retain original in-desk RAYE "I Will Overcome. (Live at Abbey Road Studios)" YouTube embed and move it only one paragraph higher, immediately after paragraph three, leaving three substantial paragraphs after the video. The original shortcode was verified as `[youtube:Iy2FoVeIUXs]` through the protected editor and the live page; retain this ID.
+- **Embedded video:** retain the original in-desk RAYE "I Will Overcome. (Live at Abbey Road Studios)" YouTube embed immediately after paragraph three. The original shortcode was verified as `[youtube:Iy2FoVeIUXs]` through the protected editor and the live page; retain this ID.
 - **Tickets button:** none, by editorial decision.
-- **Current in-desk article:** live article ID `raye26royalalbertsymphony`, verified from the protected editor. This file mirrors the published paragraphs, excluding the in-desk YouTube shortcode inserted after paragraph three.
+- **Current in-desk article:** live article ID `raye26royalalbertsymphony`, verified from the protected editor. This file mirrors the exact published body, including the YouTube shortcode after paragraph three.
 
 ## Fact-check sources (research only; not links for the article)
 
@@ -48,5 +50,5 @@ The album's autumn chapter starts with loneliness and the belief that finding lo
 
 ## Publication gate
 
-The article is live. The protected GitHub Actions publishing workflow verified the exact body hash, preserved the original cover and video, and passed the readthrough, gate and preflight checks. This markdown file is the editorial reference; further changes require a fresh authorized desk write and post-save verification.
+The reviewed article is live. Publication was completed in https://github.com/bohatykhvlad-bot/music98-news/actions/runs/38308814072. Full source and final readthroughs, gate with media URL checks, preflight, public verification, exact body comparison and non-target post stability all passed. The published body SHA-256 is 786cd7f769fecebe52fa87fdf995664d276e894ecc2285f2421e224aef04d55e. This markdown file is the editorial reference; further changes require a fresh authorized desk write and post-save verification.
 
