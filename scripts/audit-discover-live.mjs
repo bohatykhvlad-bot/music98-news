@@ -1,52 +1,61 @@
 import fs from 'node:fs/promises';
 
 const origin='https://music98.news';
-const stamp=Date.now();
-const pages=['/', '/discover', '/releases', '/chart', '/data/discover-albums.json', '/discover-app.js'];
-const checks=[];
-const home=await fs.readFile(new URL('../public/index.html', import.meta.url), 'utf8');
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const localIndex=await fs.readFile(new URL('../public/index.html',import.meta.url),'utf8');
+const localApp=await fs.readFile(new URL('../public/discover-app.js',import.meta.url),'utf8');
 const expected={
-  darkArtist: home.includes('#tab-discover .discover-artist{font-size:17px;font-weight:600;color:var(--text)'),
-  cleanSubtitle: home.includes('An easy way to find a new album.') && !home.includes('An easy way to find something to listen to.'),
-  darkMeta: home.includes('font-size:13px;color:var(--text);margin:5px 0 0}'),
-  siteButton: home.includes('#tab-discover #discoverFind{color:var(--text);'),
-  noDuplicate: !((await fs.readFile(new URL('../public/discover-app.js', import.meta.url), 'utf8')).includes('status.textContent = album.artist +')),
-  nativeTab:home.includes('id="tab-discover"')
+ centered:localIndex.includes('#tab-discover .discover-layout{width:min(100%,470px)'),
+ heading:localIndex.includes('What should I listen to?'),
+ subtitle:localIndex.includes('An easy way to find a new album.'),
+ noLegacyGrid:!localIndex.includes('grid-template-columns:minmax(0,1fr) 660px'),
+ button:localIndex.includes('>Find an album</button>'),
+ appLabels:localApp.includes('"Find another album"')&&localApp.includes('"Find an album"'),
+ noCache:localApp.includes('cache: "no-cache"'),
+ nativeTab:localIndex.includes('id="tab-discover"'),
+ nativeApple:localIndex.includes('render: albumId => appleEmbed(albumId)')
 };
-console.log('REPOSITORY_EXPECTED',JSON.stringify(expected));
-for(const path of pages){
- try{
-  const u=origin+path+(path.includes('?')?'&':'?')+'audit='+stamp;
-  const started=Date.now();
-  const r=await fetch(u,{redirect:'manual',signal:AbortSignal.timeout(12000),headers:{'accept':'text/html,application/json,*/*'}});
-  const body=await r.text();
-  const result={path,status:r.status,ms:Date.now()-started,contentType:r.headers.get('content-type'),location:r.headers.get('location'),bytes:body.length,cache:r.headers.get('cf-cache-status'),age:r.headers.get('age')};
-  if(path==='/data/discover-albums.json'){
-   try{
-    const j=JSON.parse(body);result.rankCount=j.rankingCount;result.artistCount=j.artists?.length;
-    result.playableCount=j.artists?.filter(x=>x.albums?.length).length;
-    result.albumCount=j.artists?.reduce((n,x)=>n+(x.albums?.length||0),0);
-    result.updatedAt=j.updatedAt;result.isSample=j.isSample;
-   }catch(e){result.parseError=String(e).slice(0,120)}
-  }else if(path==='/discover-app.js'){
-   result.noDuplicate=!body.includes('status.textContent = album.artist +');
-   result.containsCachedFetcher=body.includes('/data/discover-albums.json');
-  }else{
-   result.containsDiscover=body.includes('id="tab-discover"');
-   result.darkArtist=body.includes('#tab-discover .discover-artist{font-size:17px;font-weight:600;color:var(--text)');
-   result.darkButton=body.includes('#tab-discover #discoverFind{color:var(--text)');
-   result.cleanSubtitle=body.includes('An easy way to find a new album.') && !body.includes('An easy way to find something to listen to.');
-   result.correctRouteStartup=body.includes('if(initialSectionPath || initialSectionHash){');
-   result.appleNative=body.includes('render: albumId => appleEmbed(albumId)');
-  }
-  checks.push(result);
-  console.log('LIVE_RESULT',JSON.stringify(result));
- }catch(e){
-  const x={path,error:String(e)};checks.push(x);console.log('LIVE_ERROR',JSON.stringify(x));
- }
+if(Object.values(expected).some(v=>!v)){
+ console.error('DISCOVER_REPOSITORY_EXPECTED_FAIL',JSON.stringify(expected));
+ process.exit(1);
 }
-const stale=checks.some(x=>x.path==='/discover'&& (!x.darkArtist||!x.darkButton||!x.cleanSubtitle||!x.correctRouteStartup));
-const repoMismatch=Object.values(expected).some(x=>!x);
-console.log('DISCOVER_LIVE_AUDIT',JSON.stringify({stale,repoMismatch,checks:checks.length,runDate:new Date().toISOString()}));
-// Diagnostics remain successful to avoid failing unrelated deployments while
-// Cloudflare rolls out an updated build. The output is authoritative.
+async function fetchText(path){
+ const u=origin+path+(path.includes('?')?'&':'?')+'audit='+Date.now();
+ const r=await fetch(u,{redirect:'manual',signal:AbortSignal.timeout(15000),headers:{accept:'text/html,application/json,*/*','cache-control':'no-cache'}});
+ return {status:r.status,body:await r.text()};
+}
+function validate(page,app,catalogText){
+ const result={pageStatus:page.status,appStatus:app.status,catalogStatus:catalogText.status};
+ result.centered=page.body.includes('#tab-discover .discover-layout{width:min(100%,470px)');
+ result.heading=page.body.includes('What should I listen to?');
+ result.subtitle=page.body.includes('An easy way to find a new album.');
+ result.noLegacyGrid=!page.body.includes('grid-template-columns:minmax(0,1fr) 660px');
+ result.nativeTab=page.body.includes('id="tab-discover"');
+ result.nativeApple=page.body.includes('render: albumId => appleEmbed(albumId)');
+ result.appLabels=app.body.includes('"Find another album"')&&app.body.includes('"Find an album"');
+ result.noCache=app.body.includes('cache: "no-cache"');
+ try{
+  const c=JSON.parse(catalogText.body);
+  result.schema=c.schema;result.artistCount=c.artists?.length||0;
+  result.playableCount=c.artists?.filter(a=>a.albums?.length).length||0;
+  result.albumCount=c.artists?.reduce((n,a)=>n+(a.albums?.length||0),0)||0;
+  result.isSample=c.isSample;result.updatedAt=c.updatedAt;
+ }catch(e){result.catalogParseError=String(e)}
+ result.ok=page.status===200&&app.status===200&&catalogText.status===200&&result.centered&&result.heading&&result.subtitle&&result.noLegacyGrid&&result.nativeTab&&result.nativeApple&&result.appLabels&&result.noCache&&result.schema===2&&result.artistCount===500&&result.playableCount===500&&result.isSample===false;
+ return result;
+}
+let last;
+for(let attempt=1;attempt<=8;attempt++){
+ try{
+  const [page,app,catalog]=await Promise.all([fetchText('/discover'),fetchText('/discover-app.js'),fetchText('/data/discover-albums.json')]);
+  last=validate(page,app,catalog);
+  console.log('DISCOVER_LIVE_ATTEMPT',JSON.stringify({attempt,...last}));
+  if(last.ok){console.log('DISCOVER_LIVE_AUDIT PASS');process.exit(0)}
+ }catch(e){
+  last={error:String(e)};
+  console.warn('DISCOVER_LIVE_RETRY',JSON.stringify({attempt,...last}));
+ }
+ if(attempt<8)await sleep(12000);
+}
+console.error('DISCOVER_LIVE_AUDIT FAIL',JSON.stringify(last));
+process.exit(1);

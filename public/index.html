@@ -884,77 +884,47 @@ textarea{resize:vertical;min-height:64px}
   .crow .weeks-in,.crowbtns{grid-column:span 2}
 }
 
-/* Balance the actual visible nav-to-title, title-to-player and player-to-
-   section-bottom gaps at desktop widths. JS measures the shared panel height
-   and adjusts only this section's top inset, leaving the 450px embed intact. */
-#tab-discover{padding-top:var(--discover-heading-top,var(--section-heading-top));padding-bottom:12px}
-/* The Discover canvas is extended down across the shared Subscribe top
-   margin (see discover-ambient.js measureGeometry): the next section keeps the
-   exact same offset as on Releases, and no white strip shows between the
-   ambient and the subscribe card. */
-
-#tab-discover .discover-layout{--discover-row-inset:0px;display:grid;grid-template-columns:minmax(0,1fr) 660px minmax(0,1fr);column-gap:calc(4 * var(--section-heading-gap));grid-template-rows:max-content minmax(calc(450px + var(--discover-row-inset)),1fr);align-items:start;width:100%;height:var(--discover-layout-height,auto);margin:0;padding:0}
-#tab-discover .discover-heading{grid-area:1/1/2/4;text-align:center;width:100%;margin-bottom:0}
-#tab-discover .discover-copy{grid-area:2/1;align-self:center;min-width:0;width:100%;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left}
-#tab-discover .discover-intro{grid-area:2/3;align-self:center;min-width:0;min-height:calc(450px + var(--discover-row-inset));padding-top:var(--discover-row-inset);display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%;max-width:100%}
-#tab-discover .discover-selected{display:flex;flex-direction:column;gap:4px;width:100%;max-width:100%}
+/* Discover uses the centered composition from the original standalone
+   experience, but it lives inside the shared music98.news shell. */
+#tab-discover{padding-top:var(--section-heading-top);padding-bottom:12px}
+#tab-discover .discover-layout{width:min(100%,470px);margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
+#tab-discover .discover-heading{width:100%;margin-bottom:0;text-align:center}
+#tab-discover .discover-subtitle{font-size:14px;line-height:1.4;color:var(--muted);margin:6px 0 0}
+#tab-discover .discover-copy{min-height:78px;width:100%;display:flex;align-items:center;justify-content:center}
+#tab-discover .discover-selected{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;max-width:100%}
 #tab-discover .discover-selected[hidden]{display:none!important}
-#tab-discover .discover-artist{font-size:clamp(23px,2.6vw,32px);font-weight:800;color:var(--text);line-height:1.16;letter-spacing:-.035em;margin:0;overflow-wrap:anywhere}
-#tab-discover .discover-album{font-size:17px;font-weight:500;line-height:1.3;color:var(--muted);margin:0;overflow-wrap:anywhere}
-#tab-discover .discover-details{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--muted);margin:0}
-#tab-discover .discover-details span+span:not(:empty):before{content:"·";margin-right:9px}
-#tab-discover .discover-stage{grid-area:2/2;align-self:center;justify-self:center;position:relative;isolation:isolate;min-width:0;width:100%;max-width:660px;padding-top:var(--discover-row-inset);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:17px}
-#tab-discover .discover-card{z-index:1}
-/* Discover-only document ambience. The canvas is always click-through and
-   sits behind the site UI; it never shifts the player or affects other tabs. */
+#tab-discover .discover-artist{font-size:15px;font-weight:650;color:var(--muted);margin:0;line-height:1.2}
+#tab-discover .discover-album{font-size:clamp(21px,2.25vw,26px);letter-spacing:-.03em;line-height:1.15;font-weight:750;color:var(--text);margin:0;max-width:100%;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+#tab-discover .discover-details{display:flex;align-items:center;justify-content:center;gap:0;font-size:11px;color:var(--muted2);margin:0}
+#tab-discover .discover-details span+span:not(:empty):before{content:"·";padding:0 8px}
+#tab-discover .discover-stage{position:relative;isolation:isolate;width:min(100%,430px);display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+#tab-discover .discover-card{z-index:1;position:relative;width:100%;height:clamp(360px,calc(100dvh - 350px),450px);max-height:450px;flex:none;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);background:var(--card2);box-shadow:var(--shadow)}
+#tab-discover .discover-question{display:grid;place-items:center;position:absolute;inset:0;font-size:100px;font-weight:300;color:#b1bdc2;line-height:1;user-select:none}
+#tab-discover .discover-card .aembed{margin:0;width:100%;max-width:none;height:100%;min-height:100%!important;overflow:hidden;border-radius:inherit;background:var(--card)}
+#tab-discover .discover-card .aembed iframe{display:block;width:100%;max-width:none;height:100%!important;min-height:100%!important;border:0;border-radius:0;background:#fff}
+#tab-discover .discover-status{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+#tab-discover .discover-intro{width:100%;display:flex;justify-content:center;align-items:center}
+#tab-discover #discoverFind{color:var(--text);font-weight:600;align-self:center;margin:0}
+#tab-discover #discoverFind:disabled{opacity:.55;cursor:wait}
+@media(hover:hover) and (pointer:fine){#tab-discover #discoverFind:hover{color:#03282b}#tab-discover #discoverFind:hover::before{background:var(--accent);border-color:var(--accent)}}
 #discoverAmbient{position:absolute;top:0;left:0;z-index:0;width:100%;height:100vh;display:block;pointer-events:none;user-select:none;opacity:0;visibility:hidden;transition:opacity .28s ease}
 body.discover-ambient-visible #discoverAmbient{visibility:visible}
-/* The ambient fades in only once its canvas geometry has settled
-   (discover-ambient.js): a late layout change must never re-anchor an
-   already visible background. */
 body.discover-ambient-visible.discover-ambient-settled #discoverAmbient{opacity:1}
 @media(prefers-reduced-motion:reduce){#discoverAmbient{transition:none}}
-
-#tab-discover .discover-card{position:relative;width:100%;max-width:660px;height:450px;flex:none;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);background:var(--card2);box-shadow:var(--shadow)}
-#tab-discover .discover-question{display:grid;place-items:center;position:absolute;inset:0;font-size:clamp(95px,10vw,130px);font-weight:300;color:#b8c5c9;line-height:1;user-select:none}
-#tab-discover .discover-card .aembed{margin:0;width:100%;max-width:none;height:450px;min-height:450px!important;overflow:hidden;border-radius:inherit;background:var(--card)}
-#tab-discover .discover-card .aembed iframe{display:block;width:100%;max-width:none;height:450px!important;min-height:450px;border:0;border-radius:0;background:#fff}
-#tab-discover #discoverFind:disabled{opacity:.55;cursor:wait}
-#tab-discover .discover-status{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-#tab-discover #discoverFind{color:var(--text);font-weight:600;align-self:center;margin-top:0}
-@media(hover:hover) and (pointer:fine){#tab-discover #discoverFind:hover{color:#03282b}#tab-discover #discoverFind:hover::before{background:var(--accent);border-color:var(--accent)}}
-@media(min-width:1161px){
-  #tab-discover .discover-artist{font-size:26px}
-  #tab-discover .discover-copy{align-items:flex-end}
-  #tab-discover .discover-selected{width:max-content}
-  #tab-discover .discover-intro{align-items:flex-start}
-  #tab-discover #discoverFind{align-self:flex-start}
-}
-@media(max-width:1160px){
-  #tab-discover .discover-layout{display:flex;flex-direction:column;gap:18px;height:auto}
-  #tab-discover .discover-heading{margin-bottom:0}
-  #tab-discover .discover-copy{max-width:none;min-height:0;width:100%;padding-top:0}
-  #tab-discover .discover-copy:has(> .discover-selected[hidden]){display:none}
-  #tab-discover .discover-intro{min-height:0;width:100%;padding-top:0;margin-top:calc(var(--section-heading-gap) - 18px)}
-  #tab-discover #discoverFind{margin-top:0;align-self:center}
-  #tab-discover .discover-stage{width:100%;max-width:none;padding-top:0}
-}
 @media(max-width:720px){
-  /* Centre the button between the player and the Subscribe section. Its
-     existing upper gap already uses the shared section-heading spacing. */
   #tab-discover{padding-bottom:var(--section-heading-gap)}
-  #tab-discover .discover-layout{gap:18px;padding:0}
-  #tab-discover .discover-copy{max-width:490px;width:100%;align-self:center}
-  #tab-discover .discover-selected{gap:3px}
-  #tab-discover .discover-artist{font-size:23px}
-  #tab-discover .discover-album{font-size:14px}
-  #tab-discover .discover-details{font-size:12px}
-  #tab-discover .discover-stage{width:100%;gap:12px}
-  #tab-discover .discover-card{width:100%;max-width:660px;height:450px}
-  }
-@media(max-width:720px) and (max-height:660px){
-  #tab-discover .discover-layout{gap:12px}
-  #tab-discover .discover-intro{margin-top:calc(var(--section-heading-gap) - 12px)}
+  #tab-discover .discover-layout{width:100%;gap:9px}
+  #tab-discover .discover-subtitle{font-size:12px;margin-top:5px}
+  #tab-discover .discover-copy{min-height:69px}
+  #tab-discover .discover-artist{font-size:13px}
+  #tab-discover .discover-album{font-size:21px}
+  #tab-discover .discover-card{width:100%;height:clamp(340px,calc(100dvh - 335px),450px)}
+  #tab-discover .discover-question{font-size:82px}
+}
+@media(max-width:720px) and (max-height:620px){
+  #tab-discover .discover-layout{gap:6px}
+  #tab-discover .discover-copy{min-height:58px}
+  #tab-discover .discover-card{height:330px}
 }
 
 /* Avoid a News flash for deep links while the shared site scripts initialize. */
@@ -1056,11 +1026,14 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
 
   <section class="tab" id="tab-discover">
     <div class="discover-layout">
-      <div class="hd discover-heading"><h1 class="hd-t">Find what to listen to</h1></div>
+      <div class="hd discover-heading">
+        <h1 class="hd-t">What should I listen to?</h1>
+        <p class="discover-subtitle">An easy way to find a new album.</p>
+      </div>
       <div class="discover-copy">
         <div class="discover-selected" id="discoverSelection" hidden>
-          <h2 class="discover-artist" id="discoverArtist"></h2>
-          <p class="discover-album" id="discoverAlbum"></p>
+          <p class="discover-artist" id="discoverArtist"></p>
+          <h2 class="discover-album" id="discoverAlbum"></h2>
           <p class="discover-details"><span id="discoverYear"></span><span id="discoverGenre"></span></p>
         </div>
       </div>
@@ -1071,7 +1044,7 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
         <p class="discover-status" id="discoverStatus" role="status" aria-live="polite"></p>
       </div>
       <div class="discover-intro">
-        <button class="loadmore-btn" id="discoverFind" type="button" disabled>Pick for me</button>
+        <button class="loadmore-btn" id="discoverFind" type="button" disabled>Find an album</button>
       </div>
     </div>
   </section>
