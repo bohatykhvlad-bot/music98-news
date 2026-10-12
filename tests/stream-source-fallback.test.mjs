@@ -109,10 +109,10 @@ test("verified rows accept site metrics with guards and official only by exact d
     estimated: true, sourceUrl: "https://soundcamps.com/spotify-stream-checker/", trackUrl: `https://open.spotify.com/track/${id}`};
   assert.ok(verifiedSpotifyRow(sc, day));
   assert.equal(verifiedSpotifyRow({...sc, trackUrl: `https://open.spotify.com/track/${"d".repeat(22)}`}, day), false);
-  const official = {status: "matched", daily: 777, spotifyId: id, date: day, metric: "kworb-track-global-daily",
-    sourceUrl: `https://kworb.net/spotify/track/${id}.html`};
-  assert.ok(verifiedSpotifyRow(official, day));
-  assert.equal(verifiedSpotifyRow({...official, date: back(1)}, day), false);
+  const direct = {status: "matched", daily: 777, date: day, metric: "musicrank-spotify-chart-global-daily",
+    sourceUrl: "https://musicrank.org/spotify"};
+  assert.ok(verifiedSpotifyRow(direct, day));
+  assert.equal(verifiedSpotifyRow({...direct, date: back(1)}, day), false);
 });
 
 test("cumulative measurements require two actual dates and identical providers",()=>{
@@ -144,4 +144,11 @@ test("Japanese Apple aliases resolve the precise Spotify track and not another s
  assert.ok(queries.some(x=>x==="Yes! Tokyo EBiDAN"));
  assert.equal(pickSearchHit("FOR OKINAWA","YAO",[
   {kind:"track",id:"C".repeat(22),name:"Different Song",subtitle:"YAO"}]),null);
+});
+
+test("legacy providerless totals are migrated as SoundCamps observations",()=>{
+ const legacy=[{date:back(2),total:1000000}];
+ const rows=saveCounterObservation(legacy,day,1300000,"soundcamps");
+ assert.equal(rows[0].provider,"soundcamps");
+ assert.equal(measuredProviderDelta(rows,day,"soundcamps").daily,150000);
 });

@@ -11,8 +11,8 @@ function fixtures(){
   return {title:"Song "+(i+1),artist:"Artist "+(i+1),
    sourceRanks:{U:i<90?i+1:i<100?null:i-9,A:i<90?i+1:i<100?null:i-9,S:spotify?i+1:null},
    spotify:spotify?{status:"matched",daily:1000000-i*6500,spotifyId:id(i),date:day,
-    metric:"kworb-spotify-chart-global-daily",
-    sourceUrl:"https://kworb.net/spotify/country/global_daily.html"}:
+    metric:"musicrank-spotify-chart-global-daily",
+    sourceUrl:"https://musicrank.org/spotify"}:
     {status:"unavailable",daily:null,reason:"not-in-spotify-daily-chart"}};
  });
  // Rank 1 is Spotify-only, proven daily streams: eligible for Music98 Top 50.
@@ -48,8 +48,8 @@ test("Spotify-only songs can enter even when absent from Apple USA and Global",(
   title:"Unique "+i,artist:"Performer "+i,
   sourceRanks:{U:i<100?i+1:null,A:i>=100&&i<200?i-99:null,S:i>=200?i-199:null},
   spotify:i>=200?{status:"matched",daily:2800000-(i-200)*1000,
-   spotifyId:id(i),date:day,metric:"kworb-spotify-chart-global-daily",
-   sourceUrl:"https://kworb.net/spotify/country/global_daily.html"}:
+   spotifyId:id(i),date:day,metric:"musicrank-spotify-chart-global-daily",
+   sourceUrl:"https://musicrank.org/spotify"}:
    {status:"unavailable",daily:null}
  }));
  assert.ok(verifiedTriCandidates(isolated,day));

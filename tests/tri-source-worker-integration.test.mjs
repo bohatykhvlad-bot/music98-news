@@ -14,8 +14,8 @@ function setup(){
  const spotify=apple.map((row,i)=>({
   ...row,sourceRanks:{U:i+1,A:i+1,S:i+1},
   spotify:{status:"matched",daily:3000000-i*20000,spotifyId:String(i+1).padStart(22,"0"),
-   date:today,sourceUrl:"https://kworb.net/spotify/country/global_daily.html",
-   metric:"kworb-spotify-chart-global-daily"}
+   date:today,sourceUrl:"https://musicrank.org/spotify",
+   metric:"musicrank-spotify-chart-global-daily"}
  }));
  const seed={schema:3,methodology:TRI_METHOD,appleUsDate:today,appleGlobalDate:today,spotifyDate:today,
   fingerprint:"a".repeat(64),sourceSizes:{U:100,A:100,S:200},
