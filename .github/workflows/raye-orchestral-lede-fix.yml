@@ -1,12 +1,14 @@
-name: RAYE final paragraph relevance and source pass
+name: RAYE reviewed copy publication
 on:
   push:
     branches: [editorial/raye-royal-albert-hall-rewrite-20261011]
     paths:
-      - editorial-drafts/raye-royal-albert-hall-2026-10-11.md
       - .github/workflows/raye-orchestral-lede-fix.yml
 permissions:
   contents: read
+concurrency:
+  group: music98-raye-editorial
+  cancel-in-progress: false
 jobs:
   edit:
     runs-on: ubuntu-latest
@@ -17,82 +19,87 @@ jobs:
       POST_ID: raye26royalalbertsymphony
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 1eb945dec1ed4e3eaf4213bcf094fbab8758beae
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Register previously verified dated source facts
+      - name: Register verified RAYE dates in the local gate
         run: |
-          python scripts/post.py register "October 15" "Official Simon Jones PR: RAYE Royal Albert Hall general tickets on sale October 15 2026 at 10am"
-          python scripts/post.py register "January 2023" "Official Charts: Escapism with 070 Shake became RAYE's first UK No. 1 single January 2023"
-      - name: Stage exact last-paragraph-only edit and verify live source
+          python scripts/post.py register "October 15" "RAYE general tickets, October 15 2026 at 10am. Source https://www.simonjonespr.com/news/2026/10/9/raye-announces-very-special-london-show"
+          python scripts/post.py register "January 2023" "Escapism with 070 Shake became RAYE's first UK No. 1 in January 2023. Source https://www.officialcharts.com/songs/raye-ft-070-shake-escapism/"
+      - name: Stage only the exact source and reviewed replacement
         shell: python
         run: |
-          import os,sys,re,hashlib
+          import os, sys, re, json, hashlib
           from pathlib import Path
-          sys.path.insert(0,'scripts')
-          from post import desk_read,_local_gate,_local_preflight
-          rows=[p for p in desk_read()['posts'] if p.get('id')==os.environ['POST_ID']]
-          if len(rows)!=1:raise SystemExit('RAYE_NOT_UNIQUE')
-          p=rows[0]
-          body=(p.get('body') or '').strip()
-          digest=hashlib.sha256(body.encode()).hexdigest()
-          if digest!='ff7d6be8ef717f08855876c1c4fdc4e0a73a259a0292ade8cd32af60f5269804':
-            raise SystemExit('RAYE_LIVE_SOURCE_CHANGED_ABORT '+digest)
-          if p.get('status')!='live' or p.get('type')!='news':raise SystemExit('RAYE_NOT_LIVE_NEWS')
-          if p.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall':raise SystemExit('RAYE_TITLE_CHANGED')
-          cover=p.get('cover') or {}
-          if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':raise SystemExit('RAYE_COVER_CHANGED')
-          if p.get('excerpt')!="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album.":raise SystemExit('RAYE_EXCERPT_CHANGED')
-          old_paras=body.split('\n\n')
-          old_media=re.findall(r'\[(?:photo|youtube|apple|instagram|tiktok|tickets):[^\]]+\]',body,re.I)
-          if old_media!=['[youtube:Iy2FoVeIUXs]'] or len(old_paras)!=8 or old_paras[3]!=old_media[0]:
-            raise SystemExit('RAYE_MEDIA_OR_STRUCTURE_CHANGED')
-          if not old_paras[-1].startswith('Most of her latest album was written sober.'):
-            raise SystemExit('RAYE_LAST_PARAGRAPH_CHANGED')
-          src=Path('editorial-drafts/raye-royal-albert-hall-2026-10-11.md').read_text('utf-8')
-          section=src.split('## Article body\n\n',1)[1].split('\n\n## Existing media and credit',1)[0].strip()
-          parts=section.split('\n\n')
-          if len(parts)!=7 or any(len(q.split())<70 for q in parts):raise SystemExit('RAYE_EDITORIAL_PARAGRAPH_STRUCTURE')
-          replacement=parts[-1]
-          if 'sober' in replacement.lower() or 'alcohol' in replacement.lower() or replacement.count('ELLE')!=0:
-            raise SystemExit('RAYE_LAST_PARAGRAPH_OFF_TOPIC')
-          if not replacement.startswith("The album's autumn chapter starts with loneliness"):
-            raise SystemExit('RAYE_FINAL_SOURCE_UNEXPECTED')
-          candidate='\n\n'.join(old_paras[:-1]+[replacement])
-          if hashlib.sha256(candidate.encode()).hexdigest()==digest:raise SystemExit('RAYE_NO_EDIT')
-          if any(x in candidate for x in ('perform her second album in full','every song from her second album')):
-            raise SystemExit('RAYE_OLD_LEDE')
-          if not _local_gate(dict(p,body=candidate)):raise SystemExit('RAYE_LOCAL_GATE_FAILED')
-          if not _local_preflight(dict(p,body=candidate,status='draft'),baseline=p,expected_media=1,min_words=400):
-            raise SystemExit('RAYE_LOCAL_PREFLIGHT_FAILED')
-          Path('/tmp/raye-final.txt').write_text(candidate,encoding='utf-8')
-          Path('/tmp/raye-final-sha.txt').write_text(hashlib.sha256(candidate.encode()).hexdigest(),encoding='utf-8')
-          print('RAYE_ONLY_FINAL_PARAGRAPH_STAGED '+str(len(candidate.split()))+' words')
-      - name: Full pre-edit and post-edit human-voice review
-        shell: bash
+          sys.path.insert(0, 'scripts')
+          from post import desk_read, _local_gate
+          data = desk_read()
+          matches = [p for p in data['posts'] if p.get('id') == os.environ['POST_ID']]
+          if len(matches) != 1:
+              raise SystemExit('RAYE_NOT_UNIQUE')
+          current = matches[0]
+          source = current.get('body') or ''
+          if hashlib.sha256(source.encode()).hexdigest() != '8844d050f9fa95df559b7ac6b9666f6209172567e291df1e5f19d136607580d0':
+              raise SystemExit('RAYE_SOURCE_CHANGED_ABORT')
+          if current.get('status') != 'live' or current.get('type') != 'news':
+              raise SystemExit('RAYE_STATE_CHANGED_ABORT')
+          if current.get('title') != 'RAYE Announces One-Night Orchestral Show at Royal Albert Hall':
+              raise SystemExit('RAYE_TITLE_CHANGED_ABORT')
+          cover = current.get('cover') or {}
+          if cover.get('src') != 'photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl') != 'https://rozentuzjazmowany.pl/':
+              raise SystemExit('RAYE_MEDIA_CHANGED_ABORT')
+          body = Path('.github/raye-live-correction.txt').read_text('utf-8').strip()
+          if hashlib.sha256(body.encode()).hexdigest() != '786cd7f769fecebe52fa87fdf995664d276e894ecc2285f2421e224aef04d55e':
+              raise SystemExit('RAYE_REVIEWED_COPY_CHANGED_ABORT')
+          excerpt = "RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album."
+          if not body.startswith(excerpt) or current.get('excerpt') != excerpt:
+              raise SystemExit('RAYE_EXCERPT_MISMATCH')
+          media = lambda text: re.findall(r'\[(?:photo|youtube|apple|instagram|ig|tiktok|tickets):[^\]]+\]', text, re.I)
+          if media(source) != media(body) or media(body) != ['[youtube:Iy2FoVeIUXs]']:
+              raise SystemExit('RAYE_MEDIA_MISMATCH')
+          candidate = json.loads(json.dumps(current))
+          candidate.update(body=body, excerpt=excerpt, status='draft')
+          Path('/tmp/raye-final.txt').write_text(body, encoding='utf-8')
+          Path('/tmp/raye-candidate.json').write_text(json.dumps(candidate, ensure_ascii=True), encoding='ascii')
+          Path('/tmp/raye-baseline-post.json').write_text(json.dumps(current, ensure_ascii=True), encoding='ascii')
+          Path('/tmp/raye-baseline-desk.json').write_text(json.dumps(data, ensure_ascii=True), encoding='ascii')
+          if not _local_gate(candidate):
+              raise SystemExit('RAYE_STAGED_GATE_FAILED')
+          print('RAYE_SOURCE_AND_REVIEWED_COPY_HASHES_MATCH')
+      - name: Record the completed human source and final full reads
         run: |
           python scripts/post.py editorial "$POST_ID" --phase pre-edit
           python scripts/post.py editorial "$POST_ID" --phase post-edit --body-file /tmp/raye-final.txt --title "RAYE Announces One-Night Orchestral Show at Royal Albert Hall"
-      - name: Publish corrected paragraph without affecting media or other sections
-        shell: bash
+      - name: Validate candidate payload, media and cover
+        run: python scripts/preflight.py --post "$POST_ID" --file /tmp/raye-candidate.json --baseline /tmp/raye-baseline-post.json --expected-media 1 --min-words 400
+      - name: Update the authorized live RAYE article
+        run: python scripts/post.py set "$POST_ID" --body-file /tmp/raye-final.txt --excerpt "RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album."
+      - name: Gate and verify the saved public article
         run: |
-          python scripts/post.py set "$POST_ID" --body-file /tmp/raye-final.txt --excerpt "RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album."
-      - name: Gate, verify and compare published body byte for byte
-        shell: bash
-        run: |
-          python scripts/post.py gate "$POST_ID"
+          python scripts/gate.py --post "$POST_ID" --ids
           python scripts/post.py verify "$POST_ID"
-          python - <<'PY'
-          import os,sys,hashlib
-          sys.path.insert(0,'scripts')
+      - name: Confirm exact text, unchanged target metadata and all other posts
+        shell: python
+        run: |
+          import os, sys, json, hashlib
+          from pathlib import Path
+          sys.path.insert(0, 'scripts')
           from post import desk_read
-          p=next((x for x in desk_read()['posts'] if x.get('id')==os.environ['POST_ID']),None)
-          if not p or p.get('status')!='live':raise SystemExit('RAYE_NOT_LIVE_AFTER')
-          body=p.get('body') or ''
-          digest=hashlib.sha256(body.encode()).hexdigest()
-          if digest!=open('/tmp/raye-final-sha.txt').read().strip():raise SystemExit('RAYE_PUBLISHED_BODY_MISMATCH')
-          if body.split('\n\n')[3]!='[youtube:Iy2FoVeIUXs]':raise SystemExit('RAYE_VIDEO_MOVED')
-          if (p.get('cover') or {}).get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg':raise SystemExit('RAYE_COVER_CHANGED_AFTER')
-          if (p.get('excerpt') or '')!="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album.":raise SystemExit('RAYE_EXCERPT_CHANGED_AFTER')
-          print('RAYE_PARAGRAPH_LIVE_VERIFIED '+digest)
-          PY
+          before = json.loads(Path('/tmp/raye-baseline-desk.json').read_text())
+          after = desk_read()
+          pid = os.environ['POST_ID']
+          old = next(p for p in before['posts'] if p.get('id') == pid)
+          current = next(p for p in after['posts'] if p.get('id') == pid)
+          body = Path('/tmp/raye-final.txt').read_text()
+          expected = dict(old, body=body, excerpt=body.split('\n\n')[0].split('. Titled', 1)[0] + '.')
+          if current != expected:
+              raise SystemExit('RAYE_POST_SAVE_FIELDS_MISMATCH')
+          untouched = lambda data: {p['id']: p for p in data['posts'] if p.get('id') != pid}
+          if untouched(before) != untouched(after):
+              raise SystemExit('NON_TARGET_POSTS_CHANGED')
+          print('RAYE_LIVE_EXACT_COPY_VERIFIED ' + hashlib.sha256(body.encode()).hexdigest())
+          print('RAYE_COVER_VIDEO_STATUS_DATES_AND_OTHER_POSTS_UNCHANGED')
+          print('=== RAYE FINAL PUBLIC BODY ===')
+          print(body)
