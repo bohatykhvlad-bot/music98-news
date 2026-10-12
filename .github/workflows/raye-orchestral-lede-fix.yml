@@ -51,7 +51,7 @@ jobs:
           media=re.findall(r'\[(?:youtube|photo|apple|instagram|ig|tiktok|tickets):[^\]]+\]',live,re.I)
           if media!=['[youtube:Iy2FoVeIUXs]'] or live.split('\n\n')[3]!=media[0]: raise SystemExit('RAYE_MEDIA_CHANGED')
           final='\n\n'.join(paras[:3]+media+paras[3:])
-          excerpt="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around material from her latest album."
+          excerpt="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album."
           if not final.startswith(excerpt): raise SystemExit('RAYE_EXCERPT_NOT_PREFIX')
           if final.count('RAYE')>8: raise SystemExit('RAYE_NAME_OVERUSED')
           if any(x in final for x in ('perform her second album in full','every song from her second album','This makes','The result is','This helps explain')):
@@ -70,7 +70,7 @@ jobs:
       - name: Write final copy through guarded editor
         shell: bash
         run: |
-          python scripts/post.py set "$POST_ID" --body-file /tmp/raye-final.txt --excerpt "RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around material from her latest album."
+          python scripts/post.py set "$POST_ID" --body-file /tmp/raye-final.txt --excerpt "RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album."
       - name: Gate and exact post-save verification
         shell: bash
         run: |
@@ -86,7 +86,7 @@ jobs:
           expected=open('/tmp/raye-final-sha.txt').read().strip()
           if hashlib.sha256(live.encode()).hexdigest()!=expected: raise SystemExit('RAYE_FINAL_HASH_MISMATCH')
           if live.split('\n\n')[3]!='[youtube:Iy2FoVeIUXs]': raise SystemExit('RAYE_VIDEO_MOVED')
-          if p.get('excerpt')!="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around material from her latest album.": raise SystemExit('RAYE_EXCERPT_CHANGED')
+          if p.get('excerpt')!="RAYE will return to London's Royal Albert Hall on October 23 for a one-night orchestral concert built around her latest album.": raise SystemExit('RAYE_EXCERPT_CHANGED')
           cover=p.get('cover') or {}
           if cover.get('src')!='photos/raye-radoslaw-zydowicz-lodz-live-2026.jpg' or cover.get('creditUrl')!='https://rozentuzjazmowany.pl/':
               raise SystemExit('RAYE_COVER_CHANGED_AFTER')
