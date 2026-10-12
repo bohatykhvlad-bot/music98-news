@@ -74,6 +74,11 @@ export function parseMusicrankSpotify(html,limit=SPOTIFY_INPUT_SIZE){
   if(!daily)throw new Error("musicrank_streams_missing_"+(tracks.length+1));
   seen.add(url);tracks.push({pos:tracks.length+1,title,artist:textOf(artist[1]),daily});
  }
+ if(tracks.length!==limit){
+  const chunks=[...h.matchAll(/<script\\b[^>]*>([\\s\\S]*?)<\\/script>/gi)].map(x=>x[1]).join("\n");
+  const at=chunks.indexOf('"rank":131');
+  throw new Error("musicrank_visible_rows_"+tracks.length+":"+chunks.slice(Math.max(0,at),at<0?1200:at+1400));
+ }
  const verified=validatedSpotifyRows(tracks,limit);
  const ids=new Map();
  for(const script of h.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)){
