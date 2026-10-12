@@ -46,14 +46,14 @@
       status.textContent = "Loading albums…";
       try {
         const response = await fetch("/data/discover-albums.json?identity=1", {
-          cache: "no-cache", signal: AbortSignal.timeout(15000)
+          cache: "default", signal: AbortSignal.timeout(15000)
         });
         if (!response.ok) throw new Error("Catalog HTTP " + response.status);
         const catalog = usable(await response.json());
         if (!catalog.length) throw new Error("Empty album catalog");
         artists = catalog;
         loaded = true;
-        button.textContent = current ? "Find another album" : "Find an album";
+        button.textContent = current ? "Try another" : "Pick for me";
         status.textContent = "";
         return true;
       } catch (error) {
@@ -117,7 +117,7 @@
     byId("discoverYear").textContent = album.year || "";
     byId("discoverGenre").textContent = album.genre || "";
     selection.hidden = false;
-    button.textContent = "Find another album";
+    button.textContent = "Try another";
     status.textContent = ""; // The artist and album are already displayed above.
     renderPlayer();
   }

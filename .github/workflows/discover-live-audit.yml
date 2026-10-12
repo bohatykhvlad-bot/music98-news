@@ -5,21 +5,16 @@ on:
     paths:
       - public/index.html
       - public/discover-app.js
-      - public/discover-ambient.js
-      - public/discover-catalog-policy.js
       - public/data/discover-albums.json
       - scripts/audit-discover-live.mjs
       - .github/workflows/discover-live-audit.yml
   workflow_dispatch:
 permissions:
   contents: read
-concurrency:
-  group: discover-live-audit
-  cancel-in-progress: true
 jobs:
   live:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,5 +22,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Verify the deployed primary Discover UI and complete catalog
+      - name: Compare live Discover routes and catalog with GitHub
         run: node scripts/audit-discover-live.mjs
