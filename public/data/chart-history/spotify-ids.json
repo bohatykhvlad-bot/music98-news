@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-11T10:06:06.421Z",
+  "updated": "2026-10-12T18:50:55.835Z",
   "entries": {
     "quebec|drake": {
       "id": "67DgVQlvQ0qilSBN1hdkKN",
@@ -488,12 +488,33 @@
       "subtitle": "Drake",
       "resolvedAt": "2026-10-11T09:59:35.675Z"
     },
-    "popit|gunna": {
-      "id": "3LVkyYg0PSo8XInTPKKhZM",
-      "name": "pop it",
-      "subtitle": "Gunna",
-      "resolvedAt": "2026-10-12T18:45:00.000Z",
-      "matchedFrom": "verified-official-spotify-track-page"
+    "untouchable|youngboyneverbrokeagain": {
+      "id": "6xL9MJ2yt39HPPZPyGkRy8",
+      "name": "Untouchable",
+      "subtitle": "YoungBoy Never Broke Again",
+      "resolvedAt": "2026-10-12T18:50:13.459Z",
+      "matchedFrom": "original-title-search"
+    },
+    "loveme|lilwayne": {
+      "id": "2XHzzp1j4IfTNp1FTn7YFg",
+      "name": "Love Me",
+      "subtitle": "Lil Wayne, Drake, Future",
+      "resolvedAt": "2026-10-12T18:50:19.055Z",
+      "matchedFrom": "original-title-search"
+    },
+    "shiwaawase|vaundy": {
+      "id": "7ytwCwjXrrgXmpC9Leaw7n",
+      "name": "Shiwaawase",
+      "subtitle": "Vaundy",
+      "resolvedAt": "2026-10-12T18:50:25.318Z",
+      "matchedFrom": "original-title-search"
+    },
+    "itsme|illit": {
+      "id": "1D5L58KLBbceOynTP4DQnY",
+      "name": "It's Me",
+      "subtitle": "ILLIT",
+      "resolvedAt": "2026-10-12T18:50:39.812Z",
+      "matchedFrom": "original-title-search"
     }
   }
 }
