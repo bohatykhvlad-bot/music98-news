@@ -34,8 +34,8 @@ test("the published seed stays valid until the next morning advance", () => {
     title: "Song " + (i + 1), artist: "Artist " + (i + 1),
     sourceRanks: {U: i < 90 ? i + 1 : i < 100 ? null : i - 9, A: i < 90 ? i + 1 : i < 100 ? null : i - 9, S: i < 100 ? i + 1 : null},
     spotify: i < 100 ? {status: "matched", daily: 1000000 - i * 6500, spotifyId: id(i), date: day,
-      metric: "kworb-spotify-chart-global-daily",
-      sourceUrl: "https://kworb.net/spotify/country/global_daily.html"} :
+      metric: "musicrank-spotify-chart-global-daily",
+      sourceUrl: "https://musicrank.org/spotify"} :
       {status: "unavailable", daily: null, reason: "not-in-spotify-daily-chart"}
   }));
   rows[0].sourceRanks.U = null; rows[0].sourceRanks.A = null;

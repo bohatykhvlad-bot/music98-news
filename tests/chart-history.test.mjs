@@ -46,7 +46,7 @@ test("ChartStats parser accepts dated structured top 100 and rejects partial or 
 test("Spotify archive requires all 200 real numbers and identities",()=>{
  const tracks=Array.from({length:200},(_,i)=>({pos:i+1,title:"Song "+i,artist:"Artist "+i,
   spotifyId:String(i+1).padStart(22,"0"),daily:1000000+i}));
- const snapshot={schema:1,source:"kworb-spotify-global-daily",region:"global",date:day,tracks};
+ const snapshot={schema:1,source:"musicrank-spotify-global-daily",sourceUrl:"https://musicrank.org/spotify",region:"global",date:day,tracks};
  assert.ok(verifiedDatedSpotify(snapshot,day));
  const invalid=structuredClone(snapshot);invalid.tracks[4].daily=null;
  assert.equal(verifiedDatedSpotify(invalid,day),null);

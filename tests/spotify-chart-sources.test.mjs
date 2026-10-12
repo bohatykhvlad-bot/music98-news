@@ -9,25 +9,37 @@ import {parseMusicrankSpotify,spotifyDateCurrent,validatedSpotifyRows,
  verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
 
 const tracks=Array.from({length:200},(_,i)=>({pos:i+1,title:"Song "+(i+1),artist:"Artist "+(i+1),daily:5000000-i*10000}));
+function spotifyId(pos){return String(pos).padStart(22,"0");}
 function musicrank(rows=tracks,date="Oct 10, 2026"){
  const json={"@type":"ItemList",name:"Spotify global chart",
-  itemListElement:rows.slice(0,20).map(t=>({position:t.pos,item:{name:t.title,byArtist:{name:t.artist}}}))};
- const links=rows.map(t=>'<a href="/track/'+t.pos+'">'+t.title+'</a>'+
-  '<p><a href="/artist/'+t.pos+'">'+t.artist+'</a></p><span>'+String(t.daily/1000000)+'M streams</span>').join("");
+  itemListElement:tracks.slice(0,20).map(t=>({position:t.pos,item:{name:t.title,byArtist:{name:t.artist}}}))};
+ const serialized=rows.map(t=>JSON.stringify({
+  rank:t.pos,title:t.title,artist:t.artist,credits:[],
+  sourceEntityId:t.spotifyId||spotifyId(t.pos),isrc:null,value:String(t.daily)
+ })).join(",");
+ const flight='<script>self.__next_f.push([1,'+JSON.stringify(serialized)+'])</script>';
  return '<html><head><meta name="description" content="Spotify&#x27;s daily top songs worldwide for '+
   date+'. Worldwide"/></head><body><main><script type="application/ld+json">'+JSON.stringify(json)+
-  '</script>'+links+'</main></body></html>';
+  '</script>'+flight+'</main></body></html>';
 }
-test("Musicrank yields the full Spotify Top 200 with daily stream counts",()=>{
+test("Musicrank extracts 200 rows with exact daily stream counts",()=>{
  const mr=parseMusicrankSpotify(musicrank(),200);
  assert.equal(mr.tracks.length,200);assert.equal(mr.ldConfirmed,20);
- assert.equal(mr.tracks[0].daily,5000000);assert.equal(mr.tracks[199].pos,200);
+ assert.equal(mr.tracks[0].daily,5000000);assert.equal(mr.tracks[130].daily,tracks[130].daily);
+ assert.equal(mr.tracks[199].pos,200);
 });
-test("Musicrank structured metadata protects visible identities and ranks",()=>{
- const h=musicrank().replace('>Song 5</a>','>Wrong title</a>');
- assert.throws(()=>parseMusicrankSpotify(h,200),/metadata_mismatch/);
+test("Musicrank top 20 metadata catches mismatched source identities",()=>{
+ const altered=tracks.map(t=>t.pos===5?{...t,title:"Wrong title"}:t);
+ assert.throws(()=>parseMusicrankSpotify(musicrank(altered),200),/metadata_mismatch/);
  assert.throws(()=>validatedSpotifyRows(tracks.map(t=>({...t,pos:t.pos===200?199:t.pos})),200));
 });
+test("distinct Spotify recording IDs may share a displayed title but not an ID",()=>{
+ const repeated=tracks.map(t=>t.pos===198?{...t,title:tracks[30].title,artist:tracks[30].artist}:t);
+ assert.equal(parseMusicrankSpotify(musicrank(repeated),200).tracks.length,200);
+ const bad=repeated.map(t=>t.pos===198?{...t,spotifyId:spotifyId(31)}:t);
+ assert.throws(()=>parseMusicrankSpotify(musicrank(bad),200),/duplicate_id/);
+});
+
 test("Spotify dates allow the intended three-day source lag",()=>{
  const now=Date.parse("2026-10-12T16:00:00Z");
  assert.equal(spotifyDateCurrent("2026-10-10",now),true);

@@ -146,9 +146,10 @@ test("Japanese Apple aliases resolve the precise Spotify track and not another s
   {kind:"track",id:"C".repeat(22),name:"Different Song",subtitle:"YAO"}]),null);
 });
 
-test("legacy providerless totals are migrated as SoundCamps observations",()=>{
+test("providerless legacy totals cannot be silently attributed to SoundCamps",()=>{
  const legacy=[{date:back(2),total:1000000}];
  const rows=saveCounterObservation(legacy,day,1300000,"soundcamps");
+ assert.equal(rows.length,1);
  assert.equal(rows[0].provider,"soundcamps");
- assert.equal(measuredProviderDelta(rows,day,"soundcamps").daily,150000);
+ assert.equal(measuredProviderDelta(rows,day,"soundcamps"),null);
 });

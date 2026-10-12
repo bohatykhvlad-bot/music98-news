@@ -99,7 +99,8 @@ test("verified source publisher dispatches downstream chart audit after bot comm
  const auditWorkflow=readFileSync(new URL("../.github/workflows/apple-data.yml",import.meta.url),"utf8");
  assert.match(spotifyWorkflow,/actions: write/);
  assert.match(spotifyWorkflow,/GH_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}/);
- assert.match(spotifyWorkflow,/git push origin HEAD:main; then[\s\S]*gh workflow run apple-data\.yml --ref main/);
+ assert.match(spotifyWorkflow,/git push origin HEAD:main/);
+ assert.match(spotifyWorkflow,/if publish; then[\s\S]*gh workflow run apple-data\.yml --ref main/);
  assert.match(auditWorkflow,/group: apple-data/);
 });
 
