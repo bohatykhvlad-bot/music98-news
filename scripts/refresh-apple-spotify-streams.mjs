@@ -355,7 +355,13 @@ if(missingTracks.length)console.warn("TRI_UNMEASURED",JSON.stringify(missingTrac
 }))));
 const matched=tracks.filter(t=>t.spotify.status==="matched").length;
 if(decision.publish&&matched>=50&&missingTracks.length){
+ // Musicrank positions 1..200 are sorted by the SAME day's global plays.
+ // A candidate absent from this Top 200 cannot exceed the #200 daily count.
+ // Using the Top 1 count here falsely treats every missing song as a hit.
  const maxDaily=Math.max(1,...tracks.filter(t=>t.spotify.status==="matched").map(t=>t.spotify.daily));
+ const absentMaxDaily=spotify.tracks[spotify.tracks.length-1].daily;
+ if(!Number.isSafeInteger(absentMaxDaily)||absentMaxDaily<=0)throw new Error("Spotify Top 200 floor unavailable");
+ const absentMaxPoints=30*Math.sqrt(absentMaxDaily/maxDaily);
  const scored=tracks.filter(t=>t.spotify.status==="matched").map(t=>{
   const u=t.sourceRanks.U===null?0:40*(101-t.sourceRanks.U)/100;
   const a=t.sourceRanks.A===null?0:30*(101-t.sourceRanks.A)/100;
@@ -365,7 +371,7 @@ if(decision.publish&&matched>=50&&missingTracks.length){
  const risky=missingTracks.filter(t=>{
   const u=t.sourceRanks.U===null?0:40*(101-t.sourceRanks.U)/100;
   const a=t.sourceRanks.A===null?0:30*(101-t.sourceRanks.A)/100;
-  return u+a+30>=cutoff-1e-9;
+  return u+a+absentMaxPoints>=cutoff-1e-9;
  });
  if(risky.length)throw new Error("Unresolved Spotify streams could change Top 50: "+risky.length);
 }
