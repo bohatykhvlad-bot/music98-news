@@ -49,18 +49,15 @@ jobs:
         run: node scripts/refresh-apple-ranking.mjs
       - name: Build union of THREE sources from the latest common source date
         run: node scripts/refresh-apple-spotify-streams.mjs
-      - name: Preserve real Spotify ID and stream observations even if publication is blocked
+      - name: Merge verified Spotify observations if publication is blocked
         if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p /tmp/chart-measurement-recovery
           for file in public/data/chart-history/spotify-ids.json public/data/chart-history/stream-totals.json; do
             if [ -f "$file" ]; then
-              mkdir -p "/tmp/chart-measurement-recovery/$(dirname "$file")"
-              cp "$file" "/tmp/chart-measurement-recovery/$file"
+              cp "$file" "/tmp/chart-measurement-recovery/$(basename "$file")"
             fi
           done
           git config user.name "music98 chart measurement bot"
@@ -68,23 +65,55 @@ jobs:
           for n in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
-            for file in public/data/chart-history/spotify-ids.json public/data/chart-history/stream-totals.json; do
-              if [ -f "/tmp/chart-measurement-recovery/$file" ]; then
-                cp "/tmp/chart-measurement-recovery/$file" "$file"
-              fi
-            done
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          base=Path('public/data/chart-history')
+          cache=Path('/tmp/chart-measurement-recovery')
+          def read(path):
+              try:return json.loads(path.read_text('utf-8'))
+              except (FileNotFoundError,ValueError):return {}
+          ids=read(base/'spotify-ids.json')
+          incoming=read(cache/'spotify-ids.json')
+          entries=ids.setdefault('entries',{})
+          for key,value in incoming.get('entries',{}).items():
+              if not isinstance(value,dict):continue
+              if not isinstance(value.get('id'),str) or len(value['id'])!=22:continue
+              entries.setdefault(key,value)
+          (base/'spotify-ids.json').write_text(json.dumps(ids,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          totals=read(base/'stream-totals.json')
+          incoming=read(cache/'stream-totals.json')
+          tracks=totals.setdefault('tracks',{})
+          for sid,observations in incoming.get('tracks',{}).items():
+              if not isinstance(observations,list):continue
+              existing=tracks.get(sid,[])
+              if not isinstance(existing,list):existing=[]
+              merged={}
+              for item in existing+observations:
+                  if not isinstance(item,dict):continue
+                  provider=item.get('provider','soundcamps')
+                  date=item.get('date')
+                  total=item.get('total')
+                  if provider not in ('soundcamps','mystreamcount') or not isinstance(date,str) or not isinstance(total,int) or total<=0:continue
+                  key=(date,provider)
+                  merged.setdefault(key,{'date':date,'provider':provider,'total':total})
+              tracks[sid]=sorted(merged.values(),key=lambda x:(x['date'],x['provider']))[-28:]
+          (base/'stream-totals.json').write_text(json.dumps(totals,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          PY
             git add public/data/chart-history/spotify-ids.json public/data/chart-history/stream-totals.json
             if git diff --cached --quiet; then
               echo "Spotify observations already preserved"
-              break
+              exit 0
             fi
             git commit -m "chart: retain verified site observations without publishing incomplete Top 50"
             if git push origin HEAD:main; then
-              echo "Cached stream measurements safely retained"
-              break
+              echo "Cached stream measurements safely merged"
+              exit 0
             fi
             sleep 3
           done
+          echo "Unable to save measurement cache after three retries" >&2
+          exit 1
       - name: Prepare verified Apple media for Spotify-only Top 50 entrants
         run: node scripts/resolve-tri-apple-media.mjs
       - name: Validate three-source identity, weights, rank continuity and Spotify numbers
