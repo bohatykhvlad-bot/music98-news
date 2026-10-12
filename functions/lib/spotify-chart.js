@@ -29,13 +29,16 @@ export function spotifyDateCurrent(day,now=Date.now(),maxAge=SPOTIFY_MAX_LAG_DAY
 }
 export function validatedSpotifyRows(rows,limit=SPOTIFY_INPUT_SIZE){
  if(!Array.isArray(rows)||rows.length!==limit)throw new Error("spotify_expected_"+limit+"_rows");
- const sorted=[...rows].sort((a,b)=>Number(a.pos)-Number(b.pos)),identities=new Set(),ids=new Set();
+ const sorted=[...rows].sort((a,b)=>Number(a.pos)-Number(b.pos)),identities=new Map(),ids=new Set();
  for(let i=0;i<limit;i++){
   const t=sorted[i],title=String(t?.title||"").trim(),artist=String(t?.artist||"").trim();
   if(Number(t?.pos)!==i+1||!title||!artist)throw new Error("spotify_missing_rank_"+(i+1));
   const key=mergeKey(title,artist);
-  if(!key||identities.has(key))throw new Error("spotify_duplicate_track_"+(i+1));
-  identities.add(key);
+  if(!key)throw new Error("spotify_invalid_identity_"+(i+1));
+  const previous=identities.get(key);
+  if(previous&&(!t.spotifyId||!previous.spotifyId))
+   throw new Error("spotify_ambiguous_duplicate_without_ids_"+(i+1));
+  identities.set(key,{spotifyId:t.spotifyId||null,pos:i+1});
   if(t.spotifyId){
    if(!/^[A-Za-z0-9]{22}$/.test(String(t.spotifyId))||ids.has(String(t.spotifyId)))
     throw new Error("spotify_invalid_or_duplicate_id_"+(i+1));

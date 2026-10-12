@@ -255,7 +255,7 @@ if(!spotifySeed)throw new Error("Musicrank Spotify Top 200 missing, stale or inv
 const latest={date:spotifySeed.date,source:"musicrank-spotify-global-daily",
  sourceUrl:"https://musicrank.org/spotify",tracks:spotifySeed.tracks};
 const latestArchive=archive("spotify-global",latest.date);
-if(!fs.existsSync(new URL(latestArchive,ROOT))){
+if(!loadArchive("spotify-global",latest.date,verifiedDatedSpotify)){
  const snap={schema:1,source:latest.source,date:latest.date,region:"global",cadence:"daily",
   sourceUrl:latest.sourceUrl,capturedAt:new Date().toISOString(),
   tracks:latest.tracks.map(x=>({pos:x.pos,title:x.title,artist:x.artist,
@@ -290,9 +290,15 @@ function admit(t,source,rank){
    spotify:{status:"unavailable",daily:null,reason:"not-measured-yet"}};
   candidates.set(key,item);
  }
- if(item.sourceRanks[source]!==null||sets[source].has(rank))
-  throw new Error("duplicate_source_song_or_rank_"+source+":"+rank);
- sets[source].add(rank);item.sourceRanks[source]=rank;
+ if(sets[source].has(rank))throw new Error("duplicate_source_rank_"+source+":"+rank);
+ sets[source].add(rank);
+ if(item.sourceRanks[source]!==null){
+  // Distinct Spotify recording IDs can share a displayed song title.
+  // Represent the song once, using its highest-ranked recording.
+  if(source!=="S")throw new Error("duplicate_source_song_"+source+":"+rank);
+  return item;
+ }
+ item.sourceRanks[source]=rank;
  if(source==="U"||(source==="A"&&(!item.art||!item.url))){
   item.title=t.title;item.artist=t.artist;item.url=t.url||item.url;
   item.art=t.art||item.art;item.year=t.year||item.year;
