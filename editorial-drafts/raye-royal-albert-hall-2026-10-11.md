@@ -18,7 +18,7 @@ Before releasing an album of her own, RAYE spent years writing songs for artists
 
 In January 2023, "Escapism." with 070 Shake became her first UK No. 1 single. The song follows someone trying to numb the pain of a breakup with alcohol, drugs and nights out, a darker turn from the dance-pop singles that had defined much of her earlier career. Her debut album arrived the following month, putting jazz, soul and R&B at the center of her own music. RAYE later described the chart success as proof that backing herself had been the right decision.
 
-The autumn chapter of *This Music May Contain Hope.* starts with loneliness and the belief that finding love might be enough to make it disappear. RAYE has talked about learning to spend an evening alone rather than relying on someone else to make everything better. Becoming more comfortable in her own company was not easy, but it mattered to how she thought about future relationships. "I don't want someone else to come and fix me," she said. "I want to meet someone as the best version of myself."
+The album's autumn chapter starts with loneliness and the belief that finding love might be enough to make it disappear. RAYE has talked about learning to spend an evening alone rather than relying on someone else to make everything better. Becoming more comfortable in her own company was not easy, but it changed how she thought about future relationships. "I don't want someone else to come and fix me," she said.
 
 ## Existing media and credit — preserve on desk sync
 

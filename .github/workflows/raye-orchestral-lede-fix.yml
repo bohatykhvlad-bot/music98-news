@@ -56,7 +56,7 @@ jobs:
           replacement=parts[-1]
           if 'sober' in replacement.lower() or 'alcohol' in replacement.lower() or replacement.count('ELLE')!=0:
             raise SystemExit('RAYE_LAST_PARAGRAPH_OFF_TOPIC')
-          if not replacement.startswith('The autumn chapter of *This Music May Contain Hope.*'):
+          if not replacement.startswith("The album's autumn chapter starts with loneliness"):
             raise SystemExit('RAYE_FINAL_SOURCE_UNEXPECTED')
           candidate='\n\n'.join(old_paras[:-1]+[replacement])
           if hashlib.sha256(candidate.encode()).hexdigest()==digest:raise SystemExit('RAYE_NO_EDIT')
