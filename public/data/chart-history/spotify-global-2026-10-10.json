@@ -1,0 +1,1411 @@
+{
+  "schema": 1,
+  "source": "musicrank-spotify-global-daily",
+  "date": "2026-10-10",
+  "region": "global",
+  "cadence": "daily",
+  "sourceUrl": "https://musicrank.org/spotify",
+  "capturedAt": "2026-10-12T18:54:29.641Z",
+  "tracks": [
+    {
+      "pos": 1,
+      "title": "BbY WOW",
+      "artist": "KAROL G, Judeline, rusowsky",
+      "spotifyId": "3h5T5JypYU7huFiVYhv1dr",
+      "daily": 5339548
+    },
+    {
+      "pos": 2,
+      "title": "Nicole Kidman",
+      "artist": "ADÉLA",
+      "spotifyId": "70cHKK8bHAfJrOGVnfRG9J",
+      "daily": 4574774
+    },
+    {
+      "pos": 3,
+      "title": "Ain't In LA",
+      "artist": "ADÉLA",
+      "spotifyId": "6U9VpmP3dEinuezxCJ2Zg9",
+      "daily": 3515930
+    },
+    {
+      "pos": 4,
+      "title": "the cure",
+      "artist": "Olivia Rodrigo",
+      "spotifyId": "55pBIZO1cqoldeqpp5WR7H",
+      "daily": 3258214
+    },
+    {
+      "pos": 5,
+      "title": "Earrings",
+      "artist": "Malcolm Todd",
+      "spotifyId": "0eAuGrXyGFYwur9ARUe7LJ",
+      "daily": 3120118
+    },
+    {
+      "pos": 6,
+      "title": "Beauty And A Beat",
+      "artist": "Justin Bieber, Nicki Minaj",
+      "spotifyId": "6QFCMUUq1T2Vf5sFUXcuQ7",
+      "daily": 2996502
+    },
+    {
+      "pos": 7,
+      "title": "Patient Zero",
+      "artist": "Taylor Swift",
+      "spotifyId": "11hcBLPtbMp4aQI6zGQLub",
+      "daily": 2855393
+    },
+    {
+      "pos": 8,
+      "title": "The One That Got Away",
+      "artist": "Katy Perry",
+      "spotifyId": "2009X8GyWTqyxIdzAEYW6N",
+      "daily": 2791360
+    },
+    {
+      "pos": 9,
+      "title": "Stop The Wedding!",
+      "artist": "Ashe",
+      "spotifyId": "3zOYmiNOuyDL0ClxJcEJ0T",
+      "daily": 2756324
+    },
+    {
+      "pos": 10,
+      "title": "Die With A Smile",
+      "artist": "Lady Gaga, Bruno Mars",
+      "spotifyId": "7so0lgd0zP2Sbgs2d7a1SZ",
+      "daily": 2750162
+    },
+    {
+      "pos": 11,
+      "title": "stupid song",
+      "artist": "Olivia Rodrigo",
+      "spotifyId": "49j6SvuvWfbEKZKzsHCdLJ",
+      "daily": 2702597
+    },
+    {
+      "pos": 12,
+      "title": "Man I Need",
+      "artist": "Olivia Dean",
+      "spotifyId": "1qbmS6ep2hbBRaEZFpn7BX",
+      "daily": 2587579
+    },
+    {
+      "pos": 13,
+      "title": "Loser",
+      "artist": "Tame Impala",
+      "spotifyId": "7bxaFZ1O3cHkgLKMsdC3xR",
+      "daily": 2577146
+    },
+    {
+      "pos": 14,
+      "title": "back to friends",
+      "artist": "sombr",
+      "spotifyId": "7qjZnBKE73H4Oxkopwulqe",
+      "daily": 2568191
+    },
+    {
+      "pos": 15,
+      "title": "Iris",
+      "artist": "The Goo Goo Dolls",
+      "spotifyId": "6Qyc6fS4DsZjB2mRW9DsQs",
+      "daily": 2532881
+    },
+    {
+      "pos": 16,
+      "title": "Love Me Not",
+      "artist": "Ravyn Lenae",
+      "spotifyId": "4WFgvKVfEhb3IUAFGrutTR",
+      "daily": 2531142
+    },
+    {
+      "pos": 17,
+      "title": "Sweater Weather",
+      "artist": "The Neighbourhood",
+      "spotifyId": "0cQVqPuHQP4KEwc7ZUQmj6",
+      "daily": 2524424
+    },
+    {
+      "pos": 18,
+      "title": "Self Aware",
+      "artist": "Temper City",
+      "spotifyId": "4qW3BbQAwZsrnu8a3ZRdyT",
+      "daily": 2504904
+    },
+    {
+      "pos": 19,
+      "title": "Babydoll",
+      "artist": "Dominic Fike",
+      "spotifyId": "7yNf9YjeO5JXUE3JEBgnYc",
+      "daily": 2482348
+    },
+    {
+      "pos": 20,
+      "title": "Billie Jean",
+      "artist": "Michael Jackson",
+      "spotifyId": "7J1uxwnxfQLu4APicE5Rnj",
+      "daily": 2474895
+    },
+    {
+      "pos": 21,
+      "title": "Dai Dai",
+      "artist": "Shakira, Burna Boy",
+      "spotifyId": "0kosUz0jePvjiz4ctmR6wL",
+      "daily": 2429278
+    },
+    {
+      "pos": 22,
+      "title": "Choosin' Texas",
+      "artist": "Ella Langley",
+      "spotifyId": "7scFxt9VhL4FJwuPSfRlfN",
+      "daily": 2341097
+    },
+    {
+      "pos": 23,
+      "title": "hate that i made you love me",
+      "artist": "Ariana Grande",
+      "spotifyId": "3iy2QuCtCzpWnR6tia39AB",
+      "daily": 2297535
+    },
+    {
+      "pos": 24,
+      "title": "Great Expectation",
+      "artist": "SIENNA SPIRO",
+      "spotifyId": "7ujApz6iFP3PmKIDGcaGbe",
+      "daily": 2277725
+    },
+    {
+      "pos": 25,
+      "title": "SWIM",
+      "artist": "BTS",
+      "spotifyId": "68lbSrXDORS51pmyjZv712",
+      "daily": 2241728
+    },
+    {
+      "pos": 26,
+      "title": "Cinderella (feat. Ty Dolla $ign)",
+      "artist": "Mac Miller, Ty Dolla $ign",
+      "spotifyId": "2lpygKqzPFtItQ4ss3cgfb",
+      "daily": 2238070
+    },
+    {
+      "pos": 27,
+      "title": "Just Give Me a Reason (feat. Nate Ruess)",
+      "artist": "P!nk, Nate Ruess",
+      "spotifyId": "1mKXFLRA179hdOWQBwUk9e",
+      "daily": 2231316
+    },
+    {
+      "pos": 28,
+      "title": "Treat You Better",
+      "artist": "Shawn Mendes",
+      "spotifyId": "3QGsuHI8jO1Rx4JWLUh9jd",
+      "daily": 2199707
+    },
+    {
+      "pos": 29,
+      "title": "Ordinary",
+      "artist": "Alex Warren",
+      "spotifyId": "2RkZ5LkEzeHGRsmDqKwmaJ",
+      "daily": 2198361
+    },
+    {
+      "pos": 30,
+      "title": "Postinho de Gasolina",
+      "artist": "João Gustavo e Murilo, Grelo",
+      "spotifyId": "4RuRAwMmuBxw4QsKeFVhxh",
+      "daily": 2196639
+    },
+    {
+      "pos": 31,
+      "title": "Wonderwall - Remastered",
+      "artist": "Oasis",
+      "spotifyId": "5qqabIl2vWzo9ApSC317sa",
+      "daily": 2135930
+    },
+    {
+      "pos": 32,
+      "title": "Mr. Brightside",
+      "artist": "The Killers",
+      "spotifyId": "003vvx7Niy0yvhvHt4a68B",
+      "daily": 2119982
+    },
+    {
+      "pos": 33,
+      "title": "Sailor Song",
+      "artist": "Gigi Perez",
+      "spotifyId": "21IYMdzTrzSe191Cy5eMap",
+      "daily": 2104697
+    },
+    {
+      "pos": 34,
+      "title": "End of Beginning",
+      "artist": "Djo",
+      "spotifyId": "3qhlB30KknSejmIvZZLjOD",
+      "daily": 2097434
+    },
+    {
+      "pos": 35,
+      "title": "Training Season",
+      "artist": "Dua Lipa",
+      "spotifyId": "5b5cPscqVEMChvDqscVw26",
+      "daily": 2093184
+    },
+    {
+      "pos": 36,
+      "title": "BIRDS OF A FEATHER",
+      "artist": "Billie Eilish",
+      "spotifyId": "6dOtVTDdiauQNBQEDOtlAB",
+      "daily": 2086687
+    },
+    {
+      "pos": 37,
+      "title": "One Of The Girls (with JENNIE, Lily Rose Depp)",
+      "artist": "The Weeknd, JENNIE, Lily-Rose Depp",
+      "spotifyId": "7CyPwkp0oE8Ro9Dd5CUDjW",
+      "daily": 2053741
+    },
+    {
+      "pos": 38,
+      "title": "The Fate of Ophelia",
+      "artist": "Taylor Swift",
+      "spotifyId": "53iuhJlwXhSER5J2IYYv1W",
+      "daily": 1959739
+    },
+    {
+      "pos": 39,
+      "title": "Cuando No Era Cantante RMX - Remix",
+      "artist": "El Bogueto, Anuel AA, Fuerza Regida, Yung Beef",
+      "spotifyId": "56V7nzrqr6Sq1uFym4odwa",
+      "daily": 1922789
+    },
+    {
+      "pos": 40,
+      "title": "TRALALA",
+      "artist": "manifest",
+      "spotifyId": "6hPPwiXH4Y4kmc121v9Fdg",
+      "daily": 1914173
+    },
+    {
+      "pos": 41,
+      "title": "Every Breath You Take",
+      "artist": "The Police",
+      "spotifyId": "1JSTJqkT5qHq8MDJnJbRE1",
+      "daily": 1904388
+    },
+    {
+      "pos": 42,
+      "title": "Risk It All",
+      "artist": "Bruno Mars",
+      "spotifyId": "5y2ijHECwFYWqcAHKTZgzD",
+      "daily": 1880350
+    },
+    {
+      "pos": 43,
+      "title": "Creep",
+      "artist": "Radiohead",
+      "spotifyId": "70LcF31zb1H0PyJoS1Sx1r",
+      "daily": 1876101
+    },
+    {
+      "pos": 44,
+      "title": "Sign of the Times",
+      "artist": "Harry Styles",
+      "spotifyId": "5Ohxk2dO5COHF1krpoPigN",
+      "daily": 1875599
+    },
+    {
+      "pos": 45,
+      "title": "I Wanna Be Yours",
+      "artist": "Arctic Monkeys",
+      "spotifyId": "5XeFesFbtLpXzIVDNQP22n",
+      "daily": 1858552
+    },
+    {
+      "pos": 46,
+      "title": "So Easy (To Fall In Love)",
+      "artist": "Olivia Dean",
+      "spotifyId": "6sGIMrtIzQjdzNndVxe397",
+      "daily": 1854374
+    },
+    {
+      "pos": 47,
+      "title": "Animal",
+      "artist": "KATSEYE",
+      "spotifyId": "3ouNEk0tv5TTi8VWMe1xbX",
+      "daily": 1853262
+    },
+    {
+      "pos": 48,
+      "title": "Raindance (feat. Tems)",
+      "artist": "Dave, Tems",
+      "spotifyId": "3oTuTpF1F3A7rEC6RKsMRz",
+      "daily": 1852311
+    },
+    {
+      "pos": 49,
+      "title": "drop dead",
+      "artist": "Olivia Rodrigo",
+      "spotifyId": "3fRCAPMMZ8l8P9YKI6OCzD",
+      "daily": 1843992
+    },
+    {
+      "pos": 50,
+      "title": "Starboy",
+      "artist": "The Weeknd, Daft Punk",
+      "spotifyId": "7MXVkk9YMctZqd1Srtv4MB",
+      "daily": 1816695
+    },
+    {
+      "pos": 51,
+      "title": "Yellow",
+      "artist": "Coldplay",
+      "spotifyId": "3AJwUDP919kvQ9QcozQPxg",
+      "daily": 1809153
+    },
+    {
+      "pos": 52,
+      "title": "WHERE IS MY HUSBAND!",
+      "artist": "RAYE",
+      "spotifyId": "7eYzn1CuiJK6VvUhf8zA6k",
+      "daily": 1795870
+    },
+    {
+      "pos": 53,
+      "title": "Jamaican (Bam Bam)",
+      "artist": "HUGEL, SOLTO (FR)",
+      "spotifyId": "0Vcss0GZ1rbNI7QQPfXeg4",
+      "daily": 1793055
+    },
+    {
+      "pos": 54,
+      "title": "Riptide",
+      "artist": "Vance Joy",
+      "spotifyId": "2uXlHCUbq9OMUwx3hrk06o",
+      "daily": 1778364
+    },
+    {
+      "pos": 55,
+      "title": "OLIVIA LA FLAKA",
+      "artist": "Natanael Cano, Tito Double P, Victor Mendivil, Ovi",
+      "spotifyId": "6756nr1dYiw5aNLSgIHNOI",
+      "daily": 1748142
+    },
+    {
+      "pos": 56,
+      "title": "Rein Me In (with Olivia Dean)",
+      "artist": "Sam Fender, Olivia Dean",
+      "spotifyId": "0MUXBhPUDF8or0kfQ0EHwV",
+      "daily": 1744173
+    },
+    {
+      "pos": 57,
+      "title": "Locked out of Heaven",
+      "artist": "Bruno Mars",
+      "spotifyId": "5g7sDjBhZ4I3gcFIpkrLuI",
+      "daily": 1738703
+    },
+    {
+      "pos": 58,
+      "title": "Beat It",
+      "artist": "Michael Jackson",
+      "spotifyId": "3BovdzfaX4jb5KFQwoPfAw",
+      "daily": 1703807
+    },
+    {
+      "pos": 59,
+      "title": "Sunflower - Spider-Man: Into the Spider-Verse",
+      "artist": "Post Malone, Swae Lee",
+      "spotifyId": "0RiRZpuVRbi7oqRdSMwhQY",
+      "daily": 1701589
+    },
+    {
+      "pos": 60,
+      "title": "WILDFLOWER",
+      "artist": "Billie Eilish",
+      "spotifyId": "3QaPy1KgI7nu9FJEQUgn6h",
+      "daily": 1687431
+    },
+    {
+      "pos": 61,
+      "title": "The Night We Met",
+      "artist": "Lord Huron",
+      "spotifyId": "5yJaXWIErrrsjQ3J0eR5aK",
+      "daily": 1670687
+    },
+    {
+      "pos": 62,
+      "title": "One Dance",
+      "artist": "Drake, Wizkid, Kyla",
+      "spotifyId": "1zi7xx7UVEFkmKfv06H8x0",
+      "daily": 1665990
+    },
+    {
+      "pos": 63,
+      "title": "DtMF",
+      "artist": "Bad Bunny",
+      "spotifyId": "3sK8wGT43QFpWrvNQsrQya",
+      "daily": 1647729
+    },
+    {
+      "pos": 64,
+      "title": "Beautiful Things",
+      "artist": "Benson Boone",
+      "spotifyId": "3xkHsmpQCBMytMJNiDf3Ii",
+      "daily": 1640293
+    },
+    {
+      "pos": 65,
+      "title": "Sure Thing",
+      "artist": "Miguel",
+      "spotifyId": "0JXXNGljqupsJaZsgSbMZV",
+      "daily": 1630565
+    },
+    {
+      "pos": 66,
+      "title": "Lush Life",
+      "artist": "Zara Larsson",
+      "spotifyId": "1rIKgCH4H52lrvDcz50hS8",
+      "daily": 1623770
+    },
+    {
+      "pos": 67,
+      "title": "Golden",
+      "artist": "HUNTR/X, EJAE, AUDREY NUNA, REI AMI, KPop Demon Hunters Cast",
+      "spotifyId": "1CPZ5BxNNd0n0nF4Orb9JS",
+      "daily": 1585508
+    },
+    {
+      "pos": 68,
+      "title": "505",
+      "artist": "Arctic Monkeys",
+      "spotifyId": "58ge6dfP91o9oXMzq3XkIS",
+      "daily": 1578417
+    },
+    {
+      "pos": 69,
+      "title": "SUPERESTRELLA",
+      "artist": "Aitana",
+      "spotifyId": "6hpuesKPNa3WhV48O7Fa47",
+      "daily": 1569466
+    },
+    {
+      "pos": 70,
+      "title": "No Scrubs",
+      "artist": "TLC",
+      "spotifyId": "1KGi9sZVMeszgZOWivFpxs",
+      "daily": 1566582
+    },
+    {
+      "pos": 71,
+      "title": "In the End",
+      "artist": "Linkin Park",
+      "spotifyId": "60a0Rd6pjrkxjPbaKzXjfq",
+      "daily": 1557377
+    },
+    {
+      "pos": 72,
+      "title": "Pós - Ao Vivo",
+      "artist": "Felipe e Rodrigo",
+      "spotifyId": "1uDn0nbzeGPVw97jp7SvzR",
+      "daily": 1555895
+    },
+    {
+      "pos": 73,
+      "title": "Dreams - 2004 Remaster",
+      "artist": "Fleetwood Mac",
+      "spotifyId": "53qkszfgztIvkFyF31GfdQ",
+      "daily": 1547814
+    },
+    {
+      "pos": 74,
+      "title": "EoO",
+      "artist": "Bad Bunny",
+      "spotifyId": "6J5kc12BW5HuP3d7C3vvx8",
+      "daily": 1545098
+    },
+    {
+      "pos": 75,
+      "title": "Bring Me To Life",
+      "artist": "Evanescence",
+      "spotifyId": "0COqiPhxzoWICwFCS4eZcp",
+      "daily": 1540993
+    },
+    {
+      "pos": 76,
+      "title": "Don't Stop The Music",
+      "artist": "Rihanna",
+      "spotifyId": "1Jo0Zg7XlrA6z0mFTZVdkn",
+      "daily": 1539546
+    },
+    {
+      "pos": 77,
+      "title": "Shape of You",
+      "artist": "Ed Sheeran",
+      "spotifyId": "7qiZfU4dY1lWllzX7mPBI3",
+      "daily": 1530076
+    },
+    {
+      "pos": 78,
+      "title": "Reflections",
+      "artist": "The Neighbourhood",
+      "spotifyId": "2xql0pid3EUwW38AsywxhV",
+      "daily": 1526418
+    },
+    {
+      "pos": 79,
+      "title": "Payphone",
+      "artist": "Maroon 5, Wiz Khalifa",
+      "spotifyId": "1XGmzt0PVuFgQYYnV2It7A",
+      "daily": 1526339
+    },
+    {
+      "pos": 80,
+      "title": "On The Floor",
+      "artist": "Jennifer Lopez, Pitbull",
+      "spotifyId": "3C0nOe05EIt1390bVABLyN",
+      "daily": 1523080
+    },
+    {
+      "pos": 81,
+      "title": "Die On This Hill",
+      "artist": "SIENNA SPIRO",
+      "spotifyId": "7gkZNvBHfI30qG7hA0eopT",
+      "daily": 1518899
+    },
+    {
+      "pos": 82,
+      "title": "Sesi Potret",
+      "artist": "eńau, Ari Lesmana",
+      "spotifyId": "4xoY4lZNoTjEuHsSmhgF1G",
+      "daily": 1514755
+    },
+    {
+      "pos": 83,
+      "title": "That’s So True",
+      "artist": "Gracie Abrams",
+      "spotifyId": "7ne4VBA60CxGM75vw0EYad",
+      "daily": 1493611
+    },
+    {
+      "pos": 84,
+      "title": "Blinding Lights",
+      "artist": "The Weeknd",
+      "spotifyId": "0VjIjW4GlUZAMYd2vXMi3b",
+      "daily": 1487189
+    },
+    {
+      "pos": 85,
+      "title": "Na Para Bang",
+      "artist": "Mariah Deborah",
+      "spotifyId": "5U3UOiWDos9P2NWV7xTNwJ",
+      "daily": 1484282
+    },
+    {
+      "pos": 86,
+      "title": "As It Was",
+      "artist": "Harry Styles",
+      "spotifyId": "4Dvkj6JhhA12EX05fT7y2e",
+      "daily": 1473813
+    },
+    {
+      "pos": 87,
+      "title": "oh yeah?",
+      "artist": "Steve Lacy",
+      "spotifyId": "22NHkFYbgxB2Zirj29Gbp8",
+      "daily": 1458333
+    },
+    {
+      "pos": 88,
+      "title": "Just the Way You Are",
+      "artist": "Bruno Mars",
+      "spotifyId": "7BqBn9nzAq8spo5e7cZ0dJ",
+      "daily": 1454015
+    },
+    {
+      "pos": 89,
+      "title": "Only Girl (In The World)",
+      "artist": "Rihanna",
+      "spotifyId": "2ENexcMEMsYk0rVJigVD3i",
+      "daily": 1448455
+    },
+    {
+      "pos": 90,
+      "title": "BAILE INoLVIDABLE",
+      "artist": "Bad Bunny",
+      "spotifyId": "2lTm559tuIvatlT1u0JYG2",
+      "daily": 1447306
+    },
+    {
+      "pos": 91,
+      "title": "Can't Hold Us (feat. Ray Dalton)",
+      "artist": "Macklemore, Ryan Lewis, Macklemore & Ryan Lewis, Ray Dalton",
+      "spotifyId": "22skzmqfdWrjJylampe0kt",
+      "daily": 1439943
+    },
+    {
+      "pos": 92,
+      "title": "Hips Don't Lie (feat. Wyclef Jean)",
+      "artist": "Shakira, Wyclef Jean",
+      "spotifyId": "3d0WouFnFmr0K3kjeza3fF",
+      "daily": 1434101
+    },
+    {
+      "pos": 93,
+      "title": "we fell in love in october",
+      "artist": "girl in red",
+      "spotifyId": "6IPwKM3fUUzlElbvKw2sKl",
+      "daily": 1432994
+    },
+    {
+      "pos": 94,
+      "title": "Smells Like Teen Spirit",
+      "artist": "Nirvana",
+      "spotifyId": "0gucTLf7trAf37Ua1uAyAu",
+      "daily": 1418847
+    },
+    {
+      "pos": 95,
+      "title": "Midnight Sun",
+      "artist": "Zara Larsson",
+      "spotifyId": "1qRV1dKLOfH1s00b9J2LUQ",
+      "daily": 1417002
+    },
+    {
+      "pos": 96,
+      "title": "honeybee",
+      "artist": "Olivia Rodrigo",
+      "spotifyId": "4kX7xkopoXZCfE1D6fNwl2",
+      "daily": 1412909
+    },
+    {
+      "pos": 97,
+      "title": "Si Antes Te Hubiera Conocido",
+      "artist": "KAROL G",
+      "spotifyId": "73scB4Q4fcOmnsBVZPmk32",
+      "daily": 1411167
+    },
+    {
+      "pos": 98,
+      "title": "Viva La Vida",
+      "artist": "Coldplay",
+      "spotifyId": "1mea3bSkSGXuIRvnydlB5b",
+      "daily": 1406373
+    },
+    {
+      "pos": 99,
+      "title": "Die For You",
+      "artist": "The Weeknd",
+      "spotifyId": "2LBqCSwhJGcFQeTHMVGwy3",
+      "daily": 1403701
+    },
+    {
+      "pos": 100,
+      "title": "Do I Wanna Know?",
+      "artist": "Arctic Monkeys",
+      "spotifyId": "5FVd6KXrgO9B3JPmC8OPst",
+      "daily": 1397853
+    },
+    {
+      "pos": 101,
+      "title": "bloodstream",
+      "artist": "Alyssa Grace",
+      "spotifyId": "2oWFJJW9d1bIra3zHjR6GO",
+      "daily": 1397737
+    },
+    {
+      "pos": 102,
+      "title": "Boston",
+      "artist": "STELLA LEFTY",
+      "spotifyId": "2QihEF7BIfPCJjkB0c4Rrv",
+      "daily": 1387467
+    },
+    {
+      "pos": 103,
+      "title": "Sweet Child O' Mine",
+      "artist": "Guns N' Roses",
+      "spotifyId": "7snQQk1zcKl8gZ92AnueZW",
+      "daily": 1383052
+    },
+    {
+      "pos": 104,
+      "title": "Don't Stop Believin' (2022 Remaster)",
+      "artist": "Journey",
+      "spotifyId": "5RKQ5NdjSh2QzD4MaunT91",
+      "daily": 1381324
+    },
+    {
+      "pos": 105,
+      "title": "We Are The People",
+      "artist": "Empire Of The Sun",
+      "spotifyId": "3zEN0ii6s4DHHBpnTp3RP7",
+      "daily": 1378956
+    },
+    {
+      "pos": 106,
+      "title": "Apocalypse",
+      "artist": "Cigarettes After Sex",
+      "spotifyId": "1oAwsWBovWRIp7qLMGPIet",
+      "daily": 1378341
+    },
+    {
+      "pos": 107,
+      "title": "Mi Chico - Official - Jason Derulo x Melody",
+      "artist": "DJ Goja, Jason Derulo, Melody",
+      "spotifyId": "6c2ZcdXHkEFdsNArdJXrHX",
+      "daily": 1370594
+    },
+    {
+      "pos": 108,
+      "title": "RIKI",
+      "artist": "Neton Vega",
+      "spotifyId": "37wfBdDJidbipEG2fEwkWX",
+      "daily": 1364574
+    },
+    {
+      "pos": 109,
+      "title": "Counting Stars",
+      "artist": "OneRepublic",
+      "spotifyId": "2tpWsVSb9UEmDRxAl1zhX1",
+      "daily": 1364120
+    },
+    {
+      "pos": 110,
+      "title": "Purple Rain",
+      "artist": "Prince",
+      "spotifyId": "1uvyZBs4IZYRebHIB1747m",
+      "daily": 1364105
+    },
+    {
+      "pos": 111,
+      "title": "Take on Me",
+      "artist": "a-ha",
+      "spotifyId": "04aigH9HRGebQZu1JAN6X1",
+      "daily": 1359295
+    },
+    {
+      "pos": 112,
+      "title": "That's What I Like",
+      "artist": "Bruno Mars",
+      "spotifyId": "0KKkJNfGyhkQ5aFogxQAPU",
+      "daily": 1349714
+    },
+    {
+      "pos": 113,
+      "title": "Teh Hijau",
+      "artist": "Tulus",
+      "spotifyId": "4R9G7azXaZe93KTX65P9fU",
+      "daily": 1343702
+    },
+    {
+      "pos": 114,
+      "title": "Amor",
+      "artist": "Emmanuel Cortes",
+      "spotifyId": "6r6IPuFvUX72kQGc9b46rk",
+      "daily": 1338153
+    },
+    {
+      "pos": 115,
+      "title": "APT.",
+      "artist": "ROSÉ, Bruno Mars",
+      "spotifyId": "4wJ5Qq0jBN4ajy7ouZIV1c",
+      "daily": 1336544
+    },
+    {
+      "pos": 116,
+      "title": "Lose Control",
+      "artist": "Teddy Swims",
+      "spotifyId": "17phhZDn6oGtzMe56NuWvj",
+      "daily": 1335576
+    },
+    {
+      "pos": 117,
+      "title": "Janice STFU",
+      "artist": "Drake",
+      "spotifyId": "514joG57v4yKTsfQmz7stz",
+      "daily": 1334200
+    },
+    {
+      "pos": 118,
+      "title": "See You Again (feat. Kali Uchis)",
+      "artist": "Tyler, The Creator, Kali Uchis",
+      "spotifyId": "7KA4W4McWYRpgf0fWsJZWB",
+      "daily": 1329989
+    },
+    {
+      "pos": 119,
+      "title": "Stateside + Zara Larsson",
+      "artist": "PinkPantheress, Zara Larsson",
+      "spotifyId": "1DwscornXpj8fmOmYVlqZt",
+      "daily": 1329671
+    },
+    {
+      "pos": 120,
+      "title": "Danza Kuduro",
+      "artist": "Don Omar, Lucenzo",
+      "spotifyId": "2a1o6ZejUi8U3wzzOtCOYw",
+      "daily": 1327511
+    },
+    {
+      "pos": 121,
+      "title": "Umbrella",
+      "artist": "Rihanna, JAŸ-Z",
+      "spotifyId": "2yPoXCs7BSIUrucMdK5PzV",
+      "daily": 1325488
+    },
+    {
+      "pos": 122,
+      "title": "Movin' To The Sun",
+      "artist": "HUGEL, Imael Angel, Ultra Naté",
+      "spotifyId": "4vTsKN15Kqo3Geo9r7FhAN",
+      "daily": 1325292
+    },
+    {
+      "pos": 123,
+      "title": "Sparks",
+      "artist": "Coldplay",
+      "spotifyId": "7D0RhFcb3CrfPuTJ0obrod",
+      "daily": 1321665
+    },
+    {
+      "pos": 124,
+      "title": "COQUETA",
+      "artist": "Fuerza Regida, Grupo Frontera",
+      "spotifyId": "1PREzVLuDT6PSE9sej4wnV",
+      "daily": 1315566
+    },
+    {
+      "pos": 125,
+      "title": "Give Me Everything (feat. Nayer)",
+      "artist": "Pitbull, AFROJACK, Ne-Yo, Nayer",
+      "spotifyId": "4QNpBfC0zvjKqPJcyqBy9W",
+      "daily": 1310864
+    },
+    {
+      "pos": 126,
+      "title": "Dunia Yang Nanti",
+      "artist": "Raim Laode",
+      "spotifyId": "1sVQuuvFDKu6vklPVeiUXT",
+      "daily": 1307993
+    },
+    {
+      "pos": 127,
+      "title": "Dracula (with JENNIE)",
+      "artist": "Tame Impala, JENNIE",
+      "spotifyId": "5yvVYFDUpbnjcnRBgjwTzM",
+      "daily": 1306691
+    },
+    {
+      "pos": 128,
+      "title": "Young And Beautiful",
+      "artist": "Lana Del Rey",
+      "spotifyId": "2nMeu6UenVvwUktBCpLMK9",
+      "daily": 1294240
+    },
+    {
+      "pos": 129,
+      "title": "Have You Ever Seen The Rain",
+      "artist": "Creedence Clearwater Revival",
+      "spotifyId": "2LawezPeJhN4AWuSB0GtAU",
+      "daily": 1292737
+    },
+    {
+      "pos": 130,
+      "title": "Feel Good Inc.",
+      "artist": "Gorillaz, De La Soul",
+      "spotifyId": "0d28khcov6AiegSCpG5TuT",
+      "daily": 1289697
+    },
+    {
+      "pos": 131,
+      "title": "Flash - Ao Vivo",
+      "artist": "Hugo & Guilherme",
+      "spotifyId": "3rRihXlOCLUlkQTzglpwCi",
+      "daily": 1288618
+    },
+    {
+      "pos": 132,
+      "title": "Numb",
+      "artist": "Linkin Park",
+      "spotifyId": "2nLtzopw4rPReszdYBJU6h",
+      "daily": 1288174
+    },
+    {
+      "pos": 133,
+      "title": "There's Nothing Holdin' Me Back",
+      "artist": "Shawn Mendes",
+      "spotifyId": "7JJmb5XwzOO8jgpou264Ml",
+      "daily": 1285194
+    },
+    {
+      "pos": 134,
+      "title": "Me Rehúso",
+      "artist": "Danny Ocean",
+      "spotifyId": "6ifUES3keWjwXgae8pXI3o",
+      "daily": 1281582
+    },
+    {
+      "pos": 135,
+      "title": "Empire State Of Mind",
+      "artist": "JAŸ-Z, Alicia Keys",
+      "spotifyId": "2igwFfvr1OAGX9SKDCPBwO",
+      "daily": 1277480
+    },
+    {
+      "pos": 136,
+      "title": "We Found Love",
+      "artist": "Rihanna, Calvin Harris",
+      "spotifyId": "1zv3WFUbZ5vPxFq9I2jAU1",
+      "daily": 1269796
+    },
+    {
+      "pos": 137,
+      "title": "All The Stars (with SZA) - From \"Black Panther: The Album\"",
+      "artist": "Kendrick Lamar, SZA",
+      "spotifyId": "3GCdLUSnKSMJhs4Tj6CV3s",
+      "daily": 1268485
+    },
+    {
+      "pos": 138,
+      "title": "Unforgettable",
+      "artist": "French Montana, Swae Lee",
+      "spotifyId": "3B54sVLJ402zGa6Xm4YGNe",
+      "daily": 1266355
+    },
+    {
+      "pos": 139,
+      "title": "The Man Who Can't Be Moved",
+      "artist": "The Script",
+      "spotifyId": "3nqqDo8CcCLke3ZoTgiOKf",
+      "daily": 1261280
+    },
+    {
+      "pos": 140,
+      "title": "Te Estoy Correteando",
+      "artist": "LATIN MAFIA, Fred again..",
+      "spotifyId": "5B579RUazOpBcuxjTZWnMs",
+      "daily": 1259560
+    },
+    {
+      "pos": 141,
+      "title": "My Body Isn't Ready",
+      "artist": "sombr",
+      "spotifyId": "79RJg6MqIJlBuedcMqB9F0",
+      "daily": 1256124
+    },
+    {
+      "pos": 142,
+      "title": "Everybody Wants To Rule The World",
+      "artist": "Tears For Fears",
+      "spotifyId": "2YiCMmONQcoMPX2bV1LxE0",
+      "daily": 1255905
+    },
+    {
+      "pos": 143,
+      "title": "Babydoll",
+      "artist": "Jamie Miller",
+      "spotifyId": "1o9mAOmNm3wT2NdyGV1Ard",
+      "daily": 1255520
+    },
+    {
+      "pos": 144,
+      "title": "Barsaat",
+      "artist": "Banjaare, Roni",
+      "spotifyId": "0DpUQ3mpAGy3bYsEKVy6t5",
+      "daily": 1252566
+    },
+    {
+      "pos": 145,
+      "title": "Talking Body",
+      "artist": "Tove Lo",
+      "spotifyId": "7cgu4JBW3hq1GwTM1ilkKQ",
+      "daily": 1251176
+    },
+    {
+      "pos": 146,
+      "title": "Confident",
+      "artist": "Justin Bieber, Chance the Rapper",
+      "spotifyId": "6czM6UMQD9qE5GAUp68oud",
+      "daily": 1249211
+    },
+    {
+      "pos": 147,
+      "title": "Ayúdame",
+      "artist": "LOS DOS DE TAMAULIPAS",
+      "spotifyId": "45f6FcdWcuBGB4GvFuwr9f",
+      "daily": 1248615
+    },
+    {
+      "pos": 148,
+      "title": "Duvet",
+      "artist": "bôa",
+      "spotifyId": "42qNWdLKCI41S4uzfamhFM",
+      "daily": 1247555
+    },
+    {
+      "pos": 149,
+      "title": "Solar Eclipse (feat. Don Toliver)",
+      "artist": "Drake, Don Toliver",
+      "spotifyId": "4IAWZw00ZI9DLKDjesx86u",
+      "daily": 1246850
+    },
+    {
+      "pos": 150,
+      "title": "Hootie Frutti",
+      "artist": "KATSEYE",
+      "spotifyId": "3NxXZVLBdHsNMOaTvBaF3b",
+      "daily": 1246423
+    },
+    {
+      "pos": 151,
+      "title": "Fade Into You",
+      "artist": "Mazzy Star",
+      "spotifyId": "1LzNfuep1bnAUR9skqdHCK",
+      "daily": 1246289
+    },
+    {
+      "pos": 152,
+      "title": "Orbiter",
+      "artist": "Noah Kahan",
+      "spotifyId": "77fL8ATR0dpUDLI0XLmDBV",
+      "daily": 1236398
+    },
+    {
+      "pos": 153,
+      "title": "Kiss It Better",
+      "artist": "Rihanna",
+      "spotifyId": "0UHB9METy4VCXNgkcGqHqS",
+      "daily": 1235361
+    },
+    {
+      "pos": 154,
+      "title": "iqro'",
+      "artist": "Raim Laode",
+      "spotifyId": "2ImWVGyYTRMi64861WCCcq",
+      "daily": 1228239
+    },
+    {
+      "pos": 155,
+      "title": "Let Me Love You",
+      "artist": "DJ Snake, Justin Bieber",
+      "spotifyId": "0lYBSQXN6rCTvUZvg9S0lU",
+      "daily": 1225168
+    },
+    {
+      "pos": 156,
+      "title": "NUEVAYoL",
+      "artist": "Bad Bunny",
+      "spotifyId": "5TFD2bmFKGhoCRbX61nXY5",
+      "daily": 1219433
+    },
+    {
+      "pos": 157,
+      "title": "Alfaaz",
+      "artist": "Hamza Malik, Zain Zohaib",
+      "spotifyId": "0tW2gwaRzFQQrgr2UCO56G",
+      "daily": 1216409
+    },
+    {
+      "pos": 158,
+      "title": "De Lejitos - Remix",
+      "artist": "Jay Wheeler, Omar Courtz",
+      "spotifyId": "5dgREmLlxVJn6h8U0CofEo",
+      "daily": 1211561
+    },
+    {
+      "pos": 159,
+      "title": "Homewrecker",
+      "artist": "sombr",
+      "spotifyId": "7tICCrK3CcyRFKza7yrR0z",
+      "daily": 1210176
+    },
+    {
+      "pos": 160,
+      "title": "Paparazzi",
+      "artist": "Lady Gaga",
+      "spotifyId": "02XnQdf7sipaKBBHixz3Zp",
+      "daily": 1210007
+    },
+    {
+      "pos": 161,
+      "title": "STORM II",
+      "artist": "GENER8ION, Yung Lean",
+      "spotifyId": "4ipD5CMmWkehabGlAGTOBB",
+      "daily": 1205052
+    },
+    {
+      "pos": 162,
+      "title": "Espresso",
+      "artist": "Sabrina Carpenter",
+      "spotifyId": "2HRqTpkrJO5ggZyyK6NPWz",
+      "daily": 1203351
+    },
+    {
+      "pos": 163,
+      "title": "Gabriela",
+      "artist": "KATSEYE",
+      "spotifyId": "1xOqGUkyxGQRdCvGpvWKmL",
+      "daily": 1201845
+    },
+    {
+      "pos": 164,
+      "title": "Zombie - 2025 Remastered",
+      "artist": "The Cranberries",
+      "spotifyId": "3gjHnylel3PTRpjS44ocqr",
+      "daily": 1191086
+    },
+    {
+      "pos": 165,
+      "title": "deja vu",
+      "artist": "Olivia Rodrigo",
+      "spotifyId": "6HU7h9RYOaPRFeh0R3UeAr",
+      "daily": 1190930
+    },
+    {
+      "pos": 166,
+      "title": "Timeless (feat Playboi Carti)",
+      "artist": "The Weeknd, Playboi Carti",
+      "spotifyId": "0FIDCNYYjNvPVimz5icugS",
+      "daily": 1186763
+    },
+    {
+      "pos": 167,
+      "title": "12 to 12",
+      "artist": "sombr",
+      "spotifyId": "05od2qm2MTSKCHxy1GBp5W",
+      "daily": 1184349
+    },
+    {
+      "pos": 168,
+      "title": "About You",
+      "artist": "The 1975",
+      "spotifyId": "3hEfpBHxgieRLz4t3kLNEg",
+      "daily": 1183986
+    },
+    {
+      "pos": 169,
+      "title": "NORMAL",
+      "artist": "BTS",
+      "spotifyId": "4B4Q7zfd0aHcuhQBfCRnH5",
+      "daily": 1183609
+    },
+    {
+      "pos": 170,
+      "title": "Dandy Hats",
+      "artist": "El Rabbanito",
+      "spotifyId": "3XtzisizPzb5ednIuoyVAM",
+      "daily": 1183378
+    },
+    {
+      "pos": 171,
+      "title": "Perfect",
+      "artist": "Ed Sheeran",
+      "spotifyId": "0tgVpDi06FyKpA1z0VMD4v",
+      "daily": 1183103
+    },
+    {
+      "pos": 172,
+      "title": "Your Love",
+      "artist": "The Outfield",
+      "spotifyId": "0WoFs3EdGOx58yX5BtXvOa",
+      "daily": 1180390
+    },
+    {
+      "pos": 173,
+      "title": "Promiscuous",
+      "artist": "Nelly Furtado, Timbaland",
+      "spotifyId": "2gam98EZKrF9XuOkU13ApN",
+      "daily": 1179428
+    },
+    {
+      "pos": 174,
+      "title": "SaWaDiKa",
+      "artist": "LISA",
+      "spotifyId": "1VWiDyYTrqQhhmnWANWkFa",
+      "daily": 1175789
+    },
+    {
+      "pos": 175,
+      "title": "We Don't Talk Anymore (feat. Selena Gomez)",
+      "artist": "Charlie Puth, Selena Gomez",
+      "spotifyId": "54PbBpquVfhfrwRwvjSXbI",
+      "daily": 1175456
+    },
+    {
+      "pos": 176,
+      "title": "Into You",
+      "artist": "Ariana Grande",
+      "spotifyId": "76FZM38RC8XaAjJ77CVTNe",
+      "daily": 1174939
+    },
+    {
+      "pos": 177,
+      "title": "Love On The Brain",
+      "artist": "Rihanna",
+      "spotifyId": "5oO3drDxtziYU2H1X23ZIp",
+      "daily": 1173159
+    },
+    {
+      "pos": 178,
+      "title": "Closer",
+      "artist": "The Chainsmokers, Halsey",
+      "spotifyId": "7BKLCZ1jbUBVqRi2FVlTVw",
+      "daily": 1173022
+    },
+    {
+      "pos": 179,
+      "title": "Tu Boda",
+      "artist": "Oscar Maydon, Fuerza Regida",
+      "spotifyId": "5mp6OBKCAjN4UYRvhOuUze",
+      "daily": 1172294
+    },
+    {
+      "pos": 180,
+      "title": "Manchild",
+      "artist": "Sabrina Carpenter",
+      "spotifyId": "2BwO5K8Q7EPAJSGze3AAh9",
+      "daily": 1169673
+    },
+    {
+      "pos": 181,
+      "title": "Poker Face",
+      "artist": "Lady Gaga",
+      "spotifyId": "1QV6tiMFM6fSOKOGLMHYYg",
+      "daily": 1167797
+    },
+    {
+      "pos": 182,
+      "title": "UNETHICAL",
+      "artist": "Faouzia",
+      "spotifyId": "7G8EmDx7L5zRHb6rBJDqEG",
+      "daily": 1166254
+    },
+    {
+      "pos": 183,
+      "title": "I Gotta Feeling",
+      "artist": "Black Eyed Peas",
+      "spotifyId": "4kLLWz7srcuLKA7Et40PQR",
+      "daily": 1162447
+    },
+    {
+      "pos": 184,
+      "title": "The Chain - 2004 Remaster",
+      "artist": "Fleetwood Mac",
+      "spotifyId": "2MRjYBbIbH1VTToIrO1mdi",
+      "daily": 1157278
+    },
+    {
+      "pos": 185,
+      "title": "Linger - Remastered 2026",
+      "artist": "The Cranberries",
+      "spotifyId": "1WYrTfvKjQYaYfVziGG1ET",
+      "daily": 1155390
+    },
+    {
+      "pos": 186,
+      "title": "Livin' On A Prayer",
+      "artist": "Bon Jovi",
+      "spotifyId": "0ee1DiZF94NSqqpG0XHUzH",
+      "daily": 1154624
+    },
+    {
+      "pos": 187,
+      "title": "Pure",
+      "artist": "SIENNA SPIRO",
+      "spotifyId": "31IKMjvv6Oskp4hjGVeYsT",
+      "daily": 1151137
+    },
+    {
+      "pos": 188,
+      "title": "Flashing Lights",
+      "artist": "Kanye West, Dwele",
+      "spotifyId": "5TRPicyLGbAF2LGBFbHGvO",
+      "daily": 1146522
+    },
+    {
+      "pos": 189,
+      "title": "Chicago",
+      "artist": "Michael Jackson",
+      "spotifyId": "5BKKy9fIJL5uM9fz1SnqyP",
+      "daily": 1145826
+    },
+    {
+      "pos": 190,
+      "title": "Baby",
+      "artist": "Justin Bieber, Ludacris",
+      "spotifyId": "6epn3r7S14KUqlReYr77hA",
+      "daily": 1143820
+    },
+    {
+      "pos": 191,
+      "title": "Titanium (feat. Sia)",
+      "artist": "David Guetta, Sia",
+      "spotifyId": "0lHAMNU8RGiIObScrsRgmP",
+      "daily": 1143749
+    },
+    {
+      "pos": 192,
+      "title": "Somewhere Only We Know",
+      "artist": "Keane",
+      "spotifyId": "0ll8uFnc0nANY35E0Lfxvg",
+      "daily": 1141145
+    },
+    {
+      "pos": 193,
+      "title": "When I Was Your Man",
+      "artist": "Bruno Mars",
+      "spotifyId": "0B7wvvmu9EISAwZnOpjhNI",
+      "daily": 1136827
+    },
+    {
+      "pos": 194,
+      "title": "Cinnamon Girl",
+      "artist": "Lana Del Rey",
+      "spotifyId": "2mdEsXPu8ZmkHRRtAdC09e",
+      "daily": 1134029
+    },
+    {
+      "pos": 195,
+      "title": "I Just Might",
+      "artist": "Bruno Mars",
+      "spotifyId": "6f68Ac5tt5BQOpwr0BV9oN",
+      "daily": 1133747
+    },
+    {
+      "pos": 196,
+      "title": "No One Noticed",
+      "artist": "The Marías",
+      "spotifyId": "3siwsiaEoU4Kuuc9WKMUy5",
+      "daily": 1133681
+    },
+    {
+      "pos": 197,
+      "title": "S&M",
+      "artist": "Rihanna",
+      "spotifyId": "7ySUcLPVX7KudhnmNcgY2D",
+      "daily": 1131666
+    },
+    {
+      "pos": 198,
+      "title": "Dracula",
+      "artist": "Tame Impala",
+      "spotifyId": "1NXbNEAcPvY5G1xvfN57aA",
+      "daily": 1129921
+    },
+    {
+      "pos": 199,
+      "title": "Wicked Game",
+      "artist": "Chris Isaak",
+      "spotifyId": "2y42xAsl6dfMeVXQgOYsUw",
+      "daily": 1129140
+    },
+    {
+      "pos": 200,
+      "title": "Another Love",
+      "artist": "Tom Odell",
+      "spotifyId": "7jtQIBanIiJOMS6RyCx6jZ",
+      "daily": 1125926
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-12T18:50:55.835Z",
+  "updated": "2026-10-12T18:56:33.061Z",
   "calibration": 1,
   "tracks": {
     "4IAWZw00ZI9DLKDjesx86u": [
@@ -13,13 +13,13 @@
     "67DgVQlvQ0qilSBN1hdkKN": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 13071896
+        "total": 13071896,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 13071896
+        "total": 13071896,
+        "provider": "mystreamcount"
       }
     ],
     "7scFxt9VhL4FJwuPSfRlfN": [
@@ -39,13 +39,13 @@
     "50GVx8sCc1TDKHXumgYqEO": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 13039675
+        "total": 13039675,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 13039675
+        "total": 13039675,
+        "provider": "mystreamcount"
       }
     ],
     "11hcBLPtbMp4aQI6zGQLub": [
@@ -65,25 +65,25 @@
     "5qGziX9216V8hKJjGg8RtH": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 22874515
+        "total": 22874515,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 22874515
+        "total": 22874515,
+        "provider": "mystreamcount"
       }
     ],
     "3xwMjQriBVW0OGEvNKo9c0": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 79650622
+        "total": 79650622,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 79650622
+        "total": 79650622,
+        "provider": "mystreamcount"
       }
     ],
     "70cHKK8bHAfJrOGVnfRG9J": [
@@ -124,13 +124,13 @@
     "59nOXPmaKlBfGMDeOVGrIK": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1424636860
+        "total": 1424636860,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1424636860
+        "total": 1424636860,
+        "provider": "mystreamcount"
       }
     ],
     "31lopd32BkJBTSgYE16c5e": [
@@ -143,13 +143,13 @@
     "5BbdKBZO0TH0GhfxUfyhL9": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 997561560
+        "total": 997561560,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 997561560
+        "total": 997561560,
+        "provider": "mystreamcount"
       }
     ],
     "3HkQz0gJg8AleZI6naFSr4": [
@@ -162,13 +162,13 @@
     "5ZAMlvo6ZUjVRZOGu2bJib": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 76211051
+        "total": 76211051,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 76211051
+        "total": 76211051,
+        "provider": "mystreamcount"
       }
     ],
     "3HlWVKwU0JqJXqJK9DWHnZ": [
@@ -195,13 +195,13 @@
     "3gOL6mYIq19Oq8raxIntrV": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 74392486
+        "total": 74392486,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 74392486
+        "total": 74392486,
+        "provider": "mystreamcount"
       }
     ],
     "2j7wI9QWrP8cjKDdOLVQTU": [
@@ -214,85 +214,85 @@
     "2nEfvO4T7gERNdrPD3iI8g": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 5465429
+        "total": 5465429,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 5465429
+        "total": 5465429,
+        "provider": "mystreamcount"
       }
     ],
     "3WcC6NH9J77xPEvj1SOL7z": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 242262515
+        "total": 242262515,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 242262515
+        "total": 242262515,
+        "provider": "mystreamcount"
       }
     ],
     "1VOSSXuWRcBj2rpfxNdX9v": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 539888777
+        "total": 539888777,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 539888777
+        "total": 539888777,
+        "provider": "mystreamcount"
       }
     ],
     "583dMdiUquLMenarTp7PQm": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1572356109
+        "total": 1572356109,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1572356109
+        "total": 1572356109,
+        "provider": "mystreamcount"
       }
     ],
     "02Ya2Q08bBKFqUJvjmyRXK": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 374611460
+        "total": 374611460,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 374611460
+        "total": 374611460,
+        "provider": "mystreamcount"
       }
     ],
     "19n0UZuW8AArMVWNztoXu9": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 59006861
+        "total": 59006861,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 59006861
+        "total": 59006861,
+        "provider": "mystreamcount"
       }
     ],
     "0AAVJIN4plafvmNKqRCltG": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 97146190
+        "total": 97146190,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 97146190
+        "total": 97146190,
+        "provider": "mystreamcount"
       }
     ],
     "1qbmS6ep2hbBRaEZFpn7BX": [
@@ -312,13 +312,13 @@
     "65OVbaJR5O1RmwOQx0875b": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1019321414
+        "total": 1019321414,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1019321414
+        "total": 1019321414,
+        "provider": "mystreamcount"
       }
     ],
     "7ujApz6iFP3PmKIDGcaGbe": [
@@ -338,37 +338,37 @@
     "047fCsbO4NdmwCBn8pcUXl": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 845949013
+        "total": 845949013,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 845949013
+        "total": 845949013,
+        "provider": "mystreamcount"
       }
     ],
     "20fAoPjfYltmd3K3bO7gbt": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 180472205
+        "total": 180472205,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 180472205
+        "total": 180472205,
+        "provider": "mystreamcount"
       }
     ],
     "5f4Hy5mw5SRaUgXX9c6P5S": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 638431548
+        "total": 638431548,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 638431548
+        "total": 638431548,
+        "provider": "mystreamcount"
       }
     ],
     "36idurZmYRjJ56KQ8JD9bN": [
@@ -388,13 +388,13 @@
     "2uwnP6tZVVmTovzX5ELooy": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1004456866
+        "total": 1004456866,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1004456866
+        "total": 1004456866,
+        "provider": "mystreamcount"
       }
     ],
     "2lpygKqzPFtItQ4ss3cgfb": [
@@ -407,37 +407,37 @@
     "5YanmSgudc0CaxZrn40YnM": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1026189910
+        "total": 1026189910,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1026189910
+        "total": 1026189910,
+        "provider": "mystreamcount"
       }
     ],
     "3gyJbNBTRVRdZDA1yO3clm": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 38841820
+        "total": 38841820,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 38841820
+        "total": 38841820,
+        "provider": "mystreamcount"
       }
     ],
     "1SF8piqsZWn86DajVKih8F": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 218312904
+        "total": 218312904,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 218312904
+        "total": 218312904,
+        "provider": "mystreamcount"
       }
     ],
     "04emojnbYkrRmv5qtJcgVP": [
@@ -450,25 +450,25 @@
     "6ws54n2IzyrIxxyzlG2bVJ": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 158213584
+        "total": 158213584,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 158213584
+        "total": 158213584,
+        "provider": "mystreamcount"
       }
     ],
     "4mtmmBBEgdJLYWnLy5zvWE": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 831161205
+        "total": 831161205,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 831161205
+        "total": 831161205,
+        "provider": "mystreamcount"
       }
     ],
     "2BcMwX1MPV6ZHP4tUT9uq6": [
@@ -481,13 +481,13 @@
     "03UERpSRNgwNt1poeQQZ0M": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 6398232
+        "total": 6398232,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 6398232
+        "total": 6398232,
+        "provider": "mystreamcount"
       }
     ],
     "4DEIW3K4lQj5F9lgWrNn8M": [
@@ -507,13 +507,13 @@
     "644rGY6maSElnKVsAg1gJj": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 416534103
+        "total": 416534103,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 416534103
+        "total": 416534103,
+        "provider": "mystreamcount"
       }
     ],
     "2A22iI0x4EYAVXNpKPhNEM": [
@@ -526,49 +526,49 @@
     "2fXwCWkh6YG5zU1IyvQrbs": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1021905258
+        "total": 1021905258,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1021905258
+        "total": 1021905258,
+        "provider": "mystreamcount"
       }
     ],
     "7uxkx8HPBYkJKcimOyggUM": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 39155051
+        "total": 39155051,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 39155051
+        "total": 39155051,
+        "provider": "mystreamcount"
       }
     ],
     "3pXF1nA74528Edde4of9CC": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1964718937
+        "total": 1964718937,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1964718937
+        "total": 1964718937,
+        "provider": "mystreamcount"
       }
     ],
     "5ry2OE6R2zPQFDO85XkgRb": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1153895810
+        "total": 1153895810,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1153895810
+        "total": 1153895810,
+        "provider": "mystreamcount"
       }
     ],
     "003vvx7Niy0yvhvHt4a68B": [
@@ -588,49 +588,49 @@
     "477ztj2o2hYKeUjUrKk8K5": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 8241810
+        "total": 8241810,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 8241810
+        "total": 8241810,
+        "provider": "mystreamcount"
       }
     ],
     "6DCZcSspjsKoFjzjrWoCdn": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 3198937071
+        "total": 3198937071,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 3198937071
+        "total": 3198937071,
+        "provider": "mystreamcount"
       }
     ],
     "3aSWXU6owkZeVhh94XxEWO": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 367737047
+        "total": 367737047,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 367737047
+        "total": 367737047,
+        "provider": "mystreamcount"
       }
     ],
     "6AI3ezQ4o3HUoP6Dhudph3": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 2056573407
+        "total": 2056573407,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 2056573407
+        "total": 2056573407,
+        "provider": "mystreamcount"
       }
     ],
     "77fL8ATR0dpUDLI0XLmDBV": [
@@ -643,49 +643,49 @@
     "5m0yZ33oOy0yYBtdTXuxQe": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 385610186
+        "total": 385610186,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 385610186
+        "total": 385610186,
+        "provider": "mystreamcount"
       }
     ],
     "6vjpQIdABqntoe3zPazPec": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 171034633
+        "total": 171034633,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 171034633
+        "total": 171034633,
+        "provider": "mystreamcount"
       }
     ],
     "2JPLbjOn0wPCngEot2STUS": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1724414772
+        "total": 1724414772,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1724414772
+        "total": 1724414772,
+        "provider": "mystreamcount"
       }
     ],
     "2tudvzsrR56uom6smgOcSf": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1065723786
+        "total": 1065723786,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1065723786
+        "total": 1065723786,
+        "provider": "mystreamcount"
       }
     ],
     "0j7cf4wWPAvvvLPbCA6nBC": [
@@ -698,37 +698,37 @@
     "3WMj8moIAXJhHsyLaqIIHI": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1676697944
+        "total": 1676697944,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1676697944
+        "total": 1676697944,
+        "provider": "mystreamcount"
       }
     ],
     "3fqwjXwUGN6vbzIwvyFMhx": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1597222042
+        "total": 1597222042,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1597222042
+        "total": 1597222042,
+        "provider": "mystreamcount"
       }
     ],
     "0a5qYlqZgVqynD4lsGwvPT": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 15847249
+        "total": 15847249,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 15847249
+        "total": 15847249,
+        "provider": "mystreamcount"
       }
     ],
     "4U1wiRcBOsDvxFbw0hJgq7": [
@@ -741,13 +741,13 @@
     "62nb5YUYUqtYJhVPwRhCke": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 87335485
+        "total": 87335485,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 87335485
+        "total": 87335485,
+        "provider": "mystreamcount"
       }
     ],
     "5kuhuKFtFU0PXLN05ojJRW": [
@@ -767,97 +767,97 @@
     "5mCPDVBb16L4XQwDdbRUpz": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 2408688767
+        "total": 2408688767,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 2408688767
+        "total": 2408688767,
+        "provider": "mystreamcount"
       }
     ],
     "0eBFgRxyVSeuT4iyrbukdn": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 701633324
+        "total": 701633324,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 701633324
+        "total": 701633324,
+        "provider": "mystreamcount"
       }
     ],
     "5hb2X5SnGfVnNQyqAWJCch": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 48955813
+        "total": 48955813,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 48955813
+        "total": 48955813,
+        "provider": "mystreamcount"
       }
     ],
     "3B4cjvGlPvyBLNG3AzEgkZ": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 371622549
+        "total": 371622549,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 371622549
+        "total": 371622549,
+        "provider": "mystreamcount"
       }
     ],
     "0HrWshW3SuFJ6nKS9ba9Mh": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 120142520
+        "total": 120142520,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 120142520
+        "total": 120142520,
+        "provider": "mystreamcount"
       }
     ],
     "312z6PZ8wwREck8613PkJk": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 415087685
+        "total": 415087685,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 415087685
+        "total": 415087685,
+        "provider": "mystreamcount"
       }
     ],
     "1Lo0QY9cvc8sUB2vnIOxDT": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1049024069
+        "total": 1049024069,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1049024069
+        "total": 1049024069,
+        "provider": "mystreamcount"
       }
     ],
     "3EUl8M6SzxZl03NPkB8mUd": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 601479572
+        "total": 601479572,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 601479572
+        "total": 601479572,
+        "provider": "mystreamcount"
       }
     ],
     "2QjOHCTQ1Jl3zawyYOpxh6": [
@@ -870,25 +870,25 @@
     "2rxQMGVafnNaRaXlRMWPde": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1207537579
+        "total": 1207537579,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1207537579
+        "total": 1207537579,
+        "provider": "mystreamcount"
       }
     ],
     "34oWbFBfGEElvgO0a5c9V4": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 751396680
+        "total": 751396680,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 751396680
+        "total": 751396680,
+        "provider": "mystreamcount"
       }
     ],
     "5J6CXHvsfRGyyCnQZmVPoE": [
@@ -901,13 +901,13 @@
     "7vxLj7MREliG5i5vSnqSVr": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 262360079
+        "total": 262360079,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 262360079
+        "total": 262360079,
+        "provider": "mystreamcount"
       }
     ],
     "0yhMmqax6HRAZxI7udEask": [
@@ -941,13 +941,13 @@
     "6gBFPUFcJLzWGx4lenP6h2": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 3244111172
+        "total": 3244111172,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 3244111172
+        "total": 3244111172,
+        "provider": "mystreamcount"
       }
     ],
     "7aLndReanHBzpTGE5Am9H8": [
@@ -967,37 +967,37 @@
     "3FSwpQ9dBZBeBV6UdYHI2R": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 145545497
+        "total": 145545497,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 145545497
+        "total": 145545497,
+        "provider": "mystreamcount"
       }
     ],
     "3O8NlPh2LByMU9lSRSHedm": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 959653007
+        "total": 959653007,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 959653007
+        "total": 959653007,
+        "provider": "mystreamcount"
       }
     ],
     "2j0mQg77Ivev2aIksyiiqc": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 4173210
+        "total": 4173210,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 4173210
+        "total": 4173210,
+        "provider": "mystreamcount"
       }
     ],
     "6QFCMUUq1T2Vf5sFUXcuQ7": [
@@ -1010,37 +1010,37 @@
     "7L1UsUbSqowTKwrgT0v8AS": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 21163709
+        "total": 21163709,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 21163709
+        "total": 21163709,
+        "provider": "mystreamcount"
       }
     ],
     "03PGemRNLrjn9Efmy2y6OY": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 7150245
+        "total": 7150245,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 7150245
+        "total": 7150245,
+        "provider": "mystreamcount"
       }
     ],
     "5P3Nmg0jSYfrSKoYonTGan": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 2908310
+        "total": 2908310,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 2908310
+        "total": 2908310,
+        "provider": "mystreamcount"
       }
     ],
     "3fRCAPMMZ8l8P9YKI6OCzD": [
@@ -2292,265 +2292,277 @@
     "5aVBxVa0kz9uzv0F4gwdEn": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 146550793
+        "total": 146550793,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 146550793
+        "total": 146550793,
+        "provider": "mystreamcount"
       }
     ],
     "05CjWFAcAlY6O9po6Qwakk": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 290404764
+        "total": 290404764,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 290404764
+        "total": 290404764,
+        "provider": "mystreamcount"
       }
     ],
     "3ihIZrJreMJPjQdNLrEXnP": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 236421516
+        "total": 236421516,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 236421516
+        "total": 236421516,
+        "provider": "mystreamcount"
       }
     ],
     "0SeTP12t4EwBJ6zsjHn9Wa": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 49759814
+        "total": 49759814,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 49759814
+        "total": 49759814,
+        "provider": "mystreamcount"
       }
     ],
     "7AeM1BGYM7emrqmQn1PuWv": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 498001223
+        "total": 498001223,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 498001223
+        "total": 498001223,
+        "provider": "mystreamcount"
       }
     ],
     "45UDzIWgqj5hgQKXLlfdp7": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 125599008
+        "total": 125599008,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 125599008
+        "total": 125599008,
+        "provider": "mystreamcount"
       }
     ],
     "3QLjDkgLh9AOEHlhQtDuhs": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 918819822
+        "total": 918819822,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 918819822
+        "total": 918819822,
+        "provider": "mystreamcount"
       }
     ],
     "249E7AgSyA4vhtXNEjQYb5": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 832820798
+        "total": 832820798,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 832820798
+        "total": 832820798,
+        "provider": "mystreamcount"
       }
     ],
     "4Sb8neYCkT7lyMIo2kOOEC": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 845822162
+        "total": 845822162,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 845822162
+        "total": 845822162,
+        "provider": "mystreamcount"
       }
     ],
     "48NthgcgfoRrWT8LtgW28A": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 479523560
+        "total": 479523560,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 479523560
+        "total": 479523560,
+        "provider": "mystreamcount"
       }
     ],
     "4iZ4pt7kvcaH6Yo8UoZ4s2": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 2088866078
+        "total": 2088866078,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 2088866078
+        "total": 2088866078,
+        "provider": "mystreamcount"
       }
     ],
     "7221xIgOnuakPdLqT0F3nP": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1615469988
+        "total": 1615469988,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1615469988
+        "total": 1615469988,
+        "provider": "mystreamcount"
       }
     ],
     "4v9alNvEjLjvqo4LNWwswl": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 504825337
+        "total": 504825337,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 504825337
+        "total": 504825337,
+        "provider": "mystreamcount"
       }
     ],
     "0VV38e61NaGvYAko5HoHm0": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 31675317
+        "total": 31675317,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 31675317
+        "total": 31675317,
+        "provider": "mystreamcount"
       }
     ],
     "57a4iloBWqan5rtqPJBoVY": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 989620170
+        "total": 989620170,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 989620170
+        "total": 989620170,
+        "provider": "mystreamcount"
       }
     ],
     "6zZvy88xp6FIjJKhqwnJeQ": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 60235157
+        "total": 60235157,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 60235157
+        "total": 60235157,
+        "provider": "mystreamcount"
       }
     ],
     "2P3SLxeQHPqh8qKB6gtJY2": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 763050696
+        "total": 763050696,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 763050696
+        "total": 763050696,
+        "provider": "mystreamcount"
       }
     ],
     "712uvW1Vezq8WpQi38v2L9": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 972484253
+        "total": 960779767,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 960779767
+        "total": 972484253,
+        "provider": "mystreamcount"
       }
     ],
     "6xL9MJ2yt39HPPZPyGkRy8": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 357547598
+        "total": 357547598,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 357547598
+        "total": 357547598,
+        "provider": "mystreamcount"
       }
     ],
     "2XHzzp1j4IfTNp1FTn7YFg": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 1580010521
+        "total": 1580010521,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 1580010521
+        "total": 1580010521,
+        "provider": "mystreamcount"
       }
     ],
     "7ytwCwjXrrgXmpC9Leaw7n": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 70254370
+        "total": 70254370,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 70254370
+        "total": 70254370,
+        "provider": "mystreamcount"
       }
     ],
     "1D5L58KLBbceOynTP4DQnY": [
       {
         "date": "2026-10-12",
-        "provider": "mystreamcount",
-        "total": 173610086
+        "total": 173610086,
+        "provider": "soundcamps"
       },
       {
         "date": "2026-10-12",
-        "provider": "soundcamps",
-        "total": 173610086
+        "total": 173610086,
+        "provider": "mystreamcount"
+      }
+    ],
+    "3LVkyYg0PSo8XInTPKKhZM": [
+      {
+        "date": "2026-10-12",
+        "total": 1533246,
+        "provider": "soundcamps"
+      },
+      {
+        "date": "2026-10-12",
+        "total": 1533246,
+        "provider": "mystreamcount"
       }
     ]
   }
