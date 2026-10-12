@@ -36,16 +36,17 @@ export function verifiedDatedSpotify(snapshot,date) {
   snapshot.sourceUrl!=="https://musicrank.org/spotify"||
   snapshot.region!=="global"||snapshot.date!==date||
   !Array.isArray(snapshot.tracks)||snapshot.tracks.length!==200)return null;
- const ids=new Set(),identity=new Set();
+ const ids=new Set(),identity=new Map();
  for(let i=0;i<200;i++){
   const t=snapshot.tracks[i],key=mergeKey(t?.title,t?.artist);
-  if(t?.pos!==i+1||!key||identity.has(key)||
-    !Number.isSafeInteger(t.daily)||t.daily<=0)return null;
+  if(t?.pos!==i+1||!key||!Number.isSafeInteger(t.daily)||t.daily<=0)return null;
+  const previous=identity.get(key);
+  if(previous&&(!t.spotifyId||!previous.spotifyId))return null;
   if(t.spotifyId){
    if(!/^[A-Za-z0-9]{22}$/.test(t.spotifyId)||ids.has(t.spotifyId))return null;
    ids.add(t.spotifyId);
   }
-  identity.add(key);
+  identity.set(key,{spotifyId:t.spotifyId||null});
  }
  return snapshot;
 }
