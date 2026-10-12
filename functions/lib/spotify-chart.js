@@ -4,7 +4,7 @@ export const SPOTIFY_INPUT_SIZE=200;
 export const SPOTIFY_MAX_LAG_DAYS=3;
 
 function textOf(html){
- return String(html||"").replace(/<[^>]*>/g,"")
+ return String(html||"").replace(/<[^>]*>/g," ")
   .replace(/&#x([\da-f]+);/gi,(_,v)=>String.fromCodePoint(parseInt(v,16)))
   .replace(/&#(\d+);/g,(_,v)=>String.fromCodePoint(Number(v)))
   .replace(/&(amp|quot|apos|nbsp|lt|gt);/gi,(_,v)=>({amp:"&",quot:'"',apos:"'",nbsp:" ",lt:"<",gt:">"})[v.toLowerCase()]||"")
@@ -71,7 +71,7 @@ export function parseMusicrankSpotify(html,limit=SPOTIFY_INPUT_SIZE){
   if(!artist)throw new Error("musicrank_artist_missing_"+(tracks.length+1));
   const flat=textOf(context),stream=flat.match(/([\d.]+)\s*([KMB]?)\s*streams\b/i);
   const daily=stream?compactStreams(stream[1],stream[2]):null;
-  if(!daily)throw new Error("musicrank_streams_missing_"+(tracks.length+1)+":"+title+":"+flat.slice(0,700));
+  if(!daily)throw new Error("musicrank_streams_missing_"+(tracks.length+1));
   seen.add(url);tracks.push({pos:tracks.length+1,title,artist:textOf(artist[1]),daily});
  }
  const verified=validatedSpotifyRows(tracks,limit);
