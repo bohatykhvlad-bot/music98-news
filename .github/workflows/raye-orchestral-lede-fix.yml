@@ -37,7 +37,7 @@ jobs:
           p=rows[0]
           live=(p.get('body') or '').strip()
           live_sha=hashlib.sha256(live.encode()).hexdigest()
-          if live_sha!='92268ff6389725f08d3e849d61c614ee340b02b74fd0016343cd074f2521e045':
+          if live_sha!='c279813136206aa4cc6a4d2504f01d4dc097d0d6efbca9b163c82ceacff2f38d':
               raise SystemExit('RAYE_LIVE_CHANGED_ABORT '+live_sha)
           if p.get('status')!='live' or p.get('type')!='news': raise SystemExit('RAYE_NOT_LIVE_NEWS')
           if p.get('title')!='RAYE Announces One-Night Orchestral Show at Royal Albert Hall': raise SystemExit('RAYE_TITLE_CHANGED')
