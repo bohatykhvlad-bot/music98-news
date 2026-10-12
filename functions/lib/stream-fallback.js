@@ -144,12 +144,18 @@ export function medianValue(values, minimum = 1) {
 export function saveCounterObservation(records,day,total,provider) {
  if(!/^20\d{2}-\d{2}-\d{2}$/.test(day||"")||!Number.isSafeInteger(total)||total<0||
     !["mystreamcount","soundcamps"].includes(provider)) return records||[];
- const valid=(records||[]).filter(x=>x?.provider&&x?.date&&Number.isSafeInteger(x.total)&&
+ const valid=(records||[]).map(x=>{
+   if(x?.provider)return x;
+   if(x?.date&&Number.isSafeInteger(x.total))return {...x,provider:"soundcamps"};
+   return x;
+  }).filter(x=>x?.provider&&x?.date&&Number.isSafeInteger(x.total)&&
    !(x.date===day&&x.provider===provider));
  return [...valid,{date:day,total,provider}].sort((a,b)=>a.date.localeCompare(b.date)).slice(-28);
 }
 export function measuredProviderDelta(records,day,provider){
- return totalDelta((records||[]).filter(x=>x.provider===provider),day);
+ const normalized=(records||[]).map(x=>x?.provider?x:
+   (provider==="soundcamps"&&x?.date&&Number.isSafeInteger(x.total)?{...x,provider:"soundcamps"}:x));
+ return totalDelta(normalized.filter(x=>x?.provider===provider),day);
 }
 export function extractCounterTotal(html){
  const flat=String(html||"").replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi," ")

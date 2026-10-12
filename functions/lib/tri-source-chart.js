@@ -22,10 +22,12 @@ export function songIdentity(title,artist){
 export function sourceRankValid(rank,limit) {
  return rank===null||(Number.isInteger(rank)&&rank>=1&&rank<=limit);
 }
-const sourcePattern=/^https:\/\/kworb\.net\/spotify\/(?:artist\/[A-Za-z0-9]{22}_songs|country\/global_daily)\.html$/;
 export function verifiedSpotifyRow(s,date){
- if(!s||s.status!=="matched"||!Number.isSafeInteger(s.daily)||s.daily<0||
-  !/^[A-Za-z0-9]{22}$/.test(s.spotifyId||""))return false;
+ if(!s||s.status!=="matched"||!Number.isSafeInteger(s.daily)||s.daily<=0)return false;
+ if(s.metric==="musicrank-spotify-chart-global-daily")
+  return s.date===date&&s.sourceUrl==="https://musicrank.org/spotify"&&
+   (!s.spotifyId||/^[A-Za-z0-9]{22}$/.test(s.spotifyId));
+ if(!/^[A-Za-z0-9]{22}$/.test(s.spotifyId||""))return false;
  if(["mystreamcount-daily-delta","mystreamcount-total-delta"].includes(s.metric))
   /* Резервный сайт: MyStreamCount используется только когда основной
      SoundCamps ещё не имеет пары totals для измеренной дневной дельты. */
@@ -36,11 +38,7 @@ export function verifiedSpotifyRow(s,date){
      только измеренная дельта двух реальных дат; trackUrl фиксирует запись. */
   return s.estimated===true&&(s.sourceUrl||"")==="https://soundcamps.com/spotify-stream-checker/"&&
    String(s.trackUrl||"").endsWith("/"+s.spotifyId)&&freshDay(s.date,Date.parse(date+"T00:00:00Z"),3);
- if(s.metric==="kworb-track-global-daily")
-  /* Официальная страница трека: только аварийный резерв, ровно та же дата. */
-  return s.sourceUrl==="https://kworb.net/spotify/track/"+s.spotifyId+".html"&&s.date===date;
- return s.date===date&&sourcePattern.test(s.sourceUrl||"")&&
-  ["kworb-spotify-artist-daily","kworb-spotify-chart-global-daily"].includes(s.metric);
+ return false;
 }
 export function verifiedTriCandidates(rows,date) {
  if(!Array.isArray(rows)||rows.length<100||rows.length>400||!freshDay(date,Date.now(),TRI_MAX_LAG_DAYS))return false;
@@ -55,8 +53,11 @@ export function verifiedTriCandidates(rows,date) {
    if(r[src]!==null){if(positions[src].has(r[src]))return false;positions[src].add(r[src]);}
   }
   if(t.spotify?.status==="matched"){
-   if(!verifiedSpotifyRow(t.spotify,date)||ids.has(t.spotify.spotifyId))return false;
-   ids.add(t.spotify.spotifyId);
+   if(!verifiedSpotifyRow(t.spotify,date))return false;
+   if(t.spotify.spotifyId){
+    if(ids.has(t.spotify.spotifyId))return false;
+    ids.add(t.spotify.spotifyId);
+   }
   } else if(t.spotify?.status!=="unavailable"||t.spotify.daily!==null)return false;
   return true;
  });

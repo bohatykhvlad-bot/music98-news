@@ -1,11 +1,10 @@
 import fs from "node:fs";
 import {createHash} from "node:crypto";
 import {datedChartPath,verifiedDatedApple,verifiedDatedSpotify} from "../functions/lib/chart-history.js";
-import {KWORB_ARTISTS_URL,artistKey,htmlText,parseKworbArtists,
- parseKworbArtistDaily,matchKworbTrack,freshDay,parseKworbGlobalStreams} from "../functions/lib/apple-spotify-chart.js";
+import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
 import {TRI_METHOD,verifiedTriSeed,verifiedSpotifyRow,songIdentity} from "../functions/lib/tri-source-chart.js";
 import {shouldPublishSeed} from "../functions/lib/publish-window.js";
-import {pickSearchHit,spotifySearchQueries,pickDailyForDate,measuredProviderDelta,saveCounterObservation,extractCounterTotal,medianValue,FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
+import {pickSearchHit,spotifySearchQueries,pickDailyForDate,measuredProviderDelta,saveCounterObservation,extractCounterTotal,FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
 
 const ROOT=new URL("../public/data/",import.meta.url);
 const OUT=new URL("apple-spotify-streams.json",ROOT);
@@ -37,15 +36,15 @@ async function requestText(url){
  throw error;
 }
 
-/* ===== Сайты-источники (главный канал дневных чисел по решению владельца) =====
-   SoundCamps — основной счётчик: сохраняем totals и считаем измеренную дневную
-   дельту. MyStreamCount вызывается только когда SoundCamps ещё не имеет двух
-   дат для дельты. Kworb остаётся аварийным резервом, без выдуманных чисел. */
+/* ===== Spotify streams =====
+   Musicrank supplies the dated Spotify Global Top 200 and its daily stream
+   values. SoundCamps is the first fallback for Apple-only candidates and
+   MyStreamCount is the final targeted fallback. */
 const idsCache=readCache(IDS_FILE)||{schema:1,updated:null,entries:{}};
 const totalsCache=readCache(TOTALS_FILE)||{schema:1,updated:null,calibration:1,tracks:{}};
 if(!idsCache.entries)idsCache.entries={};
 if(!totalsCache.tracks)totalsCache.tracks={};
-const OFFICIAL_METRICS=new Set(["kworb-spotify-chart-global-daily","kworb-spotify-artist-daily","kworb-track-global-daily"]);
+const DIRECT_METRICS=new Set(["musicrank-spotify-chart-global-daily"]);
 
 function extractCsrf(html){
  const text=String(html||"");
@@ -168,113 +167,77 @@ async function resolveSpotifyId(t){
  return null;
 }
 async function applySiteStreams(){
- const stats={processed:0,sitePrimary:0,myscFallback:0,siteCapture:0,soundcampsDelta:0,officialKept:0,unresolved:0,rejected:0,myscBlocked:false,monitor:null};
+ const stats={processed:0,musicrankDirect:0,sitePrimary:0,myscFallback:0,siteCapture:0,
+  soundcampsDelta:0,unresolved:0,rejected:0,myscBlocked:false,monitor:null};
  const capture=(id,provider,total)=>{
   totalsCache.tracks[id]=saveCounterObservation(totalsCache.tracks[id],CAPTURE_DAY,total,provider);
   stats.siteCapture++;
  };
- const official=new Map();
- for(const [key,t] of candidates){
-  if(t.spotify.status==="matched"&&t.spotify.date===chosen&&OFFICIAL_METRICS.has(t.spotify.metric))
-   official.set(key,{daily:t.spotify.daily,global:t.spotify.metric==="kworb-spotify-chart-global-daily"});
- }
  const usedIds=new Set();
- for(const t of candidates.values())if(t.spotify.spotifyId)usedIds.add(t.spotify.spotifyId);
- const countFallback=t=>{
-  if(OFFICIAL_METRICS.has(t.spotify.metric)&&t.spotify.date===chosen)stats.officialKept++;
-  else stats.unresolved++;
- };
+ for(const t of candidates.values())if(t.spotify?.spotifyId)usedIds.add(t.spotify.spotifyId);
  let msFailStreak=0,msBlocked=false;
- for(const [key,t] of candidates){
+ for(const t of candidates.values()){
+  if(t.spotify.status==="matched"&&DIRECT_METRICS.has(t.spotify.metric)){
+   stats.musicrankDirect++;continue;
+  }
   if(SERVICE_LIMIT&&stats.processed>=SERVICE_LIMIT){console.log("SITE_STREAM_LIMIT_REACHED",SERVICE_LIMIT);break;}
   stats.processed++;
   try{
-   const entry=t.spotify.spotifyId?{id:t.spotify.spotifyId}:await resolveSpotifyId(t);
-   const duplicate=!!entry?.id&&!t.spotify.spotifyId&&usedIds.has(entry.id);
-   if(!entry?.id||duplicate){countFallback(t);}
-   else{
-    let found=null;
-    /* Primary path: one lightweight SoundCamps total request. Once two real
-       capture dates exist, their delta is the daily count. */
+   const entry=t.spotify?.spotifyId?{id:t.spotify.spotifyId}:await resolveSpotifyId(t);
+   const duplicate=!!entry?.id&&!t.spotify?.spotifyId&&usedIds.has(entry.id);
+   if(!entry?.id||duplicate){stats.unresolved++;continue;}
+   let found=null;
+   try{
+    const total=await soundcampsTotal(entry.id);
+    if(total!==null)capture(entry.id,"soundcamps",total);
+   }catch(e){console.warn("SERVICE_SC_FAILED",entry.id,String(e?.message||e));}
+   const soundDelta=measuredProviderDelta(totalsCache.tracks[entry.id],chosen,"soundcamps");
+   if(soundDelta){
+    found={id:entry.id,daily:soundDelta.daily,date:soundDelta.date,method:soundDelta.method,
+     sourceUrl:"https://soundcamps.com/spotify-stream-checker/",metric:"soundcamps-total-delta",
+     trackUrl:"https://open.spotify.com/track/"+entry.id,
+     matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
+    stats.sitePrimary++;stats.soundcampsDelta++;
+   }
+   if(!found&&!msBlocked){
     try{
-     const total=await soundcampsTotal(entry.id);
-     if(total!==null)capture(entry.id,"soundcamps",total);
-    }catch(e){console.warn("SERVICE_SC_FAILED",entry.id,String(e?.message||e));}
-    const soundDelta=measuredProviderDelta(totalsCache.tracks[entry.id],chosen,"soundcamps");
-    if(soundDelta){
-     found={id:entry.id,daily:soundDelta.daily,date:soundDelta.date,method:soundDelta.method,
-      sourceUrl:"https://soundcamps.com/spotify-stream-checker/",metric:"soundcamps-total-delta",
-      trackUrl:"https://open.spotify.com/track/"+entry.id,
+     const series=await mystreamcountSeries(entry.id,n=>capture(entry.id,"mystreamcount",n));
+     const pick=series?pickDailyForDate(series.data,chosen,{windowDays:FALLBACK_WINDOW_DAYS}):null;
+     if(pick)found={id:entry.id,daily:pick.daily,date:pick.date,method:pick.method,
+      sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-daily-delta",
       matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
-     stats.sitePrimary++;stats.soundcampsDelta++;
-    }
-    /* MyStreamCount is now a targeted bootstrap/fallback only. This avoids
-       hundreds of page+POST requests and the 429 cascade that blocked builds. */
-    if(!found&&!msBlocked){
-     try{
-      const series=await mystreamcountSeries(entry.id,n=>capture(entry.id,"mystreamcount",n));
-      const pick=series?pickDailyForDate(series.data,chosen,{windowDays:FALLBACK_WINDOW_DAYS}):null;
-      if(pick)found={id:entry.id,daily:pick.daily,date:pick.date,method:pick.method,
-       sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-daily-delta",
+     if(!found){
+      const delta=measuredProviderDelta(totalsCache.tracks[entry.id],chosen,"mystreamcount");
+      if(delta)found={id:entry.id,daily:delta.daily,date:delta.date,method:delta.method,
+       sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-total-delta",
        matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
-      if(!found){
-       const delta=measuredProviderDelta(totalsCache.tracks[entry.id],chosen,"mystreamcount");
-       if(delta)found={id:entry.id,daily:delta.daily,date:delta.date,method:delta.method,
-        sourceUrl:"https://www.mystreamcount.com/track/"+entry.id,metric:"mystreamcount-total-delta",
-        matchedTitle:entry.name||t.title,matchedArtist:entry.subtitle||t.artist};
-      }
-      if(found)stats.myscFallback++;
-      msFailStreak=0;
-     }catch(e){
-      msFailStreak++;
-      console.warn("SERVICE_MYSC_FAILED",entry.id,String(e?.message||e));
-      if(msFailStreak>=5&&!msBlocked){
-       msBlocked=true;stats.myscBlocked=true;
-       console.warn("SERVICE_MYSC_BLOCKED","fallback rate-limited; keeping SoundCamps/verified Kworb values");
-      }
+     }
+     if(found)stats.myscFallback++;
+     msFailStreak=0;
+    }catch(e){
+     msFailStreak++;
+     console.warn("SERVICE_MYSC_FAILED",entry.id,String(e?.message||e));
+     if(msFailStreak>=5&&!msBlocked){
+      msBlocked=true;stats.myscBlocked=true;
+      console.warn("SERVICE_MYSC_BLOCKED","fallback rate-limited; Musicrank and SoundCamps remain active");
      }
     }
-    if(found){
-     t._site=found;
-     usedIds.add(found.id);
-    }else{countFallback(t);}
    }
+   if(found){
+    const row={status:"matched",daily:found.daily,spotifyId:found.id,total:null,date:found.date,
+     sourceUrl:found.sourceUrl,metric:found.metric,estimated:true,estimateMethod:found.method,
+     trackUrl:found.trackUrl||("https://open.spotify.com/track/"+found.id),
+     matchedTitle:found.matchedTitle,matchedArtist:found.matchedArtist};
+    if(verifiedSpotifyRow(row,chosen)){t.spotify=row;usedIds.add(found.id);}
+    else{stats.rejected++;console.log("TRI_ROW_REJECTED",JSON.stringify({title:t.title,artist:t.artist,row}));}
+   }else stats.unresolved++;
   }catch(e){
-   console.warn("SERVICE_TRACK_FAILED",JSON.stringify([t.title,String(e?.message||e)]));
+   stats.unresolved++;console.warn("SERVICE_TRACK_FAILED",JSON.stringify([t.title,String(e?.message||e)]));
   }
   await sleep(250);
  }
- /* Калибровка шкалы: медиана отношения официальное/сайтовое по пересечению. */
- const pairs=[];
- for(const [key,t] of candidates){
-  const ref=official.get(key);
-  /* Калибровка — только по настоящим глобальным официальным числам:
-     artist-page значения частичные (сумма стран) и занижали бы шкалу. */
-  if(ref?.global&&ref.daily>0&&t._site?.daily>0)pairs.push(ref.daily/t._site.daily);
- }
- const median=medianValue(pairs,10);
- /* 0.96 = замеренный типовой фактор (сайт ≈ ×1.042 от официального).
-    Берём его, если пересечения для медианы пока мало. */
- const calibration=median?Math.min(1.3,Math.max(0.65,median)):0.96;
- totalsCache.calibration=Number(calibration.toFixed(4));
- stats.monitor={samples:pairs.length,medianRatio:median?Number(median.toFixed(4)):null,calibration:totalsCache.calibration};
- for(const t of candidates.values()){
-  if(!t._site)continue;
-  const daily=Math.max(1,Math.round(t._site.daily*calibration));
-  const row={status:"matched",daily,spotifyId:t._site.id,total:null,date:t._site.date,
-   sourceUrl:t._site.sourceUrl,metric:t._site.metric,estimated:true,estimateMethod:t._site.method,
-   trackUrl:t._site.trackUrl||("https://open.spotify.com/track/"+t._site.id),
-   matchedTitle:t._site.matchedTitle,matchedArtist:t._site.matchedArtist};
-  delete t._site;
-  /* Замена официального ряда сайтовым — только если он проходит валидатор.
-     Иначе сохраняем прежний (официальный) ряд: одна кривая запись не вправе
-     уронить весь выпуск. */
-  if(verifiedSpotifyRow(row,chosen))t.spotify=row;
-  else{
-   stats.rejected++;
-   console.log("TRI_ROW_REJECTED",JSON.stringify({title:t.title,artist:t.artist,row}));
-  }
- }
+ totalsCache.calibration=1;
+ stats.monitor={calibration:1,primary:"musicrank",fallbacks:["soundcamps","mystreamcount"]};
  idsCache.updated=new Date().toISOString();
  totalsCache.updated=new Date().toISOString();
  try{
@@ -286,31 +249,24 @@ async function applySiteStreams(){
  return stats;
 }
 
-/* ===== Архивы: Spotify-чарт (дата выпуска и аварийный резерв) ===== */
-const [globalPage,artistIndex]=await Promise.all([
- requestText("https://kworb.net/spotify/country/global_daily.html"),
- requestText(KWORB_ARTISTS_URL)
-]);
-const latest=parseKworbGlobalStreams(globalPage);
-if(!freshDay(latest.date)||latest.tracks.length!==200)
- throw new Error("Spotify Top 200 incomplete or older than two UTC days");
+/* ===== Dated Spotify archive from Musicrank ===== */
+const spotifySeed=verifiedSpotifySnapshot(load("spotify-chart.json"));
+if(!spotifySeed)throw new Error("Musicrank Spotify Top 200 missing, stale or invalid");
+const latest={date:spotifySeed.date,source:"musicrank-spotify-global-daily",
+ sourceUrl:"https://musicrank.org/spotify",tracks:spotifySeed.tracks};
 const latestArchive=archive("spotify-global",latest.date);
 if(!fs.existsSync(new URL(latestArchive,ROOT))){
- const snap={schema:1,source:"kworb-spotify-global-daily",
-  date:latest.date,region:"global",cadence:"daily",
-  sourceUrl:"https://kworb.net/spotify/country/global_daily.html",
-  capturedAt:new Date().toISOString(),
-  tracks:latest.tracks.map(x=>({
-   pos:x.pos,title:x.title,artist:x.artist,spotifyId:x.spotifyId,daily:x.daily
-  }))};
+ const snap={schema:1,source:latest.source,date:latest.date,region:"global",cadence:"daily",
+  sourceUrl:latest.sourceUrl,capturedAt:new Date().toISOString(),
+  tracks:latest.tracks.map(x=>({pos:x.pos,title:x.title,artist:x.artist,
+   ...(x.spotifyId?{spotifyId:x.spotifyId}:{}),daily:x.daily}))};
  if(!verifiedDatedSpotify(snap,latest.date))
-  throw new Error("Spotify chart has incomplete IDs, ranks or daily counters");
+  throw new Error("Musicrank Spotify Top 200 failed archive verification");
  fs.writeFileSync(new URL(latestArchive,ROOT),JSON.stringify(snap,null,2)+"\n");
 }
-
 const utcDate=new Date().toISOString().slice(0,10),ms=Date.parse(utcDate+"T00:00:00Z");
 let chosen=null,us=null,global=null,spotify=null;
-for(let lag=0;lag<=2;lag++){
+for(let lag=0;lag<=3;lag++){
  const day=new Date(ms-lag*86400000).toISOString().slice(0,10);
  if(day>latest.date)continue;
  const U=loadArchive("apple-us",day,(v,d)=>verifiedDatedApple(v,"U",d));
@@ -318,16 +274,10 @@ for(let lag=0;lag<=2;lag++){
  const S=loadArchive("spotify-global",day,verifiedDatedSpotify);
  if(U&&A&&S){chosen=day;us=U;global=A;spotify=S;break;}
 }
-if(!chosen)throw new Error("No COMMON dated Apple US, Apple Global and Spotify edition. Keep previous chart.");
+if(!chosen)throw new Error("No common dated Apple US, Apple Global and Musicrank Spotify edition. Keep previous chart.");
 if(us.sourceDate!==spotify.date||global.sourceDate!==spotify.date)
  throw new Error("Mixed-date source ranking refused");
 
-const artists=parseKworbArtists(artistIndex);
-for(const m of globalPage.matchAll(/<a\b[^>]*href=["']\.\.\/artist\/([A-Za-z0-9]{22})\.html["'][^>]*>([\s\S]*?)<\/a>/gi)){
- const name=htmlText(m[2]),key=artistKey(name);
- if(!artists.has(key))artists.set(key,{name,id:m[1],
-  url:"https://kworb.net/spotify/artist/"+m[1]+"_songs.html"});
-}
 const candidates=new Map(),sets={U:new Set(),A:new Set(),S:new Set()};
 function admit(t,source,rank){
  if(!t?.title||!t?.artist||!Number.isInteger(rank))throw new Error("invalid_chart_row_"+source+":"+rank);
@@ -335,9 +285,9 @@ function admit(t,source,rank){
  if(!key)throw new Error("unidentifiable_"+source+":"+rank);
  let item=candidates.get(key);
  if(!item){
-  item={title:t.title,artist:t.artist,url:t.url||"",art:t.art||"",
-   year:t.year||"",prev:"",sourceRanks:{U:null,A:null,S:null},
-   spotify:{status:"unavailable",daily:null,reason:"not-in-matched-spotify-global-edition"}};
+  item={title:t.title,artist:t.artist,url:t.url||"",art:t.art||"",year:t.year||"",prev:"",
+   sourceRanks:{U:null,A:null,S:null},
+   spotify:{status:"unavailable",daily:null,reason:"not-measured-yet"}};
   candidates.set(key,item);
  }
  if(item.sourceRanks[source]!==null||sets[source].has(rank))
@@ -348,9 +298,9 @@ function admit(t,source,rank){
   item.art=t.art||item.art;item.year=t.year||item.year;
  }
  if(source==="S"){
-  item.spotify={status:"matched",daily:t.daily,spotifyId:t.spotifyId,
-   total:null,date:chosen,sourceUrl:"https://kworb.net/spotify/country/global_daily.html",
-   metric:"kworb-spotify-chart-global-daily",matchedTitle:t.title,matchedArtist:t.artist};
+  item.spotify={status:"matched",daily:t.daily,...(t.spotifyId?{spotifyId:t.spotifyId}:{}),
+   total:null,date:chosen,sourceUrl:"https://musicrank.org/spotify",
+   metric:"musicrank-spotify-chart-global-daily",matchedTitle:t.title,matchedArtist:t.artist};
  }
  return item;
 }
@@ -360,59 +310,12 @@ spotify.tracks.forEach(t=>admit(t,"S",t.pos));
 if(sets.U.size!==100||sets.A.size!==global.tracks.length||sets.S.size!==200)
  throw new Error("Daily source set incomplete for "+chosen);
 
-const credited=t=>{
- const raw=String(t.artist||"").trim();
- const parts=raw.split(/\s*(?:,|\s+&\s+|\s+feat\.?\s+|\s+ft\.?|\s+with\s+)\s*/i).map(x=>x.trim()).filter(Boolean);
- const titleFeat=String(t.title||"").match(/\((?:feat\.?|ft\.?|with)\s+([^)]+)\)/i);
- if(titleFeat)for(const name of titleFeat[1].split(/\s*,\s*|\s+&\s+/))parts.push(name.trim());
- return [...new Set([raw,...parts])].filter(Boolean).slice(0,8);
-};
-const wanted=new Map(),candidateArtists=new Map(),pages=new Map();
-let recovered=0,artistErrors=0;
-// Artist pages expose their latest edition only; never use a later day's
-// artist counter for an earlier dated Spotify chart.
-if(chosen===latest.date){
- for(const [key,t] of candidates){
-  if(t.spotify.status==="matched")continue;
-  const possible=credited(t).map(name=>artists.get(artistKey(name))).filter(Boolean);
-  candidateArtists.set(key,possible);
-  for(const artist of possible)wanted.set(artist.id,artist);
- }
- const jobs=[...wanted.values()];let cursor=0;
- await Promise.all(Array.from({length:Math.min(6,jobs.length)},async()=>{
-  while(cursor<jobs.length){
-   const artist=jobs[cursor++];
-   try{pages.set(artist.id,parseKworbArtistDaily(await requestText(artist.url),artist));}
-   catch(e){artistErrors++;console.warn("ARTIST_DAILY_UNAVAILABLE",artist.name,String(e?.message||e));}
-  }
- }));
- for(const [key,t] of candidates){
-  if(t.spotify.status==="matched")continue;
-  const hits=[];
-  for(const artist of candidateArtists.get(key)||[]){
-   const page=pages.get(artist.id);
-   if(page?.date!==chosen)continue;
-   const match=matchKworbTrack(t,page,artist.name);
-   if(match.status==="matched")hits.push({...match,artist});
-  }
-  const ids=new Set(hits.map(h=>h.spotifyId));
-  if(ids.size!==1)continue;
-  const hit=hits[0];
-  if([...candidates.values()].some(other=>other!==t&&
-    other.spotify.status==="matched"&&other.spotify.spotifyId===hit.spotifyId))continue;
-  t.spotify={status:"matched",daily:hit.daily,spotifyId:hit.spotifyId,total:hit.total,
-   date:chosen,sourceUrl:hit.artist.url,metric:"kworb-spotify-artist-daily",
-   matchedTitle:hit.title,matchedArtist:hit.artist.name};
-  recovered++;
- }
-}
-
 /* ===== Главный канал: сайтовые дневные числа (только на публикующих прогонах) ===== */
 let old=null;try{old=load("apple-spotify-streams.json");}catch{}
 const decision=shouldPublishSeed({previousDate:old?.schema===3?old.spotifyDate:null,
  candidateDate:chosen,lastPublishedAt:old?.schema===3?old.capturedAt:null,
  nowMs:Date.now(),forced:process.env.TRI_FORCE_PUBLISH==="1"});
-let siteStats={processed:0,sitePrimary:0,myscFallback:0,soundcampsDelta:0,officialKept:0,unresolved:0,monitor:null};
+let siteStats={processed:0,musicrankDirect:0,sitePrimary:0,myscFallback:0,soundcampsDelta:0,unresolved:0,monitor:null};
 if(decision.publish){
  siteStats=await applySiteStreams();
  /* Preserve verified site measurements across rate-limited retries for the
@@ -439,14 +342,27 @@ if(decision.publish){
 }
 
 const tracks=[...candidates.values()];
-const missingUs=tracks.filter(t=>t.sourceRanks.U!==null&&t.spotify.status!=="matched");
-if(decision.publish&&missingUs.length)throw new Error("Apple USA 40pct missing verified Spotify counts: "+missingUs.length);
 const missingTracks=tracks.filter(t=>t.spotify.status!=="matched");
 if(missingTracks.length)console.warn("TRI_UNMEASURED",JSON.stringify(missingTracks.map(t=>({
  title:t.title,artist:t.artist,appleRank:t.sourceRanks.A,
  spotifyId:idsCache.entries[songIdentity(t.title,t.artist)]?.id||null
 }))));
 const matched=tracks.filter(t=>t.spotify.status==="matched").length;
+if(decision.publish&&matched>=50&&missingTracks.length){
+ const maxDaily=Math.max(1,...tracks.filter(t=>t.spotify.status==="matched").map(t=>t.spotify.daily));
+ const scored=tracks.filter(t=>t.spotify.status==="matched").map(t=>{
+  const u=t.sourceRanks.U===null?0:40*(101-t.sourceRanks.U)/100;
+  const a=t.sourceRanks.A===null?0:30*(101-t.sourceRanks.A)/100;
+  return u+a+30*Math.sqrt(t.spotify.daily/maxDaily);
+ }).sort((a,b)=>b-a);
+ const cutoff=scored[49]??Infinity;
+ const risky=missingTracks.filter(t=>{
+  const u=t.sourceRanks.U===null?0:40*(101-t.sourceRanks.U)/100;
+  const a=t.sourceRanks.A===null?0:30*(101-t.sourceRanks.A)/100;
+  return u+a+30>=cutoff-1e-9;
+ });
+ if(risky.length)throw new Error("Unresolved Spotify streams could change Top 50: "+risky.length);
+}
 const fingerprint=createHash("sha256").update(JSON.stringify([chosen,chosen,chosen,tracks])).digest("hex");
 const payload={schema:3,methodology:TRI_METHOD,
  appleUsDate:chosen,appleGlobalDate:chosen,spotifyDate:chosen,
@@ -456,12 +372,12 @@ const payload={schema:3,methodology:TRI_METHOD,
   A:{source:global.source,url:global.sourceUrl,rows:global.tracks.length},
   S:{source:spotify.source,url:spotify.sourceUrl,rows:spotify.tracks.length}
  },
- streamSource:"soundcamps-totals-primary+mystreamcount-fallback+kworb-emergency",
+ streamSource:"musicrank-primary+soundcamps-fallback+mystreamcount-last-resort",
  sourceSizes:{U:us.tracks.length,A:global.tracks.length,S:spotify.tracks.length},
  coverage:{candidates:tracks.length,matched,unmatched:tracks.length-matched,
-  spotifyChart:200,artistRecovered:recovered,artistPages:pages.size,artistErrors,
+  spotifyChart:200,musicrankDirect:siteStats.musicrankDirect,
   siteRecovered:siteStats.sitePrimary,soundcampsDeltas:siteStats.soundcampsDelta,
-  myscFallback:siteStats.myscFallback,officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
+  myscFallback:siteStats.myscFallback,unresolved:siteStats.unresolved,
   calibration:totalsCache.calibration,monitor:siteStats.monitor},
  tracks};
 if(!verifiedTriSeed(payload)){
@@ -489,9 +405,9 @@ console.log("TRI_SOURCE_DATE_ALIGNED",JSON.stringify({
  editionDate:chosen,latestSpotifyDate:latest.date,appleUsRows:us.tracks.length,
  appleGlobalRows:global.tracks.length,spotifyRows:spotify.tracks.length,
  candidates:tracks.length,matched,missing:tracks.length-matched,
- artistRecovered:recovered,appleSource:us.source,
+ appleSource:us.source,musicrankDirect:siteStats.musicrankDirect,
  siteRecovered:siteStats.sitePrimary,soundcampsDeltas:siteStats.soundcampsDelta,
- myscFallback:siteStats.myscFallback,officialKept:siteStats.officialKept,unresolved:siteStats.unresolved,
+ myscFallback:siteStats.myscFallback,unresolved:siteStats.unresolved,
  rejected:siteStats.rejected,myscBlocked:siteStats.myscBlocked,
  calibration:totalsCache.calibration,monitor:siteStats.monitor,
  published:Boolean(changed&&decision.publish),
