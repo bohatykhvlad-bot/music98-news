@@ -3,28 +3,26 @@ on:
   push:
     branches: [main]
     paths:
-      # Only changes to the actual builder should queue a rebuild.
-      # Editing this workflow must not enqueue another hour-long task.
       - 'scripts/build-discover-albums.mjs'
       - 'scripts/lib/discover-artist-identity.mjs'
       - 'public/discover-catalog-policy.js'
   schedule:
-    - cron: '30 2 * * 1'
+    - cron: '30 2 * * *'
   workflow_dispatch:
     inputs:
       batch:
-        description: 'Maximum new/stale artists to check this week (1-2500; target catalog remains 500)'
+        description: 'Maximum new/stale artists to refresh (1-2500; daily default 75)'
         required: false
-        default: '750'
+        default: '75'
 permissions:
   contents: write
 concurrency:
   group: discover-catalog
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 130
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,37 +31,51 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Test catalog filters and artist matching
+      - name: Test catalog filters, identity and rolling refresh
         run: node --test scripts/discover-albums.test.mjs
       - name: Prepare and validate album catalog
         env:
-          BATCH: ${{ github.event.inputs.batch || '750' }}
+          BATCH: ${{ github.event_name == 'push' && '750' || github.event.inputs.batch || '75' }}
         run: node scripts/build-discover-albums.mjs --batch="$BATCH"
-      - name: Back up the complete catalog before pushing
+      - name: Back up the complete catalog before publishing
         uses: actions/upload-artifact@v4
         with:
           name: discover-catalog-${{ github.run_id }}
           path: public/data/discover-albums.json
           retention-days: 21
           if-no-files-found: error
-      - name: Commit refreshed catalog if changed
+      - name: Publish generated catalog onto the latest main safely
+        shell: bash
         run: |
-          if git diff --quiet -- public/data/discover-albums.json; then
-            echo 'No updates'; exit 0
-          fi
+          set -euo pipefail
+          cp public/data/discover-albums.json /tmp/discover-albums.json
+          BASE_BUILDER="$(git rev-parse HEAD:scripts/build-discover-albums.mjs)"
+          BASE_IDENTITY="$(git rev-parse HEAD:scripts/lib/discover-artist-identity.mjs)"
+          BASE_POLICY="$(git rev-parse HEAD:public/discover-catalog-policy.js)"
           git config user.name 'music98-catalog-bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add public/data/discover-albums.json
-          git commit -m 'Refresh cached album discovery catalog'
           for attempt in 1 2 3 4 5; do
             git fetch origin main
-            git rebase origin/main
+            if [ "$(git rev-parse origin/main:scripts/build-discover-albums.mjs)" != "$BASE_BUILDER" ] ||
+               [ "$(git rev-parse origin/main:scripts/lib/discover-artist-identity.mjs)" != "$BASE_IDENTITY" ] ||
+               [ "$(git rev-parse origin/main:public/discover-catalog-policy.js)" != "$BASE_POLICY" ]; then
+              echo 'Discover builder changed while this run was active; discard stale output. The newer push queues its own build.'
+              exit 0
+            fi
+            git reset --hard origin/main
+            cp /tmp/discover-albums.json public/data/discover-albums.json
+            if git diff --quiet -- public/data/discover-albums.json; then
+              echo 'Catalog already current on latest main'
+              exit 0
+            fi
+            git add public/data/discover-albums.json
+            git commit -m 'Refresh cached album discovery catalog'
             if git push origin HEAD:main; then
               echo "Catalog published successfully (attempt $attempt)"
               exit 0
             fi
-            echo "Concurrent main update; retrying publish: $attempt/5"
+            echo "Concurrent main update; reapplying generated catalog: $attempt/5"
             sleep 5
           done
-          echo 'Could not publish after five retries; retrieve artifact from this run' >&2
+          echo 'Could not publish after five retries; retrieve the catalog artifact from this run' >&2
           exit 1

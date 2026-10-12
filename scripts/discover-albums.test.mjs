@@ -109,6 +109,23 @@ test('weekly lookup budget covers excluded ranks and refreshes the last selected
 });
 
 
+
+test('daily maintenance refreshes a bounded stale slice and preserves the complete catalog',async()=>{
+ const now=Date.parse('2026-10-17T01:00:00Z'),fresh=new Date(now).toISOString(),stale='2026-10-01T01:00:00Z';
+ const ranking=Array.from({length:510},(_,i)=>artistFixture({rank:i+1,name:'Artist '+(i+1)}));
+ const previous={schema:2,identityPolicyVersion,genrePolicyVersion,
+  artists:ranking.slice(0,500).map((a,i)=>({...a,position:i+1,albums:albumsFixture(a,[{id:a.rank,genre:'Pop'}]),checkedAt:i<25?fresh:stale})),
+  excludedArtists:[],missingArtists:[]};
+ const calls=[];
+ const result=await assembleCatalog(ranking,previous,{now,batch:10,lookup:async(name,entry)=>{
+  calls.push(entry.rank);return {...entry,albums:albumsFixture(entry,[{id:entry.rank,genre:'Pop'}])};
+ }});
+ assert.deepEqual(calls,[26,27,28,29,30,31,32,33,34,35]);
+ assert.equal(result.artists.length,500);
+ assert.equal(result.playableArtistCount,500);
+ assert.equal(result.artists[499].rank,500);
+});
+
 test('regional Mexican labels are excluded without removing other Latin genres',()=>{
  for(const genre of ['Música Mexicana','Musica Mexicana','Regional Mexican','Regional Mexicano','Ranchera','Corridos','Mariachi','Banda','Norteño','Grupero','Tejano','Sierreño'])assert.equal(excludedGenre(genre),true,genre);
  for(const genre of ['Latin','Urbano latino','Pop Latino','Música tropical','Baladas y Boleros','Banda Sonora'])assert.equal(excludedGenre(genre),false,genre);

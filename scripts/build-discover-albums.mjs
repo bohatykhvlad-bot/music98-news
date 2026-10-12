@@ -2,8 +2,9 @@
  * Prebuild album suggestions; the website NEVER calls Spotify/Kworb/iTunes
  * to randomize. One cached JSON request on page load, then local picks.
  *
- * Run: node scripts/build-discover-albums.mjs --batch=750
- * Initial catalog: --batch=750 (typically around 60-80 minutes with Apple pacing).
+ * Run: node scripts/build-discover-albums.mjs --batch=75
+ * Daily maintenance refreshes a small rolling slice of stale artists. Use
+ * --batch=750 only for recovery or a deliberate identity/policy migration.
  * The chart is a third-party Kworb estimate, not official Spotify API data.
  */
 import fs from 'node:fs/promises';
@@ -146,7 +147,7 @@ async function albumsFor(name,entry={}){
  }
  return {...identity,albums:albumCandidates(entries,appleArtistName,artistId),genre};
 }
-export async function assembleCatalog(ranking,previous,{batch=750,lookup=albumsFor,now=Date.now()}={}){
+export async function assembleCatalog(ranking,previous,{batch=75,lookup=albumsFor,now=Date.now()}={}){
  const oldRecords=[...(previous?.artists||[])];
  // Empty matches are independent of genre policy. Version 2 only adds genre
  // exclusions, so version 1's exclusions also remain valid until refreshed.
@@ -209,7 +210,7 @@ export async function assembleCatalog(ranking,previous,{batch=750,lookup=albumsF
   artists,excludedArtists,missingArtists};
 }
 
-export async function build({batch=750}={}){
+export async function build({batch=75}={}){
  let ranking=[],rankError;
  for(let attempt=0;attempt<3;attempt++){
   try{
@@ -242,7 +243,7 @@ export async function build({batch=750}={}){
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  const arg=process.argv.find(x=>x.startsWith('--batch='));
- const batch=arg?Number(arg.slice(8)):750;
+ const batch=arg?Number(arg.slice(8)):75;
  if(!Number.isInteger(batch)||batch<1||batch>2500)throw Error('Use --batch=1..2500');
  build({batch}).catch(e=>{console.error('DISCOVER_FAILED',e.message);process.exitCode=1});
 }
