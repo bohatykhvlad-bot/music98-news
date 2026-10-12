@@ -18,7 +18,7 @@ Before releasing an album of her own, RAYE spent years writing songs for artists
 
 In January 2023, "Escapism." with 070 Shake became her first UK No. 1 single. The song follows someone trying to numb the pain of a breakup with alcohol, drugs and nights out, a darker turn from the dance-pop singles that had defined much of her earlier career. Her debut album arrived the following month, putting jazz, soul and R&B at the center of her own music. RAYE later described the chart success as proof that backing herself had been the right decision.
 
-In an interview with ELLE, RAYE said she wrote most of her latest album sober and no longer used alcohol to bury or numb difficult feelings. Its autumn section begins with loneliness and the temptation to reach for alcohol or a relationship as a quick fix. She also talked about learning to spend an evening by herself, something she said had once made her sad, and becoming more comfortable in her own company. "I don't want someone else to come and fix me," she said.
+Most of her latest album was written sober. By then, alcohol was no longer a way to bury or numb difficult feelings. Its autumn section begins with loneliness and the temptation to reach for alcohol or a relationship as a quick fix. She also talked about learning to spend an evening by herself, something she said had once made her sad, and becoming more comfortable in her own company. "I don't want someone else to come and fix me," she said.
 
 ## Existing media and credit — preserve on desk sync
 
