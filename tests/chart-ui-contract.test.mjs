@@ -23,12 +23,18 @@ vm.runInContext(setup+"\n"+validators,context,{timeout:500});
 function validates(method,chart) {
  return vm.runInContext(method+"(chart)",vm.createContext({...context,chart}),{timeout:500});
 }
-const chosen=rankTriCandidates(seed.tracks,seed.spotifyDate);
+// Browser contract test: project the last checked-in reference edition onto
+// the CURRENT source schema. This is a synthetic UI fixture, not published data.
+const fixtureDate=new Date().toISOString().slice(0,10);
+const fixtureRows=seed.tracks.map(t=>({...t,spotify:t.spotify.status==="matched"
+ ? {...t.spotify,metric:"musicrank-spotify-chart-global-daily",
+    sourceUrl:"https://musicrank.org/spotify",date:fixtureDate}:t.spotify}));
+const chosen=rankTriCandidates(fixtureRows,fixtureDate);
 const chart={
  methodology:TRI_METHOD,consensus:TRI_RULE,complete:true,
- updated:seed.appleUsDate,sources:{U:100,A:seed.sourceSizes.A,S:seed.sourceSizes.S},
+ updated:fixtureDate,sources:{U:100,A:seed.sourceSizes.A,S:seed.sourceSizes.S},
  sourceDetails:{A:{provenance:seed.archiveProvenance?.A}},
- sourceDates:{U:seed.spotifyDate,A:seed.spotifyDate,S:seed.spotifyDate},
+ sourceDates:{U:fixtureDate,A:fixtureDate,S:fixtureDate},
  spotifyFingerprint:seed.fingerprint,tracks:chosen.tracks
 };
 test("production candidate sample is accepted by the real browser's current chart validators",()=>{
