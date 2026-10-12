@@ -279,6 +279,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/e5/2e/9b/e52e9bd5-761a-8665-542b-c7391e5c0f6c/mzaf_17420079795001025422.plus.aac.p.m4a",
     "year": "2017"
   },
+  "frozen|lilbaby": {
+    "title": "Frozen",
+    "artist": "Lil Baby",
+    "url": "https://music.apple.com/us/album/1621207919?i=1621207921",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/ca/45/f4/ca45f42d-b4dc-533b-0c10-8c478fd43ee8/mzaf_4396075670395326834.plus.aac.p.m4a",
+    "year": "2022"
+  },
   "godsplan|drake": {
     "title": "God's Plan",
     "artist": "Drake",
@@ -335,12 +342,26 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/57/33/a4/5733a427-883b-586d-d90e-281c91d9ef4e/mzaf_201398670995826930.plus.aac.p.m4a",
     "year": "2026"
   },
+  "ihadsomehelp|postmalone": {
+    "title": "I Had Some Help (feat. Morgan Wallen)",
+    "artist": "Post Malone",
+    "url": "https://music.apple.com/us/album/1744439045?i=1744439049",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/08/2c/fd/082cfdd3-67ff-7f1a-7cf1-9aa260ce6535/mzaf_2048041044801829494.plus.aac.p.m4a",
+    "year": "2024"
+  },
   "iknewitiknewyou|taylorswift": {
     "title": "I Knew It, I Knew You (From \"Toy Story 5\")",
     "artist": "Taylor Swift",
     "url": "https://music.apple.com/us/album/6775527442?i=6775527443",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/73/76/42/737642e6-c478-bed7-f11f-efee96072450/mzaf_5163950318414409594.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "imdatna|future": {
+    "title": "I'M DAT N***A",
+    "artist": "Future",
+    "url": "https://music.apple.com/us/album/1621119097?i=1621119426",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/c8/40/0b/c8400bc1-1a56-56f0-ef19-0958f6ce510a/mzaf_9365424036238205362.plus.aac.p.m4a",
+    "year": "2022"
   },
   "imspent|drake": {
     "title": "I’m Spent",
@@ -460,6 +481,20 @@
     "url": "https://music.apple.com/us/album/1817609404?i=1817609509",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/42/bb/5b/42bb5b21-2550-6205-bf3c-334b0e7d6199/mzaf_17462928687872215879.plus.aac.p.m4a",
     "year": "2025"
+  },
+  "marchmadness|future": {
+    "title": "March Madness",
+    "artist": "Future",
+    "url": "https://music.apple.com/us/album/1506297314?i=1506297772",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/5c/03/82/5c0382f4-b213-09d7-e3c6-e334c9d0c94f/mzaf_4690595544095466665.plus.aac.p.m4a",
+    "year": "2015"
+  },
+  "marvinsroom|drake": {
+    "title": "Marvins Room",
+    "artist": "Drake",
+    "url": "https://music.apple.com/us/album/1440642493?i=1440642743",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/6b/5b/24/6b5b24cd-3235-b99b-a311-e3cf6f752b04/mzaf_306177031500304589.plus.aac.p.m4a",
+    "year": "2011"
   },
   "medicine|meganmoroney": {
     "title": "Medicine",
@@ -650,6 +685,13 @@
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/fc/9f/38/fc9f3868-52f1-bb3b-f692-1dca6d78c0df/mzaf_1462205118009470155.plus.aac.p.m4a",
     "year": "2024"
   },
+  "sticktalk|future": {
+    "title": "Stick Talk",
+    "artist": "Future",
+    "url": "https://music.apple.com/us/album/1017053934?i=1017055092",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/41/9e/27/419e270f-df7a-fee0-2e8f-46ab2ff6e8c4/mzaf_11983743748430993131.plus.aac.p.m4a",
+    "year": "2015"
+  },
   "stopthewedding|ashe": {
     "title": "Stop The Wedding!",
     "artist": "Ashe",
@@ -663,6 +705,13 @@
     "url": "https://music.apple.com/us/album/1889992111?i=1889992115",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ab/d6/78/abd678a1-bf4e-7ee9-d0b2-ba8afee10914/mzaf_3280183609788906841.plus.aac.p.m4a",
     "year": "2026"
+  },
+  "sum2prove|lilbaby": {
+    "title": "Sum 2 Prove",
+    "artist": "Lil Baby",
+    "url": "https://music.apple.com/us/album/1534816297?i=1534816484",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/47/47/f5/4747f507-ad40-e228-f550-3511b5c3c8b6/mzaf_17240655843742556761.plus.aac.p.m4a",
+    "year": "2020"
   },
   "sunflower|postmalone": {
     "title": "Sunflower (Spider-Man: Into the Spider-Verse)",
@@ -740,6 +789,13 @@
     "url": "https://music.apple.com/us/album/1621119097?i=1621119447",
     "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/77/67/90/77679025-8a80-42a2-bbcd-335dd083295b/mzaf_11646896799515737302.plus.aac.p.m4a",
     "year": "2022"
+  },
+  "wantsandneeds|drake": {
+    "title": "Wants and Needs (feat. Lil Baby)",
+    "artist": "Drake",
+    "url": "https://music.apple.com/us/album/1556669854?i=1556670532",
+    "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8f/f5/f3/8ff5f38f-5803-212f-2edf-29865316646b/mzaf_9094270342036499562.plus.aac.p.m4a",
+    "year": "2021"
   },
   "whatyouneed|tems": {
     "title": "What You Need",
