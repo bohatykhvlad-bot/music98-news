@@ -89,15 +89,15 @@
   "spotifyFingerprint": "8ab570795cb9dbc6b69f03f994a61221379769880c82079858ed88d1989fa482",
   "complete": true,
   "seed": {
-    "covers": 148,
-    "names": 121,
-    "namesWithUrl": 121,
+    "covers": 150,
+    "names": 122,
+    "namesWithUrl": 122,
     "loudness": 50
   },
   "covers": {
-    "asked": 2,
+    "asked": 0,
     "filled": 0,
-    "failed": 2,
+    "failed": 0,
     "missing": 0,
     "runtimeFilled": 0
   },
@@ -1281,10 +1281,10 @@
     {
       "title": "Like That",
       "artist": "Future, Metro Boomin & Kendrick Lamar",
-      "url": "https://music.apple.com/us/album/like-that/1737149923?i=1737150439&app=music&at=1001l3aZW&ct=music98",
+      "url": "https://music.apple.com/us/album/1737149923?i=1737150439&app=music&at=1001l3aZW&ct=music98",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4e/9f/7b/4e9f7b71-28ad-a8dc-9b34-da532feb82f6/196871937382.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": "",
+      "year": "2024",
+      "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/0d/43/77/0d43774e-5ceb-5ef0-d6ef-413aafedfda9/mzaf_3430860277257077664.plus.aac.p.m4a",
       "sourceRanks": {
         "U": 69,
         "A": null,
@@ -1312,7 +1312,10 @@
       "applePoints": 12.8,
       "spotifyBonus": 30,
       "delta": "new",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -8,
+      "lufs": -8,
+      "truePeakDbtp": 0.7
     },
     {
       "title": "March Madness",
@@ -1924,7 +1927,10 @@
       "applePoints": 4.4,
       "spotifyBonus": 1.6657684831675024,
       "delta": "re-entry",
-      "weeks": 1
+      "weeks": 1,
+      "gainDb": -9.8,
+      "lufs": -6.2,
+      "truePeakDbtp": 0.4
     },
     {
       "title": "Not Like Us",
@@ -2002,7 +2008,7 @@
       "weeks": 17
     }
   ],
-  "seedEdition": "[[\"A\",\"2026-10-11T09:56:08.664Z\",\"2026-10-11\"],[\"U\",\"2026-10-11T09:56:08.523Z\",\"2026-10-11\"],[\"C\",\"148:d6282c43\"]]",
+  "seedEdition": "[[\"A\",\"2026-10-11T09:56:08.664Z\",\"2026-10-11\"],[\"U\",\"2026-10-11T09:56:08.523Z\",\"2026-10-11\"],[\"C\",\"150:99d9a92b\"]]",
   "arrows": {
     "ok": true,
     "bad": 0,
