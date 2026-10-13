@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-12T18:56:33.061Z",
+  "updated": "2026-10-13T02:51:55.316Z",
   "entries": {
     "quebec|drake": {
       "id": "67DgVQlvQ0qilSBN1hdkKN",
@@ -522,6 +522,27 @@
       "subtitle": "Gunna",
       "resolvedAt": "2026-10-12T18:53:00Z",
       "matchedFrom": "official-spotify-track-url-verified"
+    },
+    "valuablepain|youngboyneverbrokeagain": {
+      "id": "61Oo3DUJubecZQosjho6Pp",
+      "name": "Valuable Pain",
+      "subtitle": "YoungBoy Never Broke Again",
+      "resolvedAt": "2026-10-13T02:50:52.136Z",
+      "matchedFrom": "original-title-search"
+    },
+    "sukisugitemetsu|mlk": {
+      "id": "4Re9Zb9uYlMtMiZy7HFFw5",
+      "name": "Sukisugite METSU!",
+      "subtitle": "M!LK",
+      "resolvedAt": "2026-10-13T02:51:38.304Z",
+      "matchedFrom": "verified-apple-japanese-alias"
+    },
+    "lulu|mrsgreenapple": {
+      "id": "0vE1WglBbhmd5wDO49lcih",
+      "name": "lulu.",
+      "subtitle": "Mrs. GREEN APPLE",
+      "resolvedAt": "2026-10-13T02:51:48.755Z",
+      "matchedFrom": "original-title-search"
     }
   }
 }
