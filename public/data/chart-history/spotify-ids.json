@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-13T02:51:55.316Z",
+  "updated": "2026-10-14T00:50:05.340Z",
   "entries": {
     "quebec|drake": {
       "id": "67DgVQlvQ0qilSBN1hdkKN",
@@ -543,6 +543,34 @@
       "subtitle": "Mrs. GREEN APPLE",
       "resolvedAt": "2026-10-13T02:51:48.755Z",
       "matchedFrom": "original-title-search"
+    },
+    "sogood|jhenaiko": {
+      "id": "3Yd3J42s3GZaYty4Iy4ewT",
+      "name": "So Good (feat. Kendrick Lamar)",
+      "subtitle": "Jhené Aiko, Kendrick Lamar",
+      "resolvedAt": "2026-10-14T00:40:00.205Z",
+      "matchedFrom": "original-title-search"
+    },
+    "baby|justinbieber": {
+      "id": "6epn3r7S14KUqlReYr77hA",
+      "name": "Baby",
+      "subtitle": "Justin Bieber, Ludacris",
+      "resolvedAt": "2026-10-14T00:48:38.797Z",
+      "matchedFrom": "original-title-search"
+    },
+    "irisout|kenshiyonezu": {
+      "id": "59hVbgr8rfYkDbHfr8RcGI",
+      "name": "IRIS OUT",
+      "subtitle": "Kenshi Yonezu",
+      "resolvedAt": "2026-10-14T00:49:33.693Z",
+      "matchedFrom": "original-title-search"
+    },
+    "hanataba|backnumber": {
+      "id": "3QIAwtEEDOrv0g5NKCGrXZ",
+      "name": "花束",
+      "subtitle": "back number",
+      "resolvedAt": "2026-10-14T00:49:56.278Z",
+      "matchedFrom": "verified-apple-japanese-alias"
     }
   }
 }
