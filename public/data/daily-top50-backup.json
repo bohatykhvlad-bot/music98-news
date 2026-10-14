@@ -98,7 +98,8 @@
     "asked": 0,
     "filled": 0,
     "failed": 0,
-    "missing": 0
+    "missing": 0,
+    "runtimeFilled": 0
   },
   "tracks": [
     {
@@ -773,9 +774,9 @@
       "rank": 18,
       "applePoints": 31.2,
       "spotifyBonus": 0.45262217133233945,
-      "gainDb": -8.1,
-      "lufs": -7.9,
-      "truePeakDbtp": 0.3,
+      "gainDb": -6.3,
+      "lufs": -9.7,
+      "truePeakDbtp": -1.2,
       "delta": "4",
       "weeks": 4
     },
@@ -814,7 +815,7 @@
       "spotifyBonus": 0.17268482302792243,
       "gainDb": -7.8,
       "lufs": -8.2,
-      "truePeakDbtp": 1.2,
+      "truePeakDbtp": 1.1,
       "delta": "-1",
       "weeks": 4
     },
@@ -1613,9 +1614,9 @@
       "rank": 40,
       "applePoints": 7.2,
       "spotifyBonus": 1.2545378252586292,
-      "gainDb": -9.4,
-      "lufs": -6.6,
-      "truePeakDbtp": 0.2,
+      "gainDb": -9.8,
+      "lufs": -6.2,
+      "truePeakDbtp": 0.4,
       "delta": "8",
       "weeks": 2
     },
