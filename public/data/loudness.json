@@ -4,14 +4,14 @@
     "targetLufs": -16,
     "truePeakCeilingDbtp": -1,
     "method": "ffmpeg ebur128 (ITU-R BS.1770), attenuation only",
-    "measuredAt": "2026-10-14T12:07:10.137Z"
+    "measuredAt": "2026-10-14T14:43:00.184Z"
   },
   "aintinla|adla": {
-    "integratedLufs": -6.2,
-    "truePeakDbtp": 0.4,
-    "gainDb": -9.8,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a5/1c/db/a51cdb2c-4d28-3aea-feb2-44b7d0f1c05b/mzaf_11945853055580460496.plus.aac.p.m4a",
-    "measuredAt": "2026-10-14T12:07:11.403Z"
+    "integratedLufs": -6.6,
+    "truePeakDbtp": 0.2,
+    "gainDb": -9.4,
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/af/19/98/af1998ee-ed0e-4655-ec27-610c78dcb4fc/mzaf_18150537039377466708.plus.aac.p.m4a",
+    "measuredAt": "2026-10-14T14:43:01.305Z"
   },
   "babylon|taylorswift": {
     "integratedLufs": -9.1,
@@ -136,8 +136,8 @@
     "integratedLufs": -8.4,
     "truePeakDbtp": 0.2,
     "gainDb": -7.6,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/02/41/f3/0241f307-2ec2-f817-3953-78df5f80f63d/mzaf_525670659940588152.plus.aac.p.m4a",
-    "measuredAt": "2026-10-14T12:07:11.739Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9e/85/8d/9e858d51-fb47-3aff-c037-4e9fd284cefe/mzaf_12282803114326162707.plus.aac.p.m4a",
+    "measuredAt": "2026-10-14T14:43:01.866Z"
   },
   "icantloveyouanymore|ellalangley": {
     "integratedLufs": -7.4,
@@ -176,10 +176,10 @@
   },
   "inaminute|lilbaby": {
     "integratedLufs": -8.2,
-    "truePeakDbtp": 1.1,
+    "truePeakDbtp": 1.2,
     "gainDb": -7.8,
-    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/bb/f6/56/bbf6566c-7137-0484-be0b-8bc05283e99f/mzaf_1914219810054297365.plus.aac.p.m4a",
-    "measuredAt": "2026-10-14T12:07:11.052Z"
+    "preview": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/39/53/a7/3953a785-58f1-3dbb-dc0c-d36fe5aa499e/mzaf_12727081294267193811.plus.aac.p.m4a",
+    "measuredAt": "2026-10-14T14:43:00.836Z"
   },
   "janicestfu|drake": {
     "integratedLufs": -9.9,
