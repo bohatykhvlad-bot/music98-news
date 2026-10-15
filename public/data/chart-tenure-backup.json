@@ -1,6 +1,1613 @@
 {
   "schema": 1,
   "current": {
+    "updated": "2026-10-15",
+    "week": 28,
+    "rev": "tri-source-v42",
+    "complete": true,
+    "methodology": "apple-us40-spotify30-global30-v3",
+    "consensus": "three-source-union-verified-streams-v3",
+    "sources": {
+      "U": 100,
+      "A": 100,
+      "S": 200
+    },
+    "scoring": {
+      "appleUSA": "40*(101-US rank)/100",
+      "spotify": "30*sqrt(verified global daily/maxDaily)",
+      "appleGlobal": "30*(101-Global rank)/100",
+      "maxDaily": 5063699,
+      "missingSpotify": "not eligible; no fabricated stream counts",
+      "candidatePool": 297,
+      "eligibleWithVerifiedSpotify": 286
+    },
+    "sourceDetails": {
+      "U": {
+        "name": "Apple Music Top 100: USA",
+        "region": "us",
+        "url": "https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12",
+        "provenance": {
+          "source": "official-apple-us-playlist",
+          "url": "https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12",
+          "rows": 100
+        }
+      },
+      "A": {
+        "name": "Apple Music Top 100: Global",
+        "region": "global",
+        "cadence": "daily",
+        "entity": "song",
+        "url": "https://music.apple.com/us/playlist/top-100-global/pl.d25f5d1181894928af76c85c967f8f31",
+        "provenance": {
+          "source": "official-apple-global-playlist",
+          "url": "https://music.apple.com/us/playlist/top-100-global/pl.d25f5d1181894928af76c85c967f8f31",
+          "rows": 100
+        }
+      },
+      "S": {
+        "name": "Spotify Global Daily Top 200 and verified artist Daily via Kworb",
+        "region": "global",
+        "metric": "per-row verified global daily streams",
+        "url": "https://kworb.net/spotify/country/global_daily.html"
+      }
+    },
+    "sourceDateKinds": {
+      "U": "playlist-published",
+      "A": "playlist-published",
+      "S": "kworb-daily-edition"
+    },
+    "sourceDates": {
+      "U": "2026-10-13",
+      "A": "2026-10-13",
+      "S": "2026-10-13"
+    },
+    "sourceOrigin": {
+      "U": "verified-apple-usa-top100",
+      "A": "verified-apple-global-top100",
+      "S": "kworb-global-daily-and-artist-pages"
+    },
+    "spotifyFingerprint": "04e12c717a781b4d0790011d6e0f1f620cc362e12da3b410b6a890b8902168a8",
+    "tracks": [
+      {
+        "rank": 1,
+        "sourceRanks": {
+          "U": 3,
+          "A": 1,
+          "S": 1
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 5063699,
+          "spotifyId": "3h5T5JypYU7huFiVYhv1dr",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "BbY WOW",
+          "matchedArtist": "KAROL G, Judeline, rusowsky"
+        },
+        "score": 99.2,
+        "applePoints": 39.2,
+        "spotifyBonus": 30,
+        "appleUsPoints": 39.2,
+        "appleGlobalPoints": 30,
+        "spotifyPoints": 30,
+        "title": "BbY WOW",
+        "artist": "KAROL G, Judeline & rusowsky",
+        "weeks": 26,
+        "delta": "0"
+      },
+      {
+        "rank": 2,
+        "sourceRanks": {
+          "U": 6,
+          "A": 2,
+          "S": 2
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 4478556,
+          "spotifyId": "70cHKK8bHAfJrOGVnfRG9J",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Nicole Kidman",
+          "matchedArtist": "ADÉLA"
+        },
+        "score": 95.91345794605289,
+        "applePoints": 38,
+        "spotifyBonus": 28.21345794605289,
+        "appleUsPoints": 38,
+        "appleGlobalPoints": 29.7,
+        "spotifyPoints": 28.21345794605289,
+        "title": "Nicole Kidman",
+        "artist": "ADÉLA",
+        "weeks": 26,
+        "delta": "2"
+      },
+      {
+        "rank": 3,
+        "sourceRanks": {
+          "U": 12,
+          "A": 8,
+          "S": 4
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 3526431,
+          "spotifyId": "55pBIZO1cqoldeqpp5WR7H",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "the cure",
+          "matchedArtist": "Olivia Rodrigo"
+        },
+        "score": 88.53542734103723,
+        "applePoints": 35.6,
+        "spotifyBonus": 25.03542734103723,
+        "appleUsPoints": 35.6,
+        "appleGlobalPoints": 27.9,
+        "spotifyPoints": 25.03542734103723,
+        "title": "the cure",
+        "artist": "Olivia Rodrigo",
+        "weeks": 26,
+        "delta": "9"
+      },
+      {
+        "rank": 4,
+        "sourceRanks": {
+          "U": 2,
+          "A": 4,
+          "S": 32
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2098343,
+          "spotifyId": "7scFxt9VhL4FJwuPSfRlfN",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Choosin' Texas",
+          "matchedArtist": "Ella Langley"
+        },
+        "score": 88.01192445513385,
+        "applePoints": 39.6,
+        "spotifyBonus": 19.311924455133845,
+        "appleUsPoints": 39.6,
+        "appleGlobalPoints": 29.1,
+        "spotifyPoints": 19.311924455133845,
+        "title": "Choosin' Texas",
+        "artist": "Ella Langley",
+        "weeks": 26,
+        "delta": "-1"
+      },
+      {
+        "rank": 5,
+        "sourceRanks": {
+          "U": 11,
+          "A": 7,
+          "S": 7
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 3002700,
+          "spotifyId": "49j6SvuvWfbEKZKzsHCdLJ",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "stupid song",
+          "matchedArtist": "Olivia Rodrigo"
+        },
+        "score": 87.30166520368508,
+        "applePoints": 36,
+        "spotifyBonus": 23.101665203685073,
+        "appleUsPoints": 36,
+        "appleGlobalPoints": 28.2,
+        "spotifyPoints": 23.101665203685073,
+        "title": "stupid song",
+        "artist": "Olivia Rodrigo",
+        "weeks": 26,
+        "delta": "4"
+      },
+      {
+        "rank": 6,
+        "sourceRanks": {
+          "U": 10,
+          "A": 5,
+          "S": 11
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2705855,
+          "spotifyId": "11hcBLPtbMp4aQI6zGQLub",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Patient Zero",
+          "matchedArtist": "Taylor Swift"
+        },
+        "score": 87.13004756900746,
+        "applePoints": 36.4,
+        "spotifyBonus": 21.930047569007453,
+        "appleUsPoints": 36.4,
+        "appleGlobalPoints": 28.8,
+        "spotifyPoints": 21.930047569007453,
+        "title": "Patient Zero",
+        "artist": "Taylor Swift",
+        "weeks": 19,
+        "delta": "2"
+      },
+      {
+        "rank": 7,
+        "sourceRanks": {
+          "U": 1,
+          "A": 3,
+          "S": 176
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 1172597,
+          "spotifyId": "4IAWZw00ZI9DLKDjesx86u",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Solar Eclipse (feat. Don Toliver)",
+          "matchedArtist": "Drake, Don Toliver"
+        },
+        "score": 83.83649294724654,
+        "applePoints": 40,
+        "spotifyBonus": 14.436492947246542,
+        "appleUsPoints": 40,
+        "appleGlobalPoints": 29.4,
+        "spotifyPoints": 14.436492947246542,
+        "title": "Solar Eclipse",
+        "artist": "Drake & Don Toliver",
+        "weeks": 12,
+        "delta": "-5"
+      },
+      {
+        "rank": 8,
+        "sourceRanks": {
+          "U": 7,
+          "A": 9,
+          "S": 132
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 1299183,
+          "spotifyId": "514joG57v4yKTsfQmz7stz",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Janice STFU",
+          "matchedArtist": "Drake"
+        },
+        "score": 80.3957618360302,
+        "applePoints": 37.6,
+        "spotifyBonus": 15.195761836030206,
+        "appleUsPoints": 37.6,
+        "appleGlobalPoints": 27.6,
+        "spotifyPoints": 15.195761836030206,
+        "title": "Janice STFU",
+        "artist": "Drake",
+        "weeks": 26,
+        "delta": "-2"
+      },
+      {
+        "rank": 9,
+        "sourceRanks": {
+          "U": 4,
+          "A": 6,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 892049,
+          "spotifyId": "67DgVQlvQ0qilSBN1hdkKN",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/67DgVQlvQ0qilSBN1hdkKN",
+          "matchedTitle": "Quebec",
+          "matchedArtist": "Drake"
+        },
+        "score": 79.89162174768019,
+        "applePoints": 38.8,
+        "spotifyBonus": 12.591621747680188,
+        "appleUsPoints": 38.8,
+        "appleGlobalPoints": 28.5,
+        "spotifyPoints": 12.591621747680188,
+        "title": "Quebec",
+        "artist": "Drake",
+        "weeks": 5,
+        "delta": "-4"
+      },
+      {
+        "rank": 10,
+        "sourceRanks": {
+          "U": 5,
+          "A": 10,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 947332,
+          "spotifyId": "50GVx8sCc1TDKHXumgYqEO",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/50GVx8sCc1TDKHXumgYqEO",
+          "matchedTitle": "Cold Shoulder (feat. Don Toliver & Yebba)",
+          "matchedArtist": "Drake, Don Toliver, Yebba"
+        },
+        "score": 78.67592771238259,
+        "applePoints": 38.4,
+        "spotifyBonus": 12.97592771238259,
+        "appleUsPoints": 38.4,
+        "appleGlobalPoints": 27.3,
+        "spotifyPoints": 12.97592771238259,
+        "title": "Cold Shoulder",
+        "artist": "Drake, Don Toliver & Yebba",
+        "weeks": 12,
+        "delta": "-3"
+      },
+      {
+        "rank": 11,
+        "sourceRanks": {
+          "U": 31,
+          "A": 16,
+          "S": 15
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2593319,
+          "spotifyId": "7ujApz6iFP3PmKIDGcaGbe",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Great Expectation",
+          "matchedArtist": "SIENNA SPIRO"
+        },
+        "score": 74.96917146894295,
+        "applePoints": 28,
+        "spotifyBonus": 21.469171468942946,
+        "appleUsPoints": 28,
+        "appleGlobalPoints": 25.5,
+        "spotifyPoints": 21.469171468942946,
+        "title": "Great Expectation",
+        "artist": "SIENNA SPIRO",
+        "weeks": 13,
+        "delta": "12"
+      },
+      {
+        "rank": 12,
+        "sourceRanks": {
+          "U": 8,
+          "A": 14,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 604842,
+          "spotifyId": "5qGziX9216V8hKJjGg8RtH",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/5qGziX9216V8hKJjGg8RtH",
+          "matchedTitle": "Last Thing You Need (from GTAVI: The Album)",
+          "matchedArtist": "Morgan Wallen, Grand Theft Auto VI"
+        },
+        "score": 73.6683174114543,
+        "applePoints": 37.2,
+        "spotifyBonus": 10.368317411454287,
+        "appleUsPoints": 37.2,
+        "appleGlobalPoints": 26.1,
+        "spotifyPoints": 10.368317411454287,
+        "title": "Last Thing You Need",
+        "artist": "Morgan Wallen",
+        "weeks": 5,
+        "delta": "-2"
+      },
+      {
+        "rank": 13,
+        "sourceRanks": {
+          "U": 9,
+          "A": 15,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 688269,
+          "spotifyId": "3xwMjQriBVW0OGEvNKo9c0",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/3xwMjQriBVW0OGEvNKo9c0",
+          "matchedTitle": "Been By Now",
+          "matchedArtist": "Morgan Wallen"
+        },
+        "score": 73.66028755348772,
+        "applePoints": 36.8,
+        "spotifyBonus": 11.060287553487722,
+        "appleUsPoints": 36.8,
+        "appleGlobalPoints": 25.8,
+        "spotifyPoints": 11.060287553487722,
+        "title": "Been By Now",
+        "artist": "Morgan Wallen",
+        "weeks": 5,
+        "delta": "-2"
+      },
+      {
+        "rank": 14,
+        "sourceRanks": {
+          "U": 37,
+          "A": 18,
+          "S": 17
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2524847,
+          "spotifyId": "1qbmS6ep2hbBRaEZFpn7BX",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Man I Need",
+          "matchedArtist": "Olivia Dean"
+        },
+        "score": 71.68384775908683,
+        "applePoints": 25.6,
+        "spotifyBonus": 21.183847759086827,
+        "appleUsPoints": 25.6,
+        "appleGlobalPoints": 24.9,
+        "spotifyPoints": 21.183847759086827,
+        "title": "Man I Need",
+        "artist": "Olivia Dean",
+        "weeks": 26,
+        "delta": "7"
+      },
+      {
+        "rank": 15,
+        "sourceRanks": {
+          "U": 17,
+          "A": 27,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 893735,
+          "spotifyId": "05CjWFAcAlY6O9po6Qwakk",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/05CjWFAcAlY6O9po6Qwakk",
+          "matchedTitle": "Be Her",
+          "matchedArtist": "Ella Langley"
+        },
+        "score": 68.40351540634994,
+        "applePoints": 33.6,
+        "spotifyBonus": 12.603515406349942,
+        "appleUsPoints": 33.6,
+        "appleGlobalPoints": 22.2,
+        "spotifyPoints": 12.603515406349942,
+        "title": "Be Her",
+        "artist": "Ella Langley",
+        "weeks": 5,
+        "delta": "1"
+      },
+      {
+        "rank": 16,
+        "sourceRanks": {
+          "U": 14,
+          "A": 24,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 557771,
+          "spotifyId": "5aVBxVa0kz9uzv0F4gwdEn",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/5aVBxVa0kz9uzv0F4gwdEn",
+          "matchedTitle": "I Can't Love You Anymore",
+          "matchedArtist": "Ella Langley, Morgan Wallen"
+        },
+        "score": 67.85669672194027,
+        "applePoints": 34.8,
+        "spotifyBonus": 9.956696721940272,
+        "appleUsPoints": 34.8,
+        "appleGlobalPoints": 23.1,
+        "spotifyPoints": 9.956696721940272,
+        "title": "I Can't Love You Anymore",
+        "artist": "Ella Langley & Morgan Wallen",
+        "weeks": 5,
+        "delta": "-3"
+      },
+      {
+        "rank": 17,
+        "sourceRanks": {
+          "U": 13,
+          "A": 23,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 476911,
+          "spotifyId": "59nOXPmaKlBfGMDeOVGrIK",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/59nOXPmaKlBfGMDeOVGrIK",
+          "matchedTitle": "WAIT FOR U (feat. Drake & Tems)",
+          "matchedArtist": "Future, Drake, Tems"
+        },
+        "score": 67.80674221913758,
+        "applePoints": 35.2,
+        "spotifyBonus": 9.206742219137578,
+        "appleUsPoints": 35.2,
+        "appleGlobalPoints": 23.4,
+        "spotifyPoints": 9.206742219137578,
+        "title": "WAIT FOR U",
+        "artist": "Future, Drake, Tems",
+        "weeks": 5,
+        "delta": "-3"
+      },
+      {
+        "rank": 18,
+        "sourceRanks": {
+          "U": 41,
+          "A": 35,
+          "S": 24
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2259008,
+          "spotifyId": "2lpygKqzPFtItQ4ss3cgfb",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Cinderella (feat. Ty Dolla $ign)",
+          "matchedArtist": "Mac Miller, Ty Dolla $ign"
+        },
+        "score": 63.83762285455487,
+        "applePoints": 24,
+        "spotifyBonus": 20.037622854554876,
+        "appleUsPoints": 24,
+        "appleGlobalPoints": 19.8,
+        "spotifyPoints": 20.037622854554876,
+        "title": "Cinderella",
+        "artist": "Mac Miller, Ty Dolla $ign",
+        "weeks": 17,
+        "delta": "18"
+      },
+      {
+        "rank": 19,
+        "sourceRanks": {
+          "U": 16,
+          "A": 26,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 223613,
+          "spotifyId": "5BbdKBZO0TH0GhfxUfyhL9",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/5BbdKBZO0TH0GhfxUfyhL9",
+          "matchedTitle": "Freestyle",
+          "matchedArtist": "Lil Baby"
+        },
+        "score": 62.804284992819824,
+        "applePoints": 34,
+        "spotifyBonus": 6.304284992819822,
+        "appleUsPoints": 34,
+        "appleGlobalPoints": 22.5,
+        "spotifyPoints": 6.304284992819822,
+        "title": "Freestyle",
+        "artist": "Lil Baby",
+        "weeks": 5,
+        "delta": "-2"
+      },
+      {
+        "rank": 20,
+        "sourceRanks": {
+          "U": 74,
+          "A": 12,
+          "S": 3
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 3581813,
+          "spotifyId": "6U9VpmP3dEinuezxCJ2Zg9",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Ain't In LA",
+          "matchedArtist": "ADÉLA"
+        },
+        "score": 62.731250062993155,
+        "applePoints": 10.8,
+        "spotifyBonus": 25.23125006299315,
+        "appleUsPoints": 10.8,
+        "appleGlobalPoints": 26.7,
+        "spotifyPoints": 25.23125006299315,
+        "title": "Ain't In LA",
+        "artist": "ADÉLA",
+        "weeks": 3,
+        "delta": "20"
+      },
+      {
+        "rank": 21,
+        "sourceRanks": {
+          "U": 19,
+          "A": 37,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 552609,
+          "spotifyId": "5ZAMlvo6ZUjVRZOGu2bJib",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/5ZAMlvo6ZUjVRZOGu2bJib",
+          "matchedTitle": "Dead Fresh",
+          "matchedArtist": "Lil Baby"
+        },
+        "score": 61.91051653635303,
+        "applePoints": 32.8,
+        "spotifyBonus": 9.910516536353029,
+        "appleUsPoints": 32.8,
+        "appleGlobalPoints": 19.2,
+        "spotifyPoints": 9.910516536353029,
+        "title": "Dead Fresh",
+        "artist": "Lil Baby",
+        "weeks": 5,
+        "delta": "-1"
+      },
+      {
+        "rank": 22,
+        "sourceRanks": {
+          "U": 26,
+          "A": 25,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 445264,
+          "spotifyId": "249E7AgSyA4vhtXNEjQYb5",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/249E7AgSyA4vhtXNEjQYb5",
+          "matchedTitle": "Wicked Games",
+          "matchedArtist": "The Weeknd"
+        },
+        "score": 61.69602726678856,
+        "applePoints": 30,
+        "spotifyBonus": 8.896027266788565,
+        "appleUsPoints": 30,
+        "appleGlobalPoints": 22.8,
+        "spotifyPoints": 8.896027266788565,
+        "title": "Wicked Games",
+        "artist": "The Weeknd",
+        "weeks": 5,
+        "delta": "-4"
+      },
+      {
+        "rank": 23,
+        "sourceRanks": {
+          "U": 21,
+          "A": 49,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 950882,
+          "spotifyId": "1VOSSXuWRcBj2rpfxNdX9v",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/1VOSSXuWRcBj2rpfxNdX9v",
+          "matchedTitle": "Broken Window Serenade",
+          "matchedArtist": "Whiskey Myers"
+        },
+        "score": 60.60021775477004,
+        "applePoints": 32,
+        "spotifyBonus": 13.000217754770041,
+        "appleUsPoints": 32,
+        "appleGlobalPoints": 15.6,
+        "spotifyPoints": 13.000217754770041,
+        "title": "Broken Window Serenade",
+        "artist": "Whiskey Myers",
+        "weeks": 5,
+        "delta": "5"
+      },
+      {
+        "rank": 24,
+        "sourceRanks": {
+          "U": 15,
+          "A": 30,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 54905,
+          "spotifyId": "3ihIZrJreMJPjQdNLrEXnP",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/3ihIZrJreMJPjQdNLrEXnP",
+          "matchedTitle": "In A Minute",
+          "matchedArtist": "Lil Baby"
+        },
+        "score": 58.82387222404696,
+        "applePoints": 34.4,
+        "spotifyBonus": 3.123872224046954,
+        "appleUsPoints": 34.4,
+        "appleGlobalPoints": 21.3,
+        "spotifyPoints": 3.123872224046954,
+        "title": "In A Minute",
+        "artist": "Lil Baby",
+        "weeks": 5,
+        "delta": "-5"
+      },
+      {
+        "rank": 25,
+        "sourceRanks": {
+          "U": 20,
+          "A": 39,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 273487,
+          "spotifyId": "0SeTP12t4EwBJ6zsjHn9Wa",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/0SeTP12t4EwBJ6zsjHn9Wa",
+          "matchedTitle": "I'm Spent (feat. Loe Shimmy)",
+          "matchedArtist": "Drake, Loe Shimmy"
+        },
+        "score": 57.971972369563865,
+        "applePoints": 32.4,
+        "spotifyBonus": 6.971972369563863,
+        "appleUsPoints": 32.4,
+        "appleGlobalPoints": 18.6,
+        "spotifyPoints": 6.971972369563863,
+        "title": "I’m Spent",
+        "artist": "Drake & Loe Shimmy",
+        "weeks": 5,
+        "delta": "-3"
+      },
+      {
+        "rank": 26,
+        "sourceRanks": {
+          "U": 40,
+          "A": 31,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 831721,
+          "spotifyId": "4iZ4pt7kvcaH6Yo8UoZ4s2",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/4iZ4pt7kvcaH6Yo8UoZ4s2",
+          "matchedTitle": "Snooze",
+          "matchedArtist": "SZA"
+        },
+        "score": 57.55839216162492,
+        "applePoints": 24.4,
+        "spotifyBonus": 12.15839216162492,
+        "appleUsPoints": 24.4,
+        "appleGlobalPoints": 21,
+        "spotifyPoints": 12.15839216162492,
+        "title": "Snooze",
+        "artist": "SZA",
+        "weeks": 5,
+        "delta": "4"
+      },
+      {
+        "rank": 27,
+        "sourceRanks": {
+          "U": 34,
+          "A": 33,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 509932,
+          "spotifyId": "3Yd3J42s3GZaYty4Iy4ewT",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://www.mystreamcount.com/track/3Yd3J42s3GZaYty4Iy4ewT",
+          "metric": "mystreamcount-daily-delta",
+          "estimated": true,
+          "estimateMethod": "totals-window-3d",
+          "trackUrl": "https://open.spotify.com/track/3Yd3J42s3GZaYty4Iy4ewT",
+          "matchedTitle": "So Good (feat. Kendrick Lamar)",
+          "matchedArtist": "Jhené Aiko, Kendrick Lamar"
+        },
+        "score": 56.72014245041656,
+        "applePoints": 26.8,
+        "spotifyBonus": 9.520142450416557,
+        "appleUsPoints": 26.8,
+        "appleGlobalPoints": 20.4,
+        "spotifyPoints": 9.520142450416557,
+        "title": "So Good",
+        "artist": "Jhené Aiko, Kendrick Lamar",
+        "weeks": 5,
+        "delta": "-3"
+      },
+      {
+        "rank": 28,
+        "sourceRanks": {
+          "U": 54,
+          "A": 51,
+          "S": 13
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2615714,
+          "spotifyId": "0cQVqPuHQP4KEwc7ZUQmj6",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Sweater Weather",
+          "matchedArtist": "The Neighbourhood"
+        },
+        "score": 55.36167234196964,
+        "applePoints": 18.8,
+        "spotifyBonus": 21.561672341969636,
+        "appleUsPoints": 18.8,
+        "appleGlobalPoints": 15,
+        "spotifyPoints": 21.561672341969636,
+        "title": "Sweater Weather",
+        "artist": "The Neighbourhood",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 29,
+        "sourceRanks": {
+          "U": 18,
+          "A": 52,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 304665,
+          "spotifyId": "3QLjDkgLh9AOEHlhQtDuhs",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/3QLjDkgLh9AOEHlhQtDuhs",
+          "matchedTitle": "Best I Ever Had",
+          "matchedArtist": "Drake"
+        },
+        "score": 55.25865761160722,
+        "applePoints": 33.2,
+        "spotifyBonus": 7.358657611607215,
+        "appleUsPoints": 33.2,
+        "appleGlobalPoints": 14.7,
+        "spotifyPoints": 7.358657611607215,
+        "title": "Best I Ever Had",
+        "artist": "Drake",
+        "weeks": 5,
+        "delta": "-4"
+      },
+      {
+        "rank": 30,
+        "sourceRanks": {
+          "U": 56,
+          "A": 42,
+          "S": 35
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2044221,
+          "spotifyId": "003vvx7Niy0yvhvHt4a68B",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Mr. Brightside",
+          "matchedArtist": "The Killers"
+        },
+        "score": 54.76124380853389,
+        "applePoints": 18,
+        "spotifyBonus": 19.06124380853389,
+        "appleUsPoints": 18,
+        "appleGlobalPoints": 17.7,
+        "spotifyPoints": 19.06124380853389,
+        "title": "Mr. Brightside",
+        "artist": "The Killers",
+        "weeks": 7,
+        "delta": "9"
+      },
+      {
+        "rank": 31,
+        "sourceRanks": {
+          "U": 27,
+          "A": 47,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 379989,
+          "spotifyId": "3LVkyYg0PSo8XInTPKKhZM",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/3LVkyYg0PSo8XInTPKKhZM",
+          "matchedTitle": "pop it",
+          "matchedArtist": "Gunna"
+        },
+        "score": 54.018126576484406,
+        "applePoints": 29.6,
+        "spotifyBonus": 8.218126576484412,
+        "appleUsPoints": 29.6,
+        "appleGlobalPoints": 16.2,
+        "spotifyPoints": 8.218126576484412,
+        "title": "pop it",
+        "artist": "Gunna",
+        "weeks": 4,
+        "delta": "-4"
+      },
+      {
+        "rank": 32,
+        "sourceRanks": {
+          "U": 23,
+          "A": 55,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 418124,
+          "spotifyId": "7AeM1BGYM7emrqmQn1PuWv",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/7AeM1BGYM7emrqmQn1PuWv",
+          "matchedTitle": "I'm The Problem",
+          "matchedArtist": "Morgan Wallen"
+        },
+        "score": 53.62064699986493,
+        "applePoints": 31.2,
+        "spotifyBonus": 8.620646999864935,
+        "appleUsPoints": 31.2,
+        "appleGlobalPoints": 13.8,
+        "spotifyPoints": 8.620646999864935,
+        "title": "I'm The Problem",
+        "artist": "Morgan Wallen",
+        "weeks": 5,
+        "delta": "-6"
+      },
+      {
+        "rank": 33,
+        "sourceRanks": {
+          "U": 47,
+          "A": 46,
+          "S": 119
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 1320537,
+          "spotifyId": "2QihEF7BIfPCJjkB0c4Rrv",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Boston",
+          "matchedArtist": "STELLA LEFTY"
+        },
+        "score": 53.420135298064096,
+        "applePoints": 21.6,
+        "spotifyBonus": 15.320135298064097,
+        "appleUsPoints": 21.6,
+        "appleGlobalPoints": 16.5,
+        "spotifyPoints": 15.320135298064097,
+        "title": "Boston",
+        "artist": "STELLA LEFTY",
+        "weeks": 26,
+        "delta": "-2"
+      },
+      {
+        "rank": 34,
+        "sourceRanks": {
+          "U": 87,
+          "A": 13,
+          "S": 27
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2211293,
+          "spotifyId": "3iy2QuCtCzpWnR6tia39AB",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "hate that i made you love me",
+          "matchedArtist": "Ariana Grande"
+        },
+        "score": 51.824875070214,
+        "applePoints": 5.6,
+        "spotifyBonus": 19.824875070214,
+        "appleUsPoints": 5.6,
+        "appleGlobalPoints": 26.4,
+        "spotifyPoints": 19.824875070214,
+        "title": "hate that i made you love me",
+        "artist": "Ariana Grande",
+        "weeks": 2,
+        "delta": "14"
+      },
+      {
+        "rank": 35,
+        "sourceRanks": {
+          "U": 60,
+          "A": 28,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 989710,
+          "spotifyId": "2j7wI9QWrP8cjKDdOLVQTU",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://www.mystreamcount.com/track/2j7wI9QWrP8cjKDdOLVQTU",
+          "metric": "mystreamcount-daily-delta",
+          "estimated": true,
+          "estimateMethod": "totals-window-3d",
+          "trackUrl": "https://open.spotify.com/track/2j7wI9QWrP8cjKDdOLVQTU",
+          "matchedTitle": "Babylon",
+          "matchedArtist": "Taylor Swift"
+        },
+        "score": 51.56298543951854,
+        "applePoints": 16.4,
+        "spotifyBonus": 13.262985439518548,
+        "appleUsPoints": 16.4,
+        "appleGlobalPoints": 21.9,
+        "spotifyPoints": 13.262985439518548,
+        "title": "Babylon",
+        "artist": "Taylor Swift",
+        "weeks": 19,
+        "delta": "0"
+      },
+      {
+        "rank": 36,
+        "sourceRanks": {
+          "U": 59,
+          "A": 32,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 839891,
+          "spotifyId": "6DCZcSspjsKoFjzjrWoCdn",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/6DCZcSspjsKoFjzjrWoCdn",
+          "matchedTitle": "God's Plan",
+          "matchedArtist": "Drake"
+        },
+        "score": 49.71796220674849,
+        "applePoints": 16.8,
+        "spotifyBonus": 12.217962206748489,
+        "appleUsPoints": 16.8,
+        "appleGlobalPoints": 20.7,
+        "spotifyPoints": 12.217962206748489,
+        "title": "God's Plan",
+        "artist": "Drake",
+        "weeks": 5,
+        "delta": "1"
+      },
+      {
+        "rank": 37,
+        "sourceRanks": {
+          "U": 22,
+          "A": 56,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 20280,
+          "spotifyId": "3gOL6mYIq19Oq8raxIntrV",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/3gOL6mYIq19Oq8raxIntrV",
+          "matchedTitle": "LIKE ME (feat. 42 Dugg & Lil Baby)",
+          "matchedArtist": "Future, 42 Dugg, Lil Baby"
+        },
+        "score": 46.998546720561016,
+        "applePoints": 31.6,
+        "spotifyBonus": 1.898546720561014,
+        "appleUsPoints": 31.6,
+        "appleGlobalPoints": 13.5,
+        "spotifyPoints": 1.898546720561014,
+        "title": "LIKE ME",
+        "artist": "Future, 42 Dugg, Lil Baby",
+        "weeks": 5,
+        "delta": "-8"
+      },
+      {
+        "rank": 38,
+        "sourceRanks": {
+          "U": 24,
+          "A": 66,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 172571,
+          "spotifyId": "45UDzIWgqj5hgQKXLlfdp7",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/45UDzIWgqj5hgQKXLlfdp7",
+          "matchedTitle": "Don't We",
+          "matchedArtist": "Morgan Wallen"
+        },
+        "score": 46.83823298008878,
+        "applePoints": 30.8,
+        "spotifyBonus": 5.538232980088784,
+        "appleUsPoints": 30.8,
+        "appleGlobalPoints": 10.5,
+        "spotifyPoints": 5.538232980088784,
+        "title": "Don't We",
+        "artist": "Morgan Wallen",
+        "weeks": 5,
+        "delta": "-6"
+      },
+      {
+        "rank": 39,
+        "sourceRanks": {
+          "U": null,
+          "A": 20,
+          "S": 8
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2757938,
+          "spotifyId": "6QFCMUUq1T2Vf5sFUXcuQ7",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Beauty And A Beat",
+          "matchedArtist": "Justin Bieber, Nicki Minaj"
+        },
+        "score": 46.440099230893864,
+        "applePoints": 0,
+        "spotifyBonus": 22.14009923089386,
+        "appleUsPoints": 0,
+        "appleGlobalPoints": 24.3,
+        "spotifyPoints": 22.14009923089386,
+        "title": "Beauty and a Beat",
+        "artist": "Justin Bieber, Nicki Minaj",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 40,
+        "sourceRanks": {
+          "U": 33,
+          "A": 69,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 487807,
+          "spotifyId": "583dMdiUquLMenarTp7PQm",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/583dMdiUquLMenarTp7PQm",
+          "matchedTitle": "Last Night",
+          "matchedArtist": "Morgan Wallen"
+        },
+        "score": 46.11132161892361,
+        "applePoints": 27.2,
+        "spotifyBonus": 9.311321618923616,
+        "appleUsPoints": 27.2,
+        "appleGlobalPoints": 9.6,
+        "spotifyPoints": 9.311321618923616,
+        "title": "Last Night",
+        "artist": "Morgan Wallen",
+        "weeks": 5,
+        "delta": "-7"
+      },
+      {
+        "rank": 41,
+        "sourceRanks": {
+          "U": 29,
+          "A": 74,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 372587,
+          "spotifyId": "047fCsbO4NdmwCBn8pcUXl",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/047fCsbO4NdmwCBn8pcUXl",
+          "matchedTitle": "Marvins Room",
+          "matchedArtist": "Drake"
+        },
+        "score": 45.03769039113372,
+        "applePoints": 28.8,
+        "spotifyBonus": 8.137690391133724,
+        "appleUsPoints": 28.8,
+        "appleGlobalPoints": 8.1,
+        "spotifyPoints": 8.137690391133724,
+        "title": "Marvins Room",
+        "artist": "Drake",
+        "weeks": 4,
+        "delta": "1"
+      },
+      {
+        "rank": 42,
+        "sourceRanks": {
+          "U": 25,
+          "A": 73,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 69504,
+          "spotifyId": "3WcC6NH9J77xPEvj1SOL7z",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/3WcC6NH9J77xPEvj1SOL7z",
+          "matchedTitle": "March Madness",
+          "matchedArtist": "Future"
+        },
+        "score": 42.314731982314804,
+        "applePoints": 30.4,
+        "spotifyBonus": 3.514731982314804,
+        "appleUsPoints": 30.4,
+        "appleGlobalPoints": 8.4,
+        "spotifyPoints": 3.514731982314804,
+        "title": "March Madness",
+        "artist": "Future",
+        "weeks": 4,
+        "delta": "-8"
+      },
+      {
+        "rank": 43,
+        "sourceRanks": {
+          "U": null,
+          "A": 22,
+          "S": 37
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 1943405,
+          "spotifyId": "53iuhJlwXhSER5J2IYYv1W",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "The Fate of Ophelia",
+          "matchedArtist": "Taylor Swift"
+        },
+        "score": 42.28527414154678,
+        "applePoints": 0,
+        "spotifyBonus": 18.585274141546783,
+        "appleUsPoints": 0,
+        "appleGlobalPoints": 23.7,
+        "spotifyPoints": 18.585274141546783,
+        "title": "The Fate of Ophelia",
+        "artist": "Taylor Swift",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 44,
+        "sourceRanks": {
+          "U": 63,
+          "A": 41,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 345341,
+          "spotifyId": "2JPLbjOn0wPCngEot2STUS",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/2JPLbjOn0wPCngEot2STUS",
+          "matchedTitle": "Yonaguni",
+          "matchedArtist": "Bad Bunny"
+        },
+        "score": 41.034501801926694,
+        "applePoints": 15.2,
+        "spotifyBonus": 7.834501801926689,
+        "appleUsPoints": 15.2,
+        "appleGlobalPoints": 18,
+        "spotifyPoints": 7.834501801926689,
+        "title": "Yonaguni",
+        "artist": "Bad Bunny",
+        "weeks": 5,
+        "delta": "-1"
+      },
+      {
+        "rank": 45,
+        "sourceRanks": {
+          "U": null,
+          "A": 40,
+          "S": 9
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 2730740,
+          "spotifyId": "7so0lgd0zP2Sbgs2d7a1SZ",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Die With A Smile",
+          "matchedArtist": "Lady Gaga, Bruno Mars"
+        },
+        "score": 40.33065906524476,
+        "applePoints": 0,
+        "spotifyBonus": 22.030659065244755,
+        "appleUsPoints": 0,
+        "appleGlobalPoints": 18.3,
+        "spotifyPoints": 22.030659065244755,
+        "title": "Die With A Smile",
+        "artist": "Lady Gaga & Bruno Mars",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 46,
+        "sourceRanks": {
+          "U": 66,
+          "A": 53,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 653566,
+          "spotifyId": "6AI3ezQ4o3HUoP6Dhudph3",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/6AI3ezQ4o3HUoP6Dhudph3",
+          "matchedTitle": "Not Like Us",
+          "matchedArtist": "Kendrick Lamar"
+        },
+        "score": 39.17784762188381,
+        "applePoints": 14,
+        "spotifyBonus": 10.77784762188381,
+        "appleUsPoints": 14,
+        "appleGlobalPoints": 14.4,
+        "spotifyPoints": 10.77784762188381,
+        "title": "Not Like Us",
+        "artist": "Kendrick Lamar",
+        "weeks": 5,
+        "delta": "-31"
+      },
+      {
+        "rank": 47,
+        "sourceRanks": {
+          "U": 67,
+          "A": 61,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 925064,
+          "spotifyId": "5mCPDVBb16L4XQwDdbRUpz",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/5mCPDVBb16L4XQwDdbRUpz",
+          "matchedTitle": "Passionfruit",
+          "matchedArtist": "Drake"
+        },
+        "score": 38.42251464452773,
+        "applePoints": 13.6,
+        "spotifyBonus": 12.822514644527729,
+        "appleUsPoints": 13.6,
+        "appleGlobalPoints": 12,
+        "spotifyPoints": 12.822514644527729,
+        "title": "Passionfruit",
+        "artist": "Drake",
+        "weeks": 1,
+        "delta": "new"
+      },
+      {
+        "rank": 48,
+        "sourceRanks": {
+          "U": null,
+          "A": 36,
+          "S": 36
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 1950063,
+          "spotifyId": "3fRCAPMMZ8l8P9YKI6OCzD",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "drop dead",
+          "matchedArtist": "Olivia Rodrigo"
+        },
+        "score": 38.117082990992564,
+        "applePoints": 0,
+        "spotifyBonus": 18.617082990992564,
+        "appleUsPoints": 0,
+        "appleGlobalPoints": 19.5,
+        "spotifyPoints": 18.617082990992564,
+        "title": "drop dead",
+        "artist": "Olivia Rodrigo",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 49,
+        "sourceRanks": {
+          "U": 38,
+          "A": 91,
+          "S": null
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 550462,
+          "spotifyId": "2uwnP6tZVVmTovzX5ELooy",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://soundcamps.com/spotify-stream-checker/",
+          "metric": "soundcamps-total-delta",
+          "estimated": true,
+          "estimateMethod": "totals-delta",
+          "trackUrl": "https://open.spotify.com/track/2uwnP6tZVVmTovzX5ELooy",
+          "matchedTitle": "Power Trip (feat. Miguel)",
+          "matchedArtist": "J. Cole, Miguel"
+        },
+        "score": 38.09124559931867,
+        "applePoints": 25.2,
+        "spotifyBonus": 9.891245599318669,
+        "appleUsPoints": 25.2,
+        "appleGlobalPoints": 3,
+        "spotifyPoints": 9.891245599318669,
+        "title": "Power Trip",
+        "artist": "J. Cole, Miguel",
+        "weeks": 1,
+        "delta": "re-entry"
+      },
+      {
+        "rank": 50,
+        "sourceRanks": {
+          "U": 65,
+          "A": 76,
+          "S": 104
+        },
+        "spotify": {
+          "status": "matched",
+          "daily": 1367150,
+          "spotifyId": "77fL8ATR0dpUDLI0XLmDBV",
+          "total": null,
+          "date": "2026-10-13",
+          "sourceUrl": "https://musicrank.org/spotify",
+          "metric": "musicrank-spotify-chart-global-daily",
+          "matchedTitle": "Orbiter",
+          "matchedArtist": "Noah Kahan"
+        },
+        "score": 37.488179462020895,
+        "applePoints": 14.4,
+        "spotifyBonus": 15.588179462020896,
+        "appleUsPoints": 14.4,
+        "appleGlobalPoints": 7.5,
+        "spotifyPoints": 15.588179462020896,
+        "title": "Orbiter",
+        "artist": "Noah Kahan",
+        "weeks": 1,
+        "delta": "re-entry"
+      }
+    ]
+  },
+  "previous": {
     "updated": "2026-10-14",
     "week": 27,
     "rev": "tri-source-v42",
@@ -1622,1631 +3229,6 @@
         "artist": "Ayumu Imazu",
         "weeks": 1,
         "delta": "re-entry"
-      }
-    ]
-  },
-  "previous": {
-    "updated": "2026-10-13",
-    "week": 26,
-    "rev": "tri-source-v42",
-    "complete": true,
-    "methodology": "apple-us40-spotify30-global30-v3",
-    "consensus": "three-source-union-verified-streams-v3",
-    "sources": {
-      "U": 100,
-      "A": 100,
-      "S": 200
-    },
-    "scoring": {
-      "appleUSA": "40*(101-US rank)/100",
-      "spotify": "30*sqrt(verified global daily/maxDaily)",
-      "appleGlobal": "30*(101-Global rank)/100",
-      "maxDaily": 1066033651,
-      "missingSpotify": "not eligible; no fabricated stream counts",
-      "candidatePool": 296,
-      "eligibleWithVerifiedSpotify": 285
-    },
-    "sourceDetails": {
-      "U": {
-        "name": "Apple Music Top 100: USA",
-        "region": "us",
-        "url": "https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12",
-        "provenance": {
-          "source": "official-apple-us-playlist",
-          "url": "https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12",
-          "rows": 100
-        }
-      },
-      "A": {
-        "name": "Apple Music Top 100: Global",
-        "region": "global",
-        "cadence": "daily",
-        "entity": "song",
-        "url": "https://music.apple.com/us/playlist/top-100-global/pl.d25f5d1181894928af76c85c967f8f31",
-        "provenance": {
-          "source": "official-apple-global-playlist",
-          "url": "https://music.apple.com/us/playlist/top-100-global/pl.d25f5d1181894928af76c85c967f8f31",
-          "rows": 100
-        }
-      },
-      "S": {
-        "name": "Spotify Global Daily Top 200 and verified artist Daily via Kworb",
-        "region": "global",
-        "metric": "per-row verified global daily streams",
-        "url": "https://kworb.net/spotify/country/global_daily.html"
-      }
-    },
-    "sourceDateKinds": {
-      "U": "playlist-published",
-      "A": "playlist-published",
-      "S": "kworb-daily-edition"
-    },
-    "sourceDates": {
-      "U": "2026-10-11",
-      "A": "2026-10-11",
-      "S": "2026-10-11"
-    },
-    "sourceOrigin": {
-      "U": "verified-apple-usa-top100",
-      "A": "verified-apple-global-top100",
-      "S": "kworb-global-daily-and-artist-pages"
-    },
-    "spotifyFingerprint": "8ab570795cb9dbc6b69f03f994a61221379769880c82079858ed88d1989fa482",
-    "tracks": [
-      {
-        "rank": 1,
-        "sourceRanks": {
-          "U": 3,
-          "A": 1,
-          "S": 1
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 4620088,
-          "spotifyId": "3h5T5JypYU7huFiVYhv1dr",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "BbY WOW",
-          "matchedArtist": "KAROL G, Judeline, rusowsky"
-        },
-        "score": 71.17497190323729,
-        "applePoints": 39.2,
-        "spotifyBonus": 1.9749719032372839,
-        "appleUsPoints": 39.2,
-        "appleGlobalPoints": 30,
-        "spotifyPoints": 1.9749719032372839,
-        "title": "BbY WOW",
-        "artist": "KAROL G, Judeline & rusowsky",
-        "weeks": 24,
-        "delta": "1"
-      },
-      {
-        "rank": 2,
-        "sourceRanks": {
-          "U": 1,
-          "A": 2,
-          "S": 188
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1041025,
-          "spotifyId": "4IAWZw00ZI9DLKDjesx86u",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Solar Eclipse (feat. Don Toliver)",
-          "matchedArtist": "Drake, Don Toliver"
-        },
-        "score": 70.63748942437715,
-        "applePoints": 40,
-        "spotifyBonus": 0.9374894243771495,
-        "appleUsPoints": 40,
-        "appleGlobalPoints": 29.7,
-        "spotifyPoints": 0.9374894243771495,
-        "title": "Solar Eclipse",
-        "artist": "Drake & Don Toliver",
-        "weeks": 10,
-        "delta": "-1"
-      },
-      {
-        "rank": 3,
-        "sourceRanks": {
-          "U": 2,
-          "A": 4,
-          "S": 28
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 2016150,
-          "spotifyId": "7scFxt9VhL4FJwuPSfRlfN",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Choosin' Texas",
-          "matchedArtist": "Ella Langley"
-        },
-        "score": 70.00465961049142,
-        "applePoints": 39.6,
-        "spotifyBonus": 1.304659610491408,
-        "appleUsPoints": 39.6,
-        "appleGlobalPoints": 29.1,
-        "spotifyPoints": 1.304659610491408,
-        "title": "Choosin' Texas",
-        "artist": "Ella Langley",
-        "weeks": 24,
-        "delta": "0"
-      },
-      {
-        "rank": 4,
-        "sourceRanks": {
-          "U": 8,
-          "A": 3,
-          "S": 2
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 4093000,
-          "spotifyId": "70cHKK8bHAfJrOGVnfRG9J",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Nicole Kidman",
-          "matchedArtist": "ADÉLA"
-        },
-        "score": 68.45890275043315,
-        "applePoints": 37.2,
-        "spotifyBonus": 1.8589027504331652,
-        "appleUsPoints": 37.2,
-        "appleGlobalPoints": 29.4,
-        "spotifyPoints": 1.8589027504331652,
-        "title": "Nicole Kidman",
-        "artist": "ADÉLA",
-        "weeks": 24,
-        "delta": "3"
-      },
-      {
-        "rank": 5,
-        "sourceRanks": {
-          "U": 4,
-          "A": 6,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1039399,
-          "spotifyId": "67DgVQlvQ0qilSBN1hdkKN",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/67DgVQlvQ0qilSBN1hdkKN",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/67DgVQlvQ0qilSBN1hdkKN",
-          "matchedTitle": "Quebec",
-          "matchedArtist": "Drake"
-        },
-        "score": 68.2367569955203,
-        "applePoints": 38.8,
-        "spotifyBonus": 0.9367569955203031,
-        "appleUsPoints": 38.8,
-        "appleGlobalPoints": 28.5,
-        "spotifyPoints": 0.9367569955203031,
-        "title": "Quebec",
-        "artist": "Drake",
-        "weeks": 3,
-        "delta": "-1"
-      },
-      {
-        "rank": 6,
-        "sourceRanks": {
-          "U": 7,
-          "A": 5,
-          "S": 15
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 2394913,
-          "spotifyId": "11hcBLPtbMp4aQI6zGQLub",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Patient Zero",
-          "matchedArtist": "Taylor Swift"
-        },
-        "score": 67.82193802583895,
-        "applePoints": 37.6,
-        "spotifyBonus": 1.4219380258389467,
-        "appleUsPoints": 37.6,
-        "appleGlobalPoints": 28.8,
-        "spotifyPoints": 1.4219380258389467,
-        "title": "Patient Zero",
-        "artist": "Taylor Swift",
-        "weeks": 17,
-        "delta": "-1"
-      },
-      {
-        "rank": 7,
-        "sourceRanks": {
-          "U": 5,
-          "A": 8,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1062642,
-          "spotifyId": "50GVx8sCc1TDKHXumgYqEO",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/50GVx8sCc1TDKHXumgYqEO",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/50GVx8sCc1TDKHXumgYqEO",
-          "matchedTitle": "Cold Shoulder (feat. Don Toliver & Yebba)",
-          "matchedArtist": "Drake, Don Toliver, Yebba"
-        },
-        "score": 67.2471729489248,
-        "applePoints": 38.4,
-        "spotifyBonus": 0.9471729489247952,
-        "appleUsPoints": 38.4,
-        "appleGlobalPoints": 27.9,
-        "spotifyPoints": 0.9471729489247952,
-        "title": "Cold Shoulder",
-        "artist": "Drake, Don Toliver & Yebba",
-        "weeks": 10,
-        "delta": "-1"
-      },
-      {
-        "rank": 8,
-        "sourceRanks": {
-          "U": 6,
-          "A": 7,
-          "S": 134
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1147359,
-          "spotifyId": "514joG57v4yKTsfQmz7stz",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Janice STFU",
-          "matchedArtist": "Drake"
-        },
-        "score": 67.1842047597212,
-        "applePoints": 38,
-        "spotifyBonus": 0.9842047597212009,
-        "appleUsPoints": 38,
-        "appleGlobalPoints": 28.2,
-        "spotifyPoints": 0.9842047597212009,
-        "title": "Janice STFU",
-        "artist": "Drake",
-        "weeks": 24,
-        "delta": "0"
-      },
-      {
-        "rank": 9,
-        "sourceRanks": {
-          "U": 9,
-          "A": 11,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 718857,
-          "spotifyId": "5qGziX9216V8hKJjGg8RtH",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/5qGziX9216V8hKJjGg8RtH",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/5qGziX9216V8hKJjGg8RtH",
-          "matchedTitle": "Last Thing You Need (from GTAVI: The Album)",
-          "matchedArtist": "Morgan Wallen, Grand Theft Auto VI"
-        },
-        "score": 64.57903514514095,
-        "applePoints": 36.8,
-        "spotifyBonus": 0.7790351451409574,
-        "appleUsPoints": 36.8,
-        "appleGlobalPoints": 27,
-        "spotifyPoints": 0.7790351451409574,
-        "title": "Last Thing You Need",
-        "artist": "Morgan Wallen",
-        "weeks": 3,
-        "delta": "0"
-      },
-      {
-        "rank": 10,
-        "sourceRanks": {
-          "U": 10,
-          "A": 12,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 764857,
-          "spotifyId": "3xwMjQriBVW0OGEvNKo9c0",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/3xwMjQriBVW0OGEvNKo9c0",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/3xwMjQriBVW0OGEvNKo9c0",
-          "matchedTitle": "Been By Now",
-          "matchedArtist": "Morgan Wallen"
-        },
-        "score": 63.90357408146675,
-        "applePoints": 36.4,
-        "spotifyBonus": 0.8035740814667534,
-        "appleUsPoints": 36.4,
-        "appleGlobalPoints": 26.7,
-        "spotifyPoints": 0.8035740814667534,
-        "title": "Been By Now",
-        "artist": "Morgan Wallen",
-        "weeks": 3,
-        "delta": "0"
-      },
-      {
-        "rank": 11,
-        "sourceRanks": {
-          "U": 17,
-          "A": 9,
-          "S": 9
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 2600551,
-          "spotifyId": "49j6SvuvWfbEKZKzsHCdLJ",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "stupid song",
-          "matchedArtist": "Olivia Rodrigo"
-        },
-        "score": 62.681727991608284,
-        "applePoints": 33.6,
-        "spotifyBonus": 1.4817279916082795,
-        "appleUsPoints": 33.6,
-        "appleGlobalPoints": 27.6,
-        "spotifyPoints": 1.4817279916082795,
-        "title": "stupid song",
-        "artist": "Olivia Rodrigo",
-        "weeks": 24,
-        "delta": "0"
-      },
-      {
-        "rank": 12,
-        "sourceRanks": {
-          "U": 19,
-          "A": 10,
-          "S": 4
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 3171937,
-          "spotifyId": "55pBIZO1cqoldeqpp5WR7H",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "the cure",
-          "matchedArtist": "Olivia Rodrigo"
-        },
-        "score": 61.73643241715753,
-        "applePoints": 32.8,
-        "spotifyBonus": 1.6364324171575397,
-        "appleUsPoints": 32.8,
-        "appleGlobalPoints": 27.3,
-        "spotifyPoints": 1.6364324171575397,
-        "title": "the cure",
-        "artist": "Olivia Rodrigo",
-        "weeks": 24,
-        "delta": "0"
-      },
-      {
-        "rank": 13,
-        "sourceRanks": {
-          "U": 11,
-          "A": 21,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 640720,
-          "spotifyId": "5aVBxVa0kz9uzv0F4gwdEn",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/5aVBxVa0kz9uzv0F4gwdEn",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/5aVBxVa0kz9uzv0F4gwdEn",
-          "matchedTitle": "I Can't Love You Anymore",
-          "matchedArtist": "Ella Langley, Morgan Wallen"
-        },
-        "score": 60.73547842606744,
-        "applePoints": 36,
-        "spotifyBonus": 0.735478426067436,
-        "appleUsPoints": 36,
-        "appleGlobalPoints": 24,
-        "spotifyPoints": 0.735478426067436,
-        "title": "I Can't Love You Anymore",
-        "artist": "Ella Langley & Morgan Wallen",
-        "weeks": 3,
-        "delta": "0"
-      },
-      {
-        "rank": 14,
-        "sourceRanks": {
-          "U": 12,
-          "A": 22,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 576491,
-          "spotifyId": "59nOXPmaKlBfGMDeOVGrIK",
-          "total": null,
-          "date": "2026-10-10",
-          "sourceUrl": "https://www.mystreamcount.com/track/59nOXPmaKlBfGMDeOVGrIK",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/59nOXPmaKlBfGMDeOVGrIK",
-          "matchedTitle": "WAIT FOR U (feat. Drake & Tems)",
-          "matchedArtist": "Future, Drake, Tems"
-        },
-        "score": 59.997641108507096,
-        "applePoints": 35.6,
-        "spotifyBonus": 0.6976411085071026,
-        "appleUsPoints": 35.6,
-        "appleGlobalPoints": 23.7,
-        "spotifyPoints": 0.6976411085071026,
-        "title": "WAIT FOR U",
-        "artist": "Future, Drake, Tems",
-        "weeks": 3,
-        "delta": "1"
-      },
-      {
-        "rank": 15,
-        "sourceRanks": {
-          "U": 16,
-          "A": 24,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 999839,
-          "spotifyId": "05CjWFAcAlY6O9po6Qwakk",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/05CjWFAcAlY6O9po6Qwakk",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/05CjWFAcAlY6O9po6Qwakk",
-          "matchedTitle": "Be Her",
-          "matchedArtist": "Ella Langley"
-        },
-        "score": 58.01875736633865,
-        "applePoints": 34,
-        "spotifyBonus": 0.9187573663386485,
-        "appleUsPoints": 34,
-        "appleGlobalPoints": 23.1,
-        "spotifyPoints": 0.9187573663386485,
-        "title": "Be Her",
-        "artist": "Ella Langley",
-        "weeks": 3,
-        "delta": "2"
-      },
-      {
-        "rank": 16,
-        "sourceRanks": {
-          "U": 13,
-          "A": 29,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 378447,
-          "spotifyId": "5BbdKBZO0TH0GhfxUfyhL9",
-          "total": null,
-          "date": "2026-10-10",
-          "sourceUrl": "https://www.mystreamcount.com/track/5BbdKBZO0TH0GhfxUfyhL9",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/5BbdKBZO0TH0GhfxUfyhL9",
-          "matchedTitle": "Freestyle",
-          "matchedArtist": "Lil Baby"
-        },
-        "score": 57.36524708469485,
-        "applePoints": 35.2,
-        "spotifyBonus": 0.5652470846948456,
-        "appleUsPoints": 35.2,
-        "appleGlobalPoints": 21.6,
-        "spotifyPoints": 0.5652470846948456,
-        "title": "Freestyle",
-        "artist": "Lil Baby",
-        "weeks": 3,
-        "delta": "0"
-      },
-      {
-        "rank": 17,
-        "sourceRanks": {
-          "U": 15,
-          "A": 30,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 677967,
-          "spotifyId": "5ZAMlvo6ZUjVRZOGu2bJib",
-          "total": null,
-          "date": "2026-10-10",
-          "sourceUrl": "https://www.mystreamcount.com/track/5ZAMlvo6ZUjVRZOGu2bJib",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/5ZAMlvo6ZUjVRZOGu2bJib",
-          "matchedTitle": "Dead Fresh",
-          "matchedArtist": "Lil Baby"
-        },
-        "score": 56.456554249905466,
-        "applePoints": 34.4,
-        "spotifyBonus": 0.7565542499054627,
-        "appleUsPoints": 34.4,
-        "appleGlobalPoints": 21.3,
-        "spotifyPoints": 0.7565542499054627,
-        "title": "Dead Fresh",
-        "artist": "Lil Baby",
-        "weeks": 3,
-        "delta": "1"
-      },
-      {
-        "rank": 18,
-        "sourceRanks": {
-          "U": 14,
-          "A": 31,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 68116,
-          "spotifyId": "3ihIZrJreMJPjQdNLrEXnP",
-          "total": null,
-          "date": "2026-10-10",
-          "sourceUrl": "https://www.mystreamcount.com/track/3ihIZrJreMJPjQdNLrEXnP",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/3ihIZrJreMJPjQdNLrEXnP",
-          "matchedTitle": "In A Minute",
-          "matchedArtist": "Lil Baby"
-        },
-        "score": 56.03980617726931,
-        "applePoints": 34.8,
-        "spotifyBonus": 0.239806177269317,
-        "appleUsPoints": 34.8,
-        "appleGlobalPoints": 21,
-        "spotifyPoints": 0.239806177269317,
-        "title": "In A Minute",
-        "artist": "Lil Baby",
-        "weeks": 3,
-        "delta": "1"
-      },
-      {
-        "rank": 19,
-        "sourceRanks": {
-          "U": 20,
-          "A": 27,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 462278,
-          "spotifyId": "3LVkyYg0PSo8XInTPKKhZM",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/3LVkyYg0PSo8XInTPKKhZM",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-2d",
-          "trackUrl": "https://open.spotify.com/track/3LVkyYg0PSo8XInTPKKhZM",
-          "matchedTitle": "pop it",
-          "matchedArtist": "Gunna"
-        },
-        "score": 55.224722877949056,
-        "applePoints": 32.4,
-        "spotifyBonus": 0.6247228779490617,
-        "appleUsPoints": 32.4,
-        "appleGlobalPoints": 22.2,
-        "spotifyPoints": 0.6247228779490617,
-        "title": "pop it",
-        "artist": "Gunna",
-        "weeks": 2,
-        "delta": "1"
-      },
-      {
-        "rank": 20,
-        "sourceRanks": {
-          "U": 18,
-          "A": 33,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 310516,
-          "spotifyId": "0SeTP12t4EwBJ6zsjHn9Wa",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/0SeTP12t4EwBJ6zsjHn9Wa",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/0SeTP12t4EwBJ6zsjHn9Wa",
-          "matchedTitle": "I'm Spent (feat. Loe Shimmy)",
-          "matchedArtist": "Drake, Loe Shimmy"
-        },
-        "score": 54.112009228958506,
-        "applePoints": 33.2,
-        "spotifyBonus": 0.5120092289585051,
-        "appleUsPoints": 33.2,
-        "appleGlobalPoints": 20.4,
-        "spotifyPoints": 0.5120092289585051,
-        "title": "I’m Spent",
-        "artist": "Drake & Loe Shimmy",
-        "weeks": 3,
-        "delta": "1"
-      },
-      {
-        "rank": 21,
-        "sourceRanks": {
-          "U": 36,
-          "A": 14,
-          "S": 20
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 2232930,
-          "spotifyId": "1qbmS6ep2hbBRaEZFpn7BX",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Man I Need",
-          "matchedArtist": "Olivia Dean"
-        },
-        "score": 53.473008898707626,
-        "applePoints": 26,
-        "spotifyBonus": 1.3730088987076252,
-        "appleUsPoints": 26,
-        "appleGlobalPoints": 26.1,
-        "spotifyPoints": 1.3730088987076252,
-        "title": "Man I Need",
-        "artist": "Olivia Dean",
-        "weeks": 24,
-        "delta": "1"
-      },
-      {
-        "rank": 22,
-        "sourceRanks": {
-          "U": 27,
-          "A": 26,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 467964,
-          "spotifyId": "249E7AgSyA4vhtXNEjQYb5",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/249E7AgSyA4vhtXNEjQYb5",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/249E7AgSyA4vhtXNEjQYb5",
-          "matchedTitle": "Wicked Games",
-          "matchedArtist": "The Weeknd"
-        },
-        "score": 52.728553168433315,
-        "applePoints": 29.6,
-        "spotifyBonus": 0.6285531684333105,
-        "appleUsPoints": 29.6,
-        "appleGlobalPoints": 22.5,
-        "spotifyPoints": 0.6285531684333105,
-        "title": "Wicked Games",
-        "artist": "The Weeknd",
-        "weeks": 3,
-        "delta": "1"
-      },
-      {
-        "rank": 23,
-        "sourceRanks": {
-          "U": 29,
-          "A": 34,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 540899,
-          "spotifyId": "3Yd3J42s3GZaYty4Iy4ewT",
-          "total": null,
-          "date": "2026-10-09",
-          "sourceUrl": "https://www.mystreamcount.com/track/3Yd3J42s3GZaYty4Iy4ewT",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/3Yd3J42s3GZaYty4Iy4ewT",
-          "matchedTitle": "So Good (feat. Kendrick Lamar)",
-          "matchedArtist": "Jhené Aiko"
-        },
-        "score": 49.575762187372206,
-        "applePoints": 28.8,
-        "spotifyBonus": 0.6757621873722028,
-        "appleUsPoints": 28.8,
-        "appleGlobalPoints": 20.1,
-        "spotifyPoints": 0.6757621873722028,
-        "title": "So Good",
-        "artist": "Jhené Aiko, Kendrick Lamar",
-        "weeks": 3,
-        "delta": "5"
-      },
-      {
-        "rank": 24,
-        "sourceRanks": {
-          "U": 21,
-          "A": 45,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 338404,
-          "spotifyId": "3QLjDkgLh9AOEHlhQtDuhs",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/3QLjDkgLh9AOEHlhQtDuhs",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/3QLjDkgLh9AOEHlhQtDuhs",
-          "matchedTitle": "Best I Ever Had",
-          "matchedArtist": "Drake"
-        },
-        "score": 49.3345071777417,
-        "applePoints": 32,
-        "spotifyBonus": 0.534507177741705,
-        "appleUsPoints": 32,
-        "appleGlobalPoints": 16.8,
-        "spotifyPoints": 0.534507177741705,
-        "title": "Best I Ever Had",
-        "artist": "Drake",
-        "weeks": 3,
-        "delta": "1"
-      },
-      {
-        "rank": 25,
-        "sourceRanks": {
-          "U": 23,
-          "A": 47,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 480864,
-          "spotifyId": "7AeM1BGYM7emrqmQn1PuWv",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/7AeM1BGYM7emrqmQn1PuWv",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/7AeM1BGYM7emrqmQn1PuWv",
-          "matchedTitle": "I'm The Problem",
-          "matchedArtist": "Morgan Wallen"
-        },
-        "score": 48.037157691422856,
-        "applePoints": 31.2,
-        "spotifyBonus": 0.6371576914228552,
-        "appleUsPoints": 31.2,
-        "appleGlobalPoints": 16.2,
-        "spotifyPoints": 0.6371576914228552,
-        "title": "I'm The Problem",
-        "artist": "Morgan Wallen",
-        "weeks": 3,
-        "delta": "1"
-      },
-      {
-        "rank": 26,
-        "sourceRanks": {
-          "U": 48,
-          "A": 18,
-          "S": 19
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 2289303,
-          "spotifyId": "7ujApz6iFP3PmKIDGcaGbe",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Great Expectation",
-          "matchedArtist": "SIENNA SPIRO"
-        },
-        "score": 47.49023249811974,
-        "applePoints": 21.2,
-        "spotifyBonus": 1.3902324981197451,
-        "appleUsPoints": 21.2,
-        "appleGlobalPoints": 24.9,
-        "spotifyPoints": 1.3902324981197451,
-        "title": "Great Expectation",
-        "artist": "SIENNA SPIRO",
-        "weeks": 11,
-        "delta": "1"
-      },
-      {
-        "rank": 27,
-        "sourceRanks": {
-          "U": 22,
-          "A": 49,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 23167,
-          "spotifyId": "3gOL6mYIq19Oq8raxIntrV",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/3gOL6mYIq19Oq8raxIntrV",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/3gOL6mYIq19Oq8raxIntrV",
-          "matchedTitle": "LIKE ME (feat. 42 Dugg & Lil Baby)",
-          "matchedArtist": "Future, 42 Dugg, Lil Baby"
-        },
-        "score": 47.33985264903086,
-        "applePoints": 31.6,
-        "spotifyBonus": 0.1398526490308597,
-        "appleUsPoints": 31.6,
-        "appleGlobalPoints": 15.6,
-        "spotifyPoints": 0.1398526490308597,
-        "title": "LIKE ME",
-        "artist": "Future, 42 Dugg, Lil Baby",
-        "weeks": 3,
-        "delta": "2"
-      },
-      {
-        "rank": 28,
-        "sourceRanks": {
-          "U": 26,
-          "A": 54,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1022095,
-          "spotifyId": "1VOSSXuWRcBj2rpfxNdX9v",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/1VOSSXuWRcBj2rpfxNdX9v",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/1VOSSXuWRcBj2rpfxNdX9v",
-          "matchedTitle": "Broken Window Serenade",
-          "matchedArtist": "Whiskey Myers"
-        },
-        "score": 45.02892666500692,
-        "applePoints": 30,
-        "spotifyBonus": 0.9289266650069181,
-        "appleUsPoints": 30,
-        "appleGlobalPoints": 14.1,
-        "spotifyPoints": 0.9289266650069181,
-        "title": "Broken Window Serenade",
-        "artist": "Whiskey Myers",
-        "weeks": 3,
-        "delta": "2"
-      },
-      {
-        "rank": 29,
-        "sourceRanks": {
-          "U": 41,
-          "A": 35,
-          "S": 102
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1261583,
-          "spotifyId": "2QihEF7BIfPCJjkB0c4Rrv",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Boston",
-          "matchedArtist": "STELLA LEFTY"
-        },
-        "score": 44.83203330269191,
-        "applePoints": 24,
-        "spotifyBonus": 1.0320333026919122,
-        "appleUsPoints": 24,
-        "appleGlobalPoints": 19.8,
-        "spotifyPoints": 1.0320333026919122,
-        "title": "Boston",
-        "artist": "STELLA LEFTY",
-        "weeks": 24,
-        "delta": "3"
-      },
-      {
-        "rank": 30,
-        "sourceRanks": {
-          "U": 24,
-          "A": 59,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 193350,
-          "spotifyId": "45UDzIWgqj5hgQKXLlfdp7",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/45UDzIWgqj5hgQKXLlfdp7",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/45UDzIWgqj5hgQKXLlfdp7",
-          "matchedTitle": "Don't We",
-          "matchedArtist": "Morgan Wallen"
-        },
-        "score": 43.80402467155216,
-        "applePoints": 30.8,
-        "spotifyBonus": 0.4040246715521672,
-        "appleUsPoints": 30.8,
-        "appleGlobalPoints": 12.6,
-        "spotifyPoints": 0.4040246715521672,
-        "title": "Don't We",
-        "artist": "Morgan Wallen",
-        "weeks": 3,
-        "delta": "1"
-      },
-      {
-        "rank": 31,
-        "sourceRanks": {
-          "U": 52,
-          "A": 25,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1700567,
-          "spotifyId": "2j7wI9QWrP8cjKDdOLVQTU",
-          "total": null,
-          "date": "2026-10-09",
-          "sourceUrl": "https://www.mystreamcount.com/track/2j7wI9QWrP8cjKDdOLVQTU",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/2j7wI9QWrP8cjKDdOLVQTU",
-          "matchedTitle": "Babylon",
-          "matchedArtist": "Taylor Swift"
-        },
-        "score": 43.59820925917693,
-        "applePoints": 19.6,
-        "spotifyBonus": 1.1982092591769242,
-        "appleUsPoints": 19.6,
-        "appleGlobalPoints": 22.8,
-        "spotifyPoints": 1.1982092591769242,
-        "title": "Babylon",
-        "artist": "Taylor Swift",
-        "weeks": 17,
-        "delta": "-7"
-      },
-      {
-        "rank": 32,
-        "sourceRanks": {
-          "U": 69,
-          "A": null,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1066033651,
-          "spotifyId": "2tudvzsrR56uom6smgOcSf",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/2tudvzsrR56uom6smgOcSf",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "exact-lone",
-          "trackUrl": "https://open.spotify.com/track/2tudvzsrR56uom6smgOcSf",
-          "matchedTitle": "Like That",
-          "matchedArtist": "Future, Metro Boomin, Kendrick Lamar"
-        },
-        "score": 42.8,
-        "applePoints": 12.8,
-        "spotifyBonus": 30,
-        "appleUsPoints": 12.8,
-        "appleGlobalPoints": 0,
-        "spotifyPoints": 30,
-        "title": "Like That",
-        "artist": "Future, Metro Boomin & Kendrick Lamar",
-        "weeks": 1,
-        "delta": "new"
-      },
-      {
-        "rank": 33,
-        "sourceRanks": {
-          "U": 25,
-          "A": 61,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 80068,
-          "spotifyId": "3WcC6NH9J77xPEvj1SOL7z",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/3WcC6NH9J77xPEvj1SOL7z",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/3WcC6NH9J77xPEvj1SOL7z",
-          "matchedTitle": "March Madness",
-          "matchedArtist": "Future"
-        },
-        "score": 42.659995174722205,
-        "applePoints": 30.4,
-        "spotifyBonus": 0.2599951747222082,
-        "appleUsPoints": 30.4,
-        "appleGlobalPoints": 12,
-        "spotifyPoints": 0.2599951747222082,
-        "title": "March Madness",
-        "artist": "Future",
-        "weeks": 2,
-        "delta": "1"
-      },
-      {
-        "rank": 34,
-        "sourceRanks": {
-          "U": 31,
-          "A": 57,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 554464,
-          "spotifyId": "583dMdiUquLMenarTp7PQm",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/583dMdiUquLMenarTp7PQm",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/583dMdiUquLMenarTp7PQm",
-          "matchedTitle": "Last Night",
-          "matchedArtist": "Morgan Wallen"
-        },
-        "score": 41.88418330804241,
-        "applePoints": 28,
-        "spotifyBonus": 0.6841833080424079,
-        "appleUsPoints": 28,
-        "appleGlobalPoints": 13.2,
-        "spotifyPoints": 0.6841833080424079,
-        "title": "Last Night",
-        "artist": "Morgan Wallen",
-        "weeks": 3,
-        "delta": "-1"
-      },
-      {
-        "rank": 35,
-        "sourceRanks": {
-          "U": 45,
-          "A": 46,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 882083,
-          "spotifyId": "4iZ4pt7kvcaH6Yo8UoZ4s2",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/4iZ4pt7kvcaH6Yo8UoZ4s2",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/4iZ4pt7kvcaH6Yo8UoZ4s2",
-          "matchedTitle": "Snooze",
-          "matchedArtist": "SZA"
-        },
-        "score": 39.76295971793725,
-        "applePoints": 22.4,
-        "spotifyBonus": 0.8629597179372509,
-        "appleUsPoints": 22.4,
-        "appleGlobalPoints": 16.5,
-        "spotifyPoints": 0.8629597179372509,
-        "title": "Snooze",
-        "artist": "SZA",
-        "weeks": 3,
-        "delta": "3"
-      },
-      {
-        "rank": 36,
-        "sourceRanks": {
-          "U": 28,
-          "A": 68,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 38131,
-          "spotifyId": "0AAVJIN4plafvmNKqRCltG",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/0AAVJIN4plafvmNKqRCltG",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/0AAVJIN4plafvmNKqRCltG",
-          "matchedTitle": "I'M DAT N****",
-          "matchedArtist": "Future"
-        },
-        "score": 39.27942167021678,
-        "applePoints": 29.2,
-        "spotifyBonus": 0.1794216702167751,
-        "appleUsPoints": 29.2,
-        "appleGlobalPoints": 9.9,
-        "spotifyPoints": 0.1794216702167751,
-        "title": "I'M DAT N***A",
-        "artist": "Future",
-        "weeks": 2,
-        "delta": "0"
-      },
-      {
-        "rank": 37,
-        "sourceRanks": {
-          "U": 58,
-          "A": 39,
-          "S": 36
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1862669,
-          "spotifyId": "003vvx7Niy0yvhvHt4a68B",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Mr. Brightside",
-          "matchedArtist": "The Killers"
-        },
-        "score": 37.05401762668849,
-        "applePoints": 17.2,
-        "spotifyBonus": 1.2540176266884926,
-        "appleUsPoints": 17.2,
-        "appleGlobalPoints": 18.6,
-        "spotifyPoints": 1.2540176266884926,
-        "title": "Mr. Brightside",
-        "artist": "The Killers",
-        "weeks": 5,
-        "delta": "6"
-      },
-      {
-        "rank": 38,
-        "sourceRanks": {
-          "U": 30,
-          "A": 74,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 13002,
-          "spotifyId": "19n0UZuW8AArMVWNztoXu9",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/19n0UZuW8AArMVWNztoXu9",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/19n0UZuW8AArMVWNztoXu9",
-          "matchedTitle": "Frozen",
-          "matchedArtist": "Lil Baby"
-        },
-        "score": 36.60477094919898,
-        "applePoints": 28.4,
-        "spotifyBonus": 0.10477094919898097,
-        "appleUsPoints": 28.4,
-        "appleGlobalPoints": 8.1,
-        "spotifyPoints": 0.10477094919898097,
-        "title": "Frozen",
-        "artist": "Lil Baby",
-        "weeks": 2,
-        "delta": "-1"
-      },
-      {
-        "rank": 39,
-        "sourceRanks": {
-          "U": 57,
-          "A": 38,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1134,
-          "spotifyId": "6DCZcSspjsKoFjzjrWoCdn",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/6DCZcSspjsKoFjzjrWoCdn",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-2d",
-          "trackUrl": "https://open.spotify.com/track/6DCZcSspjsKoFjzjrWoCdn",
-          "matchedTitle": "God's Plan",
-          "matchedArtist": "Drake"
-        },
-        "score": 36.53094156847425,
-        "applePoints": 17.6,
-        "spotifyBonus": 0.030941568474250582,
-        "appleUsPoints": 17.6,
-        "appleGlobalPoints": 18.9,
-        "spotifyPoints": 0.030941568474250582,
-        "title": "God's Plan",
-        "artist": "Drake",
-        "weeks": 3,
-        "delta": "1"
-      },
-      {
-        "rank": 40,
-        "sourceRanks": {
-          "U": 53,
-          "A": 51,
-          "S": 24
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 2088685,
-          "spotifyId": "2lpygKqzPFtItQ4ss3cgfb",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Cinderella (feat. Ty Dolla $ign)",
-          "matchedArtist": "Mac Miller, Ty Dolla $ign"
-        },
-        "score": 35.52792109975445,
-        "applePoints": 19.2,
-        "spotifyBonus": 1.3279210997544457,
-        "appleUsPoints": 19.2,
-        "appleGlobalPoints": 15,
-        "spotifyPoints": 1.3279210997544457,
-        "title": "Cinderella",
-        "artist": "Mac Miller, Ty Dolla $ign",
-        "weeks": 15,
-        "delta": "-5"
-      },
-      {
-        "rank": 41,
-        "sourceRanks": {
-          "U": 32,
-          "A": 77,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 207850,
-          "spotifyId": "65OVbaJR5O1RmwOQx0875b",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/65OVbaJR5O1RmwOQx0875b",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/65OVbaJR5O1RmwOQx0875b",
-          "matchedTitle": "Wants and Needs (feat. Lil Baby)",
-          "matchedArtist": "Drake, Lil Baby"
-        },
-        "score": 35.21890043572522,
-        "applePoints": 27.6,
-        "spotifyBonus": 0.4189004357252103,
-        "appleUsPoints": 27.6,
-        "appleGlobalPoints": 7.2,
-        "spotifyPoints": 0.4189004357252103,
-        "title": "Wants and Needs",
-        "artist": "Drake, Lil Baby",
-        "weeks": 2,
-        "delta": "0"
-      },
-      {
-        "rank": 42,
-        "sourceRanks": {
-          "U": 60,
-          "A": 41,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 393526,
-          "spotifyId": "2JPLbjOn0wPCngEot2STUS",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/2JPLbjOn0wPCngEot2STUS",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/2JPLbjOn0wPCngEot2STUS",
-          "matchedTitle": "Yonaguni",
-          "matchedArtist": "Bad Bunny"
-        },
-        "score": 34.976398063777154,
-        "applePoints": 16.4,
-        "spotifyBonus": 0.5763980637771532,
-        "appleUsPoints": 16.4,
-        "appleGlobalPoints": 18,
-        "spotifyPoints": 0.5763980637771532,
-        "title": "Yonaguni",
-        "artist": "Bad Bunny",
-        "weeks": 3,
-        "delta": "2"
-      },
-      {
-        "rank": 43,
-        "sourceRanks": {
-          "U": 34,
-          "A": 80,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 303395,
-          "spotifyId": "5f4Hy5mw5SRaUgXX9c6P5S",
-          "total": null,
-          "date": "2026-10-10",
-          "sourceUrl": "https://www.mystreamcount.com/track/5f4Hy5mw5SRaUgXX9c6P5S",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/5f4Hy5mw5SRaUgXX9c6P5S",
-          "matchedTitle": "Sum 2 Prove",
-          "matchedArtist": "Lil Baby"
-        },
-        "score": 33.606104276811244,
-        "applePoints": 26.8,
-        "spotifyBonus": 0.5061042768112448,
-        "appleUsPoints": 26.8,
-        "appleGlobalPoints": 6.3,
-        "spotifyPoints": 0.5061042768112448,
-        "title": "Sum 2 Prove",
-        "artist": "Lil Baby",
-        "weeks": 2,
-        "delta": "2"
-      },
-      {
-        "rank": 44,
-        "sourceRanks": {
-          "U": 35,
-          "A": 79,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 308831,
-          "spotifyId": "02Ya2Q08bBKFqUJvjmyRXK",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/02Ya2Q08bBKFqUJvjmyRXK",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/02Ya2Q08bBKFqUJvjmyRXK",
-          "matchedTitle": "Just In Case",
-          "matchedArtist": "Morgan Wallen"
-        },
-        "score": 33.510618142613026,
-        "applePoints": 26.4,
-        "spotifyBonus": 0.5106181426130241,
-        "appleUsPoints": 26.4,
-        "appleGlobalPoints": 6.6,
-        "spotifyPoints": 0.5106181426130241,
-        "title": "Just In Case",
-        "artist": "Morgan Wallen",
-        "weeks": 3,
-        "delta": "-2"
-      },
-      {
-        "rank": 45,
-        "sourceRanks": {
-          "U": 33,
-          "A": 81,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 36466,
-          "spotifyId": "20fAoPjfYltmd3K3bO7gbt",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/20fAoPjfYltmd3K3bO7gbt",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/20fAoPjfYltmd3K3bO7gbt",
-          "matchedTitle": "Stick Talk",
-          "matchedArtist": "Future"
-        },
-        "score": 33.37546070155656,
-        "applePoints": 27.2,
-        "spotifyBonus": 0.17546070155656304,
-        "appleUsPoints": 27.2,
-        "appleGlobalPoints": 6,
-        "spotifyPoints": 0.17546070155656304,
-        "title": "Stick Talk",
-        "artist": "Future",
-        "weeks": 2,
-        "delta": "5"
-      },
-      {
-        "rank": 46,
-        "sourceRanks": {
-          "U": 51,
-          "A": 60,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 681640,
-          "spotifyId": "7221xIgOnuakPdLqT0F3nP",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/7221xIgOnuakPdLqT0F3nP",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/7221xIgOnuakPdLqT0F3nP",
-          "matchedTitle": "I Had Some Help (Feat. Morgan Wallen)",
-          "matchedArtist": "Post Malone, Morgan Wallen"
-        },
-        "score": 33.05860086149179,
-        "applePoints": 20,
-        "spotifyBonus": 0.7586008614917904,
-        "appleUsPoints": 20,
-        "appleGlobalPoints": 12.3,
-        "spotifyPoints": 0.7586008614917904,
-        "title": "I Had Some Help",
-        "artist": "Post Malone, Morgan Wallen",
-        "weeks": 2,
-        "delta": "3"
-      },
-      {
-        "rank": 47,
-        "sourceRanks": {
-          "U": 37,
-          "A": 82,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 398969,
-          "spotifyId": "047fCsbO4NdmwCBn8pcUXl",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/047fCsbO4NdmwCBn8pcUXl",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-3d",
-          "trackUrl": "https://open.spotify.com/track/047fCsbO4NdmwCBn8pcUXl",
-          "matchedTitle": "Marvins Room",
-          "matchedArtist": "Drake"
-        },
-        "score": 31.880370559420577,
-        "applePoints": 25.6,
-        "spotifyBonus": 0.5803705594205749,
-        "appleUsPoints": 25.6,
-        "appleGlobalPoints": 5.7,
-        "spotifyPoints": 0.5803705594205749,
-        "title": "Marvins Room",
-        "artist": "Drake",
-        "weeks": 2,
-        "delta": "0"
-      },
-      {
-        "rank": 48,
-        "sourceRanks": {
-          "U": 90,
-          "A": 16,
-          "S": 3
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 3286682,
-          "spotifyId": "6U9VpmP3dEinuezxCJ2Zg9",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "Ain't In LA",
-          "matchedArtist": "ADÉLA"
-        },
-        "score": 31.565768483167503,
-        "applePoints": 4.4,
-        "spotifyBonus": 1.6657684831675024,
-        "appleUsPoints": 4.4,
-        "appleGlobalPoints": 25.5,
-        "spotifyPoints": 1.6657684831675024,
-        "title": "Ain't In LA",
-        "artist": "ADÉLA",
-        "weeks": 1,
-        "delta": "re-entry"
-      },
-      {
-        "rank": 49,
-        "sourceRanks": {
-          "U": 66,
-          "A": 52,
-          "S": null
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 752612,
-          "spotifyId": "6AI3ezQ4o3HUoP6Dhudph3",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://www.mystreamcount.com/track/6AI3ezQ4o3HUoP6Dhudph3",
-          "metric": "mystreamcount-daily-delta",
-          "estimated": true,
-          "estimateMethod": "totals-window-4d",
-          "trackUrl": "https://open.spotify.com/track/6AI3ezQ4o3HUoP6Dhudph3",
-          "matchedTitle": "Not Like Us",
-          "matchedArtist": "Kendrick Lamar"
-        },
-        "score": 29.497115707180082,
-        "applePoints": 14,
-        "spotifyBonus": 0.7971157071800815,
-        "appleUsPoints": 14,
-        "appleGlobalPoints": 14.7,
-        "spotifyPoints": 0.7971157071800815,
-        "title": "Not Like Us",
-        "artist": "Kendrick Lamar",
-        "weeks": 3,
-        "delta": "-35"
-      },
-      {
-        "rank": 50,
-        "sourceRanks": {
-          "U": 93,
-          "A": 20,
-          "S": 43
-        },
-        "spotify": {
-          "status": "matched",
-          "daily": 1683337,
-          "spotifyId": "53iuhJlwXhSER5J2IYYv1W",
-          "total": null,
-          "date": "2026-10-11",
-          "sourceUrl": "https://musicrank.org/spotify",
-          "metric": "musicrank-spotify-chart-global-daily",
-          "matchedTitle": "The Fate of Ophelia",
-          "matchedArtist": "Taylor Swift"
-        },
-        "score": 28.692123728334284,
-        "applePoints": 3.2,
-        "spotifyBonus": 1.1921237283342851,
-        "appleUsPoints": 3.2,
-        "appleGlobalPoints": 24.3,
-        "spotifyPoints": 1.1921237283342851,
-        "title": "The Fate of Ophelia",
-        "artist": "Taylor Swift",
-        "weeks": 17,
-        "delta": "-2"
       }
     ]
   }
