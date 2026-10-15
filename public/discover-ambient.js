@@ -351,14 +351,20 @@
   }
   function unsettle() {
     settled=false;settleRef=null;stableAt=0;
-    document.body.classList.remove("discover-ambient-settled");
+    // Keep the last rendered texture visible while a mobile viewport or player
+    // layout change is measured. Hiding it here made the whole background flash
+    // on scroll and whenever an Apple Music album iframe was inserted.
+    if(!active) document.body.classList.remove("discover-ambient-settled");
     if(settleFrame)cancelAnimationFrame(settleFrame);settleFrame=0;
   }
   function setVisible(value) {
+    const wasActive=active;
     if(value&&!active)settlePalette();
     active=!!value;document.body.classList.toggle("discover-ambient-visible",active);
     if(!active){playing=false;energy=0;pointer.strength=0;pointer.targetStrength=0;}
-    unsettle();
+    // Repeated pagechange events must not restart the fade on an already
+    // visible Discover tab. Only a real tab transition resets geometry.
+    if(!value || !wasActive) unsettle();
     start();
   }
   function setPlaying(value) { playing=!!value;if(active&&motion.matches)render(); }
