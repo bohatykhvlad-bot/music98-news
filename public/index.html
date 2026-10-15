@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="admaven-placement" content="BpdU5qjUE">
-<meta name="purpleads-verification" content="8a46b794412e1768c4be3bbf"/>
 <meta name="clckd" content="2b8e0bd3455c405f05211878349de311" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TCLEVYQ4L2"></script>
@@ -164,30 +163,8 @@ main{position:relative;z-index:1}
 /* equal breathing around section headings (owner: blocks higher + equal gaps
    to the header above and the content below) */
 .tab .hd{margin:0 0 var(--section-heading-gap)}
-/* PurpleAds: exactly one ad to the RIGHT of the Latest stories title.
-   Width changes by breakpoint to avoid collisions. On narrow phones, the
-   slot stacks because no supported rectangular ad fits beside the title. */
-#tab-news .news-heading-row{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 var(--section-heading-gap)}
-#tab-news .news-heading-row .hd{margin:0;min-width:0}
-.m98-home-banner{flex:0 0 728px;min-width:0;text-align:center}
-#tab-news .m98-home-banner.m98-ad-unfilled{display:none}
-.m98-home-banner-slot{width:728px;height:90px;margin:0 auto}
-@media (min-width:800px) and (max-width:1049px){
-  .m98-home-banner{flex-basis:468px}
-  .m98-home-banner-slot{width:468px;height:60px}
-}
-@media (min-width:560px) and (max-width:799px){
-  .m98-home-banner{flex-basis:320px}
-  .m98-home-banner-slot{width:320px;height:100px}
-}
-@media (max-width:559px){
-  #tab-news .news-heading-row{flex-wrap:wrap;gap:var(--section-heading-gap)}
-  .m98-home-banner{flex:0 0 100%}
-  .m98-home-banner-slot{width:320px;max-width:100%;height:100px}
-}
-@media (max-width:351px){
-  .m98-home-banner-slot{width:250px;height:250px}
-}
+#tab-news .news-heading-row{margin:0 0 var(--section-heading-gap)}
+#tab-news .news-heading-row .hd{margin:0}
 .tab.active{display:block}
 .tab.rise{animation:rise .28s ease both}
 @keyframes rise{from{transform:translateY(10px)}to{transform:none}}
@@ -971,19 +948,6 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
 /* Extra-narrow screens: preserve readable labels without clipping. */
 @media (max-width:299px){.nav .nav-btn{font-size:9px;padding:0 4px}}
 </style>
-<!-- PurpleAds automatic sticky placements: load on every route, even when News is hidden.
-     This head tag has no inline banner container. The sole in-content banner
-     remains next to Latest stories, with the same publisher ID. -->
-<script src="https://cdn.prplads.com/agent.js?publisherId=9690ead840831dca7bd8c39a8fe8319a:4798082d134821c8b1738f0f10eaaf23f3efe05cb7d35fb352e8ff6b890246d887780d2f11b33c3dcff58e9a3450f86af6cd880a62390b7ff083fdd94f3563bc" data-pa-tag async></script>
-<!-- PurpleAds callback applies to the inline News banner only. -->
-<script>
-  window.purpleDisplay = window.purpleDisplay || {};
-  window.purpleDisplay.onUnfilled = function (placement) {
-    var el = placement && placement.element;
-    var banner = el && el.closest && el.closest(".m98-home-banner");
-    if (banner) banner.classList.add("m98-ad-unfilled");
-  };
-</script>
 </head>
 <body>
 <canvas id="discoverAmbient" aria-hidden="true"></canvas>
@@ -1021,9 +985,6 @@ html[data-m98-initial-tab="concerts"] #nav [data-tab="concerts"]{background:var(
   <section class="tab active" id="tab-news">
     <div class="news-heading-row">
       <div class="hd"><h1 class="hd-t">Latest stories</h1></div>
-      <aside class="m98-home-banner" data-ad-position="news-top" aria-label="Advertisement">
-        <div class="m98-home-banner-slot"><script src="https://cdn.prplads.com/agent.js?publisherId=9690ead840831dca7bd8c39a8fe8319a:4798082d134821c8b1738f0f10eaaf23f3efe05cb7d35fb352e8ff6b890246d887780d2f11b33c3dcff58e9a3450f86af6cd880a62390b7ff083fdd94f3563bc" data-pa-tag async></script></div>
-      </aside>
     </div>
     <div id="heroSlot"></div>
     <div class="rail-wrap">
