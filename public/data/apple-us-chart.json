@@ -1,10 +1,10 @@
 {
   "schema": 2,
-  "updated": "2026-10-14",
-  "capturedAt": "2026-10-14T14:40:06.992Z",
+  "updated": "2026-10-15",
+  "capturedAt": "2026-10-15T14:25:07.069Z",
   "source": "official-apple-us-playlist",
-  "sourceDate": "2026-10-14",
-  "publishedAt": "2026-10-14T07:00:43Z",
+  "sourceDate": "2026-10-15",
+  "publishedAt": "2026-10-15T07:00:42Z",
   "region": "us",
   "cadence": "daily",
   "sourceUrl": "https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12",
@@ -74,19 +74,19 @@
     },
     {
       "pos": 8,
-      "title": "Last Thing You Need",
+      "title": "Been By Now",
       "artist": "Morgan Wallen",
-      "url": "https://music.apple.com/us/album/last-thing-you-need/6812476961?i=6812477290",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/d3/1c/5dd31c9c-1e1c-0bbc-104f-4a42e2bb4c59/075679556424.jpg/600x600bb.jpg",
+      "url": "https://music.apple.com/us/album/been-by-now/6792676858?i=6792676860",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/9f/8d/52/9f8d52a0-b6d9-d038-327b-4fe58bedce67/26UMGIM94572.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
       "pos": 9,
-      "title": "Been By Now",
+      "title": "Last Thing You Need",
       "artist": "Morgan Wallen",
-      "url": "https://music.apple.com/us/album/been-by-now/6792676858?i=6792676860",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/9f/8d/52/9f8d52a0-b6d9-d038-327b-4fe58bedce67/26UMGIM94572.rgb.jpg/600x600bb.jpg",
+      "url": "https://music.apple.com/us/album/last-thing-you-need/6812476961?i=6812477290",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/d3/1c/5dd31c9c-1e1c-0bbc-104f-4a42e2bb4c59/075679556424.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -119,10 +119,10 @@
     },
     {
       "pos": 13,
-      "title": "I Can't Love You Anymore",
-      "artist": "Ella Langley & Morgan Wallen",
-      "url": "https://music.apple.com/us/album/i-cant-love-you-anymore/1895158676?i=6763091996",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d9/7a/6e/d97a6e25-ef5c-0c26-64e9-266c18641a57/196874324103.jpg/600x600bb.jpg",
+      "title": "Freestyle",
+      "artist": "Lil Baby",
+      "url": "https://music.apple.com/us/album/freestyle/1440928174?i=1440929293",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/93/e7/aa/93e7aa59-da8b-15bc-2992-5803f70fe8fa/17UM1IM55478.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -137,15 +137,6 @@
     },
     {
       "pos": 15,
-      "title": "Freestyle",
-      "artist": "Lil Baby",
-      "url": "https://music.apple.com/us/album/freestyle/1440928174?i=1440929293",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/93/e7/aa/93e7aa59-da8b-15bc-2992-5803f70fe8fa/17UM1IM55478.rgb.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 16,
       "title": "In A Minute",
       "artist": "Lil Baby",
       "url": "https://music.apple.com/us/album/in-a-minute/1648587138?i=1648587330",
@@ -154,7 +145,25 @@
       "prev": ""
     },
     {
+      "pos": 16,
+      "title": "I Can't Love You Anymore",
+      "artist": "Ella Langley & Morgan Wallen",
+      "url": "https://music.apple.com/us/album/i-cant-love-you-anymore/1895158676?i=6763091996",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d9/7a/6e/d97a6e25-ef5c-0c26-64e9-266c18641a57/196874324103.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 17,
+      "title": "Wicked Games",
+      "artist": "The Weeknd",
+      "url": "https://music.apple.com/us/album/wicked-games/1550877895?i=1550878110",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/4b/ab/3c/4bab3c0d-ea9a-ad8e-4229-b1e73cad0283/21UMGIM06668.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 18,
       "title": "Be Her",
       "artist": "Ella Langley",
       "url": "https://music.apple.com/us/album/be-her/1869436835?i=1869436845",
@@ -163,20 +172,11 @@
       "prev": ""
     },
     {
-      "pos": 18,
+      "pos": 19,
       "title": "Best I Ever Had",
       "artist": "Drake",
       "url": "https://music.apple.com/us/album/best-i-ever-had/1452017773?i=1452017954",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/7e/b0/35/7eb0353b-8f25-32dd-5f5e-71d9ed700247/00602577524004.rgb.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 19,
-      "title": "I'm The Problem",
-      "artist": "Morgan Wallen",
-      "url": "https://music.apple.com/us/album/im-the-problem/1802103958?i=1802103970",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -191,24 +191,6 @@
     },
     {
       "pos": 21,
-      "title": "Broken Window Serenade",
-      "artist": "Whiskey Myers",
-      "url": "https://music.apple.com/us/album/broken-window-serenade/1813021356?i=1813021660",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/cf/22/d0cf226c-607d-d97c-61d4-26eabde51f1d/886443002371_Cover.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 22,
-      "title": "I’m Spent",
-      "artist": "Drake & Loe Shimmy",
-      "url": "https://music.apple.com/us/album/im-spent/6769551464?i=6769551476",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c4/3b/89/c43b8964-a24e-b396-bd65-e5b45cabe039/26UMGIM63616.rgb.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 23,
       "title": "LIKE ME (feat. 42 Dugg & Lil Baby)",
       "artist": "Future",
       "url": "https://music.apple.com/us/album/like-me-feat-42-dugg-lil-baby/1621803882?i=1621803969",
@@ -217,20 +199,38 @@
       "prev": ""
     },
     {
-      "pos": 24,
-      "title": "Don't We",
+      "pos": 22,
+      "title": "I'm The Problem",
       "artist": "Morgan Wallen",
-      "url": "https://music.apple.com/us/album/dont-we/1802103958?i=1802104400",
+      "url": "https://music.apple.com/us/album/im-the-problem/1802103958?i=1802103970",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
+      "pos": 23,
+      "title": "Broken Window Serenade",
+      "artist": "Whiskey Myers",
+      "url": "https://music.apple.com/us/album/broken-window-serenade/1813021356?i=1813021660",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/cf/22/d0cf226c-607d-d97c-61d4-26eabde51f1d/886443002371_Cover.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 24,
+      "title": "I’m Spent",
+      "artist": "Drake & Loe Shimmy",
+      "url": "https://music.apple.com/us/album/im-spent/6769551464?i=6769551476",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c4/3b/89/c43b8964-a24e-b396-bd65-e5b45cabe039/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 25,
-      "title": "Wicked Games",
-      "artist": "The Weeknd",
-      "url": "https://music.apple.com/us/album/wicked-games/1550877895?i=1550878110",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/4b/ab/3c/4bab3c0d-ea9a-ad8e-4229-b1e73cad0283/21UMGIM06668.rgb.jpg/600x600bb.jpg",
+      "title": "Don't We",
+      "artist": "Morgan Wallen",
+      "url": "https://music.apple.com/us/album/dont-we/1802103958?i=1802104400",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -245,10 +245,10 @@
     },
     {
       "pos": 27,
-      "title": "pop it",
-      "artist": "Gunna",
-      "url": "https://music.apple.com/us/album/pop-it/6819441629?i=6819441636",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7f/c3/77/7fc37797-be3f-ad4e-e374-6dcf3d6f7913/075679559616.jpg/600x600bb.jpg",
+      "title": "I'M DAT N***A",
+      "artist": "Future",
+      "url": "https://music.apple.com/us/album/im-dat-n-a/1621119097?i=1621119426",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/65/f2/06/65f2067b-a8ea-239c-c219-8e0f0282dcea/196589073693.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -263,19 +263,19 @@
     },
     {
       "pos": 29,
-      "title": "Last Night",
-      "artist": "Morgan Wallen",
-      "url": "https://music.apple.com/us/album/last-night/1818423949?i=1818424212",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/82/eb/b3/82ebb3c6-2bd4-31fd-0eb9-57667f3590e1/00602455239419_Cover.jpg/600x600bb.jpg",
+      "title": "Marvins Room",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/marvins-room/1440642493?i=1440642743",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
       "pos": 30,
-      "title": "I'M DAT N***A",
-      "artist": "Future",
-      "url": "https://music.apple.com/us/album/im-dat-n-a/1621119097?i=1621119426",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/65/f2/06/65f2067b-a8ea-239c-c219-8e0f0282dcea/196589073693.jpg/600x600bb.jpg",
+      "title": "Wants and Needs (feat. Lil Baby)",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/wants-and-needs-feat-lil-baby/1556669854?i=1556670532",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/63/2a/34/632a3488-d104-3ff1-dc02-4ed86f58ed05/21UMGIM18577.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -290,33 +290,15 @@
     },
     {
       "pos": 32,
-      "title": "Marvins Room",
-      "artist": "Drake",
-      "url": "https://music.apple.com/us/album/marvins-room/1440642493?i=1440642743",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/74/fb/d3/74fbd365-bd52-23b4-604b-7f164407b0a9/00602527899107.rgb.jpg/600x600bb.jpg",
+      "title": "Last Night",
+      "artist": "Morgan Wallen",
+      "url": "https://music.apple.com/us/album/last-night/1818423949?i=1818424212",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/82/eb/b3/82ebb3c6-2bd4-31fd-0eb9-57667f3590e1/00602455239419_Cover.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
       "pos": 33,
-      "title": "Wants and Needs (feat. Lil Baby)",
-      "artist": "Drake",
-      "url": "https://music.apple.com/us/album/wants-and-needs-feat-lil-baby/1556669854?i=1556670532",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/63/2a/34/632a3488-d104-3ff1-dc02-4ed86f58ed05/21UMGIM18577.rgb.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 34,
-      "title": "Just In Case",
-      "artist": "Morgan Wallen",
-      "url": "https://music.apple.com/us/album/just-in-case/1802103958?i=1802103977",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 35,
       "title": "So Good (feat. Kendrick Lamar)",
       "artist": "Jhené Aiko",
       "url": "https://music.apple.com/us/album/so-good-feat-kendrick-lamar/6810715695?i=6810716062",
@@ -325,7 +307,7 @@
       "prev": ""
     },
     {
-      "pos": 36,
+      "pos": 34,
       "title": "Man I Need",
       "artist": "Olivia Dean",
       "url": "https://music.apple.com/us/album/man-i-need/6769592103?i=6769592306",
@@ -334,7 +316,7 @@
       "prev": ""
     },
     {
-      "pos": 37,
+      "pos": 35,
       "title": "Sum 2 Prove",
       "artist": "Lil Baby",
       "url": "https://music.apple.com/us/album/sum-2-prove/1534816297?i=1534816484",
@@ -343,11 +325,29 @@
       "prev": ""
     },
     {
-      "pos": 38,
+      "pos": 36,
       "title": "Stick Talk",
       "artist": "Future",
       "url": "https://music.apple.com/us/album/stick-talk/1017053934?i=1017055092",
       "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0a/46/ab/0a46ab3a-2415-0659-2cc2-f3f173144bd5/886445328530.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 37,
+      "title": "Just In Case",
+      "artist": "Morgan Wallen",
+      "url": "https://music.apple.com/us/album/just-in-case/1802103958?i=1802103977",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 38,
+      "title": "pop it",
+      "artist": "Gunna",
+      "url": "https://music.apple.com/us/album/pop-it/6819441629?i=6819441636",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7f/c3/77/7fc37797-be3f-ad4e-e374-6dcf3d6f7913/075679559616.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -389,24 +389,15 @@
     },
     {
       "pos": 43,
-      "title": "Boston",
-      "artist": "STELLA LEFTY",
-      "url": "https://music.apple.com/us/album/boston/1884403092?i=1884403093",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7c/de/5e/7cde5e7a-612d-9714-d34c-1eb234c85ebb/810129961546.jpg/600x600bb.jpg",
+      "title": "Knife Talk (feat. 21 Savage & Project Pat)",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/knife-talk-feat-21-savage-project-pat/1584281467?i=1584281787",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/11/36/38/1136384a-eebc-697a-c005-d890e41c0854/21UM1IM07518.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
       "pos": 44,
-      "title": "Thinkin’ Bout Me",
-      "artist": "Morgan Wallen",
-      "url": "https://music.apple.com/us/album/thinkin-bout-me/1818423949?i=1818425528",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/82/eb/b3/82ebb3c6-2bd4-31fd-0eb9-57667f3590e1/00602455239419_Cover.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 45,
       "title": "Cinderella (feat. Ty Dolla $ign)",
       "artist": "Mac Miller",
       "url": "https://music.apple.com/us/album/cinderella-feat-ty-dolla-%24ign/1137965822?i=1137966332",
@@ -415,11 +406,20 @@
       "prev": ""
     },
     {
+      "pos": 45,
+      "title": "Boston",
+      "artist": "STELLA LEFTY",
+      "url": "https://music.apple.com/us/album/boston/1884403092?i=1884403093",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7c/de/5e/7cde5e7a-612d-9714-d34c-1eb234c85ebb/810129961546.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 46,
-      "title": "Knife Talk (feat. 21 Savage & Project Pat)",
-      "artist": "Drake",
-      "url": "https://music.apple.com/us/album/knife-talk-feat-21-savage-project-pat/1584281467?i=1584281787",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/11/36/38/1136384a-eebc-697a-c005-d890e41c0854/21UM1IM07518.rgb.jpg/600x600bb.jpg",
+      "title": "Thinkin’ Bout Me",
+      "artist": "Morgan Wallen",
+      "url": "https://music.apple.com/us/album/thinkin-bout-me/1818423949?i=1818425528",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/82/eb/b3/82ebb3c6-2bd4-31fd-0eb9-57667f3590e1/00602455239419_Cover.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -461,24 +461,6 @@
     },
     {
       "pos": 51,
-      "title": "Cowgirls (feat. ERNEST)",
-      "artist": "Morgan Wallen",
-      "url": "https://music.apple.com/us/album/cowgirls-feat-ernest/1818423949?i=1818426110",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/82/eb/b3/82ebb3c6-2bd4-31fd-0eb9-57667f3590e1/00602455239419_Cover.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 52,
-      "title": "I Had Some Help (feat. Morgan Wallen)",
-      "artist": "Post Malone",
-      "url": "https://music.apple.com/us/album/i-had-some-help-feat-morgan-wallen/1744439045?i=1744439049",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e1/b7/09/e1b7098f-d6e1-2b18-fd6f-8390110908eb/24UMGIM50612.rgb.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 53,
       "title": "Don't",
       "artist": "Bryson Tiller",
       "url": "https://music.apple.com/us/album/dont/1031354875?i=1031354882",
@@ -487,16 +469,25 @@
       "prev": ""
     },
     {
-      "pos": 54,
-      "title": "weren't for the wind",
-      "artist": "Ella Langley",
-      "url": "https://music.apple.com/us/album/werent-for-the-wind/1770160322?i=1770160814",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ef/f1/65/eff16551-2b83-202a-f923-a655a57c61b8/196872452563.jpg/600x600bb.jpg",
+      "pos": 52,
+      "title": "Cowgirls (feat. ERNEST)",
+      "artist": "Morgan Wallen",
+      "url": "https://music.apple.com/us/album/cowgirls-feat-ernest/1818423949?i=1818426110",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/82/eb/b3/82ebb3c6-2bd4-31fd-0eb9-57667f3590e1/00602455239419_Cover.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 55,
+      "pos": 53,
+      "title": "I Had Some Help (feat. Morgan Wallen)",
+      "artist": "Post Malone",
+      "url": "https://music.apple.com/us/album/i-had-some-help-feat-morgan-wallen/1744439045?i=1744439049",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e1/b7/09/e1b7098f-d6e1-2b18-fd6f-8390110908eb/24UMGIM50612.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 54,
       "title": "Broken Clocks",
       "artist": "SZA",
       "url": "https://music.apple.com/us/album/broken-clocks/1239976329?i=1239976610",
@@ -505,7 +496,7 @@
       "prev": ""
     },
     {
-      "pos": 56,
+      "pos": 55,
       "title": "Now Who",
       "artist": "YoungBoy Never Broke Again",
       "url": "https://music.apple.com/us/album/now-who/1713814104?i=1713814120",
@@ -514,11 +505,20 @@
       "prev": ""
     },
     {
+      "pos": 56,
+      "title": "weren't for the wind",
+      "artist": "Ella Langley",
+      "url": "https://music.apple.com/us/album/werent-for-the-wind/1770160322?i=1770160814",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/ef/f1/65/eff16551-2b83-202a-f923-a655a57c61b8/196872452563.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 57,
-      "title": "Mr. Brightside",
-      "artist": "The Killers",
-      "url": "https://music.apple.com/us/album/mr-brightside/1526194184?i=1526194192",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/1a/5a/071a5aee-6e42-060c-35b9-6a6e45b9ea59/06UMGIM10441.rgb.jpg/600x600bb.jpg",
+      "title": "Money In The Grave (feat. Rick Ross)",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/money-in-the-grave-feat-rick-ross/1468617896?i=1468618077",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/5b/31/bf/5b31bf6d-0a7f-ad73-426f-72948846bef2/19UMGIM54644.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -533,19 +533,19 @@
     },
     {
       "pos": 59,
-      "title": "Babylon",
-      "artist": "Taylor Swift",
-      "url": "https://music.apple.com/us/album/babylon/6814997249?i=6814997429",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
+      "title": "Low Down",
+      "artist": "Lil Baby",
+      "url": "https://music.apple.com/us/album/low-down/1534816297?i=1534816500",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/70/97/3a/70973a36-b897-e20e-4698-c05d4f5ee24f/20UMGIM30253.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
       "pos": 60,
-      "title": "Money In The Grave (feat. Rick Ross)",
-      "artist": "Drake",
-      "url": "https://music.apple.com/us/album/money-in-the-grave-feat-rick-ross/1468617896?i=1468618077",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/5b/31/bf/5b31bf6d-0a7f-ad73-426f-72948846bef2/19UMGIM54644.rgb.jpg/600x600bb.jpg",
+      "title": "Mr. Brightside",
+      "artist": "The Killers",
+      "url": "https://music.apple.com/us/album/mr-brightside/1526194184?i=1526194192",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/07/1a/5a/071a5aee-6e42-060c-35b9-6a6e45b9ea59/06UMGIM10441.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -560,24 +560,15 @@
     },
     {
       "pos": 62,
-      "title": "Sweater Weather",
-      "artist": "The Neighbourhood",
-      "url": "https://music.apple.com/us/album/sweater-weather/635016635?i=635016640",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/28/71/00/287100fb-5c31-0195-5343-e6b3625886d0/886443969834.jpg/600x600bb.jpg",
+      "title": "Not Like Us",
+      "artist": "Kendrick Lamar",
+      "url": "https://music.apple.com/us/album/not-like-us/1744776162?i=1744776167",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/ef/b6/d0efb685-73be-fdee-58c9-be655f4cd4fd/24UMGIM51924.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
       "pos": 63,
-      "title": "Low Down",
-      "artist": "Lil Baby",
-      "url": "https://music.apple.com/us/album/low-down/1534816297?i=1534816500",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/70/97/3a/70973a36-b897-e20e-4698-c05d4f5ee24f/20UMGIM30253.rgb.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 64,
       "title": "Orbiter",
       "artist": "Noah Kahan",
       "url": "https://music.apple.com/us/album/orbiter/1894997820?i=6762757958",
@@ -586,11 +577,20 @@
       "prev": ""
     },
     {
+      "pos": 64,
+      "title": "Sweater Weather",
+      "artist": "The Neighbourhood",
+      "url": "https://music.apple.com/us/album/sweater-weather/635016635?i=635016640",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/28/71/00/287100fb-5c31-0195-5343-e6b3625886d0/886443969834.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 65,
-      "title": "Not Like Us",
-      "artist": "Kendrick Lamar",
-      "url": "https://music.apple.com/us/album/not-like-us/1744776162?i=1744776167",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d0/ef/b6/d0efb685-73be-fdee-58c9-be655f4cd4fd/24UMGIM51924.rgb.jpg/600x600bb.jpg",
+      "title": "Like That",
+      "artist": "Future, Metro Boomin & Kendrick Lamar",
+      "url": "https://music.apple.com/us/album/like-that/1737149923?i=1737150439",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4e/9f/7b/4e9f7b71-28ad-a8dc-9b34-da532feb82f6/196871937382.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -605,15 +605,6 @@
     },
     {
       "pos": 67,
-      "title": "Like That",
-      "artist": "Future, Metro Boomin & Kendrick Lamar",
-      "url": "https://music.apple.com/us/album/like-that/1737149923?i=1737150439",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4e/9f/7b/4e9f7b71-28ad-a8dc-9b34-da532feb82f6/196871937382.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 68,
       "title": "Passionfruit",
       "artist": "Drake",
       "url": "https://music.apple.com/us/album/passionfruit/1440890708?i=1440891494",
@@ -622,11 +613,20 @@
       "prev": ""
     },
     {
+      "pos": 68,
+      "title": "E85",
+      "artist": "Don Toliver",
+      "url": "https://music.apple.com/us/album/e85/1871258329?i=1871258330",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e8/e5/c6/e8e5c690-a958-622e-eb62-0dce6059300e/075679599360.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
       "pos": 69,
-      "title": "Tennessee Whiskey",
-      "artist": "Chris Stapleton",
-      "url": "https://music.apple.com/us/album/tennessee-whiskey/1440827477?i=1440827492",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e2/4b/60/e24b6016-8278-bb18-cf5d-d44bf68371da/00602547223838.rgb.jpg/600x600bb.jpg",
+      "title": "Babylon",
+      "artist": "Taylor Swift",
+      "url": "https://music.apple.com/us/album/babylon/6814997249?i=6814997429",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/dd/fd/a0ddfd72-ee9e-f046-6466-a5dbefc696fa/26UM1IM21436.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -641,28 +641,28 @@
     },
     {
       "pos": 71,
-      "title": "E85",
-      "artist": "Don Toliver",
-      "url": "https://music.apple.com/us/album/e85/1871258329?i=1871258330",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e8/e5/c6/e8e5c690-a958-622e-eb62-0dce6059300e/075679599360.jpg/600x600bb.jpg",
+      "title": "Tennessee Whiskey",
+      "artist": "Chris Stapleton",
+      "url": "https://music.apple.com/us/album/tennessee-whiskey/1440827477?i=1440827492",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/e2/4b/60/e24b6016-8278-bb18-cf5d-d44bf68371da/00602547223838.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
       "pos": 72,
-      "title": "A Couple Minutes",
-      "artist": "Olivia Dean",
-      "url": "https://music.apple.com/us/album/a-couple-minutes/1817609404?i=1817609514",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/600x600bb.jpg",
+      "title": "How It Feels",
+      "artist": "Lil Baby & Lil Durk",
+      "url": "https://music.apple.com/us/album/how-it-feels/1569712089?i=1569712108",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9a/51/3f/9a513f0d-452a-a4de-aa54-3d629a94d2c3/21UMGIM47174.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
       "pos": 73,
-      "title": "How It Feels",
-      "artist": "Lil Baby & Lil Durk",
-      "url": "https://music.apple.com/us/album/how-it-feels/1569712089?i=1569712108",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/9a/51/3f/9a513f0d-452a-a4de-aa54-3d629a94d2c3/21UMGIM47174.rgb.jpg/600x600bb.jpg",
+      "title": "A Couple Minutes",
+      "artist": "Olivia Dean",
+      "url": "https://music.apple.com/us/album/a-couple-minutes/1817609404?i=1817609514",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/08/e2/21/08e22164-7c0b-1522-818f-e0e74f62dc49/25UMGIM69703.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -677,10 +677,10 @@
     },
     {
       "pos": 75,
-      "title": "WTF GOIN",
-      "artist": "Belly Gang Kushington & 21 Savage",
-      "url": "https://music.apple.com/us/album/wtf-goin/6779378647?i=6779378648",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/14/d5/7b/14d57b74-7680-e414-2424-f03f1173da3a/820233646390.jpg/600x600bb.jpg",
+      "title": "Vette Motors",
+      "artist": "YoungBoy Never Broke Again",
+      "url": "https://music.apple.com/us/album/vette-motors/1617170958?i=1617171238",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/4d/54/ec/4d54eccd-8e71-4217-cb81-445adc77136b/075679750006.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
@@ -695,33 +695,6 @@
     },
     {
       "pos": 77,
-      "title": "Vette Motors",
-      "artist": "YoungBoy Never Broke Again",
-      "url": "https://music.apple.com/us/album/vette-motors/1617170958?i=1617171238",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music112/v4/4d/54/ec/4d54eccd-8e71-4217-cb81-445adc77136b/075679750006.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 78,
-      "title": "Jaded",
-      "artist": "Koe Wetzel & Ella Langley",
-      "url": "https://music.apple.com/us/album/jaded/6798042820?i=6798042825",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 79,
-      "title": "Poetic Justice (feat. Drake)",
-      "artist": "Kendrick Lamar",
-      "url": "https://music.apple.com/us/album/poetic-justice-feat-drake/1440818890?i=1440818972",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/ca/5b/c0/ca5bc0b3-d81d-cc6c-0d19-54b9eedb6dbd/12UMGIM52990.rgb.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 80,
       "title": "Ain't In LA",
       "artist": "ADÉLA",
       "url": "https://music.apple.com/us/album/aint-in-la/6792883860?i=6792884101",
@@ -730,25 +703,25 @@
       "prev": ""
     },
     {
-      "pos": 81,
-      "title": "You Proof",
-      "artist": "Morgan Wallen",
-      "url": "https://music.apple.com/us/album/you-proof/1818406806?i=1818407111",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b7/66/c4/b766c457-2500-e2d6-895e-59b45e95d009/00602445957033_Cover.jpg/600x600bb.jpg",
+      "pos": 78,
+      "title": "Poetic Justice (feat. Drake)",
+      "artist": "Kendrick Lamar",
+      "url": "https://music.apple.com/us/album/poetic-justice-feat-drake/1440818890?i=1440818972",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/ca/5b/c0/ca5bc0b3-d81d-cc6c-0d19-54b9eedb6dbd/12UMGIM52990.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 82,
-      "title": "Take Me Back (Leave Me There)",
-      "artist": "Cody Johnson",
-      "url": "https://music.apple.com/us/album/take-me-back-leave-me-there/1892465981?i=1892466278",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/d9/7a/e2d97a87-6ec6-99de-9a1f-31b86ce6e7c4/093624826613.jpg/600x600bb.jpg",
+      "pos": 79,
+      "title": "WTF GOIN",
+      "artist": "Belly Gang Kushington & 21 Savage",
+      "url": "https://music.apple.com/us/album/wtf-goin/6779378647?i=6779378648",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/14/d5/7b/14d57b74-7680-e414-2424-f03f1173da3a/820233646390.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 83,
+      "pos": 80,
       "title": "bloodstream",
       "artist": "Alyssa Grace",
       "url": "https://music.apple.com/us/album/bloodstream/6783576156?i=6783576167",
@@ -757,16 +730,7 @@
       "prev": ""
     },
     {
-      "pos": 84,
-      "title": "Where the Wild Things Are",
-      "artist": "Luke Combs",
-      "url": "https://music.apple.com/us/album/where-the-wild-things-are/1666738524?i=1666738581",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/7d/24/14/7d241439-671a-d957-9613-2f738f43a064/196589485991.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 85,
+      "pos": 81,
       "title": "Body",
       "artist": "Summer Walker",
       "url": "https://music.apple.com/us/album/body/1481606156?i=1481606158",
@@ -775,16 +739,7 @@
       "prev": ""
     },
     {
-      "pos": 86,
-      "title": "hate that i made you love me",
-      "artist": "Ariana Grande",
-      "url": "https://music.apple.com/us/album/hate-that-i-made-you-love-me/1895420989?i=6763656876",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7e/e6/82/7ee682bd-1b17-6adc-be63-b5af1bdff369/26UMGIM51126.rgb.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 87,
+      "pos": 82,
       "title": "Controlla",
       "artist": "Drake",
       "url": "https://music.apple.com/us/album/controlla/1440841363?i=1440841382",
@@ -793,16 +748,25 @@
       "prev": ""
     },
     {
-      "pos": 88,
-      "title": "Neon Moon",
-      "artist": "Brooks & Dunn",
-      "url": "https://music.apple.com/us/album/neon-moon/258642334?i=258643362",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a4/db/c5/a4dbc5c7-bc69-931a-0e46-c6e11e86e003/078221885225.jpg/600x600bb.jpg",
+      "pos": 83,
+      "title": "hate that i made you love me",
+      "artist": "Ariana Grande",
+      "url": "https://music.apple.com/us/album/hate-that-i-made-you-love-me/1895420989?i=6763656876",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7e/e6/82/7ee682bd-1b17-6adc-be63-b5af1bdff369/26UMGIM51126.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 89,
+      "pos": 84,
+      "title": "You Proof",
+      "artist": "Morgan Wallen",
+      "url": "https://music.apple.com/us/album/you-proof/1818406806?i=1818407111",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/b7/66/c4/b766c457-2500-e2d6-895e-59b45e95d009/00602445957033_Cover.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 85,
       "title": "Bitch, Don’t Kill My Vibe",
       "artist": "Kendrick Lamar",
       "url": "https://music.apple.com/us/album/bitch-dont-kill-my-vibe/1471264092?i=1471264095",
@@ -811,25 +775,16 @@
       "prev": ""
     },
     {
-      "pos": 90,
-      "title": "Classic PT2",
-      "artist": "Drake",
-      "url": "https://music.apple.com/us/album/classic-pt2/6818209777?i=6818209993",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
+      "pos": 86,
+      "title": "Jaded",
+      "artist": "Koe Wetzel & Ella Langley",
+      "url": "https://music.apple.com/us/album/jaded/6798042820?i=6798042825",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c1/09/7e/c1097e38-0d2e-d389-2be7-0762979bb43a/ticket.easjqfbg.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 91,
-      "title": "Fast Car",
-      "artist": "Luke Combs",
-      "url": "https://music.apple.com/us/album/fast-car/1666738524?i=1666738585",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/7d/24/14/7d241439-671a-d957-9613-2f738f43a064/196589485991.jpg/600x600bb.jpg",
-      "year": "",
-      "prev": ""
-    },
-    {
-      "pos": 92,
+      "pos": 87,
       "title": "goosebumps",
       "artist": "Travis Scott",
       "url": "https://music.apple.com/us/album/goosebumps/1150135681?i=1150135924",
@@ -838,16 +793,16 @@
       "prev": ""
     },
     {
-      "pos": 93,
-      "title": "Beautiful Crazy",
-      "artist": "Luke Combs",
-      "url": "https://music.apple.com/us/album/beautiful-crazy/1376705241?i=1376707066",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f4/4b/59/f44b59a2-62c7-e9c7-df8b-4b8e7d772b41/886447048443.jpg/600x600bb.jpg",
+      "pos": 88,
+      "title": "Take Me Back (Leave Me There)",
+      "artist": "Cody Johnson",
+      "url": "https://music.apple.com/us/album/take-me-back-leave-me-there/1892465981?i=1892466278",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e2/d9/7a/e2d97a87-6ec6-99de-9a1f-31b86ce6e7c4/093624826613.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 94,
+      "pos": 89,
       "title": "712PM",
       "artist": "Future",
       "url": "https://music.apple.com/us/album/712pm/1621803882?i=1621803883",
@@ -856,7 +811,16 @@
       "prev": ""
     },
     {
-      "pos": 95,
+      "pos": 90,
+      "title": "Where the Wild Things Are",
+      "artist": "Luke Combs",
+      "url": "https://music.apple.com/us/album/where-the-wild-things-are/1666738524?i=1666738581",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/7d/24/14/7d241439-671a-d957-9613-2f738f43a064/196589485991.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 91,
       "title": "Wild Thoughts (feat. Rihanna & Bryson Tiller)",
       "artist": "DJ Khaled",
       "url": "https://music.apple.com/us/album/wild-thoughts-feat-rihanna-bryson-tiller/1244230120?i=1244230126",
@@ -865,16 +829,25 @@
       "prev": ""
     },
     {
-      "pos": 96,
-      "title": "28",
-      "artist": "Zach Bryan",
-      "url": "https://music.apple.com/us/album/28/1819829616?i=1819829902",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f6/2e/c1/f62ec15a-3294-0743-e80c-c5e890171a14/093624828730.jpg/600x600bb.jpg",
+      "pos": 92,
+      "title": "Neon Moon",
+      "artist": "Brooks & Dunn",
+      "url": "https://music.apple.com/us/album/neon-moon/258642334?i=258643362",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/a4/db/c5/a4dbc5c7-bc69-931a-0e46-c6e11e86e003/078221885225.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     },
     {
-      "pos": 97,
+      "pos": 93,
+      "title": "Fast Car",
+      "artist": "Luke Combs",
+      "url": "https://music.apple.com/us/album/fast-car/1666738524?i=1666738585",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music113/v4/7d/24/14/7d241439-671a-d957-9613-2f738f43a064/196589485991.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 94,
       "title": "Money Trees (feat. Jay Rock)",
       "artist": "Kendrick Lamar",
       "url": "https://music.apple.com/us/album/money-trees-feat-jay-rock/1440818890?i=1440818969",
@@ -883,7 +856,7 @@
       "prev": ""
     },
     {
-      "pos": 98,
+      "pos": 95,
       "title": "Untouchable",
       "artist": "YoungBoy Never Broke Again",
       "url": "https://music.apple.com/us/album/untouchable/1266332358?i=1266332375",
@@ -892,7 +865,7 @@
       "prev": ""
     },
     {
-      "pos": 99,
+      "pos": 96,
       "title": "Valuable Pain",
       "artist": "YoungBoy Never Broke Again",
       "url": "https://music.apple.com/us/album/valuable-pain/1447442327?i=1447442333",
@@ -901,11 +874,38 @@
       "prev": ""
     },
     {
-      "pos": 100,
-      "title": "Be By You",
+      "pos": 97,
+      "title": "28",
+      "artist": "Zach Bryan",
+      "url": "https://music.apple.com/us/album/28/1819829616?i=1819829902",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f6/2e/c1/f62ec15a-3294-0743-e80c-c5e890171a14/093624828730.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 98,
+      "title": "Beautiful Crazy",
       "artist": "Luke Combs",
-      "url": "https://music.apple.com/us/album/be-by-you/1862634688?i=1862634805",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4c/b6/e5/4cb6e5b1-2db0-88c0-f025-b79cad3b8fab/196873832111.jpg/600x600bb.jpg",
+      "url": "https://music.apple.com/us/album/beautiful-crazy/1376705241?i=1376707066",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/f4/4b/59/f44b59a2-62c7-e9c7-df8b-4b8e7d772b41/886447048443.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 99,
+      "title": "deja vu",
+      "artist": "Olivia Rodrigo",
+      "url": "https://music.apple.com/us/album/deja-vu/1582277315?i=1582277651",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/76/46/48/76464884-0e9c-1951-a3f6-ce02f74c2b19/21UMGIM26093.rgb.jpg/600x600bb.jpg",
+      "year": "",
+      "prev": ""
+    },
+    {
+      "pos": 100,
+      "title": "Classic PT2",
+      "artist": "Drake",
+      "url": "https://music.apple.com/us/album/classic-pt2/6818209777?i=6818209993",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/bb/45/62/bb4562a3-45a2-539c-b557-a18ea060a476/26UMGIM63616.rgb.jpg/600x600bb.jpg",
       "year": "",
       "prev": ""
     }
