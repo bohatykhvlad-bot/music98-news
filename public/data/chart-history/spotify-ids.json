@@ -571,6 +571,13 @@
       "subtitle": "back number",
       "resolvedAt": "2026-10-14T00:49:56.278Z",
       "matchedFrom": "verified-apple-japanese-alias"
+    },
+    "babylon|taylorswift": {
+      "id": "2j7wI9QWrP8cjKDdOLVQTU",
+      "name": "Babylon",
+      "subtitle": "Taylor Swift",
+      "resolvedAt": "2026-10-15T00:07:42.347Z",
+      "matchedFrom": "original-title-search"
     }
   }
 }
