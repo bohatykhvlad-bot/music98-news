@@ -89,7 +89,7 @@
   "spotifyFingerprint": "d5d2a6903974df6161857b012e05cfa55866730109334e06ec480f49fb13f8e3",
   "complete": true,
   "seed": {
-    "covers": 153,
+    "covers": 152,
     "names": 124,
     "namesWithUrl": 124,
     "loudness": 50
@@ -1272,6 +1272,9 @@
       "rank": 31,
       "applePoints": 0,
       "spotifyBonus": 30,
+      "gainDb": -6.5,
+      "lufs": -9.5,
+      "truePeakDbtp": 0.9,
       "delta": "new",
       "weeks": 1
     },
@@ -1650,6 +1653,9 @@
       "rank": 41,
       "applePoints": 28.4,
       "spotifyBonus": 0.1389101281617889,
+      "gainDb": -7.3,
+      "lufs": -8.7,
+      "truePeakDbtp": 0.5,
       "delta": "re-entry",
       "weeks": 1
     },
@@ -1686,6 +1692,9 @@
       "rank": 42,
       "applePoints": 29.2,
       "spotifyBonus": 0.080352431900348,
+      "gainDb": -7,
+      "lufs": -9,
+      "truePeakDbtp": 0.4,
       "delta": "re-entry",
       "weeks": 1
     },
@@ -1761,6 +1770,9 @@
       "rank": 44,
       "applePoints": 26.8,
       "spotifyBonus": 0.3855513182866774,
+      "gainDb": -7.9,
+      "lufs": -8.1,
+      "truePeakDbtp": 0.4,
       "delta": "re-entry",
       "weeks": 1
     },
@@ -1869,6 +1881,9 @@
       "rank": 47,
       "applePoints": 27.2,
       "spotifyBonus": 0.325161116813964,
+      "gainDb": -6.5,
+      "lufs": -9.5,
+      "truePeakDbtp": 0,
       "delta": "re-entry",
       "weeks": 1
     },
@@ -1983,11 +1998,14 @@
       "rank": 50,
       "applePoints": 19.6,
       "spotifyBonus": 0.5658546629498976,
+      "gainDb": -7.4,
+      "lufs": -8.6,
+      "truePeakDbtp": 0.4,
       "delta": "re-entry",
       "weeks": 1
     }
   ],
-  "seedEdition": "[[\"A\",\"2026-10-14T14:40:07.005Z\",\"2026-10-14\"],[\"U\",\"2026-10-14T14:40:06.992Z\",\"2026-10-14\"],[\"C\",\"153:dd5cc726\"]]",
+  "seedEdition": "[[\"A\",\"2026-10-14T14:40:07.005Z\",\"2026-10-14\"],[\"U\",\"2026-10-14T14:40:06.992Z\",\"2026-10-14\"],[\"C\",\"152:a2a8782a\"]]",
   "arrows": {
     "ok": true,
     "bad": 0,
