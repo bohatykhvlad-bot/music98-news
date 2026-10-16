@@ -1587,10 +1587,10 @@
     {
       "title": "Ain't In LA",
       "artist": "ADÉLA",
-      "url": "https://music.apple.com/us/album/6792883860?i=6792884101&app=music&at=1001l3aZW&ct=music98",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/77/7b/5d777b87-e796-0b3e-cef6-d37d993dd8fe/26UMGIM82371.rgb.jpg/600x600bb.jpg",
+      "url": "https://music.apple.com/us/album/6796149321?i=6796149323&app=music&at=1001l3aZW&ct=music98",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/54/19/e8/5419e883-3cc4-5d8b-a10d-c1fee1f5c969/26UMGIM82372.rgb.jpg/600x600bb.jpg",
       "year": "2026",
-      "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/a5/1c/db/a51cdb2c-4d28-3aea-feb2-44b7d0f1c05b/mzaf_11945853055580460496.plus.aac.p.m4a",
+      "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/af/19/98/af1998ee-ed0e-4655-ec27-610c78dcb4fc/mzaf_18150537039377466708.plus.aac.p.m4a",
       "sourceRanks": {
         "U": 80,
         "A": 14,
@@ -1779,10 +1779,10 @@
     {
       "title": "hate that i made you love me",
       "artist": "Ariana Grande",
-      "url": "https://music.apple.com/us/album/1895420989?i=6763656876&app=music&at=1001l3aZW&ct=music98",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7e/e6/82/7ee682bd-1b17-6adc-be63-b5af1bdff369/26UMGIM51126.rgb.jpg/600x600bb.jpg",
+      "url": "https://music.apple.com/us/album/6773388583?i=6773388585&app=music&at=1001l3aZW&ct=music98",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c7/8d/7d/c78d7db8-cf34-8a65-99d6-850a3d60d03b/26UMGIM66898.rgb.jpg/600x600bb.jpg",
       "year": "2026",
-      "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/02/41/f3/0241f307-2ec2-f817-3953-78df5f80f63d/mzaf_525670659940588152.plus.aac.p.m4a",
+      "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/9e/85/8d/9e858d51-fb47-3aff-c037-4e9fd284cefe/mzaf_12282803114326162707.plus.aac.p.m4a",
       "sourceRanks": {
         "U": 86,
         "A": 15,
@@ -1815,10 +1815,10 @@
     {
       "title": "Sweater Weather",
       "artist": "The Neighbourhood",
-      "url": "https://music.apple.com/us/album/635016635?i=635016640&app=music&at=1001l3aZW&ct=music98",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/28/71/00/287100fb-5c31-0195-5343-e6b3625886d0/886443969834.jpg/600x600bb.jpg",
+      "url": "https://music.apple.com/us/album/548656698?i=548656753&app=music&at=1001l3aZW&ct=music98",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/b9/8c/0f/b98c0f03-d78f-1619-8c7b-0b7f2c4d6ae7/886443575264.jpg/600x600bb.jpg",
       "year": "2012",
-      "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/8c/37/20/8c372047-2727-8054-9411-0e4867643dd8/mzaf_10169659262182214119.plus.aac.p.m4a",
+      "prev": "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview211/v4/42/53/4a/42534ad1-465f-2e5c-882b-51b3460f829e/mzaf_2625936130660551028.plus.aac.p.m4a",
       "sourceRanks": {
         "U": 62,
         "A": 50,
@@ -2005,7 +2005,7 @@
       "weeks": 1
     }
   ],
-  "seedEdition": "[[\"A\",\"2026-10-14T14:40:07.005Z\",\"2026-10-14\"],[\"U\",\"2026-10-14T14:40:06.992Z\",\"2026-10-14\"],[\"C\",\"152:a2a8782a\"]]",
+  "seedEdition": "[[\"A\",\"2026-10-14T14:40:07.005Z\",\"2026-10-14\"],[\"U\",\"2026-10-14T14:40:06.992Z\",\"2026-10-14\"],[\"C\",\"152:9b8212b4\"]]",
   "arrows": {
     "ok": true,
     "bad": 0,
