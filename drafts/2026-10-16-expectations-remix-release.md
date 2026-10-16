@@ -23,7 +23,7 @@ The official music video was directed by Bardia Zeinali and features both artist
 
 ![Olivia Rodrigo and Chappell Roan posing on the set of "The Big Expectations Show"](drafts/assets/2026-10-16-expectations-remix-x-photo.jpg)
 
-*Photo: from Olivia Rodrigo's post on X, https://x.com/oliviarodrigo/status/2110884276359319861. Photographer credit to be confirmed before publication.*
+*Photo: Olivia Rodrigo, [oliviarodrigo.com](https://oliviarodrigo.com/). Photographer credit to be confirmed before publication.*
 
 The cover art was shot by Phoenix Johnson. It shows Rodrigo and Roan posing on a vintage convertible in 1980s-style outfits.
 
