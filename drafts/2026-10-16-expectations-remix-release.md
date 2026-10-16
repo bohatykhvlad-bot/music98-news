@@ -3,7 +3,7 @@ title: Olivia Rodrigo and Chappell Roan Release the "expectations" Remix
 type: release
 status: draft
 excerpt: Olivia Rodrigo and Chappell Roan have released a remix of "expectations," a song from Rodrigo's third studio album, You Seem Pretty Sad for a Girl So in Love.
-photo: NOT FOUND (see open items)
+photo: drafts/assets/2026-10-16-expectations-remix-x-photo.jpg (from @oliviarodrigo X post; photographer credit to confirm)
 youtube: https://www.youtube.com/embed/gsZauX8gwxo
 ---
 
@@ -20,6 +20,10 @@ Daniel Nigro produced the remix. He also worked on the original, and he has coll
 https://youtu.be/gsZauX8gwxo
 
 The official music video was directed by Bardia Zeinali and features both artists. The label says Zeinali has also worked with Katseye, Sabrina Carpenter and Doja Cat. The video was released alongside the single.
+
+![Olivia Rodrigo and Chappell Roan posing on the set of "The Big Expectations Show"](drafts/assets/2026-10-16-expectations-remix-x-photo.jpg)
+
+*Photo: from Olivia Rodrigo's post on X, https://x.com/oliviarodrigo/status/2110884276359319861. Photographer credit to be confirmed before publication.*
 
 The cover art was shot by Phoenix Johnson. It shows Rodrigo and Roan posing on a vintage convertible in 1980s-style outfits.
 
