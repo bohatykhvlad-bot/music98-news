@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-15T06:28:39.497Z",
+  "updated": "2026-10-16T06:24:55.205Z",
   "entries": {
     "quebec|drake": {
       "id": "67DgVQlvQ0qilSBN1hdkKN",
@@ -577,6 +577,13 @@
       "name": "Babylon",
       "subtitle": "Taylor Swift",
       "resolvedAt": "2026-10-15T00:07:42.347Z",
+      "matchedFrom": "original-title-search"
+    },
+    "28|zachbryan": {
+      "id": "6dANcQ00uiiWoBDYVrsGvz",
+      "name": "28",
+      "subtitle": "Zach Bryan",
+      "resolvedAt": "2026-10-16T06:23:59.169Z",
       "matchedFrom": "original-title-search"
     }
   }
