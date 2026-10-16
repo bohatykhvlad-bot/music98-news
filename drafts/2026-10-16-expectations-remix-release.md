@@ -2,12 +2,12 @@
 title: Olivia Rodrigo and Chappell Roan Release the "expectations" Remix
 type: release
 status: draft
-excerpt: Olivia Rodrigo and Chappell Roan team up on a remix of "expectations," a song from Rodrigo's third studio album, You Seem Pretty Sad for a Girl So in Love.
+excerpt: Olivia Rodrigo and Chappell Roan have released a remix of "expectations," a song from Rodrigo's third studio album, You Seem Pretty Sad for a Girl So in Love.
 photo: NOT FOUND (see open items)
 youtube: https://www.youtube.com/embed/gsZauX8gwxo
 ---
 
-Olivia Rodrigo and Chappell Roan team up on a remix of "expectations," a song from Rodrigo's third studio album, You Seem Pretty Sad for a Girl So in Love. The single was set for release on Thursday, October 15, through Interscope Records, and it marks the first feature of Roan's career on a song.
+Olivia Rodrigo and Chappell Roan have released a remix of "expectations," a song from Rodrigo's third studio album, You Seem Pretty Sad for a Girl So in Love. The single arrived on Thursday, October 15, through Interscope Records, and it marks the first feature of Roan's career on a song.
 
 The original version of "expectations" came out in June with the album. The record debuted at No. 1 on the Billboard 200 with 485,000 first-week units, according to the label, which called it the biggest solo debut of 2026. The original is a new wave-inspired dance track about setting high standards in relationships. Its lyrics describe a narrator who refuses to settle for a partner who is unreliable or passive, and who has learned from past mistakes.
 
@@ -17,9 +17,9 @@ The two singers have known each other for years. Roan opened a show on Rodrigo's
 
 Daniel Nigro produced the remix. He also worked on the original, and he has collaborated with both artists for years.
 
-{{YOUTUBE_EMBED: https://www.youtube.com/embed/gsZauX8gwxo}}
+https://youtu.be/gsZauX8gwxo
 
-The official music video was directed by Bardia Zeinali and features both artists. The label says Zeinali has also worked with Katseye, Sabrina Carpenter and Doja Cat. The video was announced for the same day as the single.
+The official music video was directed by Bardia Zeinali and features both artists. The label says Zeinali has also worked with Katseye, Sabrina Carpenter and Doja Cat. The video was released alongside the single.
 
 The cover art was shot by Phoenix Johnson. It shows Rodrigo and Roan posing on a vintage convertible in 1980s-style outfits.
 
