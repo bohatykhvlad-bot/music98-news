@@ -1,15 +1,15 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-15T23:53:38.912Z",
-  "chartUpdated": "2026-10-15",
+  "updatedAt": "2026-10-16T06:25:35.791Z",
+  "chartUpdated": "2026-10-16",
   "chartRev": "tri-source-v42",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 44,
+    "apple-feed": 47,
     "previous-audit": 1,
-    "apple-chart": 5
+    "apple-chart": 2
   },
   "entries": {
     "aintinla|adela": {
@@ -29,7 +29,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.160Z",
+      "checkedAt": "2026-10-16T06:25:35.783Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -45,6 +45,72 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "baby|bieberjustinludacris": {
+      "identity": "baby|bieberjustinludacris",
+      "title": "Baby",
+      "artist": "Justin Bieber, Ludacris",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "My World 2.0 (Bonus Track Version)",
+      "releaseArtist": "Justin Bieber",
+      "releaseDate": "2010-01-18T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1440661543?i=1440661545",
+      "collectionId": "1440661543",
+      "trackId": "1440661545",
+      "confidence": 96,
+      "score": 880,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-16T06:25:35.779Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1440661545",
+          "collectionId": "1440661543",
+          "releaseTitle": "My World 2.0 (Bonus Track Version)",
+          "releaseArtist": "Justin Bieber",
+          "releaseDate": "2010-01-18T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1440661543?i=1440661545",
+          "score": 880,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2010
+        },
+        {
+          "provider": "apple",
+          "id": "1440661545",
+          "collectionId": "1440661543",
+          "releaseTitle": "My World 2.0 (Bonus Track Version)",
+          "releaseArtist": "Justin Bieber",
+          "releaseDate": "2010-01-18T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1440661543?i=1440661545",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2010
+        },
+        {
+          "provider": "apple",
+          "id": "1472491703",
+          "collectionId": "1472491692",
+          "releaseTitle": "My World 2.0",
+          "releaseArtist": "Justin Bieber",
+          "releaseDate": "2010-01-18T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7c/74/e0/7c74e0b8-46fe-2211-e59d-037593a87f05/10UMGIM01134.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1472491692?i=1472491703",
+          "score": 755,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2010
         }
       ]
     },
@@ -65,7 +131,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.168Z",
+      "checkedAt": "2026-10-16T06:25:35.781Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -101,7 +167,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.726Z",
+      "checkedAt": "2026-10-16T06:25:29.039Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -117,87 +183,6 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "beautyandabeat|bieberjustinminajnicki": {
-      "identity": "beautyandabeat|bieberjustinminajnicki",
-      "title": "Beauty and a Beat",
-      "artist": "Justin Bieber, Nicki Minaj",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/73/08/1a/73081a96-0f7c-b5f8-2757-5c17fb714323/12UMGIM31899.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Believe (Deluxe Edition)",
-      "releaseArtist": "Justin Bieber",
-      "releaseDate": "2012-06-15T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
-      "collectionId": "1440650852",
-      "trackId": "1440650961",
-      "confidence": 98,
-      "score": 1120,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-15T23:53:30.753Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1440650961",
-          "collectionId": "1440650852",
-          "releaseTitle": "Believe (Deluxe Edition)",
-          "releaseArtist": "Justin Bieber",
-          "releaseDate": "2012-06-15T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/73/08/1a/73081a96-0f7c-b5f8-2757-5c17fb714323/12UMGIM31899.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
-          "score": 1120,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2012
-        },
-        {
-          "provider": "apple",
-          "id": "1440650961",
-          "collectionId": "1440650852",
-          "releaseTitle": "Believe (Deluxe Edition)",
-          "releaseArtist": "Justin Bieber",
-          "releaseDate": "2012-06-15T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/73/08/1a/73081a96-0f7c-b5f8-2757-5c17fb714323/12UMGIM31899.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
-          "score": 995,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2012
-        },
-        {
-          "provider": "apple",
-          "id": "1440805856",
-          "collectionId": "1440804754",
-          "releaseTitle": "Believe",
-          "releaseArtist": "Justin Bieber",
-          "releaseDate": "2012-06-15T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/bd/89/97/bd89971c-fc5a-47dd-5e90-a433d1b9e11f/12UMGIM31898.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1440804754?i=1440805856",
-          "score": 995,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2012
-        },
-        {
-          "provider": "deezer",
-          "id": "37027991",
-          "collectionId": "3602971",
-          "releaseTitle": "Believe (Deluxe Edition)",
-          "releaseArtist": "Justin Bieber",
-          "releaseDate": "2012-06-19",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/312ece7b31fb86c7a13afd757e99437c/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/37027991",
-          "score": 940,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2012
         }
       ]
     },
@@ -218,7 +203,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:24.706Z",
+      "checkedAt": "2026-10-16T06:25:30.895Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -254,7 +239,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.158Z",
+      "checkedAt": "2026-10-16T06:25:30.897Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -290,7 +275,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.166Z",
+      "checkedAt": "2026-10-16T06:25:31.536Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -326,7 +311,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.167Z",
+      "checkedAt": "2026-10-16T06:25:31.539Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -362,7 +347,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.161Z",
+      "checkedAt": "2026-10-16T06:25:31.534Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -398,7 +383,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.729Z",
+      "checkedAt": "2026-10-16T06:25:29.040Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -434,7 +419,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.159Z",
+      "checkedAt": "2026-10-16T06:25:35.780Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -470,7 +455,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.733Z",
+      "checkedAt": "2026-10-16T06:25:29.044Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -506,7 +491,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.161Z",
+      "checkedAt": "2026-10-16T06:25:30.899Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -522,102 +507,6 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "diewithasmile|brunogagaladymars": {
-      "identity": "diewithasmile|brunogagaladymars",
-      "title": "Die With A Smile",
-      "artist": "Lady Gaga & Bruno Mars",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/ae/f2/11aef294-f57c-bab9-c9fc-529162984e62/24UMGIM85348.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Die With A Smile - Single",
-      "releaseArtist": "Lady Gaga & Bruno Mars",
-      "releaseDate": "2024-08-16T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/1762656724?i=1762656732",
-      "collectionId": "1762656724",
-      "trackId": "1762656732",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-15T23:53:38.338Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1762656732",
-          "collectionId": "1762656724",
-          "releaseTitle": "Die With A Smile - Single",
-          "releaseArtist": "Lady Gaga & Bruno Mars",
-          "releaseDate": "2024-08-16T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/ae/f2/11aef294-f57c-bab9-c9fc-529162984e62/24UMGIM85348.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1762656724?i=1762656732",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1762656732",
-          "collectionId": "1762656724",
-          "releaseTitle": "Die With A Smile - Single",
-          "releaseArtist": "Lady Gaga & Bruno Mars",
-          "releaseDate": "2024-08-16T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/ae/f2/11aef294-f57c-bab9-c9fc-529162984e62/24UMGIM85348.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1762656724?i=1762656732",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "deezer",
-          "id": "2947516331",
-          "collectionId": "629506181",
-          "releaseTitle": "Die With A Smile",
-          "releaseArtist": "Lady Gaga",
-          "releaseDate": "2024-08-16",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/4bd5903f4ce8f2601916bfadb44efe8a/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/2947516331",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1792667027",
-          "collectionId": "1792666546",
-          "releaseTitle": "MAYHEM",
-          "releaseArtist": "Lady Gaga",
-          "releaseDate": "2024-08-16T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/be/11/d1/be11d187-1aeb-99f3-01c5-597ed65cdb6a/25UMGIM07433.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1792666546?i=1792667027",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1837311222",
-          "collectionId": "1837310866",
-          "releaseTitle": "MAYHEM",
-          "releaseArtist": "Lady Gaga",
-          "releaseDate": "2024-08-16T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c5/43/8b/c5438b81-75e8-3a0a-05ee-4f29ae0b9bb3/25UMGIM07433.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1837310866?i=1837311222",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
         }
       ]
     },
@@ -638,7 +527,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.170Z",
+      "checkedAt": "2026-10-16T06:25:35.780Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -654,102 +543,6 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2025
-        }
-      ]
-    },
-    "dropdead|oliviarodrigo": {
-      "identity": "dropdead|oliviarodrigo",
-      "title": "drop dead",
-      "artist": "Olivia Rodrigo",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/b0/f1/1eb0f1d8-84e4-3a66-be48-133f330b0153/26UMGIM21837.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "drop dead (singalong pack) - Single",
-      "releaseArtist": "Olivia Rodrigo",
-      "releaseDate": "2026-04-16T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/1894362510?i=1894362511",
-      "collectionId": "1894362510",
-      "trackId": "1894362511",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-15T23:53:38.909Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1894362511",
-          "collectionId": "1894362510",
-          "releaseTitle": "drop dead (singalong pack) - Single",
-          "releaseArtist": "Olivia Rodrigo",
-          "releaseDate": "2026-04-16T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/b0/f1/1eb0f1d8-84e4-3a66-be48-133f330b0153/26UMGIM21837.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1894362510?i=1894362511",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "1894362511",
-          "collectionId": "1894362510",
-          "releaseTitle": "drop dead (singalong pack) - Single",
-          "releaseArtist": "Olivia Rodrigo",
-          "releaseDate": "2026-04-16T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/b0/f1/1eb0f1d8-84e4-3a66-be48-133f330b0153/26UMGIM21837.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1894362510?i=1894362511",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "1894362512",
-          "collectionId": "1894362510",
-          "releaseTitle": "drop dead (singalong pack) - Single",
-          "releaseArtist": "Olivia Rodrigo",
-          "releaseDate": "2026-04-17T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/b0/f1/1eb0f1d8-84e4-3a66-be48-133f330b0153/26UMGIM21837.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1894362510?i=1894362512",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6762380193",
-          "collectionId": "1893996068",
-          "releaseTitle": "drop dead - Single",
-          "releaseArtist": "Olivia Rodrigo",
-          "releaseDate": "2026-04-16T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/36/57/6b/36576b81-785b-d02c-00ed-d7362fec7688/26UMGIM21837.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1893996068?i=6762380193",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
-        },
-        {
-          "provider": "apple",
-          "id": "6762687190",
-          "collectionId": "1894963246",
-          "releaseTitle": "drop dead (itunes limited cover) - Single",
-          "releaseArtist": "Olivia Rodrigo",
-          "releaseDate": "2026-04-16T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/9d/2d/b0/9d2db0d2-3656-6cf4-7c4c-21901f3d12f6/26UMGIM48177.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1894963246?i=6762687190",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2026
         }
       ]
     },
@@ -770,7 +563,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.160Z",
+      "checkedAt": "2026-10-16T06:25:30.897Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -786,6 +579,42 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2017
+        }
+      ]
+    },
+    "frozen|babylil": {
+      "identity": "frozen|babylil",
+      "title": "Frozen",
+      "artist": "Lil Baby",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/4c/5c/d2/4c5cd2e1-2244-2527-3ea3-2003ee734428/22UMGIM45519.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "Frozen - Single",
+      "releaseArtist": "Lil Baby",
+      "releaseDate": "2022-04-29T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/1621207919?i=1621207921",
+      "collectionId": "1621207919",
+      "trackId": "1621207921",
+      "confidence": 99,
+      "score": 1350,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-16T06:25:35.784Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "1621207921",
+          "collectionId": "1621207919",
+          "releaseTitle": "Frozen - Single",
+          "releaseArtist": "Lil Baby",
+          "releaseDate": "2022-04-29T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/4c/5c/d2/4c5cd2e1-2244-2527-3ea3-2003ee734428/22UMGIM45519.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1621207919?i=1621207921",
+          "score": 1350,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2022
         }
       ]
     },
@@ -806,7 +635,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.169Z",
+      "checkedAt": "2026-10-16T06:25:35.781Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -842,7 +671,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.733Z",
+      "checkedAt": "2026-10-16T06:25:30.899Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -878,7 +707,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.168Z",
+      "checkedAt": "2026-10-16T06:25:35.785Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -914,7 +743,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.158Z",
+      "checkedAt": "2026-10-16T06:25:30.896Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -930,6 +759,78 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "ihadsomehelp|malonemorganpostwallen": {
+      "identity": "ihadsomehelp|malonemorganpostwallen",
+      "title": "I Had Some Help",
+      "artist": "Post Malone, Morgan Wallen",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e1/b7/09/e1b7098f-d6e1-2b18-fd6f-8390110908eb/24UMGIM50612.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "I Had Some Help (feat. Morgan Wallen) - Single",
+      "releaseArtist": "Post Malone",
+      "releaseDate": "2024-05-10T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/1744439045?i=1744439049",
+      "collectionId": "1744439045",
+      "trackId": "1744439049",
+      "confidence": 99,
+      "score": 1350,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-16T06:25:35.788Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "1744439049",
+          "collectionId": "1744439045",
+          "releaseTitle": "I Had Some Help (feat. Morgan Wallen) - Single",
+          "releaseArtist": "Post Malone",
+          "releaseDate": "2024-05-10T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e1/b7/09/e1b7098f-d6e1-2b18-fd6f-8390110908eb/24UMGIM50612.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1744439045?i=1744439049",
+          "score": 1350,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        }
+      ]
+    },
+    "imdatna|future": {
+      "identity": "imdatna|future",
+      "title": "I'M DAT N***A",
+      "artist": "Future",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/65/f2/06/65f2067b-a8ea-239c-c219-8e0f0282dcea/196589073693.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "I NEVER LIKED YOU",
+      "releaseArtist": "Future",
+      "releaseDate": "2022-04-29T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1621119097?i=1621119426",
+      "collectionId": "1621119097",
+      "trackId": "1621119426",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-16T06:25:35.783Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "1621119426",
+          "collectionId": "1621119097",
+          "releaseTitle": "I NEVER LIKED YOU",
+          "releaseArtist": "Future",
+          "releaseDate": "2022-04-29T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/65/f2/06/65f2067b-a8ea-239c-c219-8e0f0282dcea/196589073693.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1621119097?i=1621119426",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2022
         }
       ]
     },
@@ -950,7 +851,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.163Z",
+      "checkedAt": "2026-10-16T06:25:31.534Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -986,7 +887,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.167Z",
+      "checkedAt": "2026-10-16T06:25:31.535Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1022,7 +923,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.162Z",
+      "checkedAt": "2026-10-16T06:25:30.898Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1058,7 +959,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.731Z",
+      "checkedAt": "2026-10-16T06:25:29.042Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1074,6 +975,42 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "justincase|morganwallen": {
+      "identity": "justincase|morganwallen",
+      "title": "Just In Case",
+      "artist": "Morgan Wallen",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "I’m The Problem",
+      "releaseArtist": "Morgan Wallen",
+      "releaseDate": "2025-03-21T07:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1802103958?i=1802103977",
+      "collectionId": "1802103958",
+      "trackId": "1802103977",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-16T06:25:35.785Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "1802103977",
+          "collectionId": "1802103958",
+          "releaseTitle": "I’m The Problem",
+          "releaseArtist": "Morgan Wallen",
+          "releaseDate": "2025-03-21T07:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1802103958?i=1802103977",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2025
         }
       ]
     },
@@ -1094,7 +1031,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:30.755Z",
+      "checkedAt": "2026-10-16T06:25:35.780Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1130,7 +1067,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:24.705Z",
+      "checkedAt": "2026-10-16T06:25:30.895Z",
       "alternatives": []
     },
     "likeme|42babyduggfuturelil": {
@@ -1150,7 +1087,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.169Z",
+      "checkedAt": "2026-10-16T06:25:31.538Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1186,7 +1123,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.157Z",
+      "checkedAt": "2026-10-16T06:25:31.533Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1252,7 +1189,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:30.756Z",
+      "checkedAt": "2026-10-16T06:25:35.781Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1288,7 +1225,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:30.755Z",
+      "checkedAt": "2026-10-16T06:25:35.782Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1324,7 +1261,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.166Z",
+      "checkedAt": "2026-10-16T06:25:35.782Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1360,7 +1297,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.727Z",
+      "checkedAt": "2026-10-16T06:25:29.041Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1396,7 +1333,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:38.339Z",
+      "checkedAt": "2026-10-16T06:25:35.787Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1412,78 +1349,6 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2024
-        }
-      ]
-    },
-    "orbiter|kahannoah": {
-      "identity": "orbiter|kahannoah",
-      "title": "Orbiter",
-      "artist": "Noah Kahan",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f9/aa/69/f9aa6992-40ca-a756-85ca-b27c48f7c720/26UMGIM02802.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
-      "releaseTitle": "The Great Divide: The Last Of The Bugs",
-      "releaseArtist": "Noah Kahan",
-      "releaseDate": "2026-04-25T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1894997820?i=6762757958",
-      "collectionId": "1894997820",
-      "trackId": "6762757958",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-15T23:53:38.910Z",
-      "alternatives": [
-        {
-          "provider": "apple-feed",
-          "id": "6762757958",
-          "collectionId": "1894997820",
-          "releaseTitle": "The Great Divide: The Last Of The Bugs",
-          "releaseArtist": "Noah Kahan",
-          "releaseDate": "2026-04-25T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f9/aa/69/f9aa6992-40ca-a756-85ca-b27c48f7c720/26UMGIM02802.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1894997820?i=6762757958",
-          "score": 1270,
-          "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "passionfruit|drake": {
-      "identity": "passionfruit|drake",
-      "title": "Passionfruit",
-      "artist": "Drake",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/71/97/d0/7197d021-de0f-9548-3f31-40b8294d3242/17UMGIM85032.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
-      "releaseTitle": "More Life",
-      "releaseArtist": "Drake",
-      "releaseDate": "2017-03-18T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1440890708?i=1440891494",
-      "collectionId": "1440890708",
-      "trackId": "1440891494",
-      "confidence": 99,
-      "score": 1380,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-15T23:53:38.339Z",
-      "alternatives": [
-        {
-          "provider": "apple-feed",
-          "id": "1440891494",
-          "collectionId": "1440890708",
-          "releaseTitle": "More Life",
-          "releaseArtist": "Drake",
-          "releaseDate": "2017-03-18T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/71/97/d0/7197d021-de0f-9548-3f31-40b8294d3242/17UMGIM85032.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1440890708?i=1440891494",
-          "score": 1380,
-          "confidence": 99,
-          "consensus": 1,
-          "earliestReleaseYear": 2017
         }
       ]
     },
@@ -1504,7 +1369,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.730Z",
+      "checkedAt": "2026-10-16T06:25:29.042Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1540,7 +1405,7 @@
       "score": 1210,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.166Z",
+      "checkedAt": "2026-10-16T06:25:31.537Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1576,7 +1441,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:38.909Z",
+      "checkedAt": "2026-10-16T06:25:35.788Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1612,7 +1477,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.732Z",
+      "checkedAt": "2026-10-16T06:25:29.041Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1648,7 +1513,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.164Z",
+      "checkedAt": "2026-10-16T06:25:31.538Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1684,7 +1549,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.165Z",
+      "checkedAt": "2026-10-16T06:25:31.537Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1720,7 +1585,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.731Z",
+      "checkedAt": "2026-10-16T06:25:29.040Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1756,7 +1621,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.730Z",
+      "checkedAt": "2026-10-16T06:25:29.044Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1792,7 +1657,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.165Z",
+      "checkedAt": "2026-10-16T06:25:35.786Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1828,7 +1693,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:52:59.729Z",
+      "checkedAt": "2026-10-16T06:25:29.045Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1844,102 +1709,6 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2026
-        }
-      ]
-    },
-    "thefateofophelia|swifttaylor": {
-      "identity": "thefateofophelia|swifttaylor",
-      "title": "The Fate of Ophelia",
-      "artist": "Taylor Swift",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2d/46/e0/2d46e0bc-8ab9-85dd-4b56-ee6951351034/25UM1IM19577.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "The Life of a Showgirl",
-      "releaseArtist": "Taylor Swift",
-      "releaseDate": "2025-10-03T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1833328839?i=1833328840",
-      "collectionId": "1833328839",
-      "trackId": "1833328840",
-      "confidence": 98,
-      "score": 1010,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-15T23:53:32.651Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1833328840",
-          "collectionId": "1833328839",
-          "releaseTitle": "The Life of a Showgirl",
-          "releaseArtist": "Taylor Swift",
-          "releaseDate": "2025-10-03T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2d/46/e0/2d46e0bc-8ab9-85dd-4b56-ee6951351034/25UM1IM19577.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1833328839?i=1833328840",
-          "score": 1010,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "1838810951",
-          "collectionId": "1838810949",
-          "releaseTitle": "The Life of a Showgirl",
-          "releaseArtist": "Taylor Swift",
-          "releaseDate": "2025-10-03T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/8f/a9/588fa9a2-7cc5-f02c-9ce6-c986e0dc1c15/25UM1IM19577.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1838810949?i=1838810951",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "1842897454",
-          "collectionId": "1842897453",
-          "releaseTitle": "The Life of a Showgirl",
-          "releaseArtist": "Taylor Swift",
-          "releaseDate": "2025-10-03T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/30/0c/5a/300c5a57-d3be-a170-f880-f63380ca6312/25UM1IM19577.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1842897453?i=1842897454",
-          "score": 885,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "deezer",
-          "id": "3579685431",
-          "collectionId": "829966251",
-          "releaseTitle": "The Life of a Showgirl",
-          "releaseArtist": "Taylor Swift",
-          "releaseDate": "2025-10-03",
-          "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/d0bed55a0efb3c5c3ddb3dacda67d9b3/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3579685431",
-          "score": 830,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "1849771459",
-          "collectionId": "1849771329",
-          "releaseTitle": "The Fate of Ophelia - Single",
-          "releaseArtist": "Taylor Swift",
-          "releaseDate": "2025-10-03T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/be/b7/b4/beb7b462-abe6-c719-79c1-e0691fe446db/25UM1IM74070.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1849771329?i=1849771459",
-          "score": 725,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2025
         }
       ]
     },
@@ -1960,7 +1729,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.159Z",
+      "checkedAt": "2026-10-16T06:25:30.896Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1976,6 +1745,42 @@
           "confidence": 99,
           "consensus": 1,
           "earliestReleaseYear": 2022
+        }
+      ]
+    },
+    "wantsandneeds|babydrakelil": {
+      "identity": "wantsandneeds|babydrakelil",
+      "title": "Wants and Needs",
+      "artist": "Drake, Lil Baby",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/63/2a/34/632a3488-d104-3ff1-dc02-4ed86f58ed05/21UMGIM18577.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "Scary Hours 2",
+      "releaseArtist": "Drake",
+      "releaseDate": "2021-03-05T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1556669854?i=1556670532",
+      "collectionId": "1556669854",
+      "trackId": "1556670532",
+      "confidence": 99,
+      "score": 1380,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-16T06:25:35.786Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "1556670532",
+          "collectionId": "1556669854",
+          "releaseTitle": "Scary Hours 2",
+          "releaseArtist": "Drake",
+          "releaseDate": "2021-03-05T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/63/2a/34/632a3488-d104-3ff1-dc02-4ed86f58ed05/21UMGIM18577.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1556669854?i=1556670532",
+          "score": 1380,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2021
         }
       ]
     },
@@ -1996,7 +1801,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:26.161Z",
+      "checkedAt": "2026-10-16T06:25:30.898Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -2032,7 +1837,7 @@
       "score": 1210,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-15T23:53:32.652Z",
+      "checkedAt": "2026-10-16T06:25:35.784Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -4366,72 +4171,6 @@
           "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2024
-        }
-      ]
-    },
-    "baby|bieberjustinludacris": {
-      "identity": "baby|bieberjustinludacris",
-      "title": "Baby",
-      "artist": "Justin Bieber, Ludacris",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "My World 2.0 (Bonus Track Version)",
-      "releaseArtist": "Justin Bieber",
-      "releaseDate": "2010-01-18T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1440661543?i=1440661545",
-      "collectionId": "1440661543",
-      "trackId": "1440661545",
-      "confidence": 96,
-      "score": 880,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-10T09:39:24.235Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1440661545",
-          "collectionId": "1440661543",
-          "releaseTitle": "My World 2.0 (Bonus Track Version)",
-          "releaseArtist": "Justin Bieber",
-          "releaseDate": "2010-01-18T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1440661543?i=1440661545",
-          "score": 880,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 2010
-        },
-        {
-          "provider": "apple",
-          "id": "1440661545",
-          "collectionId": "1440661543",
-          "releaseTitle": "My World 2.0 (Bonus Track Version)",
-          "releaseArtist": "Justin Bieber",
-          "releaseDate": "2010-01-18T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/b9/0a/b4/b90ab45a-07b1-0bcc-331c-c496a21d07e4/10UMGIM01134.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1440661543?i=1440661545",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2010
-        },
-        {
-          "provider": "apple",
-          "id": "1472491703",
-          "collectionId": "1472491692",
-          "releaseTitle": "My World 2.0",
-          "releaseArtist": "Justin Bieber",
-          "releaseDate": "2010-01-18T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/7c/74/e0/7c74e0b8-46fe-2211-e59d-037593a87f05/10UMGIM01134.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1472491692?i=1472491703",
-          "score": 755,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2010
         }
       ]
     },
@@ -7297,72 +7036,6 @@
         }
       ]
     },
-    "frozen|babylil": {
-      "identity": "frozen|babylil",
-      "title": "Frozen",
-      "artist": "Lil Baby",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/4c/5c/d2/4c5cd2e1-2244-2527-3ea3-2003ee734428/22UMGIM45519.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "Frozen - Single",
-      "releaseArtist": "Lil Baby",
-      "releaseDate": "2022-04-29T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/1621207919?i=1621207921",
-      "collectionId": "1621207919",
-      "trackId": "1621207921",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-14T14:41:48.387Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1621207921",
-          "collectionId": "1621207919",
-          "releaseTitle": "Frozen - Single",
-          "releaseArtist": "Lil Baby",
-          "releaseDate": "2022-04-29T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/4c/5c/d2/4c5cd2e1-2244-2527-3ea3-2003ee734428/22UMGIM45519.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1621207919?i=1621207921",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2022
-        },
-        {
-          "provider": "apple",
-          "id": "1621203172",
-          "collectionId": "1621203171",
-          "releaseTitle": "Frozen - Single",
-          "releaseArtist": "Lil Baby",
-          "releaseDate": "2022-04-29T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/97/d9/62/97d9621a-fd66-c72d-3741-5bcb56a256b9/22UMGIM45520.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1621203171?i=1621203172",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2022
-        },
-        {
-          "provider": "deezer",
-          "id": "1732597017",
-          "collectionId": "313987597",
-          "releaseTitle": "Frozen",
-          "releaseArtist": "Lil Baby",
-          "releaseDate": "2022-01-16",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/65d905e4cba4a3a44bb4ea946d5b0303/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/1732597017",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2022
-        }
-      ]
-    },
     "girlsneedlove|summerwalker": {
       "identity": "girlsneedlove|summerwalker",
       "title": "Girls Need Love",
@@ -7441,249 +7114,6 @@
           "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2018
-        }
-      ]
-    },
-    "ihadsomehelp|malonemorganpostwallen": {
-      "identity": "ihadsomehelp|malonemorganpostwallen",
-      "title": "I Had Some Help",
-      "artist": "Post Malone, Morgan Wallen",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e1/b7/09/e1b7098f-d6e1-2b18-fd6f-8390110908eb/24UMGIM50612.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "I Had Some Help (feat. Morgan Wallen) - Single",
-      "releaseArtist": "Post Malone",
-      "releaseDate": "2024-05-10T12:00:00Z",
-      "releaseClass": "dedicated",
-      "url": "https://music.apple.com/us/album/1744439045?i=1744439049",
-      "collectionId": "1744439045",
-      "trackId": "1744439049",
-      "confidence": 98,
-      "score": 1090,
-      "consensus": 2,
-      "verified": true,
-      "checkedAt": "2026-10-14T14:41:57.857Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1744439049",
-          "collectionId": "1744439045",
-          "releaseTitle": "I Had Some Help (feat. Morgan Wallen) - Single",
-          "releaseArtist": "Post Malone",
-          "releaseDate": "2024-05-10T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/e1/b7/09/e1b7098f-d6e1-2b18-fd6f-8390110908eb/24UMGIM50612.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1744439045?i=1744439049",
-          "score": 1090,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1744452425",
-          "collectionId": "1744452421",
-          "releaseTitle": "I Had Some Help (feat. Morgan Wallen) - Single",
-          "releaseArtist": "Post Malone",
-          "releaseDate": "2024-05-10T12:00:00Z",
-          "releaseClass": "dedicated",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/84/df/b9/84dfb96b-27c8-4d40-4780-b65ff22790e4/24UMGIM50612.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1744452421?i=1744452425",
-          "score": 965,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "deezer",
-          "id": "2780753191",
-          "collectionId": "581268421",
-          "releaseTitle": "I Had Some Help",
-          "releaseArtist": "Post Malone",
-          "releaseDate": "2024-05-10",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/b9c8cc4fd597a9bc516445e6573501cf/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/2780753191",
-          "score": 910,
-          "confidence": 98,
-          "consensus": 2,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1752536590",
-          "collectionId": "1752536575",
-          "releaseTitle": "F-1 Trillion",
-          "releaseArtist": "Post Malone",
-          "releaseDate": "2024-05-10T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/0e/7c/29/0e7c29f4-74ec-e234-cc49-9212a5c0f847/24UMGIM60824.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1752536575?i=1752536590",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        },
-        {
-          "provider": "apple",
-          "id": "1762454469",
-          "collectionId": "1762454246",
-          "releaseTitle": "F-1 Trillion (Long Bed)",
-          "releaseArtist": "Post Malone",
-          "releaseDate": "2024-05-10T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/b7/24/79b724d8-c248-8d5b-07d1-4c8c341fe983/24UMGIM86335.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1762454246?i=1762454469",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2024
-        }
-      ]
-    },
-    "imdatna|future": {
-      "identity": "imdatna|future",
-      "title": "I'M DAT N***A",
-      "artist": "Future",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/65/f2/06/65f2067b-a8ea-239c-c219-8e0f0282dcea/196589073693.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "I NEVER LIKED YOU",
-      "releaseArtist": "Future",
-      "releaseDate": "2022-04-29T12:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1621119097?i=1621119426",
-      "collectionId": "1621119097",
-      "trackId": "1621119426",
-      "confidence": 96,
-      "score": 770,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-14T14:41:42.994Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1621119426",
-          "collectionId": "1621119097",
-          "releaseTitle": "I NEVER LIKED YOU",
-          "releaseArtist": "Future",
-          "releaseDate": "2022-04-29T12:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/65/f2/06/65f2067b-a8ea-239c-c219-8e0f0282dcea/196589073693.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1621119097?i=1621119426",
-          "score": 770,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 2022
-        },
-        {
-          "provider": "apple",
-          "id": "1621610734",
-          "collectionId": "1621610722",
-          "releaseTitle": "I NEVER LIKED YOU",
-          "releaseArtist": "Future",
-          "releaseDate": "2022-04-29T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c8/4c/fa/c84cfa03-1916-89f1-5362-03425fbe2ff9/196589073709.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1621610722?i=1621610734",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2022
-        },
-        {
-          "provider": "apple",
-          "id": "1622286556",
-          "collectionId": "1622286552",
-          "releaseTitle": "I NEVER LIKED YOU",
-          "releaseArtist": "Future",
-          "releaseDate": "2022-04-29T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/f1/22/fa/f122fa93-684a-8762-6fe9-27014da7b979/196589131812.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1622286552?i=1622286556",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2022
-        }
-      ]
-    },
-    "justincase|morganwallen": {
-      "identity": "justincase|morganwallen",
-      "title": "Just In Case",
-      "artist": "Morgan Wallen",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-chart",
-      "releaseTitle": "I’m The Problem",
-      "releaseArtist": "Morgan Wallen",
-      "releaseDate": "2025-03-21T07:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1802103958?i=1802103977",
-      "collectionId": "1802103958",
-      "trackId": "1802103977",
-      "confidence": 96,
-      "score": 770,
-      "consensus": 1,
-      "verified": true,
-      "checkedAt": "2026-10-14T14:41:54.419Z",
-      "alternatives": [
-        {
-          "provider": "apple-chart",
-          "id": "1802103977",
-          "collectionId": "1802103958",
-          "releaseTitle": "I’m The Problem",
-          "releaseArtist": "Morgan Wallen",
-          "releaseDate": "2025-03-21T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1802103958?i=1802103977",
-          "score": 770,
-          "confidence": 96,
-          "consensus": 1,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "deezer",
-          "id": "3278152451",
-          "collectionId": "727297031",
-          "releaseTitle": "Just In Case",
-          "releaseArtist": "Morgan Wallen",
-          "releaseDate": "2025-03-21",
-          "releaseClass": "dedicated",
-          "art": "https://cdn-images.dzcdn.net/images/cover/22c6d080209e45ef58cca3596bf95e71/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/3278152451",
-          "score": 670,
-          "confidence": 91,
-          "consensus": 1,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "1802103915",
-          "collectionId": "1802103906",
-          "releaseTitle": "I’m The Problem",
-          "releaseArtist": "Morgan Wallen",
-          "releaseDate": "2025-03-21T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/fa/60/fe/fa60fe4a-4329-a0bb-eb7c-3b6094a4d831/25UMGIM46049.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1802103906?i=1802103915",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2025
-        },
-        {
-          "provider": "apple",
-          "id": "1802103977",
-          "collectionId": "1802103958",
-          "releaseTitle": "I’m The Problem",
-          "releaseArtist": "Morgan Wallen",
-          "releaseDate": "2025-03-21T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/1e/ef/26/1eef2600-29f4-5423-3052-26874afd2947/25UMGIM46050.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1802103958?i=1802103977",
-          "score": 645,
-          "confidence": 94,
-          "consensus": 1,
-          "earliestReleaseYear": 2025
         }
       ]
     },
@@ -7819,69 +7249,348 @@
         }
       ]
     },
-    "wantsandneeds|babydrakelil": {
-      "identity": "wantsandneeds|babydrakelil",
-      "title": "Wants and Needs",
-      "artist": "Drake, Lil Baby",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/63/2a/34/632a3488-d104-3ff1-dc02-4ed86f58ed05/21UMGIM18577.rgb.jpg/600x600bb.jpg",
+    "beautyandabeat|bieberjustinminajnicki": {
+      "identity": "beautyandabeat|bieberjustinminajnicki",
+      "title": "Beauty and a Beat",
+      "artist": "Justin Bieber, Nicki Minaj",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/73/08/1a/73081a96-0f7c-b5f8-2757-5c17fb714323/12UMGIM31899.rgb.jpg/600x600bb.jpg",
       "provider": "apple-chart",
-      "releaseTitle": "Scary Hours 2",
-      "releaseArtist": "Drake",
-      "releaseDate": "2021-03-05T12:00:00Z",
+      "releaseTitle": "Believe (Deluxe Edition)",
+      "releaseArtist": "Justin Bieber",
+      "releaseDate": "2012-06-15T12:00:00Z",
       "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1556669854?i=1556670532",
-      "collectionId": "1556669854",
-      "trackId": "1556670532",
+      "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
+      "collectionId": "1440650852",
+      "trackId": "1440650961",
       "confidence": 98,
       "score": 1120,
       "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-14T14:41:55.265Z",
+      "checkedAt": "2026-10-15T23:53:30.753Z",
       "alternatives": [
         {
           "provider": "apple-chart",
-          "id": "1556670532",
-          "collectionId": "1556669854",
-          "releaseTitle": "Scary Hours 2",
-          "releaseArtist": "Drake",
-          "releaseDate": "2021-03-05T12:00:00Z",
+          "id": "1440650961",
+          "collectionId": "1440650852",
+          "releaseTitle": "Believe (Deluxe Edition)",
+          "releaseArtist": "Justin Bieber",
+          "releaseDate": "2012-06-15T12:00:00Z",
           "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/63/2a/34/632a3488-d104-3ff1-dc02-4ed86f58ed05/21UMGIM18577.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1556669854?i=1556670532",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/73/08/1a/73081a96-0f7c-b5f8-2757-5c17fb714323/12UMGIM31899.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
           "score": 1120,
           "confidence": 98,
           "consensus": 2,
-          "earliestReleaseYear": 2021
+          "earliestReleaseYear": 2012
         },
         {
           "provider": "apple",
-          "id": "1556658055",
-          "collectionId": "1556657246",
-          "releaseTitle": "Scary Hours 2",
-          "releaseArtist": "Drake",
-          "releaseDate": "2021-03-05T12:00:00Z",
+          "id": "1440650961",
+          "collectionId": "1440650852",
+          "releaseTitle": "Believe (Deluxe Edition)",
+          "releaseArtist": "Justin Bieber",
+          "releaseDate": "2012-06-15T12:00:00Z",
           "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/9f/e2/93/9fe2935e-da8e-8951-26cc-3454c52a2831/21UMGIM18577.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1556657246?i=1556658055",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/73/08/1a/73081a96-0f7c-b5f8-2757-5c17fb714323/12UMGIM31899.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1440650852?i=1440650961",
           "score": 995,
           "confidence": 98,
           "consensus": 2,
-          "earliestReleaseYear": 2021
+          "earliestReleaseYear": 2012
+        },
+        {
+          "provider": "apple",
+          "id": "1440805856",
+          "collectionId": "1440804754",
+          "releaseTitle": "Believe",
+          "releaseArtist": "Justin Bieber",
+          "releaseDate": "2012-06-15T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/bd/89/97/bd89971c-fc5a-47dd-5e90-a433d1b9e11f/12UMGIM31898.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1440804754?i=1440805856",
+          "score": 995,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2012
         },
         {
           "provider": "deezer",
-          "id": "1265229662",
-          "collectionId": "212457792",
-          "releaseTitle": "Scary Hours 2",
-          "releaseArtist": "Drake",
-          "releaseDate": "2021-03-05",
+          "id": "37027991",
+          "collectionId": "3602971",
+          "releaseTitle": "Believe (Deluxe Edition)",
+          "releaseArtist": "Justin Bieber",
+          "releaseDate": "2012-06-19",
           "releaseClass": "album",
-          "art": "https://cdn-images.dzcdn.net/images/cover/14fddd3675b7aeeab18d58b1d46acf92/1000x1000-000000-80-0-0.jpg",
-          "url": "https://www.deezer.com/track/1265229662",
+          "art": "https://cdn-images.dzcdn.net/images/cover/312ece7b31fb86c7a13afd757e99437c/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/37027991",
           "score": 940,
           "confidence": 98,
           "consensus": 2,
-          "earliestReleaseYear": 2021
+          "earliestReleaseYear": 2012
+        }
+      ]
+    },
+    "diewithasmile|brunogagaladymars": {
+      "identity": "diewithasmile|brunogagaladymars",
+      "title": "Die With A Smile",
+      "artist": "Lady Gaga & Bruno Mars",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/ae/f2/11aef294-f57c-bab9-c9fc-529162984e62/24UMGIM85348.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "Die With A Smile - Single",
+      "releaseArtist": "Lady Gaga & Bruno Mars",
+      "releaseDate": "2024-08-16T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/1762656724?i=1762656732",
+      "collectionId": "1762656724",
+      "trackId": "1762656732",
+      "confidence": 98,
+      "score": 1090,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-15T23:53:38.338Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1762656732",
+          "collectionId": "1762656724",
+          "releaseTitle": "Die With A Smile - Single",
+          "releaseArtist": "Lady Gaga & Bruno Mars",
+          "releaseDate": "2024-08-16T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/ae/f2/11aef294-f57c-bab9-c9fc-529162984e62/24UMGIM85348.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1762656724?i=1762656732",
+          "score": 1090,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1762656732",
+          "collectionId": "1762656724",
+          "releaseTitle": "Die With A Smile - Single",
+          "releaseArtist": "Lady Gaga & Bruno Mars",
+          "releaseDate": "2024-08-16T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/11/ae/f2/11aef294-f57c-bab9-c9fc-529162984e62/24UMGIM85348.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1762656724?i=1762656732",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "deezer",
+          "id": "2947516331",
+          "collectionId": "629506181",
+          "releaseTitle": "Die With A Smile",
+          "releaseArtist": "Lady Gaga",
+          "releaseDate": "2024-08-16",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/4bd5903f4ce8f2601916bfadb44efe8a/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/2947516331",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1792667027",
+          "collectionId": "1792666546",
+          "releaseTitle": "MAYHEM",
+          "releaseArtist": "Lady Gaga",
+          "releaseDate": "2024-08-16T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/be/11/d1/be11d187-1aeb-99f3-01c5-597ed65cdb6a/25UMGIM07433.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1792666546?i=1792667027",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        },
+        {
+          "provider": "apple",
+          "id": "1837311222",
+          "collectionId": "1837310866",
+          "releaseTitle": "MAYHEM",
+          "releaseArtist": "Lady Gaga",
+          "releaseDate": "2024-08-16T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/c5/43/8b/c5438b81-75e8-3a0a-05ee-4f29ae0b9bb3/25UMGIM07433.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1837310866?i=1837311222",
+          "score": 645,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2024
+        }
+      ]
+    },
+    "orbiter|kahannoah": {
+      "identity": "orbiter|kahannoah",
+      "title": "Orbiter",
+      "artist": "Noah Kahan",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f9/aa/69/f9aa6992-40ca-a756-85ca-b27c48f7c720/26UMGIM02802.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "The Great Divide: The Last Of The Bugs",
+      "releaseArtist": "Noah Kahan",
+      "releaseDate": "2026-04-25T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1894997820?i=6762757958",
+      "collectionId": "1894997820",
+      "trackId": "6762757958",
+      "confidence": 99,
+      "score": 1270,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-15T23:53:38.910Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "6762757958",
+          "collectionId": "1894997820",
+          "releaseTitle": "The Great Divide: The Last Of The Bugs",
+          "releaseArtist": "Noah Kahan",
+          "releaseDate": "2026-04-25T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f9/aa/69/f9aa6992-40ca-a756-85ca-b27c48f7c720/26UMGIM02802.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1894997820?i=6762757958",
+          "score": 1270,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        }
+      ]
+    },
+    "passionfruit|drake": {
+      "identity": "passionfruit|drake",
+      "title": "Passionfruit",
+      "artist": "Drake",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/71/97/d0/7197d021-de0f-9548-3f31-40b8294d3242/17UMGIM85032.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-feed",
+      "releaseTitle": "More Life",
+      "releaseArtist": "Drake",
+      "releaseDate": "2017-03-18T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1440890708?i=1440891494",
+      "collectionId": "1440890708",
+      "trackId": "1440891494",
+      "confidence": 99,
+      "score": 1380,
+      "consensus": 1,
+      "verified": true,
+      "checkedAt": "2026-10-15T23:53:38.339Z",
+      "alternatives": [
+        {
+          "provider": "apple-feed",
+          "id": "1440891494",
+          "collectionId": "1440890708",
+          "releaseTitle": "More Life",
+          "releaseArtist": "Drake",
+          "releaseDate": "2017-03-18T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music125/v4/71/97/d0/7197d021-de0f-9548-3f31-40b8294d3242/17UMGIM85032.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1440890708?i=1440891494",
+          "score": 1380,
+          "confidence": 99,
+          "consensus": 1,
+          "earliestReleaseYear": 2017
+        }
+      ]
+    },
+    "thefateofophelia|swifttaylor": {
+      "identity": "thefateofophelia|swifttaylor",
+      "title": "The Fate of Ophelia",
+      "artist": "Taylor Swift",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2d/46/e0/2d46e0bc-8ab9-85dd-4b56-ee6951351034/25UM1IM19577.rgb.jpg/600x600bb.jpg",
+      "provider": "apple-chart",
+      "releaseTitle": "The Life of a Showgirl",
+      "releaseArtist": "Taylor Swift",
+      "releaseDate": "2025-10-03T12:00:00Z",
+      "releaseClass": "album",
+      "url": "https://music.apple.com/us/album/1833328839?i=1833328840",
+      "collectionId": "1833328839",
+      "trackId": "1833328840",
+      "confidence": 98,
+      "score": 1010,
+      "consensus": 2,
+      "verified": true,
+      "checkedAt": "2026-10-15T23:53:32.651Z",
+      "alternatives": [
+        {
+          "provider": "apple-chart",
+          "id": "1833328840",
+          "collectionId": "1833328839",
+          "releaseTitle": "The Life of a Showgirl",
+          "releaseArtist": "Taylor Swift",
+          "releaseDate": "2025-10-03T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/2d/46/e0/2d46e0bc-8ab9-85dd-4b56-ee6951351034/25UM1IM19577.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1833328839?i=1833328840",
+          "score": 1010,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "apple",
+          "id": "1838810951",
+          "collectionId": "1838810949",
+          "releaseTitle": "The Life of a Showgirl",
+          "releaseArtist": "Taylor Swift",
+          "releaseDate": "2025-10-03T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/58/8f/a9/588fa9a2-7cc5-f02c-9ce6-c986e0dc1c15/25UM1IM19577.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1838810949?i=1838810951",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "apple",
+          "id": "1842897454",
+          "collectionId": "1842897453",
+          "releaseTitle": "The Life of a Showgirl",
+          "releaseArtist": "Taylor Swift",
+          "releaseDate": "2025-10-03T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/30/0c/5a/300c5a57-d3be-a170-f880-f63380ca6312/25UM1IM19577.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1842897453?i=1842897454",
+          "score": 885,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "deezer",
+          "id": "3579685431",
+          "collectionId": "829966251",
+          "releaseTitle": "The Life of a Showgirl",
+          "releaseArtist": "Taylor Swift",
+          "releaseDate": "2025-10-03",
+          "releaseClass": "album",
+          "art": "https://cdn-images.dzcdn.net/images/cover/d0bed55a0efb3c5c3ddb3dacda67d9b3/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/3579685431",
+          "score": 830,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2025
+        },
+        {
+          "provider": "apple",
+          "id": "1849771459",
+          "collectionId": "1849771329",
+          "releaseTitle": "The Fate of Ophelia - Single",
+          "releaseArtist": "Taylor Swift",
+          "releaseDate": "2025-10-03T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/be/b7/b4/beb7b462-abe6-c719-79c1-e0691fe446db/25UM1IM74070.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/1849771329?i=1849771459",
+          "score": 725,
+          "confidence": 94,
+          "consensus": 1,
+          "earliestReleaseYear": 2025
         }
       ]
     }
