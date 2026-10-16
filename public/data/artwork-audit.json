@@ -1,38 +1,69 @@
 {
   "schema": 2,
-  "updatedAt": "2026-10-16T14:16:49.927Z",
+  "updatedAt": "2026-10-16T23:53:52.616Z",
   "chartUpdated": "2026-10-16",
   "chartRev": "tri-source-v42",
   "rows": 50,
   "verified": 50,
   "unresolved": [],
   "sourceCounts": {
-    "apple-feed": 47,
+    "apple-feed": 45,
     "previous-audit": 1,
-    "apple-chart": 2
+    "apple-chart": 2,
+    "apple": 2
   },
   "entries": {
     "aintinla|adela": {
       "identity": "aintinla|adela",
       "title": "Ain't In LA",
       "artist": "ADÉLA",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/77/7b/5d777b87-e796-0b3e-cef6-d37d993dd8fe/26UMGIM82371.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
-      "releaseTitle": "PRIMA",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/54/19/e8/5419e883-3cc4-5d8b-a10d-c1fee1f5c969/26UMGIM82372.rgb.jpg/600x600bb.jpg",
+      "provider": "apple",
+      "releaseTitle": "Ain't In LA - Single",
       "releaseArtist": "ADÉLA",
-      "releaseDate": "2026-07-23T07:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/6792883860?i=6792884101",
-      "collectionId": "6792883860",
-      "trackId": "6792884101",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
+      "releaseDate": "2026-07-22T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/6796149321?i=6796149323",
+      "collectionId": "6796149321",
+      "trackId": "6796149323",
+      "confidence": 98,
+      "score": 965,
+      "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.923Z",
+      "checkedAt": "2026-10-16T23:53:49.073Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
+          "provider": "apple",
+          "id": "6796149323",
+          "collectionId": "6796149321",
+          "releaseTitle": "Ain't In LA - Single",
+          "releaseArtist": "ADÉLA",
+          "releaseDate": "2026-07-22T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/54/19/e8/5419e883-3cc4-5d8b-a10d-c1fee1f5c969/26UMGIM82372.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6796149321?i=6796149323",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4158551132",
+          "collectionId": "1030868982",
+          "releaseTitle": "Ain't In LA",
+          "releaseArtist": "ADÉLA",
+          "releaseDate": "2026-07-23",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/68502d8730fa4ce6a41e2cb4db6d2fb7/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4158551132",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple-chart",
           "id": "6792884101",
           "collectionId": "6792883860",
           "releaseTitle": "PRIMA",
@@ -41,8 +72,23 @@
           "releaseClass": "album",
           "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/5d/77/7b/5d777b87-e796-0b3e-cef6-d37d993dd8fe/26UMGIM82371.rgb.jpg/600x600bb.jpg",
           "url": "https://music.apple.com/us/album/6792883860?i=6792884101",
-          "score": 1270,
-          "confidence": 99,
+          "score": 770,
+          "confidence": 96,
+          "consensus": 1,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6807192838",
+          "collectionId": "6807192580",
+          "releaseTitle": "PRIMA",
+          "releaseArtist": "ADÉLA",
+          "releaseDate": "2026-07-22T12:00:00Z",
+          "releaseClass": "album",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/53/c6/9a/53c69a6a-d1c4-0983-a20c-a67dceae554f/26UMGIM82372.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6807192580?i=6807192838",
+          "score": 645,
+          "confidence": 94,
           "consensus": 1,
           "earliestReleaseYear": 2026
         }
@@ -65,7 +111,7 @@
       "score": 880,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.920Z",
+      "checkedAt": "2026-10-16T23:53:46.399Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -131,7 +177,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.921Z",
+      "checkedAt": "2026-10-16T23:53:46.400Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -167,7 +213,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.919Z",
+      "checkedAt": "2026-10-16T23:53:18.926Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -203,7 +249,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.303Z",
+      "checkedAt": "2026-10-16T23:53:39.702Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -239,7 +285,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.304Z",
+      "checkedAt": "2026-10-16T23:53:39.703Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -275,7 +321,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.348Z",
+      "checkedAt": "2026-10-16T23:53:42.207Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -311,7 +357,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.351Z",
+      "checkedAt": "2026-10-16T23:53:42.208Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -347,7 +393,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.348Z",
+      "checkedAt": "2026-10-16T23:53:42.206Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -383,7 +429,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.921Z",
+      "checkedAt": "2026-10-16T23:53:18.927Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -419,7 +465,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.920Z",
+      "checkedAt": "2026-10-16T23:53:46.399Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -455,7 +501,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.923Z",
+      "checkedAt": "2026-10-16T23:53:18.929Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -491,7 +537,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.305Z",
+      "checkedAt": "2026-10-16T23:53:39.703Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -527,7 +573,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.920Z",
+      "checkedAt": "2026-10-16T23:53:46.399Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -563,7 +609,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.304Z",
+      "checkedAt": "2026-10-16T23:53:39.703Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -599,7 +645,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.924Z",
+      "checkedAt": "2026-10-16T23:53:49.074Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -635,7 +681,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.921Z",
+      "checkedAt": "2026-10-16T23:53:46.401Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -671,7 +717,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.305Z",
+      "checkedAt": "2026-10-16T23:53:39.703Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -694,34 +740,94 @@
       "identity": "hatethatimadeyouloveme|arianagrande",
       "title": "hate that i made you love me",
       "artist": "Ariana Grande",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7e/e6/82/7ee682bd-1b17-6adc-be63-b5af1bdff369/26UMGIM51126.rgb.jpg/600x600bb.jpg",
-      "provider": "apple-feed",
-      "releaseTitle": "petal",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c7/8d/7d/c78d7db8-cf34-8a65-99d6-850a3d60d03b/26UMGIM66898.rgb.jpg/600x600bb.jpg",
+      "provider": "apple",
+      "releaseTitle": "hate that i made you love me - Single",
       "releaseArtist": "Ariana Grande",
-      "releaseDate": "2026-05-28T07:00:00Z",
-      "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/1895420989?i=6763656876",
-      "collectionId": "1895420989",
-      "trackId": "6763656876",
-      "confidence": 99,
-      "score": 1270,
-      "consensus": 1,
+      "releaseDate": "2026-05-28T12:00:00Z",
+      "releaseClass": "dedicated",
+      "url": "https://music.apple.com/us/album/6773388583?i=6773388585",
+      "collectionId": "6773388583",
+      "trackId": "6773388585",
+      "confidence": 98,
+      "score": 965,
+      "consensus": 2,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.924Z",
+      "checkedAt": "2026-10-16T23:53:52.613Z",
       "alternatives": [
         {
-          "provider": "apple-feed",
-          "id": "6763656876",
-          "collectionId": "1895420989",
-          "releaseTitle": "petal",
+          "provider": "apple",
+          "id": "6773388585",
+          "collectionId": "6773388583",
+          "releaseTitle": "hate that i made you love me - Single",
           "releaseArtist": "Ariana Grande",
-          "releaseDate": "2026-05-28T07:00:00Z",
-          "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/7e/e6/82/7ee682bd-1b17-6adc-be63-b5af1bdff369/26UMGIM51126.rgb.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/1895420989?i=6763656876",
-          "score": 1270,
-          "confidence": 99,
-          "consensus": 1,
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/c7/8d/7d/c78d7db8-cf34-8a65-99d6-850a3d60d03b/26UMGIM66898.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6773388583?i=6773388585",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6774398128",
+          "collectionId": "6774398127",
+          "releaseTitle": "hate that i made you love me - Single",
+          "releaseArtist": "Ariana Grande",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/dc/97/01/dc9701ca-b443-2a84-1966-bccee0adf0e7/26UMGIM66898.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6774398127?i=6774398128",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6776051292",
+          "collectionId": "6776051290",
+          "releaseTitle": "hate that i made you love me - Single",
+          "releaseArtist": "Ariana Grande",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/46/91/22/4691224b-b6e3-9e3d-20dc-b2117ef827c7/26UMGIM66898.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6776051290?i=6776051292",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "apple",
+          "id": "6776373491",
+          "collectionId": "6776373490",
+          "releaseTitle": "hate that i made you love me (bad news montage version) - Single",
+          "releaseArtist": "Ariana Grande",
+          "releaseDate": "2026-05-28T12:00:00Z",
+          "releaseClass": "dedicated",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/ea/1a/80/ea1a802a-f231-fe8e-9634-0bd0b87d13c8/26UMGIM66898.rgb.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/6776373490?i=6776373491",
+          "score": 965,
+          "confidence": 98,
+          "consensus": 2,
+          "earliestReleaseYear": 2026
+        },
+        {
+          "provider": "deezer",
+          "id": "4045817471",
+          "collectionId": "991609961",
+          "releaseTitle": "hate that i made you love me",
+          "releaseArtist": "Ariana Grande",
+          "releaseDate": "2026-05-29",
+          "releaseClass": "dedicated",
+          "art": "https://cdn-images.dzcdn.net/images/cover/020b1804e8c8a2aba6770f5b2763847b/1000x1000-000000-80-0-0.jpg",
+          "url": "https://www.deezer.com/track/4045817471",
+          "score": 910,
+          "confidence": 98,
+          "consensus": 2,
           "earliestReleaseYear": 2026
         }
       ]
@@ -743,7 +849,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.303Z",
+      "checkedAt": "2026-10-16T23:53:39.702Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -779,7 +885,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.925Z",
+      "checkedAt": "2026-10-16T23:53:52.614Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -815,7 +921,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.923Z",
+      "checkedAt": "2026-10-16T23:53:49.074Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -851,7 +957,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.348Z",
+      "checkedAt": "2026-10-16T23:53:42.206Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -887,7 +993,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.348Z",
+      "checkedAt": "2026-10-16T23:53:42.207Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -923,7 +1029,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.305Z",
+      "checkedAt": "2026-10-16T23:53:39.703Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -959,7 +1065,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.922Z",
+      "checkedAt": "2026-10-16T23:53:18.928Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -995,7 +1101,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.924Z",
+      "checkedAt": "2026-10-16T23:53:49.075Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1031,7 +1137,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.921Z",
+      "checkedAt": "2026-10-16T23:53:46.400Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1067,7 +1173,7 @@
       "score": 390,
       "consensus": 0,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.302Z",
+      "checkedAt": "2026-10-16T23:53:39.701Z",
       "alternatives": []
     },
     "likeme|42babyduggfuturelil": {
@@ -1087,7 +1193,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.349Z",
+      "checkedAt": "2026-10-16T23:53:42.208Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1123,7 +1229,7 @@
       "score": 770,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.347Z",
+      "checkedAt": "2026-10-16T23:53:42.206Z",
       "alternatives": [
         {
           "provider": "apple-chart",
@@ -1189,7 +1295,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.921Z",
+      "checkedAt": "2026-10-16T23:53:46.400Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1225,7 +1331,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.923Z",
+      "checkedAt": "2026-10-16T23:53:46.401Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1261,7 +1367,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.923Z",
+      "checkedAt": "2026-10-16T23:53:46.401Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1297,7 +1403,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.921Z",
+      "checkedAt": "2026-10-16T23:53:18.928Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1333,7 +1439,7 @@
       "score": 1350,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.925Z",
+      "checkedAt": "2026-10-16T23:53:52.614Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1369,7 +1475,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.922Z",
+      "checkedAt": "2026-10-16T23:53:18.929Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1405,7 +1511,7 @@
       "score": 1210,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.349Z",
+      "checkedAt": "2026-10-16T23:53:42.208Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1441,7 +1547,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.925Z",
+      "checkedAt": "2026-10-16T23:53:52.614Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1477,7 +1583,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.922Z",
+      "checkedAt": "2026-10-16T23:53:18.928Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1513,7 +1619,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.350Z",
+      "checkedAt": "2026-10-16T23:53:42.208Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1549,7 +1655,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:45.349Z",
+      "checkedAt": "2026-10-16T23:53:42.207Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1585,7 +1691,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.920Z",
+      "checkedAt": "2026-10-16T23:53:18.926Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1621,7 +1727,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.923Z",
+      "checkedAt": "2026-10-16T23:53:18.930Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1644,31 +1750,31 @@
       "identity": "sweaterweather|neighbourhoodthe",
       "title": "Sweater Weather",
       "artist": "The Neighbourhood",
-      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/28/71/00/287100fb-5c31-0195-5343-e6b3625886d0/886443969834.jpg/600x600bb.jpg",
+      "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/b9/8c/0f/b98c0f03-d78f-1619-8c7b-0b7f2c4d6ae7/886443575264.jpg/600x600bb.jpg",
       "provider": "apple-feed",
-      "releaseTitle": "I Love You.",
+      "releaseTitle": "I'm Sorry... - EP",
       "releaseArtist": "The Neighbourhood",
-      "releaseDate": "2012-12-03T08:00:00Z",
+      "releaseDate": "2012-05-07T12:00:00Z",
       "releaseClass": "album",
-      "url": "https://music.apple.com/us/album/635016635?i=635016640",
-      "collectionId": "635016635",
-      "trackId": "635016640",
+      "url": "https://music.apple.com/us/album/548656698?i=548656753",
+      "collectionId": "548656698",
+      "trackId": "548656753",
       "confidence": 99,
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.924Z",
+      "checkedAt": "2026-10-16T23:53:52.614Z",
       "alternatives": [
         {
           "provider": "apple-feed",
-          "id": "635016640",
-          "collectionId": "635016635",
-          "releaseTitle": "I Love You.",
+          "id": "548656753",
+          "collectionId": "548656698",
+          "releaseTitle": "I'm Sorry... - EP",
           "releaseArtist": "The Neighbourhood",
-          "releaseDate": "2012-12-03T08:00:00Z",
+          "releaseDate": "2012-05-07T12:00:00Z",
           "releaseClass": "album",
-          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/28/71/00/287100fb-5c31-0195-5343-e6b3625886d0/886443969834.jpg/600x600bb.jpg",
-          "url": "https://music.apple.com/us/album/635016635?i=635016640",
+          "art": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/b9/8c/0f/b98c0f03-d78f-1619-8c7b-0b7f2c4d6ae7/886443575264.jpg/600x600bb.jpg",
+          "url": "https://music.apple.com/us/album/548656698?i=548656753",
           "score": 1380,
           "confidence": 99,
           "consensus": 1,
@@ -1693,7 +1799,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:20.924Z",
+      "checkedAt": "2026-10-16T23:53:18.930Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1729,7 +1835,7 @@
       "score": 1270,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.304Z",
+      "checkedAt": "2026-10-16T23:53:39.702Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1765,7 +1871,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.925Z",
+      "checkedAt": "2026-10-16T23:53:52.614Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1801,7 +1907,7 @@
       "score": 1380,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:40.305Z",
+      "checkedAt": "2026-10-16T23:53:39.703Z",
       "alternatives": [
         {
           "provider": "apple-feed",
@@ -1837,7 +1943,7 @@
       "score": 1210,
       "consensus": 1,
       "verified": true,
-      "checkedAt": "2026-10-16T14:16:49.924Z",
+      "checkedAt": "2026-10-16T23:53:49.074Z",
       "alternatives": [
         {
           "provider": "apple-feed",
