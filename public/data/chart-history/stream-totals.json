@@ -5724,6 +5724,18 @@
         "provider": "soundcamps",
         "total": 937669277
       }
+    ],
+    "3yWuTOYDztXjZxdE2cIRUa": [
+      {
+        "date": "2026-10-17",
+        "provider": "mystreamcount",
+        "total": 910364757
+      },
+      {
+        "date": "2026-10-17",
+        "provider": "soundcamps",
+        "total": 910364757
+      }
     ]
   }
 }
