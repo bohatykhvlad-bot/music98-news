@@ -1,0 +1,48 @@
+name: Tate draft visual audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/tate-draft-visual-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify actual saved draft and inspect photograph without changes
+        run: |
+          python -m pip -q install Pillow
+          python - <<'PY'
+          import sys,io,base64,json,hashlib,urllib.request
+          from PIL import Image
+          sys.path.insert(0,'scripts')
+          import post
+          pid='tate-housewife-20261020'
+          saved=post.find_post(post.desk_read()['posts'],pid)
+          stage=json.load(open('editorial/staged/tate-housewife-20261020.json',encoding='utf-8'))
+          for key in ('title','excerpt','body','status','cover'):
+              v=saved.get(key)
+              print('DESK_DIAG',key, 'match='+str(v==stage.get(key)),
+                    'summary='+str(v if key in ('title','status','cover') else
+                           {'chars':len(v or ''),'curly':sum((v or '').count(c) for c in '“”„‟«»'),
+                            'sha':hashlib.sha256((v or '').encode()).hexdigest()[:12]}))
+          url='https://music98.news/'+str(saved['cover']['src']).lstrip('/')
+          with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=30) as f:
+              raw=f.read()
+          im=Image.open(io.BytesIO(raw)).convert('RGB')
+          print('COVER_DIMENSIONS',im.size,'BYTES',len(raw))
+          im.thumbnail((420,600))
+          out=io.BytesIO();im.save(out,format='JPEG',quality=64,optimize=True)
+          data=base64.b64encode(out.getvalue()).decode()
+          for i in range(0,len(data),3500):
+              print('TATE_COVER_PREVIEW',i//3500,data[i:i+3500])
+          PY
