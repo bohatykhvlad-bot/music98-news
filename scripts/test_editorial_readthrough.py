@@ -169,7 +169,7 @@ def assert_single_release_format():
     prose = lede + "\n\n" + (
         "The music video uses the setting to illustrate the song's central theme, "
         "with a tightly structured narrative and a carefully chosen final scene. "
-    ) * 16 + "\n\n[youtube:DPEodkHzH-s]"
+    ) * 20 + "\n\n[youtube:DPEodkHzH-s]"
     original = {
         "id": "single-test", "status": "draft", "type": "release", "rtype": "Single",
         "artist": "Tate McRae", "title": "Housewife", "body": prose,
