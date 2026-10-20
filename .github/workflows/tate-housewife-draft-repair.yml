@@ -1,0 +1,23 @@
+name: Apply Tate draft typography and cover fix
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/tate-housewife-draft-repair.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  update-saved-draft:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      MUSIC98_KEY: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Update only the existing draft and read back saved fields
+        run: python scripts/tate-housewife-repair.py
