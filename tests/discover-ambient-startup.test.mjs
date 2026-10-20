@@ -7,18 +7,19 @@ const source=readFileSync("public/discover-ambient.js","utf8");
 const html=readFileSync("public/index.html","utf8");
 
 test("Discover HTML references a fresh ambient asset revision",()=>{
-  assert.match(html,/\/discover-ambient\.js\?v=20261020-mineral02/);
+  assert.match(html,/\/discover-ambient\.js\?v=20261020-waves03/);
 });
 
 test("Discover's animated background appears despite continuous mobile layout jitter",()=>{
   let time=16,tick=0,id=0,draws=0;
   const waveStrokes=[];
+  const particleDraws=[];
   const scheduled=new Map();
   const raf=fn=>{const n=++id;scheduled.set(n,fn);return n;};
   const cancel=n=>scheduled.delete(n);
   const mockContext=()=>({
     createRadialGradient(){return {addColorStop(){}};},
-    fillRect(){},clearRect(){},setTransform(){},save(){},restore(){},
+    fillRect(x,y,w,h){draws++;if(w>0&&w<2&&h>0&&h<2)particleDraws.push([x,y]);},clearRect(){},setTransform(){},save(){},restore(){},
     translate(){},scale(){},beginPath(){},roundRect(){},ellipse(){},
     stroke(){waveStrokes.push(this.strokeStyle);},
     drawImage(){draws++;},
@@ -82,6 +83,8 @@ test("Discover's animated background appears despite continuous mobile layout ji
   }
   assert.ok(classes.has("discover-ambient-settled"),"ambient must eventually become visible");
   assert.ok(draws>0,"background must actually render, not just toggle its CSS class");
+  assert.ok(particleDraws.length>=1400,"non-WebGL renderer must preserve the dense sand particles");
+  assert.notDeepEqual(particleDraws[0],particleDraws[1400],"particles must move between rendered frames");
   assert.ok(waveStrokes.some(stroke => {
     const alpha=Number(String(stroke).match(/,([0-9.]+)\)$/)?.[1] ?? 0);
     return alpha >= .10;

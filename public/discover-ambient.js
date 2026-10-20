@@ -56,9 +56,9 @@
                  mix(hash(i+vec2(0.,1.)),hash(i+1.),f.x),f.y);
     }
     float fbm(vec2 p) {
-      float v=0.; float a=.565;
+      float v=0.; float a=.53;
       mat2 turn=mat2(.80,-.60,.60,.80);
-      for(int i=0;i<3;i++) { v+=a*noise(p); p=turn*p*2.04+7.3; a*=.49; }
+      for(int i=0;i<4;i++) { v+=a*noise(p); p=turn*p*2.04+7.3; a*=.49; }
       return v;
     }
     float playerDistance(vec2 p, vec2 centre, vec2 size) {
@@ -66,19 +66,17 @@
       vec2 q=abs(p-centre)-size+rounding;
       return length(max(q,0.))+min(max(q.x,q.y),0.)-rounding;
     }
-    vec2 sparkle(vec2 p, float scale, float seed) {
+    // Restore the sand particles from 25fa4ad, before the soft-glow replacement.
+    vec2 sand(vec2 p, float scale, float seed) {
       vec2 cell=p*scale+seed;
       vec2 id=floor(cell), f=fract(cell);
       vec2 center=.22+.56*vec2(hash(id+seed),hash(id+seed+23.));
-      vec2 offset=f-center;
-      float d2=dot(offset,offset);
-      // Rounded light with no hard core or trail. An undistorted sampling
-      // field keeps the glow circular while the larger currents bend.
-      float core=exp(-d2*240.);
-      float halo=exp(-d2*42.);
-      float presence=smoothstep(.52,.85,hash(id+71.));
-      float twinkle=.48+.22*sin(time*.65+hash(id+11.)*6.283);
-      return vec2(core,halo)*presence*twinkle;
+      float d=length(f-center);
+      float radius=.055+.05*hash(id+71.);
+      float dotLight=1.-smoothstep(radius*.3,radius,d);
+      float halo=exp(-d*d*110.)*.22;
+      float twinkle=.65+.35*sin(time*.8+hash(id+11.)*6.283);
+      return vec2(dotLight,halo)*twinkle;
     }
     void main() {
       float aspect=viewport.x/viewport.y;
@@ -108,48 +106,38 @@
       // Fronts begin on the card boundary, then bend gradually as they spread.
       float edgeBend=smoothstep(0.,.12,max(distance,0.));
       float waveDistance=distance+edgeBend*motionStrength*(bend+.025*sin(p.x*4.+p.y*3.-time*.3));
-      float lanes=fbm(vec2(waveDistance*8.-time*.46,(p.x+p.y)*2.)+warp*.6);
+      float lanes=fbm(vec2(waveDistance*12.-time*.72,(p.x+p.y)*2.)+warp*.6);
       float volume=fbm(transport*4.8+warp*.9);
       float detail=noise(transport*26.+warp*2.);
-      float ripple=.5+.5*sin(waveDistance*20.-time*1.+(volume-.5)*.8*edgeBend);
+      float ripple=.5+.5*sin(waveDistance*28.-time*1.65+(volume-.5)*.8*edgeBend);
       // Equal distances from the player share the same base coverage. This
       // removes the old asymmetric edge clouds and their white clearings.
       float envelope=.60+.40*exp(-max(distance,0.)*1.5);
-      float density=.08+volume*.62+lanes*.18+ripple*.10*motionStrength+detail*.05;
+      float density=volume*.38+lanes*.35+ripple*.32*motionStrength+detail*.05;
       float body=envelope*(.10+smoothstep(.25,.80,density)*.8);
-      // Keep the outward fronts within the diffuse texture so repeating
-      // rings don't dominate the player or become a high-contrast pulse.
+      // The original textured crests, rather than the later diffuse haze.
       float crests=smoothstep(.55,.98,ripple)*(.45+.55*smoothstep(.25,.75,volume));
-      body+=envelope*crests*.055*motionStrength;
+      body+=envelope*crests*.20*motionStrength;
       float haze=.04+envelope*.035;
       // Interpolated grain moves continuously instead of jumping between
       // random pixel cells as the current advances.
       float grain=noise(transport*viewport.y/3.5+17.);
+      // Keep the original particle density, but sample in screen space so
+      // the curved wave field cannot stretch round grains into streaks.
       vec2 lights=p+vec2(time*.008,-time*.005);
-      vec2 dots=sparkle(lights,viewport.y/15.,3.);
-      vec2 motes=sparkle(lights,viewport.y/28.,89.);
+      vec2 dots=sand(lights,viewport.y/7.,3.)+sand(lights,viewport.y/12.,41.)*.65;
+      vec2 motes=sand(lights,viewport.y/24.,89.);
       float depth=smoothstep(.30,.8,volume);
       vec3 blue=tintBlue, cyan=tintCyan, mineral=tintMineral;
       vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23)*paletteMix.x*2.);
-      colour=mix(colour,mineral,clamp((smoothstep(.48,.86,lanes)*2.+crests*.32)*paletteMix.y,0.,.65));
-      // A neutral wave relief survives pale / grayscale album covers.
-      // Previously an almost-white cover tinted the entire shader white and
-      // the currents disappeared on the white page. Cover colour still wins
-      // for saturated artwork; soft mineral grey keeps its contours visible.
-      float maxTint=max(colour.r,max(colour.g,colour.b));
-      float minTint=min(colour.r,min(colour.g,colour.b));
-      float nearNeutral=1.-smoothstep(.045,.18,maxTint-minTint);
-      float nearWhite=smoothstep(.78,.95,minTint);
-      float neutralWeight=.13+.54*max(nearNeutral,nearWhite);
-      float front=.5+.5*sin(waveDistance*14.-time*.87+(volume-.5)*.8);
-      vec3 neutralRidge=mix(vec3(.45,.57,.61),vec3(.67,.75,.77),smoothstep(.18,.82,front));
-      colour=mix(colour,neutralRidge,neutralWeight);
+      colour=mix(colour,mineral,clamp((smoothstep(.48,.86,lanes)*3.68+crests*1.28)*paletteMix.y,0.,.65));
       // Lit grains sit within the volume, with a wider glow beneath it.
       colour*=1.-depth*.12*smoothstep(.4,.7,max(colour.r,max(colour.g,colour.b)));
-      colour=mix(colour,vec3(1.),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.05,0.,.8));
+      colour=mix(colour,vec3(1.),clamp(dots.x*.45+dots.y*.3+depth*.14,0.,.8));
+      colour=mix(colour,blue,motes.x*.4);
       float breathing=1.+.025*motionStrength*sin(time*.55);
       float alpha=(body*(.405+grain*.03)+haze+dots.y*body*.12)*(1.+energy*.18)*breathing;
-      alpha+=(dots.x*.025+dots.y*.04+motes.x*.035+motes.y*.04)*body;
+      alpha+=(dots.x*.10+motes.x*.22+motes.y*.04)*body;
       gl_FragColor=vec4(colour,clamp(alpha*paletteStrength,0.,.65));
     }
   `;
@@ -204,31 +192,23 @@
   function fallbackRenderer(surface) {
     const ctx=surface.getContext("2d",{alpha:true});
     if (!ctx) return null;
-    // Reuse one blurred light sprite instead of drawing hundreds of sharp
-    // grains or applying a canvas shadow separately to every particle.
-    const light=document.createElement("canvas");light.width=light.height=24;
-    const lightContext=light.getContext("2d");
-    const lightGlow=lightContext.createRadialGradient(12,12,0,12,12,12);
-    lightGlow.addColorStop(0,"rgba(255,255,255,.65)");
-    lightGlow.addColorStop(.3,"rgba(255,255,255,.28)");
-    lightGlow.addColorStop(1,"rgba(255,255,255,0)");
-    lightContext.fillStyle=lightGlow;lightContext.fillRect(0,0,24,24);
-    const grains=Array.from({length:320},()=>({x:Math.random(),y:Math.random(),phase:Math.random()*6.28,size:3+Math.random()*3}));
+    // Keep actual sand grains in the non-WebGL path too, as before 72b066f.
+    const grains=Array.from({length:1400},()=>({x:Math.random(),y:Math.random(),phase:Math.random()*6.28,size:.4+Math.random()*.8}));
     return { surface, draw() {
       if(surface.width!==canvas.width||surface.height!==canvas.height){surface.width=canvas.width;surface.height=canvas.height;}
       ctx.setTransform(surface.width/width,0,0,surface.height/height,0,0);
       ctx.clearRect(0,0,width,height);
       const rgba=(c,a)=>`rgba(${c.map(v=>Math.round(v*255)).join(',')},${a*paletteStrength})`;
       const base=palette[0].map((v,k)=>v+(palette[1][k]-v)*paletteMix[0]);
-      ctx.fillStyle=rgba(base,.105+.01*Math.sin(clock*.25));
+      ctx.fillStyle=rgba(base,.06+.005*Math.sin(clock*.25));
       ctx.fillRect(0,0,width,height);
       const [sourceX,sourceY,halfWidth,halfHeight]=playerSource();
       const centres=[[sourceX,sourceY,width*.65,height*.8]];
       for(const [x,y,rx,ry] of centres){
         ctx.save();ctx.translate(x,y);ctx.scale(rx,ry);
         const glow=ctx.createRadialGradient(0,0,0,0,0,1);
-        glow.addColorStop(0,rgba(palette[0],.20+energy*.05));
-        glow.addColorStop(.45,rgba(base,.12));glow.addColorStop(1,rgba(base,0));
+        glow.addColorStop(0,rgba(palette[0],.12+energy*.04));
+        glow.addColorStop(.45,rgba(base,.08));glow.addColorStop(1,rgba(base,0));
         ctx.fillStyle=glow;ctx.fillRect(-1,-1,2,2);ctx.restore();
       }
       ctx.save();ctx.shadowBlur=38;ctx.shadowColor=rgba(palette[0],.18);
@@ -243,7 +223,7 @@
         ctx.stroke();
       }
       ctx.restore();
-      const count=width<760?160:grains.length;
+      const count=width<760?700:grains.length;
       for(let i=0;i<count;i++){
         const p=grains[i];
         // Curved outward paths start at the actual player boundary.
@@ -258,8 +238,10 @@
         x+=Math.sin(clock*.25+p.phase)*22*motionStrength;y+=Math.cos(clock*.2+p.phase)*18*motionStrength;
         const dx=x-pointer.x,dy=y-pointer.y,near=Math.exp(-(dx*dx+dy*dy)/32000)*pointer.strength;
         x-=dy*near*.17;y+=dx*near*.17;
-        ctx.globalAlpha=(.25+.15*Math.sin(clock*.65+p.phase))*(1+energy*.15);
-        ctx.drawImage(light,x-p.size,y-p.size,p.size*2,p.size*2);
+        let density=.35;
+        for(const [cx,cy,rx,ry] of centres)density+=Math.exp(-2*((x-cx)**2/rx**2+(y-cy)**2/ry**2));
+        ctx.fillStyle=rgba(palette[2],Math.min(.24,density*.16)*(1+energy*.3));
+        ctx.fillRect(x,y,p.size,p.size);
       }
       ctx.globalAlpha=1;
     }};
