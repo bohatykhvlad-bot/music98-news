@@ -7,23 +7,28 @@ const source=readFileSync("public/discover-ambient.js","utf8");
 const html=readFileSync("public/index.html","utf8");
 
 test("Discover HTML references a fresh ambient asset revision",()=>{
-  assert.match(html,/\/discover-ambient\.js\?v=20261020-settle01/);
+  assert.match(html,/\/discover-ambient\.js\?v=20261020-mineral02/);
 });
 
 test("Discover's animated background appears despite continuous mobile layout jitter",()=>{
   let time=16,tick=0,id=0,draws=0;
+  const waveStrokes=[];
   const scheduled=new Map();
   const raf=fn=>{const n=++id;scheduled.set(n,fn);return n;};
   const cancel=n=>scheduled.delete(n);
   const mockContext=()=>({
     createRadialGradient(){return {addColorStop(){}};},
     fillRect(){},clearRect(){},setTransform(){},save(){},restore(){},
-    translate(){},scale(){},beginPath(){},roundRect(){},ellipse(){},stroke(){},
+    translate(){},scale(){},beginPath(){},roundRect(){},ellipse(){},
+    stroke(){waveStrokes.push(this.strokeStyle);},
     drawImage(){draws++;},
   });
   const canvas={
     width:0,height:0,style:{},addEventListener(){},
-    getContext(type){return type==="2d"?mockContext():null;},
+    getContext(type){
+      if(type==="webgl")throw Error("WebGL is disabled by browser privacy settings");
+      return type==="2d"?mockContext():null;
+    },
   };
   const classes=new Set();
   const bodyClasses={
@@ -77,6 +82,10 @@ test("Discover's animated background appears despite continuous mobile layout ji
   }
   assert.ok(classes.has("discover-ambient-settled"),"ambient must eventually become visible");
   assert.ok(draws>0,"background must actually render, not just toggle its CSS class");
+  assert.ok(waveStrokes.some(stroke => {
+    const alpha=Number(String(stroke).match(/,([0-9.]+)\\)$/)?.[1] ?? 0);
+    return alpha >= .10;
+  }),"non-WebGL fallback must draw visible wave fronts, not nearly transparent lines");
   assert.ok(canvas.width>0&&canvas.height>0,"ambient should have a drawable surface");
   win.music98DiscoverAmbient.setVisible(false);
   assert.equal(classes.has("discover-ambient-visible"),false);
