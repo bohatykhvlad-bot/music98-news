@@ -26,6 +26,17 @@ async function evaluate(expression){
  if(x.exceptionDetails)throw Error(JSON.stringify(x.exceptionDetails).slice(0,2200));
  return x.result?.value;
 }
+
+async function screenshotSamples(){
+ const shot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
+ const expression='(async()=>{const img=new Image();img.src='+JSON.stringify('data:image/png;base64,'+shot.data)+
+  ';await img.decode();const cv=document.createElement("canvas");cv.width=img.width;cv.height=img.height;'+
+  'const c=cv.getContext("2d");c.drawImage(img,0,0);const d=c.getImageData(0,0,img.width,img.height).data;'+
+  'const out=[];for(let y=40;y<Math.min(img.height,700);y+=40){for(let x=20;x<img.width;x+=40){'+
+  'const i=(y*img.width+x)*4;out.push([d[i],d[i+1],d[i+2]])}}return out})()';
+ return await evaluate(expression);
+}
+
 const inspect=String.raw`(()=>{
   const c=document.getElementById('discoverAmbient');
   if(!c) return {href:location.href,ready:document.readyState,title:document.title,html:document.body?.outerHTML.slice(0,800),error:'canvas absent'};
@@ -33,6 +44,7 @@ const inspect=String.raw`(()=>{
   const st=document.getElementById('discoverPlayerStage');
   const styles=x=>{const s=getComputedStyle(x);return {display:s.display,position:s.position,opacity:s.opacity,visibility:s.visibility,z:s.zIndex,background:s.backgroundColor}};
   const rect=x=>{const r=x.getBoundingClientRect();return {x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)}};
+  window.music98DiscoverAmbient?.setVisible(true);
   const gl=c.getContext('webgl'); const pix=[];
   if(gl){
     for(const [x,y] of [[10,10],[Math.floor(c.width/2),Math.floor(c.height/2)],[Math.floor(c.width/4),Math.floor(c.height/3)]]){
@@ -61,5 +73,15 @@ try{
   await sleep(5500);
   const out=await evaluate(inspect);
   console.log('REAL_BROWSER_AMBIENT '+view+' '+JSON.stringify(out));
+  const on=await screenshotSamples();
+  await evaluate('document.getElementById("discoverAmbient").style.visibility="hidden"');
+  await sleep(140);
+  const off=await screenshotSamples();
+  const diffs=on.map((v,i)=>v.reduce((sum,ch,k)=>sum+Math.abs(ch-off[i][k]),0)/3);
+  const changed=diffs.filter(v=>v>=3);
+  const contrast={view,count:diffs.length,changed:changed.length,mean:Math.round(diffs.reduce((a,b)=>a+b,0)/diffs.length*100)/100,
+   maximum:Math.max(...diffs),over10:diffs.filter(x=>x>10).length,
+   onExamples:on.slice(0,12),offExamples:off.slice(0,12)};
+  console.log('REAL_BROWSER_AMBIENT_CONTRAST '+JSON.stringify(contrast));
  }
 }finally{if(ws)ws.close();browser.kill('SIGTERM');}
