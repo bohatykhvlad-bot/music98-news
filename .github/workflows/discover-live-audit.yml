@@ -7,6 +7,7 @@ on:
       - public/discover-app.js
       - public/discover-ambient.js
       - scripts/audit-discover-ambient-live.mjs
+      - scripts/audit-discover-ambient-browser.mjs
       - public/data/discover-albums.json
       - scripts/audit-discover-live.mjs
       - .github/workflows/discover-live-audit.yml
@@ -28,3 +29,5 @@ jobs:
         run: node scripts/audit-discover-live.mjs
       - name: Verify Discover background fix is live
         run: node scripts/audit-discover-ambient-live.mjs
+      - name: Inspect actual Discover canvas in desktop/mobile Chrome
+        run: node scripts/audit-discover-ambient-browser.mjs
