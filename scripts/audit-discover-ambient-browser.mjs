@@ -83,13 +83,13 @@ try{
    maximum:Math.max(...diffs),over10:diffs.filter(x=>x>10).length,
    onExamples:on.slice(0,12),offExamples:off.slice(0,12)};
   console.log('REAL_BROWSER_AMBIENT_CONTRAST '+JSON.stringify(contrast));
-  if(view==='desktop'){
-    await evaluate('document.getElementById("discoverAmbient").style.visibility="visible"');
-    await sleep(250);
-    const shot=await call('Page.captureScreenshot',{format:'png',clip:{x:0,y:0,width:1200,height:650,scale:0.72}});
-    const data=shot.data;
-    const batch=5000,parts=Math.ceil(data.length/batch);
-    for(let n=0;n<parts;n++) console.log('AMBIENT_IMAGE_CHUNK '+n+'/'+parts+' '+data.slice(n*batch,(n+1)*batch));
-  }
+  // A successful HTTP request is not a visibility check: fail if the real
+  // Chrome compositor shows no substantial background difference.
+  if(!out.API||out.canvas?.style?.opacity!=="1"||!out.rendering?.program
+     ||!out.rendering.pix.some(pixel=>Array.isArray(pixel)&&pixel[3]>10))
+    throw Error('DISCOVER_CANVAS_NOT_DRAWING: '+view);
+  if(contrast.over10<(view==='desktop'?80:20))
+    throw Error('DISCOVER_WAVES_NOT_VISIBLE: '+view+' '+JSON.stringify(contrast));
+  console.log('DISCOVER_REAL_BROWSER_WAVES: PASS '+view);
  }
 }finally{if(ws)ws.close();browser.kill('SIGTERM');}
