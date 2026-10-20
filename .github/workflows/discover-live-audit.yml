@@ -5,6 +5,8 @@ on:
     paths:
       - public/index.html
       - public/discover-app.js
+      - public/discover-ambient.js
+      - scripts/audit-discover-ambient-live.mjs
       - public/data/discover-albums.json
       - scripts/audit-discover-live.mjs
       - .github/workflows/discover-live-audit.yml
@@ -24,3 +26,5 @@ jobs:
           node-version: '22'
       - name: Compare live Discover routes and catalog with GitHub
         run: node scripts/audit-discover-live.mjs
+      - name: Verify Discover background fix is live
+        run: node scripts/audit-discover-ambient-live.mjs
