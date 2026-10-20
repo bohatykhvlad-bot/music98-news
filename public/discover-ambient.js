@@ -19,7 +19,7 @@
   /* The ambient stays invisible until its measured geometry holds still for a
      moment: painting at a transient layout size re-anchors the shader (the
      aspect changes) and read as the background jerking sideways on open. */
-  let settled=false, settleFrame=0, settleRef=null, stableAt=0, lastSettledGeo=null;
+  let settled=false, settleFrame=0, settleRef=null, stableAt=0, settleStartedAt=0, lastSettledGeo=null;
   const defaultPalette=[[.18,.66,.90],[0,.83,.81],[.02,.59,.64]];
   let palette=defaultPalette.map(c=>c.slice()), targetPalette=palette.map(c=>c.slice()), artworkRequest=0;
   let paletteStrength=1,targetPaletteStrength=1;
@@ -330,18 +330,32 @@
   }
   function start() {
     if(frame)cancelAnimationFrame(frame);frame=0;last=0;
-    if(settleFrame)cancelAnimationFrame(settleFrame);settleFrame=0;
-    if(!(active&&!document.hidden&&!lost&&inView&&!scrolling))return;
-    if(!settled){settleFrame=requestAnimationFrame(watchSettle);return;}
+    if(!(active&&!document.hidden&&!lost&&inView&&!scrolling)){
+      if(settleFrame)cancelAnimationFrame(settleFrame);
+      settleFrame=0;
+      return;
+    }
+    // ResizeObserver and the panel equalizer can both call start() while the
+    // first layout is settling. Do not cancel a pending settle tick: on some
+    // phones those callbacks arrive on every frame, starving the reveal.
+    if(!settled){
+      if(!settleFrame)settleFrame=requestAnimationFrame(watchSettle);
+      return;
+    }
+    if(settleFrame)cancelAnimationFrame(settleFrame);
+    settleFrame=0;
     resize();render();if(!motion.matches)frame=requestAnimationFrame(loop);
   }
   function watchSettle() {
     settleFrame=0;
     if(!active)return;
     const geo=measureGeometry(), now=performance.now();
+    if(!settleStartedAt)settleStartedAt=now;
     if(!settleRef||geo.w!==settleRef.w||geo.h!==settleRef.h){settleRef=geo;stableAt=now;}
     const known=lastSettledGeo&&geo.w===lastSettledGeo.w&&geo.h===lastSettledGeo.h;
-    if(known||now-stableAt>=300){
+    // The first accurate frame is better than a permanently invisible canvas
+    // when mobile viewport chrome keeps nudging the geometry by a pixel.
+    if(known||now-stableAt>=300||now-settleStartedAt>=1100){
       settled=true;lastSettledGeo=geo;
       document.body.classList.add("discover-ambient-settled");
       start();
@@ -350,7 +364,7 @@
     settleFrame=requestAnimationFrame(watchSettle);
   }
   function unsettle() {
-    settled=false;settleRef=null;stableAt=0;
+    settled=false;settleRef=null;stableAt=0;settleStartedAt=0;
     // Keep the last rendered texture visible while a mobile viewport or player
     // layout change is measured. Hiding it here made the whole background flash
     // on scroll and whenever an Apple Music album iframe was inserted.
