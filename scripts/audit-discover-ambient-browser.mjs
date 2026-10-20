@@ -25,8 +25,30 @@ async function evaluate(expression){
  if(x.exceptionDetails)throw Error(JSON.stringify(x.exceptionDetails).slice(0,2200));
  return x.result?.value;
 }
-const inspect="(()=>{\n  const c=document.getElementById('discoverAmbient');
-  if(!c) return {href:location.href,ready:document.readyState,title:document.title,html:document.body?.outerHTML.slice(0,800),error:'canvas absent'};\n  const p=document.getElementById('tab-discover');\n  const st=document.getElementById('discoverPlayerStage');\n  const styles=x=>{const s=getComputedStyle(x);return {display:s.display,position:s.position,opacity:s.opacity,visibility:s.visibility,z:s.zIndex,background:s.backgroundColor}};\n  const rect=x=>{const r=x.getBoundingClientRect();return {x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)}};\n  const gl=c.getContext('webgl'); const pix=[];\n  if(gl){\n    for(const [x,y] of [[10,10],[Math.floor(c.width/2),Math.floor(c.height/2)],[Math.floor(c.width/4),Math.floor(c.height/3)]]){\n      const rgba=new Uint8Array(4);\n      try{gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,rgba);pix.push([...rgba]);}catch(e){pix.push(String(e))}\n    }\n  }\n  return {\n    href:location.href,body:document.body.className,doc:document.documentElement.dataset.m98InitialTab,\n    API:!!window.music98DiscoverAmbient,tab:p.className,canvas:{style:styles(c),rect:rect(c),width:c.width,height:c.height},\n    tabStyle:styles(p),tabRect:rect(p),stageRect:rect(st),mainStyle:styles(document.querySelector('main')),\n    rendering:{webgl:!!gl,program:gl?!!gl.getParameter(gl.CURRENT_PROGRAM):null,error:gl?gl.getError():null,pix},\n    elementsAtTop:document.elementsFromPoint(innerWidth/2,Math.min(200,innerHeight/2)).slice(0,7).map(x=>x.tagName+'.'+String(x.className)+'#'+x.id),\n    countCanvases:document.querySelectorAll('canvas').length,\n    subscribeRect:rect(document.querySelector('.subscribe')),scrollY,innerWidth,innerHeight\n  };\n})()";
+const inspect=String.raw`(()=>{
+  const c=document.getElementById('discoverAmbient');
+  if(!c) return {href:location.href,ready:document.readyState,title:document.title,html:document.body?.outerHTML.slice(0,800),error:'canvas absent'};
+  const p=document.getElementById('tab-discover');
+  const st=document.getElementById('discoverPlayerStage');
+  const styles=x=>{const s=getComputedStyle(x);return {display:s.display,position:s.position,opacity:s.opacity,visibility:s.visibility,z:s.zIndex,background:s.backgroundColor}};
+  const rect=x=>{const r=x.getBoundingClientRect();return {x:Math.round(r.x),y:Math.round(r.y),w:Math.round(r.width),h:Math.round(r.height)}};
+  const gl=c.getContext('webgl'); const pix=[];
+  if(gl){
+    for(const [x,y] of [[10,10],[Math.floor(c.width/2),Math.floor(c.height/2)],[Math.floor(c.width/4),Math.floor(c.height/3)]]){
+      const rgba=new Uint8Array(4);
+      try{gl.readPixels(x,y,1,1,gl.RGBA,gl.UNSIGNED_BYTE,rgba);pix.push([...rgba]);}catch(e){pix.push(String(e))}
+    }
+  }
+  return {
+    href:location.href,body:document.body.className,doc:document.documentElement.dataset.m98InitialTab,
+    API:!!window.music98DiscoverAmbient,tab:p.className,canvas:{style:styles(c),rect:rect(c),width:c.width,height:c.height},
+    tabStyle:styles(p),tabRect:rect(p),stageRect:rect(st),mainStyle:styles(document.querySelector('main')),
+    rendering:{webgl:!!gl,program:gl?!!gl.getParameter(gl.CURRENT_PROGRAM):null,error:gl?gl.getError():null,pix},
+    elementsAtTop:document.elementsFromPoint(innerWidth/2,Math.min(200,innerHeight/2)).slice(0,7).map(x=>x.tagName+'.'+String(x.className)+'#'+x.id),
+    countCanvases:document.querySelectorAll('canvas').length,
+    subscribeRect:rect(document.querySelector('.subscribe')),scrollY,innerWidth,innerHeight
+  };
+})()`;
 try{
  ws=new WebSocket(await openCDP());
  await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
