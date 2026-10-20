@@ -242,18 +242,19 @@ def inspect(post, allows):
     # length bodies so briefs and special formats are not forced into padding.
     total_prose_words = sum(words(p) for p in paras)
     if len(paras) >= 4 and total_prose_words >= 300:
+        # Short paragraphs may be powerful; flag their rhythm for a human
+        # instead of forcing filler until an arbitrary 55/70-word threshold.
         short_paras = [(i, words(p)) for i, p in enumerate(paras, 1) if words(p) < 55]
-        for i, wc in short_paras:
-            fails.append(
-                f"paragraph {i}: choppy article paragraph is only {wc} words; "
-                "merge it or develop the idea instead of leaving a 2-3 line patch"
+        if short_paras:
+            detail = ", ".join(f"{i}:{wc}w" for i, wc in short_paras)
+            notes.append(
+                f"choppy article paragraph review ({detail}); ensure each short "
+                "paragraph is intentional, not a patch"
             )
-        under_70 = [(i, words(p)) for i, p in enumerate(paras, 1) if words(p) < 70]
-        if len(under_70) >= 2:
-            detail = ", ".join(f"{i}:{wc}w" for i, wc in under_70)
-            fails.append(
-                f"paragraph rhythm: multiple underdeveloped paragraphs ({detail}); "
-                "the article reads chopped up rather than continuous"
+        if len(short_paras) >= 2:
+            notes.append(
+                "paragraph rhythm: multiple short paragraphs; read the full "
+                "sequence before deciding whether to merge or expand"
             )
         for i, p in enumerate(paras, 1):
             wc = words(p)
@@ -389,9 +390,13 @@ def inspect(post, allows):
 
     if len(last_s) == 1 and words(last) < 55 and "single-sentence" not in allows:
         fails.append(f"final paragraph: single-sentence ending is only {words(last)} words")
-    ending_floor = 70 if sum(words(p) for p in paras) >= 300 and len(paras) >= 4 else 45
-    if words(last) < ending_floor:
-        fails.append(f"ending: final paragraph is too thin ({words(last)} words; floor {ending_floor})")
+    # A short ending is not automatically a bad ending. Block only an
+    # obviously fragmentary article-length close; review borderline cases.
+    if total_prose_words >= 300 and len(paras) >= 4:
+        if words(last) < 30:
+            fails.append(f"ending: final paragraph is a fragment ({words(last)} words)")
+        elif words(last) < 55:
+            notes.append(f"ending: final paragraph is brief ({words(last)} words); review substance and cadence")
     if re.search(r"\b\d+(?:st|nd|rd|th)?[.!?]?[\"'’”]?$", last.strip()):
         fails.append("ending: article ends on a bare number/ordinal")
 
