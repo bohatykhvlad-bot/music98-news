@@ -91,7 +91,7 @@ Canonical writes:
 - full draft replacement: `python scripts/post.py replace-draft ...`
 - publish: `python scripts/post.py publish <id>`
 
-## 3. Human quality barrier
+## 4. Human quality barrier
 
 Before any gate/preflight, read as a music-magazine editor.
 
@@ -107,7 +107,7 @@ A post fails if:
 
 If a sentence can be removed without losing anything useful, remove it.
 
-## 4. Hard anti-AI / anti-PR rules
+## 5. Hard anti-AI / anti-PR rules
 
 Do not write prose whose job is to explain the prose itself.
 
@@ -134,7 +134,7 @@ Avoid generic PR abstractions unless a concrete fact earns them:
 Do not copy this structure:
 `announcement → venue/guest list → background dump → sales/format metadata → recap`.
 
-## 5. Endings
+## 6. Endings
 
 The final paragraph must add meaning, not summarize previous paragraphs.
 
@@ -155,7 +155,7 @@ Good endings:
 
 No recap, slogan, aphorism or fake profundity.
 
-## 6. Names, venues, tracks, lists
+## 7. Names, venues, tracks, lists
 
 Research is not prose.
 
@@ -182,7 +182,7 @@ Releases:
 - routine deluxe/extended/physical metadata is expendable;
 - technical credits appear only when central to the story.
 
-## 7. Facts
+## 8. Facts
 
 Lock every checkable detail before prose:
 - names/styling;
@@ -208,7 +208,7 @@ Rules:
 - no external outlet links in article body;
 - do not leak verification language into prose.
 
-## 8. Lede, title, excerpt
+## 9. Lede, title, excerpt
 
 News sentence 1:
 `ARTIST + ACTION + NEWS`.
@@ -230,7 +230,7 @@ Title:
 - release page may use release-title convention;
 - no colon-heavy headline style.
 
-## 9. Language and rhythm
+## 10. Language and rhythm
 
 Use natural journalistic American English.
 
@@ -262,7 +262,7 @@ Final rhythm check:
 - then only the final sentence of every paragraph;
 - rewrite template-like transitions and sentences that merely explain what a paragraph “means.”
 
-## 10. Photos and media
+## 11. Photos and media
 
 - Prefer official hi-res press/promo originals.
 - Do not replace an available original with a compressed grab.
@@ -274,7 +274,7 @@ Final rhythm check:
 - Visual approval requires inspecting the actual rendered image/crop.
 - Do not put two media items back-to-back without prose.
 
-## 11. What each check means
+## 12. What each check means
 
 `editorial_readthrough.py`
 - human-quality barrier;
@@ -307,7 +307,7 @@ Gate does not replace a full read.
 
 Preflight does not judge prose quality.
 
-## 12. READY
+## 13. READY
 
 A post is READY only when:
 - facts are verified;
