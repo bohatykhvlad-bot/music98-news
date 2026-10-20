@@ -7,9 +7,10 @@ It blocks reader-facing defects that can survive factual and payload checks:
 AI/PR phrasing, research-note leakage, list-like prose, recap endings,
 administrative endings, and mechanical name rhythm.
 
-Existing edits require two content-hashed stamps:
-PRE_EDIT proves the exact source was read before editing.
-POST_EDIT proves the exact final body was reread after the last edit.
+Existing edits require two content-hashed attestations:
+PRE_EDIT records a claimed full read of the exact source before editing.
+POST_EDIT records a claimed full read of the exact final body after editing.
+Hashes detect stale edits; they cannot independently prove editorial judgment.
 """
 from __future__ import annotations
 
