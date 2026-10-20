@@ -878,6 +878,15 @@ def check_post(p, strict):
     """Returns (fails, warns, info). Each item is (code, message)."""
     fails, warns, info = [], [], []
     body = p.get("body") or ""
+    # Site house style uses plain ASCII double quotes for song titles and
+    # quoted speech. The quote-attribution parser below scans only " and
+    # previously ignored curly quotes entirely, allowing a false QA pass.
+    for field in ("title", "excerpt", "body"):
+        value = p.get(field) or ""
+        wrong = [(ch, value.count(ch)) for ch in "“”„‟«»" if ch in value]
+        if wrong:
+            details = ", ".join("%s ×%d" % (repr(ch), count) for ch, count in wrong)
+            fails.append(("quote-glyph", "%s uses unsupported quotation marks (%s); use straight double quotes" % (field, details)))
     paras = paragraphs(body)
     media = [t.strip() for t in paras if is_media(t)]
 
