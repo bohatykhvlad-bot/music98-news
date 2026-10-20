@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Read-only payload/state preflight for a music98 draft.
 
-This script does NOT judge prose quality. That belongs to editorial_readthrough.py.
+This script does NOT judge prose quality. That requires full editorial reading;
+editorial_readthrough.py supplies additional heuristics, not a substitute.
 It validates fields, status, media, cover, minimum format length and mutation safety.
 """
 import argparse
