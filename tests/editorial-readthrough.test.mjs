@@ -29,3 +29,23 @@ test("saving or publishing through post.py requires a current full-read stamp",(
   assert.match(post,/sp = sub\.add_parser\("editorial"\)/);
   assert.match(post,/--check-stamp/);
 });
+
+test("Music98 gate flags curly quotes in title, teaser and body", async()=>{
+  const {spawnSync}=await import("node:child_process");
+  const py=`
+import sys
+sys.path.insert(0,"scripts")
+from gate import check_post
+post={"id":"quote-regression","type":"news","status":"draft","title":"Singer releases “Housewife”","excerpt":"A single features “Housewife” in the title.","body":"The singer released “Housewife” as a single."}
+fails,_,_=check_post(post,strict=True)
+quoted=[msg for code,msg in fails if code=="quote-glyph"]
+assert len(quoted)==3,quoted
+post["title"]='Singer releases "Housewife"'
+post["excerpt"]='A single features "Housewife" in the title.'
+post["body"]='The singer released "Housewife" as a single.'
+fails,_,_=check_post(post,strict=True)
+assert not any(code=="quote-glyph" for code,_ in fails),fails
+`;
+  const run=spawnSync("python3",["-c",py],{encoding:"utf8"});
+  assert.equal(run.status,0,run.stdout+"\\n"+run.stderr);
+});
