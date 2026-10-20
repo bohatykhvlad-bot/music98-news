@@ -7,7 +7,7 @@ const source=readFileSync("public/discover-ambient.js","utf8");
 const html=readFileSync("public/index.html","utf8");
 
 test("Discover HTML references a fresh ambient asset revision",()=>{
-  assert.match(html,/\/discover-ambient\.js\?v=20261020-waves03/);
+  assert.match(html,/\/discover-ambient\.js\?v=20261020-flow14-restored04/);
 });
 
 test("Discover's animated background appears despite continuous mobile layout jitter",()=>{
@@ -19,13 +19,13 @@ test("Discover's animated background appears despite continuous mobile layout ji
   const cancel=n=>scheduled.delete(n);
   const mockContext=()=>({
     createRadialGradient(){return {addColorStop(){}};},
-    fillRect(x,y,w,h){draws++;if(w>0&&w<2&&h>0&&h<2)particleDraws.push([x,y]);},clearRect(){},setTransform(){},save(){},restore(){},
+    fillRect(){},clearRect(){},setTransform(){},save(){},restore(){},
     translate(){},scale(){},beginPath(){},roundRect(){},ellipse(){},
     stroke(){waveStrokes.push(this.strokeStyle);},
-    drawImage(){draws++;},
+    drawImage(light,x,y){draws++;particleDraws.push([x,y]);},
   });
   const canvas={
-    width:0,height:0,style:{},addEventListener(){},
+    width:0,height:0,style:{},dataset:{},addEventListener(){},
     getContext(type){
       if(type==="webgl")throw Error("WebGL is disabled by browser privacy settings");
       return type==="2d"?mockContext():null;
@@ -83,12 +83,13 @@ test("Discover's animated background appears despite continuous mobile layout ji
   }
   assert.ok(classes.has("discover-ambient-settled"),"ambient must eventually become visible");
   assert.ok(draws>0,"background must actually render, not just toggle its CSS class");
-  assert.ok(particleDraws.length>=1400,"non-WebGL renderer must preserve the dense sand particles");
-  assert.notDeepEqual(particleDraws[0],particleDraws[1400],"particles must move between rendered frames");
+  assert.equal(canvas.dataset.ambientRenderer,"2d","browser fallback can be identified without changing its appearance");
+  assert.ok(particleDraws.length>=320,"non-WebGL renderer must draw soft particle sprites");
+  assert.notDeepEqual(particleDraws[0],particleDraws[320],"soft particles must move between rendered frames");
   assert.ok(waveStrokes.some(stroke => {
     const alpha=Number(String(stroke).match(/,([0-9.]+)\)$/)?.[1] ?? 0);
-    return alpha >= .10;
-  }),"non-WebGL fallback must draw visible wave fronts, not nearly transparent lines");
+    return alpha > 0;
+  }),"non-WebGL fallback must draw the original soft wave fronts");
   assert.ok(canvas.width>0&&canvas.height>0,"ambient should have a drawable surface");
   win.music98DiscoverAmbient.setVisible(false);
   assert.equal(classes.has("discover-ambient-visible"),false);
