@@ -162,9 +162,27 @@ def assert_news_word_floor():
     assert pf.check(article(30), None, None) is False
     assert pf.check(article(42), None, None) is True
 
+
+
+def assert_single_release_format():
+    lede = "Tate McRae released the single on October 15, confirming the song and its video."
+    prose = lede + "\n\n" + (
+        "The music video uses the setting to illustrate the song's central theme, "
+        "with a tightly structured narrative and a carefully chosen final scene. "
+    ) * 16 + "\n\n[youtube:DPEodkHzH-s]"
+    original = {
+        "id": "single-test", "status": "draft", "type": "release", "rtype": "Single",
+        "artist": "Tate McRae", "title": "Housewife", "body": prose,
+        "excerpt": lede, "cover": {"src": "photos/example.jpg"}
+    }
+    assert pf.check(original, None, None), "Single + video must pass without duplicate Apple embed"
+    invalid = dict(original, title="Tate McRae releases Housewife with a new video")
+    assert not pf.check(invalid, None, None), "Release title must not contain artist or news headline"
+
 def main():
     assert_quality_regressions()
     assert_news_word_floor()
+    assert_single_release_format()
 
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
