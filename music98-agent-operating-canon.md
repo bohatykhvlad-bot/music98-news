@@ -18,7 +18,7 @@ Priority: latest owner instruction > this canon > existing desk conventions.
 3. Use natural **American-English music journalism** with no first-person narrator. News and Releases need **at least 400 substantive prose words**; longreads **at least 1300**. Facts, not padding, earn the length.
 4. Headline: factual, specific, no colon or unverified hype. Excerpt: the literal first 1–2 complete sentences of the final body. Songs in quotation marks; album styling follows site conventions; full names on first mention.
 5. Exclude detached biography, tour-city/date walls, guest/producer/engineer roll calls, tracklist prose, physical-format details, platform lists and ticketing jargon unless essential to the actual story. No Billboard chart news; no external news-outlet links in the article body; no semicolons. For ticket buttons use the site's established Ticketmaster/Impact mechanism.
-6. Plan an **ENDING** on a strong reported fact or fresh grounded consequence, not a recap, slogan, bare date, presale detail or "new chapter" remark.
+6. **ENDINGS:** Close on a strong reported fact or fresh grounded consequence, not a recap, slogan, bare date, presale detail or "new chapter" remark.
 
 ## 3. HUMAN QUALITY BARRIER — finish editing BEFORE showing the owner
 
