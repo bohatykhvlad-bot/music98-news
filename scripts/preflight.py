@@ -82,10 +82,23 @@ def check(post, baseline, expected_media, min_words=None):
         failures.append(f"expected {expected_media} media, found {len(media)}")
     if ptype in {"news", "release", "longread"} and not media:
         failures.append(f"{ptype} has no body media")
-    if ptype == "release" and not any(
-        kind == "apple" and value.lower().startswith("album:") for kind, value in media
-    ):
-        failures.append("release has no Apple Music album embed")
+    if ptype == "release":
+        artist = (post.get("artist") or "").strip()
+        rtype = (post.get("rtype") or "").strip().lower()
+        if not artist:
+            failures.append("release is missing artist field")
+        if artist and title.lower().startswith(artist.lower()):
+            failures.append("release title contains artist: store only the track/album title")
+        if re.search(r"\b(releases?|announces?|unveils?|drops?|shares?|debuts?)\b", title, re.I):
+            warnings.append("release title looks like a news headline; check that it is ONLY the release name")
+        if rtype not in {"single", "ep", "album"}:
+            warnings.append("release type must identify Single, EP or Album")
+        # A single with its official music video does not need a duplicate Apple
+        # embed. Albums/EPs use the established Apple Music album player.
+        if rtype in {"", "ep", "album"} and not any(
+            kind == "apple" and value.lower().startswith("album:") for kind, value in media
+        ):
+            failures.append("album/EP release has no Apple Music album embed")
 
     for i, (kind, value) in enumerate(media, 1):
         if kind == "photo":
