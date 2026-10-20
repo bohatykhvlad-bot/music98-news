@@ -83,7 +83,7 @@ test("Discover's animated background appears despite continuous mobile layout ji
   assert.ok(classes.has("discover-ambient-settled"),"ambient must eventually become visible");
   assert.ok(draws>0,"background must actually render, not just toggle its CSS class");
   assert.ok(waveStrokes.some(stroke => {
-    const alpha=Number(String(stroke).match(/,([0-9.]+)\\)$/)?.[1] ?? 0);
+    const alpha=Number(String(stroke).match(/,([0-9.]+)\)$/)?.[1] ?? 0);
     return alpha >= .10;
   }),"non-WebGL fallback must draw visible wave fronts, not nearly transparent lines");
   assert.ok(canvas.width>0&&canvas.height>0,"ambient should have a drawable surface");
