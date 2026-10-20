@@ -136,10 +136,11 @@ def assert_quality_regressions():
     name_fails, _ = er.inspect(BAD_NAME_RHYTHM, set())
     assert "three consecutive sentences" in "\n".join(name_fails)
 
-    choppy_fails, _ = er.inspect(BAD_CHOPPY, set())
-    joined = "\n".join(choppy_fails)
+    choppy_fails, choppy_notes = er.inspect(BAD_CHOPPY, set())
+    joined = "\n".join(choppy_notes)
     assert "choppy article paragraph" in joined
     assert "paragraph rhythm" in joined
+    assert not any("choppy article paragraph" in x for x in choppy_fails)
 
 
 def main():
