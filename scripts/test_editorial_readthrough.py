@@ -8,6 +8,7 @@ import tempfile
 from pathlib import Path
 
 import editorial_readthrough as er
+import preflight as pf
 
 
 SOURCE = """The opening section explains how the project changed during writing and recording, keeping the focus on the choices that matter to the listener rather than on every available production detail. The paragraph then connects those choices to the finished songs, giving the article a clear reason to move forward without repeating the same factual point in a second form.
@@ -136,14 +137,34 @@ def assert_quality_regressions():
     name_fails, _ = er.inspect(BAD_NAME_RHYTHM, set())
     assert "three consecutive sentences" in "\n".join(name_fails)
 
-    choppy_fails, _ = er.inspect(BAD_CHOPPY, set())
-    joined = "\n".join(choppy_fails)
+    choppy_fails, choppy_notes = er.inspect(BAD_CHOPPY, set())
+    joined = "\n".join(choppy_notes)
     assert "choppy article paragraph" in joined
     assert "paragraph rhythm" in joined
+    assert not any("choppy article paragraph" in x for x in choppy_fails)
 
+
+
+def assert_news_word_floor():
+    # News drafts below 400 words must not silently pass preflight.
+    opening = "Example Artist has confirmed that a new record will arrive next month."
+    detail = "The announcement includes specific material about the songs and their recording."
+
+    def article(n):
+        return {
+            "id": "word-floor-test", "status": "draft", "type": "news",
+            "title": "Example Artist Announces an Album",
+            "excerpt": opening,
+            "body": opening + "\n\n" + " ".join([detail] * n) + "\n\n[youtube:abcdefghijk]",
+            "cover": {"src": "photos/example.jpg"},
+        }
+
+    assert pf.check(article(30), None, None) is False
+    assert pf.check(article(42), None, None) is True
 
 def main():
     assert_quality_regressions()
+    assert_news_word_floor()
 
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
