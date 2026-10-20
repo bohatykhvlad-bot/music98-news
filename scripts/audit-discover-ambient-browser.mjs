@@ -83,5 +83,13 @@ try{
    maximum:Math.max(...diffs),over10:diffs.filter(x=>x>10).length,
    onExamples:on.slice(0,12),offExamples:off.slice(0,12)};
   console.log('REAL_BROWSER_AMBIENT_CONTRAST '+JSON.stringify(contrast));
+  if(view==='desktop'){
+    await evaluate('document.getElementById("discoverAmbient").style.visibility="visible"');
+    await sleep(250);
+    const shot=await call('Page.captureScreenshot',{format:'png',clip:{x:0,y:0,width:1200,height:650,scale:0.72}});
+    const data=shot.data;
+    const batch=5000,parts=Math.ceil(data.length/batch);
+    for(let n=0;n<parts;n++) console.log('AMBIENT_IMAGE_CHUNK '+n+'/'+parts+' '+data.slice(n*batch,(n+1)*batch));
+  }
  }
 }finally{if(ws)ws.close();browser.kill('SIGTERM');}
