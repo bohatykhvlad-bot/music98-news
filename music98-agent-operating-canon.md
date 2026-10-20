@@ -1,6 +1,6 @@
 # music98 — Mandatory AI Editorial Canon
 
-Version: 2026-10-06  
+Version: 2026-10-20  
 This file is the single mandatory instruction for AI editorial work on music98.news.
 
 ## 1. Priority
@@ -15,7 +15,59 @@ Gate/preflight PASS never proves that prose is good.
 
 If a post sounds like AI, PR copy, research notes, a ticket page, a tracklist, or a recap of itself, it is NOT READY.
 
-## 2. Required workflow
+
+## 2. First-pass publication-quality protocol (mandatory, 2026-10-20)
+
+**Goal:** Deliver the FIRST version shown to the owner as a nearly publication-ready article. Drafting, researching, editing, and reviewing happen BEFORE presenting it, not through repetitive owner-led repairs. Do not optimize for the number of passes. Optimize for defects found and removed before delivery.
+
+**Non-negotiable distinction:** A writing draft is NOT the first owner-facing version. The owner sees the text only after all available pre-delivery editorial passes. Internal checks cannot guarantee perfection; report unresolved issues instead of inventing certainty.
+
+### A. Prewrite decisions — eliminate bad articles before prose
+
+1. Determine the actual event and its status **as of the publication date**: announced / teased / released / performed / confirmed / rumored. Do not confuse future and completed actions. Reject clickbait and unsubstantiated collaborations, awards, chart records or "first ever" claims.
+2. Form a one-sentence **story thesis**: what happened, why a music reader should care, and what specific reporting makes it worth a full article. If this cannot be answered with facts, change the angle or stop. Do not pad thin news to reach a word quota.
+3. Build a private **fact registry** before drafting. For each material claim, record the precise fact, primary-source URL, exact wording/date and status (verified, qualified or unverified). Verify names, collaborators, roles, releases, quotes, chronology, records, charts and comparisons. Use independent corroboration where sources conflict. Unverified claims cannot silently enter the article.
+4. Select useful evidence, not just all available facts. Write a brief paragraph map with a distinct **job** for every paragraph. Reserve one reported detail or insight for an ending that advances the story. Decide what to omit (tour route, credits, platform lists, unnecessary dates) before writing.
+5. Research visual material **in parallel with facts**, not at the very end. Seek the authentic official/press original (prefer >=1920 px, ideally 2500–8000), the photographer's name and legitimate credit URL. Inspect actual image, resolution, central crop and face clearance. Do not accept a large but ugly image, compressed screenshot, watermarked photo or wrong era. If an original/credit cannot be verified, say so, don't fake approval.
+
+### B. Write once from the locked evidence
+
+6. Write coherent natural American-English journalism, not an annotated research dump. Begin news with **artist + actual news** in one strong sentence. Every next paragraph must deliver a NEW fact, consequence, verified context or concrete insight. Reader comprehension outranks ornamental language.
+7. Target **at least 400 substantive prose words for News and Releases** and **at least 1300 for longreads**; there is no benefit in filler. When a genuinely newsworthy short item cannot support 400 words without padding, flag the format/angle as unsuitable instead of inventing context. Do not use a numeric word target as a reason to retain repetition.
+8. Use real structural variation. Avoid the mechanically repeatable "announcement → career biography → list of features → date/sales → generic conclusion" template. Integrate background where it explains this news, not in a detached encyclopedia paragraph.
+9. The headline must communicate artist and actual news without a colon; no unverified adjectives or "new era" claims. Excerpt must be a literal 1–2 sentence prefix of the final body. Quotes are exact, attributed and checked against their original context. Song titles in quotation marks; full public names at first mention; avoid mechanical surname repetition. No semicolons, external-outlet links in the article body, Billboard chart news, needless track/guest/producer lists, CD/vinyl details, or route/date walls.
+
+### C. Internal editor passes — required BEFORE owner sees the article
+
+10. **Meaning pass (cold reader):** Read the complete article without consulting the outline. For every paragraph ask: What NEW thing does the reader learn? Why is it here and why here? Remove or rewrite anything interchangeable with another paragraph, a press release, or a generic AI response. Check the subject of pronouns, unexplained references and time jumps.
+11. **Sentence pass (human voice):** Check every sentence for natural English, real subject/verb, strong attribution, correct tense, specificity and rhythm. Cut empty transitions, tautology, fake profundity, stock PR judgments, indirect phrasing and "this shows/proves/marks" commentary that merely restates facts. Keep concrete reporting; don't delete evidence to make a paragraph superficially smooth.
+12. **Repetition pass (global):** Compare adjacent paragraphs, the full set of first sentences, the full set of last sentences, name/surname frequency, ideas repeated across the lede/body/ending, and overused structures. Read paragraph openings together, then paragraph endings together. No consecutive near-duplicates, list-shaped paragraphs or token two-line conclusion.
+13. **Fact/source pass (adversarial):** Recheck each checkable sentence against the registry, distinguishing source fact from editorial inference. Challenge superlatives, chronology, quotes, disputed claims, and assertions that imply the writer heard or watched material when that did not happen. For a claim that cannot be confirmed: qualify transparently, replace with a supported fact, or remove.
+14. **Ending pass:** Inspect the last two paragraphs against the central thesis. The final paragraph must land on a real reported detail, a useful new connection grounded in the article, or a meaningful consequence. No recap, "what's next," ticket metadata, empty flourish or abstract summary.
+15. **Full slow read #1:** Read title → excerpt → ALL body prose → media carriers as one story after editing. Correct awkward English and editorial defects. **Full slow read #2:** Reread the resulting exact version as a fresh reader after the last substantive change. Then **reverse-scan paragraphs** from last to first to find local contradictions, dangling references, duplicate facts and endings that do not earn their place. Never count a skim as a complete read.
+16. **Regression lock:** Preserve already-good sentences. Before making any edit, name the specific problem and smallest effective fix. Compare before/after for facts, tone, adjacent transitions, word count, excerpt prefix and media. Do not launch another stylistic rewrite after the copy is clean. A newly introduced defect is a failed edit: restore the better wording. After ANY final-body change, invalidate the final read and required downstream checks, then re-verify the exact changed version.
+
+These passes are distinct review lenses, **not** a claim that multiple independent humans or AI models reviewed the story.
+
+### D. Mechanical checks, saving, and evidence
+
+17. Only after editorial content is stable, run the actual available **`editorial_readthrough.py` (required PRE_EDIT/POST_EDIT stamps for edits), `gate.py` and `preflight.py`** using the supported `scripts/post.py` workflow. Inspect failures and warnings. Their PASS does not prove journalistic quality; do not claim execution if scripts were not actually run.
+18. Validate the final cover and in-body media: official original, attribution, placement, embed identity and size, no two consecutive carriers, no unnecessary Apple + YouTube duplicate for the same track, readable desktop/mobile crops. Use visual preview when available. An image URL or dimension alone is not a visual inspection.
+19. **State discipline:** `RESEARCHED → WRITTEN → EDITED → HUMAN_READ_PASSED → VERIFIED → DRAFT_SAVED → READBACK_CONFIRMED → READY`. Any failure or missing verification yields `BLOCKED` or `READY_WITH_DISCLOSED_LIMITATION`, never an invented PASS. The saved desk content, not the local draft, is the final authority. Only the canonical `scripts/post.py` commands may mutate a post.
+20. Publication requires the owner's explicit permission. After publishing, reopen the LIVE rendered article, verify title, excerpt, actual body, crop, credit, embeds, links and mobile layout (where access is available) and reread the published copy from beginning to end. Record unavailable checks; do not silently call them complete.
+
+### E. Compact handoff — avoid owner doing the editor's work
+
+Give the owner the article **only after** the preceding internal work, along with a compact accurate status:
+- **Editorial:** clear / blocked; remaining meaningful issues (if any).
+- **Facts:** verified material claims and any explicitly unresolved claims.
+- **Photo/media:** verified original + attribution + crop, or precisely what was not verified.
+- **Automated:** which real checks ran and their results; unavailable/not-run is NOT PASS.
+- **Desk:** draft ID/link and readback status, when actually saved; never report "published" before live verification.
+
+Do not award a reflexive 9/10 or claim "perfect" or "no changes needed." Treat any defect later caught by the owner as a postmortem: identify the failure mode, add the narrowest lasting prevention mechanism, and check it does not introduce new false positives.
+
+## 3. Required workflow
 
 Existing post:
 
