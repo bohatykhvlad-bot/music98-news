@@ -62,6 +62,7 @@ test("Discover's animated background appears despite continuous mobile layout ji
     performance:{now:()=>time},scrollY:0,scrollX:0,innerWidth:1200,
     innerHeight:900,devicePixelRatio:1,
     addEventListener(){},
+    ResizeObserver:win.ResizeObserver,
   };
   vm.runInNewContext(source,ctx);
   assert.ok(win.music98DiscoverAmbient,"ambient API initialized");
