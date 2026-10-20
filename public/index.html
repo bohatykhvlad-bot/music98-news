@@ -885,7 +885,12 @@ textarea{resize:vertical;min-height:64px}
 /* Discover-only document ambience. The canvas is always click-through and
    sits behind the site UI; it never shifts the player or affects other tabs. */
 #discoverAmbient{position:absolute;top:0;left:0;z-index:0;width:100%;height:100vh;display:block;pointer-events:none;user-select:none;opacity:0;visibility:hidden;transition:opacity .28s ease}
-body.discover-ambient-visible #discoverAmbient{visibility:visible}
+body.discover-ambient-visible #discoverAmbient{visibility:visible;
+  /* An always-present grey mineral layer keeps waves legible when an album
+     cover is nearly white, or WebGL is blocked by privacy settings. */
+  background:radial-gradient(ellipse 85% 62% at 9% 26%,rgba(110,138,148,.10),transparent 74%),
+             radial-gradient(ellipse 88% 74% at 91% 77%,rgba(106,136,145,.09),transparent 76%);
+}
 /* The ambient fades in only once its canvas geometry has settled
    (discover-ambient.js): a late layout change must never re-anchor an
    already visible background. */
@@ -4496,7 +4501,7 @@ window.music98DiscoverPlayer={
 };
 </script>
 <script src="/discover-palette.js?v=20261010-cover02" defer></script>
-<script src="/discover-ambient.js?v=20261020-settle01" defer></script>
+<script src="/discover-ambient.js?v=20261020-mineral02" defer></script>
 <script src="/discover-catalog-policy.js?v=20261010-identity01" defer></script>
 <script src="/discover-app.js?v=20261010-identity02" defer></script>
 <script src="/concerts-app.js?v=20261008-03" defer></script>
