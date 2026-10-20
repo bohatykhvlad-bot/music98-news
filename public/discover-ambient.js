@@ -132,8 +132,19 @@
       vec3 blue=tintBlue, cyan=tintCyan, mineral=tintMineral;
       vec3 colour=mix(blue,cyan,smoothstep(.12,.85,warp.x+p.y*.23)*paletteMix.x*2.);
       colour=mix(colour,mineral,clamp((smoothstep(.48,.86,lanes)*2.+crests*.32)*paletteMix.y,0.,.65));
+      // A neutral wave relief survives pale / grayscale album covers.
+      // Previously an almost-white cover tinted the entire shader white and
+      // the currents disappeared on the white page. Cover colour still wins
+      // for saturated artwork; soft mineral grey keeps its contours visible.
+      float maxTint=max(colour.r,max(colour.g,colour.b));
+      float minTint=min(colour.r,min(colour.g,colour.b));
+      float nearNeutral=1.-smoothstep(.045,.18,maxTint-minTint);
+      float nearWhite=smoothstep(.78,.95,minTint);
+      float neutralWeight=.13+.54*max(nearNeutral,nearWhite);
+      float front=.5+.5*sin(waveDistance*14.-time*.87+(volume-.5)*.8);
+      vec3 neutralRidge=mix(vec3(.45,.57,.61),vec3(.67,.75,.77),smoothstep(.18,.82,front));
+      colour=mix(colour,neutralRidge,neutralWeight);
       // Lit grains sit within the volume, with a wider glow beneath it.
-      // Give pale currents shaded depth before adding the small light grains.
       colour*=1.-depth*.12*smoothstep(.4,.7,max(colour.r,max(colour.g,colour.b)));
       colour=mix(colour,vec3(1.),clamp(dots.x*.35+dots.y*.45+motes.y*.3+depth*.05,0.,.8));
       float breathing=1.+.025*motionStrength*sin(time*.55);
@@ -144,8 +155,12 @@
   `;
 
   function createRenderer() {
-    const gl=canvas.getContext("webgl", { alpha:true, premultipliedAlpha:false,
-      antialias:false, depth:false, stencil:false, powerPreference:"low-power" });
+    // Privacy settings and hardened browsers can throw on WebGL context access.
+    // Fall back to a visible Canvas2D effect instead of aborting initialization.
+    let gl=null;
+    try { gl=canvas.getContext("webgl", { alpha:true, premultipliedAlpha:false,
+      antialias:false, depth:false, stencil:false, powerPreference:"low-power" }); }
+    catch { gl=null; }
     if (gl) {
       const compile=(type, source) => {
         const shader=gl.createShader(type);
@@ -205,21 +220,22 @@
       ctx.clearRect(0,0,width,height);
       const rgba=(c,a)=>`rgba(${c.map(v=>Math.round(v*255)).join(',')},${a*paletteStrength})`;
       const base=palette[0].map((v,k)=>v+(palette[1][k]-v)*paletteMix[0]);
-      ctx.fillStyle=rgba(base,.06+.005*Math.sin(clock*.25));
+      ctx.fillStyle=rgba(base,.105+.01*Math.sin(clock*.25));
       ctx.fillRect(0,0,width,height);
       const [sourceX,sourceY,halfWidth,halfHeight]=playerSource();
       const centres=[[sourceX,sourceY,width*.65,height*.8]];
       for(const [x,y,rx,ry] of centres){
         ctx.save();ctx.translate(x,y);ctx.scale(rx,ry);
         const glow=ctx.createRadialGradient(0,0,0,0,0,1);
-        glow.addColorStop(0,rgba(palette[0],.12+energy*.04));
-        glow.addColorStop(.45,rgba(base,.08));glow.addColorStop(1,rgba(base,0));
+        glow.addColorStop(0,rgba(palette[0],.20+energy*.05));
+        glow.addColorStop(.45,rgba(base,.12));glow.addColorStop(1,rgba(base,0));
         ctx.fillStyle=glow;ctx.fillRect(-1,-1,2,2);ctx.restore();
       }
-      ctx.save();ctx.shadowBlur=32;ctx.shadowColor=rgba(palette[0],.12);
+      ctx.save();ctx.shadowBlur=38;ctx.shadowColor=rgba(palette[0],.18);
       for(let i=0;i<3;i++){
         const travel=(clock*.045+i/3)%1,spread=travel*Math.max(width,height)*.5;
-        ctx.strokeStyle=rgba(palette[1],(1-travel)*(.02+energy*.015)*motionStrength);
+        // In non-WebGL browsers, preserve recognizable soft wave fronts.
+        ctx.strokeStyle=rgba(palette[1],(1-travel)*(.16+energy*.05)*motionStrength);
         ctx.lineWidth=32+spread*.06;ctx.beginPath();
         if(ctx.roundRect)ctx.roundRect(sourceX-halfWidth-spread,sourceY-halfHeight-spread,
           (halfWidth+spread)*2,(halfHeight+spread)*2,24+spread);
