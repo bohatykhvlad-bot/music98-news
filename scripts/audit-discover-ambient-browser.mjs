@@ -9,7 +9,8 @@ const browser=spawn(chrome,['--headless=new','--no-sandbox','--disable-dev-shm-u
  '--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
 async function openCDP(){
  for(let i=0;i<35;i++){try{const pages=await (await fetch('http://localhost:'+port+'/json/list')).json();
- if(pages[0]?.webSocketDebuggerUrl)return pages[0].webSocketDebuggerUrl;}catch{} await sleep(200);}
+ const page=pages.find(p=>p.type==='page'&&p.webSocketDebuggerUrl);
+ if(page)return page.webSocketDebuggerUrl;}catch{} await sleep(200);}
  throw Error('Chrome CDP not reachable');
 }
 const pending=new Map();let seq=0,ws;
