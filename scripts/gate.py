@@ -141,6 +141,8 @@ REFERENT = re.compile(
 # The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
 # was true in one draft and silently false in the next ("October 30", "the following March").
 VERIFIED_DATES = {
+    "october 21": "'Housewife (Live from The Victoria's Secret Fashion Show 2026)' was released on streaming on 21.10.2026, three days after she performed it at the Victoria's Secret Fashion Show (iTunes Lookup API trackId 6825557429, releaseDate 2026-10-21)",
+    "august 2": "The word 'Housewife' flashed on screens during Tate McRae's Lollapalooza set in Chicago on 02.08.2026; she later discussed the hidden-title tease on The Tonight Show Starring Jimmy Fallon (NBC Tonight Show interview; repo staged draft tate-mcrae-housewife-20261025)",
     "october 15": "Tate McRae released 'Housewife' and its official music video on 15.10.2026 (Sony Music Canada https://www.sonymusic.ca/press_release/tate-mcrae-releases-housewife ; Apple Music US https://music.apple.com/us/album/housewife-single/6822497770).",
     "april 6": "Lola Young Everything Begins Tour opens at The Pinnacle in Nashville on 06.04.2027 (Pollstar 05.10.2026).",
     "may 4": "Lola Young Everything Begins Tour closes at the Greek Theatre in Los Angeles on 04.05.2027 (Pollstar 05.10.2026).",
