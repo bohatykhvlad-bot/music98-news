@@ -1,0 +1,41 @@
+name: Create staged draft
+
+on:
+  workflow_dispatch:
+    inputs:
+      file:
+        description: "Path to staged JSON (relative to repo root)"
+        required: true
+        default: "editorial/staged/tate-mcrae-housewife-20261025.json"
+
+permissions:
+  contents: read
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Create draft via guarded post.py
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${ADMIN_PASSWORD:-}" ]; then
+            echo "ERROR: ADMIN_PASSWORD secret is empty"
+            exit 1
+          fi
+          FILE="${{ github.event.inputs.file }}"
+          if [ ! -f "$FILE" ]; then
+            echo "ERROR: file not found: $FILE"
+            exit 1
+          fi
+          echo "Creating draft from: $FILE"
+          python scripts/post.py create --file "$FILE"
