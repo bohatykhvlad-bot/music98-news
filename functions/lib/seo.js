@@ -270,8 +270,13 @@ function serverArticleMarkup(p, origin) {
   const cover = escapeHtml(absCover(p, origin));
   const photoCredit = p.cover && p.cover.credit ? String(p.cover.credit) : "";
   const creditUrl = publicMediaUrl(p.cover && p.cover.creditUrl, origin);
-  const byline = photoCredit
-    ? `<p class="pcred">Photo: ${creditUrl ? `<a href="${escapeHtml(creditUrl)}" rel="noopener noreferrer">${escapeHtml(photoCredit)}</a>` : escapeHtml(photoCredit)}</p>`
+  const credLink = (n, u) => u ? `<a href="${escapeHtml(u)}" rel="noopener noreferrer">${escapeHtml(n)}</a>` : escapeHtml(n);
+  const photoCredit2 = p.cover && p.cover.credit2 ? String(p.cover.credit2) : "";
+  const creditUrl2 = publicMediaUrl(p.cover && p.cover.creditUrl2, origin);
+  const byline = photoCredit && photoCredit2
+    ? `<p class="pcred">Photos: ${credLink(photoCredit, creditUrl)} (left), ${credLink(photoCredit2, creditUrl2)} (right)</p>`
+    : photoCredit
+    ? `<p class="pcred">Photo: ${credLink(photoCredit, creditUrl)}</p>`
     : "";
   const label = p.type === "release"
     ? `<span class="tag" style="position:static;margin-top:14px">${escapeHtml(p.rtype || p.tag || "Release")}</span>`

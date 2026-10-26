@@ -1227,11 +1227,11 @@ function coverImg(p, square, lazy, mode){
 function creditHTML(p){
   const c = p && p.cover;
   if(!c || !c.credit) return "";
-  const label = esc(c.credit);
-  const inner = c.creditUrl
-    ? `<a href="${esc(c.creditUrl)}" target="_blank" rel="noopener noreferrer">${label}</a>`
-    : label;
-  return `<p class="pcred">Photo: ${inner}</p>`;
+  const link = (n, u) => u
+    ? `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(n)}</a>`
+    : esc(n);
+  if(c.credit2) return `<p class="pcred">Photos: ${link(c.credit, c.creditUrl)} (left), ${link(c.credit2, c.creditUrl2)} (right)</p>`;
+  return `<p class="pcred">Photo: ${link(c.credit, c.creditUrl)}</p>`;
 }
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 const todayLocal = () => { const d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };

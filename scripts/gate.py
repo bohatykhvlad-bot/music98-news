@@ -935,6 +935,8 @@ def check_post(p, strict):
     cov = p.get("cover") or {}
     if cov and (cov.get("kind") or "img") == "img":
         credit_pair("cover", cov.get("credit"), cov.get("creditUrl"), fails, warns)
+        if cov.get("credit2") or cov.get("creditUrl2"):
+            credit_pair("cover right", cov.get("credit2"), cov.get("creditUrl2"), fails, warns)
 
     # Excerpt, colons, semicolons, and dashes are enforced by canon_checks.
     # The old teaser-length band, colon ceiling, semicolon warning, vague-time
