@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Human-quality barrier for music98 editorial work.
+"""Reader-facing checks for music98 editorial work.
 
-This script is deliberately narrower than gate.py and preflight.py.
-It blocks reader-facing defects that can survive factual and payload checks:
-AI/PR phrasing, research-note leakage, list-like prose, recap endings,
-administrative endings, and mechanical name rhythm.
+Rules come from editorial/CANON.md. canon_checks.py holds the mechanical
+subset. This script adds narrower prose heuristics and the two read stamps.
 
 Existing edits require two content-hashed attestations:
 PRE_EDIT records a claimed full read of the exact source before editing.
 POST_EDIT records a claimed full read of the exact final body after editing.
 Hashes detect stale edits; they cannot independently prove editorial judgment.
+A MECHANICAL PASS does not certify the human read. Manual canon duties print
+as NOT RUN and are never PASS.
 """
 from __future__ import annotations
 
@@ -23,6 +23,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.request import Request, urlopen
+
+import canon_checks
 
 PROD = "https://music98.news"
 STATE = Path(os.environ.get(
@@ -92,6 +94,8 @@ AI_PR_PATTERNS = (
     (re.compile(r"\b(?:new|next) (?:chapter|phase|era|direction)\b", re.I),
      "generic PR abstraction"),
     (re.compile(r"\bmoving forward\b", re.I),
+     "generic PR abstraction"),
+    (re.compile(r"\bthis highlights\b", re.I),
      "generic PR abstraction"),
     (re.compile(r"\b(?:broader|more expansive|polished) (?:sound|version|direction|approach)\b", re.I),
      "generic PR description"),
@@ -227,6 +231,9 @@ def inspect(post, allows):
     title = post.get("title") or ""
     ptype = (post.get("type") or "").lower()
     fails, notes = [], []
+    typed = ptype in {"news", "release", "longread"}
+    for _code, message in canon_checks.mechanical_issues(post, structural=typed):
+        fails.append(message)
 
     if HTML_GARBAGE.search(body):
         fails.append("encoding residue: HTML entity leaked into reader-facing copy")
@@ -289,7 +296,10 @@ def inspect(post, allows):
         wc = words(p)
 
         if len(ss) == 1 and wc < 45 and "single-sentence" not in allows:
-            fails.append(f"paragraph {idx}: one-sentence paragraph is only {wc} words")
+            notes.append(
+                f"paragraph {idx}: one-sentence paragraph is only {wc} words; "
+                "keep it only when the sentence is doing real work"
+            )
 
         if SCHEDULE_RUN.search(p):
             fails.append(f"paragraph {idx}: schedule-style date list belongs out of prose")
@@ -390,14 +400,11 @@ def inspect(post, allows):
     last_s = sentences(last)
 
     if len(last_s) == 1 and words(last) < 55 and "single-sentence" not in allows:
-        fails.append(f"final paragraph: single-sentence ending is only {words(last)} words")
-    # A short ending is not automatically a bad ending. Block only an
-    # obviously fragmentary article-length close; review borderline cases.
-    if total_prose_words >= 300 and len(paras) >= 4:
-        if words(last) < 30:
-            fails.append(f"ending: final paragraph is a fragment ({words(last)} words)")
-        elif words(last) < 55:
-            notes.append(f"ending: final paragraph is brief ({words(last)} words); review substance and cadence")
+        notes.append(f"final paragraph: single-sentence ending is only {words(last)} words")
+    # Length is not the ending test. Canon section 3 rejects a recap, slogan,
+    # bare date, number, or purchase line. A short earned fact can close.
+    if total_prose_words >= 300 and len(paras) >= 4 and words(last) < 55:
+        notes.append(f"ending: final paragraph is brief ({words(last)} words); review substance and cadence")
     if re.search(r"\b\d+(?:st|nd|rd|th)?[.!?]?[\"'’”]?$", last.strip()):
         fails.append("ending: article ends on a bare number/ordinal")
 
@@ -424,6 +431,11 @@ def inspect(post, allows):
             fails.append("ending: same explicit date repeats across the final two paragraphs")
 
     return fails, notes
+
+
+def _print_manual():
+    for line in canon_checks.manual_not_run():
+        print(line)
 
 
 def main():
@@ -477,6 +489,7 @@ def main():
                 pre_ok = pre.get("sha256") == body_hash(source_body)
             except Exception as exc:
                 print("FAIL cannot verify current desk source for pre-edit stamp:", type(exc).__name__, str(exc)[:120])
+                _print_manual()
                 raise SystemExit(1)
 
         if a.phase == "post-edit":
@@ -488,11 +501,13 @@ def main():
                 print("FAIL pre-edit full-read stamp is missing or stale for the current desk source")
             else:
                 print(f"FAIL {a.phase} full-read stamp is missing or stale for this exact body")
+        _print_manual()
         raise SystemExit(0 if ok else 1)
 
     allows = set(a.allow)
     if allows and not a.reason.strip():
         print("FAIL waivers require --reason")
+        _print_manual()
         raise SystemExit(1)
 
     fails, notes = inspect(post, allows)
@@ -505,12 +520,14 @@ def main():
     # PRE_EDIT may discover defects. POST_EDIT may not.
     if a.phase == "post-edit" and fails:
         print("EDITORIAL_READTHROUGH: FAIL")
+        _print_manual()
         raise SystemExit(1)
 
     if not a.confirm_full_read:
         print("FAIL full uninterrupted top-to-bottom read not attested")
         print("READ CHECK: read the complete body in order; never review only the requested paragraph or diff.")
         print("EDITORIAL_READTHROUGH: FAIL")
+        _print_manual()
         raise SystemExit(1)
 
     post_state = state.setdefault(a.post, {})
@@ -526,7 +543,8 @@ def main():
     }
     save_state(state)
 
-    print(f"EDITORIAL_READTHROUGH: PASS ({a.phase})")
+    print(f"EDITORIAL_READTHROUGH: PASS ({a.phase}); MANUAL NOT RUN")
+    _print_manual()
     if a.phase == "pre-edit":
         print("STAMP: source hash locked as read-before-edit; any source change requires another full read")
         if fails:

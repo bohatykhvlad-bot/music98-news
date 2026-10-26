@@ -19,7 +19,7 @@ jobs:
           python-version: "3.12"
       - name: Validate editorial workflow scripts and canon
         run: |
-          python -m py_compile scripts/editorial_readthrough.py scripts/post.py scripts/preflight.py scripts/test_editorial_readthrough.py scripts/check_agent_write_path.py
+          python -m py_compile scripts/canon_checks.py scripts/editorial_readthrough.py scripts/gate.py scripts/post.py scripts/preflight.py scripts/test_editorial_readthrough.py scripts/check_agent_write_path.py
           python scripts/check_agent_write_path.py
           python scripts/editorial_readthrough.py --help | grep -q -- "--phase"
           python scripts/post.py --help | grep -q -- "--phase"
@@ -27,8 +27,13 @@ jobs:
           python scripts/post.py --help | grep -q -- "preflight"
           python scripts/test_editorial_readthrough.py
           test "$(wc -l < music98-agent-operating-canon.md)" -le 280
-          grep -qi "HUMAN QUALITY BARRIER" music98-agent-operating-canon.md
-          grep -qi "ENDINGS" music98-agent-operating-canon.md
+          test -f editorial/CANON.md
+          grep -q "editorial/CANON.md" music98-agent-operating-canon.md
+          grep -q "NOT RUN" editorial/CANON.md
+          grep -q "1,200" editorial/CANON.md
+          for f in AGENTS.md CLAUDE.md GEMINI.md .github/copilot-instructions.md music98-agent-operating-canon.md; do
+            grep -q "editorial/CANON.md" "$f"
+          done
           for f in AGENTS.md CLAUDE.md GEMINI.md .github/copilot-instructions.md; do
             grep -q "music98-agent-operating-canon.md" "$f"
           done

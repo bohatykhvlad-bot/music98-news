@@ -21,4 +21,4 @@ Configure credentials as environment secrets outside Git, never in source code, 
 
 ## Editorial
 
-The public admin interface is part of the website. Private house-style and editorial notes are maintained separately from this public repository. The optional manual editorial check workflow can validate a specified post without automatically running for every code change.
+The public admin interface is part of the website. Editorial rules live in `editorial/CANON.md`. `music98-agent-operating-canon.md` points agents at that canon and records that `site/_style-memory.md` is not in this repo. Drafts are saved only through `scripts/post.py`, which refuses a write when the gate or preflight fails. The optional manual editorial check workflow can validate a specified post without automatically running for every code change.

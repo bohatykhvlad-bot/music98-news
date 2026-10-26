@@ -2,6 +2,12 @@
 node_modules/
 .wrangler/
 *.log
+*.bak
+*.orig
+*.tmp
+*~
+*.swp
+.scratch/
 __pycache__/
 *.pyc
 .env

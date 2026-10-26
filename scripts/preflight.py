@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Read-only payload/state preflight for a music98 draft.
 
-This script does NOT judge prose quality. That requires full editorial reading;
-editorial_readthrough.py supplies additional heuristics, not a substitute.
-It validates fields, status, media, cover, minimum format length and mutation safety.
+Mechanical rules come from editorial/CANON.md via canon_checks.py.
+A MECHANICAL PASS does not certify prose, facts, photos, or a live page.
+Manual canon duties are printed as NOT RUN and are never PASS.
 """
 import argparse
 import json
@@ -12,6 +12,8 @@ import re
 import sys
 from pathlib import Path
 from urllib.request import Request, urlopen
+
+import canon_checks
 
 MEDIA = re.compile(r"\[(photo|youtube|apple|instagram|ig|tiktok):([^\]]+)\]", re.I)
 
@@ -47,41 +49,21 @@ def get_remote(pid):
 def check(post, baseline, expected_media, min_words=None):
     failures, warnings = [], []
     ptype = (post.get("type") or "").strip().lower()
-    inferred_min = {"news": 400, "release": 400, "longread": 1300}.get(ptype, 400)
-    min_words = inferred_min if min_words is None else max(min_words, inferred_min)
-
     body = post.get("body") or ""
     title = post.get("title") or ""
-    excerpt = post.get("excerpt") or ""
     media = [(m.group(1).lower(), m.group(2)) for m in MEDIA.finditer(body)]
-    blocks = [p.strip() for p in body.split("\n\n") if p.strip()]
-    prose = [p for p in blocks if not MEDIA.fullmatch(p)]
-    word_count = len(re.findall(r"\b[\w'’-]+\b", "\n".join(prose)))
+    word_count = canon_checks.prose_word_count(body)
 
     if post.get("status") != "draft":
         failures.append("article is not a draft")
     if not title:
         failures.append("title missing")
-    elif ":" in title:
-        failures.append("forbidden colon in title")
 
-    if not excerpt or not body.startswith(excerpt):
-        failures.append("excerpt must begin the actual article verbatim")
-    elif not excerpt.rstrip('"’”').endswith((".", "!", "?")):
-        failures.append("excerpt must end at a full sentence")
-    elif len(excerpt) < 85 or len(excerpt) > 170:
-        warnings.append("excerpt length is outside preferred range")
-
-    if word_count < min_words:
-        failures.append(f"too few words for {ptype or 'post'}: {word_count} < {min_words}")
-
-    if not post.get("cover"):
-        failures.append("cover missing")
+    for code, message in canon_checks.mechanical_issues(post, structural=True, min_words=min_words):
+        failures.append(message if code == "word-count" else "%s: %s" % (code, message))
 
     if expected_media is not None and len(media) != expected_media:
         failures.append(f"expected {expected_media} media, found {len(media)}")
-    if ptype in {"news", "release", "longread"} and not media:
-        failures.append(f"{ptype} has no body media")
     if ptype == "release":
         artist = (post.get("artist") or "").strip()
         rtype = (post.get("rtype") or "").strip().lower()
@@ -94,24 +76,19 @@ def check(post, baseline, expected_media, min_words=None):
         if rtype not in {"single", "ep", "album"}:
             warnings.append("release type must identify Single, EP or Album")
         # A single with its official music video does not need a duplicate Apple
-        # embed. Albums/EPs use the established Apple Music album player.
+        # embed. Albums and EPs use the site's Apple Music album player.
         if rtype in {"", "ep", "album"} and not any(
             kind == "apple" and value.lower().startswith("album:") for kind, value in media
         ):
             failures.append("album/EP release has no Apple Music album embed")
 
     for i, (kind, value) in enumerate(media, 1):
-        if kind == "photo":
+        if kind == "youtube" and not re.fullmatch(r"[A-Za-z0-9_-]{11}", value):
+            failures.append(f"youtube {i} has malformed id")
+        elif kind == "photo":
             fields = value.split("|")
-            if len(fields) < 3 or not fields[1].strip() or not fields[2].startswith("https://"):
-                failures.append(f"photo {i} missing photographer credit or secure portfolio link")
             if not fields or not fields[0].startswith(("photos/", "https://")):
                 failures.append(f"photo {i} missing original image path")
-        elif kind == "youtube" and not re.fullmatch(r"[A-Za-z0-9_-]{11}", value):
-            failures.append(f"youtube {i} has malformed id")
-
-    if any(MEDIA.fullmatch(a) and MEDIA.fullmatch(b) for a, b in zip(blocks, blocks[1:])):
-        failures.append("back-to-back media without prose")
 
     if baseline:
         old_media = [(m.group(1).lower(), m.group(2)) for m in MEDIA.finditer(baseline.get("body") or "")]
@@ -127,7 +104,10 @@ def check(post, baseline, expected_media, min_words=None):
         print("WARN", warning)
     for failure in failures:
         print("FAIL", failure)
-    print("PREFLIGHT:", "PASS" if not failures else "FAIL")
+    for line in canon_checks.manual_not_run():
+        print(line)
+    verdict = "MECHANICAL PASS" if not failures else "MECHANICAL FAIL"
+    print("PREFLIGHT:", verdict + "; MANUAL NOT RUN")
     return not failures
 
 

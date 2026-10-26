@@ -34,5 +34,5 @@ jobs:
         run: python scripts/post.py preflight "$POST_ID"
       - name: Editorial warning
         run: |
-          echo "PASS here does NOT mean the prose is editorially ready."
-          echo "A current POST_EDIT_FULL_READ + HUMAN QUALITY PASS is still mandatory before write/publish."
+          echo "A mechanical PASS does NOT mean the prose is editorially ready."
+          echo "Manual canon checks are NOT RUN unless a human actually performed them."

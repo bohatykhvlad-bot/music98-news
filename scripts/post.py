@@ -14,7 +14,8 @@ COMMANDS
   read <url>...               fetch pages, print only fact-bearing sentences
   photo --url URL --name FILE upload one verified source image to site photo storage
   about "<words>" <url>...    same, but ranked against the words you care about
-  register <token> "<fact>"   add a date to gate.py VERIFIED_DATES
+  register <token> "<fact>"   append a historical note to gate.py VERIFIED_DATES.
+                              This does not verify the fact and does not make the gate pass.
   create --file POST.json     create a new draft only after editorial + gate + preflight
   replace-draft <id> --file POST.json
                               replace one existing draft after pre/post read + gate + preflight
@@ -139,17 +140,12 @@ def slot_stamp(p, when=None):
 
 
 def auto_excerpt(body: str) -> str:
-    """First 1-2 sentences of the lead paragraph, kept inside 85-170 chars."""
-    first = (body or "").split("\n\n", 1)[0].strip()
-    parts = re.split(r"(?<=[.!?])\s+", first)
-    if not parts:
-        return ""
-    out = parts[0]
-    if len(out) < 100 and len(parts) > 1:
-        out = out + " " + parts[1]
-    if len(out) > 170 and len(parts) > 1:
-        out = parts[0]
-    return out.strip()
+    """Verbatim first complete sentence of paragraph one. Not a new teaser."""
+    sys.path.insert(0, str(REPO / "scripts"))
+    from canon_checks import first_prose_paragraph
+    para = first_prose_paragraph(body)
+    match = re.match(r".+?[.!?](?:[\"'’\u201d])?", para)
+    return (match.group(0) if match else para).strip()
 
 
 # --- HTML to plain text --------------------------------------------------------
@@ -350,12 +346,17 @@ def cmd_dump(pid, out):
 
 def _local_gate(post):
     sys.path.insert(0, str(REPO / "scripts"))
+    from canon_checks import manual_not_run
     from gate import check_post
     fails, warns, _ = check_post(post, strict=True)
     for code, msg, *rest in fails:
         print("GATE FAIL", code, msg)
     for code, msg, *rest in warns:
         print("GATE WARN", code, msg)
+    for line in manual_not_run():
+        print(line)
+    if not fails:
+        print("GATE: MECHANICAL PASS; MANUAL NOT RUN")
     return not fails
 
 
@@ -406,8 +407,11 @@ def cmd_create(post_file, allows=None, reason=None):
         die("create accepts draft status only")
     body=(post.get("body") or "").strip()
     excerpt=(post.get("excerpt") or "").strip()
-    if not body or not excerpt or not body.startswith(excerpt):
-        die("new draft needs non-empty body and literal-prefix excerpt")
+    sys.path.insert(0, str(REPO / "scripts"))
+    from canon_checks import excerpt_issue
+    problem = excerpt_issue(excerpt, body)
+    if not body or problem:
+        die(problem or "new draft needs a non-empty body")
 
     # Full final read is an explicit barrier for new posts. Unlike an existing
     # edit, there is no pre-edit source, so only the post-edit phase applies.
@@ -491,8 +495,11 @@ def cmd_replace_draft(pid, post_file, allows=None, reason=None):
 
     body=(staged.get("body") or "").strip()
     excerpt=(staged.get("excerpt") or "").strip()
-    if not body or not excerpt or not body.startswith(excerpt):
-        die("replace-draft needs non-empty body and literal-prefix excerpt")
+    sys.path.insert(0, str(REPO / "scripts"))
+    from canon_checks import excerpt_issue
+    problem = excerpt_issue(excerpt, body)
+    if not body or problem:
+        die(problem or "replace-draft needs a non-empty body")
 
     current=find_post(desk_read()["posts"],pid)
     if current.get("status")!="draft":
@@ -563,8 +570,11 @@ def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
     if not body:
         die("body file is empty: %s" % body_file)
     exc = (excerpt or auto_excerpt(body)).strip()
-    if exc not in body:
-        die("excerpt is not a literal substring of the body:\n  %s" % exc)
+    sys.path.insert(0, str(REPO / "scripts"))
+    from canon_checks import excerpt_issue
+    problem = excerpt_issue(exc, body)
+    if problem:
+        die("excerpt: " + problem)
 
     current=find_post(desk_read()["posts"],pid)
     candidate=json.loads(json.dumps(current))
@@ -572,6 +582,8 @@ def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
     candidate["excerpt"]=exc
     if title:
         candidate["title"]=title
+    if not _local_gate(candidate):
+        die("set refused: staged body failed gate before desk write")
     # preflight.py intentionally validates draft payloads. A text-only edit to an
     # already-live article should still get the same payload/media/cover checks
     # without forcing the public post through a temporary draft state.
@@ -608,7 +620,7 @@ def run_gate(pid, quiet=True):
     if quiet:
         keep = [l for l in lines
                 if re.match(r"\s*(X|!)\s+\S", l) or "PASS" in l or "FAIL" in l
-                or re.match(r"\s*--\s+length", l)]
+                or "NOT RUN" in l or re.match(r"\s*--\s+length", l)]
     else:
         keep = lines
     # gate.py is the authority and returns 0 for a clean gate, 1 for defects.
@@ -622,7 +634,9 @@ def cmd_gate(pid):
     ok, lines = run_gate(pid)
     for l in lines:
         print(l)
-    print("\n%s" % ("GATE: PASS" if ok else "GATE: FAIL - fix the X lines first"))
+    print("\n%s" % (
+        "GATE: MECHANICAL PASS; MANUAL NOT RUN" if ok else "GATE: FAIL - fix the X lines first"
+    ))
     return ok
 
 
@@ -797,6 +811,7 @@ def cmd_register(token, fact):
     line = '    "%s": "%s",\n' % (key, fact.replace('"', "'"))
     GATE.write_text(src.replace(anchor, anchor + line, 1), encoding="utf-8")
     print("register  added %r -> %s" % (key, fact[:90]))
+    print("register  notebook only — this does not verify the fact and the gate will not PASS it")
 
 
 # --- cli -----------------------------------------------------------------------
