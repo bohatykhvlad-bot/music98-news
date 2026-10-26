@@ -4,6 +4,9 @@ import fs from "node:fs";
 
 const checker=fs.readFileSync("scripts/editorial_readthrough.py","utf8");
 const post=fs.readFileSync("scripts/post.py","utf8");
+const canon=fs.readFileSync("scripts/canon_checks.py","utf8");
+const gate=fs.readFileSync("scripts/gate.py","utf8");
+const preflight=fs.readFileSync("scripts/preflight.py","utf8");
 
 test("second editorial barrier exists and targets reader-facing failure modes",()=>{
   assert.match(checker,/EDITORIAL_READTHROUGH: PASS/);
@@ -25,9 +28,22 @@ test("second editorial barrier exists and targets reader-facing failure modes",(
 
 test("saving or publishing through post.py requires a current full-read stamp",()=>{
   assert.match(post,/def cmd_set[\s\S]*?require_editorial_stamp\(pid, body_file=body_file/);
+  assert.match(post,/def cmd_set[\s\S]*?_local_gate\(candidate\)/);
   assert.match(post,/def cmd_publish[\s\S]*?require_editorial_stamp\(pid\)/);
   assert.match(post,/sp = sub\.add_parser\("editorial"\)/);
   assert.match(post,/--check-stamp/);
+});
+
+test("canon checks are wired and manual items are never passed",()=>{
+  assert.match(canon,/def manual_not_run/);
+  assert.match(canon,/1200/);
+  assert.match(canon,/NOT RUN/);
+  assert.doesNotMatch(canon,/return \[[\s\S]*?"PASS"/);
+  assert.match(gate,/canon_checks/);
+  assert.doesNotMatch(gate,/fails\.append\(\("date-unregistered"/);
+  assert.match(preflight,/canon_checks/);
+  assert.match(preflight,/mechanical_issues/);
+  assert.doesNotMatch(preflight,/1300/);
 });
 
 test("Music98 gate flags curly quotes in title, teaser and body", async()=>{

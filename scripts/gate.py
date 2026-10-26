@@ -1,26 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Deterministic mechanical/editorial safety gate for music98 posts.
+"""Deterministic mechanical gate for music98 posts.
 
-This gate runs AFTER editorial_readthrough.py. It does not replace a full read
-and a PASS is not proof that prose is good.
+Authority is editorial/CANON.md. canon_checks.py applies the rules a script
+can actually decide. This file adds site invariants (straight quotes, false
+English forms, publication state, echo, credit shape).
 
-What it checks deterministically:
-- registered/risky dates and claims,
-- quote/title handling,
-- repetition, tautology and known fog patterns,
-- credits and media structure,
-- publication state and selected field invariants.
+A MECHANICAL PASS is not proof that prose, facts, photos, or a live page are
+ready. Manual canon duties are printed as NOT RUN and are never PASS.
 
-What it does NOT certify:
-- truth without sources,
-- natural human voice,
-- whether the story is interesting,
-- whether the ending works,
-- whether the article sounds like PR/AI.
-
-Those reader-facing judgments belong to editorial_readthrough.py and the
-mandatory HUMAN QUALITY BARRIER in music98-agent-operating-canon.md.
+VERIFIED_DATES is a historical notebook. Canon section 1 requires a
+source-backed registry before writing, which this dictionary cannot prove.
+A missing year is not a mechanical failure, and a listed year is not a pass.
 
 Usage:
   python scripts/gate.py
@@ -35,18 +26,14 @@ post-edit read plus gate/preflight again.
 import argparse, hashlib, json, os, re, ssl, sys, time
 import urllib.error, urllib.parse, urllib.request
 
+import canon_checks
+
 PROD = os.environ.get("MUSIC98_PROD", "https://music98.news")
 KEY = (os.environ.get("MUSIC98_KEY") or os.environ.get("ADMIN_PASSWORD") or "").strip()
 STATE = os.path.join(os.environ.get("TEMP", "/tmp"), "music98-gate-state.json")
 
-LEAD_MIN_WORDS = 100          # guideline for prose immediately before a media carrier
 ECHO_FAIL = 4                 # a 4-gram this many times is a defect (2-3 is a warning)
-NEG_SENT_FAIL = 3             # negations inside one sentence
-COLON_FAIL = 5                # colons in prose (house norm is 2-4)
-NUM_DENSITY_FAIL = 90         # numeric tokens in a longread body
 WALL_RUN_WORDS = 260          # consecutive text paragraphs with no carrier between them
-VAGUE_TIME = r"\b(this (?:fall|autumn|spring|summer|winter|month|week)|soon(?!\s+after)|later this year|in the coming (?:weeks|months))\b"
-NEG = r"\b(?:no|not|nothing|never|nobody|none|without)\b"
 ATTRIB = ("said", "told", "says", "explains", "explained", "recalls", "recalled",
           "wrote", "called it", "put it", "added", "described", "reads", "puts it",
           "sings", "sings the line", "goes")
@@ -136,10 +123,11 @@ REFERENT = re.compile(
     r"\b(?:the|that|this)\s+(?:answer|question|point|case|version|reason|idea|story|reading|bet|"
     r"conclusion|opposite|middle|lesson|joke)\b", re.I)
 
-# --- date registry -------------------------------------------------------------
-# Owner 23.09: every date in the text must be registered here with the fact it stands for.
-# The gate then fails on any date it cannot match. The bug this prevents is quiet: a date that
-# was true in one draft and silently false in the next ("October 30", "the following March").
+# --- date notebook -------------------------------------------------------------
+# Historical notes for past posts. Not a verdict. Canon section 1 says verify
+# facts before writing; this dict cannot do that. check_post reports dates as
+# NOT RUN. `post.py register` may still append a line. Do not fail a post
+# because a year is absent, and do not treat a hit as verification.
 VERIFIED_DATES = {
     "october 15": "Tate McRae released 'Housewife' and its official music video on 15.10.2026 (Sony Music Canada https://www.sonymusic.ca/press_release/tate-mcrae-releases-housewife ; Apple Music US https://music.apple.com/us/album/housewife-single/6822497770).",
     "april 6": "Lola Young Everything Begins Tour opens at The Pinnacle in Nashville on 06.04.2027 (Pollstar 05.10.2026).",
@@ -877,6 +865,7 @@ def ids_check(p):
 def check_post(p, strict):
     """Returns (fails, warns, info). Each item is (code, message)."""
     fails, warns, info = [], [], []
+    fails.extend(canon_checks.mechanical_issues(p))
     body = p.get("body") or ""
     # Site house style uses plain ASCII double quotes for song titles and
     # quoted speech. The quote-attribution parser below scans only " and
@@ -890,31 +879,10 @@ def check_post(p, strict):
     paras = paragraphs(body)
     media = [t.strip() for t in paras if is_media(t)]
 
-    # --- structure -----------------------------------------------------------
-    pairs = [(i, paras[i][:28], paras[i + 1][:28]) for i in range(len(paras) - 1)
-             if is_media(paras[i]) and is_media(paras[i + 1])]
-    for i, a, b in pairs:
-        fails.append(("media-pair", "paragraphs %d+%d are two carriers in a row (%s / %s)" % (i, i + 1, a, b)))
-
-    for i in range(len(paras) - 1):
-        if is_media(paras[i + 1]) and not is_media(paras[i]):
-            w = len(paras[i].split())
-            # Two carriers of the same kind around one statement is not a defect by itself, but the
-            # owner's 24.09 note ("достаточно одной песни, нахера тут альбом целый") is the ruling:
-            # one song card beats an album card unless the post is about the album, so the pair is
-            # printed with the markers it found.
-            if i + 2 < len(paras) and is_media(paras[i + 2]) and not is_media(paras[i + 1]):
-                pair = []
-                for q in (paras[i], paras[i + 2]):
-                    pair.append(" ".join(re.findall(r"\[[a-z]+:[^\]]+\]", q)) or "text")
-                info.append(("carriers-around", "carriers %d and %d come from one statement: %s"
-                             % (i + 1, i + 3, " / ".join(pair))))
-            if w < LEAD_MIN_WORDS:
-                # Owner, 23.09: "какая разница 96 или 100 слов? ты же топчешься на месте". He is
-                # right - the floor is a house guideline for how much text sits before an image,
-                # not a reader problem, and as a FAIL it caused a loop of pointless edits.
-                warns.append(("thin-leadin", "%d words in paragraph %d before the carrier at %d "
-                              "(guideline %d, not a defect)" % (w, i, i + 1, LEAD_MIN_WORDS)))
+    # Media count, separation, longread ending, excerpt, length, colons,
+    # semicolons, dashes, credits, and lede shape are canon_checks failures.
+    # Paragraph word floors and "two paragraphs after every embed" are not in
+    # the canon and used to force padding, so they are not warnings here.
     info.append(("carriers", "%d total, %d photo, %d youtube, %d apple, %d tiktok, %d instagram"
                  % (len(media), sum(m.lower().startswith("[photo") for m in media),
                     sum(m.lower().startswith("[youtube") for m in media),
@@ -922,50 +890,9 @@ def check_post(p, strict):
                     sum(m.lower().startswith("[tiktok") for m in media),
                     sum(m.lower().startswith("[ig") for m in media))))
 
-    # Owner 24.09, twice in one pass: "МЕДИА СЛИШКОМ БЛИЗКО К КОНЦУ" (Taylor) and "альбом
-    # надо ВСУНУТЬ на абзац выше" (Feid). A carrier with one paragraph after it is a picture
-    # dropped next to the end; the post is supposed to close on text. Two paragraphs is the
-    # floor, and on the long read a late carrier can still be deliberate, so it warns there.
-    for i, q in enumerate(paras):
-        if not is_media(q):
-            continue
-        # A ticket CTA is intentionally allowed immediately before the closing
-        # paragraph. It is an action after the story has made its case, not
-        # editorial media that needs two paragraphs of prose beneath it.
-        if q.strip().lower().startswith("[tickets:"):
-            continue
-        after = len(paras) - 1 - i
-        if after < 2:
-            (warns if len(prose_of(body).split()) > 900 else fails).append(
-                ("media-late", "carrier in paragraph %d has %d text paragraph(s) after it - "
-                 "move it up so the post closes on text" % (i, after)))
-
-    # --- paragraph blocks (owner 23.09: a paragraph is a block, never a fragment) --
-    # The 80-word floor, the wall run and the finale floor were all measured on the longread.
-    # News and release posts are the short formats on purpose (owner: "упор на новости короткие,
-    # релизы чуть длиннее"), so on them the floor is the fragment line, not the longread band.
+    # A long run of prose with no carrier is the text wall canon section 3
+    # tells writers to avoid. It stays a warning, not a word-count fail.
     long_form = len(prose_of(body).split()) > 900
-    floor = 80 if long_form else 40
-    awards_depth = False
-    for i, q in enumerate(paras):
-        if q.strip().lower() == "[awards]":
-            awards_depth = True
-            continue
-        if q.strip().lower() == "[/awards]":
-            awards_depth = False
-            continue
-        if is_media(q) or awards_depth:
-            continue
-        w = len(q.split())
-        sents = len(sentences(q))
-        if w < floor:
-            warns.append(("short-paragraph", "paragraph %d is %d words - a fragment, merge it or grow it: %r"
-                          % (i, w, q[:60])))
-        if w > 200:
-            warns.append(("slab-paragraph", "paragraph %d is %d words - a slab, consider splitting it evenly: %r"
-                          % (i, w, q[:60])))
-        if sents <= 1:
-            warns.append(("one-sentence-paragraph", "paragraph %d is a single sentence: %r" % (i, q[:60])))
     # The real editorial defect is not an individual long paragraph: it is a RUN of long
     # paragraphs with no carrier between them, which reads as a wall before the reader has
     # committed. A single 190-word paragraph that ends by handing off to its own photo or
@@ -998,11 +925,6 @@ def check_post(p, strict):
         warns.append(("text-wall", "paragraphs %d-%d total %d words to the end with no carrier"
                       % (run_start, len(paras) - 1, run)))
 
-    # the finale only has to avoid being a dangling fragment; two even paragraphs are fine
-    if long_form and len(paras) > 1 and not is_media(paras[-1]) and len(paras[-1].split()) < 80:
-        warns.append(("thin-finale", "the closing paragraph is %d words - too thin to end on"
-                      % len(paras[-1].split())))
-
     # --- credits -------------------------------------------------------------
     for m in re.finditer(r"\[photo:([^\]]*)\]", body):
         parts = m.group(1).split("|")
@@ -1014,78 +936,19 @@ def check_post(p, strict):
     if cov and (cov.get("kind") or "img") == "img":
         credit_pair("cover", cov.get("credit"), cov.get("creditUrl"), fails, warns)
 
-    # --- teaser / lede -------------------------------------------------------
-    ex = (p.get("excerpt") or "").strip()
-    if ex and ex not in body:
-        fails.append(("teaser", "excerpt is not a literal substring of the body"))
-    if ex and paras and not paras[0].startswith(ex.split(".")[0][:40]):
-        warns.append(("teaser-place", "excerpt does not look like the opening of paragraph 0"))
-    # Owner 24.09, both ends of one defect, both on the same batch:
-    #   "почему тут у нас ТАКОЙ длинный тизер?"  (the Feid card carried 63 words)
-    #   "это СЛИШКОМ коротко, мы же так не делаем..."  (the KAROL G card carried 9)
-    # The card teaser is the first thing a reader sees on the feed, so it gets a band:
-    # hard at the absurd ends, a nudge outside the house band. Every other post in the
-    # desk sits between 18 and 36 words, so the floor of the nudge is set at 18.
-    if ex:
-        ew = len(ex.split())
-        if ew < 15 or ew > 55:
-            fails.append(("teaser-length", "the card teaser is %d words long (15-55 is workable, "
-                          "22-40 is the house band)" % ew))
-        elif ew < 18 or ew > 45:
-            warns.append(("teaser-length", "the card teaser is %d words long (house band 22-40)" % ew))
-
-    # --- house style, prose only --------------------------------------------
+    # Excerpt, colons, semicolons, and dashes are enforced by canon_checks.
+    # The old teaser-length band, colon ceiling, semicolon warning, vague-time
+    # ban, and "just" sweep are not in editorial/CANON.md.
     prose = prose_of(body)
     proselow = prose.lower()
 
-    # owner note 23.09: the semicolon is not a hard ban. It irritates him, so it is
-    # a warning to look at, not something that blocks a post or forces an edit.
-    semi = prose.count(";")
-    if semi:
-        warns.append(("semicolon", "%d semicolon(s) in prose - usually a packed list, splitting reads better, but it is allowed when it really helps" % semi))
-
-    colons = prose.count(":")
-    if colons > COLON_FAIL:
-        fails.append(("colons", "%d colons in prose (norm 2-4, ceiling %d)" % (colons, COLON_FAIL)))
-    elif colons > 4:
-        warns.append(("colons", "%d colons in prose, at the top of the norm" % colons))
-
-    for dash in ("—", "–"):
-        for m in re.finditer(re.escape(dash), prose):
-            around = prose[max(0, m.start() - 60):m.start() + 60].replace("\n", " ")
-            quoted = around.count('"') % 2 == 1
-            (warns if quoted else fails).append(
-                ("dash", ("inside a quote: " if quoted else "") + "…%s…" % around.strip()))
-
-    for m in re.finditer(VAGUE_TIME, proselow):
-        fails.append(("vague-time", "vague time expression %r - use the exact date or drop it" % m.group(0)))
-    for m in re.finditer(r"\bjust\b", proselow):
-        warns.append(("just", "…%s…" % prose[max(0, m.start() - 50):m.start() + 50].replace("\n", " ").strip()))
-
+    # Superlatives need a source. The script cannot check one, so this is
+    # NOT RUN rather than a fail against SUPERLATIVE_ALLOW.
+    supers = []
     for si in sentences(prose):
-        n = len(re.findall(NEG, si, re.I))
-        if n >= NEG_SENT_FAIL:
-            fails.append(("negation-cluster", "%d negations in one sentence: %s" % (n, si[:110])))
-    total_neg = len(re.findall(NEG, proselow))
-    if total_neg > len(prose.split()) * 0.02:
-        warns.append(("negation-rate", "%d negation words, %.1f%% of the body"
-                      % (total_neg, 100.0 * total_neg / max(1, len(prose.split())))))
-
-    # --- superlatives --------------------------------------------------------
-    for si in sentences(prose):
-        m = SUPER_RE.search(si)
-        if not m:
-            continue
-        low = si.lower()
-        if any(k in low for k in SUPERLATIVE_ALLOW):
-            continue
-        fails.append(("superlative", "unsourced superlative %r in: %s" % (m.group(0), si[:120])))
-
-    # --- fog: can a reader decode every phrase in one pass? ------------------
-    ff, fw, fi = fog_scan(p)
-    fails += ff
-    warns += fw
-    info += fi
+        if SUPER_RE.search(si):
+            supers.append(si.strip()[:140])
+    info.append(("superlative", "NOT RUN — %d superlative phrase(s); confirm each against a source" % len(supers)))
 
     # --- false irregular forms ----------------------------------------------
     for si in sentences(prose):
@@ -1093,52 +956,11 @@ def check_post(p, strict):
             if w.lower() in FALSE_FORMS:
                 fails.append(("false-form", "%r is not an English word form: %s" % (w, si[:110])))
 
-    # --- decoration: similes and personified objects (owner 23.09) ----------
-    # Owner: "Пиши текст проще без передумываний ... без сложных метафор и твоих переплетений".
-    # Beauty in this house style is precision, not ornament. Every "like a …", "as if …" and
-    # "reads/sounds/behaves like …" is printed for a plain rewrite; the figure is only kept when
-    # it says something the plain words cannot.
-    similes = []
-    for s in sentences(prose):
-        # "sounds like" is dropped from the list on purpose (calibrated 23.09): in music writing it
-        # is almost always literal ("what she sounds like", "nothing on it sounds like a member
-        # filling in"), so it produced two false positives out of five. A check that cries wolf
-        # gets ignored, and that is worse than not having it.
-        m = re.search(r"\b(?:like (?:a|an|the|someone|somebody)|as if|as though|behaves like|behaved like|reads like|looked like|felt like)\b", s, re.I)
-        if m:
-            similes.append((m.group(0), s.strip()))
-    # Balance, not a ban (owner 23.09): "Нужен баланс во всем, где можно то можно закрутить игру
-    # слов, но не перебарщивать". So a figure is allowed where it works - the check only reports
-    # the density against a budget of roughly one in every 800 words, worst offenders first.
-    budget = max(1, len(prose.split()) // 800)
-    info.append(("similes", "%d similes in %d words (budget about %d) - keep the ones that carry a fact, "
-                 "plain-rewrite the decoration" % (len(similes), len(prose.split()), budget)))
-    if len(similes) > budget:
-        warns.append(("simile-budget", "%d similes against a budget of about %d "
-                      "- this is the 'перебарщивать' line" % (len(similes), budget)))
-    for tok, s in similes[:6]:
-        warns.append(("simile", "%r: %s" % (tok, s[:130])))
+    # Simile budgets, REGISTER_BANNED, and nominal-density warnings are not in
+    # editorial/CANON.md. They flagged ordinary words and pushed checker-driven
+    # rewrites. AI/PR fillers named in canon section 3 are enforced in canon_checks.
 
-    # --- register: banned corporate words and nominalisation density --------
-    prose_low = prose.lower()
-    for term, why in REGISTER_BANNED.items():
-        for m in re.finditer(r"\b" + re.escape(term) + r"\b", prose_low):
-            ctx = prose[max(0, m.start() - 60):m.start() + 60].replace("\n", " ").strip()
-            fails.append(("register-term", "%r - %s: …%s…" % (m.group(0), why, ctx)))
-    # several abstract nouns in one sentence is how the verb disappears; worst first, capped, so
-    # the check stays a short list instead of a wall
-    dense = []
-    for s in sentences(prose):
-        hits = [h.lower() for h in NOMINAL.findall(s)]
-        if len(hits) >= NOMINAL_WARN:
-            dense.append((len(hits), s.strip(), sorted(set(hits))))
-    dense.sort(key=lambda x: -x[0])
-    info.append(("nominal", "%d sentences carry %d+ abstract nouns - each one is where a verb went missing"
-                 % (len(dense), NOMINAL_WARN)))
-    for n, s, hits in dense[:6]:
-        warns.append(("abstract-density", "%d abstract nouns (%s): %s" % (n, ", ".join(hits), s[:120])))
-
-    # --- every date must be registered with its fact ------------------------
+    # --- dates are a manual fact check, not a dictionary lookup -------------
     # A bare year inside quotes is part of a title, not a date: the GTA live post failed on
     # 23.09 with date-unregistered '2000' because of the song "Macacoa 2000". Titles are
     # skipped, real dates are not ("since 1998" stays a date).
@@ -1161,14 +983,9 @@ def check_post(p, strict):
         kept.append(t)
     skips = len(date_toks) - len(kept)
     date_toks = kept
-    unreg = [t for t in date_toks if t.lower() not in VERIFIED_DATES and t.lower().rstrip("s") not in VERIFIED_DATES]
-    for t in unreg:
-        around = prose[max(0, prose.find(t) - 60):prose.find(t) + 60].replace("\n", " ").strip()
-        fails.append(("date-unregistered", "%r is not in VERIFIED_DATES - register it with the fact it stands for, "
-                      "or drop it: …%s…" % (t, around)))
-    info.append(("dates", "%d/%d date tokens registered in VERIFIED_DATES%s (%d name-like years skipped)"
-                 % (len(date_toks) - len(unreg), len(date_toks),
-                    " (" + ", ".join(sorted(set(date_toks))) + ")", skips)))
+    shown = ", ".join(sorted(set(date_toks))) if date_toks else "none"
+    info.append(("dates", "NOT RUN — %d date token(s) (%s); %d name-like year(s) skipped. "
+                 "VERIFIED_DATES does not verify them." % (len(date_toks), shown, skips)))
 
     # --- official capitalization (owner 23.09: "у них КАПСОМ ИМЕНА ПИШУТСЯ") --------------
     # Official spelling of the four BLACKPINK members is all caps: JISOO, JENNIE, ROSÉ, LISA.
@@ -1179,20 +996,11 @@ def check_post(p, strict):
                 fails.append(("official-caps", "write %s, not %s (official BLACKPINK spelling)"
                               % (right, wrong)))
 
-    # --- missing qualifier (owner 23.09: "all 4 are busy at once? а когда они были
-    # группой они не были заняты??") ---------------------------------------------
-    # "all four are busy at once" reads as false unless it says with WHAT: as a group they
-    # were always busy together. The claim only makes sense with 'their own' / 'solo'.
-    for s in sentences(prose):
-        if re.search(r"\ball four\b[^.]*\bbusy\b", s) and not re.search(r"\b(own|solo|separate|respective)\b", s, re.I):
-            fails.append(("missing-qualifier", "'all four are busy' needs 'with their own' / 'solo' "
-                          "- otherwise it reads as false: %r" % s[:110]))
-
     # --- first-claims and absence-claims: printed for a source check --------
     firsts = [s for s in sentences(prose) if FIRST_CLAIM.search(s)
               and not any(a.lower() in s.lower() for a in approved_lines(p))]
     absences = [s for s in sentences(prose) if ABSENCE_CLAIM.search(s)]
-    info.append(("claims", "%d 'first/only' claims and %d claims of absence - each needs a source, not a reading"
+    info.append(("claims", "NOT RUN — %d 'first/only' claim(s) and %d claim(s) of absence"
                  % (len(firsts), len(absences))))
     for s in firsts[:8]:
         info.append(("first-claim", s.strip()[:150]))
@@ -1204,31 +1012,9 @@ def check_post(p, strict):
         for s in uniques:
             info.append(("unique-period", s.strip()[:150]))
 
-    # --- the same assertion twice in different paragraphs --------------------
-    def bag(s):
-        w = [x for x in re.findall(r"[a-z']+", s.lower())
-             if len(x) > 3 and x not in ("that", "this", "with", "they", "their", "hers", "were", "been",
-                                         "have", "into", "from", "than", "then", "over", "when", "what")]
-        return set(w)
-    sents = [(i, s) for i, q in enumerate(paragraphs(prose))
-             for s in sentences(q) if len(s.split()) >= 8]
-    for a in range(len(sents)):
-        for b in range(a + 1, len(sents)):
-            if sents[a][0] == sents[b][0]:
-                continue
-            ba, bb = bag(sents[a][1]), bag(sents[b][1])
-            if not ba or not bb:
-                continue
-            inter = len(ba & bb)
-            j = inter / float(len(ba | bb))
-            # Calibrated on this text (23.09): at 0.55 the check was silent, at 0.30 with four
-            # shared content words it finds the real duplicate and nothing else. Thresholds are
-            # tuned against a known case, not guessed.
-            if j >= 0.30 and inter >= 4:
-                if any(k in sents[b][1] for k in CLAIM_DUP_ALLOW):
-                    continue
-                warns.append(("claim-dup", "the same assertion appears in paragraphs %d and %d (%d shared words): %s"
-                              % (sents[a][0], sents[b][0], inter, sents[a][1].strip()[:90])))
+    # Repeated names and sentence openings are checked across the whole article
+    # in canon_checks. The old shared-word overlap warning matched unrelated
+    # sentences and is not a canon rule.
 
     # --- time deltas and referents: printed, not judged ----------------------
     deltas = [s.strip() for s in sentences(prose) if TIME_DELTA.search(s)]
@@ -1238,8 +1024,8 @@ def check_post(p, strict):
         info.append(("time-delta", "check the arithmetic against the release dates: %s" % s[:150]))
     for s in refs:
         info.append(("referent", "'the …' points at something - make sure it is named earlier: %s" % s[:150]))
-    info.append(("eyeball", "%d time deltas + %d referents + the quote/number list below are the manual pass; "
-                 "everything above it is machine" % (len(deltas), len(refs))))
+    info.append(("eyeball", "NOT RUN — %d time delta(s) and %d referent(s) still need a human check"
+                 % (len(deltas), len(refs))))
 
     # --- tautology inside one sentence --------------------------------------
     # Owner 23.09: "the tour, built entirely for stadiums, ran from a stadium outside Seoul".
@@ -1306,15 +1092,9 @@ def check_post(p, strict):
         warns.append(("echo", "%d 4-grams repeat twice (callbacks are fine, check the list): %s"
                       % (len(twins), "; ".join(twins[:6]) + (" …" if len(twins) > 6 else ""))))
 
-    for a, b in zip(paragraphs(body), paragraphs(body)[1:]):
-        if len(a.split()) > 6 and a[:40].lower() == b[:40].lower():
-            warns.append(("dup-open", "two paragraphs open the same way: %r" % a[:40]))
-
     # --- numbers ------------------------------------------------------------
     nums = re.findall(r"\b\d[\d.,]*\s?(?:%|bn|m|k|million|billion|thousand)?\b", prose)
-    if len(nums) > NUM_DENSITY_FAIL:
-        fails.append(("numbers", "%d numeric tokens in the body (ceiling %d)" % (len(nums), NUM_DENSITY_FAIL)))
-    info.append(("numbers", "%d numeric tokens" % len(nums)))
+    info.append(("numbers", "NOT RUN — %d numeric token(s); verify each against a source" % len(nums)))
     # two numbers on purpose: publishing scripts count every word of the body, this line counts
     # prose only (markers, urls and captions stripped). They differ by about 30 and the mismatch
     # used to look like a lost paragraph.
@@ -1371,6 +1151,7 @@ def render_check(url):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--post", help="post id to report in full")
+    ap.add_argument("--file", help="JSON post or {posts:[...]} to check offline")
     ap.add_argument("--all", action="store_true", help="scan every post")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--delta", action="store_true", help="only paragraphs changed since the last run")
@@ -1380,8 +1161,18 @@ def main():
     global CHECK_IDS
     CHECK_IDS = bool(args.ids)
 
-    desk = fetch("/api/desk?nocache=%d" % time.time())
-    posts = desk["posts"]
+    if args.file:
+        data = json.load(open(args.file, encoding="utf-8"))
+        if isinstance(data, dict) and isinstance(data.get("posts"), list):
+            posts = data["posts"]
+        elif isinstance(data, dict):
+            posts = [data]
+        else:
+            print("file must contain a post or a posts list")
+            return 2
+    else:
+        desk = fetch("/api/desk?nocache=%d" % time.time())
+        posts = desk["posts"]
     state = {}
     if os.path.exists(STATE):
         try:
@@ -1390,8 +1181,8 @@ def main():
             state = {}
 
     prev_posts = state.get("posts", {})
-    changed_other = [p["id"] for p in posts
-                     if p["id"] in prev_posts and prev_posts[p["id"]] != sha(p)]
+    changed_other = [p.get("id") for p in posts
+                     if p.get("id") in prev_posts and prev_posts[p.get("id")] != sha(p)]
 
     targets = posts if args.all or not args.post else [p for p in posts if p.get("id") == args.post]
     if not targets:
@@ -1436,7 +1227,7 @@ def main():
         if f:
             worst = 1
 
-    state["posts"] = {p["id"]: sha(p) for p in posts}
+    state["posts"] = {p.get("id"): sha(p) for p in posts if p.get("id")}
     try:
         json.dump(state, open(STATE, "w", encoding="utf-8"))
     except Exception:
@@ -1446,7 +1237,12 @@ def main():
         print("NOTE other posts changed since the last gate run: %s" % ", ".join(changed_other))
 
     if args.json:
-        print(json.dumps({"report": report, "changed_other": changed_other}, ensure_ascii=False, indent=2))
+        print(json.dumps({
+            "report": report,
+            "changed_other": changed_other,
+            "manual": canon_checks.manual_not_run(),
+            "verdict": "MECHANICAL FAIL" if worst else "MECHANICAL PASS",
+        }, ensure_ascii=False, indent=2))
         return worst
 
     for r in report:
@@ -1460,12 +1256,14 @@ def main():
             for c, m in r["fails"]:
                 print("   X   %-16s %s" % (c, m))
             if not r["fails"]:
-                print("   ok  gate clean")
+                print("   ok  mechanical checks clear")
             if args.post:
-                print("   ==  manual pass (facts only, one read)")
-                for line in manual_checklist(next(p for p in posts if p["id"] == r["id"])):
+                print("   ==  manual checklist (NOT RUN)")
+                for line in manual_checklist(next(p for p in posts if p.get("id") == r["id"])):
                     print("       " + line)
-    print("\n%s" % ("FAIL - fix the X lines, then run again" if worst else "PASS - gate clean"))
+    for line in canon_checks.manual_not_run():
+        print(line)
+    print("\n%s" % ("MECHANICAL FAIL" if worst else "MECHANICAL PASS"))
     return worst
 
 
