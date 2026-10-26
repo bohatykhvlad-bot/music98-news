@@ -212,6 +212,11 @@ a{color:var(--text)}
 .mini .muted{text-align:center;font-size:11px}
 .mini-card-photo{display:flex;flex-direction:column;gap:6px;width:100%}
 .mini-card-photo .btn{width:100%;padding:6px 8px;font-size:12px;line-height:1.25;text-align:center;white-space:normal}
+.cred-row{display:flex;align-items:center;gap:8px}
+.cred-row.hide{display:none}
+.cred-fields{flex:1;min-width:0}
+.cred-add{width:32px;height:32px;min-height:32px;padding:0;flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1}
+.cred-add.hide{display:none}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
 .cropbar-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 /* slider rides the same height as its buttons: the input IS a 29px pill
@@ -388,10 +393,24 @@ a{color:var(--text)}
       </div>
       <input id="photo" class="hide" type="file" accept="image/*">
       <input id="cardPhoto" class="hide" type="file" accept="image/*">
-      <label for="credit">Author</label>
-      <input id="credit" placeholder="Raph_PH / Flickr (CC BY 4.0)">
-      <label for="creditUrl">Link to the photo</label>
-      <input id="creditUrl" placeholder="https://www.flickr.com/photos/…">
+      <div class="cred-row" id="creditRow">
+        <div class="cred-fields">
+          <label for="credit">Author</label>
+          <input id="credit" placeholder="Raph_PH / Flickr (CC BY 4.0)">
+          <label for="creditUrl">Link to the photo</label>
+          <input id="creditUrl" placeholder="https://www.flickr.com/photos/…">
+        </div>
+        <button class="btn ghost cred-add" id="addCredit" type="button" aria-label="Add another photo author" title="Add another author">+</button>
+      </div>
+      <div class="cred-row hide" id="credit2row">
+        <div class="cred-fields">
+          <label for="credit2">Author</label>
+          <input id="credit2" placeholder="Raph_PH / Flickr (CC BY 4.0)">
+          <label for="creditUrl2">Link to the photo</label>
+          <input id="creditUrl2" placeholder="https://www.flickr.com/photos/…">
+        </div>
+        <button class="btn ghost cred-add" id="removeCredit" type="button" aria-label="Remove second photo author" title="Remove">×</button>
+      </div>
 
       <label>Story</label>
       <div class="toolbar" role="toolbar" aria-label="Format">
@@ -1651,6 +1670,21 @@ function renderList(){
   wireList("#listReleases");
 }
 
+function setSecondCredit(open){
+  $("#credit2row").classList.toggle("hide", !open);
+  $("#addCredit").classList.toggle("hide", !!open);
+}
+function secondCredit(id){
+  if($("#credit2row").classList.contains("hide")) return undefined;
+  return $("#"+id).value.trim() || undefined;
+}
+$("#addCredit").onclick = ()=> setSecondCredit(true);
+$("#removeCredit").onclick = ()=>{
+  $("#credit2").value = "";
+  $("#creditUrl2").value = "";
+  setSecondCredit(false);
+};
+
 function fillForm(p){
   editing = p ? p.id : null;
   crop.dirty = false;
@@ -1667,6 +1701,9 @@ function fillForm(p){
   setGoLive(toLocalInput(p?.publishAt));
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
+  $("#credit2").value = (p?.cover && p.cover.credit2) || "";
+  $("#creditUrl2").value = (p?.cover && p.cover.creditUrl2) || "";
+  setSecondCredit(!!((p?.cover && p.cover.credit2) || (p?.cover && p.cover.creditUrl2)));
   const src = (p?.cover && p.cover.src) || "";
   if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.cardZoom, p.cover.cardX, p.cover.cardSrc);
   else {
@@ -2270,6 +2307,8 @@ function collectPost(status){
         src: originalCover(coverSrc),
         credit: $("#credit").value.trim(),
         creditUrl: $("#creditUrl").value.trim(),
+        credit2: secondCredit("credit2"),
+        creditUrl2: secondCredit("creditUrl2"),
         pos: Math.round(crop.x*100)+"% "+Math.round(crop.y*100)+"%",
         zoom: Math.round((crop.zoom||1)*100)/100,
         cardY: Math.round((crop.cardY!=null?crop.cardY:0.5)*100)/100,
