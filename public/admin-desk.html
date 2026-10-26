@@ -210,6 +210,8 @@ a{color:var(--text)}
 .axis-pill.free{background:#e4ebec;border-color:#b7c4c7}
 .mini-frame img{position:absolute;left:0;top:0;max-width:none;width:auto;height:auto;display:block}
 .mini .muted{text-align:center;font-size:11px}
+.mini-card-photo{display:flex;flex-direction:column;gap:6px;width:100%}
+.mini-card-photo .btn{width:100%;padding:6px 8px;font-size:12px;line-height:1.25;text-align:center;white-space:normal}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
 .cropbar-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 /* slider rides the same height as its buttons: the input IS a 29px pill
@@ -378,9 +380,14 @@ a{color:var(--text)}
         <div class="mini">
           <div class="mini-frame" id="miniFrame" title="Card crop: vertical only"><img id="miniImg" class="hide" alt=""></div>
           <p class="muted">Card</p>
+          <div class="mini-card-photo">
+            <button class="btn ghost" type="button" id="cardPhotoBtn">Upload separate photo</button>
+            <button class="btn ghost hide" type="button" id="cardPhotoClear">Remove separate photo</button>
+          </div>
         </div>
       </div>
       <input id="photo" class="hide" type="file" accept="image/*">
+      <input id="cardPhoto" class="hide" type="file" accept="image/*">
       <label for="credit">Author</label>
       <input id="credit" placeholder="Raph_PH / Flickr (CC BY 4.0)">
       <label for="creditUrl">Link to the photo</label>
@@ -505,6 +512,7 @@ const KEY = "music98_admin_key";
 const APPLE_AT = "1001l3aZW";
 let posts = [];
 let coverSrc = "";
+let cardSrc = "";
 let crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect:"16/9", cardY:0.5, cardFree:false, cardX:null};
 let cropMode = "main";   /* main | card | hero */
 /* The live page draws a cover exactly as stored - fitCover in index.html, with
@@ -663,7 +671,7 @@ function presetThumb(p){
   return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
 }
 function listThumbSrc(p){
-  const src = (p.cover && p.cover.src) || "";
+  const src = (p.cover && (p.cover.cardSrc || p.cover.src)) || "";
   if(src && src.indexOf("data:image/")!==0 && src.indexOf("blob:")!==0) return src;
   if(src) return "";
   return presetThumb(p);
@@ -1405,11 +1413,11 @@ function paintMini(){
       }
     }
   }
-  const paint = (id, fx, fy, fz)=>{
+  const paint = (id, fx, fy, fz, src)=>{
     const m = $("#"+id);
     if(!m) return;
-    if(!coverSrc){ m.classList.add("hide"); return; }
-    if(m.getAttribute("src") !== coverSrc) m.src = coverSrc;
+    if(!src){ m.classList.add("hide"); return; }
+    if(m.getAttribute("src") !== src) m.src = src;
     m.classList.remove("hide");
     const go = ()=> fitCover(m, fx, fy, fz||crop.zoom||1);
     /* ALWAYS re-bind onload, even when a previous image is still decoded:
@@ -1422,8 +1430,9 @@ function paintMini(){
      so caption it by what is actually on screen, not by the active mode */
   const cap = document.querySelector(".mini .muted");
   if(cap) cap.textContent = (cropMode === "card") ? "Main" : "Card";
-  if(cropMode === "card") paint("miniImg", Number.isFinite(crop.x)?crop.x:0.5, Number.isFinite(crop.y)?crop.y:0.5, siteZoom(crop.zoom||1));
-  else paint("miniImg", cardFx(), crop.cardY, siteZoom(crop.cardZoom||1));
+  if(cropMode === "card") paint("miniImg", Number.isFinite(crop.x)?crop.x:0.5, Number.isFinite(crop.y)?crop.y:0.5, siteZoom(crop.zoom||1), coverSrc);
+  else if(cardSrc) paint("miniImg", 0.5, 0.5, 1, cardSrc);
+  else paint("miniImg", cardFx(), crop.cardY, siteZoom(crop.cardZoom||1), coverSrc);
 }
 /* The slider's right end IS the zoom cap (owner request): the track maps
    [1..cap] of the CURRENT focus, so dragging to the end always lands exactly
@@ -1455,11 +1464,25 @@ function syncZoomEnabled(){
     s.value = 1;
   }
 }
+function syncCardPhotoBtns(){
+  const clear = $("#cardPhotoClear");
+  if(clear) clear.classList.toggle("hide", !cardSrc);
+}
 function layoutCrop(){
   syncZoomEnabled();
   const stage = $("#stage");
   const img = $("#stageImg");
-  if(!coverSrc || !img.naturalWidth){ paintMini(); return; }
+  const want = (cropMode === "card" && cardSrc) ? cardSrc : coverSrc;
+  if(want && img.getAttribute("src") !== want){
+    img.onload = ()=> layoutCrop();
+    img.src = want;
+    img.classList.remove("hide");
+    $("#coverHint").classList.add("hide");
+    paintMini();
+    return;
+  }
+  if(!want || !img.naturalWidth){ paintMini(); return; }
+  if(cropMode === "card" && cardSrc){ fitCover(img, 0.5, 0.5, 1); paintMini(); return; }
   if(cropMode === "card"){ fitCover(img, cardFx(), crop.cardY, crop.cardZoom||1); paintMini(); if(syncZoomUI()) layoutCrop(); return; }
   const sw = stage.clientWidth, sh = stage.clientHeight;
   const iw = img.naturalWidth, ih = img.naturalHeight;
@@ -1480,6 +1503,8 @@ function layoutCrop(){
 }
 function setCover(src, pos, zoom, cardY){
   coverSrc = src;
+  if(arguments.length > 6) cardSrc = arguments[6] || "";
+  syncCardPhotoBtns();
   const parsed = parsePos(pos);
   crop.x = parsed.x; crop.y = parsed.y; crop.zoom = siteZoom(Number(zoom)||1);
   /* empty / null card fields fall back exactly like the page does: cardY to the
@@ -1495,13 +1520,13 @@ function setCover(src, pos, zoom, cardY){
   const cx = num(arguments[5]);
   crop.cardFree = Number.isFinite(cx);
   crop.cardX = Number.isFinite(cx) ? Math.min(1, Math.max(0, cx)) : null;
-  setCropMode("main");
-  $("#zoom").value = crop.zoom;
   const img = $("#stageImg");
   img.onload = ()=> layoutCrop();
   img.src = src;
   img.classList.remove("hide");
   $("#coverHint").classList.add("hide");
+  setCropMode("main");
+  $("#zoom").value = crop.zoom;
   paintMini();
 }
 
@@ -1533,10 +1558,11 @@ function renderList(){
     const c = p.cover || {};
     const pxy = String(c.pos || "50% 50%").split(/\s+/);
     const mx = Number(pxy[0]); const my = Number(pxy[1]);
-    const cyPct = (c.cardY == null) ? (my || 50) : Math.round(Number(c.cardY)*100);
-    /* same rule as the live cardFocus(): cardX, else the main crop's x */
-    const cxPct = c.cardX != null ? Math.round(Number(c.cardX)*100) : (mx || 50);
-    const czoom = siteZoom(c.cardZoom ?? c.zoom);
+    const useCardPhoto = !!c.cardSrc;
+    const cyPct = useCardPhoto ? 50 : ((c.cardY == null) ? (my || 50) : Math.round(Number(c.cardY)*100));
+    /* same rule as the live cardFocus(): a card photo is centred; otherwise cardX, else the main crop's x */
+    const cxPct = useCardPhoto ? 50 : (c.cardX != null ? Math.round(Number(c.cardX)*100) : (mx || 50));
+    const czoom = useCardPhoto ? 1 : siteZoom(c.cardZoom ?? c.zoom);
     const tattr = `class="thimg" data-fx="${(cxPct/100).toFixed(4)}" data-fy="${(cyPct/100).toFixed(4)}" data-zoom="${czoom}"`;
     /* thbox clips the fitted image to the 40px cell (zoom paints outside) */
     const thumb = tiny
@@ -1612,7 +1638,7 @@ function renderList(){
   const wireList = sel=>{
     document.querySelectorAll(sel+" img[data-thumb]").forEach(img=>{
       const p = posts.find(x => x.id === img.getAttribute("data-thumb"));
-      const src = p && p.cover && p.cover.src;
+      const src = p && p.cover && (p.cover.cardSrc || p.cover.src);
       if(src) img.src = src;
     });
     document.querySelectorAll(sel+" img.thimg").forEach(img=>{
@@ -1642,16 +1668,17 @@ function fillForm(p){
   $("#credit").value = (p?.cover && p.cover.credit) || "";
   $("#creditUrl").value = (p?.cover && p.cover.creditUrl) || "";
   const src = (p?.cover && p.cover.src) || "";
-  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.cardZoom, p.cover.cardX);
+  if(src) setCover(originalCover(src), p.cover.pos, p.cover.zoom, p.cover.cardY, p.cover.cardZoom, p.cover.cardX, p.cover.cardSrc);
   else {
     coverSrc = "";
+    cardSrc = (p && p.cover && p.cover.cardSrc) || "";
+    syncCardPhotoBtns();
     $("#stageImg").classList.add("hide");
     $("#stageImg").removeAttribute("src");
     $("#coverHint").classList.remove("hide");
     crop = {x:0.5, y:0.5, zoom:1, dirty:false, aspect: crop.aspect || "16/9", cardY:0.5, cardZoom:1, cardFree:false, cardX:null};
     $("#zoom").value = zoomNow();
-    $("#miniImg").classList.add("hide");
-    paintMini();
+    setCropMode("main");
   }
 }
 
@@ -1724,6 +1751,20 @@ stage.addEventListener("drop", e=>{
   if(!takeDroppedImage(e, src=>{ crop.dirty = true; setCover(src); })) e.preventDefault();
 });
 $("#photo").onchange = e=> readPhoto(e.target.files[0], src=>{ crop.dirty = true; setCover(src); e.target.value=""; });
+$("#cardPhotoBtn").onclick = ()=> $("#cardPhoto").click();
+$("#cardPhoto").onchange = e=> readPhoto(e.target.files[0], src=>{
+  cardSrc = src || "";
+  crop.dirty = true;
+  syncCardPhotoBtns();
+  layoutCrop();
+  e.target.value = "";
+});
+$("#cardPhotoClear").onclick = ()=>{
+  cardSrc = "";
+  crop.dirty = true;
+  syncCardPhotoBtns();
+  layoutCrop();
+};
 $("#zoom").oninput = ()=> setZoom($("#zoom").value);
 $("#zoomIn").onclick = ()=> setZoom(zoomNow() + Math.max(0.06, (zoomCap()-1)/12));
 $("#zoomOut").onclick = ()=> setZoom(zoomNow() - Math.max(0.06, (zoomCap()-1)/12));
@@ -2223,21 +2264,25 @@ function collectPost(status){
     pinned: $("#pinned").checked,
     status,
     publishAt: publishAt || (editing ? ((posts.find(x=>x.id===editing)||{}).publishAt || "") : "") || (status==="live" ? new Date().toISOString() : ""),
-    cover: coverSrc ? {
-      kind:"img",
-      src: originalCover(coverSrc),
-      credit: $("#credit").value.trim(),
-      creditUrl: $("#creditUrl").value.trim(),
-      pos: Math.round(crop.x*100)+"% "+Math.round(crop.y*100)+"%",
-      zoom: Math.round((crop.zoom||1)*100)/100,
-      cardY: Math.round((crop.cardY!=null?crop.cardY:0.5)*100)/100,
-      cardZoom: Math.round((crop.cardZoom!=null?crop.cardZoom:1)*100)/100,
-      /* lockX is no longer read by the page (the card takes the main x); it is
-         still written as a mirror of pos.x so a browser holding the previous
-         index.html keeps rendering the same card */
-      lockX: Math.round(crop.x*100)/100,
-      cardX: crop.cardFree && Number.isFinite(crop.cardX) ? Math.round(crop.cardX*100)/100 : undefined
-    } : {kind:"preset", i:0}
+    cover: (()=>{
+      const cover = coverSrc ? {
+        kind:"img",
+        src: originalCover(coverSrc),
+        credit: $("#credit").value.trim(),
+        creditUrl: $("#creditUrl").value.trim(),
+        pos: Math.round(crop.x*100)+"% "+Math.round(crop.y*100)+"%",
+        zoom: Math.round((crop.zoom||1)*100)/100,
+        cardY: Math.round((crop.cardY!=null?crop.cardY:0.5)*100)/100,
+        cardZoom: Math.round((crop.cardZoom!=null?crop.cardZoom:1)*100)/100,
+        /* lockX is no longer read by the page (the card takes the main x); it is
+           still written as a mirror of pos.x so a browser holding the previous
+           index.html keeps rendering the same card */
+        lockX: Math.round(crop.x*100)/100,
+        cardX: crop.cardFree && Number.isFinite(crop.cardX) ? Math.round(crop.cardX*100)/100 : undefined
+      } : {kind:"preset", i:0};
+      if(cardSrc) cover.cardSrc = cardSrc;
+      return cover;
+    })()
   };
 }
 async function writePost(status){

@@ -49,3 +49,5 @@ This note is not part of the owner's canon text. It records how this repository 
 `site/_style-memory.md` is the next source after this canon. It is not in the repository. There is no `site/` directory; the public site lives in `public/`. The gitignore pattern `_style-memory.md` ignores that filename in any directory, because private house-style notes were kept out of the public tree. Do not invent a style-memory file and do not treat the gap as permission to improvise house style.
 
 Until a real style memory is added, stop the chain at this canon, then follow behavior the site already implements: release headlines are rendered from `artist`, `title`, and `rtype` as Artist - Release Name; song titles use straight ASCII double quotes; ticket buttons use the existing Buy Tickets component and configured Ticketmaster/Impact tracking.
+
+`cover.cardSrc` is an optional square card image; when set, the card uses it instead of cropping the main cover.
