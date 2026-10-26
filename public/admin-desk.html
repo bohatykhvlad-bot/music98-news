@@ -212,10 +212,16 @@ a{color:var(--text)}
 .mini .muted{text-align:center;font-size:11px}
 .mini-card-photo{display:flex;flex-direction:column;gap:6px;width:100%}
 .mini-card-photo .btn{width:100%;padding:6px 8px;font-size:12px;line-height:1.25;text-align:center;white-space:normal}
-.cred-row{display:flex;align-items:center;gap:8px}
-.cred-row.hide{display:none}
-.cred-fields{flex:1;min-width:0}
-.cred-add{width:32px;height:32px;min-height:32px;padding:0;flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:18px;line-height:1}
+.cred-block{display:grid;grid-template-columns:minmax(0,1fr) 32px;column-gap:8px;align-items:center}
+.cred-block.hide{display:none}
+.cred-block > label,.cred-block > input{grid-column:1}
+.cred-block > label:first-of-type{grid-row:1}
+.cred-block > input:first-of-type{grid-row:2}
+.cred-block > label:nth-of-type(2){grid-row:3}
+.cred-block > input:nth-of-type(2){grid-row:4}
+.cred-slot{grid-column:2;grid-row:2;width:32px;height:32px}
+.cred-add{width:32px;height:32px;min-height:32px;margin:0;padding:0;display:grid;place-items:center;line-height:0;font-size:0}
+.cred-add svg{display:block}
 .cred-add.hide{display:none}
 .cropbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--bg2)}
 .cropbar-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -393,23 +399,19 @@ a{color:var(--text)}
       </div>
       <input id="photo" class="hide" type="file" accept="image/*">
       <input id="cardPhoto" class="hide" type="file" accept="image/*">
-      <div class="cred-row" id="creditRow">
-        <div class="cred-fields">
-          <label for="credit">Author</label>
-          <input id="credit" placeholder="Raph_PH / Flickr (CC BY 4.0)">
-          <label for="creditUrl">Link to the photo</label>
-          <input id="creditUrl" placeholder="https://www.flickr.com/photos/…">
-        </div>
-        <button class="btn ghost cred-add" id="addCredit" type="button" aria-label="Add another photo author" title="Add another author">+</button>
+      <div class="cred-block" id="creditRow">
+        <label for="credit">Author</label>
+        <input id="credit" placeholder="Raph_PH / Flickr (CC BY 4.0)">
+        <div class="cred-slot"><button class="btn ghost cred-add" id="addCredit" type="button" aria-label="Add another photo author" title="Add another author"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false"><path d="M8 3.25v9.5M3.25 8h9.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button></div>
+        <label for="creditUrl">Link to the photo</label>
+        <input id="creditUrl" placeholder="https://www.flickr.com/photos/…">
       </div>
-      <div class="cred-row hide" id="credit2row">
-        <div class="cred-fields">
-          <label for="credit2">Author</label>
-          <input id="credit2" placeholder="Raph_PH / Flickr (CC BY 4.0)">
-          <label for="creditUrl2">Link to the photo</label>
-          <input id="creditUrl2" placeholder="https://www.flickr.com/photos/…">
-        </div>
-        <button class="btn ghost cred-add" id="removeCredit" type="button" aria-label="Remove second photo author" title="Remove">×</button>
+      <div class="cred-block hide" id="credit2row">
+        <label for="credit2">Author</label>
+        <input id="credit2" placeholder="Raph_PH / Flickr (CC BY 4.0)">
+        <div class="cred-slot"><button class="btn ghost cred-add" id="removeCredit" type="button" aria-label="Remove second photo author" title="Remove"><svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false"><path d="M4.25 4.25l7.5 7.5M11.75 4.25l-7.5 7.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button></div>
+        <label for="creditUrl2">Link to the photo</label>
+        <input id="creditUrl2" placeholder="https://www.flickr.com/photos/…">
       </div>
 
       <label>Story</label>

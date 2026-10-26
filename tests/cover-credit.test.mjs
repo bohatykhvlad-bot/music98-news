@@ -80,7 +80,8 @@ test("the desk editor can add one second author and still saves cardSrc", () => 
   assert.match(desk, /id="credit2"/);
   assert.match(desk, /id="creditUrl2"/);
   assert.match(desk, /id="removeCredit"/);
-  assert.match(desk, /class="cred-row hide" id="credit2row"/);
+  assert.match(desk, /class="cred-block hide" id="credit2row"/);
+  assert.match(desk, /class="cred-slot"/);
   assert.match(desk, /setSecondCredit\(!!\(\(p\?\.cover && p\.cover\.credit2\) \|\| \(p\?\.cover && p\.cover\.creditUrl2\)\)\)/);
   assert.match(desk, /credit2: secondCredit\("credit2"\)/);
   assert.match(desk, /creditUrl2: secondCredit\("creditUrl2"\)/);
