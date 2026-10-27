@@ -19,15 +19,19 @@ jobs:
           python-version: "3.12"
       - name: Validate editorial workflow scripts and canon
         run: |
-          python -m py_compile scripts/canon_checks.py scripts/editorial_readthrough.py scripts/gate.py scripts/post.py scripts/preflight.py scripts/test_editorial_readthrough.py scripts/check_agent_write_path.py
+          python -m py_compile scripts/canon_checks.py scripts/editorial_readthrough.py scripts/factcheck.py scripts/gate.py scripts/post.py scripts/preflight.py scripts/test_editorial_readthrough.py scripts/test_factcheck.py scripts/check_agent_write_path.py
           python scripts/check_agent_write_path.py
           python scripts/editorial_readthrough.py --help | grep -q -- "--phase"
           python scripts/post.py --help | grep -q -- "--phase"
           python scripts/post.py --help | grep -q -- "create"
           python scripts/post.py --help | grep -q -- "preflight"
+          python scripts/post.py --help | grep -q -- "facts"
+          python scripts/post.py --help | grep -q -- "packet"
           python scripts/test_editorial_readthrough.py
+          python scripts/test_factcheck.py
           test "$(wc -l < music98-agent-operating-canon.md)" -le 280
           test -f editorial/CANON.md
+          test -f editorial/facts/TEMPLATE.md
           grep -q "editorial/CANON.md" music98-agent-operating-canon.md
           grep -q "NOT RUN" editorial/CANON.md
           grep -q "1,200" editorial/CANON.md

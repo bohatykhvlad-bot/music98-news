@@ -18,4 +18,8 @@ Run `scripts/editorial_readthrough.py`, `scripts/gate.py`, and `scripts/prefligh
 
 Save and publish only through `scripts/post.py`. Never POST `/api/desk` directly. News and releases need 400+ prose words; longreads need 1,200+. Do not pad.
 
+## Fact registry
+
+Canon section 1 asks for a source-backed registry before writing. The registry lives in the repository at `editorial/facts/<post-id>.md`, one line per checkable claim: `- <claim> | <source url> | <exact quote from that source>`. `post.py facts <id>` cross-checks the body against the registry and refuses to publish a post that has no registry. That cross-check proves coverage, not truth: the sources and an independent second pass prove truth. `post.py packet <id>` writes the body plus the registry as a standalone review packet for a fresh reviewer who has no other context. `editorial/facts/TEMPLATE.md` has the format and the rules for writing a line.
+
 Do not change site UI or live articles while editing the canon or these checks.

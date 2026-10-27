@@ -26,6 +26,8 @@ COMMANDS
   preflight <id>              run mandatory saved-draft preflight
   editorial <id> [--body-file F] [--phase pre-edit|post-edit]
                               mandatory full-read barrier before and after editing
+  facts <id> [--ledger FILE]  cross-check the body against its fact registry
+  packet <id>                 write the independent-review packet (body + registry)
   publish <id>                flip to live - refuses unless gate + editorial stamp pass
   verify <id>                 live checks: public API, cover, youtube
   finish <id> --body-file F   set -> gate -> publish -> verify, one run
@@ -58,6 +60,7 @@ PHOTO_API = "https://music98.news/api/photo"
 GATE = REPO / "scripts" / "gate.py"
 PREFLIGHT = REPO / "scripts" / "preflight.py"
 READTHROUGH = REPO / "scripts" / "editorial_readthrough.py"
+FACTS_DIR = REPO / "editorial" / "facts"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/131.0 Safari/537.36")
 MONTHS = ("january february march april may june july august september "
@@ -721,6 +724,7 @@ def cmd_publish(pid):
             if re.match(r"\s*X\s+\S", l):
                 print("  " + l.strip())
         raise SystemExit(1)
+    require_fact_registry(pid)
 
     def mutate(posts):
         p = find_post(posts, pid)
@@ -820,6 +824,118 @@ def cmd_finish(pid, body_file, title=None, excerpt=None):
     print("\nDONE - post is live.")
 
 
+# --- fact registry -------------------------------------------------------------
+
+def default_ledger(pid: str) -> Path:
+    return FACTS_DIR / ("%s.md" % pid)
+
+
+def cmd_packet(pid, out=None):
+    """Write the independent-review packet: final body + fact registry.
+
+    A fresh session receives only this file. It cannot see the draft history or
+    the research notes, so it has to re-check every claim against the sources
+    named in the registry instead of trusting the writer.
+    """
+    posts = desk_read()["posts"]
+    p = find_post(posts, pid)
+    body = p.get("body") or ""
+    path = Path(out) if out else (REPO / ".editorial" / "work" / ("%s.packet.md" % pid))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    ledger = default_ledger(pid)
+    ledger_text = ledger.read_text(encoding="utf-8", errors="replace") if ledger.exists() else ""
+    lines = [
+        "# Independent review packet - %s" % pid,
+        "",
+        "You are checking someone else's finished article. You have no other",
+        "context: no drafts, no notes, no memory of the writing session.",
+        "",
+        "For every claim in the registry below, open the source and mark it",
+        "CONFIRMED (the source says this), REFUTED (the source says otherwise)",
+        "or NOT FOUND (the source does not say it). \"Not found\" is not \"false\".",
+        "Then read the body once, as a reader, and list anything the article",
+        "claims that no registry line backs.",
+        "",
+        "## Article title",
+        "",
+        p.get("title") or "",
+        "",
+        "## Article body",
+        "",
+        body,
+        "",
+        "## Fact registry",
+        "",
+        ledger_text,
+        "",
+    ]
+    path.write_text("\n".join(lines), encoding="utf-8")
+    print("packet    ok: %s" % path)
+    return path
+
+
+def cmd_facts(pid, ledger=None, body_file=None):
+    """Cross-check a post body against its fact registry.
+
+    The registry lives in `editorial/facts/<post-id>.md` and holds one sourced
+    claim per line. Every checkable claim in the body (year, number, quantified
+    noun, quoted title, multi-word proper name, date) must be covered by it.
+    """
+    sys.path.insert(0, str(REPO / "scripts"))
+    import factcheck
+
+    posts = desk_read()["posts"]
+    p = find_post(posts, pid)
+    body = p.get("body") or ""
+    if body_file:
+        body = Path(body_file).read_text(encoding="utf-8")
+
+    path = Path(ledger) if ledger else default_ledger(pid)
+    if not path.exists():
+        print("facts     REFUSED - no fact registry for %s" % pid)
+        print("  expected: %s" % path)
+        print("  one line per claim:  - <claim> | <source url> | <exact quote>")
+        raise SystemExit(1)
+
+    ledger_text = path.read_text(encoding="utf-8", errors="replace")
+    fails, warns, info = factcheck.check(body, ledger_text)
+    for line in factcheck.render(fails, warns, info).splitlines():
+        print(line)
+    if fails:
+        print("\nFACTS: FAIL - %d claim(s) in the body are not backed by the registry."
+              % len(fails))
+        raise SystemExit(1)
+    print("\nFACTS: PASS - every checkable claim in the body is in %s" % path.name)
+    return True
+
+
+def require_fact_registry(pid, body_file=None):
+    """Publish gate: no registry, no publish."""
+    sys.path.insert(0, str(REPO / "scripts"))
+    import factcheck
+
+    posts = desk_read()["posts"]
+    p = find_post(posts, pid)
+    body = p.get("body") or ""
+    if body_file:
+        body = Path(body_file).read_text(encoding="utf-8")
+    path = default_ledger(pid)
+    if not path.exists():
+        print("publish   REFUSED - no fact registry for %s" % pid)
+        print("  expected: %s" % path)
+        print("  canon section 1 asks for a source-backed registry of every checkable")
+        print("  fact. Write the registry first, then publish.")
+        raise SystemExit(1)
+    ledger_text = path.read_text(encoding="utf-8", errors="replace")
+    fails, warns, _ = factcheck.check(body, ledger_text)
+    if fails:
+        print("publish   REFUSED - the body is not covered by %s:" % path.name)
+        for f in fails:
+            print("  X %s" % f)
+        raise SystemExit(1)
+    return True
+
+
 # --- date registry -------------------------------------------------------------
 
 def cmd_register(token, fact):
@@ -857,6 +973,15 @@ def main():
     sp.add_argument("--phase", choices=["pre-edit","post-edit"], default="post-edit")
     sp.add_argument("--allow", action="append", choices=["technical-credit","physical-format","source-attribution","single-sentence"])
     sp.add_argument("--reason")
+
+    sp = sub.add_parser("facts")
+    sp.add_argument("id")
+    sp.add_argument("--ledger")
+    sp.add_argument("--body-file")
+
+    sp = sub.add_parser("packet")
+    sp.add_argument("id")
+    sp.add_argument("--out")
 
     sp = sub.add_parser("dump")
     sp.add_argument("id")
@@ -943,6 +1068,10 @@ def main():
         cmd_preflight(a.id)
     elif a.cmd == "editorial":
         cmd_editorial(a.id, a.body_file, a.title, a.allow, a.reason, a.phase)
+    elif a.cmd == "facts":
+        cmd_facts(a.id, a.ledger, a.body_file)
+    elif a.cmd == "packet":
+        cmd_packet(a.id, a.out)
     elif a.cmd == "publish":
         cmd_publish(a.id)
     elif a.cmd == "verify":

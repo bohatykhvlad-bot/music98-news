@@ -234,6 +234,28 @@ def _name_parts(artist: str):
     return artist, bits[-1]
 
 
+def _names_artist(artist: str, text: str) -> bool:
+    """Is the artist named in this text?
+
+    Owner rule, 27.10.2026: the release card carries a joint credit with the symbol
+    ("Olivia Rodrigo & Chappell Roan"), while the prose writes it the other way round
+    ("Olivia Rodrigo has released ... featuring Chappell Roan"). Both spellings name
+    the same artists, so a joint credit counts as named when BOTH halves are in the
+    text, however the sentence splits them.
+    """
+    if not artist:
+        return False
+    low = (text or "").lower()
+    if artist.lower() in low:
+        return True
+    parts = [p.strip(" ,.;:'\"") for p in
+             re.split(r"\s*(?:&|\+|\band\b|\bfeat\.?\b|\bfeaturing\b|\bwith\b)\s*", artist, flags=re.I)
+             if p.strip(" ,.;:'\"")]
+    if len(parts) < 2:
+        return False
+    return all(p.lower() in low for p in parts)
+
+
 def _opening_key(text: str) -> str:
     words = re.findall(r"[A-Za-z0-9']+", (text or "").lower())
     while words and words[0] in {"the", "a", "an"}:
@@ -370,7 +392,7 @@ def _lede(post, paras):
             issues.append(("lede", "news headline does not name the artist"))
         if not ACTION.search(title):
             issues.append(("lede", "news headline does not state the action"))
-    if artist and artist.lower() not in first.lower():
+    if artist and not _names_artist(artist, first):
         issues.append(("lede", "first sentence does not name the artist"))
     if not ACTION.search(first):
         issues.append(("lede", "first sentence does not state the action"))
