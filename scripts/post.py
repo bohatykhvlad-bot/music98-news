@@ -564,6 +564,30 @@ def cmd_replace_draft(pid, post_file, allows=None, reason=None):
     return now
 
 
+def cmd_pin(pid, pin=True):
+    """Pin a post to the top of News on the home page (or unpin it).
+
+    The home page renders one hero: the freshest post with pinned=true. This
+    changes nothing but that flag, so it is a guarded single-field write on the
+    desk - the same read-mutate-verify path as every other post.py command.
+    """
+    current = find_post(desk_read()["posts"], pid)
+    candidate = json.loads(json.dumps(current))
+    candidate["pinned"] = bool(pin)
+    if not _local_gate(candidate):
+        die("pin refused: staged post failed gate before desk write")
+
+    def mutate(posts):
+        p = find_post(posts, pid)
+        p["pinned"] = bool(pin)
+        return p
+
+    now = guarded_write(mutate)
+    print("pin       ok: %s pinned=%s (home page hero candidate)" %
+          (now["id"], now.get("pinned")))
+    return now
+
+
 def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
     require_editorial_stamp(pid, body_file=body_file, title=title)
     body = Path(body_file).read_text(encoding="utf-8").strip()
@@ -873,6 +897,10 @@ def main():
     sp.add_argument("--excerpt")
     sp.add_argument("--publish", action="store_true")
 
+    sp = sub.add_parser("pin")
+    sp.add_argument("id")
+    sp.add_argument("--unpin", action="store_true")
+
     sp = sub.add_parser("finish")
     sp.add_argument("id")
     sp.add_argument("--body-file", required=True)
@@ -907,6 +935,8 @@ def main():
         cmd_replace_draft(a.id, a.file, a.allow, a.reason)
     elif a.cmd == "set":
         cmd_set(a.id, a.body_file, a.title, a.excerpt, a.publish)
+    elif a.cmd == "pin":
+        cmd_pin(a.id, not a.unpin)
     elif a.cmd == "gate":
         raise SystemExit(0 if cmd_gate(a.id) else 1)
     elif a.cmd == "preflight":
