@@ -262,10 +262,10 @@ test("direct /concerts is worker-first, no-store and rewrites index metadata wit
   );
   assert.match(worker,/path === "\/concerts"[\s\S]*serveConcertsShell\(request, env\)/);
   assert.match(worker,/X-M98-Concerts-Shell","index"/);
-  assert.match(worker,/Concerts Near You - music98\.news/);
+  assert.match(worker,/Concerts near you - music98\.news/);
   assert.match(worker,/https:\/\/music98\.news\/concerts/);
   assert.match(headers,/\/concerts\n  Cache-Control: no-store/);
-  assert.ok(legacy.includes("Concerts Near You - music98.news"));
+  assert.ok(legacy.includes("Concerts near you - music98.news"));
 });
 
 

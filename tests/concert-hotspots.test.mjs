@@ -906,6 +906,9 @@ test("popular artist tours are prewarmed and later served from KV without Ticket
   const oldFetch=globalThis.fetch;
   const oldCaches=globalThis.caches;
   let tmCalls=0;
+  // The event must be in the future: the prewarm drops past events, so a
+  // hardcoded date silently turns this test into a time bomb.
+  const showDate=new Date(Date.now()+86400000).toISOString().slice(0,10);
   globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
   globalThis.fetch=async input=>{
     const u=new URL(String(input));
@@ -914,7 +917,7 @@ test("popular artist tours are prewarmed and later served from KV without Ticket
       assert.equal(u.searchParams.get("attractionId"),"artist-1");
       return new Response(JSON.stringify({
         _embedded:{events:[{
-          id:"e1",name:"Show",dates:{start:{localDate:"2026-10-10",localTime:"20:00:00"}},
+          id:"e1",name:"Show",dates:{start:{localDate:showDate,localTime:"20:00:00"}},
           _embedded:{
             attractions:[{id:"artist-1",name:"Artist One",images:[]}],
             venues:[{name:"Venue",city:{name:"Paris"},country:{name:"France",countryCode:"FR"},location:{latitude:"48.8566",longitude:"2.3522"}}]
@@ -953,6 +956,9 @@ test("European capital event lists are prewarmed for Cloudflare-only map clicks"
   const oldFetch=globalThis.fetch;
   const oldCaches=globalThis.caches;
   let tmCalls=0;
+  // The event must be in the future: the prewarm drops past events, so a
+  // hardcoded date silently turns this test into a time bomb.
+  const showDate=new Date(Date.now()+86400000).toISOString().slice(0,10);
   globalThis.caches={default:{match:async()=>null,put:async()=>{}}};
   globalThis.fetch=async input=>{
     const u=new URL(String(input));
@@ -962,7 +968,7 @@ test("European capital event lists are prewarmed for Cloudflare-only map clicks"
       const cc=u.searchParams.get("countryCode");
       return new Response(JSON.stringify({
         _embedded:{events:[{
-          id:"city-"+tmCalls,name:"Show",dates:{start:{localDate:"2026-10-11",localTime:"20:00:00"}},
+          id:"city-"+tmCalls,name:"Show",dates:{start:{localDate:showDate,localTime:"20:00:00"}},
           _embedded:{
             attractions:[{id:"artist",name:"Artist",images:[]}],
             venues:[{name:"Venue",city:{name:city},country:{name:cc,countryCode:cc},location:{latitude:"48.8566",longitude:"2.3522"}}]

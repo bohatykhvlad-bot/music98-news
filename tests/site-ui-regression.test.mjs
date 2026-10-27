@@ -128,7 +128,7 @@ test("Load More only fills cyan on hover and has no press animation",()=>{
 });
 
 test("SPA /concerts uses concerts-specific document metadata",()=>{
-  assert.match(page,/const CONCERTS_PAGE_META=\{[\s\S]*title:"Concerts Near You - music98\.news"[\s\S]*canonical:"https:\/\/music98\.news\/concerts"/);
+  assert.match(page,/const CONCERTS_PAGE_META=\{[\s\S]*title:"Concerts near you - music98\.news"[\s\S]*canonical:"https:\/\/music98\.news\/concerts"/);
   assert.match(page,/activeTab = t;\n  syncSectionMeta\(t\);/);
 });
 
@@ -380,7 +380,10 @@ test("Concerts mobile heading remains left-aligned after final CSS overrides and
   assert.ok(base>=0 && mobile>base,"mobile alignment must override later centered desktop declaration");
   assert.match(css,/@media\(max-width:640px\)\{\n  \.hero h1\{font-size:clamp\(22px,7vw,26px\);line-height:1\.15\}/);
   assert.match(page,/@media \(max-width:640px\)\{[\s\S]*?\.wrap\{padding:0 16px\}/);
-  assert.match(css,/\.wrap\{padding:0 0 18px;max-width:none\}/,
+  // The owner removed the doubled bottom spacing on 2026-10 (f3fc5522), so the
+  // embedded .wrap now carries no padding of its own and inherits the host
+  // page's horizontal padding.
+  assert.match(css,/\.wrap\{padding:0;max-width:none\}/,
     "embedded Concerts inherits the main site's shared horizontal page padding");
 });
 

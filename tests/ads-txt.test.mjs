@@ -1,12 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import worker from "../worker.js";
 
-const published = readFileSync(new URL("../public/ads.txt", import.meta.url), "utf8");
+// The owner removed the published ads.txt on 16.10.2026 (commit fdef6174): the
+// site no longer serves a seller file, and /ads.txt answers 404. The worker
+// route stays, so the behaviour is still covered when a file is published
+// again. This test must not read a file that is intentionally absent.
+const adsTxtPath = new URL("../public/ads.txt", import.meta.url);
+const hasPublishedAdsTxt = existsSync(adsTxtPath);
+const published = hasPublishedAdsTxt ? readFileSync(adsTxtPath, "utf8") : "";
 const ctx = { waitUntil() {} };
 
-test("GET and HEAD crawlers receive only the published ads.txt without contacting external managers or caching it", async t => {
+test("GET and HEAD crawlers receive only the published ads.txt without contacting external managers or caching it", { skip: !hasPublishedAdsTxt && "no public/ads.txt is published" }, async t => {
   const external = t.mock.method(globalThis, "fetch", async () => new Response("# Unrelated managed seller file\n"));
   const env = {
     ASSETS: {

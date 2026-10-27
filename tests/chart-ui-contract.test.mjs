@@ -47,9 +47,18 @@ test("production candidate sample is accepted by the real browser's current char
  assert.equal(v,true);
 });
 test("Spotify-only songs are eligible but not required in every top 50 edition",()=>{
- assert.ok(chart.tracks.some(t=>t.sourceRanks.A===null));
+ // Every track must carry at least one source rank.
  assert.ok(chart.tracks.every(t=>t.sourceRanks.U!==null||t.sourceRanks.A!==null||t.sourceRanks.S!==null));
  assert.equal(validates("isDailySourceEdition",chart),true);
+ // A track with no Apple rank is eligible: the edition must still validate.
+ // The checked-in daily sample changes every day, so this asserts the rule
+ // rather than the presence of a Spotify-only track in today's data.
+ const withoutApple=structuredClone(chart);
+ const target=withoutApple.tracks.find(t=>t.sourceRanks.A!==null);
+ assert.ok(target,"the fixture must contain an Apple-ranked track to drop");
+ target.sourceRanks.A=null;
+ assert.ok(target.sourceRanks.U!==null||target.sourceRanks.S!==null);
+ assert.equal(validates("isDailySourceEdition",withoutApple),true);
 });
 test("browser blocks truly incomplete chart versions, fake streams and duplicate ranks",()=>{
  for(const mutate of [

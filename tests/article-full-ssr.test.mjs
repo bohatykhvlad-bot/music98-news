@@ -123,5 +123,7 @@ test("the real production shell keeps a mount point and SSR body-hidden tab rule
   assert.match(html, /body\.articlepage main \.tab\{display:none!important\}/);
   assert.equal((html.match(/id="articlePage"/g) || []).length, 1);
   assert.match(html, /<div class="atext">[\s\S]*This final paragraph is visible/);
-  assert.match(html, /<script src="https:\/\/cdn\.prplads\.com\/agent\.js\?/);
+  // The owner removed the PurpleAds loader and banner on 16.10.2026
+  // (commit 523414a6). The served shell must not carry the ad script.
+  assert.doesNotMatch(html, /cdn\.prplads\.com\/agent\.js/);
 });
