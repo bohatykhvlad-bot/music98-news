@@ -102,6 +102,30 @@ def run():
     f10, _, _ = fc.check(body10, ledger10)
     expect(not f10, "expected a surname starting with s to stay matchable, got: %s" % f10)
 
+    # 11. a number is bound to the unit it counts. "43 regions" must not be
+    # covered by any "30" that happens to sit in the registry.
+    body11 = "The song reached the top 10 of iTunes charts in 43 regions."
+    ledger11 = "- It came out on October 30 at 8 a.m. | https://example.com/i | \"October 30 at 8 a.m.\"\n"
+    f11, _, _ = fc.check(body11, ledger11)
+    expect(any("43 regions" in x for x in f11),
+           "expected an unbound number to fail, got: %s" % f11)
+
+    # 12. the same number with its unit IS covered.
+    ledger12 = ("- The single reached the top 10 of iTunes charts in 43 regions"
+                " | https://example.com/j | \"reached the top 10 of iTunes charts in 43 regions\"\n")
+    f12, _, _ = fc.check(body11, ledger12)
+    expect(not f12, "expected a bound number to be covered, got: %s" % f12)
+
+    # 13. a number word counts with its unit too: "eight songs" is not any "eight".
+    body13 = "It is an EP of eight songs."
+    f13, _, _ = fc.check(body13, "- It is an eight-song EP | https://example.com/k | \"an eight-song EP\"\n")
+    expect(not f13, "expected a hyphenated unit to be covered, got: %s" % f13)
+
+    # 14. "the two close the song" is a back-reference, not a quantity to check.
+    body14 = "The two close the song in harmony."
+    f14, _, _ = fc.check(body14, "- They close the song in harmony | https://example.com/l | \"close the song in harmony\"\n")
+    expect(not f14, "expected a back-reference not to be read as a quantity, got: %s" % f14)
+
     if fails:
         print("FACTCHECK: FAIL")
         for f in fails:

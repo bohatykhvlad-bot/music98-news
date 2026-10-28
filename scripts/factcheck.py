@@ -72,6 +72,65 @@ def _norm(text: str) -> str:
     return re.sub(r"\s+", " ", (text or "").replace("’", "'")).strip().lower()
 
 
+# Units that make a number mean something specific: "43 regions" is not the
+# same claim as "43 songs". The word right after the number is the unit.
+_UNIT_STOP = {
+    "a", "an", "the", "and", "or", "but", "in", "on", "at", "of", "for", "to",
+    "from", "with", "by", "as", "is", "was", "were", "are", "be", "been",
+    "that", "which", "who", "when", "where", "while", "after", "before",
+    "it", "its", "he", "she", "they", "them", "his", "her", "their", "you",
+    "not", "no", "if", "than", "then", "so", "up", "out", "over", "into",
+}
+
+
+def _date_owns(text: str, pos: int) -> bool:
+    """True when the number at pos belongs to a date ("September 4")."""
+    for m in DATE_RE.finditer(text or ""):
+        if m.start(2) == pos:
+            return True
+    return False
+
+
+def _definite_before(text: str, pos: int) -> bool:
+    """True when a number word is preceded by "the" - a back-reference."""
+    before = (text or "")[:pos].rstrip().lower()
+    return before.endswith("the") or before.endswith("these") or before.endswith("those")
+
+
+def _unit_of(text: str) -> str:
+    """The word a number counts, so "43 regions" binds to "43 regions"."""
+    m = re.match(r"\s*(?:[0-9][0-9,]*|(?:%s))\s+([A-Za-z][A-Za-z'’-]*)" % "|".join(NUMBER_WORDS),
+                 (text or "").strip(), re.I)
+    if not m:
+        return ""
+    unit = m.group(1).lower()
+    if unit in _UNIT_STOP or unit.endswith("ing") or unit.endswith("ed"):
+        return ""
+    return unit
+
+
+def _unit_after(text: str, pos: int) -> str:
+    """The unit word right after a number in the body, if it is a real unit.
+
+    A clock time ("7 p.m.") and a date ("the September 4 single") carry no
+    unit: the number is bound by the date, not by the next noun.
+    """
+    tail = (text or "")[pos:pos + 40].lstrip()
+    # "7 p.m." / "7 pm" / "7 a.m." - a clock time, not a counted thing.
+    if re.match(r"(?:p|a)\.?\s?m\.?", tail, re.I):
+        return ""
+    m = re.match(r"([A-Za-z][A-Za-z'’-]*)", tail)
+    if not m:
+        return ""
+    unit = m.group(1)
+    low = unit.lower()
+    if low in _UNIT_STOP or low in NON_NOUN_AFTER_NUMBER:
+        return ""
+    if low.endswith("ing") or low.endswith("ed"):
+        return ""
+    return low
+
+
 def _needles(kind: str, text: str):
     """Acceptable ways for the registry to mention this claim."""
     norm = _norm(text)
@@ -87,6 +146,13 @@ def _needles(kind: str, text: str):
                 value = None
         if value is not None:
             out.append(str(value))
+            # A bare digit proves nothing: "43 regions" must not be covered by
+            # any "30" that happens to sit in the registry (a release date, a
+            # clock time). Bind the number to the unit it counts, so the
+            # registry has to say "43 regions" to cover "43 regions".
+            unit = _unit_of(text)
+            if unit:
+                out.append("%s %s" % (str(value), unit))
     if kind == "name":
         # A surname alone identifies the person. Only a trailing possessive is
         # dropped: strip("'s") would also eat the first letter of a surname
@@ -102,6 +168,40 @@ def _needles(kind: str, text: str):
 
 
 def _covered(kind: str, text: str, searchable: str) -> bool:
+    # A number with a unit must be found together with that unit. A bare
+    # digit match is not enough: "30 regions" was covered by any "30" in the
+    # registry, which is how a wrong figure slipped past the check.
+    if kind == "number":
+        unit = _unit_of(text)
+        if unit:
+            needles = [n for n in _needles(kind, text) if n.strip() != str(_norm(text).split(" ")[0])]
+            value = NUMBER_WORDS.get(_norm(text).split(" ")[0])
+            if value is None:
+                try:
+                    value = int(_norm(text).split(" ")[0].replace(",", ""))
+                except ValueError:
+                    value = None
+            if value is not None:
+                # The pair may be written with a hyphen ("an eight-song EP"),
+                # and the number may be a word there ("eight" for 8).
+                spellings = {str(value)}
+                # The registry may spell the number out ("an eight-song EP").
+                for word, num in NUMBER_WORDS.items():
+                    if num == value:
+                        spellings.add(word)
+                for spelling in spellings:
+                    # The unit may be singular in the registry where the body
+                    # has the plural ("an eight-song EP" vs "eight songs").
+                    unit_pat = re.escape(unit)
+                    if unit.endswith("s") and len(unit) > 3:
+                        unit_pat = r"(?:%s|%s)" % (unit_pat, re.escape(unit[:-1]))
+                    pair = re.compile(r"(?<![0-9a-z])%s[\s-]+%s(?![0-9a-z])" % (re.escape(spelling), unit_pat))
+                    if pair.search(searchable):
+                        return True
+            for needle in needles:
+                if re.search(r"(?<![0-9a-z])%s(?![0-9a-z])" % re.escape(needle), searchable):
+                    return True
+            return False
     for needle in _needles(kind, text):
         if re.search(r"(?<![0-9a-z])%s(?![0-9a-z])" % re.escape(needle), searchable):
             return True
@@ -160,19 +260,31 @@ def extract_claims(body: str):
         raw = m.group(0)
         if YEAR_RE.fullmatch(raw):
             continue
-        add("number", raw)
+        # Keep the unit with the number: "43 regions" is one claim, and the
+        # registry has to back that pair, not any 43 in the file. A number that
+        # belongs to a date ("the September 4 single") keeps no unit.
+        if _date_owns(text, m.start()):
+            add("number", raw)
+            continue
+        unit = _unit_after(text, m.end())
+        if unit:
+            add("number", "%s %s" % (raw, unit))
+        else:
+            add("number", raw)
 
     # Number words used as a quantity ("eight albums", "two days").
     for m in re.finditer(r"\b(%s)\b" % "|".join(NUMBER_WORDS), text, re.I):
         word = m.group(1).lower()
-        tail = text[m.end():m.end() + 40].lstrip()
-        unit_match = re.match(r"([A-Za-z][A-Za-z'’-]*)", tail)
-        unit = unit_match.group(1) if unit_match else ""
-        if not unit or _norm(unit) in NON_NOUN_AFTER_NUMBER:
+        unit = _unit_after(text, m.end())
+        if not unit:
             continue
-        if unit.endswith("ing") or unit.endswith("ed"):
+        # "the two close the song" is a back-reference to two people already
+        # named, not a quantity to verify. "an EP of eight songs" is.
+        if _definite_before(text, m.start()):
             continue
-        add("number", word)
+        # Bind the word to its unit too, so "six nights" cannot be covered by
+        # any "six" in the registry.
+        add("number", "%s %s" % (word, unit))
 
     return claims
 
