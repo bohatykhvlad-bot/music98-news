@@ -46,7 +46,8 @@ def get_remote(pid):
         return select(json.loads(r.read()), pid)
 
 
-def check(post, baseline, expected_media, min_words=None):
+def check(post, baseline, expected_media, min_words=None,
+          allow_media_change=False, allow_cover_change=False):
     failures, warnings = [], []
     ptype = (post.get("type") or "").strip().lower()
     body = post.get("body") or ""
@@ -93,9 +94,15 @@ def check(post, baseline, expected_media, min_words=None):
     if baseline:
         old_media = [(m.group(1).lower(), m.group(2)) for m in MEDIA.finditer(baseline.get("body") or "")]
         if old_media != media:
-            failures.append("media order/content changed")
+            if allow_media_change:
+                warnings.append("media order/content change declared by the operator")
+            else:
+                failures.append("media order/content changed")
         if baseline.get("cover") != post.get("cover"):
-            failures.append("cover changed")
+            if allow_cover_change:
+                warnings.append("cover change declared by the operator")
+            else:
+                failures.append("cover changed")
         if baseline.get("id") != post.get("id"):
             failures.append("article ID changed")
 
@@ -118,11 +125,14 @@ if __name__ == "__main__":
     p.add_argument("--baseline", type=Path)
     p.add_argument("--expected-media", type=int)
     p.add_argument("--min-words", type=int, default=None)
+    p.add_argument("--allow-media-change", action="store_true")
+    p.add_argument("--allow-cover-change", action="store_true")
     args = p.parse_args()
     try:
         article = select(json.loads(args.file.read_text()), args.post) if args.file else get_remote(args.post)
         prior = select(json.loads(args.baseline.read_text()), args.post) if args.baseline else None
-        sys.exit(0 if check(article, prior, args.expected_media, args.min_words) else 1)
+        sys.exit(0 if check(article, prior, args.expected_media, args.min_words,
+                            args.allow_media_change, args.allow_cover_change) else 1)
     except Exception as exc:
         print("PREFLIGHT ERROR", type(exc).__name__, str(exc)[:140])
         sys.exit(2)

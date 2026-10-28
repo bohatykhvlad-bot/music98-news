@@ -368,10 +368,12 @@ def _local_gate(post):
     return not fails
 
 
-def _local_preflight(post, baseline=None, expected_media=None, min_words=None):
+def _local_preflight(post, baseline=None, expected_media=None, min_words=None,
+                     allow_media_change=False, allow_cover_change=False):
     sys.path.insert(0, str(REPO / "scripts"))
     from preflight import check
-    return check(post, baseline, expected_media, min_words)
+    return check(post, baseline, expected_media, min_words,
+                 allow_media_change, allow_cover_change)
 
 
 def run_preflight(pid, file=None, baseline=None, expected_media=None, min_words=None):
@@ -609,7 +611,8 @@ def cmd_pin(pid, pin=True):
     return now
 
 
-def cmd_set(pid, body_file, title=None, excerpt=None, publish=False, cover_json=None):
+def cmd_set(pid, body_file, title=None, excerpt=None, publish=False, cover_json=None,
+            allow_media_change=False):
     require_editorial_stamp(pid, body_file=body_file, title=title)
     body = Path(body_file).read_text(encoding="utf-8").strip()
     if not body:
@@ -646,7 +649,9 @@ def cmd_set(pid, body_file, title=None, excerpt=None, publish=False, cover_json=
     # without forcing the public post through a temporary draft state.
     preflight_candidate=json.loads(json.dumps(candidate))
     preflight_candidate["status"]="draft"
-    if not _local_preflight(preflight_candidate, baseline=current):
+    if not _local_preflight(preflight_candidate, baseline=current,
+                            allow_media_change=allow_media_change,
+                            allow_cover_change=bool(cover_json)):
         die("set refused: staged body failed preflight before desk write")
 
     def mutate(posts):
@@ -1060,6 +1065,7 @@ def main():
     sp.add_argument("--title")
     sp.add_argument("--excerpt")
     sp.add_argument("--cover-json")
+    sp.add_argument("--allow-media-change", action="store_true")
     sp.add_argument("--publish", action="store_true")
 
     sp = sub.add_parser("pin")
@@ -1101,7 +1107,8 @@ def main():
     elif a.cmd == "replace-draft":
         cmd_replace_draft(a.id, a.file, a.allow, a.reason)
     elif a.cmd == "set":
-        cmd_set(a.id, a.body_file, a.title, a.excerpt, a.publish, a.cover_json)
+        cmd_set(a.id, a.body_file, a.title, a.excerpt, a.publish, a.cover_json,
+                a.allow_media_change)
     elif a.cmd == "pin":
         cmd_pin(a.id, not a.unpin)
     elif a.cmd == "gate":
