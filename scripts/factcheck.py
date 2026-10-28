@@ -226,6 +226,11 @@ def extract_claims(body: str):
         claims.append({"kind": kind, "text": text})
 
     text = body or ""
+    # A photo token carries layout parameters after the credit: the crop
+    # position ("50% 30%") and the zoom. They are not prose claims, so they
+    # are not facts to back in the registry. The credit itself stays.
+    text = re.sub(r"\[photo:([^\]|]*)\|([^\]|]*)\|([^\]|]*)\|[^\]]*\]",
+                  r"[photo:\1|\2|\3]", text)
 
     for m in DATE_RE.finditer(text):
         month, day, year = m.group(1), m.group(2), m.group(3)
