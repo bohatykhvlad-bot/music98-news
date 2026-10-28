@@ -609,7 +609,7 @@ def cmd_pin(pid, pin=True):
     return now
 
 
-def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
+def cmd_set(pid, body_file, title=None, excerpt=None, publish=False, cover_json=None):
     require_editorial_stamp(pid, body_file=body_file, title=title)
     body = Path(body_file).read_text(encoding="utf-8").strip()
     if not body:
@@ -627,6 +627,18 @@ def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
     candidate["excerpt"]=exc
     if title:
         candidate["title"]=title
+    if cover_json:
+        try:
+            patch=json.loads(cover_json)
+        except Exception as e:
+            die("cover-json is not valid JSON: %s" % e)
+        if not isinstance(patch,dict):
+            die("cover-json must be a JSON object")
+        base=json.loads(json.dumps(candidate.get("cover") or {}))
+        base.update(patch)
+        if not base.get("src"):
+            die("cover-json must carry a src")
+        candidate["cover"]=base
     if not _local_gate(candidate):
         die("set refused: staged body failed gate before desk write")
     # preflight.py intentionally validates draft payloads. A text-only edit to an
@@ -643,6 +655,8 @@ def cmd_set(pid, body_file, title=None, excerpt=None, publish=False):
         p["excerpt"] = exc
         if title:
             p["title"] = title
+        if cover_json:
+            p["cover"] = json.loads(json.dumps(candidate["cover"]))
         return p
 
     now = guarded_write(mutate)
@@ -1045,6 +1059,7 @@ def main():
     sp.add_argument("--body-file", required=True)
     sp.add_argument("--title")
     sp.add_argument("--excerpt")
+    sp.add_argument("--cover-json")
     sp.add_argument("--publish", action="store_true")
 
     sp = sub.add_parser("pin")
@@ -1086,7 +1101,7 @@ def main():
     elif a.cmd == "replace-draft":
         cmd_replace_draft(a.id, a.file, a.allow, a.reason)
     elif a.cmd == "set":
-        cmd_set(a.id, a.body_file, a.title, a.excerpt, a.publish)
+        cmd_set(a.id, a.body_file, a.title, a.excerpt, a.publish, a.cover_json)
     elif a.cmd == "pin":
         cmd_pin(a.id, not a.unpin)
     elif a.cmd == "gate":
