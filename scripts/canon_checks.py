@@ -32,6 +32,7 @@ ACTION = re.compile(
     r"premieres?|premiered|shares?|shared|drops?|dropped|unveils?|unveiled|"
     r"launches?|launched|reveals?|revealed|wins?|won|signs?|signed|"
     r"postpones?|postponed|names?|named|sues?|sued|performs?|performed|"
+    r"inducts?|inducted|honored|honoured|"
     r"plays?|played|"
     r"returns?|returned|tops?|topped|earns?|earned|is set|are set|"
     r"will (?:play|release|tour|headline|open)|"
