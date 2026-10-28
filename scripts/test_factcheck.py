@@ -87,6 +87,21 @@ def run():
     expect(any("without a source" in x for x in f8),
            "expected a source-less line to fail on a short body, got: %s" % f8)
 
+    # 9. "The September 4 single" is a date, not a proper name.
+    # The registry mentions the date but never the words "The September",
+    # so a name claim for that phrase would fail the check.
+    body9 = "The September 4 single came with a video."
+    ledger9 = "- It came with a video | https://example.com/g | \"came with a video on September 4\"\n"
+    f9, _, _ = fc.check(body9, ledger9)
+    expect(not f9, "expected a month phrase not to be read as a name, got: %s" % f9)
+
+    # 10. a surname that starts with s keeps its first letter.
+    # strip("'s") turned "Smith" into "mith" and lost the match.
+    body10 = "Sam Smith sang in 2009."
+    ledger10 = "- Smith sang in 2009 | https://example.com/h | \"sang in 2009\"\n"
+    f10, _, _ = fc.check(body10, ledger10)
+    expect(not f10, "expected a surname starting with s to stay matchable, got: %s" % f10)
+
     if fails:
         print("FACTCHECK: FAIL")
         for f in fails:

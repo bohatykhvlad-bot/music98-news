@@ -88,10 +88,12 @@ def _needles(kind: str, text: str):
         if value is not None:
             out.append(str(value))
     if kind == "name":
-        # A surname alone identifies the person.
+        # A surname alone identifies the person. Only a trailing possessive is
+        # dropped: strip("'s") would also eat the first letter of a surname
+        # that starts with s ("September" -> "eptember").
         parts = norm.split(" ")
         if len(parts) > 1:
-            out.append(parts[-1].strip("'s"))
+            out.append(re.sub(r"'s$", "", parts[-1]))
     if kind == "title":
         out.append(norm.rstrip("."))
         out.append(norm.rstrip(".,"))
@@ -145,6 +147,10 @@ def extract_claims(body: str):
     for m in PROPER_NAME_RE.finditer(text):
         name = m.group(0).strip()
         if "*" in name or "http" in name:
+            continue
+        # "The September 4 single" is a date, not a name. A phrase whose last
+        # word is a month is read as a date and covered by the date claim.
+        if name.split()[-1].lower() in MONTHS.split():
             continue
         if _norm(name) in KNOWN_NON_FACTS:
             continue
