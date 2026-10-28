@@ -989,6 +989,25 @@ def check_post(p, strict):
     info.append(("dates", "NOT RUN — %d date token(s) (%s); %d name-like year(s) skipped. "
                  "VERIFIED_DATES does not verify them." % (len(date_toks), shown, skips)))
 
+    # --- a month without a year, next to the same month with one ----------------
+    # Owner 28.10 on the Jay-Z post: "Bad Bunny, who was there in February" read as
+    # the February the article is about (2027) while the fact was 2026 - a post
+    # that says the wrong thing. When a post names the same month with a year
+    # somewhere else, the bare month is read as that year, so it must carry its
+    # own year. Only the collision is a failure: a lone "in March" in a post that
+    # never names March again is unambiguous and stays legal.
+    bare_months = set()
+    for m in re.finditer(r"\b(%s)\b(?!\s+\d)" % MONTHS, prose):
+        if m.group(0) == "may":
+            continue
+        bare_months.add(m.group(1).lower())
+    dated_months = set(m.group(1).lower()
+                        for m in re.finditer(r"\b(%s)\s+(?:\d{1,2}\s*,?\s*)?(?:19|20)\d{2}\b" % MONTHS, prose))
+    for month in sorted(bare_months & dated_months):
+        fails.append(("ambiguous-month",
+                      "%s appears with a year elsewhere in this post, so the bare "
+                      "\"in %s\" is read as that year; give it its own year" % (month.title(), month)))
+
     # --- official capitalization (owner 23.09: "у них КАПСОМ ИМЕНА ПИШУТСЯ") --------------
     # Official spelling of the four BLACKPINK members is all caps: JISOO, JENNIE, ROSÉ, LISA.
     # Only enforced on posts that mention the group, so ordinary words cannot trip it.
