@@ -758,9 +758,14 @@ def cmd_publish(pid):
     return now
 
 
-def cmd_slot(pid, at=None, day=None):
+def cmd_slot(pid, at=None, day=None, schedule=False):
     """Move the publication slot on an existing post: publishAt and date together,
-    because the site reads the day from publishAt and the desk lists read date."""
+    because the site reads the day from publishAt and the desk lists read date.
+
+    With --schedule the post is marked "scheduled", which is the only status the
+    worker promotes to live when publishAt arrives. Without it the slot is only
+    stamped and the post keeps the status it already has.
+    """
     when = None
     if at:
         try:
@@ -778,6 +783,8 @@ def cmd_slot(pid, at=None, day=None):
             slot_stamp(p, when)
         if day:
             p["date"] = day.strip()
+        if schedule:
+            p["status"] = "scheduled"
         return p
 
     now = guarded_write(mutate)
@@ -1054,6 +1061,8 @@ def main():
     sp.add_argument("id")
     sp.add_argument("--at", help="ISO moment, default: now")
     sp.add_argument("--date", help="YYYY-MM-DD, default: the day of --at")
+    sp.add_argument("--schedule", action="store_true",
+                    help="mark the post scheduled, so the worker puts it live at --at")
 
     a = ap.parse_args()
     load_env()
@@ -1097,7 +1106,7 @@ def main():
     elif a.cmd == "finish":
         cmd_finish(a.id, a.body_file, a.title, a.excerpt)
     elif a.cmd == "slot":
-        cmd_slot(a.id, a.at, a.date)
+        cmd_slot(a.id, a.at, a.date, a.schedule)
 
 
 if __name__ == "__main__":
