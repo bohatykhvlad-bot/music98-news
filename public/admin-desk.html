@@ -2346,7 +2346,12 @@ async function writePost(status){
   try{
     /* touched: this tab only owns the post it just edited. Without it a tab opened an hour
        ago would restore its whole snapshot and silently undo other writers' work. */
-    await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify({posts, touched:[rec.id]})});
+    /* pinnedId: the home page shows one hero, so a new pin releases the old
+       one in this same write - no separate cleanup edit afterwards. */
+    const payload = {posts, touched:[rec.id]};
+    if(rec.pinned) payload.pinnedId = rec.id;
+    await api("/api/desk", {method:"POST", headers: headers(), body: JSON.stringify(payload)});
+    if(rec.pinned) posts.forEach(p=>{ if(p.id!==rec.id) p.pinned=false; });
     if(status==="live") toast("Published on the public site");
     else if(status==="scheduled") toast("Scheduled — it goes live at that time");
     else toast("Saved as draft — not on the public site");

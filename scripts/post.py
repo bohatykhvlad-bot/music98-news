@@ -257,14 +257,19 @@ def desk_read():
     return http(DESK_API, desk_key())
 
 
-def guarded_write(mutate):
+def guarded_write(mutate, pin_id=None):
     """fresh GET -> mutate only the target -> POST -> fresh GET -> verify."""
     before = desk_read()
     posts = before["posts"]
     target = mutate(posts)
     pid = target["id"]
     others_before = {p["id"]: p for p in posts if p.get("id") != pid}
-    http(DESK_API, desk_key(), {"posts": posts}, method="POST")
+    payload = {"posts": posts}
+    if pin_id:
+        # Tell the desk which post holds the pin so the server releases any
+        # other pinned post in the same write.
+        payload["pinnedId"] = pin_id
+    http(DESK_API, desk_key(), payload, method="POST")
     # Cloudflare KV can briefly return the pre-write value from another edge.
     # Treat that as propagation lag, not as a failed write. Retry the fresh GET
     # for a few seconds before declaring a post-save mismatch.
@@ -570,9 +575,9 @@ def cmd_replace_draft(pid, post_file, allows=None, reason=None):
 def cmd_pin(pid, pin=True):
     """Pin a post to the top of News on the home page (or unpin it).
 
-    The home page renders one hero: the freshest post with pinned=true. This
-    changes nothing but that flag, so it is a guarded single-field write on the
-    desk - the same read-mutate-verify path as every other post.py command.
+    The home page renders one hero: the freshest post with pinned=true. A new
+    pin therefore releases the old one in the same write - the desk never
+    holds two pins, and no separate cleanup edit is needed afterwards.
     """
     current = find_post(desk_read()["posts"], pid)
     candidate = json.loads(json.dumps(current))
@@ -580,14 +585,27 @@ def cmd_pin(pid, pin=True):
     if not _local_gate(candidate):
         die("pin refused: staged post failed gate before desk write")
 
+    released = []
+    if pin:
+        for p in desk_read()["posts"]:
+            if p.get("id") != pid and p.get("pinned"):
+                released.append(p.get("id"))
+
     def mutate(posts):
         p = find_post(posts, pid)
         p["pinned"] = bool(pin)
+        if pin:
+            # The new pin takes the hero: every other pin is released now.
+            for q in posts:
+                if q.get("id") != pid and q.get("pinned"):
+                    q["pinned"] = False
         return p
 
-    now = guarded_write(mutate)
+    now = guarded_write(mutate, pin_id=pid if pin else None)
     print("pin       ok: %s pinned=%s (home page hero candidate)" %
           (now["id"], now.get("pinned")))
+    if released:
+        print("pin       released old pin(s): %s" % ", ".join(released))
     return now
 
 

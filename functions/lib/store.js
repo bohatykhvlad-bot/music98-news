@@ -34,6 +34,29 @@ export function migratePublishAt(desk) {
   return changed;
 }
 
+/* One hero, one pin. The home page renders a single hero: the freshest post
+   with pinned=true. Two pinned posts meant the desk held a state the site
+   never showed - the owner had to unpin the old one by hand after every new
+   pin. Now the writer names the post that should hold the pin and every
+   other pinned post is released in the same write. */
+export function enforceSinglePin(posts, pinId) {
+  const list = Array.isArray(posts) ? posts : [];
+  const wanted = String(pinId || "").trim();
+  if (!wanted) return false;
+  /* A named post that is not in the desk releases nothing: a stale id must
+     not silently unpin the whole desk. */
+  if (!list.some((p) => p && p.id === wanted)) return false;
+  let changed = false;
+  list.forEach((p) => {
+    if (!p || p.id === wanted) return;
+    if (p.pinned) {
+      p.pinned = false;
+      changed = true;
+    }
+  });
+  return changed;
+}
+
 function empty() {
   return { posts: [], subscribers: [], mail: {} };
 }

@@ -1,4 +1,4 @@
-import { adminOk, json, migratePublishAt, promoteScheduled, publicPosts, readDesk, writeDesk } from "../lib/store.js";
+import { adminOk, json, enforceSinglePin, migratePublishAt, promoteScheduled, publicPosts, readDesk, writeDesk } from "../lib/store.js";
 import { normalizeCovers } from "../lib/covers.js";
 
 export async function onRequest({ request, env }) {
@@ -35,6 +35,14 @@ export async function onRequest({ request, env }) {
     }
     const desk = current;
     desk.posts = payload.posts;
+    /* one hero, one pin: a writer that pins a post names it in pinnedId, and
+       every other pinned post is released in the same write. Without this the
+       desk kept a second pin the site never showed, and cleaning it up took a
+       separate manual edit. A writer that sends no pinnedId (the old admin
+       form) keeps its own flags - nothing is released that it did not ask. */
+    if (enforceSinglePin(desk.posts, payload.pinnedId)) {
+      /* fall through: the posts array above is what gets stored */
+    }
     /* self-healing: if a client pushes old-style base64 covers, offload them
        to KV right here - desk.json in storage stays lean regardless of who
        writes (owner request after a racing writer overwrote the swap) */
