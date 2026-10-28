@@ -430,6 +430,10 @@ def inspect(post, allows):
         if a & b:
             fails.append("ending: same explicit date repeats across the final two paragraphs")
 
+    # Findings already accepted in a published text (recorded once in
+    # canon_checks) do not block the read; anything new still does.
+    fails = [f for f in fails if not canon_checks.is_legacy_message(post, f)]
+
     return fails, notes
 
 

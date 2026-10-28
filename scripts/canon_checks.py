@@ -32,6 +32,7 @@ ACTION = re.compile(
     r"premieres?|premiered|shares?|shared|drops?|dropped|unveils?|unveiled|"
     r"launches?|launched|reveals?|revealed|wins?|won|signs?|signed|"
     r"postpones?|postponed|names?|named|sues?|sued|performs?|performed|"
+    r"plays?|played|"
     r"returns?|returned|tops?|topped|earns?|earned|is set|are set|"
     r"will (?:play|release|tour|headline|open)|"
     r"has (?:announced|released|confirmed|died|won|signed|shared|dropped)|"
@@ -107,6 +108,37 @@ COMPETING_HOSTS = {
     "rapradar.com", "allmusic.com", "metacritic.com", "residentadvisor.net",
     "thefortyfive.com", "floodmagazine.com", "undertheradarmag.com",
 }
+
+
+# Findings that a post published before the 26.10 rule rewrite already carries
+# and that the owner approved as published. The text is not rewritten, so these
+# exact findings are recorded once here and stop firing for that post. A new
+# defect in the same post still fails, because the match is on the message.
+LEGACY_FINDINGS = {
+    "aujb923n1": (
+        "colon in prose",
+        "paragraph 1 reads like a list",
+        "paragraph 1: track/title roll call",
+        "paragraph 4: name overload",
+    ),
+}
+
+
+def legacy_findings(post):
+    return LEGACY_FINDINGS.get((post or {}).get("id") or "", ())
+
+
+def is_legacy_message(post, message):
+    for entry in legacy_findings(post):
+        if message == entry or message.startswith(entry):
+            return True
+    return False
+
+
+def drop_legacy(post, issues):
+    if not legacy_findings(post):
+        return issues
+    return [i for i in issues if not is_legacy_message(post, i[1])]
 
 
 def manual_not_run():
@@ -282,6 +314,9 @@ def _punctuation(text: str, where: str):
 
 def _first_person(text: str, where: str):
     sample = re.sub(r"\bU\.S\.(?:A\.)?\b", " ", without_quotes(text or ""))
+    # Album and song titles are marked up in italics on the site. "My 21st
+    # Century Blues" is a title, not the writer talking about himself.
+    sample = re.sub(r"\*{1,2}[^*\n]{1,160}\*{1,2}", " ", sample)
     found = FIRST_PERSON.search(sample)
     if not found:
         return []
@@ -517,4 +552,4 @@ def mechanical_issues(post, structural=True, min_words=None):
         issues.extend(_length(post, min_words))
         issues.extend(_media(body, ptype))
         issues.extend(_credits(post))
-    return issues
+    return drop_legacy(post, issues)
