@@ -49,6 +49,11 @@
     "_reason": "Recorded before the --owner-approved flag. Kept because this post is not one of the five posts from 2026-10-26 that the owner removed from debt.",
     "cross-post-name": 1
   },
+  "jisoo26addicted": {
+    "_ownerApproved": true,
+    "_reason": "Правило «день недели только с датой» введено 29.10.2026 после одобрения этого поста; текст не переписывается без команды владельца — там же пересекаются его правила о перегрузке датами и о времени выхода в тексте.",
+    "bare-weekday": 4
+  },
   "lisa26vegas": {
     "_ownerApproved": true,
     "_reason": "Recorded before the --owner-approved flag. Kept because this post is not one of the five posts from 2026-10-26 that the owner removed from debt.",

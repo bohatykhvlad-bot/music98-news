@@ -27,7 +27,7 @@
 
 
 - The record is his fourth solo album and it is built around the price of fame | https://www.dallasobserver.com/music/bigxthaplug-kicks-off-nationwide-better-over-time-movie-experience-in-addison-40728051/ | "Better Over Time is BigX's fourth solo album" / "The new album centers on exploring the price of fame"
-- He made a surprise appearance at the hometown screening of the short film, a companion piece to the record, at a Cinemark in North Dallas | https://www.dallasobserver.com/music/bigxthaplug-kicks-off-nationwide-better-over-time-movie-experience-in-addison-40728051/ | "BigXthaPlug made a surprise appearance at the hometown screening of his short film, which is a companion piece to his Better Over Time record dropping on Friday."
+- He made a surprise appearance at the hometown screening of the short film, a companion piece to the record, at a Cinemark in North Dallas on October 26 | https://www.complex.com/music/a/dimassanfiorenzo/bigxthaplug-better-over-time-album-tracklist-features | "On Monday, Oct. 26, BigX held an album release session in his hometown."
 
 ## Photos
 - cover photos/bigxthaplug-better-over-time-press-2026.jpg | https://theneedledrop.com/news/bigxthaplug-announces-new-album-better-over-time/ | Joshua Davis | BigXthaPlug | https://www.deepshadowspictures.com/

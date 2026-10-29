@@ -633,6 +633,45 @@ def cross_post_contamination(body: str, other_artists, registry_text: str = ""):
     return issues
 
 
+def bare_weekday(body: str):
+    """A weekday used as a date, with no date next to it (29.10.2026).
+
+    "on Monday" tells the reader nothing: they cannot put it on a calendar.
+    The owner calls this a hard rule. A weekday next to a date ("on Monday,
+    Oct. 26", "on Friday, October 30") is fine, and so is the proper noun
+    "Monday Night Football".
+    """
+    issues = []
+    body = body or ""
+    for sent in re.split(r"(?<=[.!?])\s+", body):
+        low = sent.lower()
+        if "night football" in low:
+            continue
+        for m in _WEEKDAY_RE.finditer(sent):
+            # The date has to be right next to the weekday, not somewhere else
+            # in the same sentence: "on Monday, October 26" is dated, a bare
+            # "on Monday" is not, even when the sentence mentions a date.
+            after = sent[m.end():m.end() + 40]
+            before = sent[max(0, m.start() - 40):m.start()]
+            if _DATE_NEAR_RE.search(after) or _DATE_NEAR_RE.search(before):
+                continue
+            issues.append((
+                "bare-weekday",
+                "the weekday %r stands in for a date the reader cannot place: %s"
+                % (m.group("day"), sent.strip()[:110]),
+            ))
+    return issues
+
+
+# A weekday standing in for a date, and the date that would fix it.
+_WEEKDAY_RE = re.compile(
+    r"\b(?:on|this|last|next|every|coming)\s+(?P<day>Monday|Tuesday|Wednesday|"
+    r"Thursday|Friday|Saturday|Sunday)\b", re.I)
+_DATE_NEAR_RE = re.compile(
+    r"\b(?:January|February|March|April|May|June|July|August|September|October|"
+    r"November|December)\s+\d{1,2}|\b(?:19|20)\d{2}\b|\b\d{1,2}\s+(?:st|nd|rd|th)\b")
+
+
 def lint(post, registry_text="", other_artists=()):
     """Return (code, message) findings for one post.
 
@@ -651,6 +690,7 @@ def lint(post, registry_text="", other_artists=()):
         issues.extend(duplicate_word(paras))
         issues.extend(repeated_claim(paras))
         issues.extend(tautology(paras))
+    issues.extend(bare_weekday(post.get("body") or ""))
     if registry_text:
         issues.extend(quote_fidelity(post.get("body") or "", registry_text))
         issues.extend(registry_usage(post.get("body") or "", registry_text))

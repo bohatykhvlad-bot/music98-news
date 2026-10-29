@@ -363,6 +363,34 @@ def test_honest_prose_is_silent():
     assert not issues, messages(issues)
 
 
+def test_bare_weekday_is_caught():
+    body = ("Kesha has finally released the official music video for \"Backstabber\". "
+            "The clip premiered on her YouTube channel on Monday.")
+    issues = el.bare_weekday(body)
+    assert "bare-weekday" in codes(issues), messages(issues)
+
+
+def test_weekday_next_to_a_date_is_fine():
+    body = ("BigXthaPlug releases \"Better Over Time,\" an 18-track album. "
+            "It arrives on Friday, October 30.")
+    issues = el.bare_weekday(body)
+    assert not issues, messages(issues)
+
+
+def test_monday_night_football_is_a_name_not_a_date():
+    body = ("The announcement was made during Monday Night Football between the "
+            "Eagles and the Cowboys.")
+    issues = el.bare_weekday(body)
+    assert not issues, messages(issues)
+
+
+def test_soft_month_reference_stays_allowed():
+    body = ("the invitation-only evening that the class announcement had promised "
+            "back in August.")
+    issues = el.bare_weekday(body)
+    assert not issues, messages(issues)
+
+
 def main():
     tests = [value for name, value in sorted(globals().items())
              if name.startswith("test_") and callable(value)]
@@ -374,3 +402,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
