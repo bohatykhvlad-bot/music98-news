@@ -59,6 +59,10 @@ VENUE_WORD = re.compile(
     r"\b(?:Hall|Theatre|Theater|Arena|Stadium|Auditorium|Pavilion|Amphitheatre|"
     r"Amphitheater|Ballroom|Forum|Bowl|Centre|Center)\b",
 )
+# Third-person pronouns, counted per paragraph so a body that names the artist
+# once and then says "she" for 15 sentences cannot pass as varied prose.
+PRONOUN_RE = re.compile(r"\b(?:she|her|he|him|his|they|their|them)\b", re.I)
+PRONOUN_START = re.compile(r"^(?:She|Her|He|Him|His|They|Their|Them)\b")
 HTML_GARBAGE = re.compile(r"(?:&#(?:x[0-9a-f]+|\d+);|&nbsp;|&amp;\s*$)", re.I)
 LITERAL_ESCAPE = re.compile(r"\\[nrt]")
 
@@ -290,6 +294,42 @@ def inspect(post, allows):
                 break
 
     awards_mode = "[awards]" in body.lower()
+
+    # Pronoun load. The name-rhythm rules above only see the artist's surname,
+    # so a body can name the artist once and then lean on "she" for the rest of
+    # the article without tripping anything. Owner, 29.10.2026 on the Nashville
+    # Songwriters Hall of Fame post: "В тексте Тейлор куча she повторов как они
+    # прошли???" - 15 "she" in 435 words passed the gate because nothing counted
+    # pronouns. Two budgets now cover it: the same pronoun may not open three
+    # sentences in a row inside one paragraph, and one paragraph may not spend a
+    # third of its words on third-person pronouns.
+    for idx, p in enumerate(paras, 1):
+        ss = sentences(p)
+        wc = words(p)
+        pron = PRONOUN_RE.findall(p)
+        if wc >= 40:
+            share = len(pron) / wc
+            if share > 0.20:
+                fails.append(
+                    f"paragraph {idx}: pronoun load {len(pron)}/{wc} words is {share:.0%}; "
+                    "vary the sentence subjects instead of repeating one pronoun"
+                )
+        if len(ss) >= 3:
+            run, last = 0, ""
+            for sentence in ss:
+                match = PRONOUN_START.match(sentence)
+                if match:
+                    token = match.group(0).lower()
+                    run = run + 1 if token == last else 1
+                    last = token
+                    if run >= 3:
+                        fails.append(
+                            f"paragraph {idx}: three consecutive sentences start with the same "
+                            "pronoun; restructure so the subject changes"
+                        )
+                        break
+                else:
+                    run, last = 0, ""
 
     for idx, p in enumerate(paras, 1):
         ss = sentences(p)

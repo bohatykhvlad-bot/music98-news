@@ -201,6 +201,31 @@ def healthy(target=430, ptype="news", embeds=1, artist="Example Artist", song="N
     return post
 
 
+def assert_pronoun_budget():
+    # Owner, 29.10.2026: a body that names the artist once and then says
+    # "she" for the rest of the article slipped through the gate. One
+    # paragraph spending a third of its words on pronouns must fail, and
+    # three consecutive sentences opening with the same pronoun must fail.
+    post = healthy(430)
+    flood = (
+        "She wrote the song at nineteen. She sang it in one take. She refused "
+        "every label that asked for a second verse. She finished the record "
+        "before the label had found a name for it."
+    )
+    post["body"] = post["body"] + "\n\n" + flood
+    flood_fails, _ = er.inspect(post, set())
+    assert any("pronoun" in message for message in flood_fails)
+
+    run = (
+        "She wrote the song at nineteen. The label asked for another verse. "
+        "She refused, and the record went out as it was. It sold quietly."
+    )
+    post2 = healthy(430)
+    post2["body"] = post2["body"] + "\n\n" + run
+    run_fails, _ = er.inspect(post2, set())
+    assert not any("pronoun" in message for message in run_fails)
+
+
 def assert_news_word_floor():
     short = healthy(320)
     assert pf.check(short, None, None) is False
@@ -393,6 +418,7 @@ def main():
     assert_news_word_floor()
     assert_single_release_format()
     assert_canon_rules()
+    assert_pronoun_budget()
 
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
