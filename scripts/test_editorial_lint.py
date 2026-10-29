@@ -49,6 +49,29 @@ def test_idea_repetition():
     assert "idea-repeat" not in codes(el.lint({"body": honest})), messages(el.lint({"body": honest}))
 
 
+def test_ordinal_tautology_is_caught():
+    """A tautology in other words: the same ordinal fact stated twice.
+
+    This is the defect the owner reported on 29.10.2026 - the two paragraphs
+    share only three content words, so the word-overlap rule missed them and
+    the restatement reached the desk.
+    """
+    body = (
+        "The album is his fourth full-length studio record.\n\n"
+        "It is his fourth full-length release as a solo rapper, and the pattern "
+        "matches his earlier records."
+    )
+    issues = el.lint({"body": body})
+    assert "idea-repeat" in codes(issues), messages(issues)
+
+    honest = (
+        "The album is his fourth full-length studio record.\n\n"
+        "The cover art is built from faces pulled out of his earlier releases, "
+        "which fans had already noticed him removing from streaming services."
+    )
+    assert "idea-repeat" not in codes(el.lint({"body": honest})), messages(el.lint({"body": honest}))
+
+
 def test_phrase_repetition():
     """The same three-word formulation in two paragraphs."""
     body = (

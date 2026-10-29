@@ -237,6 +237,15 @@ def _fact_signatures(text: str):
         unit = re.match(r"\s+([A-Za-z][A-Za-z'\-]{2,})", text[m.end():])
         if unit:
             sig.add("number:%s %s" % (value, unit.group(1).lower()))
+    # An ordinal carries a fact of its own: "his fourth full-length" and "the
+    # fourth full-length" are the same statement, and a writer who repeats it
+    # in other words has not added anything. Without this the tautology of
+    # two short paragraphs slipped through the word-overlap rule, because the
+    # restatement shares only three content words.
+    for m in re.finditer(
+        r"\b(first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|"
+        r"last|latest|newest)\s+([A-Za-z][A-Za-z'\-]{2,})", text, re.I):
+        sig.add("ordinal:%s %s" % (m.group(1).lower(), m.group(2).lower()))
     return sig
 
 
