@@ -391,6 +391,54 @@ def test_soft_month_reference_stays_allowed():
     assert not issues, messages(issues)
 
 
+def test_quote_capitalization_is_caught():
+    """A title spelled its own way is still a different title (29.10.2026)."""
+    body = ('The late Jerry Allison entered in the legacy category, where '
+            '"That\'ll Be The Day" was played in his honor.')
+    registry = ('- The late Jerry "J.I." Allison entered in the legacy category | '
+                'https://www.lubbockchronicle.com/p/ji-allison-nashville-songwriters-hall-fame-2026 | '
+                '"Jerry \'J.I.\' Allison ... co-writer of rock \'n\' roll classics including '
+                '\'Peggy Sue\' and \'That\'ll Be the Day,\' was inducted posthumously."')
+    issues = el.quote_fidelity(body, registry)
+    assert "quote-capitalization" in codes(issues), messages(issues)
+    assert "That'll Be the Day" in messages(issues), messages(issues)
+
+
+def test_quote_capitalization_stays_silent_on_the_source_spelling():
+    body = ('The late Jerry Allison entered in the legacy category, where '
+            '"That\'ll Be the Day" was played in his honor.')
+    registry = ('- The late Jerry Allison entered in the legacy category | '
+                'https://www.lubbockchronicle.com/p/ji-allison-nashville-songwriters-hall-fame-2026 | '
+                '"co-writer of rock \'n\' roll classics including \'Peggy Sue\' and '
+                '\'That\'ll Be the Day,\'"')
+    issues = el.quote_fidelity(body, registry)
+    assert not issues, messages(issues)
+
+
+def test_quote_capitalization_ignores_a_longer_word():
+    """'ONE' must not be found inside 'alone'."""
+    body = ('The album closes with "ONE," which he carries on his own.')
+    registry = ('- The record closes with "ONE" | https://example.com/x | '
+                '"Eight of the eighteen tracks carry a guest and the other ten are his alone"')
+    issues = el.quote_fidelity(body, registry)
+    assert "quote-capitalization" not in codes(issues), messages(issues)
+
+
+def test_weekday_with_a_date_in_the_same_sentence_is_fine():
+    """The announcement case: the date and the weekday are one sentence."""
+    body = ("The single lands on October 30, and in the United States it arrives "
+            "the evening before, at 7 p.m. ET on Thursday.")
+    issues = el.bare_weekday(body)
+    assert not issues, messages(issues)
+
+
+def test_weekday_without_a_date_still_fails():
+    body = ("At 36, she was formally welcomed on Monday at the hall's 56th "
+            "anniversary gala in Nashville.")
+    issues = el.bare_weekday(body)
+    assert "bare-weekday" in codes(issues), messages(issues)
+
+
 def main():
     tests = [value for name, value in sorted(globals().items())
              if name.startswith("test_") and callable(value)]

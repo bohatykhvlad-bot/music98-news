@@ -644,8 +644,11 @@ def cmd_pin(pid, pin=True):
 
 def cmd_set(pid, body_file, title=None, excerpt=None, publish=False, cover_json=None,
             allow_media_change=False, change_reason=""):
-    require_editorial_stamp(pid, body_file=body_file, title=title)
     body = Path(body_file).read_text(encoding="utf-8").strip()
+    # The stamp has to be taken against the text that ships, including the
+    # excerpt that ships with it.
+    staged_excerpt = (excerpt or auto_excerpt(body)).strip()
+    require_editorial_stamp(pid, body_file=body_file, title=title, excerpt=staged_excerpt)
     if (cover_json or allow_media_change) and not (change_reason or "").strip():
         die("a declared media or cover change requires --reason")
     if not body:
@@ -739,12 +742,14 @@ def cmd_gate(pid):
 
 
 def run_editorial(pid, body_file=None, title=None, confirm=False, check_stamp=False,
-                  allows=None, reason=None, phase="post-edit"):
+                  allows=None, reason=None, phase="post-edit", excerpt=None):
     cmd=[sys.executable, str(READTHROUGH), "--post", pid, "--phase", phase]
     if body_file:
         cmd += ["--body-file", str(body_file)]
     if title:
         cmd += ["--title", title]
+    if excerpt:
+        cmd += ["--excerpt", excerpt]
     if confirm:
         cmd.append("--confirm-full-read")
     if check_stamp:
@@ -758,9 +763,10 @@ def run_editorial(pid, body_file=None, title=None, confirm=False, check_stamp=Fa
     return r.returncode==0,[line.rstrip() for line in out.splitlines() if line.strip()]
 
 
-def cmd_editorial(pid, body_file=None, title=None, allows=None, reason=None, phase="post-edit"):
+def cmd_editorial(pid, body_file=None, title=None, allows=None, reason=None, phase="post-edit",
+                  excerpt=None):
     ok,lines=run_editorial(pid,body_file=body_file,title=title,confirm=True,
-                           allows=allows,reason=reason,phase=phase)
+                           allows=allows,reason=reason,phase=phase,excerpt=excerpt)
     for line in lines:
         print(line)
     if not ok:
@@ -769,8 +775,8 @@ def cmd_editorial(pid, body_file=None, title=None, allows=None, reason=None, pha
     return True
 
 
-def require_editorial_stamp(pid, body_file=None, title=None):
-    ok,lines=run_editorial(pid,body_file=body_file,title=title,check_stamp=True)
+def require_editorial_stamp(pid, body_file=None, title=None, excerpt=None):
+    ok,lines=run_editorial(pid,body_file=body_file,title=title,check_stamp=True,excerpt=excerpt)
     if not ok:
         print("editorial REFUSED - mandatory full-read stamp is missing or stale:")
         for line in lines:
@@ -1078,6 +1084,7 @@ def main():
     sp.add_argument("id")
     sp.add_argument("--body-file")
     sp.add_argument("--title")
+    sp.add_argument("--excerpt")
     sp.add_argument("--phase", choices=["pre-edit","post-edit"], default="post-edit")
     sp.add_argument("--allow", action="append", choices=["technical-credit","physical-format","source-attribution","single-sentence"])
     sp.add_argument("--reason")
@@ -1198,7 +1205,7 @@ def main():
     elif a.cmd == "preflight":
         cmd_preflight(a.id)
     elif a.cmd == "editorial":
-        cmd_editorial(a.id, a.body_file, a.title, a.allow, a.reason, a.phase)
+        cmd_editorial(a.id, a.body_file, a.title, a.allow, a.reason, a.phase, a.excerpt)
     elif a.cmd == "facts":
         cmd_facts(a.id, a.ledger, a.body_file, init=a.init)
     elif a.cmd == "packet":

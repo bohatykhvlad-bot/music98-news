@@ -381,6 +381,13 @@ MONTH_NUMBER = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
 # claim is inspected: a source URL is allowed to look like anything.
 PLACEHOLDERS = ("todo", "tbd", "fixme", "lorem ipsum", "to be confirmed")
 
+# Wording that puts two events in a stated order. A claim that uses one of
+# these is describing a sequence, and a sequence needs two sources: one
+# outlet can report the order wrong (29.10.2026, BigX).
+SEQUENCE_MARKERS = ("started with", "began with", "followed by", "preceded by",
+                    "and then", "then came", "went on to", "before that",
+                    "after that", "first, then", "then, in")
+
 # A photo-manifest line: it belongs to the `## Photos` section, not to the
 # list of claims.
 PHOTO_LINE = re.compile(r"^-\s*(cover|photo)\s+photos/\S+?\s*\|")
@@ -579,6 +586,19 @@ def registry_findings(ledger_text: str):
             out.append(("warn", "registry-claim-date-mismatch",
                         "the claim and its quote disagree on the day (%s): %s"
                         % (item, claim[:70])))
+        # A claim that puts two events in a stated order is the one kind of
+        # line where a single source is not enough. The order IS the fact, and
+        # one article can report it the wrong way round: on 29.10.2026 the
+        # BigX campaign sequence was written from a single outlet that had
+        # the order backwards, and the registry repeated it. Two independent
+        # sources have to agree before a sequence goes into the text.
+        if claim:
+            sources = set(re.findall(r"https?://\S+", entry.get("line", "")))
+            low_claim = claim.lower()
+            if len(sources) < 2 and any(marker in low_claim for marker in SEQUENCE_MARKERS):
+                out.append(("fail", "registry-order-single-source",
+                            "the claim states a sequence of events but cites only one source, "
+                            "so the order can be wrong: %s" % claim[:70]))
     return out
 
 
@@ -619,6 +639,7 @@ def ledger_claims(ledger_text: str):
             "claim": claim,
             "source": source,
             "quote": quote,
+            "line": line,
             "has_source": bool(source),
             "has_quote": bool(quote),
         })

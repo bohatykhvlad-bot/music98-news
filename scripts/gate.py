@@ -464,6 +464,12 @@ PERSON_STOP = {"records", "recordings", "entertainment", "music", "games", "stud
                "group", "collective", "agency", "media", "films", "inc", "ltd", "llc", "company"}
 # pairs where the link deliberately does not carry the credit's name, each with its reason.
 # Same idea as SUPERLATIVE_ALLOW: a decision made once is recorded, not re-argued.
+# Findings that are notes for the editor rather than defects in the post.
+# A title spelled its own way is still a title, and key art credited to the
+# owner of the frame is the last resort canon rule 7 allows - both are worth
+# saying out loud, but neither makes the post wrong.
+SOFT_LINT_CODES = {"quote-capitalization", "photo-credit-owner"}
+
 CREDIT_LINK_ALLOW = {
     ("Wontae Go", "https://www.lloud.co/"):
         "canon rule 7: he has no resource of his own, so the caption keeps his name and the "
@@ -884,7 +890,10 @@ def check_post(p, strict, context=None):
     other_artists = context.get("other_artists") or []
     all_posts = context.get("all_posts") or []
     lint_findings = list(editorial_lint.lint(p, registry_text, other_artists))
-    lint_findings += list(photo_lint.lint(p, context.get("registry_photos"), all_posts))
+    # The photo manifest is the registry's record of the images: it tells the
+    # photo rules which frame belongs to this post and who is in it.
+    registry_photos = photo_manifest.for_post(registry_text) if registry_text else None
+    lint_findings += list(photo_lint.lint(p, registry_photos, all_posts))
     if registry_text:
         lint_findings += list(photo_manifest.check(p, registry_text))
         # The fact registry is checked in both directions (29.10.2026): the
@@ -914,7 +923,12 @@ def check_post(p, strict, context=None):
     for code, message in old_findings:
         warns.append((code, "known debt, recorded before this rule: %s" % message))
     for code, message in new_findings:
-        fails.append((code, message))
+        # Some findings are notes, not defects: they point at something the
+        # editor may want to change but do not make the post wrong.
+        if code in SOFT_LINT_CODES:
+            warns.append((code, message))
+        else:
+            fails.append((code, message))
     for code, message in reg_warn_findings:
         warns.append((code, message))
     # Owner checks from 2026-10-29. They are not passed through known_debt:

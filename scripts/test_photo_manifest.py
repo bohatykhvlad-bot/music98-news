@@ -143,6 +143,35 @@ def test_stock_and_excluded_hosts_fail():
     assert "photo-credit-excluded" in codes(excluded), messages(excluded)
 
 
+def test_owner_credit_is_the_last_resort_when_the_photo_is_on_record():
+    """Key art made by a label has no photographer: the label is credited.
+
+    The owner ruled on 29.10.2026 that the frame's owner is acceptable when
+    nothing better exists - but only when the fact registry records the
+    image, where it came from and who is in it.
+    """
+    post = {
+        "id": "jisoo26addicted",
+        "artist": "JISOO",
+        "body": "",
+        "cover": {"src": "photos/jisoo-addicted-keyart-2026.jpg",
+                  "credit": "BLISSOO", "creditUrl": "https://blissoo.com/"},
+    }
+    registry_photos = pm.for_post(
+        "## Photos\n"
+        "- cover photos/jisoo-addicted-keyart-2026.jpg | "
+        "https://biz.chosun.com/en/en-entertainment/2026/10/27/BTFQB5AZEZHQFLRZZNURPHSKGI/ | "
+        "BLISSOO | JISOO | https://blissoo.com/\n")
+    issues = pl.lint(post, registry_photos, [])
+    assert "photo-credit-owner" in codes(issues), messages(issues)
+    assert "photo-credit-platform" not in codes(issues), messages(issues)
+
+    # The same credit without the registry stays a failure: the image is not
+    # on record, so nobody can say who owns the frame.
+    bare = pl.lint(post, [], [])
+    assert "photo-credit-platform" in codes(bare), messages(bare)
+
+
 def main():
     tests = [value for name, value in sorted(globals().items())
              if name.startswith("test_") and callable(value)]

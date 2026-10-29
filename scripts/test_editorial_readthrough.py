@@ -99,10 +99,12 @@ A 16-track extended version followed a day after the standard edition, adding tw
 }
 
 
-def run(args, remote_body=None):
+def run(args, remote_body=None, remote_post=None):
     old_argv = sys.argv[:]
     old_loader = er.load_remote
-    if remote_body is not None:
+    if remote_post is not None:
+        er.load_remote = lambda pid: dict(remote_post)
+    elif remote_body is not None:
         er.load_remote = lambda pid: {"id": pid, "body": remote_body}
     sys.argv = ["editorial_readthrough.py", *args]
     try:
@@ -425,9 +427,40 @@ def assert_canon_rules():
     manual_gate = [message for code, message in info if "NOT RUN" in message]
     assert manual_gate
 
+def test_staged_excerpt_reaches_the_check():
+    """The excerpt that ships is the one the reader-facing check sees.
+
+    Until 29.10.2026 the readthrough took the excerpt from the desk, so a
+    live post could never change its first sentence: the old excerpt was not
+    a prefix of the new first paragraph and the write was refused.
+    """
+    captured = {}
+    old_inspect = er.inspect
+
+    def spy(post, allows):
+        captured["excerpt"] = post.get("excerpt")
+        captured["body"] = post.get("body")
+        return old_inspect(post, allows)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        final = Path(tmp) / "body.txt"
+        final.write_text(FINAL, encoding="utf-8")
+        er.inspect = spy
+        try:
+            run(["--post", "x", "--body-file", str(final), "--excerpt",
+                 "The opening section explains how the project took shape",
+                 "--phase", "post-edit", "--confirm-full-read"],
+                remote_post={"id": "x", "body": SOURCE,
+                             "excerpt": "The opening section explains how the project changed"})
+        finally:
+            er.inspect = old_inspect
+    assert captured.get("excerpt") == "The opening section explains how the project took shape"
+
+
 def main():
     assert_quality_regressions()
     assert_news_word_floor()
+    test_staged_excerpt_reaches_the_check()
     assert_single_release_format()
     assert_canon_rules()
     assert_pronoun_budget()

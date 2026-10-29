@@ -493,6 +493,7 @@ def main():
     ap.add_argument("--file", type=Path, help="JSON post or {posts:[...]} payload")
     ap.add_argument("--body-file", type=Path)
     ap.add_argument("--title", default="")
+    ap.add_argument("--excerpt", default="")
     ap.add_argument("--confirm-full-read", action="store_true")
     ap.add_argument("--check-stamp", action="store_true")
     ap.add_argument("--phase", choices=("pre-edit", "post-edit"), default="post-edit")
@@ -518,6 +519,12 @@ def main():
         for field in ("artist", "type", "rtype", "tag", "excerpt", "cover"):
             if desk_post.get(field):
                 post[field] = desk_post[field]
+        # The excerpt that will ship is the one to check against. Without
+        # this, editing the first sentence of a live post was impossible:
+        # the desk still held the old excerpt, and the old excerpt is not a
+        # prefix of the new first paragraph.
+        if a.excerpt:
+            post["excerpt"] = a.excerpt
         if not a.title and desk_post.get("title"):
             post["title"] = desk_post["title"]
     elif a.file:

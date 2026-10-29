@@ -256,7 +256,18 @@ def test_known_debt_does_not_waive_the_new_checks():
 def test_removed_posts_are_not_grandfathered():
     debt = json.loads(Path("editorial/known-debt.json").read_text(encoding="utf-8"))
     for pid in REMOVED:
-        assert pid not in debt, pid
+        # The five posts the owner rewrote on 2026-10-26 inherit no debt from
+        # the versions that were removed. A waiver the owner signs LATER is a
+        # different thing: it is recorded with a reason, it is owner-approved,
+        # and it never covers the codes that would have been inherited.
+        entry = debt.get(pid)
+        if entry is not None:
+            assert entry.get("_ownerApproved") is True, pid
+            assert entry.get("_reason"), pid
+            for code in entry:
+                if code.startswith("_"):
+                    continue
+                assert code not in ("quote-unverified", "photo-manifest-missing"), (pid, code)
         assert known_debt.allowance({"id": pid, "date": "2026-10-27"}, "quote-unverified") == 0
         old, new = known_debt.split(
             {"id": pid, "date": "2026-10-26"},

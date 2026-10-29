@@ -295,6 +295,41 @@ def lint(post, registry_photos=None, all_posts=None):
     for photo in described:
         issues.extend(check_credit(photo["where"], photo["credit"], photo["creditUrl"]))
 
+    # Canon rule 7 has three levels: the photographer's own resource, their
+    # agency, and only then the owner of the frame. Key art made by a label
+    # has no photographer at all, so crediting the label is the last resort
+    # the canon allows - and it is only safe when the fact registry records
+    # the image, who is in it and where it came from. The check below is what
+    # makes that last resort a warning instead of a failure.
+    documented = {}
+    for entry in (registry_photos or []):
+        if not isinstance(entry, dict):
+            continue
+        src = (entry.get("src") or "").strip()
+        if src and entry.get("ok"):
+            documented[src] = entry
+    if documented:
+        for photo in described:
+            entry = documented.get((photo["src"] or "").strip())
+            if not entry:
+                continue
+            if (entry.get("credit") or "").strip() != (photo["credit"] or "").strip():
+                continue
+            if (entry.get("creditUrl") or "").strip() != (photo["creditUrl"] or "").strip():
+                continue
+            credit = (photo["credit"] or "").strip()
+            if credit_names_a_person(credit) or credit_names_a_studio_with_a_person(credit):
+                continue
+            issues = [item for item in issues
+                      if not (item[0] == "photo-credit-platform"
+                              and credit in item[1])]
+            issues.append((
+                "photo-credit-owner",
+                "%s is credited to %r, which is the owner of the frame and not the "
+                "photographer; the fact registry records the image and who is in it, "
+                "so this is the last resort canon rule 7 allows" % (photo["where"], credit),
+            ))
+
     if all_posts:
         every = []
         for other in all_posts:

@@ -521,6 +521,30 @@ def tautology(paras):
     return issues
 
 
+def _canonical_spelling(registry_text: str, text: str):
+    """The registry's own spelling of a phrase, when it differs only in case.
+
+    The registry keeps the source's words, so when the body spells a title
+    its own way ("That'll Be The Day" against the registry's "That'll Be the
+    Day") the right form can be read off the registry instead of guessed at.
+    Returns an empty string when the body already matches the registry.
+    """
+    flat_registry = re.sub(r"\s+", " ", registry_text or "")
+    flat_text = re.sub(r"\s+", " ", (text or "").strip())
+    if not flat_text:
+        return ""
+    found = ""
+    # The match has to stand on word boundaries: "ONE" must not be found
+    # inside "alone".
+    pattern = r"(?<![0-9a-z])%s(?![0-9a-z])" % re.escape(flat_text)
+    for m in re.finditer(pattern, flat_registry, re.I):
+        if m.group(0) == flat_text:
+            return ""
+        if not found:
+            found = m.group(0)
+    return found
+
+
 def quote_fidelity(body: str, registry_text: str):
     """Every quoted string in the body must exist in a registry quote.
 
@@ -536,9 +560,22 @@ def quote_fidelity(body: str, registry_text: str):
         return issues
     registry = (registry_text or "").lower()
     registry = re.sub(r"\s+", " ", registry)
+    seen = set()
     for text in quoted:
         flat = re.sub(r"\s+", " ", text.strip().lower())
         if not flat:
+            continue
+        # The spelling of a title has to be the source's spelling. A title
+        # that reads right but capitalises its words differently is still a
+        # different title to the reader.
+        canonical = _canonical_spelling(registry_text, text.strip())
+        if canonical and canonical.lower() not in seen:
+            seen.add(canonical.lower())
+            issues.append((
+                "quote-capitalization",
+                "the quotation %r is written %r in the fact registry; use the "
+                "source's own spelling" % (text.strip()[:80], canonical[:80]),
+            ))
             continue
         if flat in registry:
             continue
@@ -633,6 +670,18 @@ def cross_post_contamination(body: str, other_artists, registry_text: str = ""):
     return issues
 
 
+def _sentences(text: str):
+    """Split a text into sentences, keeping abbreviations intact.
+
+    "at 7 p.m. ET on Thursday" is one sentence. Splitting after the period in
+    "p.m." would cut the date away from the weekday it belongs to and turn a
+    dated announcement into a bare weekday.
+    """
+    protected = re.sub(r"\b([A-Za-z])\.([A-Za-z])\.", r"\1<DOT>\2<DOT>", text or "")
+    parts = re.split(r"(?<=[.!?])\s+", protected)
+    return [part.replace("<DOT>", ".") for part in parts]
+
+
 def bare_weekday(body: str):
     """A weekday used as a date, with no date next to it (29.10.2026).
 
@@ -643,16 +692,20 @@ def bare_weekday(body: str):
     """
     issues = []
     body = body or ""
-    for sent in re.split(r"(?<=[.!?])\s+", body):
+    for sent in _sentences(body):
         low = sent.lower()
         if "night football" in low:
             continue
         for m in _WEEKDAY_RE.finditer(sent):
-            # The date has to be right next to the weekday, not somewhere else
-            # in the same sentence: "on Monday, October 26" is dated, a bare
-            # "on Monday" is not, even when the sentence mentions a date.
-            after = sent[m.end():m.end() + 40]
-            before = sent[max(0, m.start() - 40):m.start()]
+            # The date has to be in the same sentence as the weekday, and
+            # close enough to be the same event: "on Friday, October 30" is
+            # dated, "on Monday" is not, even when the sentence mentions a
+            # date somewhere else. The window is wide enough for a sentence
+            # that states the event and the weekday in one breath ("The
+            # single lands on October 30, and in the United States it
+            # arrives the evening before, at 7 p.m. ET on Thursday").
+            after = sent[m.end():m.end() + 120]
+            before = sent[max(0, m.start() - 120):m.start()]
             if _DATE_NEAR_RE.search(after) or _DATE_NEAR_RE.search(before):
                 continue
             issues.append((

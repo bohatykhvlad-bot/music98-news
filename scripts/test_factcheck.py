@@ -239,6 +239,34 @@ def run():
     f30, _, _ = fc.check("The record arrives through 600 Entertainment.", ledger21)
     expect(not f30, "expected a covered claim to pass, got: %s" % f30)
 
+    # 31. a claim that puts two events in order needs two sources (29.10.2026).
+    single = ('- He confirmed the full lineup on Instagram with the guests popping up '
+              'on a stack of TV screens, and then billboards with the faces of each '
+              'featured artist went up in the cities they represent | '
+              'https://www.complex.com/music/a/x | "It started with an Instagram post '
+              'featuring a stack of TVs"')
+    f31 = fc.registry_findings(single)
+    expect(any(code == "registry-order-single-source" for _, code, _ in f31),
+           "expected a single-source sequence to fail, got: %s" % f31)
+
+    two = ('- He confirmed the full lineup on Instagram with the guests popping up on a '
+          'stack of TV screens, and then billboards with the faces of each featured '
+          'artist went up in the cities they represent | '
+          'https://www.broadwayworld.com/bwwmusic/article/x | "before BigX officially '
+          'confirmed the full lineup with an Instagram post" / '
+          'https://allhiphop.com/news/x | "Then BigX confirmed the full lineup on '
+          'Instagram"')
+    f31b = fc.registry_findings(two)
+    expect(not any(code == "registry-order-single-source" for _, code, _ in f31b),
+           "expected two sources to pass, got: %s" % f31b)
+
+    # 32. a claim without a sequence is happy with one source.
+    plain = ('- The album has 18 tracks | https://music.apple.com/us/album/x | '
+             '"18 songs"')
+    f32 = fc.registry_findings(plain)
+    expect(not any(code == "registry-order-single-source" for _, code, _ in f32),
+           "expected a plain claim to pass, got: %s" % f32)
+
     if fails:
         print("FACTCHECK: FAIL")
         for f in fails:
