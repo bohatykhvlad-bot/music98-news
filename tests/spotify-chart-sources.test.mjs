@@ -2,8 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import {SPOTIFY_CHART_PROVIDERS,SPOTIFY_PROVIDER_ORDER,buildSpotifySnapshot,
- verifiedSpotifySnapshot,parseMusicrankSpotify,SPOTIFY_INPUT_SIZE} from "../functions/lib/spotify-chart.js";
-import {collectSpotifySnapshot,refreshSpotifySource,readSpotifySource,
+ verifiedSpotifySnapshot,validatedSpotifyRows,SPOTIFY_INPUT_SIZE} from "../functions/lib/spotify-chart.js";
+import {refreshSpotifySource,readSpotifySource,
  snapshotFromWorker,SPOTIFY_SOURCE_KV} from "../functions/lib/spotify-source.js";
 
 const day=new Date().toISOString().slice(0,10);
@@ -70,13 +70,16 @@ test("the job can take the snapshot from the Worker when the source is blocked",
   async()=>{throw new Error("offline");}),/unreachable/);
 });
 
-test("the Worker reads the chart from the source and keeps it",async()=>{
- const html=fs.readFileSync("/tmp/musicrank.html","utf8");
- const parsed=parseMusicrankSpotify(html,SPOTIFY_INPUT_SIZE);
- assert.equal(parsed.tracks.length,SPOTIFY_INPUT_SIZE);
- assert.ok(parsed.date);
- const snapshot=buildSpotifySnapshot(parsed,"musicrank");
- assert.ok(verifiedSpotifySnapshot(snapshot));
+test("the stored editions of the chart carry the rows of that source",()=>{
+ const archive=JSON.parse(fs.readFileSync(new URL(
+  "../public/data/chart-history/spotify-global-2026-10-15.json",import.meta.url),"utf8"));
+ assert.equal(archive.source,"musicrank-spotify-global-daily");
+ assert.equal(archive.sourceUrl,"https://musicrank.org/spotify");
+ assert.equal(archive.tracks.length,SPOTIFY_INPUT_SIZE);
+ const rows=validatedSpotifyRows(archive.tracks,SPOTIFY_INPUT_SIZE);
+ assert.equal(rows.length,SPOTIFY_INPUT_SIZE);
+ assert.ok(rows.every(t=>Number.isSafeInteger(t.daily)&&t.daily>0));
+ assert.ok(!/kworb/i.test(JSON.stringify(archive)));
 });
 
 test("the source list of the chart names the site that publishes the streams",()=>{
