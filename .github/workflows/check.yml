@@ -19,7 +19,7 @@ jobs:
           python-version: "3.12"
       - name: Validate editorial workflow scripts and canon
         run: |
-          python -m py_compile scripts/canon_checks.py scripts/editorial_readthrough.py scripts/editorial_lint.py scripts/photo_lint.py scripts/photo_manifest.py scripts/known_debt.py scripts/cover_crop.py scripts/factcheck.py scripts/gate.py scripts/post.py scripts/preflight.py scripts/test_editorial_readthrough.py scripts/test_editorial_lint.py scripts/test_photo_manifest.py scripts/test_factcheck.py scripts/check_agent_write_path.py
+          python -m py_compile scripts/canon_checks.py scripts/editorial_readthrough.py scripts/editorial_lint.py scripts/photo_lint.py scripts/photo_manifest.py scripts/known_debt.py scripts/cover_crop.py scripts/factcheck.py scripts/gate.py scripts/post.py scripts/preflight.py scripts/test_editorial_readthrough.py scripts/test_editorial_lint.py scripts/test_owner_checks.py scripts/test_photo_manifest.py scripts/test_factcheck.py scripts/check_agent_write_path.py
           python scripts/check_agent_write_path.py
           python scripts/editorial_readthrough.py --help | grep -q -- "--phase"
           python scripts/post.py --help | grep -q -- "--phase"
@@ -29,6 +29,7 @@ jobs:
           python scripts/post.py --help | grep -q -- "packet"
           python scripts/test_editorial_readthrough.py
           python scripts/test_editorial_lint.py
+          python scripts/test_owner_checks.py
           python scripts/test_photo_manifest.py
           python scripts/test_factcheck.py
           test -f editorial/known-debt.json

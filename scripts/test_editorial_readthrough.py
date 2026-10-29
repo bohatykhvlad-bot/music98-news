@@ -166,9 +166,21 @@ def prose_until(target, artist="Example Artist", song="North Star"):
 
 
 def assemble(paras, embeds=1):
+    # The first player has to sit mid-text. A clip parked after the last
+    # paragraph fails that check, so the healthy fixture puts it in the middle.
+    middle = len(paras) // 2
+    if len(paras) >= 4:
+        middle = max(2, min(middle, len(paras) - 1))
+    elif len(paras) > 1:
+        middle = max(1, min(middle, len(paras) - 1))
+    else:
+        middle = 0
     if embeds == 1:
-        return "\n\n".join(paras[:-1]) + "\n\n[youtube:abcdefghijk]\n\n" + paras[-1]
-    middle = max(1, len(paras) // 2)
+        return (
+            "\n\n".join(paras[:middle])
+            + "\n\n[youtube:abcdefghijk]\n\n"
+            + "\n\n".join(paras[middle:])
+        )
     return (
         "\n\n".join(paras[:middle])
         + "\n\n[youtube:abcdefghijk]\n\n"

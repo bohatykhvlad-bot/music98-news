@@ -32,7 +32,9 @@ Design rules for this module
 """
 from __future__ import annotations
 
+import json
 import re
+from pathlib import Path
 
 # Words that carry no subject. They are removed before any overlap is
 # measured, otherwise two paragraphs about different subjects share
@@ -656,3 +658,431 @@ def lint(post, registry_text="", other_artists=()):
         issues.extend(cross_post_contamination(post.get("body") or "", other_artists,
                                                registry_text))
     return issues
+
+
+# --- owner checks (2026-10-29) ------------------------------------------------
+# These run in the gate and in preflight, on the same save/publish path.
+# They are not passed through known_debt: a recorded count cannot waive them.
+
+_REPO = Path(__file__).resolve().parent.parent
+_FACTS = _REPO / "editorial" / "facts"
+_DATA = _REPO / "public" / "data"
+
+# Collaborator separators the owner named, plus the comma Apple uses in a
+# credit ("A, B & C"). "and the" and ", the" stay inside a band name.
+_ARTIST_SPLIT = re.compile(
+    r"\s*(?:&|\+|/(?=\s)|,|\bfeat\.?\b|\bfeaturing\b|\bft\.?\b|\bwith\b|\bx\b|\band\b)\s*",
+    re.I,
+)
+_APPLE_EMB = re.compile(r"\[apple:(?:album|song):(\d+)(?::(\d+))?\]", re.I)
+_SPOT_EMB = re.compile(r"\[spotify:(?:album|track):([A-Za-z0-9]+)\]", re.I)
+_SPOT_URL = re.compile(
+    r"https?://open\.spotify\.com/(?:embed/)?(?:album|track)/([A-Za-z0-9]+)",
+    re.I,
+)
+_APPLE_URL = re.compile(r"album/(?P<album>\d+)(?:\?[^#]*\bi=(?P<track>\d+))?")
+_PLAYER_BLOCK = re.compile(
+    r"^\[(?:youtube|apple|spotify|tiktok|ig|instagram):[^\]]*\]$",
+    re.I,
+)
+_CLOCK = (
+    re.compile(r"\b\d{1,2}:\d{2}\b"),
+    # The lookbehind keeps "1:45 p.m." from also matching the slice "45 p.m.".
+    re.compile(r"(?<![:\d])\b\d{1,2}\s*(?:a\.?m\.?|p\.?m\.?)\b", re.I),
+    re.compile(r"\b(?:ET|EST|EDT|PT|PST|PDT|BST|GMT)\b"),
+    re.compile(r"\bEastern\b"),
+    re.compile(r"\bmidnight\b", re.I),
+    re.compile(r"\brelease timetable\b", re.I),
+)
+_TECH = re.compile(
+    r"\bplays the piano\b|\barranged the strings\b|\bengineered\b|"
+    r"\bmixed by\b|\bmastered\b|\bco-produced\b|\bproduced by\b",
+    re.I,
+)
+_PERSON = r"([A-Z][\w'’.-]+(?:\s+(?:de|da|van|von|la|del|the|[A-Z][\w'’.-]+))*)"
+_CREDIT_NAME = (
+    re.compile(r"(?i:\b(?:co-produced|produced|engineered|mixed|mastered)\s+by\s+)" + _PERSON),
+    re.compile(r"\b" + _PERSON + r"\s+plays the piano\b"),
+    re.compile(r"\b" + _PERSON + r"\s+arranged the strings\b"),
+    re.compile(r"(?i:\barranged the strings with )" + _PERSON),
+)
+_CATALOG = None
+
+
+def split_artists(value):
+    """Names in a joint credit. One name comes back as a one-item list."""
+    text = (value or "").strip()
+    if not text:
+        return []
+    text = re.sub(r"\band\s+the\b", " and_the ", text, flags=re.I)
+    text = re.sub(r",\s+the\b", ",_the ", text, flags=re.I)
+    parts = []
+    for part in _ARTIST_SPLIT.split(text):
+        part = part.strip(" ,.;:'\"")
+        part = part.replace("and_the", "and the").replace(",_the", ", the")
+        part = re.sub(r"\s+", " ", part).strip()
+        if part:
+            parts.append(part)
+    return parts
+
+
+def _richer(old, new):
+    if not old:
+        return new
+    if not new:
+        return old
+    if len(split_artists(new)) > len(split_artists(old)):
+        return new
+    if len(split_artists(new)) == len(split_artists(old)) and len(new) > len(old):
+        return new
+    return old
+
+
+def _put(index, key, artist):
+    key = str(key or "").strip()
+    artist = str(artist or "").strip()
+    if len(key) < 6 or not artist:
+        return
+    index[key] = _richer(index.get(key), artist)
+
+
+def _walk_catalog(node, index):
+    if isinstance(node, dict):
+        artist = node.get("artistName") or node.get("artist") or node.get("matchedArtist")
+        if isinstance(artist, str) and artist.strip():
+            url = node.get("url") if isinstance(node.get("url"), str) else ""
+            for match in _APPLE_URL.finditer(url):
+                _put(index, match.group("album"), artist)
+                if match.group("track"):
+                    _put(index, match.group("track"), artist)
+            for key in ("id", "collectionId", "trackId"):
+                value = node.get(key)
+                if isinstance(value, int) or (isinstance(value, str) and value.isdigit()):
+                    _put(index, value, artist)
+            sid = node.get("spotifyId")
+            if isinstance(sid, str):
+                _put(index, sid, node.get("matchedArtist") or artist)
+        for value in node.values():
+            if isinstance(value, (dict, list)):
+                _walk_catalog(value, index)
+    elif isinstance(node, list):
+        for value in node:
+            if isinstance(value, (dict, list)):
+                _walk_catalog(value, index)
+
+
+def player_catalog():
+    """Apple and Spotify ids mapped to the artist credit stored in this repo.
+
+    The gate does not call Apple or Spotify. If an id is not in this catalog,
+    the collab check cannot see who the player lists.
+    """
+    global _CATALOG
+    if _CATALOG is not None:
+        return _CATALOG
+    index = {}
+    if _DATA.is_dir():
+        for path in _DATA.rglob("*.json"):
+            try:
+                data = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            _walk_catalog(data, index)
+    _CATALOG = index
+    return index
+
+
+def _registry_text(post, context=None):
+    if context and context.get("registry"):
+        return context.get("registry")
+    pid = str((post or {}).get("id") or "").strip()
+    if not pid:
+        return None
+    path = _FACTS / ("%s.md" % pid)
+    if not path.is_file():
+        return None
+    try:
+        return path.read_text(encoding="utf-8")
+    except Exception:
+        return None
+
+
+def _names_in(text, name):
+    return name.casefold() in (text or "").casefold()
+
+
+def _rendered_headline(post):
+    title = (post.get("title") or "").strip()
+    artist = (post.get("artist") or "").strip()
+    if (post.get("type") or "").strip().lower() == "release" and artist and title:
+        return "%s - %s" % (artist, title)
+    return title
+
+
+def _player_ids(body):
+    """(label, catalog key) for every Apple or Spotify player in the body."""
+    found = []
+    for match in _APPLE_EMB.finditer(body or ""):
+        album, track = match.group(1), match.group(2)
+        found.append(("apple", track or album, (track, album)))
+    for match in _SPOT_EMB.finditer(body or ""):
+        found.append(("spotify", match.group(1), (match.group(1),)))
+    for match in _SPOT_URL.finditer(body or ""):
+        found.append(("spotify", match.group(1), (match.group(1),)))
+    return found
+
+
+def _resolve_player(keys, catalog):
+    best = None
+    for key in keys:
+        if key and catalog.get(key):
+            best = _richer(best, catalog[key])
+    return best
+
+
+def collab_issues(post, context=None):
+    """Release collabs: every billed artist in the headline/deck and sentence one.
+
+    The artist field and any Apple or Spotify player are the billing. A player
+    whose credit is not in the local catalog fails, because the check cannot
+    compare that credit to the fact registry offline.
+    """
+    post = post or {}
+    if (post.get("type") or "").strip().lower() != "release":
+        return []
+    import canon_checks
+
+    body = post.get("body") or ""
+    required = []
+    issues = []
+    field = split_artists(post.get("artist") or "")
+    if len(field) >= 2:
+        required.extend(field)
+    catalog = player_catalog()
+    for label, shown, keys in _player_ids(body):
+        credit = _resolve_player(keys, catalog)
+        if not credit:
+            issues.append((
+                "collab",
+                "%s player %s could not be read offline, so its artists cannot "
+                "be compared to the registry" % (label, shown),
+            ))
+            continue
+        parts = split_artists(credit)
+        if len(parts) >= 2:
+            required.extend(parts)
+    seen = set()
+    names = []
+    for name in required:
+        key = name.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        names.append(name)
+    if not names and not issues:
+        return []
+    headline = _rendered_headline(post)
+    deck = post.get("excerpt") or ""
+    header = headline + "\n" + deck
+    first = ""
+    paras = canon_checks.prose_paragraphs(body)
+    if paras:
+        bits = canon_checks.sentences(paras[0])
+        first = bits[0] if bits else paras[0]
+    for name in names:
+        if not _names_in(header, name):
+            issues.append((
+                "collab",
+                "collaborator %r is missing from the headline/deck" % name,
+            ))
+        if not _names_in(first, name):
+            issues.append((
+                "collab",
+                "collaborator %r is missing from the first sentence" % name,
+            ))
+    if names:
+        registry = _registry_text(post, context)
+        if registry is None:
+            issues.append((
+                "collab",
+                "collab artists cannot be compared to a fact registry offline",
+            ))
+        else:
+            for name in names:
+                if not _names_in(registry, name):
+                    issues.append((
+                        "collab",
+                        "collaborator %r is not in the fact registry" % name,
+                    ))
+    return issues
+
+
+def media_position_issues(post):
+    """The first video or player sits mid-text, not under the opening paragraph."""
+    import canon_checks
+
+    body = (post or {}).get("body") or ""
+    blocks = canon_checks.split_blocks(body)
+    total = canon_checks.prose_word_count(body)
+    prose_n = len(canon_checks.prose_paragraphs(body))
+    words_before = 0
+    paras_before = 0
+    found = False
+    in_awards = False
+    for block in blocks:
+        low = block.lower()
+        if low == "[awards]":
+            in_awards = True
+            continue
+        if low == "[/awards]":
+            in_awards = False
+            continue
+        if in_awards:
+            continue
+        if _PLAYER_BLOCK.fullmatch(block):
+            found = True
+            break
+        if canon_checks.MEDIA_BLOCK.fullmatch(block):
+            continue
+        paras_before += 1
+        words_before += len(canon_checks.WORD_RE.findall(block))
+    if not found:
+        return []
+    ratio = (words_before / float(total)) if total else 0.0
+    middle = prose_n > 0 and abs(paras_before - (prose_n / 2.0)) <= 0.5
+    in_band = total > 0 and 0.35 <= ratio <= 0.70
+    if paras_before >= 2 and (in_band or middle):
+        return []
+    return [(
+        "media-position",
+        "first video/player follows paragraph %d of %d (%.0f%% of prose words); "
+        "it must not follow paragraph 1 and must sit mid-text "
+        "(35-70%% of prose words, or the middle by paragraph count)"
+        % (paras_before, prose_n, ratio * 100),
+    )]
+
+
+def release_time_issues(post):
+    """No clock time, time zone, midnight, or release timetable in the copy."""
+    import canon_checks
+
+    post = post or {}
+    prose = canon_checks.prose_text(post.get("body") or "")
+    sample = "\n".join([
+        post.get("title") or "",
+        post.get("excerpt") or "",
+        prose,
+    ])
+    sample = canon_checks.URL_RE.sub(" ", sample)
+    found = []
+    for pattern in _CLOCK:
+        for match in pattern.finditer(sample):
+            token = re.sub(r"\s+", " ", match.group(0)).strip()
+            if token and token not in found:
+                found.append(token)
+    if not found:
+        return []
+    shown = ", ".join(found[:8])
+    return [(
+        "release-time",
+        "release or premiere time in the copy: %s" % shown,
+    )]
+
+
+def card_src_issues(post):
+    """cardSrc is the square crop of a diptych, which has a second credit."""
+    cover = (post or {}).get("cover") or {}
+    if not isinstance(cover, dict):
+        return []
+    if str(cover.get("cardSrc") or "").strip() and not str(cover.get("credit2") or "").strip():
+        return [(
+            "card-src",
+            "cover.cardSrc is set without credit2; a square card image is only for a diptych",
+        )]
+    return []
+
+
+def owner_failures(post, context=None):
+    """FAIL checks the owner added on 2026-10-29. Not waived by known debt."""
+    post = post or {}
+    issues = []
+    issues.extend(collab_issues(post, context))
+    issues.extend(media_position_issues(post))
+    issues.extend(release_time_issues(post))
+    issues.extend(card_src_issues(post))
+    return issues
+
+
+def _credit_names(sentence):
+    names = []
+    for pattern in _CREDIT_NAME:
+        for match in pattern.finditer(sentence or ""):
+            name = re.sub(r"\s+", " ", match.group(1)).strip(" ,.;:")
+            if name and name not in names:
+                names.append(name)
+    return names
+
+
+def credit_padding_warnings(post):
+    """A technical credit whose person never appears anywhere else."""
+    import canon_checks
+
+    post = post or {}
+    body = post.get("body") or ""
+    sentences = []
+    for para in canon_checks.prose_paragraphs(body):
+        sentences.extend(canon_checks.sentences(para) or [para])
+    warnings = []
+    seen = set()
+    header = "\n".join([post.get("title") or "", post.get("excerpt") or ""])
+    for index, sentence in enumerate(sentences):
+        if not _TECH.search(sentence):
+            continue
+        names = _credit_names(sentence)
+        elsewhere = "\n".join(sentences[:index] + sentences[index + 1:])
+        blob = header + "\n" + elsewhere
+        if not names:
+            key = ("bare", sentence[:80])
+            if key not in seen:
+                seen.add(key)
+                warnings.append((
+                    "credit-padding",
+                    "technical credit names nobody who appears elsewhere: %s"
+                    % sentence.strip()[:140],
+                ))
+            continue
+        for name in names:
+            if _names_in(blob, name):
+                continue
+            if name.casefold() in seen:
+                continue
+            seen.add(name.casefold())
+            warnings.append((
+                "credit-padding",
+                "%s is only in a technical credit, not elsewhere in the post" % name,
+            ))
+    return warnings
+
+
+def short_paragraph_warnings(post):
+    """A prose paragraph under 60 words. A warning, not a failure."""
+    import canon_checks
+
+    warnings = []
+    for index, para in enumerate(canon_checks.prose_paragraphs((post or {}).get("body") or ""), 1):
+        count = len(canon_checks.WORD_RE.findall(para))
+        if count < 60:
+            warnings.append((
+                "short-paragraph",
+                "paragraph %d is %d prose words, under 60" % (index, count),
+            ))
+    return warnings
+
+
+def owner_warnings(post):
+    """WARN checks the owner added on 2026-10-29. They do not block a save."""
+    post = post or {}
+    warnings = []
+    warnings.extend(credit_padding_warnings(post))
+    warnings.extend(short_paragraph_warnings(post))
+    return warnings

@@ -25,6 +25,7 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 import canon_checks
+import editorial_lint
 
 PROD = "https://music98.news"
 STATE = Path(os.environ.get(
@@ -238,6 +239,10 @@ def inspect(post, allows):
     typed = ptype in {"news", "release", "longread"}
     for _code, message in canon_checks.mechanical_issues(post, structural=typed):
         fails.append(message)
+    for _code, message in editorial_lint.owner_failures(post):
+        fails.append(message)
+    for _code, message in editorial_lint.owner_warnings(post):
+        notes.append(message)
 
     if HTML_GARBAGE.search(body):
         fails.append("encoding residue: HTML entity leaked into reader-facing copy")
