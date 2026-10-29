@@ -4,6 +4,9 @@
 **Core rule:** Write for readers, not checkers. A technically valid but artificial article is **NOT READY**.
 
 ## 1. Facts and angle
+- **Facts first, then the text.** The order of work is fixed: write the fact registry first, one line per claim with its source and the source's own words, and only then write the article from those lines. A claim that is not in the registry is a claim the article is not allowed to make. The tooling enforces the order (`post.py facts <id> --init`, then `post.py set`).
+- **One registry line is one fact from one source.** A line that packs two facts from two different sources cannot be backed by a single quote, and that is where wrong attributions come from. Split it.
+- **A number or a date in a claim must be in that claim's own quote.** If the registry says "18 tracks" and the quote says "18 songs", fine; if the quote does not carry the figure, the claim is not checked yet.
 - **Verify before writing.** Keep a source-backed registry of all checkable facts: names/styling, dates, titles, quotes, roles, charts, collaborators and superlatives. Prefer primary sources; corroborate major claims. Never invent context or present rumors, teasers or plans as completed facts.
 - **A quotation is the source's own words.** Anything the article puts in quotation marks has to appear in the registry's source quotes. A paraphrase inside quote marks is a fabricated quote.
 - **A registry line the article never uses is a warning.** It usually means a line was carried over from another story, which is how facts get mixed between posts.

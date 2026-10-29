@@ -59,13 +59,14 @@ def run():
     expect(any("without a source" in x for x in f3),
            "expected a source-less registry line to fail, got: %s" % f3)
 
-    # 4. a registry line without a quote is a WARN, not a fail
+    # 4. a registry line without the source's own words is a failure (29.10):
+    # a claim nobody can check is not a fact.
     bad = LEDGER + "- Some claim with a source but no quote | https://example.com/d | \n"
     f4, w4, _ = fc.check(BODY, bad)
-    expect(not any("without a source" in x for x in f4),
-           "expected a quote-less line to stay a warning, got: %s" % f4)
-    expect(any("without a source quote" in x for x in w4),
-           "expected a quote-less line to warn, got: %s" % w4)
+    expect(not any("without a source:" in x for x in f4),
+           "expected a quote-less line not to be read as a missing source, got: %s" % f4)
+    expect(any("registry-no-quote" in x for x in f4),
+           "expected a quote-less line to fail, got: %s" % f4)
 
     # 5. a number written as a word is covered by the digit
     body5 = "The EP has eight songs."
@@ -158,6 +159,85 @@ def run():
     f19, _, _ = fc.check("The record sold 1M copies in its first week.", ledger18)
     expect(any("1000000 copies" in x for x in f19),
            "expected 1M to fail against a registry that says 1.2M, got: %s" % f19)
+
+    # 20. a claim whose own quote does not carry its figure is a defect:
+    # this is the "600 Entertainment" line, where the quote was the copyright
+    # line and the label came from somewhere else.
+    ledger20 = ('- The record is released through 600 Entertainment and UnitedMasters'
+                ' | https://example.com/m | "\u2117 2026 BigXthaPlug under exclusive '
+                'license to UnitedMasters LLC"\n')
+    missing, _ = fc.quote_supports_claim(
+        "The record is released through 600 Entertainment and UnitedMasters",
+        fc.ledger_claims(ledger20)[0]["quote"])
+    expect(any("600" in x[0] for x in missing),
+           "expected the unsupported figure to be reported, got: %s" % missing)
+
+    # 21. the same claim with a quote that carries the figure passes.
+    ledger21 = ('- The record is released through 600 Entertainment and UnitedMasters'
+                ' | https://example.com/m | "arriving October 30 through 600 '
+                'Entertainment and UnitedMasters"\n')
+    missing21, _ = fc.quote_supports_claim(
+        "The record is released through 600 Entertainment and UnitedMasters",
+        fc.ledger_claims(ledger21)[0]["quote"])
+    expect(not missing21,
+           "expected a supported figure to pass, got: %s" % missing21)
+
+    # 22. a paraphrase that drops the subject is not a defect: the source
+    # says "he", the registry names him.
+    missing22, _ = fc.quote_supports_claim(
+        "Hamish Hamilton has directed every Super Bowl halftime show since 2010",
+        '"He has directed every Super Bowl halftime show since 2010, as well as the '
+        '2026 FIFA World Cup final halftime show."')
+    expect(not missing22,
+           "expected a paraphrased name to pass, got: %s" % missing22)
+
+    # 23. a quote that writes the figure with its unit attached still carries it.
+    missing23, _ = fc.quote_supports_claim(
+        "In the United States the single releases at 7 p.m. ET",
+        '"JISOO NEW SINGLE OUT THIS OCTOBER 30TH!! OCT 29 | 7PM EDT"')
+    expect(not missing23,
+           "expected 7PM to count as 7, got: %s" % missing23)
+
+    # 24. a date written in ISO form is a date.
+    missing24, _ = fc.quote_supports_claim(
+        '"BURN" arrived on October 9', '"2026-10-09"')
+    expect(not missing24,
+           "expected an ISO date to carry the claim, got: %s" % missing24)
+
+    # 25. a claim and its quote that disagree on the day are reported apart.
+    missing25, mismatched25 = fc.quote_supports_claim(
+        "The video premiered on October 26, 2026",
+        '"Kesha released the official music video for the song, \"Backstabber\" on '
+        'October 25, 2026."')
+    expect(not missing25 and any("October 26" in x[0] for x in mismatched25),
+           "expected a day mismatch, got missing=%s mismatched=%s" % (missing25, mismatched25))
+
+    # 26. a registry line without a quote is a failure, not a note.
+    findings26 = fc.registry_findings("- The album has 18 tracks | https://example.com/m\n")
+    expect(any(code == "registry-no-quote" for _, code, _ in findings26),
+           "expected registry-no-quote, got: %s" % findings26)
+
+    # 27. a source that is not a link is a failure.
+    findings27 = fc.registry_findings(
+        '- The album has 18 tracks | the press release | "18 tracks"\n')
+    expect(any(code == "registry-bad-source" for _, code, _ in findings27),
+           "expected registry-bad-source, got: %s" % findings27)
+
+    # 28. a photo line is not a claim.
+    findings28 = fc.registry_findings(
+        '## Photos\n- cover photos/x.jpg | https://example.com/p | Joshua Davis | '
+        'BigXthaPlug | https://joshuadavis.example\n')
+    expect(not any(code.startswith("registry-") for _, code, _ in findings28),
+           "expected a photo line to be skipped, got: %s" % findings28)
+
+    # 29. a body claim that no registry line carries is a defect.
+    f29, _, _ = fc.check("The album has 18 tracks.", ledger21)
+    expect(any("fact-uncovered" in x for x in f29),
+           "expected fact-uncovered, got: %s" % f29)
+
+    # 30. and a body claim the registry carries is not.
+    f30, _, _ = fc.check("The record arrives through 600 Entertainment.", ledger21)
+    expect(not f30, "expected a covered claim to pass, got: %s" % f30)
 
     if fails:
         print("FACTCHECK: FAIL")

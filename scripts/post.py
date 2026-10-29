@@ -418,7 +418,7 @@ def cmd_preflight(pid):
     return True
 
 
-def cmd_create(post_file, allows=None, reason=None):
+def cmd_create(post_file, allows=None, reason=None, allow_unverified=False):
     path=Path(post_file)
     data=json.loads(path.read_text(encoding="utf-8"))
     if isinstance(data,dict) and isinstance(data.get("posts"),list):
@@ -441,6 +441,18 @@ def cmd_create(post_file, allows=None, reason=None):
     problem = excerpt_issue(excerpt, body)
     if not body or problem:
         die(problem or "new draft needs a non-empty body")
+
+    # Facts first (canon section 1): the registry of the post has to exist
+    # before the article does, so the text can be written from checked facts
+    # instead of from memory.
+    registry_path = FACTS_DIR / ("%s.md" % pid)
+    if not registry_path.exists() and not allow_unverified:
+        die("new draft needs a fact registry first:\n"
+            "  python scripts/post.py facts %s --init\n"
+            "  write every claim with its source and the source's own words, then "
+            "write the article from those lines\n"
+            "  (override with --allow-unverified if you really want a draft without "
+            "a registry)" % pid)
 
     # Full final read is an explicit barrier for new posts. Unlike an existing
     # edit, there is no pre-edit source, so only the post-edit phase applies.
@@ -940,15 +952,35 @@ def cmd_packet(pid, out=None):
     return path
 
 
-def cmd_facts(pid, ledger=None, body_file=None):
+def cmd_facts(pid, ledger=None, body_file=None, init=False):
     """Cross-check a post body against its fact registry.
 
     The registry lives in `editorial/facts/<post-id>.md` and holds one sourced
     claim per line. Every checkable claim in the body (year, number, quantified
     noun, quoted title, multi-word proper name, date) must be covered by it.
+
+    With --init the registry is created empty, so the work starts with the
+    facts: one line per claim, each with its source and the source's own
+    words, and the article is written from those lines afterwards.
     """
     sys.path.insert(0, str(REPO / "scripts"))
     import factcheck
+
+    path = Path(ledger) if ledger else default_ledger(pid)
+
+    if init:
+        if path.exists():
+            print("facts     %s already exists; not overwriting it" % path)
+            return True
+        template = FACTS_DIR / "TEMPLATE.md"
+        head = template.read_text(encoding="utf-8") if template.exists() else ""
+        body = head.replace("<post-id>", pid)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+        print("facts     ok: empty registry created at %s" % path)
+        print("          write one line per claim: - <claim> | <url> | <exact quote>")
+        print("          then write the article from those lines: python scripts/post.py set %s --body-file <file>" % pid)
+        return True
 
     posts = desk_read()["posts"]
     p = find_post(posts, pid)
@@ -956,17 +988,27 @@ def cmd_facts(pid, ledger=None, body_file=None):
     if body_file:
         body = Path(body_file).read_text(encoding="utf-8")
 
-    path = Path(ledger) if ledger else default_ledger(pid)
     if not path.exists():
         print("facts     REFUSED - no fact registry for %s" % pid)
         print("  expected: %s" % path)
         print("  one line per claim:  - <claim> | <source url> | <exact quote>")
+        print("  create it with: python scripts/post.py facts %s --init" % pid)
         raise SystemExit(1)
 
     ledger_text = path.read_text(encoding="utf-8", errors="replace")
     fails, warns, info = factcheck.check(body, ledger_text)
     for line in factcheck.render(fails, warns, info).splitlines():
         print(line)
+
+    # The checklist the article is written from: every checked fact, with the
+    # source it came from. The body may only say what is on this list.
+    entries = factcheck.ledger_claims(ledger_text)
+    if entries:
+        print("\nregistry facts (%d) - the article may only use these:" % len(entries))
+        for i, entry in enumerate(entries, 1):
+            print("  %2d. %s" % (i, entry["claim"]))
+            print("      %s" % entry["source"])
+
     if fails:
         print("\nFACTS: FAIL - %d claim(s) in the body are not backed by the registry."
               % len(fails))
@@ -1044,6 +1086,8 @@ def main():
     sp.add_argument("id")
     sp.add_argument("--ledger")
     sp.add_argument("--body-file")
+    sp.add_argument("--init", action="store_true",
+                    help="create an empty registry for this post and stop")
 
     sp = sub.add_parser("packet")
     sp.add_argument("id")
@@ -1073,12 +1117,16 @@ def main():
     sp = sub.add_parser("create")
     sp.add_argument("--file", required=True)
     sp.add_argument("--allow", action="append", choices=["technical-credit","physical-format","source-attribution","single-sentence"])
+    sp.add_argument("--allow-unverified", action="store_true",
+                    help="create the draft even though it has no fact registry yet")
     sp.add_argument("--reason")
 
     sp = sub.add_parser("replace-draft")
     sp.add_argument("id")
     sp.add_argument("--file", required=True)
     sp.add_argument("--allow", action="append", choices=["technical-credit","physical-format","source-attribution","single-sentence"])
+    sp.add_argument("--allow-unverified", action="store_true",
+                    help="create the draft even though it has no fact registry yet")
     sp.add_argument("--reason")
 
     sp = sub.add_parser("set")
@@ -1134,7 +1182,7 @@ def main():
     elif a.cmd == "register":
         cmd_register(a.token, a.fact)
     elif a.cmd == "create":
-        cmd_create(a.file, a.allow, a.reason)
+        cmd_create(a.file, a.allow, a.reason, allow_unverified=a.allow_unverified)
     elif a.cmd == "replace-draft":
         cmd_replace_draft(a.id, a.file, a.allow, a.reason)
     elif a.cmd == "set":
@@ -1152,7 +1200,7 @@ def main():
     elif a.cmd == "editorial":
         cmd_editorial(a.id, a.body_file, a.title, a.allow, a.reason, a.phase)
     elif a.cmd == "facts":
-        cmd_facts(a.id, a.ledger, a.body_file)
+        cmd_facts(a.id, a.ledger, a.body_file, init=a.init)
     elif a.cmd == "packet":
         cmd_packet(a.id, a.out)
     elif a.cmd == "publish":

@@ -30,6 +30,7 @@ import canon_checks
 import editorial_lint
 import photo_lint
 import photo_manifest
+import factcheck
 import known_debt
 
 PROD = os.environ.get("MUSIC98_PROD", "https://music98.news")
@@ -886,6 +887,26 @@ def check_post(p, strict, context=None):
     lint_findings += list(photo_lint.lint(p, context.get("registry_photos"), all_posts))
     if registry_text:
         lint_findings += list(photo_manifest.check(p, registry_text))
+        # The fact registry is checked in both directions (29.10.2026): the
+        # registry has to be a sourced, quoted, self-consistent list of facts,
+        # and the body has to be covered by it. Without a registry there is
+        # nothing to check here - a post without one is caught at publish time.
+        reg_fails, reg_warns = [], []
+        for severity, code, message in factcheck.registry_findings(registry_text):
+            if severity == "fail":
+                reg_fails.append((code, message))
+            else:
+                reg_warns.append((code, message))
+        cov_fails, cov_warns, _ = factcheck.check(p.get("body") or "", registry_text,
+                                                   coverage_only=True)
+        for item in cov_fails:
+            reg_fails.append(("fact-uncovered", item.split(": ", 1)[-1]))
+        for item in cov_warns:
+            reg_warns.append(("fact-uncovered", item.split(": ", 1)[-1]))
+        lint_findings += reg_fails
+        reg_warn_findings = reg_warns
+    else:
+        reg_warn_findings = []
     # A rule introduced today must not punish a post the owner approved under
     # the old rules. The debt that already existed is recorded once and stays
     # a warning; anything beyond it fails.
@@ -894,6 +915,8 @@ def check_post(p, strict, context=None):
         warns.append((code, "known debt, recorded before this rule: %s" % message))
     for code, message in new_findings:
         fails.append((code, message))
+    for code, message in reg_warn_findings:
+        warns.append((code, message))
     # Owner checks from 2026-10-29. They are not passed through known_debt:
     # a recorded count cannot waive a collab, a player sitting under the
     # lede, a release time, or a card image without a second credit.

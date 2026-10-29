@@ -356,6 +356,232 @@ def extract_claims(body: str):
     return claims
 
 
+# --- registry hygiene and claim support ---------------------------------------
+#
+# The owner's order of work (29.10.2026): write the facts down first, each one
+# with its source, then write the article only from those facts, then check the
+# article against the registry. The checks below make that order mechanical.
+#
+# Two directions are checked:
+#   registry -> text : every line of the registry must be a usable, sourced,
+#                      quoted fact (hygiene), and every figure or date a claim
+#                      states must be carried by that claim's own quote.
+#   text -> registry : every checkable claim in the body must be covered by the
+#                      registry (the existing coverage check).
+
+MONTH_RE = re.compile(
+    r"(?<![0-9a-z])(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
+    r"jul(?:y)?|aug(?:ust)?|sep(?:t(?:ember)?)?|oct(?:ober)?|nov(?:ember)?|"
+    r"dec(?:ember)?)\.?(?![0-9a-z])", re.I)
+
+MONTH_NUMBER = {"jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+                "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12}
+
+# A registry line that still holds a placeholder is not a fact yet. Only the
+# claim is inspected: a source URL is allowed to look like anything.
+PLACEHOLDERS = ("todo", "tbd", "fixme", "lorem ipsum", "to be confirmed")
+
+# A photo-manifest line: it belongs to the `## Photos` section, not to the
+# list of claims.
+PHOTO_LINE = re.compile(r"^-\s*(cover|photo)\s+photos/\S+?\s*\|")
+
+# Units a spelled-out number can count. Without this, "the announcement
+# trailer for this one went up" would read as "one went", and a number word
+# followed by a verb would be treated as a quantity to verify.
+COUNTABLE_UNITS = {
+    "track", "tracks", "song", "songs", "single", "singles", "album", "albums",
+    "ep", "eps", "date", "dates", "show", "shows", "tour", "tours", "day", "days",
+    "night", "nights", "week", "weeks", "month", "months", "year", "years",
+    "minute", "minutes", "hour", "hours", "guest", "guests", "artist", "artists",
+    "person", "people", "time", "times", "time", "million", "thousand", "billion",
+    "copy", "copies", "viewer", "viewers", "follower", "followers", "point",
+    "points", "seat", "seats", "city", "cities", "state", "states", "country",
+    "countries", "part", "parts", "chapter", "chapters", "episode", "episodes",
+    "piece", "pieces", "time", "member", "members", "nomination", "nominations",
+    "award", "awards", "record", "records", "appearance", "appearances",
+    "collaboration", "collaborations", "label", "labels", "venue", "venues",
+    "stadium", "stadium", "arena", "arena", "cover", "covers", "mixtape",
+    "mixtapes", "candidate", "candidates", "season", "seasons", "series",
+    "festival", "festivals", "release", "releases", "stream", "streams",
+}
+
+
+def _number_value(label: str):
+    """The integer a number claim states, whatever way it is written."""
+    first = (label or "").split(" ")[0].strip().lower().replace(",", "")
+    if first in NUMBER_WORDS:
+        return NUMBER_WORDS[first]
+    try:
+        return int(first)
+    except ValueError:
+        return None
+
+
+def _number_spellings(value: int):
+    forms = {str(value), "{:,}".format(value)}
+    for word, num in NUMBER_WORDS.items():
+        if num == value:
+            forms.add(word)
+    for suffix, mult in _COMPACT_MULT.items():
+        if value % mult == 0 and value // mult >= 1:
+            forms.add("%d%s" % (value // mult, suffix.upper()))
+            forms.add("{:,}".format(value // mult) + suffix.upper())
+        exact = value / float(mult)
+        if exact >= 1:
+            forms.add("%g%s" % (exact, suffix.upper()))
+    return forms
+
+
+def _number_in_quote(value: int, quote: str) -> bool:
+    # A figure in a source is often written with its unit attached ("7PM EDT",
+    # "18th", "18 songs"), so a letter may follow the digits.
+    return any(re.search(r"(?<![0-9a-z])%s(?![0-9])" % re.escape(f), quote, re.I)
+               for f in _number_spellings(value))
+
+
+def _date_in_quote(label: str, quote: str):
+    """True when the quote carries the date, 'day' when the days disagree.
+
+    A quote that omits the year is accepted (the article prints "Oct. 26"),
+    and a claim without a year is matched on month and day. A date written in
+    ISO form ("2026-10-09") is read as a full date.
+    """
+    m = re.match(r"([A-Za-z]+)\s+(\d{1,2})(?:,)?(?:\s*(\d{4}))?$", (label or "").strip())
+    if not m:
+        return None
+    month, day, year = m.group(1), m.group(2), m.group(3)
+    for iso in re.finditer(r"(?<![0-9])(\d{4})-(\d{2})-(\d{2})(?![0-9])", quote):
+        if int(iso.group(2)) != MONTH_NUMBER.get(month.lower()[:3], 0):
+            continue
+        if int(iso.group(3)) != int(day):
+            return "day"
+        if year and iso.group(1) != year:
+            continue
+        return True
+    for mm in MONTH_RE.finditer(quote):
+        if mm.group(1).lower()[:3] != month.lower()[:3]:
+            continue
+        tail = quote[mm.end():mm.end() + 40]
+        dm = re.match(r"\.?\s*,?\s*(\d{1,2})(?:st|nd|rd|th)?(?:\s*,?\s*(\d{4}))?",
+                      tail)
+        if not dm:
+            continue
+        qday, qyear = dm.group(1), dm.group(2)
+        if year and qyear and qyear != year:
+            continue
+        if qday != day:
+            return "day"
+        return True
+    return False
+
+
+def claim_figures(claim: str):
+    """The figures and dates a claim states.
+
+    Names and titles are left out on purpose: a source often says "he" where
+    the registry says "Hamish Hamilton", and a title may be spelled out in the
+    source. A number or a date cannot be paraphrased away, so those are the
+    load-bearing parts of a claim.
+
+    A spelled-out number ("eighteen tracks") is often the writer's own count
+    of what the source lists, so it is reported as a warning; a number written
+    in digits is expected to be in the quote and is reported as a failure.
+    """
+    text = re.sub(r"\*[^*]{2,90}\*", " ", claim or "")
+    text = re.sub(r"\"[^\"]{2,90}\"", " ", text)
+    out = []
+    dates = []
+    for c in extract_claims(text):
+        if c["kind"] == "date":
+            dates.append(c["text"])
+    # The digits inside a date belong to that date; they are checked with it.
+    bare = text
+    for d in dates:
+        bare = bare.replace(d, " ")
+    for c in extract_claims(bare):
+        if c["kind"] == "number":
+            parts = c["text"].split(" ")
+            first = parts[0].lower()
+            spelled = not first.isdigit()
+            if spelled:
+                unit = parts[1].lower() if len(parts) > 1 else ""
+                if unit not in COUNTABLE_UNITS:
+                    continue
+            out.append(("number", c["text"], "warn" if spelled else "fail"))
+        elif c["kind"] == "year":
+            out.append(("number", c["text"], "fail"))
+    for d in dates:
+        out.append(("date", d, "fail"))
+    return out
+
+
+def quote_supports_claim(claim: str, quote: str):
+    """Does the quote carry the figures and dates the claim states?
+
+    Returns (missing, mismatched), each item a (label, severity) pair. A claim
+    that packs two facts from two sources into one line shows up here: the
+    quote of that line cannot carry both. That is the defect that produced
+    "his own label" and the wrong producer credit in the Jay-Z post.
+    """
+    q = " ; ".join(part.strip() for part in (quote or "").split(" / "))
+    missing, mismatched = [], []
+    for kind, label, severity in claim_figures(claim):
+        if kind == "number":
+            value = _number_value(label)
+            if value is None:
+                continue
+            if not _number_in_quote(value, q):
+                missing.append((label, severity))
+        else:
+            state = _date_in_quote(label, q)
+            if state is False:
+                missing.append((label, severity))
+            elif state == "day":
+                mismatched.append((label, severity))
+    return missing, mismatched
+
+
+def registry_findings(ledger_text: str):
+    """Findings about the registry itself.
+
+    Returns a list of (severity, code, message). Severity is "fail" or "warn".
+    """
+    out = []
+    for entry in ledger_claims(ledger_text):
+        claim = entry["claim"]
+        source = entry["source"]
+        quote = entry["quote"]
+        if not claim or len(claim) < 8:
+            out.append(("fail", "registry-empty-claim",
+                        "registry line has no usable claim: %r" % claim[:60]))
+        low = claim.lower()
+        for placeholder in PLACEHOLDERS:
+            if placeholder in low:
+                out.append(("fail", "registry-placeholder",
+                            "registry line is still a placeholder: %s" % claim[:70]))
+                break
+        if not source:
+            out.append(("fail", "registry-no-source",
+                        "registry line without a source: %s" % claim[:70]))
+        elif not re.match(r"^https?://", source.strip()):
+            out.append(("fail", "registry-bad-source",
+                        "registry source is not an http(s) URL: %s" % claim[:70]))
+        if not quote:
+            out.append(("fail", "registry-no-quote",
+                        "registry line without the source's own words: %s" % claim[:70]))
+            continue
+        missing, mismatched = quote_supports_claim(claim, quote)
+        for item, severity in missing:
+            out.append((severity, "registry-claim-unsupported",
+                        "the claim states %s but its own quote does not carry it: %s"
+                        % (item, claim[:70])))
+        for item, severity in mismatched:
+            out.append(("warn", "registry-claim-date-mismatch",
+                        "the claim and its quote disagree on the day (%s): %s"
+                        % (item, claim[:70])))
+    return out
+
+
 def read_ledger(path) -> str:
     p = Path(path)
     if not p.exists():
@@ -366,20 +592,27 @@ def read_ledger(path) -> str:
 def ledger_claims(ledger_text: str):
     """Parse the registry into claims.
 
-    A line looks like `- <claim> | <source url> | <exact quote>`. The claim part
-    is what the writer asserted; the quote is what the source actually said.
-    Both are searchable, because a number often lives in the quote and a name
-    often lives in the claim.
+    A line looks like `- <claim> | <source url> | <quote> / <url> / <quote> ...`.
+    The third field is a chain of quotes and their links, and a quote may hold
+    a table row with pipes inside it, so the line is split at most twice and
+    everything after the second separator stays with the quote.
+
+    The photo section (`## Photos`) is not a list of claims and is skipped.
     """
     out = []
     for raw in (ledger_text or "").splitlines():
         line = raw.strip()
+        if line.startswith("##"):
+            break
         if not line.startswith("- "):
             continue
-        parts = [p.strip() for p in line[2:].split("|")]
+        parts = [p.strip() for p in line[2:].split("|", 2)]
         if not parts:
             continue
         claim = parts[0]
+        # "- cover photos/x.jpg | ..." belongs to the photo section.
+        if PHOTO_LINE.match(line):
+            continue
         source = parts[1] if len(parts) > 1 else ""
         quote = parts[2] if len(parts) > 2 else ""
         out.append({
@@ -392,8 +625,13 @@ def ledger_claims(ledger_text: str):
     return out
 
 
-def check(body: str, ledger_text: str):
-    """Return (fails, warns, info) for one body against one registry."""
+def check(body: str, ledger_text: str, coverage_only: bool = False):
+    """Return (fails, warns, info) for one body against one registry.
+
+    With `coverage_only` the registry's own hygiene is left out and only the
+    text-to-registry direction is reported; the gate uses that mode because it
+    checks the registry separately and with severities.
+    """
     entries = ledger_claims(ledger_text)
     searchable = _norm(ledger_text)
     fails, warns, info = [], [], []
@@ -401,17 +639,26 @@ def check(body: str, ledger_text: str):
     if not entries:
         fails.append("registry is empty: no '- <claim> | <source> | <quote>' lines")
 
-    for entry in entries:
-        if not entry["has_source"]:
-            fails.append("registry line without a source: %s" % entry["claim"][:70])
-        if not entry["has_quote"]:
-            warns.append("registry line without a source quote: %s" % entry["claim"][:70])
+    if not coverage_only:
+        for severity, code, message in registry_findings(ledger_text):
+            if severity == "fail":
+                fails.append("%s: %s" % (code, message))
+            else:
+                warns.append("%s: %s" % (code, message))
+    else:
+        for entry in entries:
+            if not entry["has_source"]:
+                fails.append("registry-no-source: registry line without a source: %s"
+                             % entry["claim"][:70])
+            if not entry["has_quote"]:
+                fails.append("registry-no-quote: registry line without the source's own "
+                             "words: %s" % entry["claim"][:70])
 
     for claim in extract_claims(body):
         if _covered(claim["kind"], claim["text"], searchable):
             info.append("%-6s %s" % (claim["kind"], claim["text"]))
         else:
-            fails.append("%-6s %s" % (claim["kind"], claim["text"]))
+            fails.append("fact-uncovered: %-6s %s" % (claim["kind"], claim["text"]))
 
     return fails, warns, info
 
