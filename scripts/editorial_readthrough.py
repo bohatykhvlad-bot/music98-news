@@ -501,6 +501,20 @@ def main():
     if a.body_file:
         post = {"id": a.post, "title": a.title, "body": a.body_file.read_text(encoding="utf-8")}
         source = str(a.body_file)
+        # The body file carries the new text only. The name rules need to know
+        # who the post is about, otherwise the main artist is treated as a guest
+        # and "Swift" after "Taylor Swift" is reported as a shortened guest name.
+        # On 29.10 this blocked a correct fix of the Taylor Swift post, so the
+        # desk copy supplies the fields the file does not carry.
+        try:
+            desk_post = load_remote(a.post)
+        except Exception:
+            desk_post = {}
+        for field in ("artist", "type", "rtype", "tag", "excerpt", "cover"):
+            if desk_post.get(field):
+                post[field] = desk_post[field]
+        if not a.title and desk_post.get("title"):
+            post["title"] = desk_post["title"]
     elif a.file:
         data = json.loads(a.file.read_text(encoding="utf-8"))
         if isinstance(data, dict) and isinstance(data.get("posts"), list):
