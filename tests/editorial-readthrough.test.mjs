@@ -28,7 +28,10 @@ test("second editorial barrier exists and targets reader-facing failure modes",(
 
 test("saving or publishing through post.py requires a current full-read stamp",()=>{
   assert.match(post,/def cmd_set[\s\S]*?require_editorial_stamp\(pid, body_file=body_file/);
-  assert.match(post,/def cmd_set[\s\S]*?_local_gate\(candidate\)/);
+  /* cmd_set must run the local gate on the candidate it is about to write.
+     The call also passes the desk posts, because the whole-article rules
+     need the other posts to catch a frame reused from another story. */
+  assert.match(post,/def cmd_set[\s\S]*?_local_gate\(candidate[^)]*\)/);
   assert.match(post,/def cmd_publish[\s\S]*?require_editorial_stamp\(pid\)/);
   assert.match(post,/sp = sub\.add_parser\("editorial"\)/);
   assert.match(post,/--check-stamp/);
