@@ -27,6 +27,10 @@ import argparse, hashlib, json, os, re, ssl, sys, time
 import urllib.error, urllib.parse, urllib.request
 
 import canon_checks
+import editorial_lint
+import photo_lint
+import photo_manifest
+import known_debt
 
 PROD = os.environ.get("MUSIC98_PROD", "https://music98.news")
 KEY = (os.environ.get("MUSIC98_KEY") or os.environ.get("ADMIN_PASSWORD") or "").strip()
@@ -862,10 +866,30 @@ def ids_check(p):
     return fails, warns, info
 
 
-def check_post(p, strict):
+def check_post(p, strict, context=None):
     """Returns (fails, warns, info). Each item is (code, message)."""
     fails, warns, info = [], [], []
     fails.extend(canon_checks.mechanical_issues(p))
+    # Whole-article rules: tautology, one idea twice, repeated wording, and
+    # fact mixing. They need the whole body, so they cannot live in the
+    # sentence-level checks above. The registry and the rest of the desk are
+    # optional: a rule that was not given its data stays silent.
+    context = context or {}
+    registry_text = context.get("registry") or ""
+    other_artists = context.get("other_artists") or []
+    all_posts = context.get("all_posts") or []
+    lint_findings = list(editorial_lint.lint(p, registry_text, other_artists))
+    lint_findings += list(photo_lint.lint(p, context.get("registry_photos"), all_posts))
+    if registry_text:
+        lint_findings += list(photo_manifest.check(p, registry_text))
+    # A rule introduced today must not punish a post the owner approved under
+    # the old rules. The debt that already existed is recorded once and stays
+    # a warning; anything beyond it fails.
+    old_findings, new_findings = known_debt.split(p, lint_findings)
+    for code, message in old_findings:
+        warns.append((code, "known debt, recorded before this rule: %s" % message))
+    for code, message in new_findings:
+        fails.append((code, message))
     body = p.get("body") or ""
     # Site house style uses plain ASCII double quotes for song titles and
     # quoted speech. The quote-attribution parser below scans only " and
@@ -1212,9 +1236,27 @@ def main():
 
     worst = 0
     report = []
+    # Context for the whole-article rules: the fact registry of each post and
+    # the artists that have their own live post. A name from another post is
+    # not automatically wrong (collaborations exist), so the rule only fires
+    # for a name the post's own registry does not cover.
+    facts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "editorial", "facts")
+    artists = sorted({(p.get("artist") or "").strip() for p in posts
+                      if (p.get("artist") or "").strip()})
     for p in targets:
         pid = p.get("id")
-        fails, warns, info = check_post(p, strict=bool(args.post))
+        registry_text = ""
+        registry_path = os.path.join(facts_dir, "%s.md" % pid)
+        if os.path.exists(registry_path):
+            try:
+                registry_text = open(registry_path, encoding="utf-8").read()
+            except Exception:
+                registry_text = ""
+        other_artists = [a for a in artists if a and a.lower() != (p.get("artist") or "").strip().lower()]
+        fails, warns, info = check_post(p, strict=bool(args.post),
+                                        context={"registry": registry_text,
+                                                 "other_artists": other_artists,
+                                                 "all_posts": posts})
 
         if args.delta and pid in prev_posts:
             old = json.loads(prev_posts[pid]) if prev_posts[pid].startswith("{") else None  # legacy

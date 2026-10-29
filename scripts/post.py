@@ -352,11 +352,29 @@ def cmd_dump(pid, out):
     print("          current excerpt: %s" % p.get("excerpt"))
 
 
-def _local_gate(post):
+def _registry_text(pid):
+    """The fact registry of one post, or an empty string when it has none."""
+    path = FACTS_DIR / ("%s.md" % pid)
+    try:
+        return path.read_text(encoding="utf-8")
+    except Exception:
+        return ""
+
+
+def _local_gate(post, desk_posts=None):
     sys.path.insert(0, str(REPO / "scripts"))
     from canon_checks import manual_not_run
     from gate import check_post
-    fails, warns, _ = check_post(post, strict=True)
+    pid = post.get("id") or ""
+    registry = _registry_text(pid)
+    artists = sorted({(p.get("artist") or "").strip() for p in (desk_posts or [])
+                      if (p.get("artist") or "").strip()})
+    own = (post.get("artist") or "").strip().lower()
+    others = [a for a in artists if a and a.lower() != own]
+    context = {"registry": registry,
+               "other_artists": others,
+               "all_posts": desk_posts or []}
+    fails, warns, _ = check_post(post, strict=True, context=context)
     for code, msg, *rest in fails:
         print("GATE FAIL", code, msg)
     for code, msg, *rest in warns:
@@ -436,7 +454,7 @@ def cmd_create(post_file, allows=None, reason=None):
     if r.returncode!=0:
         die("new draft failed editorial full-read barrier")
 
-    if not _local_gate(post):
+    if not _local_gate(post, desk_posts=desk_read()["posts"]):
         die("new draft failed gate before desk write")
     if not _local_preflight(post):
         die("new draft failed preflight before desk write")
@@ -533,7 +551,7 @@ def cmd_replace_draft(pid, post_file, allows=None, reason=None):
     if r.returncode!=0:
         die("replace-draft refused: final full-read stamp missing or stale")
 
-    if not _local_gate(staged):
+    if not _local_gate(staged, desk_posts=desk_read()["posts"]):
         die("replace-draft failed gate before desk write")
     if not _local_preflight(staged):
         die("replace-draft failed preflight before desk write")
@@ -584,7 +602,7 @@ def cmd_pin(pid, pin=True):
     current = find_post(desk_read()["posts"], pid)
     candidate = json.loads(json.dumps(current))
     candidate["pinned"] = bool(pin)
-    if not _local_gate(candidate):
+    if not _local_gate(candidate, desk_posts=desk_read()["posts"]):
         die("pin refused: staged post failed gate before desk write")
 
     released = []
@@ -642,7 +660,7 @@ def cmd_set(pid, body_file, title=None, excerpt=None, publish=False, cover_json=
         if not base.get("src"):
             die("cover-json must carry a src")
         candidate["cover"]=base
-    if not _local_gate(candidate):
+    if not _local_gate(candidate, desk_posts=desk_read()["posts"]):
         die("set refused: staged body failed gate before desk write")
     # preflight.py intentionally validates draft payloads. A text-only edit to an
     # already-live article should still get the same payload/media/cover checks
