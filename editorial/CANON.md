@@ -19,6 +19,7 @@
 - **Every paragraph adds something.** Remove tautology, repeated names/surnames, duplicated facts, list-like credits/tracks/tour dates, generic bridges and formulaic sentence openings. Check repetition **across the whole article**, not just neighboring sentences.
 - **One idea, one place.** A fact, a date or a quoted title stated in two paragraphs is a defect even when the wording differs. Restate nothing: the second mention has to carry the article forward.
 - **Do not lean on one pronoun.** A body that names the artist once and then says "she" for the rest of the article reads as machine prose. Vary the subject: name, restructure, or bring in the people and the facts that carry the paragraph.
+- **Name the subject when somebody else was just named.** A sentence that opens on a pronoun or leans on a possessive ("... are both hers") right after another person was named will be read as belonging to that person. Name who the sentence is about, especially in the paragraph that follows a media block.
 - Use official artist styling; full names on first mention, then natural pronouns/restructuring. Explain unfamiliar people's roles. Avoid text walls and repetitive tiny paragraphs. No unnecessary CD/vinyl, engineer, platform, venue or ticket-sale details.
 - Use song titles in **quotation marks** and correct site typography; avoid colons and semicolons. End with a **specific earned fact or observation**, not a recap, slogan, bare date, number or purchase instructions.
 

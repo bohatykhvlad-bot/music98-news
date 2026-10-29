@@ -469,6 +469,10 @@ CREDIT_LINK_ALLOW = {
         "link goes to the owner of the frame (LLOUD). The agency is not part of the credit line",
     ("John V. Esparza", "https://cedarcreativestudio.com/"):
         "his own studio rather than a site under his name",
+    ("Joshua Davis", "https://www.deepshadowspictures.com/"):
+        "canon rule 7: this is his own site - the page title reads "
+        "'Deep Shadows Pictures | Joshua Davis' - and the domain carries his "
+        "company name rather than his own",
 }
 
 
