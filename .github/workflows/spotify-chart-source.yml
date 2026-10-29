@@ -5,6 +5,9 @@ on:
     paths:
       - "scripts/refresh-spotify-ranking.mjs"
       - "functions/lib/spotify-chart.js"
+      - "functions/lib/spotify-source.js"
+      - "functions/api/spotify-source.js"
+      - "worker.js"
       - ".github/workflows/spotify-chart-source.yml"
   workflow_dispatch:
 permissions:

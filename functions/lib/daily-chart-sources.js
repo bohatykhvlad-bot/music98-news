@@ -25,7 +25,7 @@ export const DEEZER_GLOBAL_URL = "https://api.deezer.com/playlist/" + DEEZER_GLO
 export const DAILY_SOURCE_DETAILS = {
   A: {name:"Apple Music Top 100: Global", region:"global", cadence:"daily", entity:"song", url:APPLE_GLOBAL_URL},
   S: {name:"Spotify Daily Top Songs Global", region:"global", cadence:"daily", entity:"song", url:"https://charts.spotify.com/charts/view/regional-global-daily/latest",
-    retrieval:"matching-public-mirrors", mirrors:["https://kworb.net/spotify/country/global_daily.html","https://musicrank.org/spotify"]},
+    retrieval:"matching-public-mirrors", mirrors:["https://musicrank.org/spotify"]},
   D: {name:"Deezer Top Worldwide", region:"global", cadence:"daily", entity:"song", url:"https://www.deezer.com/en/playlist/"+DEEZER_GLOBAL_ID,
     dateKind:"capture", upstreamEditionDateAvailable:false},
 };

@@ -21,9 +21,9 @@ candidate pool: the latest clean measurement within a three-day window of
 the edition date, on one uniformly calibrated scale (the calibration is
 read from the median ratio against official values on overlapping songs).
 When that measurement is unavailable, the fallback ladder is: soundcamps
-total-count snapshots (difference between our own daily captures), then the
-official Kworb chart value as a last resort, so a song is only dropped when
-no source has a number. Region, source URL, source date and metric type are
+total-count snapshots (difference between our own daily captures), and only
+then the chart's own daily number, so a song is only dropped when no source
+has a number. Region, source URL, source date and metric type are
 retained per recording; merged captures are smoothed, single fresh values
 are explicitly marked, and every estimate carries `estimated: true` in the
 seed for audit. Artist names alone are not enough for matching.

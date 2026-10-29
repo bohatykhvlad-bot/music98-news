@@ -7,6 +7,8 @@ import {
   refreshMapMarketSnapshot,
 } from "./functions/api/concerts.js";
 import { onRequestGet as preview } from "./functions/api/preview.js";
+import { onRequestGet as spotifySource } from "./functions/api/spotify-source.js";
+import { refreshSpotifySource } from "./functions/lib/spotify-source.js";
 import { onRequestPost as subscribe } from "./functions/api/subscribe.js";
 import { onRequestGet as subscribers, onRequestDelete as subscribersRemove } from "./functions/api/subscribers.js";
 import { onRequestPost as broadcast } from "./functions/api/broadcast.js";
@@ -220,6 +222,7 @@ export default {
     if (path === "/api/top50" && request.method === "GET") return noindexResponse(await top50(c));
     if (path === "/api/concerts" && request.method === "GET") return noindexResponse(await concerts(c));
     if (path === "/api/preview" && (request.method === "GET" || request.method === "HEAD")) return noindexResponse(await preview(c));
+    if (path === "/api/spotify-source" && request.method === "GET") return noindexResponse(await spotifySource(c));
     if (path === "/api/desk") return noindexResponse(await desk(c));
     if (path === "/api/subscribe" && request.method === "POST") return subscribe(c);
     if (path === "/api/subscribers" && request.method === "GET") return subscribers(c);
@@ -333,6 +336,11 @@ export default {
         }
         return;
       }
+
+      /* The Spotify chart is read here, not by the daily job: the machine that
+         runs the job is answered with a Cloudflare challenge, the Worker is
+         not. */
+      try{ await refreshSpotifySource(env); }catch(e){}
 
       let popularResult=null;
       try{ await refreshMapMarketSnapshot(env,false); }catch(e){}

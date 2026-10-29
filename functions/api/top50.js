@@ -731,8 +731,8 @@ export async function buildTop50(origin, env, streamSeed) {
       U:{name:"Apple Music Top 100: USA",region:"us",url:"https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12",
         provenance:independent.archiveProvenance?.U},
       A:{...DAILY_SOURCE_DETAILS.A,provenance:independent.archiveProvenance?.A},
-      S:{name:"Spotify Global Daily Top 200 and verified artist Daily via Kworb",region:"global",
-        metric:"per-row verified global daily streams",url:"https://kworb.net/spotify/country/global_daily.html"}
+      S:{name:"Spotify Global Daily Top 200 with the daily streams of every row",region:"global",
+        metric:"per-row verified global daily streams",url:"https://musicrank.org/spotify"}
     }:regional?{
       U:{name:"Apple Music Top 100: USA",region:"us",url:"https://music.apple.com/us/playlist/top-100-usa/pl.606afcbb70264d2eb2b51d8dbcfa6a12"},
       A:DAILY_SOURCE_DETAILS.A,
@@ -742,13 +742,13 @@ export async function buildTop50(origin, env, streamSeed) {
       metric:"artist-daily-counter",region:"global",url:"https://kworb.net/spotify/artists.html"}},
     sources,
     coverage:independent.coverage,
-    sourceOrigin:triple?{U:"verified-apple-usa-top100",A:"verified-apple-global-top100",S:"kworb-global-daily-and-artist-pages"}:regional?{U:"verified-apple-usa-top50-snapshot",
+    sourceOrigin:triple?{U:"verified-apple-usa-top100",A:"verified-apple-global-top100",S:"musicrank-global-daily"}:regional?{U:"verified-apple-usa-top50-snapshot",
       A:"verified-apple-global-top100-snapshot",S:"kworb-daily-snapshot"}:
       {A:"verified-apple-top50-snapshot",S:"kworb-artist-daily-snapshot"},
     sourceDates:triple?{U:independent.appleUsDate,A:independent.appleGlobalDate,S:independent.spotifyDate}:regional?{U:independent.appleUsDate,A:independent.appleGlobalDate,S:independent.spotifyDate}:
       {A:independent.appleDate,S:independent.spotifyDate},
-    sourceDateKinds:triple?{U:"playlist-published",A:"playlist-published",S:"kworb-daily-edition"}:regional?{U:"playlist-published",A:"playlist-published",S:"kworb-last-updated"}:
-      {A:"playlist-published",S:"kworb-last-updated"},
+    sourceDateKinds:triple?{U:"playlist-published",A:"playlist-published",S:"musicrank-daily-edition"}:regional?{U:"playlist-published",A:"playlist-published",S:"musicrank-last-updated"}:
+      {A:"playlist-published",S:"artist-last-updated"},
     spotifyFingerprint:independent.fingerprint,
     complete:true,
     seed: {
