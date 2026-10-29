@@ -59,6 +59,22 @@ PROPER_NAME_RE = re.compile(
 QUOTED_RE = re.compile(r'"([^"]{2,90})"')
 YEAR_RE = re.compile(r"\b(?:19|20)\d{2}\b")
 DIGIT_RE = re.compile(r"\b\d{1,3}(?:,\d{3})*(?:\.\d+)?\b")
+# A compact figure: "400K", "1.2M", "3B". Music journalism writes round
+# numbers this way, and on 29.10 the owner pointed out that "400,000" is
+# written "400K". Without this the compact form was not extracted at all,
+# so a figure that no source supports passed the check in silence.
+COMPACT_RE = re.compile(r"\b(\d{1,4}(?:\.\d+)?)\s?([KMB])\b", re.I)
+
+_COMPACT_MULT = {"k": 1000, "m": 1000000, "b": 1000000000}
+
+
+def _compact_value(digits: str, suffix: str):
+    """400K -> 400000, 1.5M -> 1500000. None when the figure is not compact."""
+    try:
+        value = float(digits) * _COMPACT_MULT[suffix.lower()]
+    except (KeyError, ValueError):
+        return None
+    return int(value)
 DATE_RE = re.compile(
     r"\b(%s)\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s*(\d{4}))?\b" % "|".join(MONTHS.split()),
     re.I,
@@ -146,6 +162,10 @@ def _needles(kind: str, text: str):
                 value = None
         if value is not None:
             out.append(str(value))
+            out.append("{:,}".format(value))
+            for suffix, mult in _COMPACT_MULT.items():
+                if value % mult == 0 and value // mult >= 1:
+                    out.append("%d%s" % (value // mult, suffix.upper()))
             # A bare digit proves nothing: "43 regions" must not be covered by
             # any "30" that happens to sit in the registry (a release date, a
             # clock time). Bind the number to the unit it counts, so the
@@ -185,6 +205,16 @@ def _covered(kind: str, text: str, searchable: str) -> bool:
                 # The pair may be written with a hyphen ("an eight-song EP"),
                 # and the number may be a word there ("eight" for 8).
                 spellings = {str(value)}
+                # The registry may write a round figure the way music
+                # journalism does ("400K") while the body writes it out, or the
+                # other way round. "400K copies" and "400,000 copies" are one
+                # claim, so both spellings have to be accepted.
+                for suffix, mult in _COMPACT_MULT.items():
+                    if value % mult == 0 and value // mult >= 1:
+                        whole = value // mult
+                        spellings.add("%d%s" % (whole, suffix.upper()))
+                        spellings.add("%d,%s" % (whole, suffix.upper()))
+                spellings.add("{:,}".format(value))
                 # The registry may spell the number out ("an eight-song EP").
                 for word, num in NUMBER_WORDS.items():
                     if num == value:
@@ -261,8 +291,25 @@ def extract_claims(body: str):
             continue
         add("name", name)
 
+    # Compact figures first: "400K copies" is one claim. The plain-digit
+    # pattern would see "400" and then read "K" as a unit, which is not the
+    # claim the writer made.
+    for m in COMPACT_RE.finditer(text):
+        value = _compact_value(m.group(1), m.group(2))
+        if value is None:
+            continue
+        unit = _unit_after(text, m.end())
+        if unit:
+            add("number", "%d %s" % (value, unit))
+        else:
+            add("number", str(value))
+
     for m in DIGIT_RE.finditer(text):
         raw = m.group(0)
+        # Skip the digits of a compact figure: "400K" was already handled.
+        if m.end() < len(text) and text[m.end():m.end() + 2].strip()[:1].upper() in "KMB" \
+                and not text[m.end():m.end() + 2].strip()[1:2].isalpha():
+            continue
         if YEAR_RE.fullmatch(raw):
             continue
         # Keep the unit with the number: "43 regions" is one claim, and the

@@ -184,6 +184,21 @@ def proper_nouns(text: str):
 def stems(text: str, skip=()):
     """Content stems: lowercased, stopwords, short words and proper names removed."""
     out = []
+    # The names to skip arrive as raw words ("Texas"), but the comparison
+    # below happens on the stem ("texa"). Without this second form a proper
+    # name was never excluded, and a title repeated in two paragraphs read
+    # as a repeated formulation.
+    skip_stems = set()
+    for name in skip or ():
+        word = re.sub(r"[^a-z]", "", str(name).lower())
+        if not word:
+            continue
+        skip_stems.add(word)
+        for suffix in ("ings", "ing", "ies", "ied", "ed", "es", "s"):
+            if word.endswith(suffix) and len(word) - len(suffix) >= 3:
+                word = word[: -len(suffix)]
+                break
+        skip_stems.add(word)
     for word in re.findall(r"[A-Za-z][A-Za-z'\u2019-]*", (text or "").lower()):
         if len(word) < 3 or word in STOPWORDS:
             continue
@@ -192,7 +207,7 @@ def stems(text: str, skip=()):
             if stem.endswith(suffix) and len(stem) - len(suffix) >= 3:
                 stem = stem[: -len(suffix)]
                 break
-        if len(stem) >= 3 and stem not in STOPWORDS and stem not in skip:
+        if len(stem) >= 3 and stem not in STOPWORDS and stem not in skip and stem not in skip_stems:
             out.append(SYNONYMS.get(stem, stem))
     return out
 
@@ -342,6 +357,153 @@ def phrase_repetition(paras):
     return issues
 
 
+def _inside_quotes(sentence: str, pos: int) -> bool:
+    """True when the position sits inside a quoted title or a quotation.
+
+    The site writes titles in straight double quotes, so a word inside them
+    is part of a name and not a typing slip: "Vroom Vroom".
+    """
+    before = sentence[:pos]
+    return before.count('"') % 2 == 1
+
+
+# A claim word carries the point of a sentence. Saying the same one twice in
+# one paragraph means the point was made twice, which is how the Swift post
+# came to say "youngest" in its opening sentence and then again two sentences
+# later. The list is short on purpose: these are the words that make a
+# sentence a claim rather than a description.
+CLAIM_WORDS = {
+    "youngest", "oldest", "biggest", "largest", "smallest", "highest",
+    "lowest", "longest", "shortest", "newest", "earliest", "fastest",
+}
+
+
+def repeated_claim(paras):
+    """The same claim word twice inside one paragraph.
+
+    "The youngest person ever to receive the honor ... the youngest
+    inductee in the hall's history" - one point, made twice, in a paragraph
+    that has no room for it. The rule is deliberately narrow: the word has
+    to be a claim word, and it has to be in the same paragraph. A post that
+    says "first" once in the lede and once at the end is fine.
+    """
+    issues = []
+    for index, para in enumerate(paras, 1):
+        words = re.findall(r"[A-Za-z]+", para.lower())
+        seen = {}
+        for word in words:
+            if word not in CLAIM_WORDS:
+                continue
+            if word in seen:
+                issues.append((
+                    "claim-repeat",
+                    "the word %r appears twice in paragraph %d; the point is made "
+                    "twice and the second one has to go"
+                    % (word, index),
+                ))
+                break
+            seen[word] = True
+    return issues
+
+
+def duplicate_word(paras):
+    """The same word standing right next to itself, as a typing slip.
+
+    "the the", "album album" - a slip no reader forgives. The owner's rule
+    on 29.10 covers this literally: одинаковые слова подряд.
+
+    Two kinds of repetition are not slips and stay silent: a title or a
+    quoted phrase that is written twice on purpose ("DDU-DU DDU-DU"), and a
+    word that ends one clause and starts the next ("JAŸ-Z in 8, in which").
+    Both are caught by looking at what stands between the two words: a
+    comma, a quotation mark or a hyphen means the writer meant it.
+    """
+    issues = []
+    for index, para in enumerate(paras, 1):
+        for sentence in sentences(para):
+            # The words are found with their positions, so two neighbours
+            # are compared even when the first one also started a pair with
+            # the word before it ("the the" was missed by a pattern that
+            # consumed its own matches).
+            words = [(m.group(0), m.start(), m.end())
+                     for m in re.finditer(r"[A-Za-z][A-Za-z'\u2019-]*", sentence)]
+            for (first, f_start, _), (second, s_start, _) in zip(words, words[1:]):
+                if first.lower() != second.lower():
+                    continue
+                if len(first) < 3:
+                    continue
+                between = sentence[f_start:s_start]
+                # A comma, a quote or a hyphen separates them on purpose.
+                if re.search(r"[,;:\u2019\"')\]\-]", between):
+                    continue
+                # A title inside quotation marks repeats itself on purpose:
+                # the track is called "Vroom Vroom".
+                if _inside_quotes(sentence, f_start):
+                    continue
+                issues.append((
+                    "duplicate-word",
+                    "the word %r stands right next to itself in paragraph %d: %s"
+                    % (first.lower(), index, sentence[:110].strip()),
+                ))
+                break
+    return issues
+
+
+def repeated_run(paras):
+    """The same two content words standing next to each other, twice, in
+    paragraphs that say the same thing.
+
+    This is the general form of the rule the owner asked for on 29.10:
+    "проверка одинаковых слов подряд", written as a rule instead of a
+    hand-written exception list.
+
+    Two conditions, both needed:
+
+    * the same pair of neighbouring content words appears in two paragraphs;
+    * the two paragraphs are near-duplicates, so the second one adds nothing.
+      The measure is containment: how much of the shorter paragraph's content
+      is already in the longer one.
+
+    The second condition is what separates a tautology from a fact that is
+    simply mentioned twice. "His fourth full-length studio record" and "his
+    fourth full-length release" repeat the pair "fourth full-length" and the
+    shorter paragraph is three-quarters contained in the longer one: the
+    second paragraph restates the first. "Thirty-seven minute" and
+    "thirty-two minute" in different paragraphs of a long piece say nothing
+    of the sort, and stay silent.
+    """
+    issues = []
+    names = [proper_nouns(p) for p in paras]
+    vectors = [set(stems(p, names[i])) for i, p in enumerate(paras)]
+    seen = {}
+    for index, para in enumerate(paras, 1):
+        words = stems(para, names[index - 1])
+        for start in range(len(words) - 1):
+            pair = (words[start], words[start + 1])
+            # A pair made only of the site's stock vocabulary ("the album",
+            # "new single") is furniture, not a repeated idea.
+            if not (set(pair) - COMMON_WORDS):
+                continue
+            if pair not in seen:
+                seen[pair] = index
+                continue
+            first = seen[pair]
+            if first == index:
+                continue
+            overlap = _containment(vectors[first - 1], vectors[index - 1])
+            if overlap < 0.50:
+                continue
+            issues.append((
+                "word-run-repeat",
+                "the words '%s %s' stand next to each other in paragraph %d and "
+                "paragraph %d, and %d%% of the shorter paragraph is already said in "
+                "the other one; the second paragraph has to add something new"
+                % (pair[0], pair[1], first, index, round(overlap * 100)),
+            ))
+            break
+    return issues
+
+
 def tautology(paras):
     issues = []
     for index, para in enumerate(paras, 1):
@@ -377,6 +539,12 @@ def quote_fidelity(body: str, registry_text: str):
         if not flat:
             continue
         if flat in registry:
+            continue
+        # A title that ends a clause carries the comma inside the quotes
+        # ("BELIEVE,"), and the registry writes the title without it. That is
+        # the same title, so the punctuation is compared away.
+        bare = flat.rstrip(".,!?;:")
+        if bare and bare in registry:
             continue
         # A long quotation may be quoted in the body with different internal
         # punctuation. Fall back to a word-run comparison.
@@ -477,6 +645,9 @@ def lint(post, registry_text="", other_artists=()):
         issues.extend(sentence_repetition(paras))
         issues.extend(idea_repetition(paras))
         issues.extend(phrase_repetition(paras))
+        issues.extend(repeated_run(paras))
+        issues.extend(duplicate_word(paras))
+        issues.extend(repeated_claim(paras))
         issues.extend(tautology(paras))
     if registry_text:
         issues.extend(quote_fidelity(post.get("body") or "", registry_text))

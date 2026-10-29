@@ -16,6 +16,7 @@
 - His own campaign counts this one as his seventh album, the titles behind it running from *6WA* to *MEET THE 6IXERS*, and the record closes with "ONE", a song that has nobody else on it | https://www.youtube.com/watch?v=B5cKOZBlKlE | "This will be BigXthaPlug's seventh album, after 6WA, I Hope You're Happy, TAKE CARE, MEET THE 6IXERS, THE BIGGEST and AMAR." / https://itunes.apple.com/lookup?id=6815463121&country=us&entity=song | "18 ONE BigXthaPlug"
 - The post's cover is BigXthaPlug's official artist portrait published by Apple Music | https://music.apple.com/us/artist/bigxthaplug/1482508209 | "BigXthaPlug" / https://is1-ssl.mzstatic.com/image/thumb/AMCArtistImages211/v4/78/71/99/787199b8-10f4-690a-d6c5-94474128efaf/ami-identity-821faf93a9cfc68d47baaebcb6328999-2026-08-25T01-40-34.199Z_cropped.png/2400x2400bb.jpg | "BigXthaPlug"
 
+- A companion short film about the record follows his life through his parents' eyes and was screened with the album | https://www.dallasobserver.com/music/bigxthaplug-kicks-off-nationwide-better-over-time-movie-experience-in-addison-40728051/ | "The album's short film follows the rap star's life through his parents' eyes, ultimately ending on a cliffhanger."
 
 ## Photos
 - cover photos/bigxthaplug-better-over-time-press-2026.jpg | https://theneedledrop.com/news/bigxthaplug-announces-new-album-better-over-time/ | Joshua Davis, Deep Shadows Pictures | BigXthaPlug | https://www.deepshadowspictures.com/

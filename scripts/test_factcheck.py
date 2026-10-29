@@ -126,6 +126,21 @@ def run():
     f14, _, _ = fc.check(body14, "- They close the song in harmony | https://example.com/l | \"close the song in harmony\"\n")
     expect(not f14, "expected a back-reference not to be read as a quantity, got: %s" % f14)
 
+    # 15. a compact figure is a figure. The owner writes "400K", and on
+    # 29.10 the compact form was not extracted at all, so a figure no source
+    # supports passed the check in silence.
+    body15 = "The record sold 400K copies in its first week."
+    ledger15 = ('- It sold 400,000 copies in its first week | https://example.com/m'
+                ' | "sold 400,000 copies in its first week"\n')
+    f15, _, _ = fc.check(body15, ledger15)
+    expect(not f15, "expected a compact figure to be covered by the written-out one, got: %s" % f15)
+
+    # 16. and a compact figure no source supports is a defect.
+    body16 = "The record sold 250K copies in its first week."
+    f16, _, _ = fc.check(body16, ledger15)
+    expect(any("250000 copies" in x for x in f16),
+           "expected an unsupported compact figure to fail, got: %s" % f16)
+
     if fails:
         print("FACTCHECK: FAIL")
         for f in fails:

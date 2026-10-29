@@ -72,6 +72,92 @@ def test_ordinal_tautology_is_caught():
     assert "idea-repeat" not in codes(el.lint({"body": honest})), messages(el.lint({"body": honest}))
 
 
+def test_identical_words_in_a_row_are_caught():
+    """The owner's rule: одинаковые слова подряд.
+
+    A typing slip is a defect, and it is caught wherever it stands - in the
+    middle of a sentence or at the end of one.
+    """
+    body = "The album is the the best one and it sold well."
+    issues = el.lint({"body": body})
+    assert "duplicate-word" in codes(issues), messages(issues)
+
+    # A title that repeats itself on purpose is not a slip.
+    quoted = ('The set closed on "Vroom Vroom." and on "Do It," and the rest of '
+              'the 29 songs kept the catalog in the room.')
+    assert "duplicate-word" not in codes(el.lint({"body": quoted})), messages(el.lint({"body": quoted}))
+
+    # A word that ends one clause and starts the next is not a slip either.
+    clause = "His own channel fills with the videos tied to the HBO series in 8, in which he stars."
+    assert "duplicate-word" not in codes(el.lint({"body": clause})), messages(el.lint({"body": clause}))
+
+
+def test_repeated_word_run_in_near_duplicate_paragraphs():
+    """The same two words standing next to each other in paragraphs that
+    say the same thing is a tautology, however the two are worded."""
+    tautology = (
+        "The album is his fourth full-length studio record.\n\n"
+        "It is his fourth full-length release as a solo rapper, and the pattern "
+        "matches his earlier records."
+    )
+    issues = el.lint({"body": tautology})
+    assert "word-run-repeat" in codes(issues), messages(issues)
+
+    # The same pair of words in paragraphs that say different things is fine:
+    # a figure mentioned twice is not a defect.
+    honest = (
+        "The album is a 28-track record and it arrives on Friday.\n\n"
+        "The cover art is built from faces pulled out of his earlier releases, "
+        "which fans had noticed him removing from streaming services."
+    )
+    assert "word-run-repeat" not in codes(el.lint({"body": honest})), messages(el.lint({"body": honest}))
+
+
+def test_repeated_claim_word_in_one_paragraph():
+    """The same claim word twice in one paragraph means the point was made
+    twice. This is the Swift post's own defect: 'youngest' in the opening
+    sentence and again two sentences later."""
+    body = (
+        "She has been inducted, becoming the youngest person ever to receive "
+        "the honor, and at 36 she is the youngest inductee in the hall's "
+        "history, a list that has been running since 1970."
+    )
+    issues = el.lint({"body": body})
+    assert "claim-repeat" in codes(issues), messages(issues)
+
+    # The same word in two different paragraphs is not a defect: a figure that
+    # belongs to the whole story may be named once at the top and once later.
+    spread = (
+        "She has been inducted, becoming the youngest person ever to receive "
+        "the honor.\n\n"
+        "The room was full of writers.\n\n"
+        "At 36, she is the youngest inductee in the hall's history."
+    )
+    assert "claim-repeat" not in codes(el.lint({"body": spread})), messages(el.lint({"body": spread}))
+
+
+def test_quoted_title_may_carry_its_comma():
+    """A title that ends a clause is written with the comma inside the quotes
+    in the body and without it in the registry. Same title, same source."""
+    registry = (
+        "- BigXthaPlug features Lil Yachty on BELIEVE | https://example.com/a "
+        "| \"BELIEVE\" is the only track with two guests on it\n"
+    )
+    body = (
+        "BigXthaPlug releases an 18-track album with guest features from "
+        "Leon Thomas and Lil Yachty.\n\n"
+        "Babyface Ray and Lil Yachty meet on \"BELIEVE\", the only track with "
+        "two guests on it."
+    )
+    issues = el.lint({"body": body}, registry)
+    assert "quote-unverified" not in codes(issues), messages(issues)
+
+    # A fabricated quotation is still caught, comma or not.
+    forged = body.replace('"BELIEVE", the only track with two guests on it',
+                          '"proves he never left hip-hop"')
+    assert "quote-unverified" in codes(el.lint({"body": forged}, registry)), messages(el.lint({"body": forged}, registry))
+
+
 def test_phrase_repetition():
     """The same three-word formulation in two paragraphs."""
     body = (
