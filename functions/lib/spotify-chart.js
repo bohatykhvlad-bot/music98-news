@@ -1,4 +1,5 @@
 import {mergeKey} from "./chart-identity.js";
+import {parseKworbGlobalStreams} from "./apple-spotify-chart.js";
 export const SPOTIFY_TOP_SIZE=50;
 export const SPOTIFY_INPUT_SIZE=200;
 export const SPOTIFY_MAX_LAG_DAYS=3;
@@ -88,12 +89,55 @@ export function parseMusicrankSpotify(html,limit=SPOTIFY_INPUT_SIZE){
  }
  return {date,source:"musicrank",sourceUrl:"https://musicrank.org/spotify",ldConfirmed:20,tracks};
 }
+/* The Spotify Global Daily chart is read from a source that can go down or
+   start blocking us (Musicrank answers 403 behind a Cloudflare challenge).
+   The shape of the data is the same everywhere - a dated Top 200 with the
+   daily stream count of every row - so the providers are described once here
+   and every check reads that description instead of naming one source. */
+export const SPOTIFY_CHART_PROVIDERS={
+ musicrank:{
+  id:"musicrank",sourceUrl:"https://musicrank.org/spotify",
+  archiveSource:"musicrank-spotify-global-daily",metric:"musicrank-spotify-chart-global-daily",
+  requiresLd:true,parse:parseMusicrankSpotify},
+ kworb:{
+  id:"kworb",sourceUrl:"https://kworb.net/spotify/country/global_daily.html",
+  archiveSource:"kworb-spotify-global-daily",metric:"kworb-spotify-chart-global-daily",
+  requiresLd:false,parse:parseKworbSpotify},
+};
+export function spotifyProviderById(id){
+ return SPOTIFY_CHART_PROVIDERS[String(id||"")]||null;
+}
+export function spotifyProviderByMetric(metric){
+ for(const p of Object.values(SPOTIFY_CHART_PROVIDERS))if(p.metric===metric)return p;
+ return null;
+}
+export function spotifyProviderByArchiveSource(source){
+ for(const p of Object.values(SPOTIFY_CHART_PROVIDERS))if(p.archiveSource===source)return p;
+ return null;
+}
+export const SPOTIFY_PROVIDER_ORDER=["musicrank","kworb"];
+
+export function parseKworbSpotify(html,limit=SPOTIFY_INPUT_SIZE){
+ const parsed=parseKworbGlobalStreams(html);
+ if(!Array.isArray(parsed.tracks)||parsed.tracks.length<limit)
+  throw new Error("kworb_expected_"+limit+"_rows");
+ const rows=parsed.tracks.slice(0,limit).map(t=>({pos:Number(t.pos),title:String(t.title||"").trim(),
+  artist:String(t.artist||"").trim(),url:"",art:"",year:"",prev:"",daily:Number(t.daily),
+  ...(t.spotifyId?{spotifyId:String(t.spotifyId)}:{})}));
+ const tracks=validatedSpotifyRows(rows,limit);
+ return {date:parsed.date,source:"kworb",sourceUrl:SPOTIFY_CHART_PROVIDERS.kworb.sourceUrl,
+  ldConfirmed:0,structural:true,tracks};
+}
+
 export function verifiedSpotifySnapshot(s,now=Date.now()){
- if(s?.schema!==1||s.verified!==true||s.provider!=="musicrank"||
-  s.sourceUrl!=="https://musicrank.org/spotify"||s.ldConfirmed<20||
+ const provider=spotifyProviderById(s?.provider);
+ if(s?.schema!==1||s.verified!==true||!provider||
+  s.sourceUrl!==provider.sourceUrl||
+  (provider.requiresLd&&Number(s.ldConfirmed)<20)||
   !spotifyDateCurrent(s.chartDate,now)||!/^[a-f0-9]{64}$/.test(String(s.fingerprint||"")))return null;
  try{
   const tracks=validatedSpotifyRows(s.tracks,SPOTIFY_INPUT_SIZE);
-  return {date:s.chartDate,source:s.provider,sourceUrl:s.sourceUrl,fingerprint:s.fingerprint,tracks};
+  return {date:s.chartDate,source:s.provider,sourceUrl:s.sourceUrl,fingerprint:s.fingerprint,
+   provider:provider.id,metric:provider.metric,archiveSource:provider.archiveSource,tracks};
  }catch{return null;}
 }

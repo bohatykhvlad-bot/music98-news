@@ -1,4 +1,5 @@
 import {mergeKey} from "./chart-identity.js";
+import {spotifyProviderByArchiveSource} from "./spotify-chart.js";
 
 export function datedChartPath(kind,date) {
  if(!["apple-us","apple-global","spotify-global"].includes(kind)||
@@ -32,8 +33,9 @@ export function verifiedDatedApple(snapshot,region,date){
 }
 
 export function verifiedDatedSpotify(snapshot,date) {
- if(snapshot?.schema!==1||snapshot.source!=="musicrank-spotify-global-daily"||
-  snapshot.sourceUrl!=="https://musicrank.org/spotify"||
+ const provider=spotifyProviderByArchiveSource(snapshot?.source);
+ if(snapshot?.schema!==1||!provider||
+  snapshot.sourceUrl!==provider.sourceUrl||
   snapshot.region!=="global"||snapshot.date!==date||
   !Array.isArray(snapshot.tracks)||snapshot.tracks.length!==200)return null;
  const ids=new Set(),identity=new Map();

@@ -1,5 +1,6 @@
 import {mergeKey,versionSignature} from "./chart-identity.js";
 import {artistKey,titleKey,freshDay} from "./apple-spotify-chart.js";
+import {spotifyProviderByMetric} from "./spotify-chart.js";
 
 export const TRI_METHOD="apple-us40-spotify30-global30-v3";
 export const TRI_RULE="three-source-union-verified-streams-v3";
@@ -24,8 +25,12 @@ export function sourceRankValid(rank,limit) {
 }
 export function verifiedSpotifyRow(s,date){
  if(!s||s.status!=="matched"||!Number.isSafeInteger(s.daily)||s.daily<=0)return false;
- if(s.metric==="musicrank-spotify-chart-global-daily")
-  return s.date===date&&s.sourceUrl==="https://musicrank.org/spotify"&&
+ /* A row taken straight from a Spotify chart provider (ranks + the daily
+    stream count that provider publishes). The provider is looked up, so a
+    second source can be added without touching this check. */
+ const chartProvider=spotifyProviderByMetric(s.metric);
+ if(chartProvider)
+  return s.date===date&&s.sourceUrl===chartProvider.sourceUrl&&
    (!s.spotifyId||/^[A-Za-z0-9]{22}$/.test(s.spotifyId));
  if(!/^[A-Za-z0-9]{22}$/.test(s.spotifyId||""))return false;
  if(["mystreamcount-daily-delta","mystreamcount-total-delta"].includes(s.metric))

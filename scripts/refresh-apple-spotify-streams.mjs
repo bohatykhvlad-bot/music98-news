@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import {createHash} from "node:crypto";
 import {datedChartPath,verifiedDatedApple,verifiedDatedSpotify} from "../functions/lib/chart-history.js";
-import {verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
+import {verifiedSpotifySnapshot,SPOTIFY_CHART_PROVIDERS} from "../functions/lib/spotify-chart.js";
 import {TRI_METHOD,verifiedTriSeed,verifiedSpotifyRow,songIdentity} from "../functions/lib/tri-source-chart.js";
 import {shouldPublishSeed} from "../functions/lib/publish-window.js";
 import {pickSearchHit,spotifySearchQueries,pickDailyForDate,measuredProviderDelta,saveCounterObservation,extractCounterTotal,FALLBACK_WINDOW_DAYS} from "../functions/lib/stream-fallback.js";
@@ -44,7 +44,7 @@ const idsCache=readCache(IDS_FILE)||{schema:1,updated:null,entries:{}};
 const totalsCache=readCache(TOTALS_FILE)||{schema:1,updated:null,calibration:1,tracks:{}};
 if(!idsCache.entries)idsCache.entries={};
 if(!totalsCache.tracks)totalsCache.tracks={};
-const DIRECT_METRICS=new Set(["musicrank-spotify-chart-global-daily"]);
+const DIRECT_METRICS=new Set(Object.values(SPOTIFY_CHART_PROVIDERS).map(p=>p.metric));
 
 function extractCsrf(html){
  const text=String(html||"");
@@ -251,9 +251,9 @@ async function applySiteStreams(){
 
 /* ===== Dated Spotify archive from Musicrank ===== */
 const spotifySeed=verifiedSpotifySnapshot(load("spotify-chart.json"));
-if(!spotifySeed)throw new Error("Musicrank Spotify Top 200 missing, stale or invalid");
-const latest={date:spotifySeed.date,source:"musicrank-spotify-global-daily",
- sourceUrl:"https://musicrank.org/spotify",tracks:spotifySeed.tracks};
+if(!spotifySeed)throw new Error("Spotify Top 200 missing, stale or invalid");
+const latest={date:spotifySeed.date,source:spotifySeed.archiveSource,
+ sourceUrl:spotifySeed.sourceUrl,tracks:spotifySeed.tracks};
 const latestArchive=archive("spotify-global",latest.date);
 if(!loadArchive("spotify-global",latest.date,verifiedDatedSpotify)){
  const snap={schema:1,source:latest.source,date:latest.date,region:"global",cadence:"daily",
@@ -261,7 +261,7 @@ if(!loadArchive("spotify-global",latest.date,verifiedDatedSpotify)){
   tracks:latest.tracks.map(x=>({pos:x.pos,title:x.title,artist:x.artist,
    ...(x.spotifyId?{spotifyId:x.spotifyId}:{}),daily:x.daily}))};
  if(!verifiedDatedSpotify(snap,latest.date))
-  throw new Error("Musicrank Spotify Top 200 failed archive verification");
+  throw new Error("Spotify Top 200 failed archive verification");
  fs.writeFileSync(new URL(latestArchive,ROOT),JSON.stringify(snap,null,2)+"\n");
 }
 const utcDate=new Date().toISOString().slice(0,10),ms=Date.parse(utcDate+"T00:00:00Z");
@@ -274,7 +274,7 @@ for(let lag=0;lag<=3;lag++){
  const S=loadArchive("spotify-global",day,verifiedDatedSpotify);
  if(U&&A&&S){chosen=day;us=U;global=A;spotify=S;break;}
 }
-if(!chosen)throw new Error("No common dated Apple US, Apple Global and Musicrank Spotify edition. Keep previous chart.");
+if(!chosen)throw new Error("No common dated Apple US, Apple Global and Spotify edition. Keep previous chart.");
 if(us.sourceDate!==spotify.date||global.sourceDate!==spotify.date)
  throw new Error("Mixed-date source ranking refused");
 
@@ -305,8 +305,8 @@ function admit(t,source,rank){
  }
  if(source==="S"){
   item.spotify={status:"matched",daily:t.daily,...(t.spotifyId?{spotifyId:t.spotifyId}:{}),
-   total:null,date:chosen,sourceUrl:"https://musicrank.org/spotify",
-   metric:"musicrank-spotify-chart-global-daily",matchedTitle:t.title,matchedArtist:t.artist};
+   total:null,date:chosen,sourceUrl:spotifySeed.sourceUrl,
+   metric:spotifySeed.metric,matchedTitle:t.title,matchedArtist:t.artist};
  }
  return item;
 }

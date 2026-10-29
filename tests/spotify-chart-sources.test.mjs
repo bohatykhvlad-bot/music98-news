@@ -5,7 +5,7 @@ import {promisify} from "node:util";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import {parseMusicrankSpotify,spotifyDateCurrent,validatedSpotifyRows,
+import {parseMusicrankSpotify,parseKworbSpotify,spotifyDateCurrent,validatedSpotifyRows,
  verifiedSpotifySnapshot} from "../functions/lib/spotify-chart.js";
 
 const tracks=Array.from({length:200},(_,i)=>({pos:i+1,title:"Song "+(i+1),artist:"Artist "+(i+1),daily:5000000-i*10000}));
@@ -55,17 +55,43 @@ test("verified Musicrank snapshot requires all 200 rows and streams",()=>{
  assert.equal(verifiedSpotifySnapshot({...s,tracks:tracks.slice(0,199)},now),null);
  assert.equal(verifiedSpotifySnapshot({...s,provider:"other"},now),null);
 });
-async function runCollector({offline=false,initial}={}){
+function kworb(rows=tracks,date="2026-10-28"){
+ const body=rows.map(t=>"<tr><td>"+t.pos+"</td><td>=</td><td>"+
+  '<a href="https://open.spotify.com/track/'+(t.spotifyId||spotifyId(t.pos))+'">'+t.artist+" - "+t.title+
+  "</a></td><td>3</td><td>1</td><td>(x1)</td><td>"+t.daily.toLocaleString("en-US")+
+  "</td><td>+1</td><td>100</td><td>+1</td><td>200</td></tr>").join("");
+ return '<html><head><title>Spotify Daily Chart - Global</title></head><body>'+
+  '<p>Last updated: '+date+'</p><table><thead><tr><th>Pos</th><th>P+</th><th>Artist and Title</th>'+
+  '<th>Days</th><th>Pk</th><th>(x?)</th><th>Streams</th><th>Streams+</th><th>7Day</th><th>7Day+</th>'+
+  '<th>Total</th></tr></thead><tbody>'+body+'</tbody></table></body></html>';
+}
+test("Kworb is accepted as a Spotify chart provider",()=>{
+ const parsed=parseKworbSpotify(kworb(),200);
+ assert.equal(parsed.date,"2026-10-28");assert.equal(parsed.tracks.length,200);
+ assert.equal(parsed.tracks[0].daily,5000000);
+ assert.equal(parsed.tracks[0].spotifyId,spotifyId(1));
+});
+test("a verified Kworb snapshot is accepted and a wrong source URL is not",()=>{
+ const now=Date.parse("2026-10-29T16:00:00Z");
+ const s={schema:1,verified:true,chartDate:"2026-10-28",provider:"kworb",
+  sourceUrl:"https://kworb.net/spotify/country/global_daily.html",ldConfirmed:0,
+  fingerprint:"a".repeat(64),tracks};
+ assert.equal(verifiedSpotifySnapshot(s,now)?.tracks.length,200);
+ assert.equal(verifiedSpotifySnapshot({...s,sourceUrl:"https://musicrank.org/spotify"},now),null);
+});
+async function runCollector({offline=false,initial,provider="musicrank"}={}){
  const dir=await fs.mkdtemp(path.join(os.tmpdir(),"music98-spotify-"));
  try{
   await Promise.all(["scripts","functions/lib","public/data"].map(p=>fs.mkdir(path.join(dir,p),{recursive:true})));
   await fs.writeFile(path.join(dir,"package.json"),'{"type":"module"}');
-  await Promise.all(["scripts/refresh-spotify-ranking.mjs","functions/lib/spotify-chart.js","functions/lib/chart-identity.js"]
+  await Promise.all(["scripts/refresh-spotify-ranking.mjs","functions/lib/spotify-chart.js",
+   "functions/lib/chart-identity.js","functions/lib/apple-spotify-chart.js"]
    .map(p=>fs.copyFile(new URL("../"+p,import.meta.url),path.join(dir,p))));
   const output=path.join(dir,"public/data/spotify-chart.json");
   const original=JSON.stringify(initial||{})+"\n";await fs.writeFile(output,original);
   const nowHuman=new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"});
-  const preload=path.join(dir,"fetch.mjs"),html=musicrank(tracks,nowHuman);
+  const isoDay=new Date(nowHuman+" 00:00:00 UTC").toISOString().slice(0,10);
+  const preload=path.join(dir,"fetch.mjs"),html=provider==="kworb"?kworb(tracks,isoDay):musicrank(tracks,nowHuman);
   await fs.writeFile(preload,'globalThis.fetch=async()=>new Response('+JSON.stringify(html)+',{status:'+(offline?503:200)+'});\n');
   let status=0,stderr="";
   try{await promisify(execFile)(process.execPath,["--import",preload,path.join(dir,"scripts/refresh-spotify-ranking.mjs")]);}
@@ -74,6 +100,11 @@ async function runCollector({offline=false,initial}={}){
   return {status,stderr,unchanged:bytes===original,snapshot:JSON.parse(bytes)};
  }finally{await fs.rm(dir,{recursive:true,force:true});}
 }
+test("collector falls back to Kworb when Musicrank is blocked",async()=>{
+ const ok=await runCollector({initial:{chartDate:"2026-10-01"},provider:"kworb"});
+ assert.equal(ok.status,0,ok.stderr);assert.equal(ok.snapshot.provider,"kworb");
+ assert.equal(ok.snapshot.tracks.length,200);
+});
 test("collector publishes Musicrank alone and preserves the old file on outage",async()=>{
  const ok=await runCollector({initial:{chartDate:"2026-10-01"}});
  assert.equal(ok.status,0,ok.stderr);assert.equal(ok.snapshot.provider,"musicrank");assert.equal(ok.snapshot.tracks.length,200);
