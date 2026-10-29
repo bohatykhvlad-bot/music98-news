@@ -63,6 +63,15 @@ jobs:
               cp "$file" "/tmp/chart-measurement-recovery/$(basename "$file")"
             fi
           done
+          # The dated Apple charts of this run are worth keeping even when the
+          # union cannot be built: a chart of a day is only published while it
+          # is the current one, so a lost archive is a lost day.
+          mkdir -p /tmp/chart-apple-recovery
+          for file in public/data/chart-history/apple-us-*.json public/data/chart-history/apple-global-*.json; do
+            if [ -f "$file" ]; then
+              cp "$file" "/tmp/chart-apple-recovery/$(basename "$file")"
+            fi
+          done
           git config user.name "music98 chart measurement bot"
           git config user.email "actions@users.noreply.github.com"
           for n in 1 2 3; do
@@ -103,12 +112,13 @@ jobs:
               tracks[sid]=sorted(merged.values(),key=lambda x:(x['date'],x['provider']))[-28:]
           (base/'stream-totals.json').write_text(json.dumps(totals,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
           PY
-            git add public/data/chart-history/spotify-ids.json public/data/chart-history/stream-totals.json
+            cp /tmp/chart-apple-recovery/*.json public/data/chart-history/ 2>/dev/null || true
+            git add public/data/chart-history/
             if git diff --cached --quiet; then
               echo "Spotify observations already preserved"
               exit 0
             fi
-            git commit -m "chart: retain verified site observations without publishing incomplete Top 50"
+            git commit -m "chart: retain verified observations and dated Apple charts without publishing an incomplete Top 50"
             if git push origin HEAD:main; then
               echo "Cached stream measurements safely merged"
               exit 0
