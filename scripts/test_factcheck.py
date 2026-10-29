@@ -141,6 +141,24 @@ def run():
     expect(any("250000 copies" in x for x in f16),
            "expected an unsupported compact figure to fail, got: %s" % f16)
 
+    # 17. the registry writes the figure the way the owner writes it
+    # ("400K"), and the body may write it out. Both are the same claim.
+    body17 = "The record sold 400,000 copies in its first week."
+    ledger17 = ('- It sold 400K copies in its first week | https://example.com/m'
+                ' | "sold 400K copies in its first week"\n')
+    f17, _, _ = fc.check(body17, ledger17)
+    expect(not f17, "expected 400,000 to be covered by a registry that says 400K, got: %s" % f17)
+
+    # 18. a figure that is not a whole multiple keeps its decimal: "1.2M" is
+    # not "1M", and a registry that says "1.2M" covers exactly that.
+    ledger18 = ('- It sold 1.2M copies in its first week | https://example.com/m'
+                ' | "sold 1.2M copies in its first week"\n')
+    f18, _, _ = fc.check("The record sold 1.2M copies in its first week.", ledger18)
+    expect(not f18, "expected 1.2M to be covered by a registry that says 1.2M, got: %s" % f18)
+    f19, _, _ = fc.check("The record sold 1M copies in its first week.", ledger18)
+    expect(any("1000000 copies" in x for x in f19),
+           "expected 1M to fail against a registry that says 1.2M, got: %s" % f19)
+
     if fails:
         print("FACTCHECK: FAIL")
         for f in fails:

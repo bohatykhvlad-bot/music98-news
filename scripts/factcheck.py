@@ -166,6 +166,9 @@ def _needles(kind: str, text: str):
             for suffix, mult in _COMPACT_MULT.items():
                 if value % mult == 0 and value // mult >= 1:
                     out.append("%d%s" % (value // mult, suffix.upper()))
+                exact = value / float(mult)
+                if exact >= 1:
+                    out.append("%g%s" % (exact, suffix.upper()))
             # A bare digit proves nothing: "43 regions" must not be covered by
             # any "30" that happens to sit in the registry (a release date, a
             # clock time). Bind the number to the unit it counts, so the
@@ -214,6 +217,11 @@ def _covered(kind: str, text: str, searchable: str) -> bool:
                         whole = value // mult
                         spellings.add("%d%s" % (whole, suffix.upper()))
                         spellings.add("%d,%s" % (whole, suffix.upper()))
+                    # A figure that is not a whole multiple keeps its decimal:
+                    # "1.2M copies" is not "1M copies".
+                    exact = value / float(mult)
+                    if exact >= 1:
+                        spellings.add("%g%s" % (exact, suffix.upper()))
                 spellings.add("{:,}".format(value))
                 # The registry may spell the number out ("an eight-song EP").
                 for word, num in NUMBER_WORDS.items():
@@ -225,15 +233,22 @@ def _covered(kind: str, text: str, searchable: str) -> bool:
                     unit_pat = re.escape(unit)
                     if unit.endswith("s") and len(unit) > 3:
                         unit_pat = r"(?:%s|%s)" % (unit_pat, re.escape(unit[:-1]))
-                    pair = re.compile(r"(?<![0-9a-z])%s[\s-]+%s(?![0-9a-z])" % (re.escape(spelling), unit_pat))
+                    # The registry is searched in lower case, so the spelling of
+                    # the figure has to be matched without regard to case:
+                    # "400K" in the registry has to cover "400K" in the body.
+                    pair = re.compile(
+                        r"(?<![0-9a-z])%s[\s-]+%s(?![0-9a-z])" % (re.escape(spelling), unit_pat),
+                        re.IGNORECASE)
                     if pair.search(searchable):
                         return True
             for needle in needles:
-                if re.search(r"(?<![0-9a-z])%s(?![0-9a-z])" % re.escape(needle), searchable):
+                if re.search(r"(?<![0-9a-z])%s(?![0-9a-z])" % re.escape(needle),
+                             searchable, re.IGNORECASE):
                     return True
             return False
     for needle in _needles(kind, text):
-        if re.search(r"(?<![0-9a-z])%s(?![0-9a-z])" % re.escape(needle), searchable):
+        if re.search(r"(?<![0-9a-z])%s(?![0-9a-z])" % re.escape(needle),
+                     searchable, re.IGNORECASE):
             return True
     return False
 
