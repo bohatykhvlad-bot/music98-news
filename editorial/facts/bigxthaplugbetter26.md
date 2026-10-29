@@ -25,4 +25,4 @@
 - He made a surprise appearance at the hometown screening of the short film, a companion piece to the record, at a Cinemark in North Dallas | https://www.dallasobserver.com/music/bigxthaplug-kicks-off-nationwide-better-over-time-movie-experience-in-addison-40728051/ | "BigXthaPlug made a surprise appearance at the hometown screening of his short film, which is a companion piece to his Better Over Time record dropping on Friday."
 
 ## Photos
-- cover photos/bigxthaplug-better-over-time-press-2026.jpg | https://theneedledrop.com/news/bigxthaplug-announces-new-album-better-over-time/ | Joshua Davis, Deep Shadows Pictures | BigXthaPlug | https://www.deepshadowspictures.com/
+- cover photos/bigxthaplug-better-over-time-press-2026.jpg | https://theneedledrop.com/news/bigxthaplug-announces-new-album-better-over-time/ | Joshua Davis | BigXthaPlug | https://www.deepshadowspictures.com/
