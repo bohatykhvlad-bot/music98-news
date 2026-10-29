@@ -894,6 +894,11 @@ def check_post(p, strict, context=None):
         warns.append((code, "known debt, recorded before this rule: %s" % message))
     for code, message in new_findings:
         fails.append((code, message))
+    # Owner checks from 2026-10-29. They are not passed through known_debt:
+    # a recorded count cannot waive a collab, a player sitting under the
+    # lede, a release time, or a card image without a second credit.
+    fails.extend(editorial_lint.owner_failures(p, context))
+    warns.extend(editorial_lint.owner_warnings(p))
     body = p.get("body") or ""
     # Site house style uses plain ASCII double quotes for song titles and
     # quoted speech. The quote-attribution parser below scans only " and

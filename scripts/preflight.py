@@ -14,6 +14,7 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 
 import canon_checks
+import editorial_lint
 
 MEDIA = re.compile(r"\[(photo|youtube|apple|instagram|ig|tiktok):([^\]]+)\]", re.I)
 
@@ -46,8 +47,16 @@ def get_remote(pid):
         return select(json.loads(r.read()), pid)
 
 
+def _crop(cover):
+    cover = cover or {}
+    return "pos=%s zoom=%s cardX=%s cardY=%s cardZoom=%s" % (
+        cover.get("pos"), cover.get("zoom"), cover.get("cardX"),
+        cover.get("cardY"), cover.get("cardZoom"),
+    )
+
+
 def check(post, baseline, expected_media, min_words=None,
-          allow_media_change=False, allow_cover_change=False):
+          allow_media_change=False, allow_cover_change=False, change_reason=""):
     failures, warnings = [], []
     ptype = (post.get("type") or "").strip().lower()
     body = post.get("body") or ""
@@ -62,6 +71,10 @@ def check(post, baseline, expected_media, min_words=None,
 
     for code, message in canon_checks.mechanical_issues(post, structural=True, min_words=min_words):
         failures.append(message if code == "word-count" else "%s: %s" % (code, message))
+    for code, message in editorial_lint.owner_failures(post):
+        failures.append("%s: %s" % (code, message))
+    for code, message in editorial_lint.owner_warnings(post):
+        warnings.append("%s: %s" % (code, message))
 
     if expected_media is not None and len(media) != expected_media:
         failures.append(f"expected {expected_media} media, found {len(media)}")
@@ -91,16 +104,23 @@ def check(post, baseline, expected_media, min_words=None,
             if not fields or not fields[0].startswith(("photos/", "https://")):
                 failures.append(f"photo {i} missing original image path")
 
+    declared = allow_media_change or allow_cover_change
+    reason = (change_reason or "").strip()
+    if declared and not reason:
+        failures.append("a declared media or cover change requires --reason")
+    if allow_cover_change and baseline is not None:
+        print("COVER before %s" % _crop(baseline.get("cover")))
+        print("COVER after %s" % _crop(post.get("cover")))
     if baseline:
         old_media = [(m.group(1).lower(), m.group(2)) for m in MEDIA.finditer(baseline.get("body") or "")]
         if old_media != media:
-            if allow_media_change:
-                warnings.append("media order/content change declared by the operator")
+            if allow_media_change and reason:
+                warnings.append("media order/content change declared by the operator (%s)" % reason)
             else:
                 failures.append("media order/content changed")
         if baseline.get("cover") != post.get("cover"):
-            if allow_cover_change:
-                warnings.append("cover change declared by the operator")
+            if allow_cover_change and reason:
+                warnings.append("cover change declared by the operator (%s)" % reason)
             else:
                 failures.append("cover changed")
         if baseline.get("id") != post.get("id"):
@@ -127,12 +147,13 @@ if __name__ == "__main__":
     p.add_argument("--min-words", type=int, default=None)
     p.add_argument("--allow-media-change", action="store_true")
     p.add_argument("--allow-cover-change", action="store_true")
+    p.add_argument("--reason", default="")
     args = p.parse_args()
     try:
         article = select(json.loads(args.file.read_text()), args.post) if args.file else get_remote(args.post)
         prior = select(json.loads(args.baseline.read_text()), args.post) if args.baseline else None
         sys.exit(0 if check(article, prior, args.expected_media, args.min_words,
-                            args.allow_media_change, args.allow_cover_change) else 1)
+                            args.allow_media_change, args.allow_cover_change, args.reason) else 1)
     except Exception as exc:
         print("PREFLIGHT ERROR", type(exc).__name__, str(exc)[:140])
         sys.exit(2)

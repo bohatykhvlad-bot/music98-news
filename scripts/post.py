@@ -387,11 +387,12 @@ def _local_gate(post, desk_posts=None):
 
 
 def _local_preflight(post, baseline=None, expected_media=None, min_words=None,
-                     allow_media_change=False, allow_cover_change=False):
+                     allow_media_change=False, allow_cover_change=False,
+                     change_reason=""):
     sys.path.insert(0, str(REPO / "scripts"))
     from preflight import check
     return check(post, baseline, expected_media, min_words,
-                 allow_media_change, allow_cover_change)
+                 allow_media_change, allow_cover_change, change_reason)
 
 
 def run_preflight(pid, file=None, baseline=None, expected_media=None, min_words=None):
@@ -630,9 +631,11 @@ def cmd_pin(pid, pin=True):
 
 
 def cmd_set(pid, body_file, title=None, excerpt=None, publish=False, cover_json=None,
-            allow_media_change=False):
+            allow_media_change=False, change_reason=""):
     require_editorial_stamp(pid, body_file=body_file, title=title)
     body = Path(body_file).read_text(encoding="utf-8").strip()
+    if (cover_json or allow_media_change) and not (change_reason or "").strip():
+        die("a declared media or cover change requires --reason")
     if not body:
         die("body file is empty: %s" % body_file)
     exc = (excerpt or auto_excerpt(body)).strip()
@@ -669,7 +672,8 @@ def cmd_set(pid, body_file, title=None, excerpt=None, publish=False, cover_json=
     preflight_candidate["status"]="draft"
     if not _local_preflight(preflight_candidate, baseline=current,
                             allow_media_change=allow_media_change,
-                            allow_cover_change=bool(cover_json)):
+                            allow_cover_change=bool(cover_json),
+                            change_reason=change_reason):
         die("set refused: staged body failed preflight before desk write")
 
     def mutate(posts):
@@ -1084,7 +1088,16 @@ def main():
     sp.add_argument("--excerpt")
     sp.add_argument("--cover-json")
     sp.add_argument("--allow-media-change", action="store_true")
+    sp.add_argument("--reason", default="",
+                    help="required with --allow-media-change or --cover-json")
     sp.add_argument("--publish", action="store_true")
+
+    sp = sub.add_parser("debt")
+    sp.add_argument("id")
+    sp.add_argument("--code", required=True)
+    sp.add_argument("--count", type=int, required=True)
+    sp.add_argument("--owner-approved", action="store_true")
+    sp.add_argument("--reason", default="")
 
     sp = sub.add_parser("pin")
     sp.add_argument("id")
@@ -1126,7 +1139,10 @@ def main():
         cmd_replace_draft(a.id, a.file, a.allow, a.reason)
     elif a.cmd == "set":
         cmd_set(a.id, a.body_file, a.title, a.excerpt, a.publish, a.cover_json,
-                a.allow_media_change)
+                a.allow_media_change, a.reason)
+    elif a.cmd == "debt":
+        import known_debt
+        known_debt.record(a.id, {a.code: a.count}, a.reason, a.owner_approved)
     elif a.cmd == "pin":
         cmd_pin(a.id, not a.unpin)
     elif a.cmd == "gate":
