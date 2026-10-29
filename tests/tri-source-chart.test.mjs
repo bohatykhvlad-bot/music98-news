@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {TRI_METHOD,TRI_RULE,songIdentity,verifiedTriCandidates,
  verifiedTriSeed,rankTriCandidates,isTriChart} from "../functions/lib/tri-source-chart.js";
+import {dampOrder,DAMP_ALPHA} from "../functions/lib/chart-smoothing.js";
 
 const day=new Date().toISOString().slice(0,10);
 const id=n=>String(n+1).padStart(22,"0");
@@ -42,6 +43,50 @@ test("all 50 ranked entries have verified Spotify numbers and bounded source poi
  assert.ok(found.tracks.every(t=>t.appleGlobalPoints>=0&&t.appleGlobalPoints<=30));
  assert.ok(found.tracks.every(t=>t.spotifyPoints>=0&&t.spotifyPoints<=30));
  assert.deepEqual(new Set(found.tracks.map(t=>songIdentity(t.title,t.artist))).size,50);
+});
+test("a damped edition publishes the half-way position and the verifier recomputes it",()=>{
+ const rows=fixtures(),rank=rankTriCandidates(rows,day);
+ const scoreOrder=rank.tracks.map(t=>songIdentity(t.title,t.artist));
+ // Yesterday: a realistic day - five songs swapped places.
+ const previousOrder=scoreOrder.slice();
+ [3,11,19,27,35].forEach(i=>{const j=i+1;[previousOrder[i],previousOrder[j]]=[previousOrder[j],previousOrder[i]];});
+ const damped=dampOrder(scoreOrder,previousOrder,DAMP_ALPHA,50);
+ assert.equal(damped.length,50);
+ const byKey=new Map(rank.tracks.map(t=>[songIdentity(t.title,t.artist),t]));
+ const tracks=damped.map((key,i)=>({...byKey.get(key),rank:i+1,scoreRank:scoreOrder.indexOf(key)+1}));
+ const chart={methodology:TRI_METHOD,consensus:TRI_RULE,complete:true,
+  sources:{U:100,A:100,S:200},sourceDates:{U:day,A:day,S:day},
+  spotifyFingerprint:"a".repeat(64),scoring:{maxDaily:rank.maxDaily},
+  damping:{alpha:DAMP_ALPHA,previousOrder},tracks};
+ assert.ok(isTriChart(chart));
+ // The published order is the damped one, not the score order.
+ assert.notDeepEqual(tracks.map(t=>songIdentity(t.title,t.artist)),scoreOrder);
+ // A song that moved further than the rule allows is rejected.
+ const tampered=structuredClone(chart);
+ tampered.tracks[0].rank=1;tampered.tracks[49].rank=1;
+ assert.equal(isTriChart(tampered),false);
+ // The damping record is part of the edition: removing it must not pass.
+ const unrecorded=structuredClone(chart);delete unrecorded.damping;
+ assert.equal(isTriChart(unrecorded),false);
+});
+test("the damped edition moves the chart less than the score order would",()=>{
+ const target=Array.from({length:50},(_,i)=>"song "+i);
+ // Yesterday: a realistic day - a handful of songs swapped places.
+ const previous=target.slice();
+ [3,11,19,27,35].forEach(i=>{const j=i+1;[previous[i],previous[j]]=[previous[j],previous[i]];});
+ const movement=order=>order.reduce((sum,key,i)=>sum+Math.abs(i-previous.indexOf(key)),0);
+ const damped=dampOrder(target,previous,0.5,50);
+ assert.equal(damped.length,50);
+ assert.equal(new Set(damped).size,50);
+ assert.ok(movement(damped)<movement(target),
+  "the damped order must jump less than the score order");
+ // Every song keeps at most half of its distance, plus the room the songs
+ // that asked for the same place needed.
+ for(const key of target){
+  const was=previous.indexOf(key)+1,now=damped.indexOf(key)+1;
+  const half=Math.ceil(Math.abs((target.indexOf(key)+1)-was)/2);
+  assert.ok(Math.abs(now-was)<=half+2,key+" moved too far");
+ }
 });
 test("Spotify-only songs can enter even when absent from Apple USA and Global",()=>{
  const isolated=Array.from({length:300},(_,i)=>({

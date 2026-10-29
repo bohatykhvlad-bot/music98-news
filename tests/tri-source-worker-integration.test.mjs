@@ -53,6 +53,37 @@ async function runWithNetworkDown(work){
  finally{globalThis.fetch=original;}
 }
 const req=url=>new Request(url||"https://music98.news/api/top50");
+test("the next edition keeps its places halfway and still passes the verifier",async()=>{
+ const f=setup();
+ await runWithNetworkDown(async()=>{
+  const first=await (await onRequestGet({env:f.env,request:req()})).json();
+  assert.ok(isTriChart(first));
+  /* The first edition is damped against the edition that was recovered, so the
+     chart catches up over days instead of jumping in one. */
+  assert.ok(first.damping);
+  // The next edition sees different streams, so the score order is different.
+  const seed=f.assets["apple-spotify-streams.json"];
+  /* One song overtakes the one above it: the score order changes by one place. */
+  seed.fingerprint="b".repeat(64);
+  seed.tracks=seed.tracks.map((t,i)=>({...t,spotify:{...t.spotify,
+   daily:i===9?2990000:t.spotify.daily}}));
+  const second=await (await onRequestGet({env:f.env,request:req()})).json();
+  assert.ok(isTriChart(second));
+  assert.ok(second.damping,"the edition must record the damping it used");
+  assert.equal(second.damping.alpha,0.5);
+  assert.deepEqual(second.damping.previousOrder,first.tracks.map(t=>mergeKey(t.title,t.artist)),
+  "the edition must be damped against the order that was published before it");
+  const scoreOrder=[...second.tracks].sort((a,b)=>a.scoreRank-b.scoreRank)
+   .map(t=>mergeKey(t.title,t.artist));
+  const published=second.tracks.map(t=>mergeKey(t.title,t.artist));
+  const previous=first.tracks.map(t=>mergeKey(t.title,t.artist));
+  assert.notDeepEqual(published,scoreOrder,"the published order must not be the score order");
+  for(const key of published){
+   const was=previous.indexOf(key)+1,now=published.indexOf(key)+1,target=scoreOrder.indexOf(key)+1;
+   assert.ok(Math.abs(now-was)<=Math.ceil(Math.abs(target-was)/2)+2,key+" moved too far");
+  }
+ });
+});
 test("Worker publishes complete 40/30/30 chart with 50 real daily Spotify stream counts",async()=>{
  const f=setup();
  await runWithNetworkDown(async()=>{

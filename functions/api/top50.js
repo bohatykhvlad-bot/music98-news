@@ -7,6 +7,7 @@ import {hasCompleteChartArtwork as completeArtwork,isTrustedChartArtwork,missing
 import {discoverAppleAlbumTracks} from "../lib/apple-album-discovery.js";
 import {candidateCompatible,isDerivativeRelease,isGenericRelease,rankArtworkCandidates} from "../lib/artwork-resolver.js";
 import {DAILY_SOURCE_DETAILS,isVerifiedChartEdition,verifiedDailySeed,verifiedTenureEdition} from "../lib/daily-chart-sources.js";
+import {DAMP_ALPHA,dampOrder} from "../lib/chart-smoothing.js";
 
 const SIZE = 50;
 const LAUNCH = Date.UTC(2026, 8, 17);
@@ -409,7 +410,7 @@ function tenureResetEvidence(tracks, ten, seen, firstDay, prior) {
   };
 }
 
-async function applyTenure(env, tracks, diag, origin) {
+async function applyTenure(env, tracks, diag, origin, dampingAlpha = 0) {
   const week = chartWeek();
   let ten = { launch: "2026-09-17", epoch: "daily", week: -1, keys: [], seen: {} };
   let firstDay = {};
@@ -455,6 +456,24 @@ async function applyTenure(env, tracks, diag, origin) {
     const cut = String(k).indexOf("|");
     return cut < 0 ? k : (isVersionedMergeKey(k) ? k : tenureKey(k.slice(0, cut), k.slice(cut + 1)));
   });
+
+  /* The score is rebuilt every day, so a song can fall many places in one
+     edition. The published position is damped: half of the way today, the
+     rest tomorrow. New songs keep their computed place. */
+  if (dampingAlpha > 0 && prevKeys.length) {
+    const targetKeys = tracks.map(t => tenureKey(t.title, t.artist));
+    const damped = dampOrder(targetKeys, prevKeys, dampingAlpha, tracks.length);
+    if (damped) {
+      const byKey = new Map(tracks.map(t => [tenureKey(t.title, t.artist), t]));
+      tracks.forEach((t, i) => { t.scoreRank = i + 1; });
+      const reordered = damped.map(key => byKey.get(key)).filter(Boolean);
+      if (reordered.length === tracks.length) {
+        tracks = reordered;
+        tracks.forEach((t, i) => { t.rank = i + 1; });
+        if (diag) diag.damping = { alpha: dampingAlpha, previousOrder: prevKeys.slice() };
+      }
+    }
+  }
 
   let ever = normalizeEver(everStored);
   if (recovery.prior) {
@@ -897,6 +916,7 @@ async function verifiedBackupTop50(env, origin, backup) {
     const prev = known.get(tenureKey(t.title,t.artist)) || {};
     return {
       rank: i+1, title: t.title, artist: t.artist,
+      scoreRank:Number(t.scoreRank)||i+1,
       sourceRanks: {...t.sourceRanks}, spotify:t.spotify, score:t.score, applePoints:t.applePoints, spotifyBonus:t.spotifyBonus,
       appleUsPoints:t.appleUsPoints,appleGlobalPoints:t.appleGlobalPoints,spotifyPoints:t.spotifyPoints,
       weeks: Math.max(1, Number(t.weeks) || 1), delta: String(t.delta ?? "0"),
@@ -911,6 +931,7 @@ async function verifiedBackupTop50(env, origin, backup) {
     updated: snap.updated, launch:"2026-09-17", week:Number(snap.week)+1,
     rev:"apple-spotify-backup-v39", methodology:snap.methodology, consensus:snap.consensus,
     sourceDetails:snap.sourceDetails||DAILY_SOURCE_DETAILS, fallback:"verified-snapshot", complete:true,
+    ...(snap.damping?{damping:snap.damping}:{}),
     sources:snap.sources,scoring:snap.scoring,sourceDates:snap.sourceDates||{},
     sourceDateKinds:snap.sourceDateKinds||{}, spotifyFingerprint:snap.spotifyFingerprint,
     sourceOrigin:snap.sourceOrigin||{}, tracks,
@@ -1125,7 +1146,9 @@ export async function onRequestGet({env,request}) {
       throw new Error("incomplete_chart_artwork:"+JSON.stringify(missingChartArtwork(payload.tracks,payload.tracks.length).slice(0,8)));
     payload.seedEdition=seedEdition;
     const memory={deferPersist:true};
-    payload.tracks=await applyTenure(env,payload.tracks,memory,origin);
+    payload.tracks=await applyTenure(env,payload.tracks,memory,origin,
+      payload.methodology===TRI_METHOD?DAMP_ALPHA:0);
+    if(memory.damping)payload.damping=memory.damping;
     payload.arrows=arrowCheck(payload.tracks,memory.refLen || SIZE);
     if(payload.arrows?.ok===false || cachedTenureRegressed(payload,backup))
       throw new Error("failed_chart_tenure_checks");

@@ -1,5 +1,6 @@
 import {mergeKey,versionSignature} from "./chart-identity.js";
 import {artistKey,titleKey,freshDay} from "./apple-spotify-chart.js";
+import {dampOrder} from "./chart-smoothing.js";
 import {spotifyProviderByMetric} from "./spotify-chart.js";
 
 export const TRI_METHOD="apple-us40-spotify30-global30-v3";
@@ -115,12 +116,35 @@ export function isTriChart(j){
    !sourceRankValid(t.sourceRanks?.S,200)))return false;
  const cap=j.scoring?.maxDaily;
  if(!Number.isSafeInteger(cap)||cap<1)return false;
- return j.tracks.every((t,i)=>{
-  if(t.rank!==i+1||t.spotify.daily>cap)return false;
+ const scoreOf=t=>{
   const us=t.sourceRanks.U===null?0:40*(101-t.sourceRanks.U)/100;
   const global=t.sourceRanks.A===null?0:30*(101-t.sourceRanks.A)/100;
   const spotify=30*Math.sqrt(t.spotify.daily/cap);
-  return Math.abs(t.score-(us+global+spotify))<1e-8 &&
-   (i===0||j.tracks[i-1].score>=t.score-1e-8);
+  return us+global+spotify;
+ };
+ /* A damped edition publishes a position that is only part of the way to the
+    score order, so the edition carries the score order and the previous one.
+    Both are recomputed here: the published order must be exactly the damped
+    order of those two inputs, and the score of every row must still be the
+    score the sources give it. Without a damping record the published order
+    must be the score order itself. */
+ if(j.damping){
+  const byScore=j.tracks.map(t=>({t,score:scoreOf(t)}))
+   .sort((a,b)=>(Number(a.t.scoreRank)||0)-(Number(b.t.scoreRank)||0));
+  if(byScore.some((x,i)=>Number(x.t.scoreRank)!==i+1))return false;
+  for(let i=1;i<byScore.length;i++)if(byScore[i-1].score<byScore[i].score-1e-8)return false;
+  /* The previous order is stored the way the chart keys its songs, so the
+     same key is used here. */
+  const expected=dampOrder(byScore.map(x=>mergeKey(x.t.title,x.t.artist)),
+   j.damping.previousOrder,j.damping.alpha,j.tracks.length);
+  if(!expected)return false;
+  const published=j.tracks.map(t=>mergeKey(t.title,t.artist));
+  if(expected.some((key,i)=>key!==published[i]))return false;
+ }
+ return j.tracks.every((t,i)=>{
+  if(t.rank!==i+1||t.spotify.daily>cap)return false;
+  if(Math.abs(t.score-scoreOf(t))>=1e-8)return false;
+  if(j.damping)return true;
+  return i===0||j.tracks[i-1].score>=t.score-1e-8;
  });
 }
