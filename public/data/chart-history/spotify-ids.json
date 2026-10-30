@@ -613,6 +613,62 @@
       "subtitle": "Taylor Swift",
       "resolvedAt": "2026-10-17T16:40:46.254Z",
       "matchedFrom": "original-title-search"
+    },
+    "solareclipse|drake": {
+      "id": "4IAWZw00ZI9DLKDjesx86u",
+      "name": "Solar Eclipse (feat. Don Toliver)",
+      "subtitle": "Drake, Don Toliver",
+      "resolvedAt": "2026-10-30T21:42:12.347Z",
+      "matchedFrom": "original-title-search"
+    },
+    "thriller7~v:edit|michaeljackson": {
+      "id": "3VKj7hHHi8pJJ4mHDzZC4Q",
+      "name": "Thriller 7\" - Special Edit",
+      "subtitle": "Michael Jackson",
+      "resolvedAt": "2026-10-30T21:42:16.512Z",
+      "matchedFrom": "original-title-search"
+    },
+    "thinice|megantheestallion": {
+      "id": "30kdhH71QYFC1WBBz89chu",
+      "name": "Thin Ice",
+      "subtitle": "Megan Thee Stallion",
+      "resolvedAt": "2026-10-30T21:42:25.934Z",
+      "matchedFrom": "original-title-search"
+    },
+    "lodiwhen|zachbryan": {
+      "id": "1mzJsnHWXIthrJQKwe8Yci",
+      "name": "Lodi When",
+      "subtitle": "Zach Bryan",
+      "resolvedAt": "2026-10-30T21:44:55.882Z",
+      "matchedFrom": "original-title-search"
+    },
+    "ghostbusters|rayparkerjr": {
+      "id": "3m0y8qLoznUYi73SUBP8GI",
+      "name": "Ghostbusters",
+      "subtitle": "Ray Parker Jr.",
+      "resolvedAt": "2026-10-30T21:45:16.115Z",
+      "matchedFrom": "original-title-search"
+    },
+    "nothing|stevelacy": {
+      "id": "3lIHa4fUwNKOCSS5k3Za0i",
+      "name": "nothing",
+      "subtitle": "Steve Lacy",
+      "resolvedAt": "2026-10-30T21:46:09.253Z",
+      "matchedFrom": "original-title-search"
+    },
+    "billiejean~v:version|michaeljackson": {
+      "id": "1euuAfFtkRzJy489azxfLC",
+      "name": "Billie Jean - Long Version",
+      "subtitle": "Michael Jackson",
+      "resolvedAt": "2026-10-30T21:46:48.424Z",
+      "matchedFrom": "original-title-search"
+    },
+    "perfect|edsheeran": {
+      "id": "0tgVpDi06FyKpA1z0VMD4v",
+      "name": "Perfect",
+      "subtitle": "Ed Sheeran",
+      "resolvedAt": "2026-10-30T21:47:03.073Z",
+      "matchedFrom": "original-title-search"
     }
   }
 }
